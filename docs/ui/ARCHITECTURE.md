@@ -81,7 +81,7 @@ sequenceDiagram
     participant U as 用户
     participant WEB as 前端 :3000
     participant AXIOS as Axios 拦截器
-    participant GW as API Gateway :8080
+    participant GW as API Gateway :18080
     participant SVC as 后端服务 :18081-18088
     participant REDIS as Redis :6379
     participant DB as MySQL :3306
@@ -91,7 +91,7 @@ sequenceDiagram
     AXIOS->>AXIOS: 从 Pinia 读取 JWT Token
     AXIOS->>AXIOS: Authorization: Bearer <token>
     AXIOS->>WEB: 附带头部，发往 :3000
-    WEB->>GW: Vite Proxy → :8080
+    WEB->>GW: Vite Proxy → :18080
     GW->>GW: JWT 校验过滤器
     GW->>SVC: 路由到目标服务
     SVC->>SVC: 业务逻辑
@@ -141,7 +141,7 @@ graph LR
     end
 
     subgraph Clients["消费方"]
-        GW["API Gateway\n:8080"]
+        GW["API Gateway\n:18080"]
         WEB["前端\n:3000"]
     end
 
