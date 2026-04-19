@@ -45,7 +45,7 @@ ManpouChinaSystem/
 ├── scripts/                  # 构建与初始化脚本
 ├── .github/workflows/       # CI/CD 流水线
 └── docs/
-    ├── pro/                 # 各项目专属文档（本目录，12-17 服务/基础设施）
+    ├── pro/                 # 各项目专属文档（本目录，12-17 基础设施/服务）
     ├── ui/                  # 前端 UI 文档 + 架构图
     ├── desigin/            # 构建指南（Step 1-6）
     └── role/               # 角色视角分析（6 角色）
@@ -192,6 +192,7 @@ docker-compose -f docker-compose.yml up -d
 | 14 | 监控告警 | `monitoring/` |
 | 15 | CI/CD | `.github/workflows/` + `scripts/` |
 | 16 | 配置中心 | `config/nacos/` + `config/checkstyle/` |
+| 17 | 可插拔基础设施 | Docker 可选接入，代码不依赖容器存在 |
 
 ---
 
