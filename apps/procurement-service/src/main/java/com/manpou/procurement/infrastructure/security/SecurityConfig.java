@@ -39,7 +39,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/**").permitAll()       // 登录接口
                 .requestMatchers("/actuator/health").permitAll()     // 健康检查
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()  // API 文档
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/swagger-ui/index.html", "/v3/api-docs/**", "/doc.html").permitAll()  // API 文档
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")  // 管理员接口
                 .anyRequest().authenticated()                         // 其他需认证
             )
