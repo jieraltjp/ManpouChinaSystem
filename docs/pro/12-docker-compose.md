@@ -115,7 +115,7 @@ docker/
 
 | 文档 | 说明 |
 |------|------|
-| `docs/pro/14-helm-k8s.md` | K8s 生产部署（Helm） |
-| `docs/pro/15-monitoring.md` | 监控告警配置 |
+| `docs/pro/13-helm-k8s.md` | K8s 生产部署（Helm） |
+| `docs/pro/14-monitoring.md` | 监控告警配置 |
 | `docs/pro/16-config-center.md` | Nacos 配置中心 |
 | `docs/pro/00-root-project.md` | 项目全局概览 |

@@ -158,6 +158,6 @@ monitoring/
 
 | 文档 | 说明 |
 |------|------|
-| `docs/pro/13-docker-compose.md` | 监控栈启动方式 |
-| `docs/pro/14-helm-k8s.md` | K8s 部署中的 Prometheus Operator |
+| `docs/pro/12-docker-compose.md` | 监控栈启动方式 |
+| `docs/pro/13-helm-k8s.md` | K8s 部署中的 Prometheus Operator |
 | `docs/pro/00-root-project.md` | 项目全局概览 |

@@ -12,7 +12,7 @@
 代码提交 (main)
       ↓
 GitHub Actions CI (.github/workflows/ci.yaml)
-      ↓ 检查：编译 + 单元测试 + ArchUnit + Checkstyle + Sonar
+      ↓ 检查：编译 + 单元测试 + ArchUnit + Checkstyle
       ↓
 代码审查 + Merge
       ↓
@@ -61,15 +61,6 @@ Helm 部署 → Kubernetes 集群
 | `smoke-test` | 冒烟测试 | `curl` 健康检查 |
 | `deploy-prod` | 部署生产 | 手动确认后部署（需 GitHub Environments approval） |
 
-### 部署目标
-
-```bash
-helm upgrade --install <service> ./infra/helm/java-service \
-  --namespace manpou-staging \
-  --set image.tag=${GITHUB_SHA} \
-  --wait --timeout 5m
-```
-
 ---
 
 ## 4. 环境变量（Secrets）
@@ -111,8 +102,6 @@ docker build -t manpou/java-service:$1 apps/java-service
 
 ```bash
 #!/bin/bash
-# 将 config/nacos/ 下的配置推送到 Nacos
-
 NACOS_ADDR="http://localhost:8848"
 NACOS_USER="nacos"
 NACOS_PASS="nacos"
@@ -129,7 +118,7 @@ done
 ## 6. 版本号策略
 
 ```
-镜像标签 = ${GITHUB_SHA:0:7}  # Git 提交 SHA 前 7 位
+镜像标签 = ${GITHUB_SHA:0:7}
 Helm Chart 版本 = 语义化版本 (SemVer)
 App 版本 = ${revision} (来自 pom.xml)
 ```
@@ -152,7 +141,7 @@ App 版本 = ${revision} (来自 pom.xml)
 ```
 .github/workflows/
 ├── ci.yaml    # CI：编译 + 测试 + Checkstyle + Sonar
-└── cd.yml     # CD：镜像构建 + Helm 部署
+└── cd.yml    # CD：镜像构建 + Helm 部署
 
 scripts/
 ├── build-all.sh     # 全量构建脚本
@@ -165,7 +154,7 @@ scripts/
 
 | 文档 | 说明 |
 |------|------|
-| `docs/pro/14-helm-k8s.md` | Helm 部署配置 |
-| `docs/pro/16-config-center.md` | Nacos 配置中心 |
-| `docs/pro/13-docker-compose.md` | Docker 开发环境 |
+| `docs/pro/13-helm-k8s.md` | Helm 部署配置 |
+| `docs/pro/14-monitoring.md` | 监控告警 |
+| `docs/pro/12-docker-compose.md` | Docker 开发环境 |
 | `docs/pro/00-root-project.md` | 项目全局概览 |

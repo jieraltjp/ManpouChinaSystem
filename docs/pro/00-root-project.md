@@ -186,13 +186,12 @@ docker-compose -f docker-compose.yml up -d
 | 08 | finance-service | `apps/finance-service/` |
 | 09 | notification-service | `apps/notification-service/` |
 | 10 | web 前端 + UI 文档 | `apps/web/` |
-| 11 | —（预留） | — |
-| 12 | API Gateway | `scaffolds/api-gateway/` |
-| 13 | Docker Compose | `docker/` |
-| 14 | Helm K8s | `infra/helm/` |
-| 15 | 监控告警 | `monitoring/` |
-| 16 | CI/CD | `.github/workflows/` + `scripts/` |
-| 17 | 配置中心 | `config/nacos/` + `config/checkstyle/` |
+| 11 | API Gateway | `apps/api-gateway/` |
+| 12 | Docker Compose | `docker/` |
+| 13 | Helm K8s | `infra/helm/` |
+| 14 | 监控告警 | `monitoring/` |
+| 15 | CI/CD | `.github/workflows/` + `scripts/` |
+| 16 | 配置中心 | `config/nacos/` + `config/checkstyle/` |
 
 ---
 

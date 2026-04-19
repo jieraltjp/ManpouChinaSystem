@@ -150,6 +150,6 @@ config/
 | 文档 | 说明 |
 |------|------|
 | `docs/pro/00-root-project.md` | 项目全局概览 |
-| `docs/pro/13-docker-compose.md` | Nacos 启动方式 |
-| `docs/pro/16-ci-cd.md` | CI 中的 Checkstyle 检查 |
+| `docs/pro/12-docker-compose.md` | Nacos 启动方式 |
+| `docs/pro/15-ci-cd.md` | CI 中的 Checkstyle 检查 |
 | `docs/role/04-后端开发工程师视角分析.md` | 开发规范 |

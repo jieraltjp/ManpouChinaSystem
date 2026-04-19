@@ -143,6 +143,6 @@ spring.cloud.nacos.config.enabled: true
 
 | 文档 | 说明 |
 |------|------|
-| `docs/pro/13-docker-compose.md` | 本地开发环境（Docker Compose） |
-| `docs/pro/15-monitoring.md` | 监控告警配置 |
+| `docs/pro/12-docker-compose.md` | 本地开发环境（Docker Compose） |
+| `docs/pro/14-monitoring.md` | 监控告警配置 |
 | `docs/pro/00-root-project.md` | 项目全局概览 |
