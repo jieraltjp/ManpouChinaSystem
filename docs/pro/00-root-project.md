@@ -32,7 +32,7 @@ ManpouChinaSystem/
 │   ├── finance-service/       # 财务管理（端口 18087）
 │   ├── notification-service/  # 通知服务（端口 18088）
 │   ├── api-gateway/         # API 网关（端口 18080）
-│   └── web/                  # 前端（端口 3000）
+│   └── web/                  # 前端（端口 13000）
 ├── scaffolds/
 │   └── api-gateway/          # API 网关脚手架（已迁移至 apps/）
 ├── infra/
@@ -88,7 +88,7 @@ ManpouChinaSystem/
 | logistics-service | 18086 | /api/v1 |
 | finance-service | 18087 | /api/v1 |
 | notification-service | 18088 | /api/v1 |
-| web（前端） | 3000 | / |
+| web（前端） | 13000 | / |
 | Nacos | 8848 | /nacos |
 | Kafka | 9092 | - |
 | Kafka UI | 8080 | - |
@@ -161,7 +161,7 @@ docker-compose -f docker-compose.yml up -d
 
 | 资源 | 地址 |
 |------|------|
-| 前端 | http://localhost:3000 |
+| 前端 | http://localhost:13000 |
 | Swagger UI（procurement） | http://localhost:18083/swagger-ui/index.html |
 | Swagger UI（user） | http://localhost:18081/swagger-ui/index.html |
 | Nacos（需 Docker） | http://localhost:8848/nacos |

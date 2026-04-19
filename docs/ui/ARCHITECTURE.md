@@ -10,7 +10,7 @@
 graph TB
     %% 前端层
     subgraph Frontend["前端层 (apps/web)"]
-        WEB["Vue 3 + Vite\nlocalhost:3000"]
+        WEB["Vue 3 + Vite\nlocalhost:13000"]
         ROUTER["Vue Router\n路由守卫"]
         STORE["Pinia Store\n认证状态"]
         AXIOS["Axios\nJWT 注入 + 拦截"]
@@ -50,7 +50,7 @@ graph TB
     %% 数据流
     WEB -->|"GET /api/*"| ROUTER
     ROUTER -->|"JWT Token"| AXIOS
-    AXIOS -->|"proxy :3000→18080"| GW
+    AXIOS -->|"proxy :13000→18080"| GW
 
     GW -->|"路由分发"| USER
     GW -->|"路由分发"| PRODUCT
@@ -79,7 +79,7 @@ graph TB
 ```mermaid
 sequenceDiagram
     participant U as 用户
-    participant WEB as 前端 :3000
+    participant WEB as 前端 :13000
     participant AXIOS as Axios 拦截器
     participant GW as API Gateway :18080
     participant SVC as 后端服务 :18081-18088
@@ -90,7 +90,7 @@ sequenceDiagram
     WEB->>AXIOS: 发起请求 /api/v1/xxx
     AXIOS->>AXIOS: 从 Pinia 读取 JWT Token
     AXIOS->>AXIOS: Authorization: Bearer <token>
-    AXIOS->>WEB: 附带头部，发往 :3000
+    AXIOS->>WEB: 附带头部，发往 :13000
     WEB->>GW: Vite Proxy → :18080
     GW->>GW: JWT 校验过滤器
     GW->>SVC: 路由到目标服务
@@ -142,7 +142,7 @@ graph LR
 
     subgraph Clients["消费方"]
         GW["API Gateway\n:18080"]
-        WEB["前端\n:3000"]
+        WEB["前端\n:13000"]
     end
 
     GW --> P81

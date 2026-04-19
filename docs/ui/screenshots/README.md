@@ -28,5 +28,5 @@
 1. 启动前端：`cd apps/web && npm run dev`
 2. 启动后端：`mvn spring-boot:run`（user-service + procurement-service）
 3. 启动网关：`mvn spring-boot:run`（api-gateway，端口 18080）
-4. 访问 http://localhost:3000，逐页面截图
+4. 访问 http://localhost:13000，逐页面截图
 5. 将截图放入本目录，命名为上表中的文件名

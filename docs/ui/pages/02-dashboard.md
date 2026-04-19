@@ -47,7 +47,7 @@
 | 侧边栏展开 | `docs/ui/screenshots/layout-sidebar-expanded.png` |
 | 侧边栏收起 | `docs/ui/screenshots/layout-sidebar-collapsed.png` |
 
-> **如何截图**：启动前端后访问 `http://localhost:3000/dashboard`，登录后截取。
+> **如何截图**：启动前端后访问 `http://localhost:13000/dashboard`，登录后截取。
 
 ---
 
@@ -131,8 +131,8 @@ auth.claims = {
   roles: ["admin"],
   permissions: ["example:read"],
   tenantId: "manpou",
-  iat: 1713000000,   // Issued At
-  exp: 1713000900,   // Expires (15min 后)
+  iat: 17113000000,   // Issued At
+  exp: 17113000900,   // Expires (15min 后)
 }
 ```
 

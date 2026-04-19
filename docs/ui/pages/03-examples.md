@@ -43,7 +43,7 @@
 |------|------|
 | 页面截图 | `docs/ui/screenshots/03-examples.png` |
 
-> **如何截图**：启动前端后访问 `http://localhost:3000/examples`，登录后截取。
+> **如何截图**：启动前端后访问 `http://localhost:13000/examples`，登录后截取。
 
 ---
 

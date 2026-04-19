@@ -51,7 +51,7 @@
 |------|------|
 | 页面截图 | `docs/ui/screenshots/04-procurement.png` |
 
-> **如何截图**：启动前端后访问 `http://localhost:3000/test`，登录后截取。
+> **如何截图**：启动前端后访问 `http://localhost:13000/test`，登录后截取。
 
 ---
 

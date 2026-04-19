@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `user` (...);
 
 | 服务 | 地址 | 默认凭证 |
 |------|------|---------|
-| 前端（通过网关） | http://localhost:3000 | — |
+| 前端（通过网关） | http://localhost:13000 | — |
 | Nacos | http://localhost:8848/nacos | nacos/nacos |
 | Kafka UI | http://localhost:8080 | — |
 | MinIO Console | http://localhost:9001 | minioadmin/minioadmin |

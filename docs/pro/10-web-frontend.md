@@ -10,7 +10,7 @@
 | 维度 | 说明 |
 |------|------|
 | 项目名 | `@manpou/web` |
-| 端口 | 3000（开发） |
+| 端口 | 13000（开发） |
 | 包名 | `@manpou/web` |
 | 描述 | Vue 3 + TypeScript + Element Plus 管理后台前端 |
 | 当前状态 | 脚手架 ✅，页面待开发 |
@@ -155,7 +155,7 @@ cd apps/web
 npm install
 
 # 开发模式
-npm run dev    # http://localhost:3000
+npm run dev    # http://localhost:13000
 
 # 类型检查
 npm run type-check

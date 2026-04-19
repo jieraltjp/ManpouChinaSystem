@@ -41,7 +41,7 @@
 | 页面截图 | `docs/ui/screenshots/01-login.png` |
 | 设计稿（若有） | — |
 
-> **如何截图**：启动前端后访问 `http://localhost:3000/login`，截取完整浏览器窗口。
+> **如何截图**：启动前端后访问 `http://localhost:13000/login`，截取完整浏览器窗口。
 
 ---
 

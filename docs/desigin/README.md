@@ -64,7 +64,7 @@ ManpouChinaSystem
 │   ├── logistics-service/      # 物流管理 (18086)
 │   ├── finance-service/        # 财务管理 (18087)
 │   ├── notification-service/  # 通知服务 (18088)
-│   └── web/                   # Vue 3 前端 (3000)
+│   └── web/                   # Vue 3 前端 (13000)
 ├── docs/
 │   ├── desigin/               # 构建指南
 │   ├── pro/                   # 项目专属文档（每服务一篇）
@@ -108,7 +108,7 @@ ManpouChinaSystem
 | logistics-service | 18086 | 物流管理 |
 | finance-service | 18087 | 财务管理 |
 | notification-service | 18088 | 通知推送 |
-| web（前端） | 3000 | Vite dev server |
+| web（前端） | 13000 | Vite dev server |
 
 ---
 
