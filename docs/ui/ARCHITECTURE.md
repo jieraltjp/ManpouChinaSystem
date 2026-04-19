@@ -17,8 +17,8 @@ graph TB
     end
 
     %% 网关层（待实现）
-    subgraph Gateway["API 网关层 (scaffolds/api-gateway)"]
-        GW["Spring Cloud Gateway\n:8080"]
+    subgraph Gateway["API 网关层 (apps/api-gateway)"]
+        GW["Spring Cloud Gateway\n:18080"]
         JWT_FILTER["JWT 校验过滤器"]
         RATE_LIMIT["限流过滤器"]
         TRACE["Trace ID 过滤器"]

@@ -73,7 +73,7 @@ ManpouChinaSystem
 ├── docker/                    # Docker Compose
 ├── infra/helm/                 # K8s Helm 模板
 ├── monitoring/                 # 监控告警
-└── scaffolds/                 # 脚手架（codegen / api-gateway）
+└── scaffolds/                 # 脚手架模板（api-gateway 已迁移至 apps/）
 ```
 
 ---
