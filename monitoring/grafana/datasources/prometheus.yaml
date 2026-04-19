@@ -1,0 +1,27 @@
+# Grafana Datasource 配置（通过 provisioning 自动加载）
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    uid: prometheus-uid
+    jsonData:
+      httpMethod: POST
+      timeInterval: 15s
+
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    editable: false
+    uid: tempo-uid
+    jsonData:
+      httpMethod: GET
+      tracesToLogs:
+        datasourceUid: Loki  # 关联日志（按需启用）
+      serviceMap:
+        datasourceUid: prometheus-uid

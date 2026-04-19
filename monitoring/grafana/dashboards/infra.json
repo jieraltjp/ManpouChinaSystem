@@ -1,0 +1,100 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "TiDB CPU 使用率",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total[5m])",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "max": 1,
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.7 },
+              { "color": "red", "value": 0.85 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "TiDB QPS",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(tidb_query_total[1m])",
+          "legendFormat": "{{type}}"
+        }
+      ]
+    },
+    {
+      "title": "Redis 内存使用",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 6 },
+      "targets": [
+        {
+          "expr": "redis_memory_used_bytes / redis_memory_max_bytes",
+          "legendFormat": "内存使用"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "max": 1,
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.75 },
+              { "color": "red", "value": 0.9 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Kafka 消息堆积",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 6 },
+      "targets": [
+        {
+          "expr": "kafka_consumer_records_lag_max",
+          "legendFormat": "{{topic}}-p{{partition}}"
+        }
+      ]
+    },
+    {
+      "title": "MinIO 存储使用",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 6 },
+      "targets": [
+        {
+          "expr": "minio_disk_storage_used_bytes / minio_disk_storage_total_bytes",
+          "legendFormat": "存储使用"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["infrastructure"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "title": "基础设施监控面板",
+  "uid": "infrastructure",
+  "version": 1
+}

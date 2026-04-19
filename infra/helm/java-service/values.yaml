@@ -1,0 +1,216 @@
+# ============================================================
+# java-service Helm Chart - 默认配置
+# 用法：helm upgrade --install java-service ./infra/helm/java-service -f values-prod.yaml -n production
+# ============================================================
+
+# ----- 全局配置 -----
+global:
+  imageRegistry: "ghcr.io"
+  imagePullSecrets: []
+  storageClass: ""
+
+# ----- 服务基本信息 -----
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 2
+
+# ----- 镜像配置 -----
+image:
+  repository: company/java-service
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# ----- 镜像拉取凭证 -----
+imagePullSecrets: []
+# - name: ghcr-secret
+
+# ----- 服务账号 -----
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# ----- 策略配置 -----
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+  # maxUnavailable: 1
+
+# ----- 安全上下文 -----
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# ----- 服务配置（从 ConfigMap 注入） -----
+env:
+  # Java 运行时
+  JAVA_OPTS: "-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Djava.security.egd=file:/dev/./urandom"
+  SERVER_PORT: "8080"
+  APP_NAME: "java-service"
+
+  # Spring Profile
+  SPRING_PROFILES_ACTIVE: "prod"
+
+  # Nacos
+  NACOS_SERVER: "nacos.production.svc.cluster.local:8848"
+  NACOS_NAMESPACE: "prod"
+
+  # 数据库（通过 ESO Secret 注入，不在此配置）
+  # DB_TYPE: "mysql"
+  # DB_NAME: "appdb"
+
+  # Redis
+  REDIS_HOST: "redis.production.svc.cluster.local"
+  REDIS_PORT: "6379"
+
+  # Kafka
+  KAFKA_BOOTSTRAP_SERVERS: "kafka.production.svc.cluster.local:9092"
+
+# ----- 探针配置（必须） -----
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8080
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+  successThreshold: 1
+
+# ----- 资源限制（必须） -----
+resources:
+  limits:
+    cpu: "2000m"
+    memory: "2Gi"
+    ephemeral-storage: "500Mi"
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+    ephemeral-storage: "100Mi"
+
+# ----- 挂载配置 -----
+extraVolumeMounts:
+  - name: tmp
+    mountPath: /tmp
+  - name: cache
+    mountPath: /home/app/.cache
+
+extraVolumes:
+  - name: tmp
+    emptyDir:
+      medium: Memory
+      sizeLimit: 256Mi
+  - name: cache
+    emptyDir:
+      medium: Memory
+      sizeLimit: 256Mi
+
+# ----- Ingress 配置 -----
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    # 限流
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/limit-connections: "50"
+  hosts:
+    - host: api-service.company.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: api-service-tls
+      hosts:
+        - api-service.company.com
+
+# ----- Service 配置 -----
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+# ----- 滚动更新策略 -----
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+# ----- Pod Anti-Affinity（高可用） -----
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: java-service
+          topologyKey: kubernetes.io/hostname
+
+# ----- 节点亲和性 -----
+nodeSelector: {}
+
+tolerations: []
+
+# ----- 拓扑分布约束 -----
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: java-service
+
+# ----- Init Container（等待依赖服务） -----
+initContainers: []
+
+# ----- Sidecar（如 OTel Collector sidecar） -----
+sidecarContainers: []
+
+# ----- HPA 自动扩缩容（可选） -----
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+  # KEDA 指标（可选，配合 Kafka 消费 lag）
+  # behavior:
+  #   scaleDown:
+  #     stabilizationWindowSeconds: 300
+  #   scaleUp:
+  #     stabilizationWindowSeconds: 0
+
+# ----- 健康检查路径 -----
+health:
+  livenessPath: /actuator/health/liveness
+  readinessPath: /actuator/health/readiness
+  prometheusPath: /actuator/prometheus

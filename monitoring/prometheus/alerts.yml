@@ -1,0 +1,102 @@
+# ============================================================
+# Prometheus 告警规则
+# 部署路径：prometheus/alerts.yml
+# AlertManager 配置负责路由和通知
+# ============================================================
+
+groups:
+  - name: java-services
+    interval: 30s
+    rules:
+      # 服务宕机
+      - alert: ServiceDown
+        expr: up{job="java-services"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "服务 {{ $labels.instance }} 宕机"
+          description: "服务 {{ $labels.job }} 已离线超过 1 分钟"
+
+      # JVM 堆内存告警
+      - alert: HighJVMHeapUsage
+        expr: jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "JVM 堆内存使用率超过 85%"
+          description: "{{ $labels.job }} 堆内存使用率 {{ $value | humanizePercentage }}"
+
+      # HTTP 5xx 错误率
+      - alert: HighHTTP5xxErrorRate
+        expr: |
+          sum(rate(http_server_requests_seconds_count{job="java-services",status=~"5.."}[5m]))
+          / sum(rate(http_server_requests_seconds_count{job="java-services"}[5m])) > 0.01
+        for: 2m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "HTTP 5xx 错误率超过 1%"
+          description: "{{ $labels.job }} 当前错误率 {{ $value | humanizePercentage }}"
+
+      # 请求延迟 P99 超阈值
+      - alert: HighLatencyP99
+        expr: |
+          histogram_quantile(0.99,
+            rate(http_server_requests_seconds_bucket{job="java-services"}[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "P99 延迟超过 2 秒"
+          description: "{{ $labels.uri }} 当前 P99 延迟 {{ $value }}s"
+
+      # 数据库连接池耗尽
+      - alert: DatabasePoolExhausted
+        expr: hikaricp_connections_active / hikaricp_connections_max > 0.9
+        for: 3m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "数据库连接池使用率超过 90%"
+          description: "{{ $labels.pool_name }} 连接池即将耗尽"
+
+  - name: infrastructure
+    interval: 30s
+    rules:
+      # Redis 内存告警
+      - alert: HighRedisMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          team: ops
+        annotations:
+          summary: "Redis 内存使用率超过 85%"
+
+      # Kafka 消息堆积
+      - alert: KafkaConsumerLag
+        expr: kafka_consumer_records_lag_max > 10000
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Kafka Consumer Lag 超过 10000 条"
+          description: "Topic {{ $labels.topic }} Partition {{ $labels.partition }} 堆积严重"
+
+      # MinIO 存储告警
+      - alert: HighMinioStorageUsage
+        expr: minio_disk_storage_used_bytes / minio_disk_storage_total_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          team: ops
+        annotations:
+          summary: "MinIO 存储使用率超过 90%"

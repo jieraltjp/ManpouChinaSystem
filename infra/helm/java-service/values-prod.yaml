@@ -1,0 +1,50 @@
+# ============================================================
+# java-service - 生产环境配置覆盖
+# 用法：helm upgrade --install java-service ./infra/helm/java-service -f values-prod.yaml -n production
+# ============================================================
+
+replicaCount: 3
+
+image:
+  tag: "v1.0.0"  # 由 CI 自动更新
+
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+  JAVA_OPTS: "-Xms1024m -Xmx2048m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -Djava.security.egd=file:/dev/./urandom"
+
+resources:
+  limits:
+    cpu: "2000m"
+    memory: "2Gi"
+    ephemeral-storage: "1Gi"
+  requests:
+    cpu: "1000m"
+    memory: "1Gi"
+
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  initialDelaySeconds: 15
+  periodSeconds: 5
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 65
+
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/limit-rps: "500"
+    nginx.ingress.kubernetes.io/limit-connections: "200"
+
+externalSecrets:
+  enabled: true
+  secretStoreName: "vault-backend"
+  secretStoreKind: "ClusterSecretStore"
+
+serviceMonitor:
+  enabled: true

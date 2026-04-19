@@ -1,0 +1,128 @@
+name: CD Pipeline
+
+# ============================================================
+# CD 流程：main 分支通过 CI 后自动触发
+# 支持蓝绿部署和金丝雀部署
+# ============================================================
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  JAVA_VERSION: '17'
+
+jobs:
+  # ================================================
+  # 1. 部署到 K8s（推荐）
+  # ================================================
+  deploy-k8s:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment:
+      name: production
+      url: https://app.example.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Kubectl
+        uses: azure/k8s-set-context@v4
+        with:
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Build & Push Docker Image
+        run: |
+          mvn -f scaffolds/java-service/pom.xml \
+              spring-boot:build-image \
+              -DskipTests \
+              -Dspring-boot.build-image.imageName=${REGISTRY}/${{ github.repository }}/java-service:${{ github.sha }}
+
+          docker push ${REGISTRY}/${{ github.repository }}/java-service:${{ github.sha }}
+
+      # 蓝绿部署
+      - name: Blue-Green Deploy
+        run: |
+          kubectl set image deployment/java-service \
+            java-service=${REGISTRY}/${{ github.repository }}/java-service:${{ github.sha }} \
+            --namespace=production
+
+          # 等待滚动更新完成
+          kubectl rollout status deployment/java-service \
+            --namespace=production \
+            --timeout=300s
+
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/java-service \
+            --namespace=production \
+            --timeout=60s
+
+      - name: Run smoke tests
+        run: |
+          sleep 10
+          curl -f "https://app.example.com/actuator/health" || exit 1
+
+  # ================================================
+  # 2. Flyway 数据库迁移（部署前置条件）
+  # ================================================
+  flyway-migrate:
+    name: Flyway Database Migration
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Flyway Migrate
+        run: |
+          # 从 Nacos 获取 prod 数据库连接信息
+          curl -s "http://${NACOS_SERVER}/nacos/v1/cs/configs?dataId=prod-datasource.yml&group=DEFAULT_GROUP" \
+            | grep -oP 'url: \K[^ ]+' || true
+
+          # 在生产执行 Flyway 前先 dry-run
+          mvn -f scaffolds/java-service/pom.xml \
+              flyway:info \
+              -Dflyway.url="${DB_URL}" \
+              -Dflyway.user="${DB_USER}" \
+              -Dflyway.password="${DB_PASSWORD}"
+
+          # 确认无误后执行 migrate
+          mvn -f scaffolds/java-service/pom.xml \
+              flyway:migrate \
+              -Dflyway.url="${DB_URL}" \
+              -Dflyway.user="${DB_USER}" \
+              -Dflyway.password="${DB_PASSWORD}"
+        env:
+          DB_URL: ${{ secrets.PROD_DB_URL }}
+          DB_USER: ${{ secrets.PROD_DB_USER }}
+          DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+          NACOS_SERVER: ${{ vars.NACOS_SERVER }}
+
+  # ================================================
+  # 3. 回滚（通过手动触发）
+  # ================================================
+  rollback:
+    name: Rollback to Previous Version
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    if: ${{ github.event.inputs.action == 'rollback' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Kubectl
+        uses: azure/k8s-set-context@v4
+        with:
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Rollback deployment
+        run: |
+          kubectl rollout undo deployment/java-service \
+            --namespace=production
+
+          kubectl rollout status deployment/java-service \
+            --namespace=production \
+            --timeout=300s

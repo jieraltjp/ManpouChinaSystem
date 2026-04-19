@@ -1,100 +1,248 @@
-version: '3.8'
+# ============================================================
+# 企业级本地开发环境
+# 启动方式：docker compose -f docker/compose.yaml up -d
+# 关闭方式：docker compose -f docker/compose.yaml down
+#
+# 包含：Nacos、TiDB、Redis、Kafka、MinIO、
+#       Prometheus、Grafana、OTel Collector + Grafana Tempo
+#
+# 链路追踪架构：
+#   Java/Python → OTLP → OTel Collector → Grafana Tempo
+#                 ↑                         ↓
+#           prometheus.yml            Grafana 面板
+# ============================================================
+
+name: company-dev-env
 
 services:
-  # MySQL 数据库
-  mysql:
-    image: mysql:8.0
-    container_name: manpou-mysql
+  # ================================================
+  # 1. 配置中心 + 注册中心
+  # ================================================
+  nacos:
+    image: nacos/nacos-server:v2.3.3   # 版本见 versions.toml [infrastructure.nacos]
+    container_name: nacos
     environment:
-      MYSQL_ROOT_PASSWORD: root123
-      MYSQL_DATABASE: manpou
-      TZ: Asia/Shanghai
+      MODE: standalone
+      SPRING_DATASOURCE_PLATFORM: mysql
+      MYSQL_SERVICE_HOST: tidb
+      MYSQL_SERVICE_PORT: 4000
+      MYSQL_SERVICE_DB_NAME: nacos_config
+      MYSQL_SERVICE_USER: root
+      MYSQL_SERVICE_PASSWORD: ""
+      NACOS_AUTH_ENABLE: false
     ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    command: --default-authentication-plugin=mysql_native_password
+      - "8848:8848"
+      - "9848:9848"
+    depends_on:
+      tidb:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos/v1/console/health/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - dev-net
+
+  # ================================================
+  # 2. 数据库（TiDB 分布式 SQL）
+  # ================================================
+  tidb:
+    image: pingcap/tidb:v8.1.0   # TiDB v8，S3 兼容，JPA/Hibernate 无缝
+    container_name: tidb
+    command:
+      - --store=mocktikv
+      - --path=/tidb_data/tidb
+      - --log-file=/logs/tidb.log
+      - --status-host=0.0.0.0
+      - --advertise-status-host=127.0.0.1
+    ports:
+      - "4000:4000"
+      - "10080:10080"
+    volumes:
+      - tidb_data:/tidb_data
+      - tidb_logs:/logs
+    healthcheck:
+      test: ["CMD", "mysql", "-h", "127.0.0.1", "-P", "4000", "-u", "root", "-e", "SELECT 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - dev-net
 
-  # Redis 缓存
+  # ================================================
+  # 3. Redis 缓存
+  # ================================================
   redis:
-    image: redis:7-alpine
-    container_name: manpou-redis
+    image: redis:7.2-alpine
+    container_name: redis
+    command: redis-server --appendonly yes --requirepass redis123
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "redis123", "ping"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 3s
+      retries: 3
+    networks:
+      - dev-net
 
-  # Nacos 配置中心
-  nacos:
-    image: nacos/nacos-server:v2.3.2
-    container_name: manpou-nacos
-    environment:
-      MODE: standalone
-      SPRING_DATASOURCE_PLATFORM: mysql
-      MYSQL_SERVICE_HOST: mysql
-      MYSQL_SERVICE_DB_NAME: nacos
-      MYSQL_SERVICE_PORT: 3306
-      MYSQL_SERVICE_USER: root
-      MYSQL_SERVICE_PASSWORD: root123
-    ports:
-      - "8848:8848"
-      - "9848:9848"
-    depends_on:
-      mysql:
-        condition: service_healthy
-    volumes:
-      - nacos_data:/home/nacos/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Kafka + Kafka UI
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.6.0
-    container_name: manpou-zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
+  # ================================================
+  # 4. Kafka 消息队列（KRaft 模式，无需 ZK）
+  # ================================================
   kafka:
-    image: confluentinc/cp-kafka:7.6.0
-    container_name: manpou-kafka
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
+    image: apache/kafka:3.8.0   # 版本见 versions.toml [infrastructure.kafka]
+    container_name: kafka
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG_DIRS: /var/lib/kafka/logs
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    ports:
+      - "29092:29092"
+      - "9092:9092"
+    volumes:
+      - kafka_data:/var/lib/kafka/logs
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - dev-net
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: manpou-kafka-ui
+    container_name: kafka-ui
+    depends_on:
+      kafka:
+        condition: service_healthy
     ports:
-      - "8080:8080"
+      - "8090:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      DYNAMIC_CONFIG_ENABLED: true
+    networks:
+      - dev-net
+
+  # ================================================
+  # 5. MinIO 对象存储
+  # ================================================
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - dev-net
+
+  # ================================================
+  # 6. Prometheus 指标采集
+  # ================================================
+  prometheus:
+    image: prom/prometheus:v2.55.0   # 版本见 versions.toml [infrastructure.prometheus]
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    networks:
+      - dev-net
+
+  # ================================================
+  # 7. Grafana 可视化（指标 + 链路）
+  # ================================================
+  grafana:
+    image: grafana/grafana:12.0.0   # 版本见 versions.toml [infrastructure.grafana]
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_USERS_ALLOW_SIGN_UP: false
+      GF_FEATURE_TOGGLES_ENABLE: publicDashboards
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ../monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ../monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
     depends_on:
-      - kafka
+      - prometheus
+    networks:
+      - dev-net
+
+  # ================================================
+  # 8. OpenTelemetry Collector（OTLP 统一接收）
+  # ================================================
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.103.0
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"    # OTLP gRPC（Java/Python 默认）
+      - "4318:4318"    # OTLP HTTP
+      - "55679:55679"  # ZPages（调试）
+    networks:
+      - dev-net
+
+  # ================================================
+  # 9. Grafana Tempo（分布式追踪存储）
+  # ================================================
+  tempo:
+    image: grafana/tempo:2.5.0
+    container_name: tempo
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./tempo-config.yaml:/etc/tempo.yaml:ro
+      - tempo_data:/var/tempo
+    ports:
+      - "3200:3200"    # Tempo HTTP（Grafana 查询后端）
+    networks:
+      - dev-net
+
+# ================================================
+# 网络和存储卷
+# ================================================
+networks:
+  dev-net:
+    driver: bridge
 
 volumes:
-  mysql_data:
+  tidb_data:
+  tidb_logs:
   redis_data:
-  nacos_data:
+  kafka_data:
+  minio_data:
+  prometheus_data:
+  grafana_data:
+  tempo_data:

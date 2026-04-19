@@ -1,0 +1,121 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: api-gateway
+
+  # Nacos 配置中心（本地 dev 无 Docker 时禁用检查；生产启用需设置 spring.profiles.active=dev）
+  cloud:
+    nacos:
+      config:
+        import-check:
+          enabled: false
+      discovery:
+        enabled: false  # 本地禁用 Nacos 服务发现；生产启用需设置 spring.profiles.active=dev
+
+    # 全局 CORS 配置
+    gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+      # Nacos 动态路由（禁用，使用静态路由）
+      discovery:
+        locator:
+          enabled: false
+          lower-case-service-id: true
+
+      # 默认过滤器（超时配置）
+      default-filters:
+        - name: RequestSize
+          args:
+            maxSize: 10M
+        - name: CircuitBreaker
+          args:
+            name: default
+            fallbackUri: forward:/fallback
+
+  # Redis 限流（可选；无 Redis 时使用内存限流）
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DB:0}
+      timeout: 2000
+
+# ==================== 网关自定义配置 ====================
+gateway:
+  # 路由 URI（无 Nacos 时使用；生产从 Nacos 动态读取）
+  route:
+    java-service: http://${JAVA_SERVICE_HOST:localhost}:${JAVA_SERVICE_PORT:8080}
+    python-service: http://${PYTHON_SERVICE_HOST:localhost}:${PYTHON_SERVICE_PORT:8000}
+
+  # 限流配置
+  ratelimit:
+    default-rate: 100    # 每秒允许请求数
+    default-burst: 200   # 突发容量
+
+  # JWT 配置（网关只使用公钥验签）
+  jwt:
+    public-key-path: classpath:keys/public.pem
+
+  # 熔断配置
+  circuit-breaker:
+    sliding-window-size: 10
+    failure-rate-threshold: 50
+    wait-duration-in-open-state: 30s
+    permitted-calls-in-half-open-state: 3
+
+  # 超时配置
+  timeout:
+    connect: 5000
+    read: 30000
+    write: 30000
+
+# Resilience4j 限流
+resilience4j:
+  ratelimiter:
+    default:
+      limitRefreshPeriod: 1s
+      limitForPeriod: 100
+      timeoutDuration: 500ms
+  circuitbreaker:
+    default:
+      slidingWindowSize: 10
+      slidingWindowType: COUNT_BASED
+      minimumNumberOfCalls: 5
+      failureRateThreshold: 50
+      waitDurationInOpenState: 30s
+      permittedNumberOfCallsInHalfOpenState: 3
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+
+# 日志配置（结构化 JSON，traceId 由 MDC 注入）
+logging:
+  level:
+    root: INFO
+    com.company.gateway: DEBUG
+    org.springframework.cloud.gateway: INFO
+  pattern:
+    console: '{"time":"%d{yyyy-MM-dd HH:mm:ss.SSS}","level":"%level","service":"${spring.application.name}","traceId":"%X{traceId}","thread":"%t","logger":"%logger{36}","msg":"%msg"}%n'}
+
+# Actuator 端点（生产按需开启）
+management:
+  endpoints:
+    web.exposure.include: health,info,metrics,circuitbreakerevents,gateway
+  endpoint:
+    health.show-details: when_authorized
+    gateway.enabled: true
+  metrics:
+    tags:
+      service: ${spring.application.name}
+  health:
+    circuitbreakers:
+      enabled: true

@@ -1,0 +1,45 @@
+{{- /*
+ConfigMap 模板：非敏感配置
+*/ -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "java-service.fullname" . }}-config
+  labels:
+    {{- include "java-service.labels" . | nindent 4 }}
+data:
+  application.yml: |
+    spring:
+      application:
+        name: {{ .Values.env.APP_NAME }}
+      config:
+        import: optional:nacos:{{ .Values.env.APP_NAME }}-{{ .Values.env.SPRING_PROFILES_ACTIVE }}.yml
+      cloud:
+        nacos:
+          discovery:
+            server-addr: {{ .Values.env.NACOS_SERVER }}
+            namespace: {{ .Values.env.NACOS_NAMESPACE }}
+            enabled: true
+        # OpenTelemetry 链路追踪
+        opentelemetry:
+          traces:
+            exporter: otlp
+          metrics:
+            exporter: prometheus
+    management:
+      endpoints:
+        web.exposure.include: health,info,metrics,prometheus,env,configprops
+      endpoint:
+        health:
+          show-details: always
+          probes:
+            enabled: true
+      metrics:
+        tags:
+          service: {{ .Values.env.APP_NAME }}
+      tracing:
+        sampling:
+          probability: 1.0
+    logging:
+      pattern:
+        console: '{"time":"%d{yyyy-MM-dd HH:mm:ss.SSS}","level":"%level","service":"{{ .Values.env.APP_NAME }}","traceId":"%X{traceId}","thread":"%t","logger":"%logger{36}","msg":"%msg"}%n'

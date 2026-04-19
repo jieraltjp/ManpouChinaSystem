@@ -1,0 +1,21 @@
+apiVersion: v2
+name: java-service
+description: Java 微服务 Helm Chart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - java
+  - spring-boot
+  - microservice
+
+maintainers:
+  - name: Architecture Team
+    email: arch@company.com
+
+# common 依赖已移除。 如需共享模板，请创建 infra/helm/common/Chart.yaml 后恢复。
+# dependencies:
+#   - name: common
+#     version: "1.0.0"
+#     repository: "file://../common"

@@ -1,0 +1,198 @@
+# ============================================================
+# AlertManager 告警路由配置
+# 部署路径：monitoring/alertmanager/alertmanager.yml
+# 用于 Prometheus 告警触发后的通知路由
+#
+# 通知渠道：
+#   - critical  → 立即电话 + 短信
+#   - warning   → 飞书群通知
+#   - info      → 邮件
+# ============================================================
+
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: 'smtp.company.com:587'
+  smtp_from: 'alerts@company.com'
+  smtp_auth_username: 'alerts@company.com'
+  smtp_auth_password: '${SMTP_PASSWORD}'  # 通过 ESO 注入
+  victorops_api_key: '${VICTOROPS_API_KEY}'
+  victorops_api_url: 'https://alert.victorops.com/directives/v1/notifications/'
+
+# 路由树：按 severity 分组
+route:
+  group_by: ['alertname', 'service', 'cluster', 'namespace']
+  group_wait: 30s       # 等待 30s 合并同类告警
+  group_interval: 5m     # 组内告警间隔
+  repeat_interval: 4h    # 告警重复间隔（避免轰炸）
+  receiver: 'feishu-warning'  # 默认接收方
+
+  # 子路由：按 severity 精确匹配
+  routes:
+    # 🔴 critical 级别 → 立即电话 + 短信
+    - match:
+        severity: critical
+      receiver: 'pagerduty-critical'
+      group_wait: 0s
+      repeat_interval: 1h
+      continue: true
+
+    # 🟡 warning 级别 → 飞书群
+    - match:
+        severity: warning
+      receiver: 'feishu-warning'
+      group_wait: 1m
+      continue: true
+
+    # 🔵 info 级别 → 邮件
+    - match:
+        severity: info
+      receiver: 'email-info'
+      group_wait: 5m
+
+    # 按服务名路由（示例）
+    - match:
+        service: java-service
+      receiver: 'backend-team'
+      routes:
+        - match:
+            severity: critical
+          receiver: 'backend-critical'
+
+    # 数据库告警 → DBA 专用
+    - match:
+        component: database
+      receiver: 'dba-team'
+
+# ================================================
+# 接收者定义
+# ================================================
+receivers:
+  # 🔴 PagerDuty（生产告警）
+  - name: 'pagerduty-critical'
+    pagerduty_configs:
+      - service_key: '${PAGERDUTY_SERVICE_KEY}'
+        severity: critical
+        dedup_key: "{{ .GroupLabels.alertname }}-{{ .Labels.instance }}"
+        component: "{{ .Labels.service }}"
+        group: "{{ .GroupLabels.alertname }}"
+        description: |
+          {{ range .Alerts }}
+          [{{ .Status }}] {{ .Labels.alertname }}
+          实例: {{ .Labels.instance }}
+          集群: {{ .Labels.cluster }}
+          摘要: {{ .Annotations.summary }}
+          描述: {{ .Annotations.description }}
+          {{ end }}
+        links:
+          - href: "{{ .ExternalURL }}"
+            text: AlertManager
+
+  # 🟡 飞书（团队通知）
+  - name: 'feishu-warning'
+    webhook_configs:
+      - url: '${FEISHU_WEBHOOK_URL}'
+        send_resolved: true
+        http_config:
+          timeout: 10s
+        headers:
+          Content-Type: application/json
+        # 自定义飞书消息格式
+        notify_payload: |
+          {
+            "msg_type": "interactive",
+            "card": {
+              "header": {
+                "title": {
+                  "tag": "plain_text",
+                  "content": "{{ if eq .Status \"resolved\" }}✅ {{ else }}🚨 {{ end }}{{ .CommonLabels.alertname }}"
+                },
+                "template": "{{ if eq .Status \"resolved\" }}green{{ else }}red{{ end }}"
+              },
+              "elements": [
+                {
+                  "tag": "div",
+                  "text": {
+                    "tag": "lark_md",
+                    "content": "**服务**: {{ .Labels.service }}\n**实例**: {{ .Labels.instance }}\n**严重度**: {{ .Labels.severity }}"
+                  }
+                },
+                {
+                  "tag": "div",
+                  "text": {
+                    "tag": "lark_md",
+                    "content": "**摘要**: {{ .Annotations.summary }}"
+                  }
+                },
+                {
+                  "tag": "note",
+                  "elements": [
+                    {
+                      "tag": "plain_text",
+                      "content": "详情: {{ .ExternalURL }}"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+
+  # 🟢 邮件通知
+  - name: 'email-info'
+    email_configs:
+      - to: 'alerts-info@company.com'
+        send_resolved: true
+        headers:
+          Subject: |
+            {{ if eq .Status "resolved" }}[恢复]{{ else }}[告警]{{ end }} {{ .GroupLabels.alertname }}
+        html: |
+          <h2>{{ .GroupLabels.alertname }}</h2>
+          <table>
+            <tr><td>状态</td><td>{{ .Status }}</td></tr>
+            <tr><td>服务</td><td>{{ .Labels.service }}</td></tr>
+            <tr><td>严重度</td><td>{{ .Labels.severity }}</td></tr>
+            <tr><td>摘要</td><td>{{ .Annotations.summary }}</td></tr>
+          </table>
+          <p><a href="{{ .ExternalURL }}">查看详情</a></p>
+
+  # 后端团队
+  - name: 'backend-team'
+    webhook_configs:
+      - url: '${FEISHU_BACKEND_WEBHOOK_URL}'
+        send_resolved: true
+
+  # 后端 critical
+  - name: 'backend-critical'
+    pagerduty_configs:
+      - service_key: '${PAGERDUTY_SERVICE_KEY}'
+        severity: critical
+
+  # DBA 团队
+  - name: 'dba-team'
+    webhook_configs:
+      - url: '${FEISHU_DBA_WEBHOOK_URL}'
+        send_resolved: true
+    email_configs:
+      - to: 'dba@company.com'
+        send_resolved: true
+
+# ================================================
+# 抑制规则（防止告警风暴）
+# ================================================
+inhibit_rules:
+  # 当机器宕机时，抑制该机器上所有其他告警
+  - source_match:
+      alertname: 'InstanceDown'
+    source_match_re:
+      severity: 'critical|warning'
+    equal: ['instance', 'cluster']
+
+  # 当服务整体宕机时，抑制该服务的详细指标告警
+  - source_match:
+      alertname: 'ServiceDown'
+    equal: ['service', 'cluster']
+
+  # 当数据库不可用时，抑制依赖该数据库的应用告警
+  - source_match:
+      component: 'database'
+      severity: 'critical'
+    equal: ['cluster']

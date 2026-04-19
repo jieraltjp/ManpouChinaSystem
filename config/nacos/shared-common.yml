@@ -1,0 +1,32 @@
+# ============================================================
+# Nacos 共享通用配置
+# 命名空间：dev / test / staging / prod
+# 所有微服务共享此配置
+# ============================================================
+
+# ----- 应用通用 -----
+spring:
+  application:
+    name: ${service_name}
+  jackson:
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSXXX
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+
+# ----- 日志 -----
+logging:
+  level:
+    root: INFO
+    com.company: DEBUG
+    org.springframework.cloud: INFO
+    com.alibaba.cloud: INFO
+
+# ----- 健康检查 -----
+management:
+  endpoints:
+    web.exposure.include: health,info,metrics,prometheus
+  health:
+    db:
+      enabled: true
+    redis:
+      enabled: true

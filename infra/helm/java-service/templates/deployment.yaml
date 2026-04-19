@@ -1,0 +1,166 @@
+{{- /*
+Deployment 模板 - java-service
+*/ -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "java-service.fullname" . }}
+  labels:
+    {{- include "java-service.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      {{- include "java-service.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: {{ .Values.strategy.type }}
+    {{- if eq .Values.strategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
+    {{- end }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "java-service.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: backend
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "java-service.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      terminationGracePeriodSeconds: 60
+
+      # Init Container：等待 Nacos 就绪
+      initContainers:
+        - name: wait-for-nacos
+          image: curlimages/curl:8.5.0
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for Nacos..."
+              until curl -sf "http://{{ .Values.env.NACOS_SERVER }}/nacos/v1/console/health/readiness"; do
+                echo "Nacos not ready, retry in 5s..."
+                sleep 5
+              done
+              echo "Nacos is ready"
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "64Mi"
+
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.image }}
+          image: "{{ .repository }}:{{ .tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .pullPolicy }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.env.SERVER_PORT | default 8080 }}
+              protocol: TCP
+            - name: ajp
+              containerPort: 8009
+              protocol: TCP
+
+          # 健康检查
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.env.SERVER_PORT | default 8080 }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 30
+
+          # 资源限制
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+          # 安全上下文
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+
+          # 环境变量
+          env:
+            - name: JAVA_OPTS
+              value: "{{ .Values.env.JAVA_OPTS }}"
+            - name: SERVER_PORT
+              value: "{{ .Values.env.SERVER_PORT }}"
+            - name: APP_NAME
+              value: "{{ .Values.env.APP_NAME }}"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "{{ .Values.env.SPRING_PROFILES_ACTIVE }}"
+            - name: NACOS_SERVER
+              value: "{{ .Values.env.NACOS_SERVER }}"
+            - name: NACOS_NAMESPACE
+              value: "{{ .Values.env.NACOS_NAMESPACE }}"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector:4317"
+            - name: OTEL_SERVICE_NAME
+              value: "{{ .Values.env.APP_NAME }}"
+            # 从 Secret 注入敏感信息
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "java-service.fullname" . }}-secrets
+                  key: db-password
+                  optional: true
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "java-service.fullname" . }}-secrets
+                  key: redis-password
+                  optional: true
+
+          # 卷挂载
+          volumeMounts:
+            {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+
+          # 生命周期钩子
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep 10 && curl -X POST http://localhost:{{ .Values.env.SERVER_PORT }}/actuator/shutdown"]
+
+      # 临时存储
+      volumes:
+        {{- toYaml .Values.extraVolumes | nindent 8 }}
+
+      # Pod Anti-Affinity
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      # 节点亲和性
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      # 容忍
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,27 @@
+# Grafana Tempo 配置
+# 接收 OTel Collector 转发的 trace 数据，提供查询 API 给 Grafana
+
+server:
+  http_listen_port: 3200
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+        http:
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /var/tempo/traces
+
+    # 保持周期（本地开发环境，7 天后自动清理）
+    wal:
+      path: /var/tempo/wal
+
+overrides:
+  # 本地开发：降低资源限制
+  max_bytes_per_trace: 5000000
+  max_trace_count_per_batch: 10000

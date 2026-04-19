@@ -1,0 +1,39 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Prometheus 自身指标
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Java 微服务（Actuator /actuator/prometheus 端点）
+  - job_name: 'java-services'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+          - 'host.docker.internal:8080'  # 本地 Java 服务
+          - 'host.docker.internal:8081'  # 第2个服务
+        labels:
+          group: 'java'
+
+  # Python FastAPI 服务
+  - job_name: 'python-services'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets:
+          - 'host.docker.internal:8000'
+        labels:
+          group: 'python'
+
+  # Kafka 指标（使用 JMX Exporter 时启用）
+  # - job_name: 'kafka'
+  #   static_configs:
+  #     - targets: ['kafka:9308']
+
+  # Redis 指标（使用 redis_exporter 时启用）
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['redis:9121']

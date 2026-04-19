@@ -1,0 +1,167 @@
+# ============================================================
+# 版本权威源（Single Source of Truth）
+# ============================================================
+# 所有文档中的版本号必须从此文件引用。
+# 代码构建文件（pom.xml / pyproject.toml / compose.yaml）
+# 引用此处版本时使用对应的引用机制。
+# 变更版本号 → 此文件一处修改 → 触发文档/配置自动更新。
+#
+# 约束：
+# - 禁止在文档中硬编码版本号（应引用此文件中的变量名）
+# - 代码构建文件必须与此处版本保持一致
+# - 每次发布前执行版本一致性审计
+# ============================================================
+
+# ---------- Java 微服务 ----------
+[java]
+language_level = "17"                # Java 语言版本
+jdk_vendor      = "Eclipse Temurin"   # JDK 供应商（影响 Docker 基础镜像）
+spring_boot     = "3.2.5"            # Spring Boot 版本（via spring-boot.version）
+spring_cloud    = "2023.0.1"         # Spring Cloud 版本
+sca_version     = "2023.0.1.2"        # Spring Cloud Alibaba 版本
+
+[java.plugins]
+maven_compiler      = "3.13.0"
+maven_surefire      = "3.2.5"
+checkstyle          = "10.16.0"
+spring_boot_plugin  = "3.2.5"
+jib                = "3.4.2"
+git_commit_id       = "8.0.2"
+dependency_check    = "8.4.0"
+
+[java.dependencies]
+archunit        = "1.3.0"
+jmolecules      = "2024.1.0"
+flyway          = "10.10.0"
+mysql_connector = "8.0.33"
+lombok          = "1.18.44"   # JDK 25 支持（1.18.40+）
+mapstruct       = "1.5.5"
+hutool          = "5.8.26"
+p6spy           = "3.9.1"
+logstash_encoder = "7.4"
+testcontainers  = "1.19.7"
+mockito         = "5.11.0"
+assertj         = "3.25.3"
+h2              = "2.2.224"
+
+# ---------- Python 微服务 ----------
+[python]
+language_level      = "3.11"
+fastapi             = "0.111.0"
+uvicorn             = "0.29.0"
+pydantic_settings   = "2.2.0"
+structlog           = "24.1.0"
+asyncpg             = "0.29.0"
+sqlalchemy          = "2.0.0"
+redis_py            = "5.0.0"
+minio_py            = "12.0.0"
+httpx               = "0.27.0"
+otel_api            = "1.24.0"
+otel_sdk            = "1.24.0"
+otel_exporter_otlp  = "1.24.0"
+otel_instrumentation_fastapi = "0.48b0"    # ⚠️ beta 版本，禁止进入生产！2046 年请替换为 stable 版
+ruff               = "0.4.0"
+mypy               = "1.10.0"
+pytest             = "8.2.0"
+pytest_asyncio     = "0.23.0"
+eslint             = "9"
+prettier           = "3"
+
+[python.tools]
+# 前端工具（Node.js）
+eslint   = "9"        # ESLint 9.x flat config
+prettier = "3"        # Prettier 3.x
+# 注意：前端工具版本在 .nvmrc / package.json 中维护
+
+# ---------- 基础设施（运行时） ----------
+[infrastructure]
+# 容器编排
+kubernetes      = "1.30"          # K8s 主版本（server version，CI 使用 ~1.30 范围）
+docker          = "24"            # Docker Engine 主版本
+helm            = "3.16"           # Helm 主版本
+
+# 数据库与缓存
+mysql           = "8.0"           # MySQL 主版本（开发用）
+redis           = "7"             # Redis 主版本（开发用）
+
+# 消息队列
+kafka           = "3.8"           # Kafka 主版本（KRaft，无需 ZK）
+
+# 配置中心
+nacos           = "2.3"           # Nacos 2.x（LTS）
+# nacos3         = "3.2"          # Nacos 3.x（AI Registry 等新特性，按需启用）
+
+# 对象存储
+minio           = "RELEASE.2025-04-08T15-41-24Z"  # MinIO S3 兼容（使用年月版本，CI 幂等）
+
+# 链路追踪（OTel Native）
+otel_collector  = "0.110"          # OTel Collector 主版本
+tempo           = "2.5"           # Grafana Tempo 主版本
+
+# 可观测性
+prometheus      = "2.55"           # Prometheus 主版本（v3 即将发布）
+grafana         = "12"             # Grafana 主版本（OSS/Enterprise）
+
+# 链路追踪老标准（仅用于兼容性说明，新项目禁用）
+# 旧版 Jaeger（已废弃，仅保留此注释供参考）
+# jaeger = "1.56"
+
+# ---------- CI/CD ----------
+[ci]
+github_actions_runner = "ubuntu-latest"
+java_version_ci       = "17"
+node_version_ci       = "20"
+python_version_ci     = "3.11"
+
+# ---------- 变更日志 ----------
+# 变更记录（每次版本修改时追加）：
+#
+# 2026-04-17 v1.0 初始版本
+#   - Java: 17 / Spring Boot 3.2.5 / Spring Cloud 2023.0.1 / SCA 2023.0.1.2
+#   - Python: 3.11 / FastAPI 0.111
+#   - 链路追踪：从 Jaeger 迁移至 OTel Collector + Grafana Tempo
+#   - ADR-0001 ORM选型 / ADR-0002 Secret管理 / ADR-0003 TraceId透传
+#
+# 2026-04-18 v1.1 运行时验证
+#   - Lombok 1.18.32 → 1.18.44（JDK 25 支持）
+#   - Maven checkstyle plugin 3.3.1 → 3.4.0（Checkstyle 10.x 配置格式）
+#   - 数据库连接：192.168.13.202:23306 / manpou23306
+#   - 新增 spring-boot-starter-security 依赖（security 模块编译必需）
+#
+# 2026-04-18 v1.2 应用启动完全成功
+#   - AOP 幂等切点：@annotation||@within 双 binding → @annotation(anno) 单绑定
+#   - LogstashEncoder 类路径：net.logstash.logback.classic → net.logstash.logback.encoder（v7.x）
+#   - JDBC 编码：characterEncoding=utf8mb4 → UTF-8（MySQL Connector/J charset 名）
+#   - H2 scope：dependencyManagement test-scope → compile 显式覆盖
+#   - JPA Repository 重构：ExampleRepositoryImpl → ExampleRepository + CustomImpl
+#   - Nacos config import：注释 + import-check.enabled=false（本地无 Docker）
+#   - Nacos discovery.enabled：true → false（本地跳过注册）
+#   - application.yml：MySQL + Flyway → H2 + ddl-auto=update（本地无 Docker）
+#   - Checkstyle config 路径：maven.multiModuleProjectDirectory → project.basedir/../../
+#   - 03 §3.3.1 新增 Python Result[T]/Option[T] 模式（INTJ 判定 23）
+#   - 08 §9 新增 macOS/Linux 跨平台完整安装命令
+#
+# 2026-04-18 v1.3 INTJ 2046 第二 Pass 审计修复
+#   - 灾1: 09 ELK 架构（不存在）→ OTel/Grafana
+#   - 灾2: 08 内部 IP/凭证硬编码 → ${DB_HOST} 占位符
+#   - 灾3: 11 spring-boot-starter-chaos 不存在 → Chaos Mesh K8s CRD
+#   - 正1: 10 JWT Stateless vs Session 矛盾 → 令牌管理语义重写 §6
+#   - 正2: 10 新增 §6.0 认证 SLO/SLA 定义
+#   - 正3: 10 版本说明引用 ADR-0002
+#   - P1: 08 MySQL 版本 → versions.toml 引用
+#   - P2: 12a/12b 新增 Outbox/对账测试策略
+#   - P2: 09 §3.4.1 AuditService 测试策略
+#   - P2: 11 §4.3.1 幂等测试策略
+#   - P2: 13 364 行 → 结构页分隔符
+#   - 正4: 09 logger/level/msg 字段名 → OTel 兼容性锁定说明
+#
+# 2026-04-18 v1.4 INTJ 2046 第三 Pass 审计修复
+#   - 危1: 09 文档头部版本号 v1.0 → v1.1（内容已为 v1.1，版本快照一致性）
+#   - 危2: 12a 文档头部版本号 v1.0 → v1.1（与 AUDIT.md §4 记录一致）
+#   - P1: 12a §3.4 Outbox 轮询硬编码 100 → @Value 注入 + fixedDelayString + Nacos 配置示例
+#   - P2: 10 §6.1 令牌策略表 → 新增 2046 年演进路径提示（ZKProof/FIDO2/WebAuthn）
+#
+# 2026-04-19 v1.5 INTJ 2046 第四 Pass 全量审计修复
+#   - 危1: KeyManagementService.java Clock 注入（INTJ 判定 24 时间主权）
+#   - 危2: JwtKeyManager.java Clock 注入（INTJ 判定 24 时间主权）
+#   - P1: pom.xml archunit.version 1.3.2 → 1.3.0（与 versions.toml 一致）

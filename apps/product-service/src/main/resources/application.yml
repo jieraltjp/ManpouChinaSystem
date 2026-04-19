@@ -16,12 +16,6 @@ spring:
     alibaba:
       cloud:
         enabled: false
-  # Nacos 配置中心（本地 dev 无 Docker 时禁用检查；生产环境启用需设置 spring.profiles.active=dev）
-  cloud:
-    nacos:
-      config:
-        import-check:
-          enabled: false
 
   # 数据源（本地 H2 无 Docker；生产切 MySQL）
   datasource:

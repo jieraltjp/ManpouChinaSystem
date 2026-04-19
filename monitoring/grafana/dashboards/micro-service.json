@@ -1,0 +1,153 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "服务健康状态",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "up{job=~\"java-services|python-services\"}",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "1": { "text": "在线", "color": "green" } } },
+            { "type": "value", "options": { "0": { "text": "离线", "color": "red" } } }
+          ]
+        }
+      }
+    },
+    {
+      "title": "JVM 堆内存使用率",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{area=\"heap\"} / jvm_memory_max_bytes{area=\"heap\"}",
+          "legendFormat": "{{job}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.7 },
+              { "color": "red", "value": 0.85 }
+            ]
+          },
+          "unit": "percentunit",
+          "max": 1
+        }
+      }
+    },
+    {
+      "title": "QPS（每秒请求数）",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(http_server_requests_seconds_count{job=\"java-services\"}[1m])",
+          "legendFormat": "{{uri}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 1, "fillOpacity": 10 }
+        }
+      }
+    },
+    {
+      "title": "HTTP 请求延迟 P99",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 6 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, rate(http_server_requests_seconds_bucket{job=\"java-services\"}[5m]))",
+          "legendFormat": "P99 {{uri}}"
+        },
+        {
+          "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{job=\"java-services\"}[5m]))",
+          "legendFormat": "P95 {{uri}}"
+        }
+      ]
+    },
+    {
+      "title": "错误率",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 6 },
+      "targets": [
+        {
+          "expr": "rate(http_server_requests_seconds_count{job=\"java-services\",status=~\"5..\"}[5m])",
+          "legendFormat": "5xx {{uri}}"
+        }
+      ]
+    },
+    {
+      "title": "数据库连接池使用率",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "expr": "hikaricp_connections_active / hikaricp_connections_max",
+          "legendFormat": "{{pool_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "max": 1,
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.6 },
+              { "color": "red", "value": 0.85 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Kafka Consumer Lag",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 12 },
+      "targets": [
+        {
+          "expr": "kafka_consumer_records_lag_max",
+          "legendFormat": "{{topic}}-{{partition}}"
+        }
+      ]
+    },
+    {
+      "title": "Redis 连接数",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 12 },
+      "targets": [
+        {
+          "expr": "redis_connected_clients",
+          "legendFormat": "连接数"
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "tags": ["microservice", "java", "backend"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "title": "微服务监控面板",
+  "uid": "micro-service",
+  "version": 1
+}
