@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: api-gateway
+  main:
+    web-application-type: reactive
 
   # Nacos 配置中心（本地 dev 无 Docker 时禁用检查；生产启用需设置 spring.profiles.active=dev）
   cloud:
@@ -119,7 +121,8 @@ logging:
     com.manpou.gateway: DEBUG
     org.springframework.cloud.gateway: INFO
   pattern:
-    console: '{"time":"%d{yyyy-MM-dd HH:mm:ss.SSS}","level":"%level","service":"${spring.application.name}","traceId":"%X{traceId}","thread":"%t","logger":"%logger{36}","msg":"%msg"}%n'}
+    console: >-
+      {"time":"%d{yyyy-MM-dd HH:mm:ss.SSS}","level":"%level","service":"${spring.application.name}","traceId":"%X{traceId}","thread":"%t","logger":"%logger{36}","msg":"%msg"}%n}
 
 # Actuator 端点（生产按需开启）
 management:
