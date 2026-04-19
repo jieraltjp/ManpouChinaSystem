@@ -17,7 +17,7 @@ replicaCount: 2
 
 # ----- 镜像配置 -----
 image:
-  repository: company/java-service
+  repository: ghcr.io/jieraltjp/manpou-chinasystem
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -142,14 +142,14 @@ ingress:
     nginx.ingress.kubernetes.io/limit-rps: "100"
     nginx.ingress.kubernetes.io/limit-connections: "50"
   hosts:
-    - host: api-service.company.com
+    - host: api-service.manpou.com
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: api-service-tls
       hosts:
-        - api-service.company.com
+        - api-service.manpou.com
 
 # ----- Service 配置 -----
 service:

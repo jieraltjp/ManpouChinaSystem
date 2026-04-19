@@ -12,7 +12,7 @@ keywords:
 
 maintainers:
   - name: Architecture Team
-    email: arch@company.com
+    email: arch@manpou.com
 
 # common 依赖已移除。 如需共享模板，请创建 infra/helm/common/Chart.yaml 后恢复。
 # dependencies:

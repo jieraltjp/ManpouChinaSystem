@@ -193,6 +193,7 @@ docker-compose -f docker-compose.yml up -d
 | 15 | CI/CD | `.github/workflows/` + `scripts/` |
 | 16 | 配置中心 | `config/nacos/` + `config/checkstyle/` |
 | 17 | 可插拔基础设施 | Docker 可选接入，代码不依赖容器存在 |
+| 18 | 服务间认证 | JWT Token 透明传递，各服务验签能力已就绪 |
 
 ---
 

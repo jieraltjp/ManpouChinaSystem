@@ -7,13 +7,13 @@ name: CD Pipeline
 
 on:
   workflow_run:
-    workflows: ["CI Pipeline"]
+    workflows: ["CI Build"]
     types: [completed]
     branches: [main]
 
 env:
   REGISTRY: ghcr.io
-  JAVA_VERSION: '17'
+  JAVA_VERSION: '21'
 
 jobs:
   # ================================================
@@ -36,7 +36,7 @@ jobs:
 
       - name: Build & Push Docker Image
         run: |
-          mvn -f scaffolds/java-service/pom.xml \
+          mvn -f apps/java-service/pom.xml \
               spring-boot:build-image \
               -DskipTests \
               -Dspring-boot.build-image.imageName=${REGISTRY}/${{ github.repository }}/java-service:${{ github.sha }}
@@ -83,14 +83,14 @@ jobs:
             | grep -oP 'url: \K[^ ]+' || true
 
           # 在生产执行 Flyway 前先 dry-run
-          mvn -f scaffolds/java-service/pom.xml \
+          mvn -f apps/java-service/pom.xml \
               flyway:info \
               -Dflyway.url="${DB_URL}" \
               -Dflyway.user="${DB_USER}" \
               -Dflyway.password="${DB_PASSWORD}"
 
           # 确认无误后执行 migrate
-          mvn -f scaffolds/java-service/pom.xml \
+          mvn -f apps/java-service/pom.xml \
               flyway:migrate \
               -Dflyway.url="${DB_URL}" \
               -Dflyway.user="${DB_USER}" \
