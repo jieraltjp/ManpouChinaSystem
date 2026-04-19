@@ -32,13 +32,22 @@ ManpouChinaSystem/
 │   ├── finance-service/       # 财务管理（端口 18087）
 │   ├── notification-service/  # 通知服务（端口 18088）
 │   └── web/                  # 前端（端口 3000）
-├── docs/
-│   ├── role/                 # 各角色视角分析
-│   ├── adr/                 # 架构决策记录
-│   └── design/               # 系统设计文档
-├── pro/                      # 各项目专属文档（本目录）
-├── docker-compose.yml         # 基础设施容器
-└── README.md
+├── scaffolds/
+│   └── api-gateway/          # API 网关脚手架（AR-001，待集成）
+├── infra/
+│   └── helm/                 # K8s Helm 部署模板
+├── docker/                   # Docker Compose 本地开发环境
+├── monitoring/               # Prometheus + Grafana + Alertmanager
+├── config/
+│   ├── checkstyle/          # 代码规范
+│   └── nacos/              # Nacos 配置模板
+├── scripts/                  # 构建与初始化脚本
+├── .github/workflows/       # CI/CD 流水线
+└── docs/
+    ├── pro/                 # 各项目专属文档（本目录，12-17 服务/基础设施）
+    ├── ui/                  # 前端 UI 文档 + 架构图
+    ├── desigin/            # 构建指南（Step 1-6）
+    └── role/               # 角色视角分析（6 角色）
 ```
 
 ---
@@ -151,15 +160,42 @@ docker-compose -f docker-compose.yml up -d
 
 | 资源 | 地址 |
 |------|------|
+| 前端 | http://localhost:3000 |
 | Swagger UI（procurement） | http://localhost:18083/swagger-ui/index.html |
 | Swagger UI（user） | http://localhost:18081/swagger-ui/index.html |
-| 前端 | http://localhost:3000 |
-| Nacos | http://localhost:8848/nacos |
-| Kafka UI | http://localhost:8080 |
+| Nacos（需 Docker） | http://localhost:8848/nacos |
+| Kafka UI（需 Docker） | http://localhost:8080 |
+| Grafana（需 Docker） | http://localhost:3001 |
+| Prometheus（需 Docker） | http://localhost:9090 |
 
 ---
 
-## 10. 相关文档
+## 10. 项目专属文档（docs/pro/）
+
+| 编号 | 文档 | 对应目录 |
+|------|------|---------|
+| 00 | 项目概览 | — |
+| 01 | Java 父 POM | `apps/java-service/` |
+| 02 | user-service | `apps/user-service/` |
+| 03 | product-service | `apps/product-service/` |
+| 04 | warehouse-service | `apps/warehouse-service/` |
+| 05 | procurement-service | `apps/procurement-service/` |
+| 06 | customs-service | `apps/customs-service/` |
+| 07 | logistics-service | `apps/logistics-service/` |
+| 08 | finance-service | `apps/finance-service/` |
+| 09 | notification-service | `apps/notification-service/` |
+| 10 | web 前端 + UI 文档 | `apps/web/` |
+| 11 | —（预留） | — |
+| 12 | API Gateway | `scaffolds/api-gateway/` |
+| 13 | Docker Compose | `docker/` |
+| 14 | Helm K8s | `infra/helm/` |
+| 15 | 监控告警 | `monitoring/` |
+| 16 | CI/CD | `.github/workflows/` + `scripts/` |
+| 17 | 配置中心 | `config/nacos/` + `config/checkstyle/` |
+
+---
+
+## 11. 相关文档
 
 | 文档 | 说明 |
 |------|------|
@@ -167,6 +203,6 @@ docker-compose -f docker-compose.yml up -d
 | `docs/role/04-后端开发工程师视角分析.md` | 后端开发规范 |
 | `docs/role/05-前端开发工程师视角分析.md` | 前端开发规范 |
 | `docs/role/06-测试工程师视角分析.md` | 测试策略与用例 |
-| `docs/pro/01-java-service-parent.md` | Java 服务父 POM 文档 |
-| `docs/pro/02-user-service.md` | 用户服务文档 |
+| `docs/ui/README.md` | 前端 UI 文档入口 |
+| `docs/ui/ARCHITECTURE.md` | 系统架构图（Mermaid） |
 | `docs/pro/05-procurement-service.md` | 发注服务文档 |
