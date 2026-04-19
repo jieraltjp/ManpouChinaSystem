@@ -34,7 +34,15 @@
       "Bash(wc -l \"D:/Programme/java/ManpouChinaSystem/docs\"/*.md)",
       "Bash(mkdir -p pro)",
       "Bash(mv docs/pro/*.md pro/)",
-      "Bash(rmdir docs/pro)"
+      "Bash(rmdir docs/pro)",
+      "Bash(taskkill //F //PID 2173360)",
+      "Bash(mvn spring-boot:run -DskipTests)",
+      "Bash(tasklist //FI \"PID eq 107340\")",
+      "Bash(node -e \"const http = require\\('http'\\); const req = http.request\\({host:'127.0.0.1',port:18081,path:'/api/v1/auth/public-key',method:'GET'}, res => {console.log\\('Backend status:', res.statusCode\\); res.on\\('data', d => console.log\\('Body:', d.toString\\(\\).substring\\(0,200\\)\\)\\)}\\); req.on\\('error', e => console.log\\('Error:', e.message\\)\\); req.end\\(\\);\")",
+      "Bash(node -e ' *)",
+      "Bash(taskkill //F //PID 284712)",
+      "Bash(taskkill //F //PID 53992)",
+      "Bash($PYTHON *)"
     ]
   }
 }

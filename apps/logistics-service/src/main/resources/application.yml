@@ -7,6 +7,15 @@ spring:
   application:
     name: ${APP_NAME:logistics-service}
 
+  cloud:
+    nacos:
+      config:
+        enabled: false
+        import-check:
+          enabled: false
+    alibaba:
+      cloud:
+        enabled: false
   # Nacos 配置中心（本地 dev 无 Docker 时禁用检查；生产环境启用需设置 spring.profiles.active=dev）
   cloud:
     nacos:

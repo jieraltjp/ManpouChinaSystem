@@ -32,6 +32,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/dashboard/ExamplesPage.vue'),
         meta: { title: '示例列表', requiresAuth: true, permission: 'example:read' },
       },
+      {
+        path: 'test',
+        name: 'Test',
+        component: () => import('@/pages/test/TestPage.vue'),
+        meta: { title: '采购单管理', requiresAuth: true },
+      },
     ],
   },
   {

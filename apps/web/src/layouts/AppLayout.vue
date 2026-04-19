@@ -23,6 +23,11 @@
           <el-icon><Document /></el-icon>
           <template #title>示例列表</template>
         </el-menu-item>
+
+        <el-menu-item index="/test">
+          <el-icon><ShoppingCart /></el-icon>
+          <template #title>采购单管理</template>
+        </el-menu-item>
       </el-menu>
     </el-aside>
 
@@ -66,7 +71,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, Document } from '@element-plus/icons-vue'
+import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, Document, ShoppingCart } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
