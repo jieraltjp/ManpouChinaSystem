@@ -42,7 +42,32 @@
       "Bash(node -e ' *)",
       "Bash(taskkill //F //PID 284712)",
       "Bash(taskkill //F //PID 53992)",
-      "Bash($PYTHON *)"
+      "Bash($PYTHON *)",
+      "Bash(awk '{print $NF}')",
+      "Bash(mkdir -p config/nacos/dev)",
+      "Bash(cp \"D:/Programme/java/arch/config/nacos/dev/app-service.yml\" config/nacos/dev/app-service.yml)",
+      "Bash(cp \"D:/Programme/java/arch/config/nacos/dev/datasource.yml\" config/nacos/dev/datasource.yml)",
+      "Bash(cp \"D:/Programme/java/arch/config/nacos/dev/kafka.yml\" config/nacos/dev/kafka.yml)",
+      "Bash(cp \"D:/Programme/java/arch/config/nacos/dev/redis.yml\" config/nacos/dev/redis.yml)",
+      "Bash(cp \"D:/Programme/java/arch/docker/otel-collector-config.yaml\" docker/otel-collector-config.yaml)",
+      "Bash(cp \"D:/Programme/java/arch/docker/tempo-config.yaml\" docker/tempo-config.yaml)",
+      "Bash(mkdir -p docker/prometheus)",
+      "Bash(cp \"D:/Programme/java/arch/docker/prometheus/prometheus.yml\" docker/prometheus/prometheus.yml)",
+      "Bash(mkdir -p monitoring/alertmanager)",
+      "Bash(mkdir -p monitoring/prometheus)",
+      "Bash(mkdir -p monitoring/grafana/dashboards)",
+      "Bash(mkdir -p monitoring/grafana/datasources)",
+      "Bash(cp \"D:/Programme/java/arch/monitoring/alertmanager/alertmanager.yml\" monitoring/alertmanager/alertmanager.yml)",
+      "Bash(mkdir -p scaffolds/api-gateway/src/main/java/com/company/gateway)",
+      "Bash(mkdir -p scaffolds/api-gateway/src/main/resources)",
+      "Bash(mkdir -p scaffolds/api-gateway/src/test/java/com/company/gateway)",
+      "Bash(cp -r \"D:/Programme/java/arch/scaffolds/api-gateway/src/main/java/com/company/gateway/\"* scaffolds/api-gateway/src/main/java/com/company/gateway/)",
+      "Bash(cp -r \"D:/Programme/java/arch/scaffolds/api-gateway/src/main/resources/\"* scaffolds/api-gateway/src/main/resources/)",
+      "Bash(sed -i 's/8080/（待实现）/g' \"01-项目规划与架构设计.md\")",
+      "Bash(sed -i 's/8081/18081/g; s/8082/18082/g; s/8083/18083/g; s/8084/18084/g; s/8085/18085/g; s/8086/18086/g; s/8087/18087/g; s/8088/18088/g' \"01-项目规划与架构设计.md\")",
+      "Bash(sed -i 's/8080/18081/g' \"04-前端项目生成.md\")",
+      "Bash(sed -i 's/port: 8081/port: 18081/g; s/port: 8082/port: 18082/g; s/port: 8083/port: 18083/g' \"06-配置与部署.md\")",
+      "Bash(sed -i 's/8090:8080/18090:18081/g' \"06-配置与部署.md\")"
     ]
   }
 }
