@@ -1,0 +1,29 @@
+# ============================================================
+# 本地开发配置文件（ConfigSource local 模式）
+# 使用方式：app.config.source=local（application.yml 中配置）
+# 此文件覆盖 application.yml 中的默认值，无需启动 Nacos
+# ============================================================
+
+# 示例：服务端口
+server:
+  port: 8080
+
+# 示例：数据库（H2 内存数据库）
+spring:
+  datasource:
+    url: jdbc:h2:mem:app;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
+    username: sa
+    password: ""
+
+# 示例：Redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# 示例：业务配置
+app:
+  jwt:
+    access-token-ttl-seconds: 3600          # 开发环境 token 有效期 1 小时
+  outbox:
+    poll-interval-ms: 1000                 # 开发环境轮询间隔 1 秒（降低 DB 压力）

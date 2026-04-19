@@ -2,41 +2,78 @@
 
 > 满铺中国发注管理体系
 
-## 项目概述
+跨境贸易发注管理系统，包含发注、仓储、报关、物流、财务等模块。
 
-满铺中国是一套跨境贸易发注管理系统，包含：
+## 项目结构
 
-- **发注管理** - 订单启动、新品准入、基础数据库维护
-- **仓储验收** - 永康待验收、货物调度、人员指派
-- **报关通关** - 出口单据生成、INVOICE/PACKING LIST
-- **物流调度** - 港口分流、拼柜管理
-- **财务结算** - 退税管理、费用核算
+```
+ManpouChinaSystem/
+├── apps/                           # 微服务
+│   ├── java-service/              # 父POM
+│   ├── user-service/              # 用户服务 (认证/权限)
+│   ├── product-service/           # 商品服务 (徐义超)
+│   ├── procurement-service/       # 发注服务 (张云)
+│   ├── warehouse-service/         # 仓储服务 (永康)
+│   ├── customs-service/           # 报关服务 (殷元)
+│   ├── logistics-service/         # 物流服务 (于世荣)
+│   ├── finance-service/           # 财务服务 (许文豪)
+│   ├── notification-service/      # 通知服务 (陈天仪)
+│   └── web/                       # 前端应用
+├── config/                         # 配置文件
+│   ├── checkstyle/              # 代码规范
+│   └── nacos/                   # Nacos配置
+├── docker/                        # Docker配置
+│   └── compose.yaml             # 本地开发环境
+├── scripts/                        # 运维脚本
+│   └── build-all.sh            # 全量构建脚本
+├── infra/                         # 基础设施
+│   └── helm/                   # K8s Helm Charts
+├── docs/                          # 文档
+│   └── *.md                    # 详细文档
+├── .github/                       # CI/CD
+│   └── workflows/
+│       └── ci.yaml             # GitHub Actions
+└── README.md
+```
 
 ## 技术栈
 
 | 组件 | 技术 | 版本 |
 |------|------|------|
 | 后端框架 | Spring Boot 3 | 3.2.5 |
-| 数据库 | MySQL 8 / TiDB | 8.0 |
+| 数据库 | MySQL 8 | 8.0 |
+| 缓存 | Redis | 7 |
 | 消息队列 | Apache Kafka | 3.8 |
 | 配置中心 | Nacos | 2.3 |
 | 前端 | Vue 3 + TypeScript | 3.4 |
+| 构建工具 | Vite | 5.x |
+| 包管理 | pnpm | 8.x |
 
-## 项目结构
+## 快速开始
 
+### 1. 启动基础设施
+
+```bash
+cd docker
+docker compose up -d
 ```
-ManpouChinaSystem/
-├── apps/                    # 微服务
-│   ├── user-service/        # 用户服务
-│   ├── product-service/      # 商品服务
-│   ├── procurement-service/ # 发注服务
-│   ├── warehouse-service/   # 仓储服务
-│   ├── customs-service/    # 报关服务
-│   ├── logistics-service/  # 物流服务
-│   ├── finance-service/    # 财务服务
-│   └── web/               # 前端应用
-├── docs/                   # 文档
-└── config/                # 配置
+
+### 2. 编译服务
+
+```bash
+# 编译单个服务
+cd apps/user-service
+./mvnw clean package -DskipTests
+
+# 编译所有服务
+./scripts/build-all.sh
+```
+
+### 3. 启动服务
+
+```bash
+cd apps/user-service
+./mvnw spring-boot:run
 ```
 
 ## 团队成员
@@ -50,9 +87,16 @@ ManpouChinaSystem/
 | 财务与系统对接 | 许文豪 | 财务凭证流对接 |
 | 系统协同支持 | 陈天仪 | 业务与技术衔接 |
 
-## 快速开始
+## 文档
 
-详见 [docs/README.md](docs/README.md)
+| 文档 | 说明 |
+|------|------|
+| [01-项目规划与架构设计](docs/01-项目规划与架构设计.md) | 限界上下文、领域模型 |
+| [02-环境准备](docs/02-环境准备.md) | 开发环境配置 |
+| [03-后端服务生成](docs/03-后端服务生成.md) | 微服务生成 |
+| [04-前端项目生成](docs/04-前端项目生成.md) | 前端配置 |
+| [05-领域模块开发](docs/05-领域模块开发.md) | 业务模块开发 |
+| [06-配置与部署](docs/06-配置与部署.md) | Docker、CI/CD |
 
 ---
 
