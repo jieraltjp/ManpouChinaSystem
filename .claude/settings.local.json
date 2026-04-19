@@ -24,7 +24,17 @@
       "Bash(./mvnw test *)",
       "Bash(./mvnw clean *)",
       "Bash(java -version)",
-      "Bash(mvn compile *)"
+      "Bash(mvn compile *)",
+      "Bash(netstat -ano)",
+      "Bash(mvn spring-boot:run -Dmaven.test.skip=true -q)",
+      "Bash(npm -v)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(npx vue-tsc *)",
+      "Bash(wc -l \"D:/Programme/java/ManpouChinaSystem/docs\"/*.md)",
+      "Bash(mkdir -p pro)",
+      "Bash(mv docs/pro/*.md pro/)",
+      "Bash(rmdir docs/pro)"
     ]
   }
 }

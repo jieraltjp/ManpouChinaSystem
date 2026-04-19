@@ -1,0 +1,197 @@
+# 项目文档：web（前端）
+
+> **文档角色**：前端开发工程师视角 → 用户界面
+> **对应角色文档**：`docs/role/05-前端开发工程师视角分析.md`
+
+---
+
+## 1. 项目定位
+
+| 维度 | 说明 |
+|------|------|
+| 项目名 | `@manpou/web` |
+| 端口 | 3000（开发） |
+| 包名 | `@manpou/web` |
+| 描述 | Vue 3 + TypeScript + Element Plus 管理后台前端 |
+| 当前状态 | 脚手架 ✅，页面待开发 |
+
+---
+
+## 2. 技术栈
+
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| Vue | 3.4+ | 框架 |
+| TypeScript | 5.4+ | 类型安全 |
+| Vite | 5.3+ | 构建工具 |
+| Element Plus | 2.6+ | UI 组件库 |
+| Pinia | 2.1+ | 状态管理 |
+| Vue Router | 4.3+ | 路由管理 |
+| Axios | 1.7+ | HTTP 客户端 |
+| jwt-decode | 4.0+ | Token 解析 |
+| dayjs | 1.11+ | 日期格式化 |
+
+---
+
+## 3. 项目结构
+
+```
+apps/web/
+├── src/
+│   ├── api/
+│   │   ├── client.ts               # Axios 实例（JWT 注入 + 401 处理）
+│   │   ├── adapters/
+│   │   │   └── auth.ts            # 认证 API 适配器
+│   │   └── types/
+│   │       └── api.ts             # API 通用类型（Result<T>）
+│   ├── components/
+│   │   └── atoms/
+│   │       └── Loading.vue         # 原子组件
+│   ├── composables/
+│   │   └── usePermission.ts        # 权限 Hook
+│   ├── layouts/
+│   │   └── AppLayout.vue          # 页面布局
+│   ├── pages/
+│   │   ├── auth/
+│   │   │   └── LoginPage.vue     # 登录页
+│   │   └── dashboard/
+│   │       ├── DashboardPage.vue  # 仪表盘
+│   │       └── ExamplesPage.vue   # 示例列表
+│   ├── router/
+│   │   └── index.ts              # 路由 + 守卫
+│   ├── stores/
+│   │   └── auth.ts               # 认证状态（Pinia）
+│   ├── types/
+│   │   ├── api.ts                # API 通用类型
+│   │   └── user.ts               # 用户类型
+│   ├── App.vue
+│   └── main.ts
+├── index.html
+├── vite.config.ts                 # Vite 配置（proxy → 18081）
+├── tsconfig.json
+└── package.json
+```
+
+---
+
+## 4. 已实现功能
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| Axios 客户端 | ✅ | JWT 注入 + 401 自动登出 |
+| 认证 Store | ✅ | Pinia 管理 token/userInfo |
+| 路由守卫 | ✅ | 未登录跳转登录页 |
+| 登录页 | ✅ | 页面框架 |
+| 仪表盘 | ✅ | 页面框架 |
+| 示例 CRUD | ✅ | 对接 user-service 示例 API |
+| Element Plus | ✅ | 组件库引入 |
+
+---
+
+## 5. 待实现页面
+
+| 页面 | 路径 | 组件 | 优先级 |
+|------|------|------|--------|
+| 登录 | `/login` | LoginPage | ✅ 已实现 |
+| 仪表盘 | `/dashboard` | DashboardPage | ✅ 已实现 |
+| 采购单列表 | `/procurement` | ProcurementListPage | P0 |
+| 新建采购单 | `/procurement/new` | ProcurementFormPage | P0 |
+| 采购单详情 | `/procurement/:id` | ProcurementDetailPage | P0 |
+| 仓储列表 | `/warehouse` | WarehouseListPage | P1 |
+| 报关管理 | `/customs` | CustomsListPage | P1 |
+| 物流管理 | `/logistics` | LogisticsListPage | P2 |
+| 财务管理 | `/finance` | FinanceListPage | P2 |
+| 商品管理 | `/product` | ProductListPage | P1 |
+| 用户管理 | `/user` | UserListPage | P1 |
+
+---
+
+## 6. API 集成状态
+
+### 6.1 已实现
+
+| 接口 | 方法 | 路径 | 服务 |
+|------|------|------|------|
+| 登录 | POST | /api/v1/auth/login | user-service |
+| 公钥获取 | GET | /api/v1/auth/public-key | user-service |
+| 密钥管理 | GET/POST | /api/v1/admin/keys | user-service |
+| 示例 CRUD | GET/POST/PUT/DELETE | /api/v1/examples | user-service |
+
+### 6.2 待实现（采购单）
+
+| 接口 | 方法 | 路径 | 页面 |
+|------|------|------|------|
+| 采购单列表 | GET | /api/v1/purchase-orders | procurement-list |
+| 采购单详情 | GET | /api/v1/purchase-orders/{id} | procurement-detail |
+| 新建采购单 | POST | /api/v1/purchase-orders | procurement-form |
+| 提交采购单 | POST | /api/v1/purchase-orders/{id}/submit | procurement-list |
+| 审批采购单 | POST | /api/v1/purchase-orders/{id}/approve | procurement-list |
+
+---
+
+## 7. Vite 代理配置
+
+```typescript
+// vite.config.ts
+server: {
+  proxy: {
+    '/api': {
+      target: 'http://localhost:18081',  // user-service 入口
+      changeOrigin: true,
+    },
+  },
+},
+```
+
+> **注意**：生产环境需要 API Gateway 做统一路由，目前前端 dev 阶段直连 user-service。
+
+---
+
+## 8. 构建与运行
+
+```bash
+# 安装依赖
+cd apps/web
+npm install
+
+# 开发模式
+npm run dev    # http://localhost:3000
+
+# 类型检查
+npm run type-check
+
+# 生产构建
+npm run build
+```
+
+---
+
+## 9. 组件规范
+
+| 层级 | 目录 | 说明 |
+|------|------|------|
+| 原子组件 | `components/atoms/` | Button, Input, Loading（无业务逻辑） |
+| 分子组件 | `components/molecules/` | Form, Card（组合原子组件） |
+| 有机体 | `components/organisms/` | Header, Sidebar（完整功能区块） |
+| 页面 | `pages/` | 路由页面（编排组件） |
+
+---
+
+## 10. 行动项
+
+- [ ] **本周**：理解现有项目结构（API 客户端/Store/路由/布局）
+- [ ] **本周**：理解 JWT 认证流程（登录→Token→请求拦截→401处理）
+- [ ] **本周**：搭建采购单列表页面框架
+- [ ] **下周二**：实现采购单列表 API 集成（GET /api/v1/purchase-orders）
+- [ ] **下周三**：实现新建采购单页面（POST）
+- [ ] **持续**：所有 API 调用通过 api/adapters/ 适配
+- [ ] **持续**：后端字段必须通过 Assembler 转换为前端 ViewModel
+
+---
+
+## 11. 相关文档
+
+| 文档 | 说明 |
+|------|------|
+| `docs/role/05-前端开发工程师视角分析.md` | 前端开发规范与 Action Items |
+| `docs/pro/00-root-project.md` | 项目全局概览 |
