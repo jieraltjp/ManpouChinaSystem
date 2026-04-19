@@ -67,7 +67,7 @@ apps/web/
 │   ├── App.vue
 │   └── main.ts
 ├── index.html
-├── vite.config.ts                 # Vite 配置（proxy → 18081）
+├── vite.config.ts                 # Vite 配置（proxy → 18080）
 ├── tsconfig.json
 └── package.json
 ```
@@ -136,14 +136,14 @@ apps/web/
 server: {
   proxy: {
     '/api': {
-      target: 'http://localhost:18081',  // user-service 入口
+      target: 'http://localhost:18080',  // API Gateway 入口
       changeOrigin: true,
     },
   },
 },
 ```
 
-> **注意**：生产环境需要 API Gateway 做统一路由，目前前端 dev 阶段直连 user-service。
+> **注意**：前端 dev 代理已切换至 API Gateway（18080），生产环境网关统一路由。
 
 ---
 

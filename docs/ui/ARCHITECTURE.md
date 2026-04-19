@@ -50,7 +50,7 @@ graph TB
     %% 数据流
     WEB -->|"GET /api/*"| ROUTER
     ROUTER -->|"JWT Token"| AXIOS
-    AXIOS -->|"proxy :3000→18081"| GW
+    AXIOS -->|"proxy :3000→18080"| GW
 
     GW -->|"路由分发"| USER
     GW -->|"路由分发"| PRODUCT

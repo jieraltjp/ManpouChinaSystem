@@ -167,7 +167,7 @@ curl -H "Authorization: Bearer <token>" \
      http://localhost:18080/api/v1/examples
 ```
 
-> **注意**：前端 Vite 代理目前直连 `localhost:18081`，网关启动后需改为 `localhost:18080`。
+> **已同步**：前端 Vite 代理已切换至 `localhost:18080`（E-01 Phase 1 完成）。
 
 ---
 
