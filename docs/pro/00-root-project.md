@@ -31,9 +31,10 @@ ManpouChinaSystem/
 │   ├── logistics-service/     # 物流管理（端口 18086）
 │   ├── finance-service/       # 财务管理（端口 18087）
 │   ├── notification-service/  # 通知服务（端口 18088）
+│   ├── api-gateway/         # API 网关（端口 18080）
 │   └── web/                  # 前端（端口 3000）
 ├── scaffolds/
-│   └── api-gateway/          # API 网关脚手架（AR-001，待集成）
+│   └── api-gateway/          # API 网关脚手架（已迁移至 apps/）
 ├── infra/
 │   └── helm/                 # K8s Helm 部署模板
 ├── docker/                   # Docker Compose 本地开发环境
@@ -148,7 +149,7 @@ docker-compose -f docker-compose.yml up -d
 
 | ID | 风险 | 等级 | 建议 |
 |----|------|------|------|
-| AR-001 | 无 API Gateway | 🔴 高 | 优先实现 |
+| AR-001 | API Gateway 脚手架已生成（apps/api-gateway），待启动验证 | 🟡 中 | 启动 + 集成前端代理 |
 | AR-002 | 无服务间认证 | 🔴 高 | mTLS / JWT 内部传递 |
 | AR-003 | Kafka 消费者未实现 | 🔴 高 | 实现消费逻辑 |
 | AR-004 | Nacos 配置当前禁用 | 🟡 中 | 开发完成后接入 |

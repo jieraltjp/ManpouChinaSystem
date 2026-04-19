@@ -1,8 +1,8 @@
 # 项目文档：api-gateway（API 网关）
 
 > **文档角色**：架构师 + 后端开发工程师视角
-> **对应目录**：`scaffolds/api-gateway/`
-> **风险等级**：🔴 高（AR-001，待实现）
+> **对应目录**：`apps/api-gateway/`
+> **风险等级**：🟡 中（AR-001，已生成脚手架，待启动测试）
 
 ---
 
@@ -11,14 +11,14 @@
 | 维度 | 说明 |
 |------|------|
 | 服务名 | api-gateway |
-| 端口 | 8080 |
-| 包名 | `com.company.gateway` |
+| 端口 | 18080 |
+| 包名 | `com.manpou.gateway` |
 | 定位 | 所有外部请求统一入口 |
-| 当前状态 | 脚手架已完成 ✅，待集成到项目 |
+| 当前状态 | 已生成 ✅，待启动验证 |
 
 **职责边界**：
 - 统一入口：所有前端请求经此网关
-- 路由转发：`/api/v1/**` → 后端服务，`/api/v2/**` → Python 服务
+- 路由转发：静态路由到各后端服务（端口 18081-18088）
 - JWT 鉴权：RS256 公钥验签，Claims 注入下游请求头
 - 限流 + 熔断：Resilience4j per-route 配置
 - TraceId 透传：W3C traceparent，响应头返回 X-Trace-Id
@@ -35,8 +35,8 @@
 | Spring Cloud Gateway | 核心网关框架 |
 | Resilience4j | 限流 + 熔断 |
 | jjwt | JWT RS256 验签 |
-| Nacos | 服务发现 + 配置中心（可选，dev 环境禁用） |
-| Redis | 分布式限流计数器（可选，无 Redis 时用内存限流） |
+| Nacos | 服务发现 + 配置中心（本地禁用） |
+| Redis | 分布式限流计数器（可选，无 Redis 时用内存） |
 
 ---
 
@@ -65,19 +65,25 @@
 
 ## 4. 路由配置
 
-| 路径 | 目标服务 | 鉴权 |
-|------|---------|------|
-| `/api/v1/**` | java-service (:8080) | ✅ JWT |
-| `/api/v2/**` | python-service (:8000) | ✅ JWT |
-| `/api/v1/auth/**` | java-service | ❌ 白名单 |
-| `/actuator/**` | forward:/actuator | ❌ 白名单 |
-| `/health` | forward:/health | ❌ 白名单 |
+| 路径 | 目标服务 | 端口 | 鉴权 |
+|------|---------|------|------|
+| `/api/v1/auth/**` | user-service | 18081 | ❌ 白名单 |
+| `/api/v1/products/**` | product-service | 18082 | ✅ JWT |
+| `/api/v1/purchase-orders/**` | procurement-service | 18083 | ✅ JWT |
+| `/api/v1/warehouse/**` | warehouse-service | 18084 | ✅ JWT |
+| `/api/v1/customs/**` | customs-service | 18085 | ✅ JWT |
+| `/api/v1/logistics/**` | logistics-service | 18086 | ✅ JWT |
+| `/api/v1/finance/**` | finance-service | 18087 | ✅ JWT |
+| `/api/v1/notifications/**` | notification-service | 18088 | ✅ JWT |
+| `/api/v1/**` | user-service（默认） | 18081 | ✅ JWT |
+| `/actuator/**` | forward:/actuator | — | ❌ 白名单 |
+| `/health` | forward:/health | — | ❌ 白名单 |
 
 ### 熔断配置（per-route）
 
 ```yaml
 circuitBreaker:
-  fallbackUri: forward:/fallback/{service}
+  fallbackUri: forward:/fallback
 retry:
   methods: GET only
   retries: 3
@@ -94,7 +100,7 @@ retry:
         ↓
 JwtAuthFilter 提取 Token
         ↓
-JwtValidator 使用 classpath:keys/public.pem 验签
+JwtValidator 使用 classpath:keys/public.pem 验签（公钥来自 user-service）
         ↓
 Claims 提取：sub / username / tenantId / roles / permissions
         ↓
@@ -111,17 +117,17 @@ Claims 提取：sub / username / tenantId / roles / permissions
 ## 6. 项目结构
 
 ```
-scaffolds/api-gateway/
-├── pom.xml
-├── Dockerfile
+apps/api-gateway/
+├── pom.xml                          # Maven 依赖（parent: java-service）
+├── Dockerfile                       # 多阶段构建（JDK 21）
 └── src/
     ├── main/
-    │   ├── java/com/company/gateway/
-    │   │   ├── ApiGatewayApplication.java   # 启动类
+    │   ├── java/com/manpou/gateway/
+    │   │   ├── ApiGatewayApplication.java   # 启动类（排除 Nacos 自动配置）
     │   │   ├── route/
-    │   │   │   └── RouteConfig.java        # 静态路由配置
+    │   │   │   └── RouteConfig.java        # 9 条静态路由
     │   │   ├── filter/
-    │   │   │   ├── TraceIdFilter.java      # TraceId 过滤器（Order=1）
+    │   │   │   ├── TraceIdFilter.java      # TraceId（Order=1）
     │   │   │   ├── JwtAuthFilter.java      # JWT 鉴权（Order=2）
     │   │   │   ├── RateLimitFilter.java    # 限流拦截（Order=3）
     │   │   │   ├── CorsFilter.java        # CORS
@@ -132,10 +138,10 @@ scaffolds/api-gateway/
     │   │   │   ├── JwtClaims.java         # Claims 记录
     │   │   │   └── JwtPublicKeyManager.java # 公钥加载
     │   │   └── config/
-    │   │       └── GatewayConfig.java
+    │   │       └── GatewayConfig.java     # 限流 Bean
     │   └── resources/
-    │       ├── application.yml
-    │       └── keys/public.pem            # RS256 公钥
+    │       ├── application.yml            # 端口 18080，路由配置
+    │       └── keys/public.pem            # RS256 公钥（来自 user-service）
     └── test/
         ├── JwtValidatorTest.java
         └── TraceIdUtilTest.java
@@ -143,60 +149,33 @@ scaffolds/api-gateway/
 
 ---
 
-## 7. 配置项
-
-```yaml
-gateway:
-  route:
-    java-service: http://localhost:8080   # 下游服务地址
-    python-service: http://localhost:8000
-  ratelimit:
-    default-rate: 100    # 每秒请求数
-    default-burst: 200   # 突发容量
-  jwt:
-    public-key-path: classpath:keys/public.pem
-  circuit-breaker:
-    sliding-window-size: 10
-    failure-rate-threshold: 50   # 50% 失败率触发熔断
-    wait-duration-in-open-state: 30s
-    permitted-calls-in-half-open-state: 3
-```
-
----
-
-## 8. 接入步骤
+## 7. 启动与验证
 
 ```bash
-# 1. 复制脚手架到项目根目录
-cp -r scaffolds/api-gateway apps/
-
-# 2. 修改 pom.xml 中的 parent 路径
-# 将 ../java-service/pom.xml 改为 ../java-service/pom.xml
-
-# 3. 复制 RS256 公钥（必须与 user-service 的私钥配对）
-cp apps/user-service/src/main/resources/keys/public.pem \
-   apps/api-gateway/src/main/resources/keys/
-
-# 4. 配置 Vite 代理（开发）
-# vite.config.ts
-proxy: {
-  '/api': { target: 'http://localhost:8080', changeOrigin: true }
-}
-
-# 5. 构建
+# 构建
 cd apps/api-gateway && mvn clean package -DskipTests
 
-# 6. 运行
+# 启动
 java -jar target/api-gateway-1.0.0-SNAPSHOT.jar
+
+# 验证
+curl http://localhost:18080/health
+# → 200 OK
+
+# 测试路由（代理到 user-service）
+curl -H "Authorization: Bearer <token>" \
+     http://localhost:18080/api/v1/examples
 ```
+
+> **注意**：前端 Vite 代理目前直连 `localhost:18081`，网关启动后需改为 `localhost:18080`。
 
 ---
 
-## 9. 相关文档
+## 8. 相关文档
 
 | 文档 | 说明 |
 |------|------|
-| `docs/pro/00-root-project.md` | 项目全局（AR-001 高风险标记） |
+| `docs/pro/00-root-project.md` | 项目全局（AR-001 风险追踪） |
 | `docs/pro/02-user-service.md` | JWT 签发方（公钥来源） |
 | `docs/pro/10-web-frontend.md` | 前端代理配置 |
 | `docs/ui/ARCHITECTURE.md` | 架构图（请求流程） |
