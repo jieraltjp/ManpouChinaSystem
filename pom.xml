@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.manpou</groupId>
+    <artifactId>manpou-china-system</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>满铺中国发注管理体系</description>
+
+    <properties>
+        <revision>1.0.0-SNAPSHOT</revision>
+    </properties>
+
+    <modules>
+        <module>apps/user-service</module>
+        <module>apps/product-service</module>
+        <module>apps/procurement-service</module>
+        <module>apps/warehouse-service</module>
+        <module>apps/customs-service</module>
+        <module>apps/logistics-service</module>
+        <module>apps/finance-service</module>
+        <module>apps/notification-service</module>
+    </modules>
+
+</project>

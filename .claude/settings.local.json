@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find *)",
+      "Bash(xargs grep *)",
+      "Bash(./mvnw compile *)",
+      "Bash(python3 *)",
+      "Bash(./apps/procurement-service/mvnw compile *)",
+      "Bash(sed -i 's|\\\\${SERVER_PORT:8080}|${SERVER_PORT:8081}|' user-service/src/main/resources/application.yml)",
+      "Bash(sed -i 's|\\\\${SERVER_PORT:8080}|${SERVER_PORT:8082}|' product-service/src/main/resources/application.yml)",
+      "Bash(sed -i 's|\\\\${SERVER_PORT:8080}|${SERVER_PORT:8084}|' warehouse-service/src/main/resources/application.yml)",
+      "Bash(sed -i 's|\\\\${SERVER_PORT:8080}|${SERVER_PORT:8085}|' customs-service/src/main/resources/application.yml)",
+      "Bash(sed -i 's|\\\\${SERVER_PORT:8080}|${SERVER_PORT:8086}|' logistics-service/src/main/resources/application.yml)",
+      "Bash(sed -i 's|java-service-template|user-service|' user-service/src/main/resources/application.yml)",
+      "Bash(sed -i 's|java-service-template|product-service|' product-service/src/main/resources/application.yml)",
+      "Bash(sed -i 's|java-service-template|procurement-service|' procurement-service/src/main/resources/application.yml)",
+      "Bash(sed -i 's|java-service-template|warehouse-service|' warehouse-service/src/main/resources/application.yml)",
+      "Bash(sed -i 's|java-service-template|customs-service|' customs-service/src/main/resources/application.yml)",
+      "Bash(./mvnw spring-boot:run -q)",
+      "Bash(curl -s http://localhost:8083/actuator/health)",
+      "Bash(./mvnw spring-boot:run -DskipTests -q)",
+      "Bash(./mvnw spring-boot:run -Dmaven.test.skip=true -q)",
+      "Bash(curl *)",
+      "Bash(./mvnw test *)",
+      "Bash(./mvnw clean *)",
+      "Bash(java -version)",
+      "Bash(mvn compile *)"
+    ]
+  }
+}

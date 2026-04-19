@@ -8,9 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 使用 Spring Cloud Alibaba 自动注册到 Nacos。
  */
 @SpringBootApplication
-public class TemplateApplication {
+public class CustomsServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TemplateApplication.class, args);
+        SpringApplication.run(CustomsServiceApplication.class, args);
     }
 }
