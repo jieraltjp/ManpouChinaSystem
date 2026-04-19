@@ -189,7 +189,20 @@ npm run build
 
 ---
 
-## 11. 相关文档
+## 11. 前端 UI 文档
+
+| 文档 | 说明 |
+|------|------|
+| [docs/ui/README.md](../ui/README.md) | 前端页面文档入口 |
+| [docs/ui/ARCHITECTURE.md](../ui/ARCHITECTURE.md) | 系统架构图（Mermaid） |
+| [docs/ui/pages/01-login.md](../ui/pages/01-login.md) | 登录页 |
+| [docs/ui/pages/02-dashboard.md](../ui/pages/02-dashboard.md) | 仪表盘 |
+| [docs/ui/pages/03-examples.md](../ui/pages/03-examples.md) | 示例列表 |
+| [docs/ui/pages/04-procurement.md](../ui/pages/04-procurement.md) | 采购单管理 |
+
+---
+
+## 12. 相关文档
 
 | 文档 | 说明 |
 |------|------|
