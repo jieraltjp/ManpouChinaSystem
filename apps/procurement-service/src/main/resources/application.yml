@@ -1,0 +1,107 @@
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: ${APP_NAME:java-service-template}
+
+  # Nacos 配置中心（本地 dev 无 Docker 时禁用检查；生产环境启用需设置 spring.profiles.active=dev）
+  cloud:
+    nacos:
+      config:
+        import-check:
+          enabled: false
+
+  # 数据源（本地 H2 无 Docker；生产切 MySQL）
+  datasource:
+    url: jdbc:h2:mem:${DB_NAME:app};MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # JPA 配置
+  jpa:
+    hibernate:
+      ddl-auto: update     # 本地 H2 用 update；生产环境必须 validate
+    show-sql: false       # 本地 dev 可改为 true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+        # 生产环境开启二级缓存（可选，配合 Redis）
+        # cache:
+        #   use_second_level_cache: true
+        #   region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+
+  # Flyway 数据库迁移（本地 H2 禁用，生产 MySQL 启用）
+  flyway:
+    enabled: false
+
+  # Redis（可选）
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DB:0}
+      timeout: 5000
+
+# Spring Cloud Alibaba Nacos 注册中心（本地禁用，需要时设置 spring.profiles.active=dev）
+spring.cloud.nacos.discovery:
+  server-addr: ${NACOS_SERVER:nacos}:8848
+  namespace: ${NACOS_NAMESPACE:dev}
+  group: ${SERVICE_GROUP:DEFAULT_GROUP}
+  enabled: false
+
+# Spring Cloud Gateway 路由配置
+spring.cloud.gateway.discovery.locator.enabled: false
+
+# 日志配置（结构化 JSON）
+logging:
+  level:
+    root: INFO
+    com.manpou.procurement: DEBUG
+  pattern:
+    console: '{"time":"%d{yyyy-MM-dd HH:mm:ss.SSS}","level":"%level","service":"${spring.application.name}","traceId":"%X{traceId}","thread":"%t","logger":"%logger{36}","msg":"%msg"}%n'
+  org.hibernate.SQL: WARN
+  org.hibernate.type.descriptor.sql.BasicBinder: WARN
+
+# JWT 配置（RS256 密钥从 classpath:keys/ 加载）
+jwt:
+  access-token-ttl-seconds: 900        # 15 分钟
+  key:
+    algorithm: RS256                   # 非对称签名，公钥暴露给前端
+
+# ============================================================
+# ConfigSource 配置（ADR-0014 Phase A — 配置抽象层）
+# 选择配置源：properties(默认) / local(开发/CI) / nacos(生产)
+# ============================================================
+app:
+  config:
+    source: ${CONFIG_SOURCE:properties}       # 配置源类型
+    local:
+      path: ${CONFIG_LOCAL_PATH:config/local.yaml}  # local 模式时的配置文件路径
+    nacos:
+      data-id: ${spring.application.name}     # Nacos data-id
+      group: ${SERVICE_GROUP:DEFAULT_GROUP}  # Nacos group
+
+# Actuator 端点（生产按需开启）
+management:
+  endpoints:
+    web.exposure.include: health,info,metrics,prometheus
+  endpoint:
+    health.show-details: when_authorized
+  metrics.tags:
+    service: ${spring.application.name}
