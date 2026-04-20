@@ -10,8 +10,8 @@ import lombok.Data;
 @Data
 public class ProcurementQuery {
 
-    /** 当前页（从 1 开始） */
-    private Integer page = 1;
+    /** 当前页（从 0 开始，与前端 0-indexed 兼容） */
+    private Integer page = 0;
 
     /** 每页条数 */
     private Integer pageSize = 20;

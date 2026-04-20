@@ -38,7 +38,7 @@ public class ProcurementUseCase {
     @Transactional(readOnly = true)
     public Page<ProcurementPageQuery> pageQuery(ProcurementQuery query) {
         PageRequest pageRequest = PageRequest.of(
-                (query.getPage() - 1),
+                query.getPage(),
                 Math.min(query.getPageSize(), 100),
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
