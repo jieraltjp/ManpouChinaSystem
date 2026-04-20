@@ -38,9 +38,7 @@
         :data="tableData"
         stripe
         style="width: 100%"
-        @row-click="onRowClick"
       >
-        <el-table-column type="selection" width="50" />
         <el-table-column prop="productCode" label="商品代码" width="120">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
@@ -62,7 +60,11 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="160" />
+        <el-table-column prop="createTime" label="创建时间" width="160">
+          <template #default="{ row }">
+            {{ row.createTime ? new Date(row.createTime).toLocaleString('zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="150" fixed="right" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">详情</el-button>
@@ -106,13 +108,13 @@
         <el-descriptions-item label="客户公司">{{ currentRow.customerCompany || '-' }}</el-descriptions-item>
         <el-descriptions-item label="下单日">{{ currentRow.orderDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="厂家出货日">{{ currentRow.factoryShipDate || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="厂家出货日">{{ currentRow.factoryShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="计划出货日">{{ currentRow.plannedShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="商品担当">{{ currentRow.productLead || '-' }}</el-descriptions-item>
         <el-descriptions-item label="日本担当">{{ currentRow.japanLead || '-' }}</el-descriptions-item>
         <el-descriptions-item label="中国担当">{{ currentRow.chinaLead || '-' }}</el-descriptions-item>
         <el-descriptions-item label="发送目的地" :span="2">{{ currentRow.destination || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="创建时间" :span="2">{{ currentRow.createTime }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间" :span="2">{{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString('zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
+        <el-descriptions-item label="更新时间" :span="2">{{ currentRow.updateTime ? new Date(currentRow.updateTime).toLocaleString('zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
       </el-descriptions>
 
       <div class="drawer-actions">
@@ -122,7 +124,7 @@
     </el-drawer>
 
     <!-- 新建/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? '新规发注' : '编辑发注单'" width="640px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? '新规发注' : '编辑发注单'" width="640px">
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="110px">
         <el-form-item label="商品代码" prop="productCode">
           <el-input v-model="formData.productCode" placeholder="如 de077" />
@@ -182,7 +184,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest } from '@/api/procurement'
 
@@ -192,12 +194,14 @@ const drawerVisible = ref(false)
 const dialogVisible = ref(false)
 const dialogMode = ref<'create' | 'update'>('create')
 const currentRow = ref<ProcurementPageVO | null>(null)
-const formRef = ref()
+const formRef = ref<FormInstance>()
 
 const deletableStatuses = ['未定', '発注待']
 
 const statusOptions = [
   { value: '未定', label: '未定' },
+  { value: '予定', label: '予定' },
+  { value: 'OEM', label: 'OEM' },
   { value: '発注待', label: '発注待' },
   { value: '永康', label: '永康' },
   { value: '直送', label: '直送' },
@@ -319,8 +323,18 @@ function onEdit(row: ProcurementPageVO | null) {
 
 async function onDelete(row: ProcurementPageVO) {
   try {
+    await ElMessageBox.confirm(
+      `确认删除发注单「${row.productCode}」（${row.quantity}件）？`,
+      '删除确认',
+      { confirmButtonText: '删除', cancelButtonText: '取消', type: 'warning' }
+    )
+  } catch {
+    return
+  }
+  try {
     await procurementApi.delete(row.id)
     ElMessage.success('删除成功')
+    drawerVisible.value = false
     loadData()
   } catch {
     // error handled by axios interceptor
@@ -379,10 +393,6 @@ async function onSubmit() {
       submitting.value = false
     }
   })
-}
-
-function onRowClick(row: ProcurementPageVO) {
-  onView(row)
 }
 
 function statusLabel(status: string): string {

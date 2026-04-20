@@ -4,7 +4,7 @@
 > **更新**: 2026-04-20
 > **依据**: `docs/发注管理体系升级.pdf` + `docs/新発注管理-設計図.xlsx`
 
-> ⚠️ **代码实现进度**: 所有接口均未实现（procurement-service / product-service 仅骨架）
+> ⚠️ **代码实现进度**: 发注单 CRUD ✅ 已实现 · 商品目录 🔴 骨架 · 验货/货柜/财务/退货 🔴 未实现
 
 ---
 
@@ -105,8 +105,8 @@ GET /api/v1/procurements
 | status | string | 状态过滤（未定/発注待/永康/倉庫着/検品/エア便/輸出/通関/日本着/会計/完了/退货） |
 | productCode | string | 商品代码 |
 | customerCompany | string | 客户公司 |
-| page | int | 页码，默认 0 |
-| size | int | 页大小，默认 20 |
+| page | int | 页码，默认 0（0-indexed） |
+| pageSize | int | 页大小，默认 20 |
 
 **响应**：`200 OK`
 ```json
@@ -216,7 +216,7 @@ PATCH /api/v1/procurements/{id}
 DELETE /api/v1/procurements/{id}
 ```
 
-- 仅 `未定`/`予定`/`発注待` 状态可删除
+- 仅 `未定`/`発注待` 状态可删除
 - `完了` 禁止删除
 
 ---
