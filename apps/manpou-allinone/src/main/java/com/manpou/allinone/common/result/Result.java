@@ -1,6 +1,7 @@
 package com.manpou.allinone.common.result;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
@@ -20,6 +21,7 @@ public class Result<T> {
 
     private String code;
     private String message;
+    @JsonProperty("data")
     private T payload;
     private String traceId;
     private String detail;

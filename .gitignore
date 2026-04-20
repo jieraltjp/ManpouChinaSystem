@@ -132,6 +132,8 @@ docker-compose.override.yml
 # =============================================
 # Config & Secrets (local overrides)
 # =============================================
+application-local.yml
+application-local.yaml
 application-local*.yml
 application-local*.yaml
 application-dev*.yml

@@ -172,6 +172,7 @@ start_manpou() {
 
     nohup java $JAVA_OPTS -jar "$jar" \
         --server.port=${ALLINONE_PORT} \
+        --spring.profiles.active=local \
         > "${PROJECT_DIR}/logs/manpou-allinone.log" 2>&1 &
     local pid=$!
     echo "$pid" > "${PROJECT_DIR}/logs/manpou-allinone.pid"
@@ -209,6 +210,7 @@ start_user() {
 
     nohup java $JAVA_OPTS -jar "$jar" \
         --server.port=${USER_PORT} \
+        --spring.profiles.active=local \
         > "${PROJECT_DIR}/logs/user-service.log" 2>&1 &
     local pid=$!
     echo "$pid" > "${PROJECT_DIR}/logs/user-service.pid"

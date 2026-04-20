@@ -1,6 +1,7 @@
 package com.manpou.user.common.result;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,6 +41,7 @@ public class Result<T> {
     private String message;
 
     /** 响应数据（成功时返回） */
+    @JsonProperty("data")
     private T payload;
 
     /** TraceId（由 Filter 注入，始终返回） */
