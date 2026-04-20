@@ -234,7 +234,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 | 文档 | 说明 |
 |------|------|
-| [`docs/98-项目全貌与演进路线图.md`](98-项目全貌与演进路线图.md) | 演进路线（Phase 0 → 4） |
+| [`docs/check/98-项目全貌与演进路线图.md`](../check/98-项目全貌与演进路线图.md) | 演进路线（Phase 0 → 4） |
 | [`docs/pro/11-api-gateway.md`](11-api-gateway.md) | API 网关配置 |
 | [`docs/pro/17-服务间认证.md`](17-服务间认证.md) | JWT + RS256 机制 |
 | `apps/manpou-allinone/src/main/resources/application.yml` | 所有inone 配置 |

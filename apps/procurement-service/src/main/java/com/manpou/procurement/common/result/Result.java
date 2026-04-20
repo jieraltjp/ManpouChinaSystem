@@ -40,7 +40,7 @@ public class Result<T> {
     private String message;
 
     /** 响应数据（成功时返回） */
-    private T data;
+    private T payload;
 
     /** TraceId（由 Filter 注入，始终返回） */
     private String traceId;
@@ -55,11 +55,11 @@ public class Result<T> {
     }
 
     public static <T> Result<T> ok(T data) {
-        return Result.<T>builder().code("ok").message("success").data(data).build();
+        return Result.<T>builder().code("ok").message("success").payload(data).build();
     }
 
     public static <T> Result<T> ok(String message, T data) {
-        return Result.<T>builder().code("ok").message(message).data(data).build();
+        return Result.<T>builder().code("ok").message(message).payload(data).build();
     }
 
     public static <T> Result<T> fail(String code, String message) {
