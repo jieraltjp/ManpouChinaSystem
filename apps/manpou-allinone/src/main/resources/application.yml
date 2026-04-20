@@ -1,0 +1,93 @@
+server:
+  port: ${SERVER_PORT:18090}
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: ${APP_NAME:manpou-allinone}
+
+  cloud:
+    nacos:
+      config:
+        enabled: false
+        import-check:
+          enabled: false
+    alibaba:
+      cloud:
+        enabled: false
+
+  datasource:
+    url: jdbc:h2:mem:${DB_NAME:allinone};MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: 30
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  flyway:
+    enabled: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DB:0}
+      timeout: 5000
+
+spring.cloud.nacos.discovery:
+  server-addr: ${NACOS_SERVER:nacos}:8848
+  namespace: ${NACOS_NAMESPACE:dev}
+  group: ${SERVICE_GROUP:DEFAULT_GROUP}
+  enabled: false
+
+spring.cloud.gateway.discovery.locator.enabled: false
+
+logging:
+  level:
+    root: INFO
+    com.manpou.allinone: DEBUG
+  pattern:
+    console: '{"time":"%d{yyyy-MM-dd HH:mm:ss.SSS}","level":"%level","service":"${spring.application.name}","traceId":"%X{traceId}","thread":"%t","logger":"%logger{36}","msg":"%msg"}%n'
+  org.hibernate.SQL: WARN
+  org.hibernate.type.descriptor.sql.BasicBinder: WARN
+
+jwt:
+  access-token-ttl-seconds: 900
+  key:
+    algorithm: RS256
+
+app:
+  config:
+    source: ${CONFIG_SOURCE:properties}
+    local:
+      path: ${CONFIG_LOCAL_PATH:config/local.yaml}
+    nacos:
+      data-id: ${spring.application.name}
+      group: ${SERVICE_GROUP:DEFAULT_GROUP}
+
+management:
+  endpoints:
+    web.exposure.include: health,info,metrics,prometheus
+  endpoint:
+    health.show-details: when_authorized
+  metrics.tags:
+    service: ${spring.application.name}

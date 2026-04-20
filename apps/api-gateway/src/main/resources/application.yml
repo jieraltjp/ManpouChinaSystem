@@ -74,6 +74,7 @@ gateway:
     logistics-service: http://${LOGISTICS_SERVICE_HOST:localhost}:${LOGISTICS_SERVICE_PORT:18086}
     finance-service: http://${FINANCE_SERVICE_HOST:localhost}:${FINANCE_SERVICE_PORT:18087}
     notification-service: http://${NOTIFY_SERVICE_HOST:localhost}:${NOTIFY_SERVICE_PORT:18088}
+    allinone-service: http://${ALLINONE_HOST:localhost}:${ALLINONE_PORT:18090}
 
   # 限流配置
   ratelimit:
