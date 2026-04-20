@@ -1,11 +1,11 @@
 <template>
   <div class="test-page">
     <div class="page-header">
-      <h2 class="page-title">采购单管理</h2>
+      <h2 class="page-title">发注单管理</h2>
       <div class="header-actions">
         <el-button type="primary" @click="onNew">
           <el-icon><Plus /></el-icon>
-          新建采购单
+          新规发注
         </el-button>
       </div>
     </div>
@@ -13,24 +13,16 @@
     <!-- 筛选栏 -->
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filterForm">
-        <el-form-item label="采购单号">
-          <el-input v-model="filterForm.orderNo" placeholder="PO+yyyyMMdd+序号" clearable style="width: 180px" />
+        <el-form-item label="商品代码">
+          <el-input v-model="filterForm.productCode" placeholder="如 de077" clearable style="width: 140px" />
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="filterForm.status" placeholder="全部" clearable style="width: 140px">
-            <el-option label="草稿" value="DRAFT" />
-            <el-option label="待审核" value="PENDING" />
-            <el-option label="已批准" value="APPROVED" />
-            <el-option label="已拒绝" value="REJECTED" />
-            <el-option label="已取消" value="CANCELLED" />
+            <el-option v-for="s in statusOptions" :key="s.value" :label="s.label" :value="s.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="优先级">
-          <el-select v-model="filterForm.priority" placeholder="全部" clearable style="width: 120px">
-            <el-option label="紧急" value="URGENT" />
-            <el-option label="高" value="HIGH" />
-            <el-option label="普通" value="NORMAL" />
-          </el-select>
+        <el-form-item label="客户公司">
+          <el-input v-model="filterForm.customerCompany" placeholder="客户公司" clearable style="width: 160px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="loadData">查询</el-button>
@@ -49,39 +41,35 @@
         @row-click="onRowClick"
       >
         <el-table-column type="selection" width="50" />
-        <el-table-column prop="orderNo" label="采购单号" width="180">
+        <el-table-column prop="productCode" label="商品代码" width="120">
           <template #default="{ row }">
-            <span class="order-no">{{ row.orderNo }}</span>
+            <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="contactName" label="联系人" width="100" />
-        <el-table-column prop="shippingAddress" label="发货地址" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="priority" label="优先级" width="90" align="center">
+        <el-table-column prop="quantity" label="数量" width="80" align="right" />
+        <el-table-column prop="estimatedPriceJpy" label="估算批发价(JPY)" width="150" align="right">
           <template #default="{ row }">
-            <el-tag :type="priorityType(row.priority)" size="small">
-              {{ priorityLabel(row.priority) }}
-            </el-tag>
+            {{ row.estimatedPriceJpy ? row.estimatedPriceJpy.toLocaleString() : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="100" align="center">
+        <el-table-column prop="customerCompany" label="客户公司" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="productLead" label="商品担当" width="100" />
+        <el-table-column prop="plannedShipDate" label="计划出货日" width="130" />
+        <el-table-column prop="status" label="状态" width="110" align="center">
           <template #default="{ row }">
             <el-tag :type="statusType(row.status)" size="small">
               {{ statusLabel(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="isExport" label="类型" width="80" align="center">
-          <template #default="{ row }">
-            <el-tag v-if="row.isExport" type="warning" size="small">出口</el-tag>
-            <el-tag v-else type="info" size="small">内贸</el-tag>
-          </template>
-        </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="160" />
-        <el-table-column label="操作" width="180" fixed="right" align="center">
+        <el-table-column label="操作" width="150" fixed="right" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">详情</el-button>
-            <el-button link type="primary" size="small" @click.stop="onEdit(row)" :disabled="row.status !== 'DRAFT'">编辑</el-button>
-            <el-button link type="danger" size="small" @click.stop="onDelete(row)" :disabled="row.status !== 'DRAFT'">删除</el-button>
+            <el-button link type="primary" size="small" @click.stop="onEdit(row)"
+              :disabled="row.status === '完了'">编辑</el-button>
+            <el-button link type="danger" size="small" @click.stop="onDelete(row)"
+              :disabled="!deletableStatuses.includes(row.status)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -101,36 +89,83 @@
     </el-card>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" title="采购单详情" size="600px" direction="rtl">
+    <el-drawer v-model="drawerVisible" title="发注单详情" size="600px" direction="rtl">
       <el-descriptions :column="2" border v-if="currentRow">
-        <el-descriptions-item label="采购单号">{{ currentRow.orderNo }}</el-descriptions-item>
+        <el-descriptions-item label="商品代码">{{ currentRow.productCode }}</el-descriptions-item>
+        <el-descriptions-item label="数量">{{ currentRow.quantity }}</el-descriptions-item>
+        <el-descriptions-item label="人民币单价">{{ currentRow.priceRmb }}</el-descriptions-item>
+        <el-descriptions-item label="汇率">{{ currentRow.exchangeRate }}</el-descriptions-item>
+        <el-descriptions-item label="票点">{{ currentRow.taxPoint }}</el-descriptions-item>
+        <el-descriptions-item label="估算批发价(JPY)">{{ currentRow.estimatedPriceJpy?.toLocaleString() }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusType(currentRow.status)" size="small">
             {{ statusLabel(currentRow.status) }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="联系人">{{ currentRow.contactName }}</el-descriptions-item>
-        <el-descriptions-item label="联系电话">{{ currentRow.contactPhone }}</el-descriptions-item>
-        <el-descriptions-item label="发货地址" :span="2">{{ currentRow.shippingAddress }}</el-descriptions-item>
-        <el-descriptions-item label="优先级">
-          <el-tag :type="priorityType(currentRow.priority)" size="small">
-            {{ priorityLabel(currentRow.priority) }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="类型">
-          {{ currentRow.isExport ? '出口' : '内贸' }}
-        </el-descriptions-item>
+        <el-descriptions-item label="客户公司">{{ currentRow.customerCompany || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="下单日">{{ currentRow.orderDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="厂家出货日">{{ currentRow.factoryShipDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="计划出货日">{{ currentRow.plannedShipDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="商品担当">{{ currentRow.productLead || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="日本担当">{{ currentRow.japanLead || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="中国担当">{{ currentRow.chinaLead || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="发送目的地" :span="2">{{ currentRow.destination || '-' }}</el-descriptions-item>
         <el-descriptions-item label="创建时间" :span="2">{{ currentRow.createTime }}</el-descriptions-item>
-        <el-descriptions-item label="备注" :span="2">{{ currentRow.remark || '-' }}</el-descriptions-item>
       </el-descriptions>
 
       <div class="drawer-actions">
         <el-button @click="drawerVisible = false">关闭</el-button>
-        <el-button type="primary" v-if="currentRow?.status === 'DRAFT'" @click="onSubmit(currentRow)">
-          提交审核
-        </el-button>
+        <el-button type="primary" @click="onEdit(currentRow)">编辑</el-button>
       </div>
     </el-drawer>
+
+    <!-- 新建/编辑弹窗 -->
+    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? '新规发注' : '编辑发注单'" width="640px" destroy-on-close>
+      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="110px">
+        <el-form-item label="商品代码" prop="productCode">
+          <el-input v-model="formData.productCode" placeholder="如 de077" />
+        </el-form-item>
+        <el-form-item label="数量" prop="quantity">
+          <el-input-number v-model="formData.quantity" :min="1" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="人民币单价" prop="priceRmb">
+          <el-input-number v-model="formData.priceRmb" :min="0" :precision="2" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="汇率" prop="exchangeRate">
+          <el-input-number v-model="formData.exchangeRate" :min="0.0001" :precision="4" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="票点" prop="taxPoint">
+          <el-input-number v-model="formData.taxPoint" :min="0.0001" :precision="4" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="客户公司">
+          <el-input v-model="formData.customerCompany" placeholder="客户公司名称" />
+        </el-form-item>
+        <el-form-item label="商品担当">
+          <el-input v-model="formData.productLead" placeholder="商品担当姓名" />
+        </el-form-item>
+        <el-form-item label="日本担当">
+          <el-input v-model="formData.japanLead" placeholder="日本担当姓名" />
+        </el-form-item>
+        <el-form-item label="中国担当">
+          <el-input v-model="formData.chinaLead" placeholder="中国担当姓名" />
+        </el-form-item>
+        <el-form-item label="计划出货日">
+          <el-date-picker v-model="formData.plannedShipDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="发送目的地">
+          <el-input v-model="formData.destination" placeholder="如 名古屋倉庫" />
+        </el-form-item>
+        <el-form-item v-if="dialogMode === 'update'" label="状态" prop="status">
+          <el-select v-model="formData.status" style="width: 100%">
+            <el-option v-for="s in statusOptions" :key="s.value" :label="s.label" :value="s.value" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="submitting" @click="onSubmit">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -138,178 +173,218 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-
-interface PurchaseOrder {
-  id: number
-  orderNo: string
-  contactName: string
-  contactPhone: string
-  shippingAddress: string
-  isExport: boolean
-  status: string
-  priority: string
-  remark: string
-  createTime: string
-}
+import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest } from '@/api/procurement'
 
 const loading = ref(false)
+const submitting = ref(false)
 const drawerVisible = ref(false)
-const currentRow = ref<PurchaseOrder | null>(null)
+const dialogVisible = ref(false)
+const dialogMode = ref<'create' | 'update'>('create')
+const currentRow = ref<ProcurementPageVO | null>(null)
+const formRef = ref()
+
+const deletableStatuses = ['未定', '発注待']
+
+const statusOptions = [
+  { value: '未定', label: '未定' },
+  { value: '発注待', label: '発注待' },
+  { value: '永康', label: '永康' },
+  { value: '直送', label: '直送' },
+  { value: '倉庫着', label: '倉庫着' },
+  { value: '検品', label: '検品' },
+  { value: '現地検品', label: '現地検品' },
+  { value: 'エア便', label: 'エア便' },
+  { value: 'メーカー直送', label: 'メーカー直送' },
+  { value: '輸出', label: '輸出' },
+  { value: '通関', label: '通関' },
+  { value: '日本着', label: '日本着' },
+  { value: '会計', label: '会計' },
+  { value: '完了', label: '完了' },
+  { value: '退货', label: '退货' },
+]
 
 const filterForm = reactive({
-  orderNo: '',
+  productCode: '',
   status: '',
-  priority: '',
+  customerCompany: '',
 })
 
 const pagination = reactive({
   page: 1,
-  pageSize: 10,
+  pageSize: 20,
   total: 0,
 })
 
-// 模拟数据
-const tableData = ref<PurchaseOrder[]>([
-  {
-    id: 1,
-    orderNo: 'PO20260419001',
-    contactName: '张三',
-    contactPhone: '13800138000',
-    shippingAddress: '浙江省金华市永康市五金城A区',
-    isExport: true,
-    status: 'DRAFT',
-    priority: 'NORMAL',
-    remark: '新品发注，货号待确认',
-    createTime: '2026-04-19 10:30:00',
-  },
-  {
-    id: 2,
-    orderNo: 'PO20260418003',
-    contactName: '李四',
-    contactPhone: '13900139000',
-    shippingAddress: '广东省深圳市宝安区福永镇',
-    isExport: false,
-    status: 'PENDING',
-    priority: 'URGENT',
-    remark: '加急订单',
-    createTime: '2026-04-18 14:22:00',
-  },
-  {
-    id: 3,
-    orderNo: 'PO20260417005',
-    contactName: '王五',
-    contactPhone: '13700137000',
-    shippingAddress: '浙江省杭州市余杭区阿里巴巴园区',
-    isExport: true,
-    status: 'APPROVED',
-    priority: 'HIGH',
-    remark: '',
-    createTime: '2026-04-17 09:15:00',
-  },
-  {
-    id: 4,
-    orderNo: 'PO20260416002',
-    contactName: '赵六',
-    contactPhone: '13600136000',
-    shippingAddress: '上海市浦东新区外高桥保税区',
-    isExport: true,
-    status: 'REJECTED',
-    priority: 'NORMAL',
-    remark: '货号有误，请重新提交',
-    createTime: '2026-04-16 16:45:00',
-  },
-  {
-    id: 5,
-    orderNo: 'PO20260415008',
-    contactName: '孙七',
-    contactPhone: '13500135000',
-    shippingAddress: '江苏省苏州市工业园区星湖街',
-    isExport: false,
-    status: 'CANCELLED',
-    priority: 'NORMAL',
-    remark: '客户取消订单',
-    createTime: '2026-04-15 11:20:00',
-  },
-])
+const tableData = ref<ProcurementPageVO[]>([])
 
-function loadData() {
+const defaultFormData = (): CreateProcurementRequest & { status?: string } => ({
+  productCode: '',
+  quantity: 1,
+  priceRmb: 0,
+  exchangeRate: 21.5,
+  taxPoint: 1.1,
+  customerCompany: '',
+  productLead: '',
+  japanLead: '',
+  chinaLead: '',
+  plannedShipDate: '',
+  destination: '',
+  status: '未定',
+})
+
+const formData = reactive<CreateProcurementRequest & { status?: string }>(defaultFormData())
+
+const formRules = {
+  productCode: [{ required: true, message: '商品代码不能为空', trigger: 'blur' }],
+  quantity: [{ required: true, message: '数量不能为空', trigger: 'blur' }],
+  priceRmb: [{ required: true, message: '人民币单价不能为空', trigger: 'blur' }],
+  exchangeRate: [{ required: true, message: '汇率不能为空', trigger: 'blur' }],
+  taxPoint: [{ required: true, message: '票点不能为空', trigger: 'blur' }],
+}
+
+async function loadData() {
   loading.value = true
-  setTimeout(() => {
-    pagination.total = 5
+  try {
+    const res = await procurementApi.list({
+      page: pagination.page - 1,
+      pageSize: pagination.pageSize,
+      status: filterForm.status || undefined,
+      productCode: filterForm.productCode || undefined,
+      customerCompany: filterForm.customerCompany || undefined,
+    })
+    const payload = res.data.data as { content: ProcurementPageVO[]; totalElements: number }
+    tableData.value = payload.content || []
+    pagination.total = payload.totalElements || 0
+  } catch {
+    // error handled by axios interceptor
+  } finally {
     loading.value = false
-  }, 600)
+  }
 }
 
 function onReset() {
-  filterForm.orderNo = ''
+  filterForm.productCode = ''
   filterForm.status = ''
-  filterForm.priority = ''
+  filterForm.customerCompany = ''
+  pagination.page = 1
   loadData()
 }
 
 function onNew() {
-  ElMessage.info('新建采购单页面（待实现）')
+  dialogMode.value = 'create'
+  Object.assign(formData, defaultFormData())
+  dialogVisible.value = true
 }
 
-function onView(row: PurchaseOrder) {
+function onView(row: ProcurementPageVO) {
   currentRow.value = row
   drawerVisible.value = true
 }
 
-function onEdit(row: PurchaseOrder) {
-  ElMessage.info(`编辑采购单 ${row.orderNo}（待实现）`)
+function onEdit(row: ProcurementPageVO | null) {
+  dialogMode.value = 'update'
+  Object.assign(formData, {
+    productCode: row?.productCode ?? '',
+    quantity: row?.quantity ?? 1,
+    priceRmb: row?.priceRmb ?? 0,
+    exchangeRate: row?.exchangeRate ?? 21.5,
+    taxPoint: row?.taxPoint ?? 1.1,
+    customerCompany: row?.customerCompany ?? '',
+    productLead: row?.productLead ?? '',
+    japanLead: row?.japanLead ?? '',
+    chinaLead: row?.chinaLead ?? '',
+    plannedShipDate: row?.plannedShipDate ?? '',
+    destination: row?.destination ?? '',
+    status: row?.status ?? '未定',
+  })
+  dialogVisible.value = true
 }
 
-function onDelete(row: PurchaseOrder) {
-  ElMessage.warning(`删除采购单 ${row.orderNo}（待实现）`)
+async function onDelete(row: ProcurementPageVO) {
+  try {
+    await procurementApi.delete(row.id)
+    ElMessage.success('删除成功')
+    loadData()
+  } catch {
+    // error handled by axios interceptor
+  }
 }
 
-function onRowClick(row: PurchaseOrder) {
+async function onSubmit() {
+  if (!formRef.value) return
+  await formRef.value.validate(async (valid: boolean) => {
+    if (!valid) return
+    submitting.value = true
+    try {
+      if (dialogMode.value === 'create') {
+        const req: CreateProcurementRequest = {
+          productCode: formData.productCode,
+          quantity: formData.quantity,
+          priceRmb: formData.priceRmb,
+          exchangeRate: formData.exchangeRate,
+          taxPoint: formData.taxPoint,
+          customerCompany: formData.customerCompany || undefined,
+          productLead: formData.productLead || undefined,
+          japanLead: formData.japanLead || undefined,
+          chinaLead: formData.chinaLead || undefined,
+          plannedShipDate: formData.plannedShipDate || undefined,
+          destination: formData.destination || undefined,
+        }
+        await procurementApi.create(req)
+        ElMessage.success('发注单创建成功')
+      } else if (currentRow.value) {
+        const req: UpdateProcurementRequest = {
+          productCode: formData.productCode,
+          quantity: formData.quantity,
+          priceRmb: formData.priceRmb,
+          exchangeRate: formData.exchangeRate,
+          taxPoint: formData.taxPoint,
+          customerCompany: formData.customerCompany || undefined,
+          productLead: formData.productLead || undefined,
+          japanLead: formData.japanLead || undefined,
+          chinaLead: formData.chinaLead || undefined,
+          plannedShipDate: formData.plannedShipDate || undefined,
+          destination: formData.destination || undefined,
+          status: formData.status !== '未定' ? formData.status : undefined,
+        }
+        await procurementApi.update(currentRow.value.id, req)
+        ElMessage.success('发注单更新成功')
+      }
+      dialogVisible.value = false
+      loadData()
+    } finally {
+      submitting.value = false
+    }
+  })
+}
+
+function onRowClick(row: ProcurementPageVO) {
   onView(row)
 }
 
-function onSubmit(row: PurchaseOrder) {
-  ElMessage.success(`提交采购单 ${row.orderNo} 审核（待实现）`)
-}
-
 function statusLabel(status: string): string {
-  const map: Record<string, string> = {
-    DRAFT: '草稿',
-    PENDING: '待审核',
-    APPROVED: '已批准',
-    REJECTED: '已拒绝',
-    CANCELLED: '已取消',
-  }
-  return map[status] ?? status
+  return statusOptions.find(s => s.value === status)?.label ?? status
 }
 
 function statusType(status: string): string {
   const map: Record<string, string> = {
-    DRAFT: 'info',
-    PENDING: 'warning',
-    APPROVED: 'success',
-    REJECTED: 'danger',
-    CANCELLED: 'info',
+    '未定': 'info',
+    '発注待': 'warning',
+    '永康': 'warning',
+    '直送': 'warning',
+    '倉庫着': 'primary',
+    '現地検品': 'primary',
+    '検品': 'primary',
+    'エア便': 'success',
+    'メーカー直送': 'success',
+    '輸出': 'success',
+    '通関': 'success',
+    '日本着': 'success',
+    '会計': 'warning',
+    '完了': 'info',
+    '退货': 'danger',
   }
   return map[status] ?? 'info'
-}
-
-function priorityLabel(priority: string): string {
-  const map: Record<string, string> = {
-    URGENT: '紧急',
-    HIGH: '高',
-    NORMAL: '普通',
-  }
-  return map[priority] ?? priority
-}
-
-function priorityType(priority: string): string {
-  const map: Record<string, string> = {
-    URGENT: 'danger',
-    HIGH: 'warning',
-    NORMAL: 'info',
-  }
-  return map[priority] ?? 'info'
 }
 
 onMounted(() => {
@@ -345,7 +420,7 @@ onMounted(() => {
   cursor: pointer;
 }
 
-.order-no {
+.product-code {
   color: #409eff;
   font-family: monospace;
   font-size: 13px;

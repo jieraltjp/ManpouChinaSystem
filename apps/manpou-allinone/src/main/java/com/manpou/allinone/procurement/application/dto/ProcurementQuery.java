@@ -5,7 +5,7 @@ import lombok.Data;
 
 /**
  * 发注单分页查询请求参数。
- * TODO Phase A: 替换为真实 ShippingOrder 筛选字段。
+ * 与 docs/business/API-发注管理.md §1.2 Query 参数对齐。
  */
 @Data
 public class ProcurementQuery {

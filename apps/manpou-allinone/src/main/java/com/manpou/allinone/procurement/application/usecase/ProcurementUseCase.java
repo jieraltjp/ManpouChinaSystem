@@ -7,7 +7,7 @@ import com.manpou.allinone.procurement.application.dto.ProcurementCreateCmd;
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
 import com.manpou.allinone.procurement.application.dto.ProcurementQuery;
 import com.manpou.allinone.procurement.application.dto.ProcurementUpdateCmd;
-import com.manpou.allinone.procurement.domain.model.ProcurementExample;
+import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.model.ShipmentStatus;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * 发注单用例服务。
  * 负责编排业务操作，不含领域逻辑。
- * TODO Phase A: 替换为真实 ShippingOrder 业务逻辑（状态机、价格计算等）。
+ * 领域逻辑（状态机、价格计算）封装在 Procurement 实体中。
  */
 @Slf4j
 @Service
@@ -42,9 +42,13 @@ public class ProcurementUseCase {
                 Math.min(query.getPageSize(), 100),
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<ProcurementExample> page;
+        Page<Procurement> page;
         if (query.getStatus() != null) {
             page = procurementRepository.findByStatusAndIsDeletedFalse(query.getStatus(), pageRequest);
+        } else if (query.getProductCode() != null && !query.getProductCode().isBlank()) {
+            page = procurementRepository.findByProductCodeAndIsDeletedFalse(query.getProductCode(), pageRequest);
+        } else if (query.getCustomerCompany() != null && !query.getCustomerCompany().isBlank()) {
+            page = procurementRepository.findByCustomerCompanyAndIsDeletedFalse(query.getCustomerCompany(), pageRequest);
         } else {
             page = procurementRepository.findAllByIsDeletedFalse(pageRequest);
         }
@@ -56,45 +60,51 @@ public class ProcurementUseCase {
      */
     @Transactional(readOnly = true)
     public ProcurementPageQuery getById(Long id) {
-        ProcurementExample entity = procurementRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> BusinessException.notFound("ProcurementExample", id));
+        Procurement entity = procurementRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> BusinessException.notFound("Procurement", id));
         return procurementAssembler.toDto(entity);
     }
 
     /**
-     * 创建。
+     * 创建发注单。
      */
     @Transactional
     public Long create(ProcurementCreateCmd cmd) {
-        ProcurementExample entity = procurementAssembler.toEntity(cmd);
-        ProcurementExample saved = procurementRepository.save(entity);
-        log.info("[Procurement] created, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId());
+        Procurement entity = procurementAssembler.toEntity(cmd);
+        Procurement saved = procurementRepository.save(entity);
+        log.info("[Procurement] created, traceId={}, id={}, productCode={}, estimatedPriceJpy={}",
+                MDC.get(TraceFilter.TRACE_ID_KEY),
+                saved.getId(),
+                saved.getProductCode(),
+                saved.getEstimatedPriceJpy());
         return saved.getId();
     }
 
     /**
-     * 更新。
+     * 更新发注单（部分更新，含状态推进）。
      */
     @Transactional
     public void update(Long id, ProcurementUpdateCmd cmd) {
-        ProcurementExample entity = procurementRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> BusinessException.notFound("ProcurementExample", id));
+        Procurement entity = procurementRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> BusinessException.notFound("Procurement", id));
         procurementAssembler.copyToEntity(cmd, entity);
         procurementRepository.save(entity);
-        log.info("[Procurement] updated, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
+        log.info("[Procurement] updated, traceId={}, id={}, status={}",
+                MDC.get(TraceFilter.TRACE_ID_KEY), id, entity.getStatus());
     }
 
     /**
      * 逻辑删除。
-     * 仅未定/未定/発注待状态可删除。
+     * 仅未定/発注待状态可删除。
      */
     @Transactional
     public void delete(Long id) {
-        ProcurementExample entity = procurementRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> BusinessException.notFound("ProcurementExample", id));
+        Procurement entity = procurementRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> BusinessException.notFound("Procurement", id));
         ShipmentStatus current = entity.getStatus();
-        if (current != ShipmentStatus.未定 && current != ShipmentStatus.未定 && current != ShipmentStatus.発注待) {
-            throw BusinessException.invalidParam("仅未定/未定/発注待状态可删除，当前状态：" + current);
+        if (current != ShipmentStatus.未定 && current != ShipmentStatus.発注待) {
+            throw BusinessException.invalidParam(
+                    "仅未定/発注待状态可删除，当前状态：" + current);
         }
         entity.markDeleted();
         procurementRepository.save(entity);

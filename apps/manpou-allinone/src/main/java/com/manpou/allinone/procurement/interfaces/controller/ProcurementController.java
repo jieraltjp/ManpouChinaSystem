@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 发注单 Controller。
+ * 与 docs/business/API-发注管理.md §1 完全对齐。
  * 职责：参数校验、调用 Application 层、返回标准化响应。
  * 禁止在此层写业务逻辑。
- * TODO Phase A: 替换为真实 ShippingOrder API（对应 docs/business/API-发注管理.md §1）。
  */
 @RestController
 @RequestMapping("/api/v1/procurements")
@@ -27,6 +27,7 @@ public class ProcurementController {
 
     /**
      * 分页查询发注单列表。
+     * GET /api/v1/procurements?status=未定&productCode=de077&customerCompany=永康&page=1&pageSize=20
      */
     @GetMapping
     public Result<Page<ProcurementPageQuery>> list(ProcurementQuery query) {
@@ -43,33 +44,36 @@ public class ProcurementController {
 
     /**
      * 创建发注单。
-     * TODO Phase A: 替换为真实字段（productCode, quantity, priceRmb, exchangeRate, taxPoint 等）。
+     * POST /api/v1/procurements
+     * 计算字段 estimatedPriceJpy 由后端自动计算并存储。
      */
     @PostMapping
     @Idempotent(ttl = 24 * 60 * 60)
     public Result<Long> create(@Valid @RequestBody ProcurementCreateCmd cmd) {
         Long id = procurementUseCase.create(cmd);
-        return Result.ok("创建成功", id);
+        return Result.ok("发注单创建成功", id);
     }
 
     /**
-     * 更新发注单（部分更新）。
-     * TODO Phase A: 支持状态推进（moveTo 方法）。
+     * 更新发注单（部分更新，含状态推进）。
+     * PATCH /api/v1/procurements/{id}
+     * 状态推进规则见 docs/business/SPEC-发注管理流程.md §5。
      */
     @PatchMapping("/{id}")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody ProcurementUpdateCmd cmd) {
         procurementUseCase.update(id, cmd);
-        return Result.ok("更新成功", null);
+        return Result.ok("发注单更新成功", null);
     }
 
     /**
      * 删除发注单（逻辑删除）。
-     * 仅未定/未定/発注待状态可删除。
+     * DELETE /api/v1/procurements/{id}
+     * 仅未定/発注待状态可删除。
      */
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         procurementUseCase.delete(id);
-        return Result.ok("删除成功", null);
+        return Result.ok("发注单删除成功", null);
     }
 }
