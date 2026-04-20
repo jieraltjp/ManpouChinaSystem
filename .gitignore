@@ -14,8 +14,7 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 .flattened-pom.xml
 
-# Scaffold / Helm target
-scaffolds/**/target/
+# Helm target (scaffolds/ 已删除)
 infra/**/target/
 
 # All apps/* service target directories
@@ -57,9 +56,10 @@ apps/web/*.local
 .pnpm/
 
 # =============================================
-# manpou-allinone local keys (私钥不提交)
+# Service JWT keys (私钥不提交，公钥需要)
 # =============================================
-apps/manpou-allinone/keys/
+apps/*/keys/*.pem
+!apps/*/keys/public.pem
 
 # =============================================
 # IDE
