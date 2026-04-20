@@ -19,21 +19,14 @@
 
 ## 快速开始
 
-### 1. 克隆脚手架
-
-```bash
-cd D:/Programme/java/ManpouChinaSystem
-git clone https://your-git-server/arch-scaffolds.git scaffolds
-```
-
-### 2. 安装依赖
+### 1. 安装依赖
 
 ```bash
 # 前端
 cd apps/web && npm install
 ```
 
-### 3. 启动服务
+### 2. 启动服务
 
 ```bash
 # Docker Compose 启动基础设施（可选）
@@ -72,8 +65,7 @@ ManpouChinaSystem
 ├── config/nacos/              # Nacos 配置模板
 ├── docker/                    # Docker Compose
 ├── infra/helm/                 # K8s Helm 模板
-├── monitoring/                 # 监控告警
-└── scaffolds/                 # 脚手架模板（api-gateway 已迁移至 apps/）
+└── monitoring/                 # 监控告警
 ```
 
 ---

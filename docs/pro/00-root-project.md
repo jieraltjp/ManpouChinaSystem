@@ -34,8 +34,6 @@ ManpouChinaSystem/
 │   ├── product-service/     # 商品管理（端口 18082）⚡ 后期独立
 │   ├── api-gateway/         # API 网关（端口 18080）
 │   └── web/                 # 前端（端口 13000）
-├── scaffolds/
-│   └── api-gateway/          # API 网关脚手架（已迁移至 apps/）
 ├── infra/
 │   └── helm/                 # K8s Helm 部署模板
 ├── docker/                   # Docker Compose 本地开发环境
