@@ -1,175 +1,230 @@
 # 发注管理 — 领域模型
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **更新**: 2026-04-20
+> **依据**: `docs/发注管理体系升级.pdf` + `docs/新発注管理-設計図.xlsx`
 
 ---
 
 ## 1. 聚合根
 
-### Procurement（发注单聚合根）
+### 1.1 ShippingOrder（出货单 — 核心聚合根）
+
+> 对应 Excel 出货单弹窗。一次发注 = 一条出货单记录。
 
 ```
-Procurement（聚合根）
+ShippingOrder（聚合根）
 ├── id: Long
-├── name: String(128)
-├── factoryId: Long
-├── status: ProcurementStatus(枚举)
-├── priority: Priority(枚举)
-├── shippingMode: ShippingMode(枚举)
-├── qcType: QcType(枚举)
-├── qcResult: QcResult(枚举, nullable)
-├── containerId: Long(nullable)
-├── financeId: Long(nullable)
-├── createdBy: String(64)
+├── skuNumber: String          # 货号（关联 Product.productCode）
+├── quantity: Integer         # 订购数量
+├── priceRmb: BigDecimal      # 人民币单价
+├── exchangeRate: BigDecimal  # CNY→JPY 汇率
+├── taxPoint: BigDecimal      # 票点（默认 1.1）
+├── billingMethod: String     # 计费方式（METHOD_A 等）
+├── orderDate: LocalDate      # 下单日（1688下单日期）
+├── factoryShipDate: LocalDate # 厂家出货日
+├── plannedShipDate: LocalDate # 计划出货日
+├── productLead: String        # 商品担当
+├── japanLead: String         # 日本担当
+├── chinaLead: String         # 中国担当
+├── destination: String       # 发送目的地
+├── customerCompany: String   # 客户公司
+├── status: ShipmentStatus    # 状态（见 枚举章节）
+├── qcType: QcType           # 验货方式（nullable）
+├── qcResult: QcResult       # 验货结果（nullable）
+├── containerId: Long         # 货柜ID（nullable，发货后赋值）
+├── financeId: Long           # 财务结算ID（nullable，结算后赋值）
+├── createdBy: String
 ├── createdAt: LocalDateTime
 ├── updatedAt: LocalDateTime
-├── isDeleted: Boolean
 │
-├── items: List<ProcurementItem>  (内聚值对象集合)
-└── 状态转换方法（领域规则）
-    ├── suspend(reason)
-    ├── resume()
-    ├── submitQc()
-    ├── approveQc()
-    ├── rejectQc()
-    ├── selectShippingMode()
-    ├── ship()
-    └── close()
+├── 计算属性（只读，非持久化）
+│   └── estimatedPriceJpy = (priceRmb / taxPoint × 1.02 × 1.2) × exchangeRate × 1.05
+│
+└── 领域方法（状态推进）
+    ├── moveTo(下一状态)   — 状态机规则校验
+    ├── submitQc(type)     — 提交验货
+    ├── approveQc()        — 验货通过
+    ├── rejectQc()         — 验货不通过（触发退货路径）
+    ├── loadToContainer()  — 装柜
+    ├── settle()            — 财务结算
+    └── close()            — 终态（完了(済)后禁止任何变更）
+```
+
+### 1.2 Product（商品目录 — 聚合根）
+
+> 对应 Excel 商品管理表。维护商品代码、尺寸、重量、包装规格、仓库归属。
+
+```
+Product（聚合根）
+├── id: Long
+├── productCode: String        # 商品代码（唯一键，如 de077）
+├── name: String              # 日文名称
+├── heightCm: BigDecimal      # 高(cm)
+├── widthCm: BigDecimal       # 宽(cm)
+├── depthCm: BigDecimal       # 深(cm)
+├── weightKg: BigDecimal      # 重量(kg)
+├── unitsPerPackage: Integer  # 段ボール入数（每包数量）
+├── packageHeightCm: BigDecimal
+├── packageWidthCm: BigDecimal
+├── packageDepthCm: BigDecimal
+├── packageWeightKg: BigDecimal
+├── remarks: String          # 备注（箱规不固定 / 整托不固定）
+├── warehouse: String        # 仓库（名古屋/久留米/永康）
+├── updatedBy: String
+├── updatedAt: LocalDateTime
+│
+└── 计算属性（只读）
+    ├── dimensionSum = heightCm + widthCm + depthCm
+    └── packageDimensions = packageHeightCm × packageWidthCm × packageDepthCm
 ```
 
 ---
 
 ## 2. 值对象
 
-### ProcurementItem（发注商品）
-
-```
-ProcurementItem（值对象）
-├── id: Long
-├── productName: String(128)
-├── productCode: String(64)
-├── unitPriceCny: BigDecimal(10,2)
-├── exchangeRate: BigDecimal(8,4)
-├── taxRate: BigDecimal(5,2)
-├── material: String(64)
-├── weightKg: BigDecimal(8,3)
-├── lengthCm: Integer
-├── widthCm: Integer
-├── heightCm: Integer
-├── quantity: Integer
-├── remarks: String(256)
-│
-└── 计算属性（只读）
-    ├── unitPriceJpy = unitPriceCny × exchangeRate
-    ├── taxJpy = unitPriceJpy × taxRate
-    ├── volumeCbm = length × width × height / 1_000_000
-    ├── subtotalCny = unitPriceCny × quantity
-    └── subtotalJpy = unitPriceJpy × quantity
-```
-
 ### Container（货柜信息）
+
+> 对应 Excel「货柜编号」区域。
 
 ```
 Container（值对象）
 ├── id: Long
-├── containerNo: String(20)     # 箱号
-├── sealNo: String(20)           # 封号
-├── containerType: ContainerType  # 20GP/40GP/40HC/45HC
-├── shippingMethod: ShippingMethod # SEA/AIR/LAND
-├── portOfLoading: String(32)    # 起运港
-├── portOfDestination: String(32)# 目的港
+├── containerNo: String      # 货柜编号（箱号）
+├── containerType: ContainerType  # 40HC / 20GP / 40GP / 45HC
+├── sealNo: String           # 封号
+├── portOfLoading: String     # 起运港（如 YANTIAN）
+├── portOfDestination: String # 目的港（如 NAGOYA）
+├── procurementIds: List<Long> # 关联的出货单ID列表
+├── totalCbm: BigDecimal     # 总体积
 ├── estimatedShipDate: LocalDate
-├── cutoffDate: LocalDate
-└── totalCbm: BigDecimal
+├── createdBy: String
+├── createdAt: LocalDateTime
 ```
 
-### Finance（财务结算）
+### QcRecord（验货记录）
+
+> 对应 Excel「検品」和「現地検品」功能。
 
 ```
-Finance（值对象）
+QcRecord（值对象）
 ├── id: Long
-├── taxType: TaxType
-├── totalCostCny: BigDecimal(12,2)
-├── actualPaidCny: BigDecimal(12,2)
-├── currency: String(3)          # CNY/JPY
-├── paymentStatus: PaymentStatus
-└── remarks: String(256)
+├── procurementId: Long
+├── qcType: QcType           # ONSITE=検品 / REMOTE=現地検品
+├── qcUserId: Long           # 验货人
+├── result: QcResult         # PASS / FAIL
+├── passedCount: Integer     # 合格数量
+├── defectiveCount: Integer  # 不良数量
+├── images: List<String>    # 缺陷照片URL列表
+├── remarks: String         # 备注（如：外箱轻微破损）
+└── qcDate: LocalDateTime
+```
+
+### FinanceRecord（财务结算）
+
+> 对应 Excel「会計」功能。
+
+```
+FinanceRecord（值对象）
+├── id: Long
+├── procurementId: Long
+├── taxType: TaxType         # EXPORT_REFUND 等
+├── totalCostRmb: BigDecimal # 实际总成本（CNY）
+├── actualPaidRmb: BigDecimal # 实付金额（CNY）
+├── currency: String         # CNY
+├── remarks: String
+└── settledAt: LocalDateTime
+```
+
+### ReturnRecord（退货记录）
+
+> 对应 Excel「返品」功能。
+
+```
+ReturnRecord（值对象）
+├── id: Long
+├── procurementId: Long
+├── reason: String           # 退货原因（如：不良品）
+├── quantity: Integer       # 退货数量
+├── refundAmount: BigDecimal # 退款金额
+├── 1688OrderId: String     # 关联的1688订单ID
+└── returnDate: LocalDateTime
 ```
 
 ---
 
 ## 3. 枚举
 
-### ProcurementStatus（发注单状态）
+### ShipmentStatus（出货单状态）
+
+> 对应 Excel basic status 流转图。终态为 `完了(済)`，此后禁止任何变更。
 
 ```java
-public enum ProcurementStatus {
-    PENDING(0),       // 待执行
-    SUSPENDED(1),     // 已挂起
-    IN_PROGRESS(2),  // 执行中
-    QC_PENDING(3),    // 待验收
-    REJECTED(4),      // 返工
-    QC_PASSED(5),    // 验收通过
-    SHIPPING(6),     // 已发货
-    CLOSED(7);       // 流程闭环（终态）
+public enum ShipmentStatus {
+    未定,       // 还未下单，仅记录需求
+    予定,       // 预计发注
+    OEM,        // OEM 定制产品路径
+    発注待,     // 已录入商品，等待下单
+    永康,       // 1688下单后货物发往永康仓
+    直送,       // 1688下单后厂家直接发货（不经永康仓）
+    倉庫着,     // 货物到达仓库
+    現地検品,   // 现场异地验货
+    検品,       // 仓库验货
+    エア便,     // 空运（尺寸/重量达标的轻量货）
+    メーカー直送, // 厂家直送
+    輸出,       // 已出口
+    通関,       // 已报关
+    日本着,     // 已到日本
+    会計,       // 财务结算
+    完了,       // 全流程结束（终态 — 禁止任何变更）
+    退货;       // 退货（独立处理，不影响原单状态）
 
-    private final int order;
-    // 禁止逆向流转：CLOSED 后不可修改
+    // 永康路径：未定 → 発注待 → 永康 → 倉庫着 → 検品 → エア便 → 輸出 → 通関 → 日本着 → 会計 → 完了
+    // OEM 路径：未定 → 発注待 → OEM → 倉庫着 → 現地検品 → メーカー直送 → 完了
+    // 终态校验：status == 完了 时，所有状态推进方法抛出 BusinessException
 }
 ```
 
-### Priority（优先级）
-
-```java
-public enum Priority {
-    STANDARD(0),         // 标准
-    PRODUCTION_FIRST(1), // 优先排产
-    SHIP_FIRST(2)         // 优先发货
-}
-```
-
-### ShippingMode（运输模式）
-
-```java
-public enum ShippingMode {
-    WAREHOUSE,   // 自有仓库
-    POOL,        // 虚拟拼柜
-    DIRECT       // 厂家直装
-}
-```
-
-### QcType（验收方式）
+### QcType（验货方式）
 
 ```java
 public enum QcType {
-    ONSITE,  // 现场验收
-    REMOTE   // 远程图片验收
+    ONSITE,   // 検品 — 仓库验货
+    REMOTE    // 現地検品 — 现场异地验货
 }
 ```
 
-### QcResult（验收结果）
+### QcResult（验货结果）
 
 ```java
 public enum QcResult {
-    PASS,
-    REJECT
+    PASS,     // 验货通过
+    FAIL      // 验货不通过（触发退货）
 }
 ```
 
-### ContainerType
+### ContainerType（柜型）
 
 ```java
 public enum ContainerType {
-    GP20(33, 67.7),  // 20GP: 自重/TARE, 最大载重/PAYLOAD
-    GP40(37, 67.7),
-    HC40(39, 67.7),  // 40HC: 高箱
-    HC45(42, 67.3);  // 45HC
+    GP20(33, 67.7),   // 20GP: 自重(TARE) / 最大载重(PAYLOAD)
+    GP40(37, 67.7),   // 40GP
+    HC40(39, 67.7),   // 40HC 高箱
+    HC45(42, 67.3);   // 45HC
 
-    private final double tareKg;      // 自重(T)
-    private final double payloadM3;  // 最大容积(m³)
+    private final double tareKg;
+    private final double payloadM3;
 
     public double maxCbm() { return payloadM3; }
+}
+```
+
+### TaxType（财务类型）
+
+```java
+public enum TaxType {
+    EXPORT_REFUND,    // 出口退税
+    NO_REFUND         // 不退税
 }
 ```
 
@@ -177,25 +232,29 @@ public enum ContainerType {
 
 ## 4. 拼柜池聚合
 
-### ConsolidationPool（拼柜池聚合根）
+### ConsolidationPool（拼柜池）
+
+> 对应 Excel「货物发送整理」。多个出货单合并装柜的虚拟容器。
 
 ```
-ConsolidationPool
+ConsolidationPool（聚合根）
 ├── id: Long
-├── destinationPort: String(32)
+├── destinationPort: String       # 目的港
 ├── status: PoolStatus
+├── containerId: Long             # 实际货柜（nullable，装柜后赋值）
 ├── containerThresholdCbm: BigDecimal
 ├── totalCbm: BigDecimal
 ├── totalBoxes: Integer
-├── estimatedConsolidationDate: LocalDate(nullable)
-├── containerId: Long(nullable)
+├── estimatedConsolidationDate: LocalDate
+├── createdBy: String
+├── createdAt: LocalDateTime
 │
 └── 领域方法
-    ├── add(Procurement)   // 加入拼柜池
-    ├── remove(Procurement)// 移出
-    ├── calculateFillRate() // 填充率
-    ├── isReady()          // 是否满足一柜
-    └── consolidate()      // 触发装柜
+    ├── add(ShippingOrder)         // 出货单加入拼柜池
+    ├── remove(ShippingOrder)      // 移出
+    ├── calculateFillRate()        // 填充率 = totalCbm / thresholdCbm
+    ├── isReady()                  // 填充率 ≥ 1 可触发装柜
+    └── consolidate()              // 触发装柜 → 绑定 Container
 ```
 
 ### PoolStatus
@@ -203,9 +262,9 @@ ConsolidationPool
 ```java
 public enum PoolStatus {
     POOL_PENDING,      // 待拼箱
-    POOL_READY,        // 可安排（已凑够）
-    CONTAINER_PLANNED, // 货柜计划已生成
-    SHIPPED            // 已装柜
+    POOL_READY,         // 可安排（已凑满一柜）
+    CONTAINER_PLANNED,  // 货柜计划已生成
+    LOADED              // 已装柜
 }
 ```
 
@@ -213,15 +272,26 @@ public enum PoolStatus {
 
 ## 5. 仓储接口
 
-### ProcurementRepository
+### ShippingOrderRepository
 
 ```java
-public interface ProcurementRepository
-    extends JpaRepository<Procurement, Long> {
+public interface ShippingOrderRepository extends JpaRepository<ShippingOrder, Long> {
 
-    Page<Procurement> findByFactoryId(Long factoryId, Pageable pageable);
-    Page<Procurement> findByStatus(ProcurementStatus status, Pageable pageable);
-    List<Procurement> findByIdInAndStatus(List<Long> ids, ProcurementStatus status);
+    Page<ShippingOrder> findByStatus(ShipmentStatus status, Pageable pageable);
+    Page<ShippingOrder> findBySkuNumber(String skuNumber, Pageable pageable);
+    Page<ShippingOrder> findByCustomerCompany(String customerCompany, Pageable pageable);
+    List<ShippingOrder> findByIdIn(List<Long> ids);
+}
+```
+
+### ProductRepository
+
+```java
+public interface ProductRepository extends JpaRepository<Product, Long> {
+
+    Optional<Product> findByProductCode(String productCode);
+    List<Product> findByWarehouse(String warehouse);
+    List<Product> findByRemarksContaining(String keyword);
 }
 ```
 
@@ -242,28 +312,67 @@ public interface ConsolidationPoolRepository
 
 ## 6. 领域服务
 
-### ProcurementDomainService
+### ShippingOrderDomainService
 
 **职责**：状态转换规则校验 + 触发副作用
 
 ```java
 @Service
-public class ProcurementDomainService {
+public class ShippingOrderDomainService {
 
-    // 校验状态转换合法性
-    public void validateTransition(Procurement p, ProcurementStatus next) {
-        // CLOSED 后禁止任何操作
-        // REJECTED 只允许 → PENDING
-        // ...
+    // 永康路径状态推进
+    public void validateTransition(ShipmentStatus current, ShipmentStatus next) {
+        // 完了(済) 后禁止任何状态变更
+        if (current == 完了) {
+            throw new BusinessException("business.cannot_modify_closed");
+        }
+        // 校验允许的下一状态...
     }
 
-    // 验收通过后：根据 shippingMode 路由
-    public void onQcPassed(Procurement p) {
-        switch (p.getShippingMode()) {
-            case WAREHOUSE -> p.moveToWarehouse();
-            case POOL     -> p.addToConsolidationPool();
-            case DIRECT   -> p.prepareDirectShip();
+    // 验货完成后路由
+    public void onQcPassed(ShippingOrder order, QcType type) {
+        if (type == REMOTE) {
+            order.moveTo(メーカー直送);
+        } else {
+            // 体积/重量判定 → エア便 或 輸出
+            order.moveTo(推荐空运(order) ? エア便 : 輸出);
         }
+    }
+
+    // 空运推荐判定（尺寸+重量达标）
+    public boolean 推荐空运(ShippingOrder order) {
+        // 读取 Product 尺寸信息，判定是否达标
+    }
+}
+```
+
+### PriceCalculationService
+
+**职责**：批发价 JPY 计算
+
+```java
+@Service
+public class PriceCalculationService {
+
+    /**
+     * 批发价 JPY = (人民币单价 ÷ 票点 × 1.02 × 1.2) × 汇率 × 1.05
+     *
+     * 参数说明：
+     * - taxPoint：票点（默认 1.1，即含10%增值税）
+     * - 1.02：中国国内流通费率
+     * - 1.2：利润率系数
+     * - 1.05：跨境费用系数
+     */
+    public BigDecimal calculateEstimatedPriceJpy(
+            BigDecimal priceRmb,
+            BigDecimal taxPoint,
+            BigDecimal exchangeRate) {
+        return priceRmb
+            .divide(taxPoint, 4, RoundingMode.HALF_UP)
+            .multiply(new BigDecimal("1.02"))
+            .multiply(new BigDecimal("1.2"))
+            .multiply(exchangeRate)
+            .multiply(new BigDecimal("1.05"));
     }
 }
 ```
@@ -274,9 +383,11 @@ public class ProcurementDomainService {
 
 | 规则 | 说明 |
 |------|------|
-| CLOSED 终态不可逆 | 一旦闭环，禁止任何状态变更 |
-| 返工只能回到 PENDING | 重新录入商品后重新提交验收 |
-| 拼柜池按目的港隔离 | 相同目的港才能合箱 |
-| 填充率 = totalCbm / containerThresholdCbm ≥ 1 才可触发合箱 |
-| 财务结算在货柜录入后 | finance 必须在 container 之后 |
-| 流程闭环 = 已报关 或 已日本签收 | 手动触发终态 |
+| 完了终态 | 状态为 `完了` 后，禁止任何状态变更（抛出 BusinessException） |
+| 退货独立 | 退货记录与原出货单独立处理，不影响原单状态 |
+| 空运推荐 | 尺寸+重量达标自动推荐走 エア便 路径 |
+| 永康路径 | 1688下单 → 永康仓 → 倉庫着 → 検品 → 発送路径 |
+| 厂家直送 | 紧急/大批量货不经仓库，厂家直送 |
+| OEM路径 | 新规 → OEM → 倉庫着 → 現地検品 → メーカー直送 → 完了 |
+| 报价计算 | `(priceRmb / taxPoint × 1.02 × 1.2) × exchangeRate × 1.05` |
+| 最低必要条件 | 商品代码、担当（馬さん/張雲さん确认项）必须填写才能推进至 発注待 |

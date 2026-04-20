@@ -1,7 +1,8 @@
 # 发注管理 — API 契约
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **更新**: 2026-04-20
+> **依据**: `docs/发注管理体系升级.pdf` + `docs/新発注管理-設計図.xlsx`
 
 ---
 
@@ -17,33 +18,61 @@
 }
 ```
 
-**错误 code 规范**：
-- `validation.*` — 参数校验失败
-- `auth.*` — 认证权限错误
-- `not_found` — 资源不存在
-- `business.*` — 业务规则违反
-
 ---
 
-## 1. 发注单
+## 1. 发注单（Procurement / 出货单）
 
-### 1.1 创建发注单
+### 1.1 创建出货单
 
 ```
 POST /api/v1/procurements
 ```
 
-**请求体**：
+**请求体**（对应 Excel 出货单弹窗）：
 ```json
 {
-  "name": "张三样品订单",
-  "factoryId": 1,
-  "priority": "STANDARD",
-  "remarks": "急单，优先排产"
+  "skuNumber": "de077",
+  "quantity": 500,
+  "priceRmb": 45.00,
+  "exchangeRate": 21.5,
+  "taxPoint": 1.1,
+  "billingMethod": "METHOD_A",
+  "orderDate": "2026-04-20",
+  "factoryShipDate": "2026-05-01",
+  "plannedShipDate": "2026-05-10",
+  "productLead": "王琳琳",
+  "japanLead": "张云",
+  "chinaLead": "田中",
+  "destination": "名古屋倉庫",
+  "customerCompany": "永康株式会社",
+  "status": "未定"
 }
 ```
 
-**priority 枚举**：`STANDARD` | `PRODUCTION_FIRST` | `SHIP_FIRST`
+**字段说明**：
+
+| 字段 | Excel 名称 | 必填 | 说明 |
+|------|-----------|------|------|
+| skuNumber | 货号 | ✅ | 商品代码（关联 Product 表） |
+| quantity | 数量 | ✅ | 订购数量 |
+| priceRmb | 人民币价格 | ✅ | 人民币单价 |
+| exchangeRate | 汇率 | ✅ | CNY→JPY 汇率 |
+| taxPoint | 票点 | ✅ | 默认 1.1 |
+| billingMethod | 计费方式 | ✅ | 计算方式 |
+| orderDate | 下单日 | | 1688 下单日期 |
+| factoryShipDate | 厂家出货日 | | 厂家发货日期 |
+| plannedShipDate | 计划出货日 | | 计划发货日期 |
+| productLead | 商品担当 | | 负责人 |
+| japanLead | 日本担当 | | 日本侧负责人 |
+| chinaLead | 中国担当 | | 中国侧负责人 |
+| destination | 发送目的地 | | 目的地 |
+| customerCompany | 客户公司 | | |
+| status | 状态 | | default: 未定 |
+
+**计算字段**（前端实时计算，后端存结果）：
+```
+estimatedPriceJpy = (priceRmb / taxPoint * 1.02 * 1.2) * exchangeRate * 1.05
+```
 
 **响应**：`201 Created`
 ```json
@@ -51,10 +80,9 @@ POST /api/v1/procurements
   "code": "ok",
   "data": {
     "id": 1,
-    "name": "张三样品订单",
-    "factoryId": 1,
-    "status": "PENDING",
-    "priority": "STANDARD",
+    "skuNumber": "de077",
+    "estimatedPriceJpy": 11321.25,
+    "status": "未定",
     "createdAt": "2026-04-20T10:00:00+09:00"
   }
 }
@@ -62,26 +90,39 @@ POST /api/v1/procurements
 
 ---
 
-### 1.2 查询发注单列表
+### 1.2 查询出货单列表
 
 ```
 GET /api/v1/procurements
 ```
 
 **Query 参数**：
+
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| status | string | 状态过滤 |
-| factoryId | long | 厂家过滤 |
-| page | int | 页码，默认0 |
-| size | int | 页大小，默认20 |
+| status | string | 状态过滤（未定/発注待/永康/倉庫着/検品/エア便/輸出/通関/日本着/会計/完了/退货） |
+| skuNumber | string | 商品代码 |
+| customerCompany | string | 客户公司 |
+| page | int | 页码，默认 0 |
+| size | int | 页大小，默认 20 |
 
 **响应**：`200 OK`
 ```json
 {
   "code": "ok",
   "data": {
-    "content": [...],
+    "content": [
+      {
+        "id": 1,
+        "skuNumber": "de077",
+        "quantity": 500,
+        "estimatedPriceJpy": 11321.25,
+        "status": "倉庫着",
+        "productLead": "王琳琳",
+        "plannedShipDate": "2026-05-10",
+        "createdAt": "2026-04-20T10:00:00+09:00"
+      }
+    ],
     "totalElements": 42,
     "totalPages": 3,
     "pageNumber": 0
@@ -91,7 +132,7 @@ GET /api/v1/procurements
 
 ---
 
-### 1.3 获取发注单详情
+### 1.3 获取出货单详情
 
 ```
 GET /api/v1/procurements/{id}
@@ -103,16 +144,22 @@ GET /api/v1/procurements/{id}
   "code": "ok",
   "data": {
     "id": 1,
-    "name": "张三样品订单",
-    "factoryId": 1,
-    "factoryName": "深圳某某玩具厂",
-    "status": "IN_PROGRESS",
-    "priority": "PRODUCTION_FIRST",
-    "shippingMode": "WAREHOUSE",
-    "qcType": "ONSITE",
-    "qcResult": null,
-    "container": null,
-    "finance": null,
+    "skuNumber": "de077",
+    "quantity": 500,
+    "priceRmb": 45.00,
+    "exchangeRate": 21.5,
+    "taxPoint": 1.1,
+    "estimatedPriceJpy": 11321.25,
+    "billingMethod": "METHOD_A",
+    "orderDate": "2026-04-20",
+    "factoryShipDate": "2026-05-01",
+    "plannedShipDate": "2026-05-10",
+    "productLead": "王琳琳",
+    "japanLead": "张云",
+    "chinaLead": "田中",
+    "destination": "名古屋倉庫",
+    "customerCompany": "永康株式会社",
+    "status": "未定",
     "createdAt": "...",
     "updatedAt": "..."
   }
@@ -121,97 +168,106 @@ GET /api/v1/procurements/{id}
 
 ---
 
-### 1.4 更新发注单状态
+### 1.4 更新出货单
 
 ```
-PATCH /api/v1/procurements/{id}/status
+PATCH /api/v1/procurements/{id}
 ```
 
-**请求体**：
+**请求体**（可部分更新）：
 ```json
 {
-  "status": "SUSPENDED",
-  "reason": "厂家交期延误"
+  "status": "発注待",
+  "factoryShipDate": "2026-05-05"
 }
 ```
 
-**状态推进规则**：
+**状态推进规则**（见 SPEC）：
 
 | 当前状态 | 可转向 |
 |----------|--------|
-| PENDING | IN_PROGRESS, SUSPENDED |
-| SUSPENDED | PENDING |
-| IN_PROGRESS | QC_PENDING |
-| QC_PENDING | QC_PASSED, REJECTED |
-| REJECTED | PENDING |
-| QC_PASSED | SHIPPING |
-| SHIPPING | CLOSED |
-| CLOSED | —（终态） |
-
-**响应**：`200 OK`
+| 未定/予定 | 発注待 / OEM |
+| 発注待 | 永康 / 直送 / 倉庫着 |
+| 永康 | 倉庫着 |
+| 直送 | 倉庫着 |
+| 倉庫着 | 検品 / 現地検品 |
+| 現地検品 | メーカー直送 |
+| 検品 | エア便 / 輸出 |
+| エア便 | 通関 / 日本着 |
+| 輸出 | 通関 |
+| 通関 | 日本着 |
+| 日本着 | 会計 |
+| 会計 | 完了(済) |
+| 完了(済) | —（终态） |
 
 ---
 
-### 1.5 删除发注单
+### 1.5 删除出货单
 
 ```
 DELETE /api/v1/procurements/{id}
 ```
 
-- 仅 `PENDING` / `SUSPENDED` 状态可删除
-- `CLOSED` 禁止删除
+- 仅 `未定`/`予定`/`発注待` 状态可删除
+- `完了(済)` 禁止删除
 
 ---
 
-## 2. 商品信息
+## 2. 商品目录（Product）
 
-### 2.1 录入商品
+### 2.1 创建/更新商品目录
 
 ```
-POST /api/v1/procurements/{id}/items
+POST   /api/v1/products      — 新规商品
+PUT    /api/v1/products/{id} — 更新商品
 ```
 
-**请求体**：
-```json
-{
-  "productName": "ABS 遥控车模",
-  "productCode": "CAR-2026-001",
-  "unitPriceCny": 45.00,
-  "exchangeRate": 21.5,
-  "taxRate": 13,
-  "material": "ABS塑料",
-  "weightKg": 0.35,
-  "lengthCm": 25,
-  "widthCm": 12,
-  "heightCm": 8,
-  "quantity": 500,
-  "remarks": "中性包装"
-}
+**请求体**（对应 Excel 商品管理表）：
+
+| 字段 | Excel 名称 | 必填 | 说明 |
+|------|-----------|------|------|
+| productCode | 商品コード | ✅ | 唯一键 |
+| name | 名称 | ✅ | 日文名称 |
+| heightCm | 高(cm) | | |
+| widthCm | 宽(cm) | | |
+| depthCm | 深(cm) | | |
+| weightKg | 重量(kg) | | |
+| unitsPerPackage | 段ボール入数 | | 每包数量 |
+| packageHeightCm | 包装高 | | |
+| packageWidthCm | 包装宽 | | |
+| packageDepthCm | 包装深 | | |
+| packageWeightKg | 包装重量 | | |
+| remarks | 备注 | | 箱规不固定/整托不固定 |
+| warehouse | 倉庫 | | 名古屋/久留米/永康 |
+
+**计算字段**（自动）：
 ```
-
-**字段说明**：
-| 字段 | 必填 | 说明 |
-|------|------|------|
-| productName | ✅ | 商品名称 |
-| productCode | ✅ | 商品编号 |
-| unitPriceCny | ✅ | 单价(人民币) |
-| exchangeRate | ✅ | 汇率(人民币→日元) |
-| taxRate | ✅ | 票点(%) |
-| material | | 材质 |
-| weightKg | | 重量(kg) |
-| lengthCm/widthCm/heightCm | | 尺寸(cm) |
-| quantity | ✅ | 数量 |
-
-**计算字段**（服务端自动）：
-- `unitPriceJpy = unitPriceCny × exchangeRate`
-- `taxJpy = unitPriceJpy × taxRate / 100`
-- `volumeCbm = lengthCm × widthCm × heightCm / 1_000_000`
+dimensionSum = heightCm + widthCm + depthCm
+```
 
 ---
 
-## 3. 验收
+### 2.2 查询商品目录
 
-### 3.1 指派验收人
+```
+GET /api/v1/products?warehouse=名古屋&remarks=箱规不固定
+```
+
+---
+
+### 2.3 按商品代码获取尺寸
+
+```
+GET /api/v1/products/{code}/dimensions
+```
+
+返回：`{ heightCm, widthCm, depthCm, weightKg, unitsPerPackage, packageDimensions, warehouse }`
+
+---
+
+## 3. 验货（検品 / 現地検品）
+
+### 3.1 提交验货结果
 
 ```
 POST /api/v1/procurements/{id}/qc
@@ -221,59 +277,25 @@ POST /api/v1/procurements/{id}/qc
 ```json
 {
   "qcType": "ONSITE",
-  "qcUserId": 3
-}
-```
-
-**qcType**：`ONSITE`(现场验收) | `REMOTE`(远程图片验收)
-
----
-
-### 3.2 提交验收结果
-
-```
-POST /api/v1/procurements/{id}/qc/result
-```
-
-**请求体**：
-```json
-{
+  "qcUserId": 3,
   "result": "PASS",
-  "images": ["https://...", "https://..."],
-  "remarks": "外观无瑕疵，数量相符"
+  "passedCount": 498,
+  "defectiveCount": 2,
+  "images": ["https://cdn.example.com/qc/defect1.jpg"],
+  "remarks": "外箱轻微破损"
 }
 ```
 
-**result**：`PASS` | `REJECT`
+**qcType**：`ONSITE`(検品/仓库验货) | `REMOTE`(現地検品/现场异地)
 
 ---
 
-## 4. 运输模式
+## 4. 货柜管理
 
-### 4.1 选择运输模式
-
-```
-POST /api/v1/procurements/{id}/shipping-mode
-```
-
-**请求体**：
-```json
-{
-  "mode": "WAREHOUSE",
-  "warehouseId": 1
-}
-```
-
-**mode**：`WAREHOUSE`(自有仓库) | `POOL`(虚拟拼柜) | `DIRECT`(厂家直装)
-
----
-
-## 5. 货柜管理
-
-### 5.1 录入货柜信息
+### 4.1 录入货柜
 
 ```
-POST /api/v1/procurements/{id}/container
+POST /api/v1/containers
 ```
 
 **请求体**：
@@ -281,23 +303,18 @@ POST /api/v1/procurements/{id}/container
 {
   "containerNo": "MSKU1234567",
   "containerType": "40HC",
-  "shippingMethod": "SEA",
+  "sealNo": "SEAL2026001",
   "portOfLoading": "YANTIAN",
-  "portOfDestination": "OSAKA",
-  "estimatedShipDate": "2026-05-15",
-  "cutoffDate": "2026-05-10"
+  "portOfDestination": "NAGOYA",
+  "procurementIds": [1, 3, 7]
 }
 ```
 
-**containerType**：`20GP` | `40GP` | `40HC` | `45HC`
-
-**shippingMethod**：`SEA` | `AIR` | `LAND`
-
 ---
 
-## 6. 财务结算
+## 5. 财务结算（会計）
 
-### 6.1 录入结算信息
+### 5.1 财务结算
 
 ```
 POST /api/v1/procurements/{id}/finance
@@ -307,64 +324,45 @@ POST /api/v1/procurements/{id}/finance
 ```json
 {
   "taxType": "EXPORT_REFUND",
-  "totalCostCny": 22500.00,
-  "actualPaidCny": 21000.00,
+  "totalCostRmb": 22500.00,
+  "actualPaidRmb": 21000.00,
   "currency": "CNY",
   "remarks": "含运费，扣减损坏赔款"
 }
 ```
 
-**taxType**：`EXPORT_REFUND`(出口退税) | `NO_TAX`(不开票) | `INCLUSIVE_TAX`(含税)
-
 ---
 
-## 7. 拼柜池
+## 6. 退货管理
 
-### 7.1 查询拼柜池
+### 6.1 创建退货记录
 
 ```
-GET /api/v1/pool
+POST /api/v1/procurements/{id}/returns
 ```
 
-**Query**：`destinationPort` | `status` | `minCbm`
-
-**响应**：
+**请求体**：
 ```json
 {
-  "code": "ok",
-  "data": {
-    "poolId": 1,
-    "destinationPort": "OSAKA",
-    "totalCbm": 28.5,
-    "totalBoxes": 120,
-    "containerThresholdCbm": 60.0,
-    "fillRate": 0.475,
-    "status": "POOL_PENDING",
-    "procurementIds": [3, 7, 12]
-  }
+  "reason": "不良品",
+  "quantity": 2,
+  "refundAmount": 90.00,
+  "1688OrderId": "1688-order-12345"
 }
 ```
 
-### 7.2 触发拼柜（生成货柜计划）
-
-```
-POST /api/v1/pool/{id}/consolidate
-```
-
-- 仅 `POOL_READY` 状态可调用
-- 自动分配集装箱号/封号
-
 ---
 
-## 8. 错误码
+## 7. 错误码
 
 | code | HTTP | 说明 |
 |------|------|------|
-| validation.param.required | 400 | 必填参数缺失 |
+| validation.required | 400 | 必填参数缺失 |
 | validation.param.invalid | 400 | 参数值非法 |
 | auth.unauthorized | 401 | 未认证 |
 | auth.forbidden | 403 | 无权操作 |
-| not_found | 404 | 发注单不存在 |
+| not_found | 404 | 资源不存在 |
 | business.status_forbidden | 422 | 状态不允许此操作 |
-| business.cannot_modify_closed | 422 | 已闭环不可修改 |
+| business.cannot_modify_closed | 422 | 完了(済)后不可修改 |
+| business.air_recommended | 200 | 空运推荐（warn级别提示） |
 | server.error | 500 | 系统异常 |

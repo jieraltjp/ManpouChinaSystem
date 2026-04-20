@@ -1,6 +1,7 @@
 package com.manpou.finance.common.result;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import java.util.Objects;
  * 约定：
  * - code="ok" 表示成功，其他表示失败
  * - message 用于展示给用户
- * - data 为 null 时不序列化（节省带宽）
+ * - payload 为 null 时不序列化（节省带宽）
  *
  * INTJ 审判：@Data 已被移除。
  * 原因：Lombok @Data 生成的 equals/hashCode 使用全部 5 个字段，
@@ -40,6 +41,7 @@ public class Result<T> {
     private String message;
 
     /** 响应数据（成功时返回） */
+    @JsonProperty("data")
     private T payload;
 
     /** TraceId（由 Filter 注入，始终返回） */
@@ -54,12 +56,12 @@ public class Result<T> {
         return Result.<T>builder().code("ok").message("success").build();
     }
 
-    public static <T> Result<T> ok(T data) {
-        return Result.<T>builder().code("ok").message("success").payload(data).build();
+    public static <T> Result<T> ok(T payload) {
+        return Result.<T>builder().code("ok").message("success").payload(payload).build();
     }
 
     public static <T> Result<T> ok(String message, T data) {
-        return Result.<T>builder().code("ok").message(message).payload(data).build();
+        return Result.<T>builder().code("ok").message(message).payload(payload).build();
     }
 
     public static <T> Result<T> fail(String code, String message) {
