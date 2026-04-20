@@ -1,8 +1,10 @@
 # 发注管理 — 领域模型
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **更新**: 2026-04-20
 > **依据**: `docs/发注管理体系升级.pdf` + `docs/新発注管理-設計図.xlsx`
+
+> ⚠️ **代码实现进度**: 所有领域模型（ShippingOrder / Product / Container / QcRecord / FinanceRecord / ReturnRecord / ConsolidationPool）均未实现
 
 ---
 
@@ -15,7 +17,7 @@
 ```
 ShippingOrder（聚合根）
 ├── id: Long
-├── skuNumber: String          # 货号（关联 Product.productCode）
+├── productCode: String        # 商品代码（关联 Product.productCode）
 ├── quantity: Integer         # 订购数量
 ├── priceRmb: BigDecimal      # 人民币单价
 ├── exchangeRate: BigDecimal  # CNY→JPY 汇率
@@ -48,7 +50,7 @@ ShippingOrder（聚合根）
     ├── rejectQc()         — 验货不通过（触发退货路径）
     ├── loadToContainer()  — 装柜
     ├── settle()            — 财务结算
-    └── close()            — 终态（完了(済)后禁止任何变更）
+    └── close()            — 终态（完了后禁止任何变更）
 ```
 
 ### 1.2 Product（商品目录 — 聚合根）
@@ -159,7 +161,7 @@ ReturnRecord（值对象）
 
 ### ShipmentStatus（出货单状态）
 
-> 对应 Excel basic status 流转图。终态为 `完了(済)`，此后禁止任何变更。
+> 对应 Excel basic status 流转图。终态为 `完了`，此后禁止任何变更。
 
 ```java
 public enum ShipmentStatus {
@@ -181,8 +183,9 @@ public enum ShipmentStatus {
     完了,       // 全流程结束（终态 — 禁止任何变更）
     退货;       // 退货（独立处理，不影响原单状态）
 
-    // 永康路径：未定 → 発注待 → 永康 → 倉庫着 → 検品 → エア便 → 輸出 → 通関 → 日本着 → 会計 → 完了
+    // 永康路径：未定 → 発注待 → 永康 → 倉庫着 → 検品 → エア便/輸出 → 通関 → 日本着 → 会計 → 完了
     // OEM 路径：未定 → 発注待 → OEM → 倉庫着 → 現地検品 → メーカー直送 → 完了
+    // 直送路径：未定 → 発注待 → 直送 → 倉庫着 → 検品/現地検品 → ...
     // 终态校验：status == 完了 时，所有状态推进方法抛出 BusinessException
 }
 ```
@@ -280,7 +283,7 @@ public enum PoolStatus {
 public interface ShippingOrderRepository extends JpaRepository<ShippingOrder, Long> {
 
     Page<ShippingOrder> findByStatus(ShipmentStatus status, Pageable pageable);
-    Page<ShippingOrder> findBySkuNumber(String skuNumber, Pageable pageable);
+    Page<ShippingOrder> findByProductCode(String productCode, Pageable pageable);
     Page<ShippingOrder> findByCustomerCompany(String customerCompany, Pageable pageable);
     List<ShippingOrder> findByIdIn(List<Long> ids);
 }
@@ -324,7 +327,7 @@ public class ShippingOrderDomainService {
 
     // 永康路径状态推进
     public void validateTransition(ShipmentStatus current, ShipmentStatus next) {
-        // 完了(済) 后禁止任何状态变更
+        // 完了 后禁止任何状态变更
         if (current == 完了) {
             throw new BusinessException("business.cannot_modify_closed");
         }

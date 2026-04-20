@@ -27,8 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class WarehouseUseCase {
 
-    private final WarehouseRepository exampleRepository;
-    private final WarehouseAssembler exampleAssembler;
+    private final WarehouseRepository warehouseRepository;
+    private final WarehouseAssembler warehouseAssembler;
 
     /**
      * 分页查询。
@@ -40,8 +40,8 @@ public class WarehouseUseCase {
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<WarehouseExample> page = exampleRepository.findAllByIsDeletedFalse(pageRequest);
-        return page.map(exampleAssembler::toDto);
+        Page<WarehouseExample> page = warehouseRepository.findAllByIsDeletedFalse(pageRequest);
+        return page.map(warehouseAssembler::toDto);
     }
 
     /**
@@ -49,9 +49,9 @@ public class WarehouseUseCase {
      */
     @Transactional(readOnly = true)
     public WarehousePageQuery getById(Long id) {
-        WarehouseExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        WarehouseExample entity = warehouseRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("WarehouseExample", id));
-        return exampleAssembler.toDto(entity);
+        return warehouseAssembler.toDto(entity);
     }
 
     /**
@@ -59,8 +59,8 @@ public class WarehouseUseCase {
      */
     @Transactional
     public Long create(WarehouseCreateCmd cmd) {
-        WarehouseExample entity = exampleAssembler.toEntity(cmd);
-        WarehouseExample saved = exampleRepository.save(entity);
+        WarehouseExample entity = warehouseAssembler.toEntity(cmd);
+        WarehouseExample saved = warehouseRepository.save(entity);
         log.info("[WarehouseExample] created, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId());
         return saved.getId();
     }
@@ -70,10 +70,10 @@ public class WarehouseUseCase {
      */
     @Transactional
     public void update(Long id, WarehouseUpdateCmd cmd) {
-        WarehouseExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        WarehouseExample entity = warehouseRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("WarehouseExample", id));
-        exampleAssembler.copyToEntity(cmd, entity);
-        exampleRepository.save(entity);
+        warehouseAssembler.copyToEntity(cmd, entity);
+        warehouseRepository.save(entity);
         log.info("[WarehouseExample] updated, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 
@@ -82,10 +82,10 @@ public class WarehouseUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        WarehouseExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        WarehouseExample entity = warehouseRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("WarehouseExample", id));
         entity.markDeleted();
-        exampleRepository.save(entity);
+        warehouseRepository.save(entity);
         log.info("[WarehouseExample] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 }

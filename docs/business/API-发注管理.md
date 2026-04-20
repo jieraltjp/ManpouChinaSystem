@@ -1,8 +1,10 @@
 # 发注管理 — API 契约
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **更新**: 2026-04-20
 > **依据**: `docs/发注管理体系升级.pdf` + `docs/新発注管理-設計図.xlsx`
+
+> ⚠️ **代码实现进度**: 所有接口均未实现（procurement-service / product-service 仅骨架）
 
 ---
 
@@ -31,7 +33,7 @@ POST /api/v1/procurements
 **请求体**（对应 Excel 出货单弹窗）：
 ```json
 {
-  "skuNumber": "de077",
+  "productCode": "de077",
   "quantity": 500,
   "priceRmb": 45.00,
   "exchangeRate": 21.5,
@@ -53,7 +55,7 @@ POST /api/v1/procurements
 
 | 字段 | Excel 名称 | 必填 | 说明 |
 |------|-----------|------|------|
-| skuNumber | 货号 | ✅ | 商品代码（关联 Product 表） |
+| productCode | 货号 | ✅ | 商品代码（关联 Product 表） |
 | quantity | 数量 | ✅ | 订购数量 |
 | priceRmb | 人民币价格 | ✅ | 人民币单价 |
 | exchangeRate | 汇率 | ✅ | CNY→JPY 汇率 |
@@ -80,7 +82,7 @@ estimatedPriceJpy = (priceRmb / taxPoint * 1.02 * 1.2) * exchangeRate * 1.05
   "code": "ok",
   "data": {
     "id": 1,
-    "skuNumber": "de077",
+    "productCode": "de077",
     "estimatedPriceJpy": 11321.25,
     "status": "未定",
     "createdAt": "2026-04-20T10:00:00+09:00"
@@ -101,7 +103,7 @@ GET /api/v1/procurements
 | 参数 | 类型 | 说明 |
 |------|------|------|
 | status | string | 状态过滤（未定/発注待/永康/倉庫着/検品/エア便/輸出/通関/日本着/会計/完了/退货） |
-| skuNumber | string | 商品代码 |
+| productCode | string | 商品代码 |
 | customerCompany | string | 客户公司 |
 | page | int | 页码，默认 0 |
 | size | int | 页大小，默认 20 |
@@ -114,7 +116,7 @@ GET /api/v1/procurements
     "content": [
       {
         "id": 1,
-        "skuNumber": "de077",
+        "productCode": "de077",
         "quantity": 500,
         "estimatedPriceJpy": 11321.25,
         "status": "倉庫着",
@@ -144,7 +146,7 @@ GET /api/v1/procurements/{id}
   "code": "ok",
   "data": {
     "id": 1,
-    "skuNumber": "de077",
+    "productCode": "de077",
     "quantity": 500,
     "priceRmb": 45.00,
     "exchangeRate": 21.5,
@@ -182,23 +184,29 @@ PATCH /api/v1/procurements/{id}
 }
 ```
 
-**状态推进规则**（见 SPEC）：
+**状态推进规则**（与 SPEC §5 完全一致）：
 
 | 当前状态 | 可转向 |
 |----------|--------|
-| 未定/予定 | 発注待 / OEM |
-| 発注待 | 永康 / 直送 / 倉庫着 |
+| 未定 | 発注待 |
+| 未定 | OEM |
+| 未定 | 直送 |
+| 発注待 | 永康 |
+| 発注待 | 直送 |
 | 永康 | 倉庫着 |
 | 直送 | 倉庫着 |
-| 倉庫着 | 検品 / 現地検品 |
+| 倉庫着 | 検品 |
+| 倉庫着 | 現地検品 |
 | 現地検品 | メーカー直送 |
-| 検品 | エア便 / 輸出 |
-| エア便 | 通関 / 日本着 |
+| 検品 | エア便 |
+| 検品 | 輸出 |
+| エア便 | 日本着 |
 | 輸出 | 通関 |
 | 通関 | 日本着 |
 | 日本着 | 会計 |
-| 会計 | 完了(済) |
-| 完了(済) | —（终态） |
+| 会計 | 完了 |
+| 完了 | —（终态，禁止任何变更） |
+
 
 ---
 
@@ -209,7 +217,7 @@ DELETE /api/v1/procurements/{id}
 ```
 
 - 仅 `未定`/`予定`/`発注待` 状态可删除
-- `完了(済)` 禁止删除
+- `完了` 禁止删除
 
 ---
 
@@ -365,6 +373,6 @@ POST /api/v1/procurements/{id}/returns
 | auth.forbidden | 403 | 无权操作 |
 | not_found | 404 | 资源不存在 |
 | business.status_forbidden | 422 | 状态不允许此操作 |
-| business.cannot_modify_closed | 422 | 完了(済)后不可修改 |
+| business.cannot_modify_closed | 422 | 完了后不可修改 |
 | business.air_recommended | 200 | 空运推荐（warn级别提示） |
 | server.error | 500 | 系统异常 |

@@ -27,8 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class NotificationUseCase {
 
-    private final NotificationRepository exampleRepository;
-    private final NotificationAssembler exampleAssembler;
+    private final NotificationRepository notificationRepository;
+    private final NotificationAssembler notificationAssembler;
 
     /**
      * 分页查询。
@@ -40,8 +40,8 @@ public class NotificationUseCase {
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<NotificationExample> page = exampleRepository.findAllByIsDeletedFalse(pageRequest);
-        return page.map(exampleAssembler::toDto);
+        Page<NotificationExample> page = notificationRepository.findAllByIsDeletedFalse(pageRequest);
+        return page.map(notificationAssembler::toDto);
     }
 
     /**
@@ -49,9 +49,9 @@ public class NotificationUseCase {
      */
     @Transactional(readOnly = true)
     public NotificationPageQuery getById(Long id) {
-        NotificationExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        NotificationExample entity = notificationRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("NotificationExample", id));
-        return exampleAssembler.toDto(entity);
+        return notificationAssembler.toDto(entity);
     }
 
     /**
@@ -59,8 +59,8 @@ public class NotificationUseCase {
      */
     @Transactional
     public Long create(NotificationCreateCmd cmd) {
-        NotificationExample entity = exampleAssembler.toEntity(cmd);
-        NotificationExample saved = exampleRepository.save(entity);
+        NotificationExample entity = notificationAssembler.toEntity(cmd);
+        NotificationExample saved = notificationRepository.save(entity);
         log.info("[NotificationExample] created, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId());
         return saved.getId();
     }
@@ -70,10 +70,10 @@ public class NotificationUseCase {
      */
     @Transactional
     public void update(Long id, NotificationUpdateCmd cmd) {
-        NotificationExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        NotificationExample entity = notificationRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("NotificationExample", id));
-        exampleAssembler.copyToEntity(cmd, entity);
-        exampleRepository.save(entity);
+        notificationAssembler.copyToEntity(cmd, entity);
+        notificationRepository.save(entity);
         log.info("[NotificationExample] updated, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 
@@ -82,10 +82,10 @@ public class NotificationUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        NotificationExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        NotificationExample entity = notificationRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("NotificationExample", id));
         entity.markDeleted();
-        exampleRepository.save(entity);
+        notificationRepository.save(entity);
         log.info("[NotificationExample] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 }

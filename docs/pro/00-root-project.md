@@ -80,19 +80,19 @@ ManpouChinaSystem/
 | 服务 | 端口 | 上下文路径 | 备注 |
 |------|------|-----------|------|
 | api-gateway | 18080 | / | 统一入口 |
-| **manpou-allinone** | **18090** | /api/v1 | ⚡ Phase 0：6 领域合一 |
-| user-service | 18081 | /api/v1 | JWT 认证 |
-| procurement-service | 18083 | /api/v1 | 核心业务：发注单 |
-| warehouse-service | 18084 | /api/v1 | ⚡ 后期独立 |
-| customs-service | 18085 | /api/v1 | ⚡ 后期独立 |
-| logistics-service | 18086 | /api/v1 | ⚡ 后期独立 |
-| finance-service | 18087 | /api/v1 | ⚡ 后期独立 |
-| notification-service | 18088 | /api/v1 | ⚡ 后期独立 |
-| product-service | 18082 | /api/v1 | ⚡ 后期独立 |
+| **manpou-allinone** | **18090** | / | ⚡ Phase 0：6 领域合一 |
+| user-service | 18081 | / | JWT 认证 |
+| procurement-service | 18083 | / | 核心业务：发注单 |
+| warehouse-service | 18084 | / | ⚡ 后期独立 |
+| customs-service | 18085 | / | ⚡ 后期独立 |
+| logistics-service | 18086 | / | ⚡ 后期独立 |
+| finance-service | 18087 | / | ⚡ 后期独立 |
+| notification-service | 18088 | / | ⚡ 后期独立 |
+| product-service | 18082 | / | ⚡ 后期独立 |
 | web（前端） | 13000 | / | |
 | Nacos | 8848 | /nacos |
 | Kafka | 9092 | - |
-| Kafka UI | 8080 | - |
+| Kafka UI | 8090 | - |
 
 ---
 
@@ -142,7 +142,7 @@ docker-compose -f docker-compose.yml up -d
 
 | 层级 | 状态 |
 |------|------|
-| ArchUnit 架构测试 | ✅ 8 个服务全部通过 |
+| ArchUnit 架构测试 | ✅ 8 个独立服务全部通过（manpou-allinone 待补充） |
 | 单元测试 | 🔴 暂无 |
 | 集成测试 | 🔴 暂无 |
 | E2E 测试 | 🔴 暂无 |
@@ -153,7 +153,7 @@ docker-compose -f docker-compose.yml up -d
 
 | ID | 风险 | 等级 | 建议 |
 |----|------|------|------|
-| AR-001 | API Gateway 脚手架已生成（apps/api-gateway），待启动验证 | 🟡 中 | 启动 + 集成前端代理 |
+| AR-001 | API Gateway 已启动验证，路由配置完成 | ✅ 已解决 | — |
 | AR-002 | 无服务间认证 | 🔴 高 | mTLS / JWT 内部传递 |
 | AR-003 | Kafka 消费者未实现 | 🔴 高 | 实现消费逻辑 |
 | AR-004 | Nacos 配置当前禁用 | 🟡 中 | 开发完成后接入 |
@@ -169,8 +169,8 @@ docker-compose -f docker-compose.yml up -d
 | Swagger UI（procurement） | http://localhost:18083/swagger-ui/index.html |
 | Swagger UI（user） | http://localhost:18081/swagger-ui/index.html |
 | Nacos（需 Docker） | http://localhost:8848/nacos |
-| Kafka UI（需 Docker） | http://localhost:8080 |
-| Grafana（需 Docker） | http://localhost:3001 |
+| Kafka UI（需 Docker） | http://localhost:8090 |
+| Grafana（需 Docker） | http://localhost:3000 |
 | Prometheus（需 Docker） | http://localhost:9090 |
 
 ---

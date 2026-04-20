@@ -22,52 +22,52 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductUseCase exampleUseCase;
+    private final ProductUseCase productUseCase;
 
     /**
-     * 分页查询示例列表。
+     * 分页查询商品列表。
      */
     @GetMapping
     public Result<Page<ProductPageQuery>> list(ProductQuery query) {
-        return Result.ok(exampleUseCase.pageQuery(query));
+        return Result.ok(productUseCase.pageQuery(query));
     }
 
     /**
-     * 根据 ID 查询单个示例。
+     * 根据 ID 查询单个商品。
      */
     @GetMapping("/{id}")
     public Result<ProductPageQuery> get(@PathVariable Long id) {
-        return Result.ok(exampleUseCase.getById(id));
+        return Result.ok(productUseCase.getById(id));
     }
 
     /**
-     * 创建示例。
+     * 创建商品。
      * 使用 @Idempotent 注解实现幂等性，防止网络重试导致重复创建。
      * 客户端需在请求头携带 X-Idempotency-Key: {uuid}
      */
     @PostMapping
     @Idempotent(ttl = 24 * 60 * 60)
     public Result<Long> create(@Valid @RequestBody ProductCreateCmd cmd) {
-        Long id = exampleUseCase.create(cmd);
+        Long id = productUseCase.create(cmd);
         return Result.ok("创建成功", id);
     }
 
     /**
-     * 更新示例。
+     * 更新商品。
      */
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody ProductUpdateCmd cmd) {
-        exampleUseCase.update(id, cmd);
+        productUseCase.update(id, cmd);
         return Result.ok("更新成功", null);
     }
 
     /**
-     * 删除示例（逻辑删除）。
+     * 删除商品（逻辑删除）。
      */
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
-        exampleUseCase.delete(id);
+        productUseCase.delete(id);
         return Result.ok("删除成功", null);
     }
 }

@@ -27,8 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CustomsUseCase {
 
-    private final CustomsRepository exampleRepository;
-    private final CustomsAssembler exampleAssembler;
+    private final CustomsRepository customsRepository;
+    private final CustomsAssembler customsAssembler;
 
     /**
      * 分页查询。
@@ -40,8 +40,8 @@ public class CustomsUseCase {
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<CustomsExample> page = exampleRepository.findAllByIsDeletedFalse(pageRequest);
-        return page.map(exampleAssembler::toDto);
+        Page<CustomsExample> page = customsRepository.findAllByIsDeletedFalse(pageRequest);
+        return page.map(customsAssembler::toDto);
     }
 
     /**
@@ -49,9 +49,9 @@ public class CustomsUseCase {
      */
     @Transactional(readOnly = true)
     public CustomsPageQuery getById(Long id) {
-        CustomsExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        CustomsExample entity = customsRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("CustomsExample", id));
-        return exampleAssembler.toDto(entity);
+        return customsAssembler.toDto(entity);
     }
 
     /**
@@ -59,8 +59,8 @@ public class CustomsUseCase {
      */
     @Transactional
     public Long create(CustomsCreateCmd cmd) {
-        CustomsExample entity = exampleAssembler.toEntity(cmd);
-        CustomsExample saved = exampleRepository.save(entity);
+        CustomsExample entity = customsAssembler.toEntity(cmd);
+        CustomsExample saved = customsRepository.save(entity);
         log.info("[CustomsExample] created, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId());
         return saved.getId();
     }
@@ -70,10 +70,10 @@ public class CustomsUseCase {
      */
     @Transactional
     public void update(Long id, CustomsUpdateCmd cmd) {
-        CustomsExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        CustomsExample entity = customsRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("CustomsExample", id));
-        exampleAssembler.copyToEntity(cmd, entity);
-        exampleRepository.save(entity);
+        customsAssembler.copyToEntity(cmd, entity);
+        customsRepository.save(entity);
         log.info("[CustomsExample] updated, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 
@@ -82,10 +82,10 @@ public class CustomsUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        CustomsExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        CustomsExample entity = customsRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("CustomsExample", id));
         entity.markDeleted();
-        exampleRepository.save(entity);
+        customsRepository.save(entity);
         log.info("[CustomsExample] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 }

@@ -27,8 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LogisticsUseCase {
 
-    private final LogisticsRepository exampleRepository;
-    private final LogisticsAssembler exampleAssembler;
+    private final LogisticsRepository logisticsRepository;
+    private final LogisticsAssembler logisticsAssembler;
 
     /**
      * 分页查询。
@@ -40,8 +40,8 @@ public class LogisticsUseCase {
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<LogisticsExample> page = exampleRepository.findAllByIsDeletedFalse(pageRequest);
-        return page.map(exampleAssembler::toDto);
+        Page<LogisticsExample> page = logisticsRepository.findAllByIsDeletedFalse(pageRequest);
+        return page.map(logisticsAssembler::toDto);
     }
 
     /**
@@ -49,9 +49,9 @@ public class LogisticsUseCase {
      */
     @Transactional(readOnly = true)
     public LogisticsPageQuery getById(Long id) {
-        LogisticsExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        LogisticsExample entity = logisticsRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("LogisticsExample", id));
-        return exampleAssembler.toDto(entity);
+        return logisticsAssembler.toDto(entity);
     }
 
     /**
@@ -59,8 +59,8 @@ public class LogisticsUseCase {
      */
     @Transactional
     public Long create(LogisticsCreateCmd cmd) {
-        LogisticsExample entity = exampleAssembler.toEntity(cmd);
-        LogisticsExample saved = exampleRepository.save(entity);
+        LogisticsExample entity = logisticsAssembler.toEntity(cmd);
+        LogisticsExample saved = logisticsRepository.save(entity);
         log.info("[LogisticsExample] created, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId());
         return saved.getId();
     }
@@ -70,10 +70,10 @@ public class LogisticsUseCase {
      */
     @Transactional
     public void update(Long id, LogisticsUpdateCmd cmd) {
-        LogisticsExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        LogisticsExample entity = logisticsRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("LogisticsExample", id));
-        exampleAssembler.copyToEntity(cmd, entity);
-        exampleRepository.save(entity);
+        logisticsAssembler.copyToEntity(cmd, entity);
+        logisticsRepository.save(entity);
         log.info("[LogisticsExample] updated, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 
@@ -82,10 +82,10 @@ public class LogisticsUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        LogisticsExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        LogisticsExample entity = logisticsRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("LogisticsExample", id));
         entity.markDeleted();
-        exampleRepository.save(entity);
+        logisticsRepository.save(entity);
         log.info("[LogisticsExample] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 }

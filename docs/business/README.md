@@ -4,6 +4,21 @@
 
 ---
 
+## 实现进度
+
+| 模块 | 文档状态 | 代码实现 | 备注 |
+|------|---------|---------|------|
+| 发注单（ShippingOrder） | ✅ 完成 | 🔴 未实现 | manpou-allinone Phase A 最高优先级 |
+| 商品目录（Product） | ✅ 完成 | 🔴 未实现 | manpou-allinone product 模块替换骨架 |
+| 货柜管理（Container） | ✅ 完成 | 🔴 未实现 | — |
+| 财务结算（FinanceRecord） | ✅ 完成 | 🔴 未实现 | — |
+| 退货管理（ReturnRecord） | ✅ 完成 | 🔴 未实现 | — |
+| 拼柜池（ConsolidationPool） | ✅ 完成 | 🔴 未实现 | Phase 5 |
+
+> 🔴 = 仅骨架/未实现  🟡 = 部分实现  ✅ = 完整实现
+
+---
+
 ## 文档索引
 
 | 编号 | 文档 | 说明 |
@@ -14,29 +29,10 @@
 
 ---
 
-## 业务概览
-
-```
-发注单生命周期：
-  PENDING → IN_PROGRESS → QC_PENDING → QC_PASSED → SHIPPING → CLOSED
-                ↓               ↓
-           SUSPENDED       REJECTED(返工)
-                               ↓
-                            PENDING
-
-运输分流（QC_PASSED 之后）：
-  WAREHOUSE → 自有仓二次验收 → 集货
-  POOL     → 虚拟拼柜池 → 凑柜 → 装柜
-  DIRECT   → 厂家直装 + 报关并行
-```
-
----
-
 ## 实现规划
 
-| Phase | 范围 |
-|--------|------|
-| Phase 3 | 发注单 CRUD + 状态机 + 商品录入 |
-| Phase 4 | 验收管理 |
-| Phase 5 | 三种运输模式 + 拼柜池 |
-| Phase 6 | 货柜管理 + 财务结算 |
+| Phase | 范围 | 目标 |
+|--------|------|------|
+| Phase A | 发注单 CRUD + Product 骨架替换 + 状态机 + 验货 | manpou-allinone 单体优先 |
+| Phase B | 货柜管理 + 拼柜池 + 财务结算 | 业务完整闭环 |
+| Phase C | 微服务抽取（可选）+ Kafka 事件驱动 | 架构演进 |

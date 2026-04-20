@@ -13,7 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 示例 Controller。
+ * Customs Controller。
  * 职责：参数校验、调用 Application 层、返回标准化响应。
  * 禁止在此层写业务逻辑。
  */
@@ -22,52 +22,52 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CustomsController {
 
-    private final CustomsUseCase exampleUseCase;
+    private final CustomsUseCase customsUseCase;
 
     /**
-     * 分页查询示例列表。
+     * 分页查询Customs列表。
      */
     @GetMapping
     public Result<Page<CustomsPageQuery>> list(CustomsQuery query) {
-        return Result.ok(exampleUseCase.pageQuery(query));
+        return Result.ok(customsUseCase.pageQuery(query));
     }
 
     /**
-     * 根据 ID 查询单个示例。
+     * 根据 ID 查询单个Customs。
      */
     @GetMapping("/{id}")
     public Result<CustomsPageQuery> get(@PathVariable Long id) {
-        return Result.ok(exampleUseCase.getById(id));
+        return Result.ok(customsUseCase.getById(id));
     }
 
     /**
-     * 创建示例。
+     * 创建Customs。
      * 使用 @Idempotent 注解实现幂等性，防止网络重试导致重复创建。
      * 客户端需在请求头携带 X-Idempotency-Key: {uuid}
      */
     @PostMapping
     @Idempotent(ttl = 24 * 60 * 60)
     public Result<Long> create(@Valid @RequestBody CustomsCreateCmd cmd) {
-        Long id = exampleUseCase.create(cmd);
+        Long id = customsUseCase.create(cmd);
         return Result.ok("创建成功", id);
     }
 
     /**
-     * 更新示例。
+     * 更新Customs。
      */
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody CustomsUpdateCmd cmd) {
-        exampleUseCase.update(id, cmd);
+        customsUseCase.update(id, cmd);
         return Result.ok("更新成功", null);
     }
 
     /**
-     * 删除示例（逻辑删除）。
+     * 删除Customs（逻辑删除）。
      */
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
-        exampleUseCase.delete(id);
+        customsUseCase.delete(id);
         return Result.ok("删除成功", null);
     }
 }

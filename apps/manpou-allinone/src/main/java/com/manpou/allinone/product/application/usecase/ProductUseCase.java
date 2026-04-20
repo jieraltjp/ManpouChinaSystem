@@ -27,8 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ProductUseCase {
 
-    private final ProductRepository exampleRepository;
-    private final ProductAssembler exampleAssembler;
+    private final ProductRepository productRepository;
+    private final ProductAssembler productAssembler;
 
     /**
      * 分页查询。
@@ -40,8 +40,8 @@ public class ProductUseCase {
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<ProductExample> page = exampleRepository.findAllByIsDeletedFalse(pageRequest);
-        return page.map(exampleAssembler::toDto);
+        Page<ProductExample> page = productRepository.findAllByIsDeletedFalse(pageRequest);
+        return page.map(productAssembler::toDto);
     }
 
     /**
@@ -49,9 +49,9 @@ public class ProductUseCase {
      */
     @Transactional(readOnly = true)
     public ProductPageQuery getById(Long id) {
-        ProductExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        ProductExample entity = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("ProductExample", id));
-        return exampleAssembler.toDto(entity);
+        return productAssembler.toDto(entity);
     }
 
     /**
@@ -59,9 +59,9 @@ public class ProductUseCase {
      */
     @Transactional
     public Long create(ProductCreateCmd cmd) {
-        ProductExample entity = exampleAssembler.toEntity(cmd);
-        ProductExample saved = exampleRepository.save(entity);
-        log.info("[ProductExample] created, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId());
+        ProductExample entity = productAssembler.toEntity(cmd);
+        ProductExample saved = productRepository.save(entity);
+        log.info("[Product] created, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId());
         return saved.getId();
     }
 
@@ -70,11 +70,11 @@ public class ProductUseCase {
      */
     @Transactional
     public void update(Long id, ProductUpdateCmd cmd) {
-        ProductExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        ProductExample entity = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("ProductExample", id));
-        exampleAssembler.copyToEntity(cmd, entity);
-        exampleRepository.save(entity);
-        log.info("[ProductExample] updated, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
+        productAssembler.copyToEntity(cmd, entity);
+        productRepository.save(entity);
+        log.info("[Product] updated, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 
     /**
@@ -82,10 +82,10 @@ public class ProductUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        ProductExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        ProductExample entity = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("ProductExample", id));
         entity.markDeleted();
-        exampleRepository.save(entity);
-        log.info("[ProductExample] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
+        productRepository.save(entity);
+        log.info("[Product] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 }

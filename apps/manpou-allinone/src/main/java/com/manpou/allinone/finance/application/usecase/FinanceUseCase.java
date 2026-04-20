@@ -27,8 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class FinanceUseCase {
 
-    private final FinanceRepository exampleRepository;
-    private final FinanceAssembler exampleAssembler;
+    private final FinanceRepository financeRepository;
+    private final FinanceAssembler financeAssembler;
 
     /**
      * 分页查询。
@@ -40,8 +40,8 @@ public class FinanceUseCase {
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<FinanceExample> page = exampleRepository.findAllByIsDeletedFalse(pageRequest);
-        return page.map(exampleAssembler::toDto);
+        Page<FinanceExample> page = financeRepository.findAllByIsDeletedFalse(pageRequest);
+        return page.map(financeAssembler::toDto);
     }
 
     /**
@@ -49,9 +49,9 @@ public class FinanceUseCase {
      */
     @Transactional(readOnly = true)
     public FinancePageQuery getById(Long id) {
-        FinanceExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        FinanceExample entity = financeRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("FinanceExample", id));
-        return exampleAssembler.toDto(entity);
+        return financeAssembler.toDto(entity);
     }
 
     /**
@@ -59,8 +59,8 @@ public class FinanceUseCase {
      */
     @Transactional
     public Long create(FinanceCreateCmd cmd) {
-        FinanceExample entity = exampleAssembler.toEntity(cmd);
-        FinanceExample saved = exampleRepository.save(entity);
+        FinanceExample entity = financeAssembler.toEntity(cmd);
+        FinanceExample saved = financeRepository.save(entity);
         log.info("[FinanceExample] created, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId());
         return saved.getId();
     }
@@ -70,10 +70,10 @@ public class FinanceUseCase {
      */
     @Transactional
     public void update(Long id, FinanceUpdateCmd cmd) {
-        FinanceExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        FinanceExample entity = financeRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("FinanceExample", id));
-        exampleAssembler.copyToEntity(cmd, entity);
-        exampleRepository.save(entity);
+        financeAssembler.copyToEntity(cmd, entity);
+        financeRepository.save(entity);
         log.info("[FinanceExample] updated, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 
@@ -82,10 +82,10 @@ public class FinanceUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        FinanceExample entity = exampleRepository.findByIdAndIsDeletedFalse(id)
+        FinanceExample entity = financeRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("FinanceExample", id));
         entity.markDeleted();
-        exampleRepository.save(entity);
+        financeRepository.save(entity);
         log.info("[FinanceExample] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 }
