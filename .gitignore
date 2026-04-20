@@ -7,16 +7,20 @@ pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 pom.xml.flattened
-.flattened-pom.xml
-release.properties
+.release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
+.flattened-pom.xml
 
 # Scaffold / Helm target
 scaffolds/**/target/
 infra/**/target/
+
+# All apps/* service target directories
+apps/*/target/
+apps/*/*/target/
 
 # Gradle (if any service uses it)
 .gradle/
@@ -33,7 +37,6 @@ infra/**/target/
 *.ear
 *.zip
 *.tar.gz
-*.rar
 
 # =============================================
 # Vue / Frontend (apps/web)
@@ -52,6 +55,11 @@ apps/web/*.local
 # pnpm
 .pnpm-store/
 .pnpm/
+
+# =============================================
+# manpou-allinone local keys (私钥不提交)
+# =============================================
+apps/manpou-allinone/keys/
 
 # =============================================
 # IDE
