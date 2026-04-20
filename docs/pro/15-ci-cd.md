@@ -26,7 +26,7 @@ Helm 部署 → Kubernetes 集群
 
 ## 2. CI 流水线（ci.yaml）
 
-触发条件：`push` + `pull_request`（所有分支）
+触发条件：`push`（main, develop）+ `pull_request`（main）
 
 ### 阶段
 
@@ -49,7 +49,7 @@ Helm 部署 → Kubernetes 集群
 
 ## 3. CD 流水线（cd.yml）
 
-触发条件：`push` 到 `main` 分支
+触发条件：`workflow_run`（CI Build 通过后，main 分支）
 
 ### 阶段
 

@@ -94,7 +94,7 @@ com.manpou.allinone/
 │
 ├── infrastructure/                   # 技术基础设施
 │   ├── security/                    # JwtKeyManager, JwtService, JwtAuthenticationFilter
-│   └── config/                      # SecurityConfig, WebConfig
+│   └── config/                      # SecurityConfig, ClockConfig, JpaAuditConfig
 │
 ├── interfaces/                       # 对外接口（跨领域）
 │   └── controller/
@@ -175,7 +175,7 @@ product.UseCase  → Kafka Topic (warehouse-events)  ✅ 正确解耦
 ## 6. 数据库
 
 - **开发**：H2 内存（`jdbc:h2:mem:allinone`），不依赖 Docker
-- **迁移**：Flyway（`db/migration/V*.sql`）
+- **迁移**：Flyway（`db/migration/V*.sql`，当前禁用）；JPA `ddl-auto: update` 管理开发期 schema
 - **表**：`product_example`, `warehouse_example`, `customs_example`, `logistics_example`, `finance_example`, `notification_example`, `signing_key`, `outbox`
 
 ---

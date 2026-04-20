@@ -32,7 +32,7 @@ infra/helm/
         ├── ingress.yaml         # Ingress（可选 TLS）
         ├── configmap.yaml       # 非敏感配置
         ├── secret.yaml          # 敏感数据（密钥、密码）
-        └── pod-disruption-budget.yaml # Pod 中断预算
+        └── pod-disruption-budget.yaml # Pod 中断预算（待创建）
 ```
 
 ---

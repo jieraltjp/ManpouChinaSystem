@@ -41,40 +41,70 @@ src/main/java/com/manpou/procurement/
 ├── ProcurementServiceApplication.java  # 启动类
 ├── interfaces/
 │   └── controller/
-│       └── ExampleController.java      # 示例 CRUD（待替换为采购单 API）
+│       ├── AuthController.java          # 登录/公钥
+│       ├── ExampleController.java        # 示例 CRUD（待替换为采购单 API）
+│       └── KeyManagementController.java # 密钥管理（管理员）
 ├── application/
 │   ├── dto/
 │   │   ├── ExampleCreateCmd.java
 │   │   ├── ExamplePageQuery.java
-│   │   └── ExampleVO.java
+│   │   ├── ExampleQuery.java
+│   │   └── ExampleUpdateCmd.java
 │   ├── usecase/
-│   │   └── ExampleUseCase.java        # 待替换为 PurchaseOrderUseCase
-│   └── assembler/
-│       └── ExampleAssembler.java
+│   │   └── ExampleUseCase.java           # 待替换为 PurchaseOrderUseCase
+│   ├── assembler/
+│   │   └── ExampleAssembler.java
+│   └── KeyManagementService.java         # 密钥轮换服务
 ├── domain/
 │   ├── model/
+│   │   ├── BaseEntity.java              # 审计基类
 │   │   ├── Example.java
-│   │   ├── PurchaseOrder.java         # 待实现：采购单聚合根
-│   │   └── OrderStatus.java          # 待实现：状态枚举
+│   │   ├── ExampleStatus.java           # 示例状态枚举
+│   │   ├── SigningKey.java              # JWT 签名密钥实体
+│   │   └── SigningKeyStatus.java        # 密钥状态枚举
+│   │   ├── PurchaseOrder.java          # 待实现：采购单聚合根
+│   │   └── OrderStatus.java            # 待实现：状态枚举
+│   ├── port/
+│   │   └── SigningKeyPort.java          # 密钥仓储端口（Hexagonal）
 │   └── repository/
-│       └── ExampleRepository.java
+│       ├── ExampleRepository.java
+│       ├── JpaRepository.java
+│       └── SigningKeyRepository.java
 ├── infrastructure/
 │   ├── config/
-│   │   ├── JpaAuditConfig.java
-│   │   ├── SecurityConfig.java        # Swagger UI 已配置 permitAll
-│   │   └── ClockConfig.java
-│   ├── security/
-│   │   ├── JwtService.java
-│   │   └── JwtAuthenticationFilter.java
-│   └── persistence/
-│       └── JpaExampleRepositoryImpl.java
+│   │   ├── ClockConfig.java
+│   │   └── JpaAuditConfig.java
+│   ├── aspect/
+│   │   └── IdempotencyAspect.java        # 幂等切面
+│   └── security/
+│       ├── JwtAuthenticationFilter.java
+│       ├── JwtContextHolder.java
+│       ├── JwtKeyManager.java
+│       ├── JwtService.java
+│       └── SecurityConfig.java
 └── common/
+    ├── annotation/
+    │   └── Idempotent.java
+    ├── config/
+    │   ├── ConfigListener.java
+    │   ├── ConfigSource.java
+    │   ├── ConfigSourceAutoConfiguration.java
+    │   ├── ConfigSourceFactory.java
+    │   ├── LocalFileConfigSource.java
+    │   ├── NacosConfigSource.java
+    │   └── PropertiesConfigSource.java
+    ├── context/
+    │   └── UserContext.java
     ├── exception/
-    │   └── GlobalExceptionHandler.java
+    │   ├── BusinessException.java
+    │   ├── GlobalExceptionHandler.java
+    │   └── ValidationErrorCodeMapper.java
+    ├── filter/
+    │   └── TraceFilter.java
     ├── result/
     │   └── Result.java
-    └── annotation/
-        └── Idempotent.java            # 幂等注解
+    └── time/
+        └── Clock.java
 
 src/main/resources/
 ├── application.yml                    # 18083 端口

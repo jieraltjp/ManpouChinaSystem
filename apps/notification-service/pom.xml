@@ -14,7 +14,7 @@
     <artifactId>notification-service</artifactId>
     <packaging>jar</packaging>
     <name>${project.groupId}:notification-service</name>
-    <description>procurement服务</description>
+    <description>notification服务</description>
 
     <dependencies>
         <!-- Spring Boot Web -->

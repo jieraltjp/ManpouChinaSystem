@@ -68,16 +68,17 @@
 | 路径 | 目标服务 | 端口 | 鉴权 |
 |------|---------|------|------|
 | `/api/v1/auth/**` | user-service | 18081 | ❌ 白名单 |
-| `/api/v1/products/**` | product-service | 18082 | ✅ JWT |
-| `/api/v1/purchase-orders/**` | procurement-service | 18083 | ✅ JWT |
-| `/api/v1/warehouse/**` | warehouse-service | 18084 | ✅ JWT |
-| `/api/v1/customs/**` | customs-service | 18085 | ✅ JWT |
-| `/api/v1/logistics/**` | logistics-service | 18086 | ✅ JWT |
-| `/api/v1/finance/**` | finance-service | 18087 | ✅ JWT |
-| `/api/v1/notifications/**` | notification-service | 18088 | ✅ JWT |
-| `/api/v1/**` | user-service（默认） | 18081 | ✅ JWT |
+| `/api/v1/purchase-orders/**` | procurement-service | 18083 | ✅ JWT，熔断+重试 |
+| `/api/v1/products/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
+| `/api/v1/warehouse/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
+| `/api/v1/customs/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
+| `/api/v1/logistics/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
+| `/api/v1/finance/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
+| `/api/v1/notifications/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
 | `/actuator/**` | forward:/actuator | — | ❌ 白名单 |
 | `/health` | forward:/health | — | ❌ 白名单 |
+
+> **注意**：原设计中的 product-service、warehouse-service、customs-service、logistics-service、finance-service、notification-service 均已合并到 manpou-allinone (18090)，网关路由已相应更新。
 
 ### 熔断配置（per-route）
 
@@ -100,7 +101,7 @@ retry:
         ↓
 JwtAuthFilter 提取 Token
         ↓
-JwtValidator 使用 classpath:keys/public.pem 验签（公钥来自 user-service）
+JwtValidator 使用 classpath:keys/public.pem 验签（公钥预置在 api-gateway classpath，由 user-service 同步维护）
         ↓
 Claims 提取：sub / username / tenantId / roles / permissions
         ↓
@@ -136,12 +137,12 @@ apps/api-gateway/
     │   │   ├── security/
     │   │   │   ├── JwtValidator.java      # RS256 验签
     │   │   │   ├── JwtClaims.java         # Claims 记录
-    │   │   │   └── JwtPublicKeyManager.java # 公钥加载
+    │   │   │   └── JwtPublicKeyManager.java # 公钥加载（实际文件名，非 JwtKeyManager）
     │   │   └── config/
     │   │       └── GatewayConfig.java     # 限流 Bean
     │   └── resources/
     │       ├── application.yml            # 端口 18080，路由配置
-    │       └── keys/public.pem            # RS256 公钥（来自 user-service）
+    │       └── keys/public.pem            # RS256 公钥（预置，由 user-service 同步维护）
     └── test/
         ├── JwtValidatorTest.java
         └── TraceIdUtilTest.java

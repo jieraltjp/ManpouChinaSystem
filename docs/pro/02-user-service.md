@@ -37,38 +37,68 @@ src/main/java/com/manpou/user/
 ├── UserServiceApplication.java          # 启动类
 ├── interfaces/
 │   └── controller/
-│       ├── AuthController.java         # 登录/公钥/密钥管理
-│       └── ExampleController.java      # 示例 CRUD
+│       ├── AuthController.java          # 登录/公钥
+│       ├── ExampleController.java        # 示例 CRUD
+│       └── KeyManagementController.java # 密钥管理（管理员）
 ├── application/
 │   ├── dto/
-│   │   ├── LoginCmd.java              # 登录请求
-│   │   ├── LoginVO.java               # 登录响应
-│   │   └── ...
+│   │   ├── ExampleCreateCmd.java
+│   │   ├── ExamplePageQuery.java
+│   │   ├── ExampleQuery.java
+│   │   └── ExampleUpdateCmd.java
 │   ├── usecase/
-│   │   └── AuthUseCase.java           # 认证业务编排
-│   └── assembler/
-│       └── AuthAssembler.java         # DTO ↔ Entity 转换
+│   │   └── ExampleUseCase.java           # 示例业务编排
+│   ├── assembler/
+│   │   └── ExampleAssembler.java         # DTO ↔ Entity 转换
+│   └── KeyManagementService.java         # 密钥轮换服务
 ├── domain/
 │   ├── model/
-│   │   ├── User.java                  # 用户实体
-│   │   └── SigningKey.java            # JWT 签名密钥实体
+│   │   ├── BaseEntity.java               # 审计基类
+│   │   ├── Example.java                   # 示例实体
+│   │   ├── ExampleStatus.java            # 示例状态枚举
+│   │   ├── SigningKey.java               # JWT 签名密钥实体
+│   │   └── SigningKeyStatus.java        # 密钥状态枚举
+│   ├── port/
+│   │   └── SigningKeyPort.java           # 密钥仓储端口（Hexagonal）
 │   └── repository/
-│       └── UserRepository.java        # JPA 仓储
+│       ├── ExampleRepository.java
+│       ├── JpaRepository.java
+│       └── SigningKeyRepository.java
 ├── infrastructure/
 │   ├── config/
-│   │   ├── JpaAuditConfig.java        # JPA 审计
-│   │   ├── SecurityConfig.java       # Spring Security 配置
-│   │   └── JwtAuthenticationFilter.java
-│   ├── security/
-│   │   ├── JwtService.java            # JWT 核心服务
-│   │   └── JwtContextHolder.java      # 用户上下文
-│   └── persistence/
-│       └── JpaUserRepositoryImpl.java
+│   │   ├── ClockConfig.java              # 统一时钟
+│   │   └── JpaAuditConfig.java           # JPA 审计
+│   ├── aspect/
+│   │   └── IdempotencyAspect.java        # 幂等切面
+│   └── security/
+│       ├── JwtAuthenticationFilter.java  # JWT 过滤器
+│       ├── JwtContextHolder.java         # 用户上下文
+│       ├── JwtKeyManager.java            # 密钥加载/管理
+│       ├── JwtService.java                # JWT 核心服务
+│       └── SecurityConfig.java            # Spring Security 配置
 └── common/
+    ├── annotation/
+    │   └── Idempotent.java                # 幂等注解
+    ├── config/
+    │   ├── ConfigListener.java
+    │   ├── ConfigSource.java
+    │   ├── ConfigSourceAutoConfiguration.java
+    │   ├── ConfigSourceFactory.java
+    │   ├── LocalFileConfigSource.java
+    │   ├── NacosConfigSource.java
+    │   └── PropertiesConfigSource.java
+    ├── context/
+    │   └── UserContext.java
     ├── exception/
-    │   └── GlobalExceptionHandler.java
-    └── result/
-        └── Result.java                # 统一响应
+    │   ├── BusinessException.java
+    │   ├── GlobalExceptionHandler.java
+    │   └── ValidationErrorCodeMapper.java
+    ├── filter/
+    │   └── TraceFilter.java               # 链路追踪过滤器
+    ├── result/
+    │   └── Result.java                    # 统一响应
+    └── time/
+        └── Clock.java
 
 src/main/resources/
 ├── application.yml                    # 主配置（18081 端口）
@@ -91,7 +121,7 @@ src/main/resources/
 | GET | `/api/v1/auth/public-key` | ❌ | 获取 RSA 公钥 |
 | POST | `/api/v1/auth/login` | ❌ | 用户登录 |
 | GET | `/api/v1/admin/keys` | ADMIN | 获取所有密钥（仅管理员） |
-| POST | `/api/v1/admin/keys` | ADMIN | 创建新密钥 |
+| POST | `/api/v1/admin/keys/rotate` | ADMIN | 轮换签名密钥 |
 | GET | `/api/v1/examples` | USER | 示例列表 |
 | POST | `/api/v1/examples` | USER | 创建示例 |
 | PUT | `/api/v1/examples/{id}` | USER | 更新示例 |

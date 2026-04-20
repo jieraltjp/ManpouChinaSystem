@@ -8,32 +8,55 @@
 
 ```
 ManpouChinaSystem/
-├── apps/                           # 微服务
-│   ├── java-service/              # 父POM
-│   ├── user-service/              # 用户服务 (认证/权限)
-│   ├── product-service/           # 商品服务 (徐义超)
-│   ├── procurement-service/       # 发注服务 (张云)
-│   ├── warehouse-service/         # 仓储服务 (永康)
-│   ├── customs-service/           # 报关服务 (殷元)
-│   ├── logistics-service/         # 物流服务 (于世荣)
-│   ├── finance-service/           # 财务服务 (许文豪)
-│   ├── notification-service/      # 通知服务 (陈天仪)
-│   └── web/                       # 前端应用
-├── config/                         # 配置文件
-│   ├── checkstyle/              # 代码规范
-│   └── nacos/                   # Nacos配置
-├── docker/                        # Docker配置
-│   └── compose.yaml             # 本地开发环境
-├── scripts/                        # 运维脚本
-│   └── build-all.sh            # 全量构建脚本
-├── infra/                         # 基础设施
-│   └── helm/                   # K8s Helm Charts
-├── docs/                          # 文档
-│   └── *.md                    # 详细文档
-├── .github/                       # CI/CD
+├── apps/
+│   ├── java-service/           # 父POM（仅pom.xml，无源码）
+│   ├── manpou-allinone/        # 6领域合一单体（端口18090）
+│   ├── user-service/            # 用户服务（端口18081）
+│   ├── product-service/         # 商品服务（端口18082）
+│   ├── procurement-service/     # 发注服务（端口18083）
+│   ├── warehouse-service/       # 仓储服务（端口18084）
+│   ├── customs-service/         # 报关服务（端口18085）
+│   ├── logistics-service/       # 物流服务（端口18086）
+│   ├── finance-service/         # 财务服务（端口18087）
+│   ├── notification-service/   # 通知服务（端口18088）
+│   ├── api-gateway/             # API网关（端口18080）
+│   └── web/                     # Vue3前端（端口13000）
+├── config/
+│   ├── checkstyle/
+│   └── nacos/
+├── docker/
+│   ├── compose.yaml
+│   ├── otel-collector-config.yaml
+│   ├── tempo-config.yaml
+│   └── prometheus/
+│       └── prometheus.yml
+├── scripts/
+│   ├── build-all.sh
+│   ├── init-config.sh
+│   ├── restart-all.sh
+│   ├── start-all.sh
+│   └── stop-all.sh
+├── infra/
+│   └── helm/
+├── monitoring/
+│   ├── alertmanager/
+│   ├── grafana/
+│   └── prometheus/
+├── docs/
+│   ├── index.md              # 文档导航
+│   ├── pro/                  # 项目专属文档
+│   ├── desigin/              # 构建指南
+│   ├── role/                 # 角色视角
+│   ├── ui/                   # 前端UI
+│   └── check/                # 审计报告
+├── .github/
 │   └── workflows/
-│       └── ci.yaml             # GitHub Actions
-└── README.md
+│       ├── ci.yaml
+│       └── cd.yml
+├── .gitignore
+├── pom.xml
+├── README.md
+└── versions.toml
 ```
 
 ## 技术栈
@@ -41,13 +64,13 @@ ManpouChinaSystem/
 | 组件 | 技术 | 版本 |
 |------|------|------|
 | 后端框架 | Spring Boot 3 | 3.2.5 |
-| 数据库 | MySQL 8 | 8.0 |
+| 数据库 | MySQL 8（开发）/ TiDB v8（生产） | 8.0 |
 | 缓存 | Redis | 7 |
 | 消息队列 | Apache Kafka | 3.8 |
 | 配置中心 | Nacos | 2.3 |
 | 前端 | Vue 3 + TypeScript | 3.4 |
 | 构建工具 | Vite | 5.x |
-| 包管理 | pnpm | 8.x |
+| 包管理 | npm | — |
 
 ## 快速开始
 

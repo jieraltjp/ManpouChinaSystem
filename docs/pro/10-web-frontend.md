@@ -43,7 +43,7 @@ apps/web/
 │   │   ├── adapters/
 │   │   │   └── auth.ts            # 认证 API 适配器
 │   │   └── types/
-│   │       └── api.ts             # API 通用类型（Result<T>）
+│   │       └── api.ts             # (废弃) 请使用 src/types/api.ts
 │   ├── components/
 │   │   └── atoms/
 │   │       └── Loading.vue         # 原子组件
@@ -67,7 +67,7 @@ apps/web/
 │   ├── App.vue
 │   └── main.ts
 ├── index.html
-├── vite.config.ts                 # Vite 配置（proxy → 18080）
+├── vite.config.ts                 # Vite 配置（proxy → 18090 Phase0 / 18080 Phase1+）
 ├── tsconfig.json
 └── package.json
 ```
@@ -94,6 +94,7 @@ apps/web/
 |------|------|------|--------|
 | 登录 | `/login` | LoginPage | ✅ 已实现 |
 | 仪表盘 | `/dashboard` | DashboardPage | ✅ 已实现 |
+| 采购单管理（测试页） | `/test` | TestPage | ✅ 已实现（开发调试用） |
 | 采购单列表 | `/procurement` | ProcurementListPage | P0 |
 | 新建采购单 | `/procurement/new` | ProcurementFormPage | P0 |
 | 采购单详情 | `/procurement/:id` | ProcurementDetailPage | P0 |
@@ -136,14 +137,15 @@ apps/web/
 server: {
   proxy: {
     '/api': {
-      target: 'http://localhost:18080',  // API Gateway 入口
+      target: 'http://localhost:18090',  // Phase 0: manpou-allinone
+      // Phase 1+: 改为 18080 (api-gateway)，由网关统一路由
       changeOrigin: true,
     },
   },
 },
 ```
 
-> **注意**：前端 dev 代理已切换至 API Gateway（18080），生产环境网关统一路由。
+> **注意**：Phase 0 指向 manpou-allinone（18090），Phase 1+ 改为 18080（api-gateway）。
 
 ---
 
@@ -159,6 +161,9 @@ npm run dev    # http://localhost:13000
 
 # 类型检查
 npm run type-check
+
+# 代码检查
+npm run lint
 
 # 生产构建
 npm run build
