@@ -23,16 +23,17 @@
 ManpouChinaSystem/
 ├── apps/
 │   ├── java-service/         # [Parent POM] 所有 Java 服务的父 pom
+│   ├── manpou-allinone/      # 6 领域合一 jar（端口 18090）⚡ Phase 0
 │   ├── user-service/         # 用户认证 + 权限管理（端口 18081）
-│   ├── product-service/      # 商品管理（端口 18082）
-│   ├── procurement-service/   # 发注管理（端口 18083）
-│   ├── warehouse-service/     # 仓储管理（端口 18084）
-│   ├── customs-service/       # 报关管理（端口 18085）
-│   ├── logistics-service/     # 物流管理（端口 18086）
-│   ├── finance-service/       # 财务管理（端口 18087）
-│   ├── notification-service/  # 通知服务（端口 18088）
+│   ├── procurement-service/  # 发注管理（端口 18083）
+│   ├── warehouse-service/    # 仓储管理（端口 18084）⚡ 后期独立
+│   ├── customs-service/     # 报关管理（端口 18085）⚡ 后期独立
+│   ├── logistics-service/    # 物流管理（端口 18086）⚡ 后期独立
+│   ├── finance-service/     # 财务管理（端口 18087）⚡ 后期独立
+│   ├── notification-service/ # 通知服务（端口 18088）⚡ 后期独立
+│   ├── product-service/     # 商品管理（端口 18082）⚡ 后期独立
 │   ├── api-gateway/         # API 网关（端口 18080）
-│   └── web/                  # 前端（端口 13000）
+│   └── web/                 # 前端（端口 13000）
 ├── scaffolds/
 │   └── api-gateway/          # API 网关脚手架（已迁移至 apps/）
 ├── infra/
@@ -78,17 +79,19 @@ ManpouChinaSystem/
 
 ## 4. 端口分配
 
-| 服务 | 端口 | 上下文路径 |
-|------|------|-----------|
-| user-service | 18081 | /api/v1 |
-| product-service | 18082 | /api/v1 |
-| procurement-service | 18083 | /api/v1 |
-| warehouse-service | 18084 | /api/v1 |
-| customs-service | 18085 | /api/v1 |
-| logistics-service | 18086 | /api/v1 |
-| finance-service | 18087 | /api/v1 |
-| notification-service | 18088 | /api/v1 |
-| web（前端） | 13000 | / |
+| 服务 | 端口 | 上下文路径 | 备注 |
+|------|------|-----------|------|
+| api-gateway | 18080 | / | 统一入口 |
+| **manpou-allinone** | **18090** | /api/v1 | ⚡ Phase 0：6 领域合一 |
+| user-service | 18081 | /api/v1 | JWT 认证 |
+| procurement-service | 18083 | /api/v1 | 核心业务：发注单 |
+| warehouse-service | 18084 | /api/v1 | ⚡ 后期独立 |
+| customs-service | 18085 | /api/v1 | ⚡ 后期独立 |
+| logistics-service | 18086 | /api/v1 | ⚡ 后期独立 |
+| finance-service | 18087 | /api/v1 | ⚡ 后期独立 |
+| notification-service | 18088 | /api/v1 | ⚡ 后期独立 |
+| product-service | 18082 | /api/v1 | ⚡ 后期独立 |
+| web（前端） | 13000 | / | |
 | Nacos | 8848 | /nacos |
 | Kafka | 9092 | - |
 | Kafka UI | 8080 | - |
@@ -187,6 +190,7 @@ docker-compose -f docker-compose.yml up -d
 | 09 | notification-service | `apps/notification-service/` |
 | 10 | web 前端 + UI 文档 | `apps/web/` |
 | 11 | API Gateway | `apps/api-gateway/` |
+| 19 | manpou-allinone | `apps/manpou-allinone/` |
 | 12 | Docker Compose | `docker/` |
 | 13 | Helm K8s | `infra/helm/` |
 | 14 | 监控告警 | `monitoring/` |
