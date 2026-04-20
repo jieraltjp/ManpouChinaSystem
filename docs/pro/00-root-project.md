@@ -133,7 +133,10 @@ docker-compose -f docker-compose.yml up -d
 - **算法**：RS256（非对称签名）
 - **Token 有效期**：15 分钟（access token）
 - **密钥管理**：JWT 签名密钥表（signing_key 表）+ 自动轮换
-- **登录入口**：`POST /api/v1/auth/login`（user-service）
+- **登录入口**：
+  - 6 领域（product/warehouse/customs/logistics/finance/notification）：`POST /api/v1/auth/login` → manpou-allinone (18090)
+  - 发注单：user-service (18081) 保留独立认证
+  - 前端统一入口：api-gateway (18080) → 各服务
 
 ---
 
