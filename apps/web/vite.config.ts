@@ -12,8 +12,10 @@ export default defineConfig({
   server: {
     port: 13000,
     proxy: {
+      // Phase 0: 直接指向 manpou-allinone (18090)
+      // Phase 1+: 改为 18080 (api-gateway)，由网关统一路由
       '/api': {
-        target: 'http://localhost:18080',
+        target: 'http://localhost:18090',
         changeOrigin: true,
         ws: true,
       },
