@@ -46,7 +46,7 @@ ManpouChinaSystem/
 └── docs/
     ├── pro/                 # 各项目专属文档（本目录，12-17 基础设施/服务）
     ├── ui/                  # 前端 UI 文档 + 架构图
-    ├── desigin/            # 构建指南（Step 1-6）
+    ├── design/             # 构建指南（Step 1-6）
     └── role/               # 角色视角分析（6 角色）
 ```
 

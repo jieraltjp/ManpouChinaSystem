@@ -28,8 +28,8 @@
 |---|------|------|------|------|
 | 1 | `procurement` | 4 | 发注单（核心业务） | 活跃 |
 | 2 | `signing_key` | 2 | JWT RS256 签名密钥 | 活跃 |
-| 3 | `outbox` | 0 | 事务性发件箱（事件驱动） | 待用 |
-| 4 | `saga_log` | 0 | Saga 分布式事务日志 | 待用 |
+| 3 | `outbox` | 0 | 事务性发件箱（事件驱动） | DB有表/无JPA实体 ⚠️ |
+| 4 | `saga_log` | 0 | Saga 分布式事务日志 | DB有表/无JPA实体 ⚠️ |
 | 5 | `flyway_schema_history` | 3 | Flyway 迁移历史 | 系统 |
 | 6 | `example` | 0 | 用户模块骨架占位 | 待替换 |
 | 7 | `customs_example` | 0 | 报关模块骨架占位 | 待替换 |
@@ -115,7 +115,6 @@
 | `destination` | `VARCHAR(128)` | `String destination` | 发送目的地 |
 | `customer_company` | `VARCHAR(128)` | `String customerCompany` | 客户公司 |
 | `status` | `ENUM(...)` | `ShipmentStatus status` | 状态枚举 |
-| `tax_point` | `DECIMAL(5,4)` | `BigDecimal taxPoint` | 票点 |
 
 **索引：**
 
@@ -173,7 +172,7 @@ ShipmentStatus: 未定, 予定, OEM, 発注待,
 
 ### 4.3 `outbox` — 事务性发件箱
 
-**实体路径：** `com.manpou.allinone.domain.model.OutboxEvent`
+**实体路径：** ~~`com.manpou.allinone.domain.model.OutboxEvent`~~ ⚠️ **JPA 实体未实现**
 **用途：** 确保跨库/跨服务操作的原子性（Outbox Pattern）
 
 | 列名 | MySQL 类型 | Java 字段 | 说明 |
@@ -202,6 +201,7 @@ ShipmentStatus: 未定, 予定, OEM, 発注待,
 
 ### 4.4 `saga_log` — Saga 分布式事务日志
 
+**JPA 实体：** ~~`com.manpou.allinone.domain.model.SagaLog`~~ ⚠️ **未实现**
 **用途：** 记录跨服务 saga 步骤执行状态，支持补偿回滚
 
 | 列名 | MySQL 类型 | Java 字段 | 说明 |

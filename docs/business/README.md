@@ -8,7 +8,7 @@
 
 | 模块 | 文档状态 | 代码实现 | 备注 |
 |------|---------|---------|------|
-| 发注单（ShippingOrder） | ✅ 完成 | ✅ CRUD+状态机+价格计算+前端集成完成 | manpou-allinone Phase A ✅ (commit 3308d7c) |
+| 发注单（Procurement） | ✅ 完成 | ✅ CRUD+报价计算+终态校验+前端对接 | manpou-allinone Phase A ✅ | 状态推进完整流转规则待实现 |
 | 商品目录（Product） | ✅ 完成 | 🔴 未实现 | manpou-allinone product 模块替换骨架 |
 | 货柜管理（Container） | ✅ 完成 | 🔴 未实现 | — |
 | 财务结算（FinanceRecord） | ✅ 完成 | 🔴 未实现 | — |
@@ -34,7 +34,7 @@
 
 | Phase | 范围 | 目标 |
 |--------|------|------|
-| Phase A | ✅ 发注单 CRUD + 报价计算 + 状态推进 + 前端对接 | ✅ 完成（commit 3308d7c + 后续修复） |
+| Phase A | ✅ 发注单 CRUD + 报价计算 + 终态校验 + 前端对接 | ✅ 完成 | 状态推进完整流转规则待实现 |
 | Phase A2 | Product 骨架替换为真实商品目录 | 待开发 |
 | Phase B | 货柜管理 + 拼柜池 + 财务结算 | 业务完整闭环 |
 | Phase C | 微服务抽取（可选）+ Kafka 事件驱动 | 架构演进 |

@@ -87,6 +87,7 @@ async function handleLogin() {
     router.push(redirect)
   } catch (err) {
     console.error('[LoginPage] login failed', err)
+    ElMessage.error('登录失败，请检查用户名和密码')
   } finally {
     loading.value = false
   }

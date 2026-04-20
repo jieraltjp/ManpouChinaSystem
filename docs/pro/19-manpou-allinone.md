@@ -1,4 +1,4 @@
-# 项目文档：manpou-allinone（6 领域合一单体）
+# 项目文档：manpou-allinone（7 领域合一单体）
 
 > **视角**：INTJ 战略 — 极简先行，演进无价
 > **原则**：最好的架构不是设计出来的，是业务长出来的
@@ -13,26 +13,26 @@
 | 服务名 | manpou-allinone |
 | 端口 | 18090 |
 | 包前缀 | `com.manpou.allinone` |
-| 定位 | **6 领域合一单体 jar**，后期按 Kafka Topic 边界逐步拆分 |
-| 当前状态 | ✅ 已完成编译 + 冒烟测试 |
+| 定位 | **7 领域合一单体 jar**，后期按 Kafka Topic 边界逐步拆分 |
+| 当前状态 | ✅ 已完成编译 + 冒烟测试 + 发注单 CRUD |
 
 **合并领域**：
 
-| 领域 | API 前缀 | 后期拆分目标 |
-|------|---------|------------|
-| product | `/api/v1/products` | product-service（Kafka topic: product-events） |
-| warehouse | `/api/v1/warehouse` | warehouse-service（Kafka topic: warehouse-events） |
-| customs | `/api/v1/customs` | customs-service（Kafka topic: customs-events） |
-| logistics | `/api/v1/logistics` | logistics-service（Kafka topic: logistics-events） |
-| finance | `/api/v1/finance` | finance-service（Kafka topic: finance-events） |
-| notification | `/api/v1/notifications` | notification-service（Kafka topic: notification-events） |
+| 领域 | API 前缀 | 后期拆分目标 | 当前状态 |
+|------|---------|------------|---------|
+| procurement | `/api/v1/procurements` | procurement-service（Kafka topic: procurement-events） | ✅ CRUD+报价计算 |
+| product | `/api/v1/products` | product-service（Kafka topic: product-events） | 🔴 骨架 |
+| warehouse | `/api/v1/warehouse` | warehouse-service（Kafka topic: warehouse-events） | 🔴 骨架 |
+| customs | `/api/v1/customs` | customs-service（Kafka topic: customs-events） | 🔴 骨架 |
+| logistics | `/api/v1/logistics` | logistics-service（Kafka topic: logistics-events） | 🔴 骨架 |
+| finance | `/api/v1/finance` | finance-service（Kafka topic: finance-events） | 🔴 骨架 |
+| notification | `/api/v1/notifications` | notification-service（Kafka topic: notification-events） | 🔴 骨架 |
 
 **保留独立**：
 
 | 服务 | 端口 | 原因 |
 |------|------|------|
 | user-service | 18081 | JWT 认证体系成熟，保持独立 |
-| procurement-service | 18083 | 核心业务（发注单），独立演进 |
 
 ---
 
@@ -100,6 +100,15 @@ com.manpou.allinone/
 │   └── controller/
 │       ├── AuthController.java      # /api/v1/auth/**（唯一）
 │       └── KeyManagementController.java  # /api/v1/admin/keys（唯一）
+│
+├── procurement/                      # 发注单领域（核心业务 ✅）
+│   ├── domain/
+│   │   ├── model/               # Procurement.java, ShipmentStatus.java
+│   │   └── repository/           # ProcurementRepository.java
+│   ├── application/
+│   │   └── usecase/             # ProcurementUseCase.java
+│   └── interfaces/
+│       └── controller/           # ProcurementController.java → /api/v1/procurements
 │
 ├── product/                          # 商品领域
 │   ├── domain/
@@ -195,6 +204,8 @@ curl http://localhost:18090/api/v1/auth/login -X POST \
 # 认证后访问各领域
 TOKEN=$(curl -s .../login | jq -r .data.accessToken)
 curl -H "Authorization: Bearer $TOKEN" \
+     http://localhost:18090/api/v1/procurements            # ✅ 发注单
+curl -H "Authorization: Bearer $TOKEN" \
      http://localhost:18090/api/v1/products                # ✅
 curl -H "Authorization: Bearer $TOKEN" \
      http://localhost:18090/api/v1/warehouse              # ✅
@@ -209,10 +220,11 @@ curl -H "Authorization: Bearer $TOKEN" \
 ```
 客户端 → api-gateway (18080)
               ├── /api/v1/auth/**           → user-service (18081)
-              ├── /api/v1/purchase-orders/** → procurement-service (18083)
-              └── /api/v1/{products,warehouse,customs,
+              └── /api/v1/{procurements,products,warehouse,customs,
                            logistics,finance,notifications}/** → manpou-allinone (18090)
 ```
+
+> 注意：`/api/v1/purchase-orders/**` 是旧路径，已迁移至 `/api/v1/procurements`。
 
 详见 [`RouteConfig.java`](file://apps/api-gateway/src/main/java/com/manpou/gateway/route/RouteConfig.java)
 
@@ -235,6 +247,6 @@ curl -H "Authorization: Bearer $TOKEN" \
 | 文档 | 说明 |
 |------|------|
 | [`docs/check/98-项目全貌与演进路线图.md`](../check/98-项目全貌与演进路线图.md) | 演进路线（Phase 0 → 4） |
-| [`docs/pro/11-api-gateway.md`](11-api-gateway.md) | API 网关配置 |
+| [`docs/pro/10-api-gateway.md`](10-api-gateway.md) | API 网关配置 |
 | [`docs/pro/17-服务间认证.md`](17-服务间认证.md) | JWT + RS256 机制 |
 | `apps/manpou-allinone/src/main/resources/application.yml` | 所有inone 配置 |

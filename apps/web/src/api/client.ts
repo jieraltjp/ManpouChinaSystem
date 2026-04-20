@@ -36,11 +36,11 @@ client.interceptors.response.use(
       const auth = useAuthStore()
       auth.logout()
       window.location.href = '/login'
-      ElMessage.error('Session expired, please login again')
+      ElMessage.error('登录已过期，请重新登录')
     } else if (status === 403) {
-      ElMessage.error('No permission to access this resource')
+      ElMessage.error('无权限访问该资源')
     } else if (status >= 500) {
-      ElMessage.error(`Server error: ${message}`)
+      ElMessage.error(`服务器错误：${message}`)
     } else {
       ElMessage.error(message)
     }

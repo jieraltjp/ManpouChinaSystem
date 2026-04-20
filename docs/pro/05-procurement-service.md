@@ -1,259 +1,180 @@
-# 项目文档：procurement-service（发注管理服务）
+# 项目文档：发注管理（procurement 模块）
 
-> **文档角色**：后端开发工程师 + 产品经理 + 测试工程师视角 → 核心业务
-> **对应角色文档**：
-> - `docs/role/04-后端开发工程师视角分析.md`
-> - `docs/role/01-产品经理视角分析.md`
-> - `docs/role/06-测试工程师视角分析.md`
+> **注意**：发注管理已从旧版 procurement-service 迁移至 `manpou-allinone` 单体。
+> 旧版 procurement-service（端口 18083）仅骨架，核心业务实现在 manpou-allinone（端口 18090）。
+> 本文档描述 manpou-allinone 中的 procurement 模块。
 
 ---
 
-## 1. 服务定位
+## 1. 模块定位
 
 | 维度 | 说明 |
 |------|------|
-| 服务名 | procurement-service |
-| 端口 | 18083 |
-| 包名 | `com.manpou.procurement` |
-| 描述 | 发注（采购单）全生命周期管理 — 发注→审批→到货→报关→物流→财务 |
-| 当前状态 | 脚手架 ✅，核心功能待开发 |
+| 模块名 | procurement |
+| 所在 jar | manpou-allinone |
+| 端口 | 18090 |
+| 包名 | `com.manpou.allinone.procurement` |
+| 描述 | 发注单（Procurement）全生命周期管理，对应 Excel 出货单弹窗 |
+| 当前状态 | ✅ CRUD + 报价计算 + 终态校验已完成 |
+| 下一步 | 完整状态流转校验 + 验货/货柜/财务 |
 
 ---
 
-## 2. 技术栈
-
-| 技术 | 说明 |
-|------|------|
-| Spring Boot 3.2.5 | 应用框架 |
-| Spring Data JPA | ORM |
-| Spring Security | 认证/鉴权 |
-| JJWT 0.12.5 | RS256 JWT |
-| H2（开发）/ MySQL 8（生产） | 数据库 |
-| Flyway | 数据库迁移 |
-| SpringDoc | OpenAPI 文档 |
-
----
-
-## 3. 项目结构
+## 2. 项目结构
 
 ```
-src/main/java/com/manpou/procurement/
-├── ProcurementServiceApplication.java  # 启动类
-├── interfaces/
-│   └── controller/
-│       ├── AuthController.java          # 登录/公钥
-│       ├── ExampleController.java        # 示例 CRUD（待替换为采购单 API）
-│       └── KeyManagementController.java # 密钥管理（管理员）
-├── application/
-│   ├── dto/
-│   │   ├── ExampleCreateCmd.java
-│   │   ├── ExamplePageQuery.java
-│   │   ├── ExampleQuery.java
-│   │   └── ExampleUpdateCmd.java
-│   ├── usecase/
-│   │   └── ExampleUseCase.java           # 待替换为 PurchaseOrderUseCase
-│   ├── assembler/
-│   │   └── ExampleAssembler.java
-│   └── KeyManagementService.java         # 密钥轮换服务
-├── domain/
-│   ├── model/
-│   │   ├── BaseEntity.java              # 审计基类
-│   │   ├── Example.java
-│   │   ├── ExampleStatus.java           # 示例状态枚举
-│   │   ├── SigningKey.java              # JWT 签名密钥实体
-│   │   └── SigningKeyStatus.java        # 密钥状态枚举
-│   │   ├── PurchaseOrder.java          # 待实现：采购单聚合根
-│   │   └── OrderStatus.java            # 待实现：状态枚举
-│   ├── port/
-│   │   └── SigningKeyPort.java          # 密钥仓储端口（Hexagonal）
-│   └── repository/
-│       ├── ExampleRepository.java
-│       ├── JpaRepository.java
-│       └── SigningKeyRepository.java
-├── infrastructure/
-│   ├── config/
-│   │   ├── ClockConfig.java
-│   │   └── JpaAuditConfig.java
-│   ├── aspect/
-│   │   └── IdempotencyAspect.java        # 幂等切面
-│   └── security/
-│       ├── JwtAuthenticationFilter.java
-│       ├── JwtContextHolder.java
-│       ├── JwtKeyManager.java
-│       ├── JwtService.java
-│       └── SecurityConfig.java
-└── common/
-    ├── annotation/
-    │   └── Idempotent.java
-    ├── config/
-    │   ├── ConfigListener.java
-    │   ├── ConfigSource.java
-    │   ├── ConfigSourceAutoConfiguration.java
-    │   ├── ConfigSourceFactory.java
-    │   ├── LocalFileConfigSource.java
-    │   ├── NacosConfigSource.java
-    │   └── PropertiesConfigSource.java
-    ├── context/
-    │   └── UserContext.java
-    ├── exception/
-    │   ├── BusinessException.java
-    │   ├── GlobalExceptionHandler.java
-    │   └── ValidationErrorCodeMapper.java
-    ├── filter/
-    │   └── TraceFilter.java
-    ├── result/
-    │   └── Result.java
-    └── time/
-        └── Clock.java
+src/main/java/com/manpou/allinone/
+└── procurement/
+    ├── domain/
+    │   ├── model/
+    │   │   ├── BaseEntity.java         # 审计基类（createTime/updateTime）
+    │   │   ├── Procurement.java        # 发注单聚合根（✅ 已实现）
+    │   │   └── ShipmentStatus.java     # 状态枚举（未定→完了）
+    │   └── repository/
+    │       └── ProcurementRepository.java
+    ├── application/
+    │   ├── dto/
+    │   │   ├── ProcurementCreateCmd.java
+    │   │   ├── ProcurementUpdateCmd.java
+    │   │   ├── ProcurementQuery.java
+    │   │   └── ProcurementPageQuery.java
+    │   ├── assembler/
+    │   │   └── ProcurementAssembler.java
+    │   └── usecase/
+    │       └── ProcurementUseCase.java  # 业务编排层
+    └── interfaces/
+        └── controller/
+            └── ProcurementController.java  # /api/v1/procurements
 
 src/main/resources/
-├── application.yml                    # 18083 端口
-├── config/local.yaml
-├── db/migration/
-│   ├── V1__init_schema.sql           # example 表
-│   ├── V2__outbox_table.sql          # Outbox 消息表
-│   └── V3__signing_key_table.sql     # JWT 签名密钥表
-└── keys/
-    ├── private.pem
-    └── public.pem
-
-src/test/java/com/manpou/procurement/
-└── arch/
-    └── LayeredArchitectureTest.java  # ✅ ArchUnit 测试（已通过）
+└── application.yml                    # 18090 端口，H2 内存数据库
 ```
 
 ---
 
-## 4. 采购单状态机（待实现）
+## 3. 发注单实体（Procurement）
 
-```
-DRAFT（草稿）
-    │ 提交
-    ↓
-PENDING（待审核）
-    │ 批准
-    ↓         │ 拒绝
-APPROVED ───→ REJECTED（拒绝）
-    │               │
-    │ 取消          │ 重新编辑
-    ↓               ↓
-CANCELLED       DRAFT
-```
+对应 Excel 出货单弹窗，一次发注 = 一条记录。
 
-| 状态 | 说明 | 可执行动作 |
-|------|------|-----------|
-| DRAFT | 草稿，可编辑 | submit() |
-| PENDING | 待审核 | approve() / reject() |
-| APPROVED | 已批准 | ship() / cancel() |
-| REJECTED | 已拒绝，可重新编辑 | submit() |
-| SHIPPED | 已发货 | arrive() |
-| ARRIVED | 已到货 | inspect() |
-| CANCELLED | 已取消 | - |
+**核心字段**：
+
+| 字段 | DB 列名 | 说明 |
+|------|---------|------|
+| id | id | 主键 |
+| productCode | product_code | 商品代码（关联 Product.productCode） |
+| quantity | quantity | 订购数量 |
+| priceRmb | price_rmb | 人民币单价 |
+| exchangeRate | exchange_rate | CNY→JPY 汇率 |
+| taxPoint | tax_point | 票点（默认 1.1） |
+| billingMethod | billing_method | 计费方式 |
+| estimatedPriceJpy | estimated_price_jpy | 估算批发价 JPY（自动计算） |
+| orderDate | order_date | 下单日（1688下单日期） |
+| factoryShipDate | factory_ship_date | 厂家出货日 |
+| plannedShipDate | planned_ship_date | 计划出货日 |
+| productLead | product_lead | 商品担当 |
+| japanLead | japan_lead | 日本担当 |
+| chinaLead | china_lead | 中国担当 |
+| destination | destination | 发送目的地 |
+| customerCompany | customer_company | 客户公司 |
+| status | status | 状态（默认：未定） |
+
+**计算公式**（后端自动计算并存储）：
+```
+estimatedPriceJpy = (priceRmb / taxPoint × 1.02 × 1.2) × exchangeRate × 1.05
+```
 
 ---
 
-## 5. 待实现 API
+## 4. 状态机
 
-| 方法 | 路径 | 说明 | 优先级 |
-|------|------|------|--------|
-| GET | `/api/v1/purchase-orders` | 采购单列表（分页） | P0 |
-| GET | `/api/v1/purchase-orders/{id}` | 采购单详情 | P0 |
-| POST | `/api/v1/purchase-orders` | 新建采购单 | P0 |
-| PUT | `/api/v1/purchase-orders/{id}` | 更新采购单 | P0 |
-| POST | `/api/v1/purchase-orders/{id}/submit` | 提交审核 | P0 |
-| POST | `/api/v1/purchase-orders/{id}/approve` | 审批通过 | P0 |
-| POST | `/api/v1/purchase-orders/{id}/reject` | 审批拒绝 | P0 |
-| POST | `/api/v1/purchase-orders/{id}/cancel` | 取消采购单 | P1 |
-| GET | `/api/v1/purchase-orders/{id}/items` | 发注明细列表 | P0 |
-| POST | `/api/v1/purchase-orders/{id}/items` | 添加发注明细 | P0 |
+### 状态枚举（ShipmentStatus）
 
----
+```
+未定 → 発注待 → 永康/直送 → 倉庫着 → 検品/現地検品 → ...
+  → エア便/輸出 → 通関 → 日本着 → 会計 → 完了
+```
 
-## 6. 数据库迁移（待创建）
-
-| 版本 | 文件 | 说明 |
+| 状态 | 说明 | 终态 |
 |------|------|------|
-| V4 | `V4__purchase_order_table.sql` | 采购单主表 |
-| V5 | `V5__procurement_item_table.sql` | 发注明细表 |
-| V6 | `V6__arrival_record_table.sql` | 到货记录表 |
-| V7 | `V7__export_document_table.sql` | 出口单据表 |
+| 未定 | 还未下单，仅记录需求 | |
+| 発注待 | 已录入商品，等待下单 | |
+| 永康 | 货物发往永康仓 | |
+| 直送 | 厂家直接发货（不经永康仓） | |
+| OEM | OEM 定制产品路径 | |
+| 倉庫着 | 货物到达仓库 | |
+| 現地検品 | 现场异地验货 | |
+| 検品 | 仓库验货 | |
+| エア便 | 空运 | |
+| メーカー直送 | 厂家直送 | |
+| 輸出 | 已出口 | |
+| 通関 | 已报关 | |
+| 日本着 | 已到日本 | |
+| 会計 | 财务结算 | |
+| 完了 | 全流程结束 | ✅ |
+| 退货 | 退货（独立处理） | |
 
-### 采购单主表核心字段
+**路径说明**：
+- 永康路径：未定 → 発注待 → 永康 → 倉庫着 → 検品 → エア便/輸出 → 通関 → 日本着 → 会計 → 完了
+- OEM 路径：未定 → 発注待 → OEM → 倉庫着 → 現地検品 → メーカー直送 → 完了
 
-```sql
-CREATE TABLE purchase_order (
-    id              BIGINT       NOT NULL  AUTO_INCREMENT  PRIMARY KEY,
-    order_no        VARCHAR(32)  NOT NULL  UNIQUE,       -- PO+yyyyMMdd+序号
-    orderer_id      BIGINT       NOT NULL,
-    contact_name    VARCHAR(64)   NOT NULL,
-    contact_phone   VARCHAR(20),
-    shipping_address VARCHAR(256),
-    is_export       TINYINT      NOT NULL  DEFAULT 0,
-    status          VARCHAR(20)   NOT NULL,               -- DRAFT/PENDING/APPROVED...
-    factory_code    VARCHAR(32),
-    priority        VARCHAR(20)   NOT NULL  DEFAULT 'NORMAL',
-    remark          VARCHAR(512),
-    -- 审计字段
-    create_time     DATETIME(3)  NOT NULL,
-    update_time     DATETIME(3)  NOT NULL,
-    create_by       VARCHAR(64)   NOT NULL,
-    update_by       VARCHAR(64)  NOT NULL,
-    is_deleted      TINYINT      NOT NULL  DEFAULT 0,
-    INDEX idx_order_no(order_no),
-    INDEX idx_status(status)
-);
+---
+
+## 5. API 契约
+
+> 详见 `docs/business/API-发注管理.md`
+
+| 方法 | 路径 | 说明 | 状态 |
+|------|------|------|------|
+| GET | `/api/v1/procurements` | 分页查询列表 | ✅ |
+| GET | `/api/v1/procurements/{id}` | 获取详情 | ✅ |
+| POST | `/api/v1/procurements` | 创建发注单 | ✅ |
+| PATCH | `/api/v1/procurements/{id}` | 部分更新（含状态推进） | ✅ |
+| DELETE | `/api/v1/procurements/{id}` | 删除（仅未定/発注待） | ✅ |
+
+---
+
+## 6. 领域方法
+
+```java
+// 计算报价
+procurement.calculateEstimatedPriceJpy();
+
+// 更新状态（终态禁止修改）
+procurement.updateStatus(ShipmentStatus.発注待);
+
+// 重置为未定
+procurement.resetToUndecided();
 ```
 
----
-
-## 7. 事件驱动（Kafka）
-
-| Topic | 事件 | 发布时机 |
-|-------|------|---------|
-| `procurement.events` | `PurchaseOrderSubmitted` | 提交审核时 |
-| `procurement.events` | `PurchaseOrderApproved` | 审批通过时 |
-| `procurement.events` | `PurchaseOrderShipped` | 发货时 |
-
-订阅方：warehouse-service、customs-service
+> ⚠️ 完整状态流转校验（validateTransition）待实现，当前仅检查终态。
 
 ---
 
-## 8. 测试策略
+## 7. 数据库
 
-| 测试类型 | 状态 | 说明 |
-|---------|------|------|
-| ArchUnit | ✅ | 分层约束 + 无循环依赖（已通过） |
-| 状态机单元测试 | 🔴 待实现 | 8 个状态转换验证 |
-| API 集成测试 | 🔴 待实现 | REST Assured |
-| E2E | 🔴 待实现 | Playwright |
+- **开发**：H2 内存（`jdbc:h2:mem:allinone`）
+- **表**：`procurement`
+- **迁移**：JPA `ddl-auto: update` 管理开发期 schema
 
 ---
 
-## 9. Swagger UI
+## 8. 行动项
 
-- **地址**：http://localhost:18083/swagger-ui/index.html
-- **已配置**：`/swagger-ui.html` 和 `/doc.html` 已加入 `permitAll`
-
----
-
-## 10. 行动项
-
-- [ ] **本周**：设计并评审采购单 + 发注明细表（V4/V5）
-- [ ] **本周**：跑通 Swagger API（登录→获取Token→访问受保护接口）
-- [ ] **下周二**：实现采购单状态机（Domain 层）
-- [ ] **下周三**：实现采购单 CRUD（Controller→UseCase→Repository）
-- [ ] **下周四**：添加采购单状态机单元测试
-- [ ] **持续**：所有 PR 必须通过 ArchUnit + 单元测试
+- [ ] **Phase A**：完整状态流转校验（validateTransition）
+- [ ] **Phase B**：验货（QC）功能
+- [ ] **Phase B**：货柜管理
+- [ ] **Phase B**：财务结算
+- [ ] **Phase B**：退货管理
 
 ---
 
-## 11. 相关文档
+## 9. 相关文档
 
 | 文档 | 说明 |
 |------|------|
-| `docs/role/01-产品经理视角分析.md` | 业务流程与功能列表 |
-| `docs/role/02-架构师视角分析.md` | 架构约束与 Kafka 规划 |
-| `docs/role/03-数据库工程师视角分析.md` | 数据模型设计 |
-| `docs/role/04-后端开发工程师视角分析.md` | 后端开发规范 |
-| `docs/role/06-测试工程师视角分析.md` | 测试用例（TC-PRO-001~TC-PER-004） |
-| `docs/pro/00-root-project.md` | 项目全局概览 |
+| `docs/business/README.md` | 业务文档总览 + 实现进度 |
+| `docs/business/API-发注管理.md` | API 契约 |
+| `docs/business/DOMAIN-发注管理领域模型.md` | 领域模型 |
+| `docs/business/SPEC-发注管理流程.md` | 需求规格 + 状态机规则 |
+| `docs/pro/19-manpou-allinone.md` | manpou-allinone 整体文档 |
+| `apps/manpou-allinone/` | 代码实现 |

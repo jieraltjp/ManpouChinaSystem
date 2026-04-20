@@ -109,12 +109,17 @@ public class Procurement extends BaseEntity {
         this.estimatedPriceJpy = base.setScale(2, java.math.RoundingMode.HALF_UP);
     }
 
-    /** 更新状态（终态禁止修改） */
+    /** 更新状态（终态禁止修改，非法转换抛出 BusinessException） */
     public void updateStatus(ShipmentStatus newStatus) {
         if (this.status.isTerminal()) {
             throw new com.manpou.allinone.common.exception.BusinessException(
                     "business.cannot_modify_closed",
                     "完了状态禁止任何状态变更");
+        }
+        if (!this.status.canTransitionTo(newStatus)) {
+            throw new com.manpou.allinone.common.exception.BusinessException(
+                    "business.invalid_status_transition",
+                    String.format("状态「%s」不允许跳转至「%s」", this.status.name(), newStatus.name()));
         }
         this.status = newStatus;
     }

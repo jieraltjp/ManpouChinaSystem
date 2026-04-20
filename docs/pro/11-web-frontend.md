@@ -78,32 +78,33 @@ apps/web/
 
 | 功能 | 状态 | 说明 |
 |------|------|------|
-| Axios 客户端 | ✅ | JWT 注入 + 401 自动登出 |
+| Axios 客户端 | ✅ | JWT 注入 + 401 自动登出（中文错误提示） |
 | 认证 Store | ✅ | Pinia 管理 token/userInfo |
 | 路由守卫 | ✅ | 未登录跳转登录页 |
-| 登录页 | ✅ | 页面框架 |
-| 仪表盘 | ✅ | 页面框架 |
+| 登录页 | ✅ | 渐变背景 + 表单验证 |
+| 仪表盘 | ✅ | JWT Claims 显示 + 重新登录 |
 | 示例 CRUD | ✅ | 对接 user-service 示例 API |
+| 发注单管理 | ✅ | `/test` — 完整 CRUD + 筛选 + 分页 + 详情抽屉 |
 | Element Plus | ✅ | 组件库引入 |
 
 ---
 
-## 5. 待实现页面
+## 5. 页面清单
 
-| 页面 | 路径 | 组件 | 优先级 |
-|------|------|------|--------|
-| 登录 | `/login` | LoginPage | ✅ 已实现 |
-| 仪表盘 | `/dashboard` | DashboardPage | ✅ 已实现 |
-| 采购单管理（测试页） | `/test` | TestPage | ✅ 已实现（开发调试用） |
-| 采购单列表 | `/procurement` | ProcurementListPage | P0 |
-| 新建采购单 | `/procurement/new` | ProcurementFormPage | P0 |
-| 采购单详情 | `/procurement/:id` | ProcurementDetailPage | P0 |
-| 仓储列表 | `/warehouse` | WarehouseListPage | P1 |
-| 报关管理 | `/customs` | CustomsListPage | P1 |
-| 物流管理 | `/logistics` | LogisticsListPage | P2 |
-| 财务管理 | `/finance` | FinanceListPage | P2 |
-| 商品管理 | `/product` | ProductListPage | P1 |
-| 用户管理 | `/user` | UserListPage | P1 |
+| 页面 | 路径 | 组件 | 状态 |
+|------|------|------|------|
+| 登录 | `/login` | LoginPage | ✅ |
+| 仪表盘 | `/dashboard` | DashboardPage | ✅ |
+| 发注单管理 | `/test` | TestPage | ✅ |
+| 示例列表 | `/examples` | ExamplesPage | ✅ |
+| 仓储列表 | `/warehouse` | WarehouseListPage | 🔴 待实现 |
+| 报关管理 | `/customs` | CustomsListPage | 🔴 待实现 |
+| 物流管理 | `/logistics` | LogisticsListPage | 🔴 待实现 |
+| 财务管理 | `/finance` | FinanceListPage | 🔴 待实现 |
+| 商品管理 | `/product` | ProductListPage | 🔴 待实现 |
+| 用户管理 | `/user` | UserListPage | 🔴 待实现 |
+
+> 发注单管理（`/test`）已为正式功能，非开发调试用。Phase A2 阶段改为路由 `/procurement` 并拆分为列表/详情页。
 
 ---
 
@@ -117,6 +118,11 @@ apps/web/
 | 公钥获取 | GET | /api/v1/auth/public-key | user-service |
 | 密钥管理 | GET/POST | /api/v1/admin/keys | user-service |
 | 示例 CRUD | GET/POST/PUT/DELETE | /api/v1/examples | user-service |
+| 发注单列表 | GET | /api/v1/purchase-orders | manpou-allinone |
+| 发注单详情 | GET | /api/v1/purchase-orders/{id} | manpou-allinone |
+| 创建发注单 | POST | /api/v1/purchase-orders | manpou-allinone |
+| 更新发注单 | PUT | /api/v1/purchase-orders/{id} | manpou-allinone |
+| 删除发注单 | DELETE | /api/v1/purchase-orders/{id} | manpou-allinone |
 
 ### 6.2 待实现（采购单）
 

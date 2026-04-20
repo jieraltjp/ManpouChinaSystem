@@ -10,6 +10,54 @@
       </div>
     </div>
 
+    <!-- 统计行 -->
+    <el-row :gutter="16" class="stats-row">
+      <el-col :span="6">
+        <el-card shadow="hover" class="stat-card">
+          <div class="stat-content">
+            <el-icon class="stat-icon" color="#409eff"><Document /></el-icon>
+            <div>
+              <div class="stat-value">{{ pagination.total }}</div>
+              <div class="stat-label">发注单总数</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover" class="stat-card">
+          <div class="stat-content">
+            <el-icon class="stat-icon" color="#e6a23c"><Clock /></el-icon>
+            <div>
+              <div class="stat-value">{{ activeCount }}</div>
+              <div class="stat-label">进行中</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover" class="stat-card">
+          <div class="stat-content">
+            <el-icon class="stat-icon" color="#67c23a"><CircleCheck /></el-icon>
+            <div>
+              <div class="stat-value">{{ completedCount }}</div>
+              <div class="stat-label">已完成</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover" class="stat-card">
+          <div class="stat-content">
+            <el-icon class="stat-icon" color="#f56c6c"><Warning /></el-icon>
+            <div>
+              <div class="stat-value">{{ returnedCount }}</div>
+              <div class="stat-label">退货</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
     <!-- 筛选栏 -->
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filterForm">
@@ -141,6 +189,13 @@
         <el-form-item label="票点" prop="taxPoint">
           <el-input-number v-model="formData.taxPoint" :min="0.0001" :precision="4" style="width: 100%" />
         </el-form-item>
+        <el-form-item label="估算批发价">
+          <div class="price-preview">
+            <span class="price-value">{{ previewPriceJpy }}</span>
+            <span class="price-unit">JPY</span>
+            <span class="price-formula">= (RMB ÷ {{ formData.taxPoint }} × 1.02 × 1.2) × {{ formData.exchangeRate }} × 1.05</span>
+          </div>
+        </el-form-item>
         <el-form-item label="计费方式">
           <el-input v-model="formData.billingMethod" placeholder="如 METHOD_A" />
         </el-form-item>
@@ -183,9 +238,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { Plus, Clock, CircleCheck, Warning, Document } from '@element-plus/icons-vue'
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest } from '@/api/procurement'
 
 const loading = ref(false)
@@ -232,6 +287,23 @@ const pagination = reactive({
 
 const tableData = ref<ProcurementPageVO[]>([])
 
+const activeCount = computed(() =>
+  tableData.value.filter(r => r.status !== '完了' && r.status !== '退货').length,
+)
+const completedCount = computed(() =>
+  tableData.value.filter(r => r.status === '完了').length,
+)
+const returnedCount = computed(() =>
+  tableData.value.filter(r => r.status === '退货').length,
+)
+
+const previewPriceJpy = computed(() => {
+  const { priceRmb, taxPoint, exchangeRate } = formData
+  if (!priceRmb || !taxPoint || !exchangeRate) return '—'
+  const base = (priceRmb / taxPoint * 1.02 * 1.2) * exchangeRate * 1.05
+  return Math.round(base * 100) / 100
+})
+
 const defaultFormData = (): CreateProcurementRequest & { status?: string } => ({
   productCode: '',
   quantity: 1,
@@ -253,11 +325,29 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string } => ({
 const formData = reactive<CreateProcurementRequest & { status?: string }>(defaultFormData())
 
 const formRules = {
-  productCode: [{ required: true, message: '商品代码不能为空', trigger: 'blur' }],
-  quantity: [{ required: true, message: '数量不能为空', trigger: 'blur' }],
-  priceRmb: [{ required: true, message: '人民币单价不能为空', trigger: 'blur' }],
-  exchangeRate: [{ required: true, message: '汇率不能为空', trigger: 'blur' }],
-  taxPoint: [{ required: true, message: '票点不能为空', trigger: 'blur' }],
+  productCode: [
+    { required: true, message: '商品代码不能为空', trigger: 'blur' },
+    { max: 32, message: '商品代码最多 32 字符', trigger: 'blur' },
+  ],
+  quantity: [
+    { required: true, message: '数量不能为空', trigger: 'blur' },
+    { type: 'number', min: 1, message: '数量必须为正整数', trigger: 'blur' },
+  ],
+  priceRmb: [
+    { required: true, message: '人民币单价不能为空', trigger: 'blur' },
+    { type: 'number', min: 0, message: '人民币单价不能为负', trigger: 'blur' },
+  ],
+  exchangeRate: [
+    { required: true, message: '汇率不能为空', trigger: 'blur' },
+    { type: 'number', min: 0.0001, message: '汇率必须为正数', trigger: 'blur' },
+  ],
+  taxPoint: [
+    { required: true, message: '票点不能为空', trigger: 'blur' },
+    { type: 'number', min: 0.0001, message: '票点必须为正数', trigger: 'blur' },
+  ],
+  billingMethod: [{ max: 32, message: '计费方式最多 32 字符', trigger: 'blur' }],
+  customerCompany: [{ max: 128, message: '客户公司最多 128 字符', trigger: 'blur' }],
+  destination: [{ max: 128, message: '发送目的地最多 128 字符', trigger: 'blur' }],
 }
 
 async function loadData() {
@@ -267,12 +357,17 @@ async function loadData() {
       page: pagination.page - 1,
       pageSize: pagination.pageSize,
       status: filterForm.status || undefined,
-      productCode: filterForm.productCode || undefined,
-      customerCompany: filterForm.customerCompany || undefined,
+      productCode: filterForm.productCode.trim() || undefined,
+      customerCompany: filterForm.customerCompany.trim() || undefined,
     })
     const payload = res.data.data as { content: ProcurementPageVO[]; totalElements: number }
     tableData.value = payload.content || []
     pagination.total = payload.totalElements || 0
+    // 删除后若当前页越界，回退到第1页
+    if (tableData.value.length === 0 && pagination.total > 0 && pagination.page > 1) {
+      pagination.page = 1
+      loadData()
+    }
   } catch {
     // error handled by axios interceptor
   } finally {
@@ -301,6 +396,7 @@ function onView(row: ProcurementPageVO) {
 
 function onEdit(row: ProcurementPageVO | null) {
   dialogMode.value = 'update'
+  currentRow.value = row  // 同步更新，避免直接编辑时 currentRow 为空
   Object.assign(formData, {
     productCode: row?.productCode ?? '',
     quantity: row?.quantity ?? 1,
@@ -335,6 +431,7 @@ async function onDelete(row: ProcurementPageVO) {
     await procurementApi.delete(row.id)
     ElMessage.success('删除成功')
     drawerVisible.value = false
+    currentRow.value = null
     loadData()
   } catch {
     // error handled by axios interceptor
@@ -363,6 +460,7 @@ async function onSubmit() {
           japanLead: formData.japanLead || undefined,
           chinaLead: formData.chinaLead || undefined,
           destination: formData.destination || undefined,
+          status: formData.status || undefined,
         }
         await procurementApi.create(req)
         ElMessage.success('发注单创建成功')
@@ -382,10 +480,17 @@ async function onSubmit() {
           japanLead: formData.japanLead || undefined,
           chinaLead: formData.chinaLead || undefined,
           destination: formData.destination || undefined,
-          status: formData.status !== '未定' ? formData.status : undefined,
+          status: formData.status || undefined,
         }
-        await procurementApi.update(currentRow.value.id, req)
+        const updatedId = currentRow.value.id
+        await procurementApi.update(updatedId, req)
         ElMessage.success('发注单更新成功')
+        // 同步更新表格当前行，避免整体刷新
+        const idx = tableData.value.findIndex(r => r.id === updatedId)
+        if (idx !== -1) {
+          const { data } = await procurementApi.get(updatedId)
+          tableData.value[idx] = data.data as ProcurementPageVO
+        }
       }
       dialogVisible.value = false
       loadData()
@@ -449,6 +554,37 @@ onMounted(() => {
   padding-bottom: 0;
 }
 
+.stats-row {
+  margin-bottom: 4px;
+}
+
+.stat-card {
+  border-radius: 8px;
+}
+
+.stat-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stat-icon {
+  font-size: 32px;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #303133;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #909399;
+  margin-top: 4px;
+}
+
 .table-card :deep(.el-table__row) {
   cursor: pointer;
 }
@@ -463,6 +599,30 @@ onMounted(() => {
   margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+}
+
+.price-preview {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: #303133;
+  line-height: 1;
+}
+
+.price-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #409eff;
+}
+
+.price-unit {
+  font-size: 13px;
+  color: #909399;
+}
+
+.price-formula {
+  font-size: 12px;
+  color: #c0c4cc;
 }
 
 .drawer-actions {

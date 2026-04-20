@@ -4,18 +4,18 @@
 > **更新**: 2026-04-20
 > **依据**: `docs/发注管理体系升级.pdf` + `docs/新発注管理-設計図.xlsx`
 
-> ⚠️ **代码实现进度**: 所有领域模型（ShippingOrder / Product / Container / QcRecord / FinanceRecord / ReturnRecord / ConsolidationPool）均未实现
+> ⚠️ **代码实现进度**: Procurement ✅ 已实现 · Product 🔴 ProductExample 骨架 · Container/QcRecord/FinanceRecord/ReturnRecord/ConsolidationPool 🔴 未实现
 
 ---
 
 ## 1. 聚合根
 
-### 1.1 ShippingOrder（出货单 — 核心聚合根）
+### 1.1 Procurement（出货单 — 核心聚合根）
 
 > 对应 Excel 出货单弹窗。一次发注 = 一条出货单记录。
 
 ```
-ShippingOrder（聚合根）
+Procurement（聚合根）
 ├── id: Long
 ├── productCode: String        # 商品代码（关联 Product.productCode）
 ├── quantity: Integer         # 订购数量
@@ -255,8 +255,8 @@ ConsolidationPool（聚合根）
 ├── createdAt: LocalDateTime
 │
 └── 领域方法
-    ├── add(ShippingOrder)         // 出货单加入拼柜池
-    ├── remove(ShippingOrder)      // 移出
+    ├── add(Procurement)         // 出货单加入拼柜池
+    ├── remove(Procurement)      // 移出
     ├── calculateFillRate()        // 填充率 = totalCbm / thresholdCbm
     ├── isReady()                  // 填充率 ≥ 1 可触发装柜
     └── consolidate()              // 触发装柜 → 绑定 Container
@@ -277,15 +277,15 @@ public enum PoolStatus {
 
 ## 5. 仓储接口
 
-### ShippingOrderRepository
+### ProcurementRepository
 
 ```java
-public interface ShippingOrderRepository extends JpaRepository<ShippingOrder, Long> {
+public interface ProcurementRepository extends JpaRepository<Procurement, Long> {
 
-    Page<ShippingOrder> findByStatus(ShipmentStatus status, Pageable pageable);
-    Page<ShippingOrder> findByProductCode(String productCode, Pageable pageable);
-    Page<ShippingOrder> findByCustomerCompany(String customerCompany, Pageable pageable);
-    List<ShippingOrder> findByIdIn(List<Long> ids);
+    Page<Procurement> findByStatus(ShipmentStatus status, Pageable pageable);
+    Page<Procurement> findByProductCode(String productCode, Pageable pageable);
+    Page<Procurement> findByCustomerCompany(String customerCompany, Pageable pageable);
+    List<Procurement> findByIdIn(List<Long> ids);
 }
 ```
 
@@ -317,13 +317,13 @@ public interface ConsolidationPoolRepository
 
 ## 6. 领域服务
 
-### ShippingOrderDomainService
+### ProcurementDomainService
 
 **职责**：状态转换规则校验 + 触发副作用
 
 ```java
 @Service
-public class ShippingOrderDomainService {
+public class ProcurementDomainService {
 
     // 永康路径状态推进
     public void validateTransition(ShipmentStatus current, ShipmentStatus next) {
@@ -335,7 +335,7 @@ public class ShippingOrderDomainService {
     }
 
     // 验货完成后路由
-    public void onQcPassed(ShippingOrder order, QcType type) {
+    public void onQcPassed(Procurement order, QcType type) {
         if (type == REMOTE) {
             order.moveTo(メーカー直送);
         } else {
@@ -345,7 +345,7 @@ public class ShippingOrderDomainService {
     }
 
     // 空运推荐判定（尺寸+重量达标）
-    public boolean 推荐空运(ShippingOrder order) {
+    public boolean 推荐空运(Procurement order) {
         // 读取 Product 尺寸信息，判定是否达标
     }
 }

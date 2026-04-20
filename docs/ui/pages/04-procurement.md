@@ -1,10 +1,10 @@
-# 页面文档：采购单管理
+# 页面文档：发注单管理
 
 > **页面路径**：`/test`
 > **组件文件**：`apps/web/src/pages/test/TestPage.vue`
 > **路由定义**：`apps/web/src/router/index.ts`
 > **认证要求**：需要认证（`requiresAuth: true`）
-> **数据状态**：**当前为模拟数据**，待对接 procurement-service 真实 API
+> **数据状态**：✅ 已对接 manpou-allinone 真实 API（发注单 CRUD）
 
 ---
 
@@ -12,151 +12,168 @@
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  [折叠]                              [头像] admin [▼]  │
+│  [折叠]                              [头像] 用户名 [▼]  │
 ├──────────┬──────────────────────────────────────────────┤
-│          │  采购单管理                    [新建采购单]   │
-│  企业平台│  ┌─────────────────────────────────────────┐ │
-│  ───────│  │ 采购单号：[___________] 状态：[全部▼]  │ │
-│  仪表盘 │  │ 优先级：[全部▼]     [查询] [重置]      │ │
-│  示例列表│  └─────────────────────────────────────────┘ │
-│  采购单 ●│  ┌─────────────────────────────────────────┐ │
-│          │  │ ☐ │ 单号          │优先级│状态  │类型│操作│ │
-│          │  │ ☐ │ PO20260419001 │普通│草稿 │出口│详情│ │
-│          │  │ ☐ │ PO20260418003 │紧急│待审核│内贸│详情│ │
-│          │  │ ☐ │ PO20260417005 │高  │已批准│出口│详情│ │
-│          │  │ ☐ │ PO20260416002 │普通│已拒绝│出口│详情│ │
-│          │  │ ☐ │ PO20260415008 │普通│已取消│内贸│详情│ │
+│          │  发注单管理                    [新规发注]      │
+│ 企业平台 │  ┌─────────────────────────────────────────┐ │
+│ ─────── │  │ 商品代码：[____] 状态：[全部▼]        │ │
+│ 仪表盘   │  │ 客户公司：[____]        [查询] [重置] │ │
+│ 发注单 ● │  └─────────────────────────────────────────┘ │
+│          │  ┌─────────────────────────────────────────┐ │
+│          │  │商品代码│数量│估算批发价│客户公司│状态│操作│ │
+│          │  │de077  │ 100│ 1,255.99│ XX会社│未定│详情│ │
+│          │  │de078  │  50│   628.00│ YY商事│完了│详情│ │
 │          │  └─────────────────────────────────────────┘ │
-│          │  共 5 条  [10▼] [< 1 >]                   │
-│          │                                              │
-│          │  ┌─ 详情抽屉（右侧滑出） ──────────────┐  │
-│          │  │  采购单号    │ 状态                  │  │
-│          │  │  联系人      │ 联系电话              │  │
-│          │  │  发货地址（跨列）                   │  │
-│          │  │  优先级      │ 类型                  │  │
-│          │  │  创建时间    │                      │  │
-│          │  │  备注（跨列）                      │  │
-│          │  │              [关闭]  [提交审核]     │  │
+│          │  共 2 条  [20▼] [◀ 1 ▶]                     │
+│          │  ┌─ 详情抽屉（右侧滑出，600px）─────────────┐  │
+│          │  │  商品代码   │ 数量    │ 估算批发价(JPY)  │  │
+│          │  │  人民币单价 │ 汇率    │ 票点            │  │
+│          │  │  状态（Tag）│ 计费方式│ 客户公司        │  │
+│          │  │  下单日     │ 厂家出货│ 计划出货日      │  │
+│          │  │  商品担当   │ 日本担当│ 中国担当        │  │
+│          │  │  发送目的地（跨列）                    │  │
+│          │  │  创建时间   │ 更新时间                  │  │
+│          │  │              [关闭]  [编辑]             │  │
 │          │  └───────────────────────────────────────┘  │
 └──────────┴──────────────────────────────────────────────┘
 ```
 
-**截图**：`docs/ui/screenshots/04-procurement.png`
-
 ---
 
-## 2. 截图对应
+## 2. 状态枚举
 
-| 资源 | 路径 |
-|------|------|
-| 页面截图 | `docs/ui/screenshots/04-procurement.png` |
+> 与 `ShipmentStatus` 后端枚举完全对齐，详见 `docs/business/SPEC-发注管理流程.md §5`。
 
-> **如何截图**：启动前端后访问 `http://localhost:13000/test`，登录后截取。
+| 值 | 中文 | Tag 颜色 | 说明 |
+|------|------|---------|------|
+| `未定` | 未定 | info（灰） | 还未下单，仅记录需求 |
+| `予定` | 予定 | info（灰） | 预计发注 |
+| `OEM` | OEM | warning（橙） | OEM 定制产品路径 |
+| `発注待` | 発注待 | warning（橙） | 已录入商品，等待下单 |
+| `永康` | 永康 | warning（橙） | 1688下单后货物发往永康仓 |
+| `直送` | 直送 | primary（蓝） | 1688下单后厂家直接发货 |
+| `倉庫着` | 倉庫着 | primary（蓝） | 货物到达仓库 |
+| `現地検品` | 現地検品 | primary（蓝） | 现场异地验货 |
+| `検品` | 検品 | primary（蓝） | 仓库验货 |
+| `エア便` | エア便 | success（绿） | 空运 |
+| `メーカー直送` | メーカー直送 | success（绿） | 厂家直送 |
+| `輸出` | 輸出 | success（绿） | 已出口 |
+| `通関` | 通関 | success（绿） | 已报关 |
+| `日本着` | 日本着 | success（绿） | 已到日本 |
+| `会計` | 会計 | warning（橙） | 财务结算 |
+| `完了` | 完了 | info（灰） | **终态**，禁止任何变更 |
+| `退货` | 退货 | danger（红） | 退货 |
 
----
+### 状态路径（SPEC §5）
 
-## 3. 功能说明
-
-| 功能 | 描述 | 状态 |
-|------|------|------|
-| 筛选栏 | 采购单号（模糊）、状态、优先级 | ✅ 界面完成，筛选逻辑待实现 |
-| 表格 | 分页列表，点击行打开详情 | ✅ 界面完成，数据为模拟 |
-| 详情抽屉 | 右侧滑出，显示完整字段 | ✅ 界面完成 |
-| 新建按钮 | 提示"新建采购单页面（待实现）" | ⚠️ 提示占位 |
-| 编辑按钮 | 仅 DRAFT 状态可点击 | ⚠️ 提示占位 |
-| 删除按钮 | 仅 DRAFT 状态可点击 | ⚠️ 提示占位 |
-| 提交审核 | 仅 DRAFT 状态可见 | ⚠️ 提示占位 |
-
----
-
-## 4. 状态与优先级
-
-### 状态枚举
-
-| 值 | 中文 | Tag 类型 | 允许操作 |
-|-----|------|---------|---------|
-| `DRAFT` | 草稿 | info | 编辑 / 删除 / 提交审核 |
-| `PENDING` | 待审核 | warning | — |
-| `APPROVED` | 已批准 | success | — |
-| `REJECTED` | 已拒绝 | danger | — |
-| `CANCELLED` | 已取消 | info | — |
-
-### 优先级枚举
-
-| 值 | 中文 | Tag 类型 |
-|-----|------|---------|
-| `URGENT` | 紧急 | danger（红色） |
-| `HIGH` | 高 | warning（橙色） |
-| `NORMAL` | 普通 | info（灰色） |
-
----
-
-## 5. 模拟数据
-
-```typescript
-const tableData = ref<PurchaseOrder[]>([
-  { id:1, orderNo:'PO20260419001', contactName:'张三', isExport:true,
-    status:'DRAFT', priority:'NORMAL', createTime:'2026-04-19 10:30:00' },
-  { id:2, orderNo:'PO20260418003', contactName:'李四', isExport:false,
-    status:'PENDING', priority:'URGENT', createTime:'2026-04-18 14:22:00' },
-  { id:3, orderNo:'PO20260417005', contactName:'王五', isExport:true,
-    status:'APPROVED', priority:'HIGH', createTime:'2026-04-17 09:15:00' },
-  { id:4, orderNo:'PO20260416002', contactName:'赵六', isExport:true,
-    status:'REJECTED', priority:'NORMAL', createTime:'2026-04-16 16:45:00' },
-  { id:5, orderNo:'PO20260415008', contactName:'孙七', isExport:false,
-    status:'CANCELLED', priority:'NORMAL', createTime:'2026-04-15 11:20:00' },
-])
+```
+永康路径：未定/未定/OEM → 発注待 → 永康/直送 → 倉庫着 → 検品/現地検品 → エア便/輸出 → 通関 → 日本着 → 会計 → 完了
+OEM路径：未定/未定/OEM → 発注待 → OEM → 倉庫着 → 現地検品 → メーカー直送 → 完了
+直送路径：未定/未定/OEM → 発注待 → 直送 → 倉庫着 → 検品/現地検品 → ...
 ```
 
 ---
 
-## 6. 待实现 API
+## 3. 功能清单
 
-| 操作 | HTTP | 路径 | 说明 |
-|------|------|------|------|
-| 列表查询 | GET | `/api/v1/purchase-orders` | 分页 + 筛选 |
-| 详情 | GET | `/api/v1/purchase-orders/{id}` | 单条记录 |
-| 新建 | POST | `/api/v1/purchase-orders` | 创建采购单 |
-| 提交审核 | POST | `/api/v1/purchase-orders/{id}/submit` | DRAFT → PENDING |
-| 审批 | POST | `/api/v1/purchase-orders/{id}/approve` | PENDING → APPROVED |
-| 拒绝 | POST | `/api/v1/purchase-orders/{id}/reject` | PENDING → REJECTED |
-
-> **注意**：当前所有操作均为 `ElMessage.info/warning/success` 提示占位，需对接 procurement-service。
+| 功能 | 描述 | 状态 |
+|------|------|------|
+| 列表查询 | 分页 + 筛选（商品代码/状态/客户公司） | ✅ |
+| 新建发注单 | 弹窗填写所有字段，实时计算批发价 | ✅ |
+| 编辑发注单 | 详情抽屉点击编辑，完了状态禁止编辑 | ✅ |
+| 状态变更 | 编辑弹窗中选择新状态（非完了行） | ✅ |
+| 删除发注单 | 仅 `未定`/`発注待` 状态可删除 | ✅ |
+| 详情抽屉 | 右侧滑出，显示完整字段 + 操作按钮 | ✅ |
+| 分页 | 10/20/50 每页可选，总数显示 | ✅ |
 
 ---
 
-## 7. 组件结构
+## 4. API 集成
+
+| 操作 | HTTP | 路径 | 说明 |
+|------|------|------|------|
+| 列表查询 | GET | `/api/v1/purchase-orders` | 分页 + 筛选（后端 0-indexed page） |
+| 详情 | GET | `/api/v1/purchase-orders/{id}` | 单条记录 |
+| 新建 | POST | `/api/v1/purchase-orders` | 创建发注单 |
+| 更新 | PUT | `/api/v1/purchase-orders/{id}` | 全量更新 |
+| 删除 | DELETE | `/api/v1/purchase-orders/{id}` | 逻辑删除 |
+| 状态变更 | PUT | `/api/v1/purchase-orders/{id}` | body 中携带 status 字段 |
+
+> **注意**：列表查询前端传 `page-1`（0-indexed），后端直接使用。
+
+---
+
+## 5. 价格计算
+
+批发价 JPY 由前端实时计算并传给后端存储：
+
+```
+estimatedPriceJpy = (priceRmb / taxPoint × 1.02 × 1.2) × exchangeRate × 1.05
+```
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `priceRmb` | 人民币单价 | 用户输入 |
+| `taxPoint` | 票点 | 1.1 |
+| `exchangeRate` | CNY→JPY 汇率 | 21.5 |
+| 固定系数 | 国内流通费 1.02、利润 1.2、跨境费 1.05 | 系统内置 |
+
+---
+
+## 6. 组件结构
 
 ```
 TestPage.vue
 ├── 页面头部
-│   ├── 标题 "采购单管理"
-│   └── "新建采购单" 按钮
-├── 筛选栏 (el-card)
-│   ├── 采购单号输入
-│   ├── 状态下拉（5个选项）
-│   ├── 优先级下拉（3个选项）
-│   ├── 查询按钮
+│   ├── 标题 "发注单管理"
+│   └── "新规发注" 按钮
+├── 筛选栏 (el-card, shadow=never)
+│   ├── 商品代码输入（placeholder: 如 de077）
+│   ├── 状态下拉（17个选项）
+│   ├── 客户公司输入
+│   ├── 查询按钮（primary）
 │   └── 重置按钮
-├── 数据表格 (el-table)
-│   ├── 多选列
-│   ├── 单号列（monospace 字体，蓝色）
-│   ├── 联系人 / 发货地址
-│   ├── 优先级标签
-│   ├── 状态标签
-│   ├── 类型标签（出口/内贸）
-│   ├── 创建时间
-│   └── 操作列（详情/编辑/删除）
-├── 分页
-└── 详情抽屉 (el-drawer direction=rtl)
-    ├── 采购单号 / 状态
-    ├── 联系人 / 联系电话
-    ├── 发货地址（跨2列）
-    ├── 优先级 / 类型
-    ├── 创建时间（跨2列）
-    ├── 备注（跨2列）
-    └── 底部操作（关闭 / 提交审核）
+├── 数据表格 (el-table, stripe, v-loading)
+│   ├── 商品代码（蓝色 monospace，点击打开详情）
+│   ├── 数量（右对齐）
+│   ├── 估算批发价 JPY（右对齐，千分位格式化）
+│   ├── 客户公司（tooltip 溢出）
+│   ├── 商品担当
+│   ├── 计划出货日
+│   ├── 状态（Tag，颜色映射）
+│   ├── 创建时间（yyyy-MM-dd HH:mm:ss 格式）
+│   └── 操作（详情 / 编辑 / 删除）
+├── 分页（bottom-right, background）
+└── 详情抽屉 (el-drawer, rtl, 600px)
+    ├── 完整字段 (el-descriptions, column=2, border)
+    ├── 创建时间 / 更新时间
+    └── 底部操作（关闭 / 编辑）
 ```
+
+---
+
+## 7. 字段对照
+
+| 前端字段 | API 字段 | 说明 |
+|---------|---------|------|
+| `productCode` | `productCode` | 商品代码 |
+| `quantity` | `quantity` | 订购数量 |
+| `priceRmb` | `priceRmb` | 人民币单价 |
+| `exchangeRate` | `exchangeRate` | CNY→JPY 汇率 |
+| `taxPoint` | `taxPoint` | 票点（默认 1.1） |
+| `estimatedPriceJpy` | `estimatedPriceJpy` | 估算批发价（前端计算，后端存储） |
+| `billingMethod` | `billingMethod` | 计费方式 |
+| `orderDate` | `orderDate` | 下单日（yyyy-MM-dd） |
+| `factoryShipDate` | `factoryShipDate` | 厂家出货日 |
+| `plannedShipDate` | `plannedShipDate` | 计划出货日 |
+| `productLead` | `productLead` | 商品担当 |
+| `japanLead` | `japanLead` | 日本担当 |
+| `chinaLead` | `chinaLead` | 中国担当 |
+| `destination` | `destination` | 发送目的地 |
+| `customerCompany` | `customerCompany` | 客户公司 |
+| `status` | `status` | 发注单状态 |
+| `createTime` | `createTime` | 创建时间 |
+| `updateTime` | `updateTime` | 更新时间 |
 
 ---
 
@@ -164,10 +181,12 @@ TestPage.vue
 
 | 文件 | 作用 |
 |------|------|
-| `apps/web/src/pages/test/TestPage.vue` | 采购单管理组件 |
-| `docs/pro/05-procurement-service.md` | 后端 procurement-service 文档 |
-| `docs/ui/ARCHITECTURE.md` | 系统架构图（Kafka 事件流） |
-| `docs/ui/pages/03-examples.md` | 上一页：示例列表 |
+| `apps/web/src/pages/test/TestPage.vue` | 发注单管理组件 |
+| `apps/web/src/api/procurement.ts` | API 类型与请求封装 |
+| `apps/manpou-allinone/.../ProcurementController.java` | 后端 REST 接口 |
+| `apps/manpou-allinone/.../ShipmentStatus.java` | 状态枚举 + FSM 规则 |
+| `docs/business/SPEC-发注管理流程.md` | 业务规格文档 |
+| `docs/business/DOMAIN-发注管理领域模型.md` | 领域模型 |
 
 ---
 

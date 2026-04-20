@@ -178,5 +178,5 @@ curl -H "Authorization: Bearer <token>" \
 |------|------|
 | `docs/pro/00-root-project.md` | 项目全局（AR-001 风险追踪） |
 | `docs/pro/02-user-service.md` | JWT 签发方（公钥来源） |
-| `docs/pro/10-web-frontend.md` | 前端代理配置 |
+| `docs/pro/11-web-frontend.md` | 前端代理配置 |
 | `docs/ui/ARCHITECTURE.md` | 架构图（请求流程） |

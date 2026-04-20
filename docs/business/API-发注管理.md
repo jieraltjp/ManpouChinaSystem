@@ -371,8 +371,8 @@ POST /api/v1/procurements/{id}/returns
 | validation.param.invalid | 400 | 参数值非法 |
 | auth.unauthorized | 401 | 未认证 |
 | auth.forbidden | 403 | 无权操作 |
-| not_found | 404 | 资源不存在 |
-| business.status_forbidden | 422 | 状态不允许此操作 |
-| business.cannot_modify_closed | 422 | 完了后不可修改 |
+| resource.not-found | 404 | 资源不存在 |
+| business.invalid_status_transition | 422 | 状态「A」不允许跳转至「B」 |
+| business.cannot_modify_closed | 422 | 完了（终态）后禁止任何变更 |
 | business.air_recommended | 200 | 空运推荐（warn级别提示） |
-| server.error | 500 | 系统异常 |
+| system.internal-error | 500 | 系统异常 |

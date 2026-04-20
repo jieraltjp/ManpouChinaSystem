@@ -11,7 +11,7 @@
 docs/
 ├── README.md                    ← 本文件 · 全局导航索引
 ├── pro/                         ← 项目专属文档（每个服务一篇）
-├── desigin/                     ← 构建指南（Step 1-6 · 过程文档）
+├── design/                      ← 构建指南（Step 1-6 · 过程文档）
 ├── role/                        ← 角色视角分析（6 角色 · 受众文档）
 ├── ui/                          ← 前端 UI 文档 + 架构图
 └── check/                       ← 审计报告（自动生成）
@@ -36,8 +36,8 @@ docs/
 | 07 | `07-logistics-service.md` | `apps/logistics-service/` | 物流管理 |
 | 08 | `08-finance-service.md` | `apps/finance-service/` | 财务管理 |
 | 09 | `09-notification-service.md` | `apps/notification-service/` | 通知服务 |
-| 10 | `10-web-frontend.md` | `apps/web/` | Vue 3 前端、路由、状态管理 |
-| 11 | `11-api-gateway.md` | `apps/api-gateway/` | Spring Cloud Gateway、路由规则、JWT 验签 |
+| 10 | `10-api-gateway.md` | `apps/api-gateway/` | Spring Cloud Gateway、路由规则、JWT 验签 |
+| 11 | `11-web-frontend.md` | `apps/web/` | Vue 3 前端、路由、状态管理 |
 | 12 | `12-docker-compose.md` | `docker/` | 本地开发环境、基础设施容器化 |
 | 13 | `13-helm-k8s.md` | `infra/helm/` | K8s Helm 部署模板 |
 | 14 | `14-monitoring.md` | `monitoring/` | Prometheus + Grafana + Alertmanager |

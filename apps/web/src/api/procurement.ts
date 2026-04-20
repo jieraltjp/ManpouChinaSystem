@@ -52,6 +52,7 @@ export interface CreateProcurementRequest {
   chinaLead?: string
   destination?: string
   customerCompany?: string
+  status?: string  // 默认未定，后端填充
 }
 
 /** 更新发注单请求 */

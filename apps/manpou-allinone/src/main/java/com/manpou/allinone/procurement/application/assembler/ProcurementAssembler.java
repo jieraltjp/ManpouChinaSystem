@@ -60,6 +60,7 @@ public class ProcurementAssembler {
         if (cmd.getChinaLead() != null) entity.setChinaLead(cmd.getChinaLead());
         if (cmd.getDestination() != null) entity.setDestination(cmd.getDestination());
         if (cmd.getCustomerCompany() != null) entity.setCustomerCompany(cmd.getCustomerCompany());
+        // 创建路径：直接 setStatus，不走 FSM 校验（新建实体尚无当前状态）
         if (cmd.getStatus() != null) entity.setStatus(cmd.getStatus());
     }
 

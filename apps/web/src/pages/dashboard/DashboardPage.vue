@@ -105,7 +105,7 @@
           <el-icon><Document /></el-icon>
           示例列表
         </el-button>
-        <el-button @click="$router.push('/login')">
+        <el-button @click="handleRelogin">
           <el-icon><SwitchButton /></el-icon>
           重新登录
         </el-button>
@@ -121,6 +121,11 @@ import { useAuthStore } from '@/stores/auth'
 import dayjs from 'dayjs'
 
 const auth = useAuthStore()
+
+function handleRelogin() {
+  auth.logout()
+  window.location.href = '/login'
+}
 
 const issuedAt = computed(() =>
   auth.claims?.iat ? dayjs.unix(auth.claims.iat).format('YYYY-MM-DD HH:mm:ss') : '—',

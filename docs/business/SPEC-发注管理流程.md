@@ -6,7 +6,7 @@
 > **状态**: 已审计
 > **依据**: `docs/发注管理体系升级.pdf` + `docs/新発注管理-設計図.xlsx`
 
-> ⚠️ **代码实现进度**: procurement-service / product-service 均仅骨架，核心业务未实现。
+> ⚠️ **代码实现进度**: 发注单（Procurement）✅ CRUD+报价计算已实现 · Product 🔴 骨架 · 其他模块 🔴 未实现
 
 ---
 

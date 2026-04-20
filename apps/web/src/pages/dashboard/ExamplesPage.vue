@@ -91,7 +91,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search, Refresh } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import client from '@/api/client'
@@ -160,9 +160,22 @@ function openEditDialog(row: ExampleItem) {
 }
 
 async function deleteRow(row: ExampleItem) {
-  await client.delete(`/examples/${row.id}`)
-  ElMessage.success('删除成功')
-  loadItems()
+  try {
+    await ElMessageBox.confirm(
+      `确认删除「${row.name}」？此操作不可恢复。`,
+      '删除确认',
+      { confirmButtonText: '删除', cancelButtonText: '取消', type: 'warning' }
+    )
+  } catch {
+    return
+  }
+  try {
+    await client.delete(`/examples/${row.id}`)
+    ElMessage.success('删除成功')
+    loadItems()
+  } catch {
+    // handled by axios interceptor
+  }
 }
 
 async function submitForm() {
