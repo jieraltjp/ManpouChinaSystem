@@ -193,7 +193,6 @@ docker-compose -f docker-compose.yml up -d
 | 09 | notification-service | `apps/notification-service/` |
 | 10 | web 前端 + UI 文档 | `apps/web/` |
 | 11 | API Gateway | `apps/api-gateway/` |
-| 19 | manpou-allinone | `apps/manpou-allinone/` |
 | 12 | Docker Compose | `docker/` |
 | 13 | Helm K8s | `infra/helm/` |
 | 14 | 监控告警 | `monitoring/` |
@@ -201,6 +200,8 @@ docker-compose -f docker-compose.yml up -d
 | 16 | 配置中心 | `config/nacos/` + `config/checkstyle/` |
 | 17 | 可插拔基础设施 | Docker 可选接入，代码不依赖容器存在 |
 | 18 | 服务间认证 | JWT Token 透明传递，各服务验签能力已就绪 |
+| 19 | manpou-allinone | `apps/manpou-allinone/` |
+| 20 | Ubuntu 轻量部署 | Phase 0 三服务本地部署指南 |
 
 ---
 
@@ -215,3 +216,5 @@ docker-compose -f docker-compose.yml up -d
 | `docs/ui/README.md` | 前端 UI 文档入口 |
 | `docs/ui/ARCHITECTURE.md` | 系统架构图（Mermaid） |
 | `docs/pro/05-procurement-service.md` | 发注服务文档 |
+| `docs/pro/19-manpou-allinone.md` | 6 领域合一单体 |
+| `docs/pro/20-ubuntu-deploy-dev.md` | Ubuntu 轻量部署指南 |
