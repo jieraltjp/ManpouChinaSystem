@@ -11,6 +11,7 @@ export interface ApiResponse<T = unknown> {
 }
 
 export interface PublicKeyVO {
+  kid: string
   algorithm: string
   publicKey: string
 }
@@ -19,6 +20,7 @@ export interface LoginVO {
   accessToken: string
   expiresIn: number
   tokenType: string
+  kid: string
 }
 
 export interface LoginCmd {

@@ -38,7 +38,7 @@ public class ProcurementController {
      * 根据 ID 查询单个发注单。
      */
     @GetMapping("/{id}")
-    public Result<ProcurementPageQuery> get(@PathVariable Long id) {
+    public Result<ProcurementPageQuery> get(@PathVariable("id") Long id) {
         return Result.ok(procurementUseCase.getById(id));
     }
 
@@ -60,7 +60,7 @@ public class ProcurementController {
      * 状态推进规则见 docs/business/SPEC-发注管理流程.md §5。
      */
     @PatchMapping("/{id}")
-    public Result<Void> update(@PathVariable Long id,
+    public Result<Void> update(@PathVariable("id") Long id,
                                @Valid @RequestBody ProcurementUpdateCmd cmd) {
         procurementUseCase.update(id, cmd);
         return Result.ok("发注单更新成功", null);
@@ -72,7 +72,7 @@ public class ProcurementController {
      * 仅未定/発注待状态可删除。
      */
     @DeleteMapping("/{id}")
-    public Result<Void> delete(@PathVariable Long id) {
+    public Result<Void> delete(@PathVariable("id") Long id) {
         procurementUseCase.delete(id);
         return Result.ok("发注单删除成功", null);
     }

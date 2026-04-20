@@ -102,8 +102,10 @@
             {{ statusLabel(currentRow.status) }}
           </el-tag>
         </el-descriptions-item>
+        <el-descriptions-item label="计费方式">{{ currentRow.billingMethod || '-' }}</el-descriptions-item>
         <el-descriptions-item label="客户公司">{{ currentRow.customerCompany || '-' }}</el-descriptions-item>
         <el-descriptions-item label="下单日">{{ currentRow.orderDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="厂家出货日">{{ currentRow.factoryShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="厂家出货日">{{ currentRow.factoryShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="计划出货日">{{ currentRow.plannedShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="商品担当">{{ currentRow.productLead || '-' }}</el-descriptions-item>
@@ -137,8 +139,17 @@
         <el-form-item label="票点" prop="taxPoint">
           <el-input-number v-model="formData.taxPoint" :min="0.0001" :precision="4" style="width: 100%" />
         </el-form-item>
+        <el-form-item label="计费方式">
+          <el-input v-model="formData.billingMethod" placeholder="如 METHOD_A" />
+        </el-form-item>
         <el-form-item label="客户公司">
           <el-input v-model="formData.customerCompany" placeholder="客户公司名称" />
+        </el-form-item>
+        <el-form-item label="下单日">
+          <el-date-picker v-model="formData.orderDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="厂家出货日">
+          <el-date-picker v-model="formData.factoryShipDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
         </el-form-item>
         <el-form-item label="商品担当">
           <el-input v-model="formData.productLead" placeholder="商品担当姓名" />
@@ -223,11 +234,14 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string } => ({
   priceRmb: 0,
   exchangeRate: 21.5,
   taxPoint: 1.1,
+  billingMethod: '',
+  orderDate: '',
+  factoryShipDate: '',
+  plannedShipDate: '',
   customerCompany: '',
   productLead: '',
   japanLead: '',
   chinaLead: '',
-  plannedShipDate: '',
   destination: '',
   status: '未定',
 })
@@ -289,11 +303,14 @@ function onEdit(row: ProcurementPageVO | null) {
     priceRmb: row?.priceRmb ?? 0,
     exchangeRate: row?.exchangeRate ?? 21.5,
     taxPoint: row?.taxPoint ?? 1.1,
+    billingMethod: row?.billingMethod ?? '',
+    orderDate: row?.orderDate ?? '',
+    factoryShipDate: row?.factoryShipDate ?? '',
+    plannedShipDate: row?.plannedShipDate ?? '',
     customerCompany: row?.customerCompany ?? '',
     productLead: row?.productLead ?? '',
     japanLead: row?.japanLead ?? '',
     chinaLead: row?.chinaLead ?? '',
-    plannedShipDate: row?.plannedShipDate ?? '',
     destination: row?.destination ?? '',
     status: row?.status ?? '未定',
   })
@@ -323,11 +340,14 @@ async function onSubmit() {
           priceRmb: formData.priceRmb,
           exchangeRate: formData.exchangeRate,
           taxPoint: formData.taxPoint,
+          billingMethod: formData.billingMethod || undefined,
+          orderDate: formData.orderDate || undefined,
+          factoryShipDate: formData.factoryShipDate || undefined,
+          plannedShipDate: formData.plannedShipDate || undefined,
           customerCompany: formData.customerCompany || undefined,
           productLead: formData.productLead || undefined,
           japanLead: formData.japanLead || undefined,
           chinaLead: formData.chinaLead || undefined,
-          plannedShipDate: formData.plannedShipDate || undefined,
           destination: formData.destination || undefined,
         }
         await procurementApi.create(req)
@@ -339,11 +359,14 @@ async function onSubmit() {
           priceRmb: formData.priceRmb,
           exchangeRate: formData.exchangeRate,
           taxPoint: formData.taxPoint,
+          billingMethod: formData.billingMethod || undefined,
+          orderDate: formData.orderDate || undefined,
+          factoryShipDate: formData.factoryShipDate || undefined,
+          plannedShipDate: formData.plannedShipDate || undefined,
           customerCompany: formData.customerCompany || undefined,
           productLead: formData.productLead || undefined,
           japanLead: formData.japanLead || undefined,
           chinaLead: formData.chinaLead || undefined,
-          plannedShipDate: formData.plannedShipDate || undefined,
           destination: formData.destination || undefined,
           status: formData.status !== '未定' ? formData.status : undefined,
         }
