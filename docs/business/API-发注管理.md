@@ -228,6 +228,8 @@ PUT    /api/v1/products/{id} — 更新商品
 |------|-----------|------|------|
 | productCode | 商品コード | ✅ | 唯一键 |
 | name | 名称 | ✅ | 日文名称 |
+| nameZh | 中文名称 | | 中文商品名称 |
+| nameEn | 英文名称 | | 英文商品名称 |
 | heightCm | 高(cm) | | |
 | widthCm | 宽(cm) | | |
 | depthCm | 深(cm) | | |

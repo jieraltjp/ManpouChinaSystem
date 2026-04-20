@@ -60,6 +60,8 @@ Product（聚合根）
 ├── id: Long
 ├── productCode: String        # 商品代码（唯一键，如 de077）
 ├── name: String              # 日文名称
+├── nameZh: String           # 中文名称
+├── nameEn: String           # 英文名称
 ├── heightCm: BigDecimal      # 高(cm)
 ├── widthCm: BigDecimal       # 宽(cm)
 ├── depthCm: BigDecimal       # 深(cm)

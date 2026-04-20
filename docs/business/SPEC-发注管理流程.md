@@ -127,8 +127,10 @@
 
 | 字段 | Excel 名称 | 说明 |
 |------|-----------|------|
-| productCode | 商品代码 | 唯一键，如 `de077` |
+| productCode | 商品コード | 唯一键，如 `de077` |
 | name | 名称 | 日文商品名称 |
+| nameZh | 中文名称 | 中文商品名称 |
+| nameEn | 英文名称 | 英文商品名称 |
 | heightCm | 高(cm) | |
 | widthCm | 宽(cm) | |
 | depthCm | 深(cm) | |
