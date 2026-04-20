@@ -43,27 +43,45 @@ ok()     { echo -e "${GREEN}[OK]${NC}   $1"; }
 # 工具函数
 # ============================================================
 
+# ---- Windows (git-bash / MSYS) 检测 ----
+is_windows() {
+    case "$(uname -s)" in
+        MINGW*|MSYS*|CYGWIN*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+# 获取占用端口的进程 PID（Windows 用 PowerShell，Linux 用 ss/lsof）
+get_port_pid() {
+    local port="$1"
+    if is_windows; then
+        # Windows: PowerShell Get-NetTCPConnection
+        powershell -Command "
+            \$c = Get-NetTCPConnection -LocalPort ${port} -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty OwningProcess
+            if (\$c) { Write-Output \$c }
+        " 2>/dev/null | tr -d '\r\n'
+    else
+        # Linux: ss → pid=
+        if command -v ss &>/dev/null; then
+            ss -tlnp 2>/dev/null | grep ":${port} " | \
+                grep -oP 'pid=\K[0-9]+' | head -1
+        elif command -v lsof &>/dev/null; then
+            lsof -ti ":${port}" 2>/dev/null | head -1
+        fi
+    fi
+}
+
 # 检测端口是否被占用
 is_port_used() {
     local port="$1"
-    if command -v ss &>/dev/null; then
+    if is_windows; then
+        powershell -Command "Get-NetTCPConnection -LocalPort ${port} -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty LocalPort" 2>/dev/null | grep -q "${port}"
+    elif command -v ss &>/dev/null; then
         ss -tlnp 2>/dev/null | grep -q ":${port} "
     elif command -v netstat &>/dev/null; then
         netstat -tlnp 2>/dev/null | grep -q ":${port} "
     else
-        # fallback: lsof
         lsof -i ":${port}" &>/dev/null
-    fi
-}
-
-# 获取占用端口的进程 PID
-get_port_pid() {
-    local port="$1"
-    if command -v ss &>/dev/null; then
-        ss -tlnp 2>/dev/null | grep ":${port} " | \
-            grep -oP 'pid=\K[0-9]+' | head -1
-    elif command -v lsof &>/dev/null; then
-        lsof -ti ":${port}" 2>/dev/null | head -1
     fi
 }
 
@@ -73,15 +91,25 @@ kill_port() {
     local svc="$2"
     local pid
     pid=$(get_port_pid "$port")
-    if [[ -n "$pid" ]]; then
+    if [[ -n "$pid" ]] && [[ "$pid" != "0" ]]; then
         warn "端口 ${port} 被占用（PID=${pid}），正在关闭 ${svc}..."
-        kill "$pid" 2>/dev/null || true
+        if is_windows; then
+            powershell -Command "Stop-Process -Id ${pid} -Force -ErrorAction SilentlyContinue" 2>/dev/null || true
+        else
+            kill "$pid" 2>/dev/null || true
+        fi
         sleep 2
         # 如果还在，强制杀死
         if is_port_used "$port"; then
             local new_pid
             new_pid=$(get_port_pid "$port")
-            [[ -n "$new_pid" ]] && kill -9 "$new_pid" 2>/dev/null || true
+            if [[ -n "$new_pid" ]] && [[ "$new_pid" != "0" ]]; then
+                if is_windows; then
+                    powershell -Command "Stop-Process -Id ${new_pid} -Force -ErrorAction SilentlyContinue" 2>/dev/null || true
+                else
+                    kill -9 "$new_pid" 2>/dev/null || true
+                fi
+            fi
             sleep 1
         fi
     fi

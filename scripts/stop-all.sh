@@ -35,18 +35,29 @@ ok()     { echo -e "${GREEN}[OK]${NC}   $1"; }
 # 工具函数
 # ============================================================
 
-# 获取占用端口的进程 PID（Windows git-bash 兼容）
+# ---- Windows (git-bash / MSYS) 检测 ----
+is_windows() {
+    case "$(uname -s)" in
+        MINGW*|MSYS*|CYGWIN*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+# 获取占用端口的进程 PID
 get_port_pid() {
     local port="$1"
-    # Windows git-bash: 使用 netstat 找到 PID
-    if command -v netstat &>/dev/null; then
-        netstat -tlnp 2>/dev/null | grep ":${port} " | \
-            grep -oP '\s+[0-9]+$' | tr -d ' ' | head -1
-    elif command -v ss &>/dev/null; then
-        ss -tlnp 2>/dev/null | grep ":${port} " | \
-            grep -oP 'pid=\K[0-9]+' | head -1
-    elif command -v lsof &>/dev/null; then
-        lsof -ti ":${port}" 2>/dev/null | head -1
+    if is_windows; then
+        powershell -Command "
+            \$c = Get-NetTCPConnection -LocalPort ${port} -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty OwningProcess
+            if (\$c) { Write-Output \$c }
+        " 2>/dev/null | tr -d '\r\n'
+    else
+        if command -v ss &>/dev/null; then
+            ss -tlnp 2>/dev/null | grep ":${port} " | \
+                grep -oP 'pid=\K[0-9]+' | head -1
+        elif command -v lsof &>/dev/null; then
+            lsof -ti ":${port}" 2>/dev/null | head -1
+        fi
     fi
 }
 
@@ -62,11 +73,15 @@ read_pid_file() {
 kill_by_pid() {
     local pid="$1"
     local name="$2"
-    if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
-        kill "$pid" 2>/dev/null || true
-        sleep 1
-        if kill -0 "$pid" 2>/dev/null; then
-            kill -9 "$pid" 2>/dev/null || true
+    if [[ -n "$pid" ]] && [[ "$pid" != "0" ]]; then
+        if is_windows; then
+            powershell -Command "Stop-Process -Id ${pid} -Force -ErrorAction SilentlyContinue" 2>/dev/null || true
+        else
+            kill "$pid" 2>/dev/null || true
+            sleep 1
+            if kill -0 "$pid" 2>/dev/null; then
+                kill -9 "$pid" 2>/dev/null || true
+            fi
         fi
         ok "${name} (PID=${pid}) 已停止"
     fi
@@ -83,14 +98,16 @@ stop_service() {
     # 优先用 PID 文件
     if [[ -f "$pid_file" ]]; then
         pid=$(read_pid_file "$pid_file")
-        if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
-            kill "$pid" 2>/dev/null || true
-            sleep 1
-            if kill -0 "$pid" 2>/dev/null; then
-                kill -9 "$pid" 2>/dev/null || true
-            fi
-            ok "${name} (PID=${pid}) 已停止"
+        if [[ -n "$pid" ]] && [[ "$pid" != "0" ]]; then
+            kill_by_pid "$pid" "$name"
             rm -f "$pid_file"
+            sleep 1
+            # 如果端口还被占用，兜底按端口杀
+            if is_windows; then
+                powershell -Command "Get-NetTCPConnection -LocalPort ${port} -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess" 2>/dev/null | while read p; do
+                    [[ -n "$p" ]] && powershell -Command "Stop-Process -Id ${p} -Force -ErrorAction SilentlyContinue" 2>/dev/null || true
+                done
+            fi
             return 0
         else
             rm -f "$pid_file"
@@ -99,11 +116,15 @@ stop_service() {
 
     # 兜底：按端口查找
     pid=$(get_port_pid "$port")
-    if [[ -n "$pid" ]]; then
-        kill "$pid" 2>/dev/null || true
-        sleep 1
-        if kill -0 "$pid" 2>/dev/null; then
-            kill -9 "$pid" 2>/dev/null || true
+    if [[ -n "$pid" ]] && [[ "$pid" != "0" ]]; then
+        if is_windows; then
+            powershell -Command "Stop-Process -Id ${pid} -Force -ErrorAction SilentlyContinue" 2>/dev/null || true
+        else
+            kill "$pid" 2>/dev/null || true
+            sleep 1
+            if kill -0 "$pid" 2>/dev/null; then
+                kill -9 "$pid" 2>/dev/null || true
+            fi
         fi
         ok "${name} (端口 ${port}, PID=${pid}) 已停止"
     else

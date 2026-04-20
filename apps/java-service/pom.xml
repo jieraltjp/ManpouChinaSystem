@@ -415,11 +415,19 @@
                     </configuration>
                 </plugin>
 
-                <!-- Spring Boot 打包 -->
+                <!-- Spring Boot 打包（repackage 绑定到 package 阶段，生成 fat jar） -->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>repackage</id>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                     <configuration>
                         <excludes>
                             <exclude>
