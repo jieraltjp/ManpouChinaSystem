@@ -1,10 +1,10 @@
 # 页面文档：发注单管理
 
-> **页面路径**：`/test`
-> **组件文件**：`apps/web/src/pages/test/TestPage.vue`
+> **页面路径**：`/procurement/order`
+> **组件文件**：`apps/web/src/pages/procurement/OrderPage.vue`
 > **路由定义**：`apps/web/src/router/index.ts`
 > **认证要求**：需要认证（`requiresAuth: true`）
-> **数据状态**：✅ 已对接 manpou-allinone 真实 API（发注单 CRUD）
+> **数据状态**：✅ 已对接 manpou-allinone 真实 API（发注单 CRUD + 需求带入 + 工厂联动）
 
 ---
 
@@ -132,7 +132,7 @@ estimatedPriceJpy = (priceRmb / taxPoint × 1.02 × 1.2) × exchangeRate × 1.05
 ## 6. 组件结构
 
 ```
-TestPage.vue
+OrderPage.vue
 ├── 页面头部
 │   ├── 标题 "发注单管理"
 │   └── "新规发注" 按钮
@@ -158,17 +158,31 @@ TestPage.vue
 │   ├── 创建时间（yyyy-MM-dd HH:mm:ss 格式）
 │   └── 操作（详情 / 编辑 / 删除）
 ├── 分页（bottom-right, background）
-└── 详情抽屉 (el-drawer, rtl, 600px, el-descriptions column=2)
-    ├── 关联工厂 / 商品代码 / 子货号 / 数量
-    ├── 材质 / 需要检测 / 人民币单价 / 汇率
-    ├── 票点 / 估算批发价(JPY) / 报关类型
-    ├── 报关备注（跨列） / 说明书（跨列）
-    ├── 状态 / 客户公司
-    ├── 下单日 / 厂家出货日 / 计划出货日 / 实际出货日
-    ├── 商品担当 / 日本担当 / 中国担当
-    ├── 发送目的地（跨列）
-    ├── 创建时间 / 更新时间（跨列）
-    └── 底部操作（关闭 / 编辑）
+├── 详情抽屉 (el-drawer, rtl, 600px, el-descriptions column=2)
+│   ├── 关联工厂 / 商品代码 / 子货号 / 数量
+│   ├── 材质 / 需要检测 / 人民币单价 / 汇率
+│   ├── 票点 / 估算批发价(JPY) / 报关类型
+│   ├── 报关备注（跨列） / 说明书（跨列）
+│   ├── 状态 / 客户公司
+│   ├── 下单日 / 厂家出货日 / 计划出货日 / 实际出货日
+│   ├── 商品担当 / 日本担当 / 中国担当
+│   ├── 发送目的地（跨列）
+│   ├── 创建时间 / 更新时间（跨列）
+│   └── 底部操作（关闭 / 编辑）
+└── 新建/编辑弹窗 (el-dialog, 800px)
+    ├── 关联需求下拉（仅创建时，筛选 PENDING 需求，可带入商品信息）
+    ├── 选择工厂下拉（必填，编辑时禁用）
+    ├── 商品代码 + 子货号
+    ├── 数量 + 材质 + 需要检测（Switch）
+    ├── 人民币单价 + 汇率 + 票点（el-input-number 三列）
+    ├── 估算批发价（JPY 实时计算）
+    ├── 报关类型（el-select，含 BILLING_TYPE_OPTIONS）
+    ├── 报关备注 + 说明书
+    ├── 客户公司 + 发送目的地
+    ├── 商品担当 + 日本担当 + 中国担当
+    ├── 下单日 + 厂家出货日
+    ├── 计划出货日 + 实际出货日
+    └── 状态（仅更新模式，el-select 19选项）
 ```
 
 > **注意**：详情抽屉字段取自 `ProcurementPageQuery`（全部 27 个字段，已包含 v1.3.0 扩展字段）。
