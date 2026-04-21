@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ExampleUseCase {
 
+    private static final int MAX_PAGE_SIZE = 100;
+
     private final ExampleRepository exampleRepository;
     private final ExampleAssembler exampleAssembler;
 
@@ -37,7 +39,7 @@ public class ExampleUseCase {
     public Page<ExamplePageQuery> pageQuery(ExampleQuery query) {
         PageRequest pageRequest = PageRequest.of(
                 (query.getPage() - 1),
-                Math.min(query.getPageSize(), 100), // 上限 100
+                Math.min(query.getPageSize(), MAX_PAGE_SIZE), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
         Page<Example> page = exampleRepository.findAllByIsDeletedFalse(pageRequest);

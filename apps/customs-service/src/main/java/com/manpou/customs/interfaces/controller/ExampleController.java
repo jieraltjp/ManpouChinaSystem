@@ -9,6 +9,8 @@ import com.manpou.customs.common.annotation.Idempotent;
 import com.manpou.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/examples")
 @RequiredArgsConstructor
 public class ExampleController {
+    private static final Logger log = LoggerFactory.getLogger(ExampleController.class);
 
     private final ExampleUseCase exampleUseCase;
 
@@ -59,6 +62,7 @@ public class ExampleController {
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody ExampleUpdateCmd cmd) {
         exampleUseCase.update(id, cmd);
+        log.info("[AUDIT] {} updated id={}", "customs", id);
         return Result.ok("更新成功", null);
     }
 
@@ -68,6 +72,7 @@ public class ExampleController {
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         exampleUseCase.delete(id);
+        log.info("[AUDIT] {} deleted id={}", "customs", id);
         return Result.ok("删除成功", null);
     }
 }
