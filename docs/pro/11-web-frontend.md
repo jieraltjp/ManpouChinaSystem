@@ -84,7 +84,7 @@ apps/web/
 | 登录页 | ✅ | 渐变背景 + 表单验证 |
 | 仪表盘 | ✅ | JWT Claims 显示 + 重新登录 |
 | 示例 CRUD | ✅ | 对接 user-service 示例 API |
-| 发注单管理 | ✅ | `/test` — 完整 CRUD + 筛选 + 分页 + 详情抽屉 |
+| 发注单管理 | ✅ | `/procurement/order`（OrderPage.vue）— 完整 CRUD + 需求带入 + 工厂选择 + 筛选 + 分页 + 详情抽屉 |
 | Element Plus | ✅ | 组件库引入 |
 
 ---
@@ -95,7 +95,7 @@ apps/web/
 |------|------|------|------|
 | 登录 | `/login` | LoginPage | ✅ |
 | 仪表盘 | `/dashboard` | DashboardPage | ✅ |
-| 发注单管理 | `/test` | TestPage | ✅ |
+| 发注单管理 | `/procurement/order` | OrderPage | ✅ |
 | 示例列表 | `/examples` | ExamplesPage | ✅ |
 | 仓储列表 | `/warehouse` | WarehouseListPage | 🔴 待实现 |
 | 报关管理 | `/customs` | CustomsListPage | 🔴 待实现 |
@@ -104,7 +104,7 @@ apps/web/
 | 商品管理 | `/product` | ProductListPage | 🔴 待实现 |
 | 用户管理 | `/user` | UserListPage | 🔴 待实现 |
 
-> 发注单管理（`/test`）已为正式功能，非开发调试用。Phase A2 阶段改为路由 `/procurement` 并拆分为列表/详情页。
+> 发注单管理（`/test`）已迁移至 `/procurement/order`（OrderPage.vue），支持关联需求带入与工厂选择。
 
 ---
 
