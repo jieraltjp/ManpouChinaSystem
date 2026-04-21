@@ -24,7 +24,7 @@ import java.util.Map;
  * JWT 认证过滤器。
  *
  * 从请求头提取 JWT Token，验证并设置 SecurityContext。
- * 详见 docs/core/10-认证授权与权限模型.md §2
+ * 详见 docs/pro/00-root-project.md §2
  */
 @Slf4j
 @Component

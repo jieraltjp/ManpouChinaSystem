@@ -1,6 +1,6 @@
 /**
  * 认证状态管理（Pinia）。
- * 详见 docs/core/10-认证授权与权限模型.md §3
+ * 详见 docs/pro/00-root-project.md §3
  */
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'

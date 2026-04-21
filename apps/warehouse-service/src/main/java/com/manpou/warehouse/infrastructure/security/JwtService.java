@@ -19,7 +19,7 @@ import java.util.List;
  * - 私钥：服务端签发 Token
  * - 公钥：其他服务 / 前端验签
  *
- * 详见 docs/core/10-认证授权与权限模型.md §2.2
+ * 详见 docs/pro/00-root-project.md §2.2
  */
 @Slf4j
 @Component

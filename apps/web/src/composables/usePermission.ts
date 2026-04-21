@@ -1,6 +1,6 @@
 /**
  * 权限判断 composable。
- * 详见 docs/core/10-认证授权与权限模型.md §4
+ * 详见 docs/pro/00-root-project.md §4
  */
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'

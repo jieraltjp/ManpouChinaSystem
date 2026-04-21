@@ -1,6 +1,6 @@
 /**
  * 认证 API 适配层。
- * 详见 docs/core/10-认证授权与权限模型.md §2
+ * 详见 docs/pro/00-root-project.md §2
  */
 import client from '@/api/client'
 import type { ApiResponse, PublicKeyVO, LoginVO, LoginCmd } from '@/types/api'

@@ -75,9 +75,9 @@ public class IdempotencyAspect {
                 redisKey, methodName(pjp), MDC.get(TraceFilter.TRACE_ID_KEY));
         try {
             return objectMapper.readValue(cached, resolveReturnType(pjp));
-        } catch (Exception ex) {
+         } catch (com.fasterxml.jackson.core.JsonProcessingException ex) {
             log.warn("[Idempotency] deserialize failed, key={}", redisKey, ex);
-            return null;
+            throw new RuntimeException("Failed to deserialize cached result: " + redisKey, ex);
         }
     }
 
@@ -109,7 +109,7 @@ public class IdempotencyAspect {
         try {
             String serialized = objectMapper.writeValueAsString(result);
             redisTemplate.opsForValue().set(redisKey, serialized, ttl, unit);
-        } catch (Exception ex) {
+         } catch (Exception ex) {
             log.warn("[Idempotency] cache write failed, key={}", redisKey, ex);
         }
     }
@@ -122,7 +122,7 @@ public class IdempotencyAspect {
             var request = ((org.springframework.web.context.request.ServletRequestAttributes) attrs)
                     .getRequest();
             return request.getHeader(IDEMPOTENCY_KEY_HEADER);
-        } catch (Exception ex) {
+         } catch (Exception ex) {
             log.debug("[Idempotency] cannot extract key from request", ex);
             return null;
         }

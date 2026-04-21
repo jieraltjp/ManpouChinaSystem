@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.manpou.finance.common.exception.BusinessException;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -112,7 +114,7 @@ public class KeyManagementService {
 
             return new KeyPairResult(privatePem, publicPem);
         } catch (NoSuchAlgorithmException ex) {
-            throw new IllegalStateException("RSA algorithm not available", ex);
+            throw new BusinessException("key.rsa-algorithm-unavailable", "RSA algorithm not available: " + ex.getMessage());
         }
     }
 
@@ -124,7 +126,7 @@ public class KeyManagementService {
             Files.writeString(file, privateKeyPem, StandardCharsets.UTF_8);
             log.debug("Private key written: {}", file);
         } catch (IOException ex) {
-            throw new IllegalStateException("Failed to write private key to filesystem", ex);
+            throw new BusinessException("key.filesystem-error", "Failed to write private key: " + ex.getMessage());
         }
     }
 

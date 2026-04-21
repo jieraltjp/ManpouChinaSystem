@@ -15,7 +15,7 @@ import java.util.List;
  * 密钥管理控制器（Admin 专用）。
  *
  * 安全说明：此接口必须仅对管理员开放（通过 RBAC 权限控制）。
- * 详见 docs/core/10-认证授权与权限模型.md §2.2
+ * 详见 docs/pro/00-root-project.md §2.2
  */
 @RestController
 @RequestMapping("/api/v1/admin/keys")

@@ -1,6 +1,6 @@
 /**
  * Axios 实例（自动注入 JWT + 错误处理）。
- * 详见 docs/core/10-认证授权与权限模型.md §3
+ * 详见 docs/pro/00-root-project.md §3
  */
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
