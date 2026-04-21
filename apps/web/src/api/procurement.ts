@@ -4,6 +4,16 @@
  */
 import client from './client'
 
+/** 报关类型枚举 — 与后端 BillingType 完全对齐 */
+export type BillingType = 'ZHE_LU_KAI_PIAO' | 'CHAO_HUI_TUI_SHUI' | 'NO_REFUND' | 'OTHER'
+
+export const BILLING_TYPE_OPTIONS: { value: BillingType; label: string }[] = [
+  { value: 'ZHE_LU_KAI_PIAO', label: '浙鲁开票' },
+  { value: 'CHAO_HUI_TUI_SHUI', label: '超慧退税' },
+  { value: 'NO_REFUND', label: '不退税' },
+  { value: 'OTHER', label: '其他' },
+]
+
 /** 发注单分页查询响应（v1.3.0 扩展字段） */
 export interface ProcurementPageVO {
   id: number
@@ -16,7 +26,7 @@ export interface ProcurementPageVO {
   priceRmb: number
   exchangeRate: number
   taxPoint: number
-  billingType?: string        // 报关类型（v1.3.0）
+  billingType?: BillingType  // 报关类型（v1.3.0）
   estimatedPriceJpy?: number
   customsRemarks?: string      // 报关备注（v1.3.0）
   instructionManual?: string   // 说明书（v1.3.0）
@@ -54,7 +64,7 @@ export interface CreateProcurementRequest {
   priceRmb: number
   exchangeRate: number
   taxPoint: number
-  billingType?: string
+  billingType?: BillingType
   customsRemarks?: string
   instructionManual?: string
   orderDate?: string
@@ -80,7 +90,7 @@ export interface UpdateProcurementRequest {
   priceRmb?: number
   exchangeRate?: number
   taxPoint?: number
-  billingType?: string
+  billingType?: BillingType
   customsRemarks?: string
   instructionManual?: string
   orderDate?: string

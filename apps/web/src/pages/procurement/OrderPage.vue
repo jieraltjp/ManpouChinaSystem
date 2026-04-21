@@ -141,22 +141,29 @@
     <!-- 详情抽屉 -->
     <el-drawer v-model="drawerVisible" title="发注单详情" size="600px" direction="rtl">
       <el-descriptions :column="2" border v-if="currentRow">
+        <el-descriptions-item label="关联工厂">{{ currentRow.factoryId || '-' }}</el-descriptions-item>
         <el-descriptions-item label="商品代码">{{ currentRow.productCode }}</el-descriptions-item>
+        <el-descriptions-item label="子货号">{{ currentRow.subProductCode || '-' }}</el-descriptions-item>
         <el-descriptions-item label="数量">{{ currentRow.quantity }}</el-descriptions-item>
+        <el-descriptions-item label="材质">{{ currentRow.material || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="需要检测">{{ currentRow.requiresQc ? '是' : '否' }}</el-descriptions-item>
         <el-descriptions-item label="人民币单价">{{ currentRow.priceRmb }}</el-descriptions-item>
         <el-descriptions-item label="汇率">{{ currentRow.exchangeRate }}</el-descriptions-item>
         <el-descriptions-item label="票点">{{ currentRow.taxPoint }}</el-descriptions-item>
         <el-descriptions-item label="估算批发价(JPY)">{{ currentRow.estimatedPriceJpy?.toLocaleString() }}</el-descriptions-item>
+        <el-descriptions-item label="报关类型">{{ billingTypeLabel(currentRow.billingType) }}</el-descriptions-item>
+        <el-descriptions-item label="报关备注" :span="2">{{ currentRow.customsRemarks || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="说明书" :span="2">{{ currentRow.instructionManual || '-' }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusType(currentRow.status)" size="small">
             {{ statusLabel(currentRow.status) }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="计费方式">{{ currentRow.billingType || '-' }}</el-descriptions-item>
         <el-descriptions-item label="客户公司">{{ currentRow.customerCompany || '-' }}</el-descriptions-item>
         <el-descriptions-item label="下单日">{{ currentRow.orderDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="厂家出货日">{{ currentRow.factoryShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="计划出货日">{{ currentRow.plannedShipDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="实际出货日">{{ currentRow.actualShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="商品担当">{{ currentRow.productLead || '-' }}</el-descriptions-item>
         <el-descriptions-item label="日本担当">{{ currentRow.japanLead || '-' }}</el-descriptions-item>
         <el-descriptions-item label="中国担当">{{ currentRow.chinaLead || '-' }}</el-descriptions-item>
@@ -172,23 +179,55 @@
     </el-drawer>
 
     <!-- 新建/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? '新规发注' : '编辑发注单'" width="640px">
+    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? '新规发注' : '编辑发注单'" width="800px">
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="110px">
+        <!-- 第一行：关联 + 商品 -->
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="关联工厂">
+              <el-input-number v-model="formData.factoryId" :min="1" placeholder="工厂ID" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="子货号">
+              <el-input v-model="formData.subProductCode" placeholder="如 re/wh/bk（颜色）" />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="商品代码" prop="productCode">
           <el-input v-model="formData.productCode" placeholder="如 de077" />
         </el-form-item>
-        <el-form-item label="数量" prop="quantity">
-          <el-input-number v-model="formData.quantity" :min="1" style="width: 100%" />
-        </el-form-item>
-        <el-form-item label="人民币单价" prop="priceRmb">
-          <el-input-number v-model="formData.priceRmb" :min="0" :precision="2" style="width: 100%" />
-        </el-form-item>
-        <el-form-item label="汇率" prop="exchangeRate">
-          <el-input-number v-model="formData.exchangeRate" :min="0.0001" :precision="4" style="width: 100%" />
-        </el-form-item>
-        <el-form-item label="票点" prop="taxPoint">
-          <el-input-number v-model="formData.taxPoint" :min="0.0001" :precision="4" style="width: 100%" />
-        </el-form-item>
+        <!-- 第二行：数量 + 材质 -->
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="数量" prop="quantity">
+              <el-input-number v-model="formData.quantity" :min="1" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="材质">
+              <el-input v-model="formData.material" placeholder="如 plastic/metal" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <!-- 第三行：价格 -->
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item label="人民币单价" prop="priceRmb">
+              <el-input-number v-model="formData.priceRmb" :min="0" :precision="2" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="汇率" prop="exchangeRate">
+              <el-input-number v-model="formData.exchangeRate" :min="0.0001" :precision="4" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="票点" prop="taxPoint">
+              <el-input-number v-model="formData.taxPoint" :min="0.0001" :precision="4" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="估算批发价">
           <div class="price-preview">
             <span class="price-value">{{ previewPriceJpy }}</span>
@@ -196,33 +235,91 @@
             <span class="price-formula">= (RMB ÷ {{ formData.taxPoint }} × 1.02 × 1.2) × {{ formData.exchangeRate }} × 1.05</span>
           </div>
         </el-form-item>
-        <el-form-item label="计费方式">
-          <el-input v-model="formData.billingType" placeholder="如 METHOD_A" />
-        </el-form-item>
-        <el-form-item label="客户公司">
-          <el-input v-model="formData.customerCompany" placeholder="客户公司名称" />
-        </el-form-item>
-        <el-form-item label="下单日">
-          <el-date-picker v-model="formData.orderDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
-        </el-form-item>
-        <el-form-item label="厂家出货日">
-          <el-date-picker v-model="formData.factoryShipDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
-        </el-form-item>
-        <el-form-item label="商品担当">
-          <el-input v-model="formData.productLead" placeholder="商品担当姓名" />
-        </el-form-item>
-        <el-form-item label="日本担当">
-          <el-input v-model="formData.japanLead" placeholder="日本担当姓名" />
-        </el-form-item>
-        <el-form-item label="中国担当">
-          <el-input v-model="formData.chinaLead" placeholder="中国担当姓名" />
-        </el-form-item>
-        <el-form-item label="计划出货日">
-          <el-date-picker v-model="formData.plannedShipDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
-        </el-form-item>
-        <el-form-item label="发送目的地">
-          <el-input v-model="formData.destination" placeholder="如 名古屋倉庫" />
-        </el-form-item>
+        <!-- 第四行：报关 + 检测 -->
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="报关类型">
+              <el-select v-model="formData.billingType" placeholder="选择报关类型" clearable style="width: 100%">
+                <el-option v-for="opt in BILLING_TYPE_OPTIONS" :key="opt.value" :value="opt.value" :label="opt.label" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="需要检测">
+              <el-switch v-model="formData.requiresQc" active-text="是" inactive-text="否" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <!-- 第五行：报关备注 + 说明书 -->
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="报关备注">
+              <el-input v-model="formData.customsRemarks" placeholder="报关备注" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="说明书">
+              <el-input v-model="formData.instructionManual" placeholder="说明书备注" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <!-- 第六行：客户公司 + 发送目的地 -->
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="客户公司">
+              <el-input v-model="formData.customerCompany" placeholder="客户公司名称" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="发送目的地">
+              <el-input v-model="formData.destination" placeholder="如 名古屋倉庫" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <!-- 第七行：担当 -->
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item label="商品担当">
+              <el-input v-model="formData.productLead" placeholder="商品担当" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="日本担当">
+              <el-input v-model="formData.japanLead" placeholder="日本担当" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="中国担当">
+              <el-input v-model="formData.chinaLead" placeholder="中国担当" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <!-- 第八行：日期 -->
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="下单日">
+              <el-date-picker v-model="formData.orderDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="厂家出货日">
+              <el-date-picker v-model="formData.factoryShipDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="计划出货日">
+              <el-date-picker v-model="formData.plannedShipDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="实际出货日">
+              <el-date-picker v-model="formData.actualShipDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <!-- 状态（仅更新模式） -->
         <el-form-item v-if="dialogMode === 'update'" label="状态" prop="status">
           <el-select v-model="formData.status" style="width: 100%">
             <el-option v-for="s in statusOptions" :key="s.value" :label="s.label" :value="s.value" />
@@ -241,7 +338,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, Clock, CircleCheck, Warning, Document } from '@element-plus/icons-vue'
-import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest } from '@/api/procurement'
+import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest, BILLING_TYPE_OPTIONS } from '@/api/procurement'
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -266,8 +363,10 @@ const statusOptions = [
   { value: 'エア便', label: 'エア便' },
   { value: 'メーカー直送', label: 'メーカー直送' },
   { value: '輸出', label: '輸出' },
+  { value: '国内通関', label: '国内通関' },
   { value: '通関', label: '通関' },
   { value: '日本着', label: '日本着' },
+  { value: '日本通関完了', label: '日本通関完了' },
   { value: '会計', label: '会計' },
   { value: '完了', label: '完了' },
   { value: '退货', label: '退货' },
@@ -305,12 +404,19 @@ const previewPriceJpy = computed(() => {
 })
 
 const defaultFormData = (): CreateProcurementRequest & { status?: string } => ({
+  factoryId: 0,
   productCode: '',
+  subProductCode: '',
+  material: '',
+  requiresQc: false,
   quantity: 1,
   priceRmb: 0,
   exchangeRate: 21.5,
   taxPoint: 1.1,
-  billingType: '',
+  billingType: undefined,
+  customsRemarks: '',
+  instructionManual: '',
+  actualShipDate: '',
   orderDate: '',
   factoryShipDate: '',
   plannedShipDate: '',
@@ -345,7 +451,6 @@ const formRules = {
     { required: true, message: '票点不能为空', trigger: 'blur' },
     { type: 'number', min: 0.0001, message: '票点必须为正数', trigger: 'blur' },
   ],
-  billingType: [{ max: 32, message: '计费方式最多 32 字符', trigger: 'blur' }],
   customerCompany: [{ max: 128, message: '客户公司最多 128 字符', trigger: 'blur' }],
   destination: [{ max: 128, message: '发送目的地最多 128 字符', trigger: 'blur' }],
 }
@@ -398,12 +503,19 @@ function onEdit(row: ProcurementPageVO | null) {
   dialogMode.value = 'update'
   currentRow.value = row  // 同步更新，避免直接编辑时 currentRow 为空
   Object.assign(formData, {
+    factoryId: row?.factoryId ?? 0,
     productCode: row?.productCode ?? '',
+    subProductCode: row?.subProductCode ?? '',
+    material: row?.material ?? '',
+    requiresQc: row?.requiresQc ?? false,
     quantity: row?.quantity ?? 1,
     priceRmb: row?.priceRmb ?? 0,
     exchangeRate: row?.exchangeRate ?? 21.5,
     taxPoint: row?.taxPoint ?? 1.1,
-    billingType: row?.billingType ?? '',
+    billingType: row?.billingType ?? undefined,
+    customsRemarks: row?.customsRemarks ?? '',
+    instructionManual: row?.instructionManual ?? '',
+    actualShipDate: row?.actualShipDate ?? '',
     orderDate: row?.orderDate ?? '',
     factoryShipDate: row?.factoryShipDate ?? '',
     plannedShipDate: row?.plannedShipDate ?? '',
@@ -446,12 +558,19 @@ async function onSubmit() {
     try {
       if (dialogMode.value === 'create') {
         const req: CreateProcurementRequest = {
+          factoryId: formData.factoryId || undefined,
           productCode: formData.productCode,
+          subProductCode: formData.subProductCode || undefined,
+          material: formData.material || undefined,
+          requiresQc: formData.requiresQc || undefined,
           quantity: formData.quantity,
           priceRmb: formData.priceRmb,
           exchangeRate: formData.exchangeRate,
           taxPoint: formData.taxPoint,
           billingType: formData.billingType || undefined,
+          customsRemarks: formData.customsRemarks || undefined,
+          instructionManual: formData.instructionManual || undefined,
+          actualShipDate: formData.actualShipDate || undefined,
           orderDate: formData.orderDate || undefined,
           factoryShipDate: formData.factoryShipDate || undefined,
           plannedShipDate: formData.plannedShipDate || undefined,
@@ -466,12 +585,19 @@ async function onSubmit() {
         ElMessage.success('发注单创建成功')
       } else if (currentRow.value) {
         const req: UpdateProcurementRequest = {
+          factoryId: formData.factoryId || undefined,
           productCode: formData.productCode,
+          subProductCode: formData.subProductCode || undefined,
+          material: formData.material || undefined,
+          requiresQc: formData.requiresQc || undefined,
           quantity: formData.quantity,
           priceRmb: formData.priceRmb,
           exchangeRate: formData.exchangeRate,
           taxPoint: formData.taxPoint,
           billingType: formData.billingType || undefined,
+          customsRemarks: formData.customsRemarks || undefined,
+          instructionManual: formData.instructionManual || undefined,
+          actualShipDate: formData.actualShipDate || undefined,
           orderDate: formData.orderDate || undefined,
           factoryShipDate: formData.factoryShipDate || undefined,
           plannedShipDate: formData.plannedShipDate || undefined,
@@ -523,6 +649,16 @@ function statusType(status: string): string {
     '退货': 'danger',
   }
   return statusTypeMap[status] ?? 'info'
+}
+
+function billingTypeLabel(val: string | undefined): string {
+  const map: Record<string, string> = {
+    ZHE_LU_KAI_PIAO: '浙鲁开票',
+    CHAO_HUI_TUI_SHUI: '超慧退税',
+    NO_REFUND: '不退税',
+    OTHER: '其他',
+  }
+  return val ? (map[val] ?? val) : '—'
 }
 
 onMounted(() => {
