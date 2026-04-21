@@ -16,8 +16,8 @@ import org.springframework.http.HttpStatus;
  *
  * 路径前缀 → 目标服务：
  * - /api/v1/auth/**           → user-service       （白名单，无需 JWT 鉴权）
- * - /api/v1/purchase-orders/** → procurement-service
- * - /api/v1/products/**      → allinone (18090)
+ * - /api/v1/procurements/**   → manpou-allinone (18090) — Phase 0
+ * - /api/v1/products/**      → manpou-allinone (18090)
  * - /api/v1/warehouse/**      → allinone (18090)
  * - /api/v1/customs/**        → allinone (18090)
  * - /api/v1/logistics/**      → allinone (18090)
@@ -34,7 +34,7 @@ public class RouteConfig {
     @Value("${gateway.route.user-service:http://localhost:18081}")
     private String userServiceUri;
 
-    @Value("${gateway.route.procurement-service:http://localhost:18083}")
+    @Value("${gateway.route.procurement-service:http://localhost:18090}")
     private String procurementServiceUri;
 
     @Value("${gateway.route.allinone-service:http://localhost:18090}")
@@ -48,12 +48,12 @@ public class RouteConfig {
             .route("user-service-auth", r -> r.path("/api/v1/auth/**")
                 .filters(f -> f.stripPrefix(0))
                 .uri(userServiceUri))
-            // 发注管理
-            .route("procurement-service", r -> r.path("/api/v1/purchase-orders/**")
+            // 发注管理（Phase 0 → manpou-allinone，Phase 1+ → 独立微服务）
+            .route("procurement", r -> r.path("/api/v1/procurements/**")
                 .filters(f -> f.stripPrefix(0)
-                    .circuitBreaker(c -> c.setName("procurementService").setFallbackUri("forward:/fallback"))
+                    .circuitBreaker(c -> c.setName("procurement").setFallbackUri("forward:/fallback"))
                     .retry(retry -> retry.setMethods(HttpMethod.GET).setRetries(3).setSeries(HttpStatus.Series.SERVER_ERROR)))
-                .uri(procurementServiceUri))
+                .uri(allinoneServiceUri))
             // 商品管理 → allinone
             .route("allinone-products", r -> r.path("/api/v1/products/**")
                 .filters(f -> f.stripPrefix(0)

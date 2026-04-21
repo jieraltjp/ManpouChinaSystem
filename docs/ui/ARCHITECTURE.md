@@ -1,6 +1,6 @@
 # 系统架构图
 
-> ManpouChinaSystem 完整架构（前端视角）
+> MANPOU 企业管理系统完整架构（前端视角）
 
 ---
 
@@ -25,15 +25,16 @@ graph TB
     end
 
     %% 后端服务层
-    subgraph Backend["后端服务层 (apps/*-service)"]
+    subgraph Backend["后端服务层 (Phase 0 → manpou-allinone + user-service)"]
+        ALLINONE["manpou-allinone\n:18090\n7领域合一"]
         USER["user-service\n:18081"]
-        PRODUCT["product-service\n:18082"]
-        PROC["procurement-service\n:18083"]
-        WAREHOUSE["warehouse-service\n:18084"]
-        CUSTOMS["customs-service\n:18085"]
-        LOGISTICS["logistics-service\n:18086"]
-        FINANCE["finance-service\n:18087"]
-        NOTIFY["notification-service\n:18088"]
+        PRODUCT["product-service\n:18082 ⚡Phase1+"]
+        PROC["procurement-service\n:18083 ⚡Phase1+"]
+        WAREHOUSE["warehouse-service\n:18084 ⚡Phase1+"]
+        CUSTOMS["customs-service\n:18085 ⚡Phase1+"]
+        LOGISTICS["logistics-service\n:18086 ⚡Phase1+"]
+        FINANCE["finance-service\n:18087 ⚡Phase1+"]
+        NOTIFY["notification-service\n:18088 ⚡Phase1+"]
     end
 
     %% 基础设施层
@@ -127,32 +128,35 @@ flowchart LR
 
 ## 4. 微服务端口映射
 
+> **Phase 0**：所有七域合一部署在 **manpou-allinone**（18090），前端直连。
+> **Phase 1+**：按 Kafka Topic 边界拆分各域为独立微服务（18083-18088），接入 API Gateway（18080）。
+
 ```mermaid
 graph LR
     subgraph Ports["服务端口"]
-        P81["user-service\n:18081"]
-        P82["product-service\n:18082"]
-        P83["procurement-service\n:18083"]
-        P84["warehouse-service\n:18084"]
-        P85["customs-service\n:18085"]
-        P86["logistics-service\n:18086"]
-        P87["finance-service\n:18087"]
-        P88["notification-service\n:18088"]
+        P90["manpou-allinone\n:18090 ✅ Phase0"]
+        P81["user-service\n:18081 ✅ Phase0"]
+        P83["procurement-service\n:18083 ⚡Phase1+"]
+        P84["warehouse-service\n:18084 ⚡Phase1+"]
+        P85["customs-service\n:18085 ⚡Phase1+"]
+        P86["logistics-service\n:18086 ⚡Phase1+"]
+        P87["finance-service\n:18087 ⚡Phase1+"]
+        P88["notification-service\n:18088 ⚡Phase1+"]
     end
 
     subgraph Clients["消费方"]
-        GW["API Gateway\n:18080"]
-        WEB["前端\n:13000"]
+        GW["API Gateway\n:18080 ⚡Phase1+"]
+        WEB["前端\n:13000 ✅ Phase0"]
     end
 
-    GW --> P81
-    GW --> P82
-    GW --> P83
-    GW --> P84
-    GW --> P85
-    GW --> P86
-    GW --> P87
-    GW --> P88
+    WEB --> P90
+    WEB --> P81
+    GW -.-> P83
+    GW -.-> P84
+    GW -.-> P85
+    GW -.-> P86
+    GW -.-> P87
+    GW -.-> P88
 
     WEB -.->|"dev proxy"| P81
     WEB -.->|"dev proxy"| P83

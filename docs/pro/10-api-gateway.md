@@ -68,7 +68,7 @@
 | 路径 | 目标服务 | 端口 | 鉴权 |
 |------|---------|------|------|
 | `/api/v1/auth/**` | user-service | 18081 | ❌ 白名单 |
-| `/api/v1/purchase-orders/**` | procurement-service | 18083 | ✅ JWT，熔断+重试 |
+| `/api/v1/procurements/**` | manpou-allinone | 18090 | ✅ JWT，熔断+重试 |
 | `/api/v1/products/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
 | `/api/v1/warehouse/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
 | `/api/v1/customs/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
