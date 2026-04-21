@@ -33,17 +33,13 @@
             <el-icon><ShoppingCart /></el-icon>
             <template #title>02 发注单</template>
           </el-menu-item>
-          <el-menu-item index="/procurement/factory">
-            <el-icon><OfficeBuilding /></el-icon>
-            <template #title>03 工厂管理</template>
-          </el-menu-item>
           <el-menu-item index="/procurement/inspection">
             <el-icon><CircleCheck /></el-icon>
-            <template #title>04 验货记录</template>
+            <template #title>03 验货记录</template>
           </el-menu-item>
           <el-menu-item index="/procurement/logistics">
             <el-icon><Van /></el-icon>
-            <template #title>05 调配计划</template>
+            <template #title>04 调配计划</template>
           </el-menu-item>
         </el-sub-menu>
       </el-menu>
@@ -89,7 +85,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, OfficeBuilding, CircleCheck, Van } from '@element-plus/icons-vue'
+import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()

@@ -6,8 +6,8 @@
 > **状态**: 已审计
 > **依据**: 业务流分析（6步重构） + `docs/发注管理体系升级.pdf`
 
-> ⚠️ **代码实现进度**: ReplenishmentDemand 🔴 新增骨架 · Procurement ✅ 已实现（需扩展字段）
-> · Product 🔴 需扩展货号结构 · Factory 🔴 新增 · QcRecord 🔴 升级为聚合根
+> ⚠️ **代码实现进度**: ReplenishmentDemand ✅ · Procurement ✅（v1.3.0 含 field sourcing + 工厂快速新建/编辑）
+> · Product 🔴 需扩展货号结构 · Factory ✅（无独立页面，内嵌于发注单页面）· QcRecord 🔴 升级为聚合根
 > · LogisticsPlan 🔴 新增 · DomesticCustoms 🔴 待定 · JapanCustoms 🔴 待定
 
 ---
@@ -24,8 +24,8 @@
 | 第二步 | 下单 | 采购根据需求信息向工厂下单，生成 Procurement |
 | 第三步 | 验收 | 货物到仓后验货，生成 QcRecord |
 | 第四步 | 调配 | 安排海运/空运/拼柜，生成 LogisticsPlan |
-| 第五步 | 国内报关 | 国内出口报关（字段待定） |
-| 第六步 | 日本清关 | 日本进口清关（字段待定） |
+| 第五步 | 国内报关 | 国内出口报关（TBD） |
+| 第六步 | 日本清关 | 日本进口清关（TBD） |
 
 **价格计算公式（前端实时计算，后端存结果）：**
 ```
@@ -67,9 +67,11 @@
 
 ### 3.2 第二步：下单（Procurement）
 
+> **工厂集成**（v1.3.0）：Factory 无独立页面，完全内嵌于发注单页面。发注表单内工厂选择器提供"新建"和"编辑"两个按钮，均在同一弹窗内完成工厂的创建/编辑/状态切换。
+
 | 字段 | 来源 | 必填 | 说明 |
 |------|------|------|------|
-| factoryId | 用户选择 | ✅ | 工厂（关联 Factory） |
+| factoryId | 用户选择 | ✅ | 工厂（关联 Factory）；选择器内嵌新建/编辑按钮 |
 | productCode | 自动带入 | ✅ | 主货号（来自 ReplenishmentDemand） |
 | subProductCode | 用户输入 | | 子货号/枝番（颜色） |
 | material | 用户输入 | | 材质 |

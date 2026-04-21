@@ -190,9 +190,19 @@
 
         <!-- 选择工厂（必填） -->
         <el-form-item label="选择工厂" prop="factoryId">
-          <el-select v-model="formData.factoryId" placeholder="请选择工厂" filterable style="width:100%" :disabled="dialogMode === 'update'">
-            <el-option v-for="f in factoryOptions" :key="f.id" :label="`${f.factoryName}（${f.factoryCode}）`" :value="f.id" />
-          </el-select>
+          <div class="factory-select-row">
+            <el-select v-model="formData.factoryId" placeholder="请选择工厂" filterable style="flex:1" :disabled="dialogMode === 'update'" @change="onFactorySelected">
+              <el-option v-for="f in factoryOptions" :key="f.id" :label="`${f.factoryName}（${f.factoryCode}）`" :value="f.id" />
+            </el-select>
+            <el-button size="small" :disabled="dialogMode === 'update'" @click="onFactoryNew">
+              <el-icon><Plus /></el-icon> 新建
+            </el-button>
+            <el-tooltip content="编辑选中工厂" placement="top">
+              <el-button size="small" :disabled="!formData.factoryId || dialogMode === 'update'" @click="onFactoryEditCurrent">
+                <el-icon><Edit /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </div>
         </el-form-item>
 
         <!-- 商品信息 -->
@@ -337,15 +347,46 @@
         <el-button type="primary" :loading="submitting" @click="onSubmit">保存</el-button>
       </template>
     </el-dialog>
+
+    <!-- 工厂新建/编辑弹窗 -->
+    <el-dialog v-model="factoryDialogVisible" :title="factoryDialogMode === 'create' ? '新增工厂' : '编辑工厂'" width="520px">
+      <el-form ref="factoryFormRef" :model="factoryFormData" :rules="factoryFormRules" label-width="110px">
+        <el-form-item label="工厂名称" prop="factoryName">
+          <el-input v-model="factoryFormData.factoryName" placeholder="工厂全称" />
+        </el-form-item>
+        <el-form-item label="工厂位置">
+          <el-input v-model="factoryFormData.location" placeholder="省/市，如 浙江省金华市" />
+        </el-form-item>
+        <el-form-item label="粗略位置">
+          <el-input v-model="factoryFormData.roughLocation" placeholder="工业区/镇/园区" />
+        </el-form-item>
+        <el-form-item label="联系人">
+          <el-input v-model="factoryFormData.contactName" placeholder="联系人姓名" />
+        </el-form-item>
+        <el-form-item label="联系电话">
+          <el-input v-model="factoryFormData.contactPhone" placeholder="手机或座机" />
+        </el-form-item>
+        <el-form-item v-if="factoryDialogMode === 'update'" label="状态">
+          <el-select v-model="factoryFormData.status" style="width:100%">
+            <el-option value="ACTIVE" label="合作中" />
+            <el-option value="INACTIVE" label="已停止" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="factoryDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="factorySubmitting" @click="onFactorySubmit">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
-import { Plus, Clock, CircleCheck, Warning, Document } from '@element-plus/icons-vue'
+import { Plus, Clock, CircleCheck, Warning, Document, Edit } from '@element-plus/icons-vue'
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest, BILLING_TYPE_OPTIONS } from '@/api/procurement'
-import { factoryApi, type FactoryPageVO } from '@/api/factory'
+import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest, type FactoryStatus } from '@/api/factory'
 import { demandApi, type DemandPageVO } from '@/api/demand'
 
 const loading = ref(false)
@@ -423,6 +464,80 @@ function onDemandChange(demandId: number | null) {
   formData.destination = d.destination || ''
   formData.japanLead = d.japanLead || ''
   formData.quantity = d.quantity
+}
+
+// ===== 工厂管理 =====
+const factoryDialogVisible = ref(false)
+const factoryDialogMode = ref<'create' | 'update'>('create')
+const factoryCurrentRow = ref<FactoryPageVO | null>(null)
+const factoryFormRef = ref<FormInstance>()
+const factorySubmitting = ref(false)
+
+const defaultFactoryForm = (): CreateFactoryRequest & { status?: FactoryStatus } => ({
+  factoryName: '',
+  location: '',
+  roughLocation: '',
+  contactName: '',
+  contactPhone: '',
+})
+
+const factoryFormData = reactive<CreateFactoryRequest & { status?: FactoryStatus }>(defaultFactoryForm())
+const factoryFormRules = {
+  factoryName: [{ required: true, message: '工厂名称不能为空', trigger: 'blur' }],
+}
+
+function onFactoryNew() {
+  factoryDialogMode.value = 'create'
+  Object.assign(factoryFormData, defaultFactoryForm())
+  factoryDialogVisible.value = true
+}
+
+/** 选中工厂变更 — 清空需求关联（避免混淆） */
+function onFactorySelected(_id: number | null) {
+  selectedDemandId.value = null
+}
+
+/** 编辑当前选中的工厂 */
+function onFactoryEditCurrent() {
+  if (!formData.factoryId) return
+  const factory = factoryOptions.value.find(f => f.id === formData.factoryId)
+  if (!factory) return
+  onFactoryEdit(factory)
+}
+
+function onFactoryEdit(row: FactoryPageVO) {
+  factoryDialogMode.value = 'update'
+  factoryCurrentRow.value = row
+  Object.assign(factoryFormData, {
+    factoryName: row.factoryName,
+    location: row.location || '',
+    roughLocation: row.roughLocation || '',
+    contactName: row.contactName || '',
+    contactPhone: row.contactPhone || '',
+    status: row.status,
+  })
+  factoryDialogVisible.value = true
+}
+
+async function onFactorySubmit() {
+  if (!factoryFormRef.value) return
+  await factoryFormRef.value.validate(async (valid: boolean) => {
+    if (!valid) return
+    factorySubmitting.value = true
+    try {
+      if (factoryDialogMode.value === 'create') {
+        await factoryApi.create(factoryFormData as CreateFactoryRequest)
+        ElMessage.success('工厂创建成功')
+      } else if (factoryCurrentRow.value) {
+        await factoryApi.update(factoryCurrentRow.value.id, factoryFormData as UpdateFactoryRequest)
+        ElMessage.success('更新成功')
+      }
+      factoryDialogVisible.value = false
+      await loadFactories()
+    } finally {
+      factorySubmitting.value = false
+    }
+  })
 }
 
 const activeCount = computed(() =>
@@ -873,5 +988,13 @@ onMounted(() => { loadData(); loadFactories(); loadDemands() })
   gap: 12px;
   justify-content: flex-end;
   background: #fff;
+}
+
+/* ── 工厂选择行 ── */
+.factory-select-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
 }
 </style>

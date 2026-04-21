@@ -45,12 +45,6 @@ const routes: RouteRecordRaw[] = [
             meta: { title: '发注单', requiresAuth: true },
           },
           {
-            path: 'factory',
-            name: 'Factory',
-            component: () => import('@/pages/procurement/FactoryPage.vue'),
-            meta: { title: '工厂管理', requiresAuth: true },
-          },
-          {
             path: 'inspection',
             name: 'Inspection',
             component: () => import('@/pages/procurement/InspectionPage.vue'),
