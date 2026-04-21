@@ -151,7 +151,7 @@
         <el-descriptions-item label="汇率">{{ currentRow.exchangeRate }}</el-descriptions-item>
         <el-descriptions-item label="票点">{{ currentRow.taxPoint }}</el-descriptions-item>
         <el-descriptions-item label="估算批发价(JPY)">{{ currentRow.estimatedPriceJpy?.toLocaleString() }}</el-descriptions-item>
-        <el-descriptions-item label="报关类型">{{ currentRow.billingType || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="报关类型">{{ billingTypeLabel(currentRow.billingType) }}</el-descriptions-item>
         <el-descriptions-item label="报关备注" :span="2">{{ currentRow.customsRemarks || '-' }}</el-descriptions-item>
         <el-descriptions-item label="说明书" :span="2">{{ currentRow.instructionManual || '-' }}</el-descriptions-item>
         <el-descriptions-item label="状态">
@@ -451,7 +451,6 @@ const formRules = {
     { required: true, message: '票点不能为空', trigger: 'blur' },
     { type: 'number', min: 0.0001, message: '票点必须为正数', trigger: 'blur' },
   ],
-  billingType: [{ max: 32, message: '计费方式最多 32 字符', trigger: 'blur' }],
   customerCompany: [{ max: 128, message: '客户公司最多 128 字符', trigger: 'blur' }],
   destination: [{ max: 128, message: '发送目的地最多 128 字符', trigger: 'blur' }],
 }
@@ -629,6 +628,16 @@ async function onSubmit() {
 
 function statusLabel(status: string): string {
   return statusOptions.find(s => s.value === status)?.label ?? status
+}
+
+function billingTypeLabel(val: string | undefined): string {
+  const map: Record<string, string> = {
+    ZHE_LU_KAI_PIAO: '浙鲁开票',
+    CHAO_HUI_TUI_SHUI: '超慧退税',
+    NO_REFUND: '不退税',
+    OTHER: '其他',
+  }
+  return val ? (map[val] ?? val) : '—'
 }
 
 function statusType(status: string): string {

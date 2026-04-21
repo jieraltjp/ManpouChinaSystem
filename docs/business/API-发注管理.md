@@ -71,7 +71,7 @@ POST /api/v1/procurements
 | priceRmb | 人民币价格 | ✅ | 人民币单价 |
 | exchangeRate | 汇率 | ✅ | CNY→JPY 汇率（默认 21.5） |
 | taxPoint | 票点 | | 默认 1.1 |
-| billingType | 计费方式 | | 报关类型（ZHE_LU_KAI_PIAO/CHAO_HUI_TUI_SHUI/NO_REFUND/OTHER） |
+| billingType | 报关类型 | | ZHE_LU_KAI_PIAO/CHAO_HUI_TUI_SHUI/NO_REFUND/OTHER |
 | customsRemarks | 报关备注 | | 报关备注 |
 | instructionManual | 说明书 | | 说明书内容 |
 | orderDate | 下单日 | | 1688 下单日期 |
