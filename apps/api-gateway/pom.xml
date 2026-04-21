@@ -105,6 +105,13 @@
             <artifactId>spring-security-config</artifactId>
         </dependency>
 
+        <!-- manpou-common 共享模块 -->
+        <dependency>
+            <groupId>com.manpou</groupId>
+            <artifactId>manpou-common</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>

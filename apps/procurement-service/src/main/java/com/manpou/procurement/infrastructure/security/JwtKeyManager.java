@@ -2,6 +2,7 @@ package com.manpou.procurement.infrastructure.security;
 
 import com.manpou.procurement.domain.port.SigningKeyPort;
 import com.manpou.common.time.Clock;
+import com.manpou.common.security.PemParser;
 import com.manpou.procurement.domain.model.SigningKey;
 import com.manpou.procurement.domain.model.SigningKeyStatus;
 import com.manpou.procurement.domain.repository.SigningKeyRepository;
@@ -17,14 +18,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -75,7 +70,7 @@ public class JwtKeyManager implements SigningKeyPort {
         if (dbKey.isPresent()) {
             currentKey = dbKey.get();
             this.privateKey = loadPrivateKeyFromPath(currentKey.getPrivateKeyPath());
-            this.publicKey = parsePublicKey(currentKey.getPublicKeyPem());
+            this.publicKey  = PemParser.parsePublicKey(currentKey.getPublicKeyPem());
             log.info("JWT key loaded from DB: kid={}", currentKey.getKid());
             return;
         }
@@ -88,7 +83,7 @@ public class JwtKeyManager implements SigningKeyPort {
 
         SigningKey bootstrap = new SigningKey();
         bootstrap.setKid(kid);
-        bootstrap.setPublicKeyPem(toPem(publicKey, "PUBLIC KEY"));
+        bootstrap.setPublicKeyPem(PemParser.toPublicPem(publicKey));
         bootstrap.setPrivateKeyPath(LEGACY_PRIVATE_KEY_PATH); // 引导密钥共享 classpath 路径
         bootstrap.setStatus(SigningKeyStatus.ACTIVE);
         bootstrap.setCreateTime(clock.nowLocalDateTime());
@@ -130,10 +125,10 @@ public class JwtKeyManager implements SigningKeyPort {
             if (!path.isAbsolute()) {
                 // 相对于 classpath 根目录
                 try (InputStream is = new ClassPathResource(relativePath).getInputStream()) {
-                    return parsePrivateKey(new String(is.readAllBytes(), StandardCharsets.UTF_8));
+                    return PemParser.parsePrivateKey(new String(is.readAllBytes(), StandardCharsets.UTF_8));
                 }
             }
-            return parsePrivateKey(Files.readString(path));
+            return PemParser.parsePrivateKey(Files.readString(path));
         } catch (IOException ex) {
             throw new IllegalStateException(
                 "RSA private key not found: " + relativePath, ex);
@@ -142,7 +137,7 @@ public class JwtKeyManager implements SigningKeyPort {
 
     private PrivateKey loadPrivateKeyFromClasspath(String path) {
         try (InputStream is = new ClassPathResource(path).getInputStream()) {
-            return parsePrivateKey(new String(is.readAllBytes(), StandardCharsets.UTF_8));
+            return PemParser.parsePrivateKey(new String(is.readAllBytes(), StandardCharsets.UTF_8));
         } catch (IOException ex) {
             throw new IllegalStateException(
                 "RSA private key not found on classpath: " + path, ex);
@@ -152,7 +147,7 @@ public class JwtKeyManager implements SigningKeyPort {
     private PublicKey loadPublicKeyFromClasspath(String path) {
         try (InputStream is = new ClassPathResource(path).getInputStream()) {
             String pem = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            return parsePublicKey(pem);
+            return PemParser.parsePublicKey(pem);
         } catch (IOException ex) {
             throw new IllegalStateException(
                 "RSA public key not found on classpath: " + path, ex);

@@ -2,6 +2,7 @@ package com.manpou.user.application;
 
 import com.manpou.user.domain.port.SigningKeyPort;
 import com.manpou.common.time.Clock;
+import com.manpou.common.security.PemParser;
 import com.manpou.user.domain.model.SigningKey;
 import com.manpou.user.domain.model.SigningKeyStatus;
 import com.manpou.user.domain.repository.SigningKeyRepository;
@@ -17,15 +18,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.KeyFactory;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,7 +39,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class KeyManagementService {
 
-    private static final int RSA_KEY_SIZE = 2048;
 
     private final SigningKeyRepository signingKeyRepository;
     private final SigningKeyPort signingKeyPort;
@@ -104,18 +98,8 @@ public class KeyManagementService {
     // ===== 内部方法 =====
 
     private KeyPairResult generateKeyPair(String kid) {
-        try {
-            KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
-            gen.initialize(RSA_KEY_SIZE);
-            java.security.KeyPair pair = gen.generateKeyPair();
-
-            String privatePem = toPrivatePem(pair.getPrivate());
-            String publicPem = toPublicPem(pair.getPublic());
-
-            return new KeyPairResult(privatePem, publicPem);
-        } catch (NoSuchAlgorithmException ex) {
-            throw new BusinessException("key.rsa-algorithm-unavailable", "RSA algorithm not available: " + ex.getMessage());
-        }
+        java.security.KeyPair pair = PemParser.generateKeyPair();
+        return new KeyPairResult(PemParser.toPrivatePem(pair.getPrivate()), PemParser.toPublicPem(pair.getPublic()));
     }
 
     private void writePrivateKey(String kid, String privateKeyPem) {
@@ -130,17 +114,7 @@ public class KeyManagementService {
         }
     }
 
-    private String toPrivatePem(PrivateKey key) {
-        String encoded = Base64.getMimeEncoder(64, "\n".getBytes(StandardCharsets.UTF_8))
-            .encodeToString(key.getEncoded()).trim();
-        return "-----BEGIN PRIVATE KEY-----\n" + encoded + "\n-----END PRIVATE KEY-----\n";
-    }
 
-    private String toPublicPem(PublicKey key) {
-        String encoded = Base64.getMimeEncoder(64, "\n".getBytes(StandardCharsets.UTF_8))
-            .encodeToString(key.getEncoded()).trim();
-        return "-----BEGIN PUBLIC KEY-----\n" + encoded + "\n-----END PUBLIC KEY-----\n";
-    }
 
     // ===== 内部记录 =====
 
