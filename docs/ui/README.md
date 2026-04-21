@@ -9,6 +9,7 @@
 | 文档 | 页面路径 | 说明 |
 |------|---------|------|
 | [ARCHITECTURE](ARCHITECTURE.md) | — | 系统架构图（前端视角） |
+| [05-UI改版方案-橙色商业主题](05-UI改版方案-橙色商业主题.md) | — | 橙色商业主题设计系统（CSS 变量 + 配色 + 组件规范） |
 | [01-登录页](pages/01-login.md) | `/login` | 企业平台登录 |
 | [02-仪表盘](pages/02-dashboard.md) | `/dashboard` | JWT 状态 + 快捷入口 |
 | [03-示例列表](pages/03-examples.md) | `/examples` | 基础 CRUD 演示 |

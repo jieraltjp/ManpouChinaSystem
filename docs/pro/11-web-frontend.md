@@ -118,21 +118,21 @@ apps/web/
 | 公钥获取 | GET | /api/v1/auth/public-key | user-service |
 | 密钥管理 | GET/POST | /api/v1/admin/keys | user-service |
 | 示例 CRUD | GET/POST/PUT/DELETE | /api/v1/examples | user-service |
-| 发注单列表 | GET | /api/v1/purchase-orders | manpou-allinone |
-| 发注单详情 | GET | /api/v1/purchase-orders/{id} | manpou-allinone |
-| 创建发注单 | POST | /api/v1/purchase-orders | manpou-allinone |
-| 更新发注单 | PUT | /api/v1/purchase-orders/{id} | manpou-allinone |
-| 删除发注单 | DELETE | /api/v1/purchase-orders/{id} | manpou-allinone |
+| 发注单列表 | GET | /api/v1/procurements | manpou-allinone |
+| 发注单详情 | GET | /api/v1/procurements/{id} | manpou-allinone |
+| 创建发注单 | POST | /api/v1/procurements | manpou-allinone |
+| 更新发注单 | PATCH | /api/v1/procurements/{id} | manpou-allinone |
+| 删除发注单 | DELETE | /api/v1/procurements/{id} | manpou-allinone |
 
 ### 6.2 待实现（采购单）
 
 | 接口 | 方法 | 路径 | 页面 |
 |------|------|------|------|
-| 采购单列表 | GET | /api/v1/purchase-orders | procurement-list |
-| 采购单详情 | GET | /api/v1/purchase-orders/{id} | procurement-detail |
-| 新建采购单 | POST | /api/v1/purchase-orders | procurement-form |
-| 提交采购单 | POST | /api/v1/purchase-orders/{id}/submit | procurement-list |
-| 审批采购单 | POST | /api/v1/purchase-orders/{id}/approve | procurement-list |
+| 采购单列表 | GET | /api/v1/procurements | procurement-list |
+| 采购单详情 | GET | /api/v1/procurements/{id} | procurement-detail |
+| 新建采购单 | POST | /api/v1/procurements | procurement-form |
+| 提交采购单 | POST | /api/v1/procurements/{id}/submit | procurement-list |
+| 审批采购单 | POST | /api/v1/procurements/{id}/approve | procurement-list |
 
 ---
 
@@ -193,7 +193,7 @@ npm run build
 - [ ] **本周**：理解现有项目结构（API 客户端/Store/路由/布局）
 - [ ] **本周**：理解 JWT 认证流程（登录→Token→请求拦截→401处理）
 - [ ] **本周**：搭建采购单列表页面框架
-- [ ] **下周二**：实现采购单列表 API 集成（GET /api/v1/purchase-orders）
+- [ ] **下周二**：实现采购单列表 API 集成（GET /api/v1/procurements）
 - [ ] **下周三**：实现新建采购单页面（POST）
 - [ ] **持续**：所有 API 调用通过 api/adapters/ 适配
 - [ ] **持续**：后端字段必须通过 Assembler 转换为前端 ViewModel

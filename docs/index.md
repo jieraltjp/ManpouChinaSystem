@@ -14,6 +14,8 @@ docs/
 ├── design/                      ← 构建指南（Step 1-6 · 过程文档）
 ├── role/                        ← 角色视角分析（6 角色 · 受众文档）
 ├── ui/                          ← 前端 UI 文档 + 架构图
+├── business/                    ← 业务 API 文档（发注管理等）
+├── database/                    ← 数据库设计文档（表结构/ER 图）
 └── check/                       ← 审计报告（自动生成）
 ```
 
@@ -50,7 +52,7 @@ docs/
 
 ---
 
-## desigin/ — 构建指南
+## design/ — 构建指南
 
 > **定位**：告诉开发者"如何从零构建这个项目"，6 步过程文档
 > **受众**：首次克隆项目的开发者
@@ -120,7 +122,7 @@ docs/
   → docs/pro/{编号}-{服务名}.md
 
 想知道如何从零构建？
-  → docs/desigin/README.md → 按 Step 1-6 顺序阅读
+  → docs/design/README.md → 按 Step 1-6 顺序阅读
 
 我是 {角色}，需要关注什么？
   → docs/role/{编号}-{角色}视角分析.md
