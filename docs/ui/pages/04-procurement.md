@@ -225,7 +225,7 @@ OrderPage.vue
 
 | 文件 | 作用 |
 |------|------|
-| `apps/web/src/pages/test/TestPage.vue` | 发注单管理组件 |
+| `apps/web/src/pages/procurement/OrderPage.vue` | 发注单管理组件（v1.3.0，含需求带入+工厂内嵌） |
 | `apps/web/src/api/procurement.ts` | API 类型与请求封装 |
 | `apps/manpou-allinone/.../ProcurementController.java` | 后端 REST 接口 |
 | `apps/manpou-allinone/.../ShipmentStatus.java` | 状态枚举 + FSM 规则 |
