@@ -1,73 +1,53 @@
 package com.manpou.allinone.logistics.interfaces.controller;
 
-import com.manpou.allinone.logistics.application.dto.LogisticsCreateCmd;
-import com.manpou.allinone.logistics.application.dto.LogisticsPageQuery;
-import com.manpou.allinone.logistics.application.dto.LogisticsQuery;
-import com.manpou.allinone.logistics.application.dto.LogisticsUpdateCmd;
-import com.manpou.allinone.logistics.application.usecase.LogisticsUseCase;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.common.result.Result;
+import com.manpou.allinone.logistics.application.dto.LogisticsPlanCreateCmd;
+import com.manpou.allinone.logistics.application.dto.LogisticsPlanPageQuery;
+import com.manpou.allinone.logistics.application.dto.LogisticsPlanQuery;
+import com.manpou.allinone.logistics.application.dto.LogisticsPlanUpdateCmd;
+import com.manpou.allinone.logistics.application.usecase.LogisticsPlanUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Logistics Controller。
- * 职责：参数校验、调用 Application 层、返回标准化响应。
- * 禁止在此层写业务逻辑。
+ * 调配计划 REST 接口。
  */
 @RestController
-@RequestMapping("/api/v1/logistics")
+@RequestMapping("/api/v1/logistics-plans")
 @RequiredArgsConstructor
 public class LogisticsController {
 
-    private final LogisticsUseCase logisticsUseCase;
+    private final LogisticsPlanUseCase logisticsPlanUseCase;
 
-    /**
-     * 分页查询Logistics列表。
-     */
     @GetMapping
-    public Result<Page<LogisticsPageQuery>> list(LogisticsQuery query) {
-        return Result.ok(logisticsUseCase.pageQuery(query));
+    public Result<Page<LogisticsPlanPageQuery>> list(LogisticsPlanQuery query) {
+        return Result.ok(logisticsPlanUseCase.pageQuery(query));
     }
 
-    /**
-     * 根据 ID 查询单个Logistics。
-     */
     @GetMapping("/{id}")
-    public Result<LogisticsPageQuery> get(@PathVariable Long id) {
-        return Result.ok(logisticsUseCase.getById(id));
+    public Result<LogisticsPlanPageQuery> get(@PathVariable("id") Long id) {
+        return Result.ok(logisticsPlanUseCase.getById(id));
     }
 
-    /**
-     * 创建Logistics。
-     * 使用 @Idempotent 注解实现幂等性，防止网络重试导致重复创建。
-     * 客户端需在请求头携带 X-Idempotency-Key: {uuid}
-     */
     @PostMapping
-    @Idempotent(ttl = 24 * 60 * 60)
-    public Result<Long> create(@Valid @RequestBody LogisticsCreateCmd cmd) {
-        Long id = logisticsUseCase.create(cmd);
-        return Result.ok("创建成功", id);
+    @Idempotent(ttl = 86400)
+    public Result<Long> create(@Valid @RequestBody LogisticsPlanCreateCmd cmd) {
+        return Result.ok(logisticsPlanUseCase.create(cmd));
     }
 
-    /**
-     * 更新Logistics。
-     */
-    @PutMapping("/{id}")
-    public Result<Void> update(@PathVariable Long id,
-                               @Valid @RequestBody LogisticsUpdateCmd cmd) {
-        logisticsUseCase.update(id, cmd);
-        return Result.ok("更新成功", null);
+    @PatchMapping("/{id}")
+    public Result<Void> update(@PathVariable("id") Long id,
+                               @RequestBody LogisticsPlanUpdateCmd cmd) {
+        logisticsPlanUseCase.update(id, cmd);
+        return Result.ok();
     }
 
-    /**
-     * 删除Logistics（逻辑删除）。
-     */
     @DeleteMapping("/{id}")
-    public Result<Void> delete(@PathVariable Long id) {
-        logisticsUseCase.delete(id);
-        return Result.ok("删除成功", null);
+    public Result<Void> delete(@PathVariable("id") Long id) {
+        logisticsPlanUseCase.delete(id);
+        return Result.ok();
     }
 }

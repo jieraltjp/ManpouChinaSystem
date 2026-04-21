@@ -1,10 +1,11 @@
 package com.manpou.allinone.logistics.domain.model;
 
 /**
- * 示例状态枚举。
- * 禁止使用魔法数字，必须引用此类定义的枚举常量。
+ * 调配计划状态枚举。
  */
 public enum LogisticsStatus {
-    ACTIVE,
-    INACTIVE
+    PLANNED,      // 已创建
+    BOOKED,       // 已订舱
+    IN_TRANSIT,   // 运输中
+    DELIVERED     // 已送达（终态）
 }

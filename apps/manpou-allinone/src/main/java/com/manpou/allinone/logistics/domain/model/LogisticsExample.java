@@ -28,7 +28,7 @@ public class LogisticsExample extends BaseEntity {
 
     @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
-    private LogisticsStatus status = LogisticsStatus.ACTIVE;
+    private LogisticsStatus status = LogisticsStatus.PLANNED;
 
     // ===== 领域方法（禁止外部直接修改字段） =====
 

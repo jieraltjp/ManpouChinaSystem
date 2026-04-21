@@ -7,8 +7,8 @@
 > **依据**: 业务流分析（6步重构） + `docs/发注管理体系升级.pdf`
 
 > ⚠️ **代码实现进度**: ReplenishmentDemand ✅ · Procurement ✅（v1.3.0 含 field sourcing + 工厂快速新建/编辑）
-> · Product 🔴 需扩展货号结构 · Factory ✅（无独立页面，内嵌于发注单页面）· QcRecord 🔴 升级为聚合根
-> · LogisticsPlan 🔴 新增 · DomesticCustoms 🔴 待定 · JapanCustoms 🔴 待定
+> · Product 🔴 需扩展货号结构 · Factory ✅（无独立页面，内嵌于发注单页面）· QcRecord ✅（聚合根 + UseCase + Controller）
+> · LogisticsPlan ✅（聚合根 + UseCase + Controller + 单元测试）· DomesticCustoms 🔴 待定 · JapanCustoms 🔴 待定
 
 ---
 
