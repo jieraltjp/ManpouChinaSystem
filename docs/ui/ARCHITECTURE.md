@@ -210,7 +210,9 @@ graph TB
         LOGIN["auth/LoginPage.vue\n/login"]
         DASH["dashboard/DashboardPage.vue\n/dashboard"]
         EXAMPLES["dashboard/ExamplesPage.vue\n/examples"]
-        TEST["test/TestPage.vue\n/test"]
+        DEMAND["procurement/DemandPage.vue\n/procurement/demand"]
+        ORDER["procurement/OrderPage.vue\n/procurement/order"]
+        FACTORY["procurement/FactoryPage.vue\n/procurement/factory"]
     end
 
     subgraph Layout["布局层 layouts/"]
