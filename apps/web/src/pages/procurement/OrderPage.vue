@@ -181,11 +181,25 @@
     <!-- 新建/编辑弹窗 -->
     <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? '新规发注' : '编辑发注单'" width="800px">
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="110px">
-        <!-- 第一行：关联 + 商品 -->
+        <!-- 关联需求（创建时可选） -->
+        <el-form-item v-if="dialogMode === 'create'" label="关联需求">
+          <el-select v-model="selectedDemandId" placeholder="从补货需求带入商品信息（可选）" clearable filterable style="width:100%" @change="onDemandChange">
+            <el-option v-for="d in demandOptions" :key="d.id" :label="`${d.demandCode} | ${d.productCode} | ${d.demandType === 'NEW_PURCHASE' ? '新品采购' : '补货'} | ${d.status}`" :value="d.id" />
+          </el-select>
+        </el-form-item>
+
+        <!-- 选择工厂（必填） -->
+        <el-form-item label="选择工厂" prop="factoryId">
+          <el-select v-model="formData.factoryId" placeholder="请选择工厂" filterable style="width:100%" :disabled="dialogMode === 'update'">
+            <el-option v-for="f in factoryOptions" :key="f.id" :label="`${f.factoryName}（${f.factoryCode}）`" :value="f.id" />
+          </el-select>
+        </el-form-item>
+
+        <!-- 商品信息 -->
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="关联工厂">
-              <el-input-number v-model="formData.factoryId" :min="1" placeholder="工厂ID" style="width: 100%" />
+            <el-form-item label="商品代码" prop="productCode">
+              <el-input v-model="formData.productCode" placeholder="如 de077" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -194,23 +208,24 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="商品代码" prop="productCode">
-          <el-input v-model="formData.productCode" placeholder="如 de077" />
-        </el-form-item>
-        <!-- 第二行：数量 + 材质 -->
         <el-row :gutter="16">
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="数量" prop="quantity">
               <el-input-number v-model="formData.quantity" :min="1" style="width: 100%" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="材质">
               <el-input v-model="formData.material" placeholder="如 plastic/metal" />
             </el-form-item>
           </el-col>
+          <el-col :span="8">
+            <el-form-item label="需要检测">
+              <el-switch v-model="formData.requiresQc" active-text="是" inactive-text="否" />
+            </el-form-item>
+          </el-col>
         </el-row>
-        <!-- 第三行：价格 -->
+        <!-- 价格 -->
         <el-row :gutter="16">
           <el-col :span="8">
             <el-form-item label="人民币单价" prop="priceRmb">
@@ -235,21 +250,12 @@
             <span class="price-formula">= (RMB ÷ {{ formData.taxPoint }} × 1.02 × 1.2) × {{ formData.exchangeRate }} × 1.05</span>
           </div>
         </el-form-item>
-        <!-- 第四行：报关 + 检测 -->
-        <el-row :gutter="16">
-          <el-col :span="12">
-            <el-form-item label="报关类型">
-              <el-select v-model="formData.billingType" placeholder="选择报关类型" clearable style="width: 100%">
-                <el-option v-for="opt in BILLING_TYPE_OPTIONS" :key="opt.value" :value="opt.value" :label="opt.label" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="需要检测">
-              <el-switch v-model="formData.requiresQc" active-text="是" inactive-text="否" />
-            </el-form-item>
-          </el-col>
-        </el-row>
+        <!-- 报关类型 -->
+        <el-form-item label="报关类型">
+          <el-select v-model="formData.billingType" placeholder="选择报关类型" clearable style="width: 100%">
+            <el-option v-for="opt in BILLING_TYPE_OPTIONS" :key="opt.value" :value="opt.value" :label="opt.label" />
+          </el-select>
+        </el-form-item>
         <!-- 第五行：报关备注 + 说明书 -->
         <el-row :gutter="16">
           <el-col :span="12">
@@ -339,6 +345,8 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, Clock, CircleCheck, Warning, Document } from '@element-plus/icons-vue'
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest, BILLING_TYPE_OPTIONS } from '@/api/procurement'
+import { factoryApi, type FactoryPageVO } from '@/api/factory'
+import { demandApi, type DemandPageVO } from '@/api/demand'
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -386,6 +394,37 @@ const pagination = reactive({
 
 const tableRows = ref<ProcurementPageVO[]>([])
 
+// 工厂下拉
+const factoryOptions = ref<FactoryPageVO[]>([])
+async function loadFactories() {
+  try {
+    const res = await factoryApi.list({ page: 0, pageSize: 200 })
+    factoryOptions.value = (res.data.data as { content: FactoryPageVO[] }).content || []
+  } catch { /* handled by interceptor */ }
+}
+
+// 需求下拉（仅 PENDING）
+const demandOptions = ref<DemandPageVO[]>([])
+const selectedDemandId = ref<number | null>(null)
+async function loadDemands() {
+  try {
+    const res = await demandApi.list({ page: 0, pageSize: 200, status: 'PENDING' })
+    demandOptions.value = (res.data.data as { content: DemandPageVO[] }).content || []
+  } catch { /* handled by interceptor */ }
+}
+
+/** 选中需求 → 自动带入 productCode / subProductCode / destination / japanLead / quantity */
+function onDemandChange(demandId: number | null) {
+  if (!demandId) return
+  const d = demandOptions.value.find(x => x.id === demandId)
+  if (!d) return
+  formData.productCode = d.productCode
+  formData.subProductCode = d.subProductCode || ''
+  formData.destination = d.destination || ''
+  formData.japanLead = d.japanLead || ''
+  formData.quantity = d.quantity
+}
+
 const activeCount = computed(() =>
   tableRows.value.filter(r => r.status !== '完了' && r.status !== '退货').length,
 )
@@ -404,7 +443,7 @@ const previewPriceJpy = computed(() => {
 })
 
 const defaultFormData = (): CreateProcurementRequest & { status?: string } => ({
-  factoryId: 0,
+  factoryId: undefined,
   productCode: '',
   subProductCode: '',
   material: '',
@@ -431,6 +470,7 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string } => ({
 const formData = reactive<CreateProcurementRequest & { status?: string }>(defaultFormData())
 
 const formRules = {
+  factoryId: [{ required: true, message: '请选择工厂', trigger: 'change' }],
   productCode: [
     { required: true, message: '商品代码不能为空', trigger: 'blur' },
     { max: 32, message: '商品代码最多 32 字符', trigger: 'blur' },
@@ -490,6 +530,7 @@ function onReset() {
 
 function onNew() {
   dialogMode.value = 'create'
+  selectedDemandId.value = null
   Object.assign(formData, defaultFormData())
   dialogVisible.value = true
 }
@@ -501,9 +542,10 @@ function onView(row: ProcurementPageVO) {
 
 function onEdit(row: ProcurementPageVO | null) {
   dialogMode.value = 'update'
-  currentRow.value = row  // 同步更新，避免直接编辑时 currentRow 为空
+  currentRow.value = row
+  selectedDemandId.value = null
   Object.assign(formData, {
-    factoryId: row?.factoryId ?? 0,
+    factoryId: row?.factoryId ?? undefined,
     productCode: row?.productCode ?? '',
     subProductCode: row?.subProductCode ?? '',
     material: row?.material ?? '',
@@ -642,8 +684,10 @@ function statusType(status: string): string {
     'エア便': 'success',
     'メーカー直送': 'success',
     '輸出': 'success',
+    '国内通関': 'success',
     '通関': 'success',
     '日本着': 'success',
+    '日本通関完了': 'success',
     '会計': 'warning',
     '完了': 'info',
     '退货': 'danger',
@@ -661,9 +705,7 @@ function billingTypeLabel(val: string | undefined): string {
   return val ? (map[val] ?? val) : '—'
 }
 
-onMounted(() => {
-  loadData()
-})
+onMounted(() => { loadData(); loadFactories(); loadDemands() })
 </script>
 
 <style scoped>
