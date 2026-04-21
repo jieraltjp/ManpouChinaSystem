@@ -5,9 +5,9 @@
 > **依据**: 业务流分析（6步重构） + `docs/发注管理体系升级.pdf`
 
 > **代码实现进度**:
-> Procurement ✅ 已实现（需扩展字段） · Product 🔴 需扩展货号结构
-> · ReplenishmentDemand 🔴 新增 · Factory 🔴 新增 · QcRecord 🔴 升级为聚合根
-> · LogisticsPlan 🔴 新增 · DomesticCustoms 🔴 待定 · JapanCustoms 🔴 待定
+> Procurement ✅ 已实现（v1.3.0，含 factoryId/subProductCode/billingType 等） · Product 🔴 待开发
+> · ReplenishmentDemand ✅ · Factory ✅（无独立页面，内嵌于发注单） · QcRecord ✅（聚合根）
+> · LogisticsPlan ✅（聚合根） · DomesticCustoms 🔴 待定 · JapanCustoms 🔴 待定
 
 ---
 
@@ -16,11 +16,11 @@
 | 变更类型 | 实体 | 说明 |
 |----------|------|------|
 | **新增** | `ReplenishmentDemand` | 补货需求单聚合根，解决"未定"状态双重语义问题 |
-| **新增** | `Factory` | 工厂聚合根，解决工厂信息内联在 Procurement 的问题 |
-| **扩展** | `Product` | 新增 masterCode/subCode（主/子货号）+ colorName + material + productCategory |
-| **扩展** | `Procurement` | 新增 factoryId + subProductCode + material + billingType + customsRemarks + instructionManual + actualShipDate |
+| **新增** | `Factory` | 工厂聚合根（无独立页面，内嵌于发注单），解决工厂信息内联在 Procurement 的问题 |
+| **扩展** | `Product` | 新增 masterCode/subCode（主/子货号）+ colorName + material + productCategory（待开发） |
+| **扩展** | `Procurement` | v1.3.0 新增 factoryId + subProductCode + material + requiresQc + billingType + customsRemarks + instructionManual + actualShipDate |
 | **升级** | `QcRecord` | 从值对象升级为独立聚合根，补全箱数/尺寸/序列号/净重/毛重/含税价/验收标准 |
-| **新增** | `BillingType` | 替换 billingMethod，定义浙鲁开票/超慧退税/不退税等枚举 |
+| **新增** | `BillingType` | 替换 billingMethod，定义浙鲁开票/超慧退税/不退税/其他枚举 |
 | **新增** | `ProductCategory` | OEM/普货/厂家出口 三种商品类型 |
 | **新增** | `BoxDimension` | 箱子尺寸值对象（长/宽/高） |
 | **新增** | `DomesticCustomsRecord` | 国内报关记录（字段待定） |
@@ -115,48 +115,35 @@ public enum FactoryStatus {
 ```
 Procurement（聚合根）
 ├── id: Long
-├── factoryId: Long                  # 关联工厂ID（新增）
+├── factoryId: Long                  # 关联工厂ID（v1.3.0 新增）
 ├── productCode: String              # 主货号
-├── subProductCode: String           # 子货号/枝番（颜色，如 odn012-re）（新增）
+├── subProductCode: String           # 子货号/枝番（颜色，如 odn012-re）（v1.3.0 新增）
+├── material: String                 # 材质（v1.3.0 新增）
+├── requiresQc: Boolean              # 是否需要检测（v1.3.0 新增）
 ├── quantity: Integer                # 订购数量
 ├── priceRmb: BigDecimal             # 人民币单价
 ├── exchangeRate: BigDecimal         # CNY→JPY 汇率
 ├── taxPoint: BigDecimal             # 票点（默认 1.1）
-├── billingType: BillingType         # 报关类型（替换 billingMethod）（新增）
+├── billingType: BillingType         # 报关类型（v1.3.0 替换 billingMethod）
+├── estimatedPriceJpy: BigDecimal    # 估算批发价 JPY（前端计算存储）
+├── customsRemarks: String           # 报关备注（v1.3.0 新增）
+├── instructionManual: String         # 说明书（v1.3.0 新增）
 ├── orderDate: LocalDate             # 下单日
-├── plannedShipDate: LocalDate       # 预计出货日（交货期）
-├── actualShipDate: LocalDate        # 实际出货日（新增）
 ├── factoryShipDate: LocalDate        # 厂家出货日
-├── material: String                 # 材质（新增）
+├── plannedShipDate: LocalDate       # 预计出货日（交货期）
+├── actualShipDate: LocalDate        # 实际出货日（v1.3.0 新增）
 ├── productLead: String              # 商品担当
 ├── japanLead: String                # 日本担当
 ├── chinaLead: String                # 中国担当
 ├── destination: String               # 发送目的地
 ├── customerCompany: String           # 客户公司
-├── instructionManual: String         # 说明书（新增）
-├── customsRemarks: String           # 报关备注（新增）
 ├── status: ShipmentStatus            # 状态
-├── qcType: QcType                   # 验货方式
-├── qcResult: QcResult               # 验货结果
-├── qcRecordId: Long                 # 验收记录ID（升级为聚合根引用）（变更）
-├── logisticsPlanId: Long            # 调配计划ID（新增）
-├── containerId: Long                # 货柜ID
-├── financeId: Long                  # 财务结算ID
-├── createdBy: String
-├── createdAt: LocalDateTime
-├── updatedAt: LocalDateTime
-│
-├── 计算属性（只读，非持久化）
-│   └── estimatedPriceJpy = (priceRmb / taxPoint × 1.02 × 1.2) × exchangeRate × 1.05
+├── createBy: String
+├── createTime: LocalDateTime
+├── updateTime: LocalDateTime
 │
 └── 领域方法（状态推进）
-    ├── submitQc(type)               # 提交验货
-    ├── approveQc()                  # 验货通过
-    ├── rejectQc()                   # 验货不通过（触发退货路径）
-    ├── assignLogistics(plan)        # 分配调配计划
-    ├── loadToContainer()            # 装柜
-    ├── settle()                     # 财务结算
-    └── close()                      # 终态（完了后禁止任何变更）
+    └── moveTo(status)               # 推进状态（由操作员在页面触发，完了为终态）
 ```
 
 ---
@@ -257,39 +244,46 @@ QcRecord（聚合根）
 ```
 LogisticsPlan（聚合根）
 ├── id: Long
+├── planCode: String                 # 流水号（如 L-20260421-001）
 ├── procurementId: Long              # 关联采购单ID（可为空，拼柜时）
-├── planType: LogisticsPlanType     # SEA(海运) | AIR(空运) | CONSOLIDATION(拼柜)
-├── factoryId: Long                 # 关联工厂ID（新增）
-├── productCode: String              # 货号（新增）
-├── cargoSize: String               # 货物尺寸（新增）
-├── cargoWeight: BigDecimal          # 货物重量（新增）
-├── requiresQc: Boolean             # 货物是否需要检测（新增）
+├── factoryId: Long                 # 关联工厂ID
+├── productCode: String              # 货号
+├── subProductCode: String           # 子货号/颜色
+├── planType: PlanType             # SEA(海运) | AIR(空运) | CONSOLIDATION(拼柜)
 ├── status: LogisticsStatus         # PLANNED | BOOKED | IN_TRANSIT | DELIVERED
-├── containerId: Long               # 关联货柜ID（装柜后赋值）
-├── poolId: Long                   # 关联拼柜池ID（拼柜后赋值）
+├── cargoLengthCm: BigDecimal        # 长(cm)
+├── cargoWidthCm: BigDecimal         # 宽(cm)
+├── cargoHeightCm: BigDecimal        # 高(cm)
+├── cargoVolumeCbm: BigDecimal       # 体积(m³)
+├── cargoWeightKg: BigDecimal        # 重量(kg)
+├── quantity: Integer               # 数量
+├── requiresQc: Boolean             # 是否需要检测
+├── containerId: Long               # 货柜ID（装柜后赋值）
+├── poolId: Long                   # 拼柜池ID（拼柜后赋值）
 ├── estimatedShipDate: LocalDate
 ├── actualShipDate: LocalDate
-├── createdBy: String
-├── createdAt: LocalDateTime
-├── updatedAt: LocalDateTime
+├── remarks: String
+├── createBy: String
+├── createTime: LocalDateTime
+├── updateTime: LocalDateTime
 │
 └── 领域方法
-    ├── bookContainer(type)         # 订舱
-    ├── assignToPool(poolId)        # 划入拼柜池
-    └── loadToContainer(containerId) # 装柜
+    ├── calculateVolume()           # 计算体积 = 长×宽×高 / 1_000_000
+    ├── updateStatus(newStatus)     # 推进状态（终态 DELIVERED 后禁止变更）
+    └── isTerminal()                 # 检查是否为终态
 ```
 
-**LogisticsPlanType 枚举（新增）：**
+**PlanType 枚举：**
 
 ```java
-public enum LogisticsPlanType {
+public enum PlanType {
     SEA,             // 海运
     AIR,             // 空运
     CONSOLIDATION    // 拼柜
 }
 ```
 
-**LogisticsStatus 枚举（新增）：**
+**LogisticsStatus 枚举：**
 
 ```java
 public enum LogisticsStatus {
@@ -704,10 +698,8 @@ Procurement
 ├── factoryId → Factory
 ├── productCode → Product.masterCode
 ├── subProductCode → Product.subCode
-├── qcRecordId → QcRecord
-├── logisticsPlanId → LogisticsPlan
-├── containerId → Container
-└── financeId → FinanceRecord
+├── status: ShipmentStatus           # 19种状态，含完了终态
+└── 验货/调配/货柜/财务 → QcRecord / LogisticsPlan / Container / FinanceRecord（业务关联，非外键约束）
 
 Product
 ├── masterCode + subCode（复合唯一键）
