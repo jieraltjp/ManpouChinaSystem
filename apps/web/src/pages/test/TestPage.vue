@@ -15,7 +15,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <el-icon class="stat-icon" color="#409eff"><Document /></el-icon>
+            <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#E8650A"><Document /></el-icon></div>
             <div>
               <div class="stat-value">{{ pagination.total }}</div>
               <div class="stat-label">发注单总数</div>
@@ -26,7 +26,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <el-icon class="stat-icon" color="#e6a23c"><Clock /></el-icon>
+            <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#E8650A"><Clock /></el-icon></div>
             <div>
               <div class="stat-value">{{ activeCount }}</div>
               <div class="stat-label">进行中</div>
@@ -37,7 +37,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <el-icon class="stat-icon" color="#67c23a"><CircleCheck /></el-icon>
+            <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#16A34A"><CircleCheck /></el-icon></div>
             <div>
               <div class="stat-value">{{ completedCount }}</div>
               <div class="stat-label">已完成</div>
@@ -48,7 +48,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <el-icon class="stat-icon" color="#f56c6c"><Warning /></el-icon>
+            <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#DC2626"><Warning /></el-icon></div>
             <div>
               <div class="stat-value">{{ returnedCount }}</div>
               <div class="stat-label">退货</div>
@@ -545,9 +545,20 @@ onMounted(() => {
 
 .page-title {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #303133;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+.page-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 20px;
+  background: var(--color-primary);
+  border-radius: 2px;
+  margin-right: 10px;
+  vertical-align: middle;
 }
 
 .filter-card :deep(.el-card__body) {
@@ -558,8 +569,29 @@ onMounted(() => {
   margin-bottom: 4px;
 }
 
+/* ── 统计卡 ── */
 .stat-card {
-  border-radius: 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--color-primary-pale);
 }
 
 .stat-content {
@@ -568,31 +600,49 @@ onMounted(() => {
   gap: 14px;
 }
 
+.stat-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-primary-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 .stat-icon {
-  font-size: 32px;
+  font-size: 22px;
 }
 
 .stat-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: #303133;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary);
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
   font-size: 13px;
-  color: #909399;
+  color: var(--text-secondary);
   margin-top: 4px;
+  font-weight: 500;
 }
 
 .table-card :deep(.el-table__row) {
   cursor: pointer;
 }
 
+/* ── 商品代码：橙色 monospace 标签 ── */
 .product-code {
-  color: #409eff;
-  font-family: monospace;
-  font-size: 13px;
+  color: var(--color-primary);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--color-primary-pale);
+  padding: 3px 9px;
+  border-radius: 5px;
+  border: 1px solid rgba(232,101,10,0.2);
 }
 
 .pagination-wrap {
@@ -601,39 +651,49 @@ onMounted(() => {
   justify-content: flex-end;
 }
 
+/* ── 价格预览 ── */
 .price-preview {
   display: flex;
   align-items: baseline;
   gap: 6px;
-  color: #303133;
+  color: var(--text-primary);
   line-height: 1;
+  background: var(--color-primary-pale);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(232,101,10,0.15);
 }
 
 .price-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: #409eff;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .price-unit {
   font-size: 13px;
-  color: #909399;
+  color: var(--color-primary-dark);
+  font-weight: 600;
 }
 
 .price-formula {
-  font-size: 12px;
-  color: #c0c4cc;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 4px;
 }
 
+/* ── 抽屉底部按钮区 ── */
 .drawer-actions {
   position: absolute;
   bottom: 20px;
   left: 0;
   right: 0;
   padding: 16px 24px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--border-color);
   display: flex;
   gap: 12px;
   justify-content: flex-end;
+  background: #fff;
 }
 </style>

@@ -15,7 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * Spring Security 配置。
  *
- * 详见 docs/core/10-认证授权与权限模型.md §4.3
+ * 详见 docs/pro/19-manpou-allinone.md §认证授权
  */
 @Configuration
 @EnableWebSecurity

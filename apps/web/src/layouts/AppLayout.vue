@@ -3,8 +3,8 @@
     <!-- 侧边栏 -->
     <el-aside :width="isCollapsed ? '64px' : '220px'" class="sidebar">
       <div class="logo">
-        <span v-if="!isCollapsed">企业平台</span>
-        <span v-else>EP</span>
+        <span v-if="!isCollapsed">漫普中国</span>
+        <span v-else>MC</span>
       </div>
 
       <el-menu
@@ -94,42 +94,83 @@ function onCommand(cmd: string) {
   height: 100vh;
 }
 
+/* ── 侧边栏 ── */
 .sidebar {
-  background: #304156;
+  background: linear-gradient(180deg, #1E2533 0%, #252D3D 100%);
   transition: width 0.3s;
   overflow: hidden;
+  box-shadow: 2px 0 16px rgba(0,0,0,0.18);
+  border-right: none;
 }
 
+/* ── Logo 区：橙色渐变 ── */
 .logo {
-  height: 60px;
-  line-height: 60px;
-  text-align: center;
+  height: 64px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
   color: #fff;
-  font-size: 18px;
-  font-weight: bold;
-  background: #263445;
+  letter-spacing: 1px;
   white-space: nowrap;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(232,101,10,0.35);
 }
 
+/* ── 菜单通用 ── */
 .sidebar-menu {
   border-right: none;
   background: transparent;
 }
 
+/* 菜单项 */
+.sidebar-menu :deep(.el-menu-item) {
+  color: #C0C4CC;
+  border-radius: 0 8px 8px 0;
+  margin: 2px 8px;
+  width: calc(100% - 16px);
+  transition: all var(--transition-fast);
+}
+.sidebar-menu :deep(.el-menu-item:hover) {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+
+/* 激活项：橙色左边框 + 淡橙背景 */
+.sidebar-menu :deep(.el-menu-item.is-active) {
+  background: rgba(232,101,10,0.15) !important;
+  border-left: 3px solid var(--color-primary);
+  color: var(--color-primary-light) !important;
+}
+.sidebar-menu :deep(.el-menu-item.is-active .el-icon) {
+  color: var(--color-primary-light) !important;
+}
+
+/* ── 顶栏 ── */
 .header {
-  background: #fff;
+  background: var(--bg-header);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
 .collapse-btn {
   font-size: 20px;
   cursor: pointer;
-  color: #606266;
+  color: var(--text-secondary);
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+.collapse-btn:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-pale);
 }
 
 .user-info {
@@ -137,15 +178,22 @@ function onCommand(cmd: string) {
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+.user-info:hover {
+  background: var(--color-primary-pale);
 }
 
 .username {
   font-size: 14px;
-  color: #303133;
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 .main-content {
-  background: #f5f7fa;
+  background: var(--bg-page);
   padding: 20px;
 }
 </style>

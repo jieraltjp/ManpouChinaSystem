@@ -1,6 +1,7 @@
 package com.manpou.allinone.interfaces.controller;
 
-import com.manpou.allinone.common.result.Result;
+import com.manpou.common.result.Result;
+import com.manpou.common.security.TokenConstants;
 import com.manpou.allinone.infrastructure.security.JwtKeyManager;
 import com.manpou.allinone.infrastructure.security.JwtService;
 import jakarta.validation.Valid;
@@ -15,7 +16,7 @@ import java.util.List;
  * 认证接口。
  *
  * 职责：登录（获取 Token）、刷新 Token、获取公钥。
- * 详见 docs/core/10-认证授权与权限模型.md §2
+ * 详见 docs/pro/19-manpou-allinone.md §认证授权
  */
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -38,7 +39,7 @@ public class AuthController {
     public Result<PublicKeyVO> publicKey() {
         return Result.ok(new PublicKeyVO(
             jwtKeyManager.getCurrentKid(),
-            "RS256",
+            TokenConstants.ALGORITHM_RS256,
             jwtKeyManager.getPublicKeyPem()
         ));
     }
@@ -59,7 +60,7 @@ public class AuthController {
         String token = jwtService.generateAccessToken(userId, username, roles, permissions, tenantId, kid);
         log.info("User {} logged in, issued RS256 token (kid={})", username, kid);
 
-        return Result.ok(new LoginVO(token, 900, "Bearer", kid));
+        return Result.ok(new LoginVO(token, TokenConstants.ACCESS_TOKEN_TTL_SECONDS, TokenConstants.BEARER_PREFIX, kid));
     }
 
     // ==================== DTO ====================

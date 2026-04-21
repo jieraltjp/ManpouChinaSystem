@@ -1,6 +1,6 @@
 package com.manpou.allinone.interfaces.controller;
 
-import com.manpou.allinone.common.result.Result;
+import com.manpou.common.result.Result;
 import com.manpou.allinone.product.application.KeyManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -14,7 +14,7 @@ import java.util.List;
  * 密钥管理控制器（Admin 专用）。
  *
  * 安全说明：此接口必须仅对管理员开放（通过 RBAC 权限控制）。
- * 详见 docs/core/10-认证授权与权限模型.md §2.2
+ * 详见 docs/pro/19-manpou-allinone.md §认证授权
  */
 @RestController
 @RequestMapping("/api/v1/admin/keys")

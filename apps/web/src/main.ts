@@ -1,3 +1,6 @@
+// 橙色商业主题 CSS 变量（必须优先引入）
+import './assets/variables.css'
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'

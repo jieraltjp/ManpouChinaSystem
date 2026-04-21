@@ -3,8 +3,8 @@
     <el-card class="login-card" shadow="hover">
       <template #header>
         <div class="card-header">
-          <h2>企业应用平台</h2>
-          <p class="subtitle">Enterprise Platform</p>
+          <h2>漫普中国管理系统</h2>
+          <p class="subtitle">Manpou China System</p>
         </div>
       </template>
 
@@ -100,36 +100,88 @@ async function handleLogin() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background:
+    radial-gradient(ellipse 70% 55% at 18% 28%, rgba(232,101,10,0.14) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 45% at 82% 72%, rgba(255,140,58,0.10) 0%, transparent 65%),
+    linear-gradient(160deg, #F7F8FA 0%, #FEF3E7 55%, #FFF8F0 100%);
 }
 
 .login-card {
-  width: 400px;
-  border-radius: 12px;
+  width: 420px;
+  border-radius: var(--radius-lg);
+  border-top: 4px solid var(--color-primary);
+  box-shadow: var(--shadow-lg);
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(12px);
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .card-header h2 {
   margin: 0;
-  font-size: 22px;
-  color: #303133;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 2px;
   text-align: center;
 }
 
+.card-header h2::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 20px;
+  background: var(--color-primary);
+  border-radius: 3px;
+  margin-right: 10px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
 .subtitle {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: #909399;
-  text-align: center;
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
 }
 
 .login-btn {
   width: 100%;
-  height: 42px;
+  height: 46px;
   font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  border: none;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 14px rgba(232,101,10,0.38);
+  transition: all var(--transition-normal);
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(232,101,10,0.48);
+  filter: brightness(1.05);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(232,101,10,0.28);
 }
 
 .hint {
   text-align: center;
   margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
 }
 </style>

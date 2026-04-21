@@ -1,0 +1,225 @@
+/* ============================================================
+   ManpouChinaSystem 橙色商业主题 — CSS 变量系统
+   ============================================================ */
+
+:root {
+  /* ── 主色系（橙色 — 品牌核心） ── */
+  --color-primary:        #E8650A;
+  --color-primary-light:  #FF8C3A;
+  --color-primary-dark:   #C4520A;
+  --color-primary-pale:   #FFF3EB;
+
+  /* ── 页面结构 ── */
+  --bg-page:              #F7F8FA;
+  --bg-card:              #FFFFFF;
+  --bg-sidebar:           #1E2533;
+  --bg-header:            #FFFFFF;
+
+  /* ── 边框与分割 ── */
+  --border-color:         #E8ECF1;
+  --border-color-dark:    #D1D5DB;
+
+  /* ── 文字层级 ── */
+  --text-primary:         #1A1A2E;
+  --text-secondary:       #6B7280;
+  --text-muted:          #9CA3AF;
+
+  /* ── 阴影系统 ── */
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:   0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg:   0 12px 32px rgba(232,101,10,0.12), 0 4px 8px rgba(0,0,0,0.06);
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03);
+
+  /* ── 圆角 ── */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+  --radius-xl:  20px;
+
+  /* ── 间距 ── */
+  --spacing-xs:  4px;
+  --spacing-sm:  8px;
+  --spacing-md:  16px;
+  --spacing-lg:  24px;
+  --spacing-xl:  32px;
+
+  /* ── 过渡 ── */
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:  400ms ease;
+}
+
+/* ============================================================
+   Element Plus 组件覆盖
+   ============================================================ */
+
+/* 主要按钮 */
+.el-button--primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%) !important;
+  border-color: var(--color-primary) !important;
+}
+.el-button--primary:hover,
+.el-button--primary:focus {
+  background: var(--color-primary-light) !important;
+  border-color: var(--color-primary-light) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(232,101,10,0.35) !important;
+}
+.el-button--primary:active {
+  background: var(--color-primary-dark) !important;
+  border-color: var(--color-primary-dark) !important;
+  transform: translateY(0);
+  box-shadow: none !important;
+}
+
+/* Tag — 警告（橙黄系） */
+.el-tag--warning {
+  background: #FEF3C7 !important;
+  border-color: #FCD34D !important;
+  color: #92400E !important;
+}
+
+/* Tag — 信息（橙色系，统一信息语义） */
+.el-tag--info {
+  background: var(--color-primary-pale) !important;
+  border-color: var(--color-primary-light) !important;
+  color: var(--color-primary-dark) !important;
+}
+
+/* Tag — 主要（橙色系） */
+.el-tag--primary {
+  background: var(--color-primary-pale) !important;
+  border-color: var(--color-primary-light) !important;
+  color: var(--color-primary-dark) !important;
+}
+
+/* Tag — 通用圆角 */
+.el-tag {
+  border-radius: 20px !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  padding: 0 10px !important;
+  height: 24px !important;
+  line-height: 22px !important;
+}
+
+/* 输入框聚焦边框 */
+.el-input__wrapper:focus-within,
+.el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--color-primary) inset !important;
+}
+.el-input__inner:focus {
+  color: var(--text-primary) !important;
+}
+
+/* 表格表头 */
+.el-table th.el-table__cell {
+  background: #F9FAFB !important;
+  color: var(--text-secondary) !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  border-bottom: 2px solid var(--color-primary-pale) !important;
+}
+
+/* 表格悬停行 */
+.el-table__body tr:hover > td.el-table__cell {
+  background: var(--color-primary-pale) !important;
+}
+
+/* 表格选中行 */
+.el-table__body .current-row > td.el-table__cell {
+  background: #FDE9D4 !important;
+}
+
+/* 对话框头部 */
+.el-dialog__header {
+  border-bottom: 1px solid var(--border-color) !important;
+  margin-right: 0 !important;
+  padding-bottom: 14px !important;
+}
+.el-dialog__title {
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  color: var(--text-primary) !important;
+}
+
+/* 下拉菜单 */
+.el-select .el-input.is-focus .el-input__wrapper {
+  box-shadow: 0 0 0 1px var(--color-primary) inset !important;
+}
+.el-select-dropdown__item.is-hovering {
+  background: var(--color-primary-pale) !important;
+}
+.el-select-dropdown__item.is-selected {
+  color: var(--color-primary) !important;
+  font-weight: 600 !important;
+}
+
+/* 分页当前页 */
+.el-pagination.is-background .el-pager li.is-active {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+}
+.el-pagination.is-background .el-pager li:hover {
+  color: var(--color-primary) !important;
+}
+
+/* 日期选择器 */
+.el-date-editor.el-input__wrapper:focus-within {
+  box-shadow: 0 0 0 1px var(--color-primary) inset !important;
+}
+
+/* ============================================================
+   全局基础样式
+   ============================================================ */
+
+/* 页面背景 */
+body {
+  background: var(--bg-page);
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 链接 */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--color-primary-light);
+}
+
+/* 文字选中 */
+::selection {
+  background: var(--color-primary-pale);
+  color: var(--color-primary-dark);
+}
+
+/* 滚动条 — 细长橙色 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-page);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color-dark);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-light);
+}
+
+/* 页面标题通用样式 */
+.page-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}

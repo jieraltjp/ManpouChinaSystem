@@ -42,7 +42,7 @@ import java.util.UUID;
  * 2. 若无记录：从 classpath 引导（兼容旧部署）
  * 3. 若有记录：从文件系统加载对应私钥
  *
- * 详见 docs/core/10-认证授权与权限模型.md §2.2
+ * 详见 docs/pro/19-manpou-allinone.md §认证授权
  */
 @Slf4j
 @Component
@@ -136,19 +136,24 @@ public class JwtKeyManager implements SigningKeyPort {
     // ===== 私钥加载 =====
 
     private PrivateKey loadPrivateKeyFromPath(String relativePath) {
+        // 优先检查 classpath（兼容打包进 jar 的密钥）
+        if (!relativePath.startsWith("/")) {
+            try (InputStream is = new ClassPathResource(relativePath).getInputStream()) {
+                return parsePrivateKey(new String(is.readAllBytes(), StandardCharsets.UTF_8));
+            } catch (IOException classpathEx) {
+                // classpath 没有，尝试文件系统
+            }
+        }
+        // 文件系统路径（绝对路径或外部挂载路径）
         try {
             Path path = Path.of(keyDirectory, relativePath.replace("keys/", ""));
-            if (!path.isAbsolute()) {
-                // 相对于 classpath 根目录
-                try (InputStream is = new ClassPathResource(relativePath).getInputStream()) {
-                    return parsePrivateKey(new String(is.readAllBytes(), StandardCharsets.UTF_8));
-                }
+            if (Files.exists(path)) {
+                return parsePrivateKey(Files.readString(path));
             }
-            return parsePrivateKey(Files.readString(path));
-        } catch (IOException ex) {
-            throw new IllegalStateException(
-                "RSA private key not found: " + relativePath, ex);
+        } catch (IOException fsEx) {
+            // ignore
         }
+        throw new IllegalStateException("RSA private key not found: " + relativePath);
     }
 
     private PrivateKey loadPrivateKeyFromClasspath(String path) {
