@@ -212,7 +212,9 @@ graph TB
         EXAMPLES["dashboard/ExamplesPage.vue\n/examples"]
         DEMAND["procurement/DemandPage.vue\n/procurement/demand"]
         ORDER["procurement/OrderPage.vue\n/procurement/order"]
-        FACTORY["procurement/OrderPage.vue\n工厂内嵌（无独立页面）"]
+        INSPECTION["procurement/InspectionPage.vue\n/procurement/inspection"]
+        LOGISTICS["procurement/LogisticsPage.vue\n/procurement/logistics"]
+        FACTORY["工厂内嵌于 OrderPage.vue\n（无独立页面）"]
     end
 
     subgraph Layout["布局层 layouts/"]

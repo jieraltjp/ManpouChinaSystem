@@ -13,8 +13,17 @@
 | [01-登录页](pages/01-login.md) | `/login` | MANPOU 登录 |
 | [02-仪表盘](pages/02-dashboard.md) | `/dashboard` | JWT 状态 + 快捷入口 |
 | [03-示例列表](pages/03-examples.md) | `/examples` | 基础 CRUD 演示 |
-| [04-采购单管理](pages/04-procurement.md) | `/procurement/order` | 发注单管理（OrderPage.vue） |
+| [04-发注单管理](pages/04-procurement.md) | `/procurement/order` | 发注单管理（OrderPage.vue） |
 | [06-发注管理UI设计-步骤1-4](06-发注管理UI设计-步骤1-4.md) | — | 发注管理全链路UI设计（补货/发注单/工厂/验货/调配） |
+
+### 发注管理子路由（`/procurement/*`）
+
+| 路由 | 组件 | 说明 |
+|------|------|------|
+| `/procurement/demand` | DemandPage.vue | 补货需求单 |
+| `/procurement/order` | OrderPage.vue | 发注单管理 |
+| `/procurement/inspection` | InspectionPage.vue | 验货记录 |
+| `/procurement/logistics` | LogisticsPage.vue | 调配计划 |
 
 ---
 
@@ -38,10 +47,13 @@
 ## 路由速查
 
 ```
-/login          → LoginPage.vue          → 无需认证
-/dashboard      → DashboardPage.vue      → 需要认证
-/examples       → ExamplesPage.vue       → 需要认证
-/procurement/order → OrderPage.vue      → 需要认证（发注单管理）
+/login                       → LoginPage.vue         → 无需认证
+/dashboard                   → DashboardPage.vue     → 需要认证
+/examples                    → ExamplesPage.vue      → 需要认证
+/procurement/demand          → DemandPage.vue        → 需要认证（补货需求）
+/procurement/order           → OrderPage.vue         → 需要认证（发注单）
+/procurement/inspection      → InspectionPage.vue    → 需要认证（验货记录）
+/procurement/logistics       → LogisticsPage.vue     → 需要认证（调配计划）
 ```
 
 ---
@@ -55,7 +67,10 @@
 │  ────────  │                                 │
 │  仪表盘    │         <RouterView />           │
 │  示例列表  │                                 │
-│  采购单管理│                                 │
+│  补货需求  │                                 │
+│  发注单    │                                 │
+│  验货记录  │                                 │
+│  调配计划  │                                 │
 └────────────┴─────────────────────────────────┘
 侧边栏 220px   顶栏 60px   内容区 #f5f7fa
 ```

@@ -63,6 +63,7 @@
     <el-card class="table-card" shadow="never">
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
         <el-table-column prop="planCode" label="调配编号" width="160" />
+        <el-table-column prop="factoryId" label="工厂ID" width="100" align="center" />
         <el-table-column prop="productCode" label="货号" width="120">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
@@ -231,6 +232,7 @@
         <el-descriptions-item label="货号">
           <span class="product-code">{{ currentRow.productCode }}</span>
         </el-descriptions-item>
+        <el-descriptions-item label="工厂ID">{{ currentRow.factoryId ?? '-' }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="logisticsStatusType(currentRow.status)" size="small">{{ logisticsStatusLabel(currentRow.status) }}</el-tag>
         </el-descriptions-item>

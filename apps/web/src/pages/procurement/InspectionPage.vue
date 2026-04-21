@@ -257,6 +257,9 @@
         <el-form-item label="备注">
           <el-input v-model="form.remarks" type="textarea" :rows="2" placeholder="备注信息" />
         </el-form-item>
+        <el-form-item label="缺陷照片">
+          <el-input v-model="form.images" type="textarea" :rows="2" placeholder="照片URL，多个用换行分隔（JSON数组格式）" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
@@ -298,6 +301,15 @@
         <el-descriptions-item label="是否退税">{{ currentRow.taxRefund ? '是' : '否' }}</el-descriptions-item>
         <el-descriptions-item label="验货标准" :span="2">{{ currentRow.qcStandard || '-' }}</el-descriptions-item>
         <el-descriptions-item label="备注" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="缺陷照片" :span="2">
+          <span v-if="!currentRow.images">-</span>
+          <template v-else>
+            <span v-for="(url, i) in (currentRow.images || '').split('\n').filter(Boolean)" :key="i">
+              <a :href="url" target="_blank" style="color:#409eff;word-break:break-all;">{{ url }}</a>
+              <br />
+            </span>
+          </template>
+        </el-descriptions-item>
         <el-descriptions-item label="创建人">{{ currentRow.createBy || '-' }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ currentRow.createTime || '-' }}</el-descriptions-item>
       </el-descriptions>
@@ -348,6 +360,7 @@ const form = reactive({
   taxRefund: false,
   qcStandard: '',
   remarks: '',
+  images: '',
   destination: '',
   quantity: undefined as number | undefined,
   orderDate: '',
@@ -438,7 +451,7 @@ function onNew() {
     boxCount: undefined, boxLengthCm: undefined, boxWidthCm: undefined,
     boxHeightCm: undefined, netWeightPerUnit: undefined, grossWeight: undefined,
     taxInclusivePrice: undefined, material: '', taxRefund: false,
-    qcStandard: '', remarks: '', destination: '', quantity: undefined, orderDate: '', sellerName: '',
+    qcStandard: '', remarks: '', images: '', destination: '', quantity: undefined, orderDate: '', sellerName: '',
   })
   procurementList.value = []
   dialogVisible.value = true
@@ -477,6 +490,7 @@ async function onSubmit() {
       taxRefund: form.taxRefund,
       qcStandard: form.qcStandard || undefined,
       remarks: form.remarks || undefined,
+      images: form.images || undefined,
       destination: form.destination || undefined,
       quantity: form.quantity,
       orderDate: form.orderDate || undefined,

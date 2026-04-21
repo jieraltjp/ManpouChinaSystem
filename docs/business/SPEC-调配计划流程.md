@@ -208,8 +208,8 @@ DELETE /api/v1/consolidation-pools/{poolId}/items/{itemId}
 - [x] ✅ UseCase（LogisticsPlanUseCase.java）
 - [x] ✅ Controller（LogisticsController.java）
 - [x] ✅ `@/api/logistics.ts` 前端 API 客户端
-- [x] ✅ `LogisticsPage.vue` 列表页（接真实 API）
+- [x] ✅ `LogisticsPage.vue` 列表页（接真实 API，含 factoryId 列）
 - [x] ✅ 新增调配弹窗
-- [x] ✅ 调配详情抽屉
+- [x] ✅ 调配详情抽屉（含 factoryId）
 - [x] ✅ SPEC 进度更新至 `SPEC-发注管理流程.md`
 - [x] ✅ 单元测试（LogisticsPlanUseCaseTest，12 个测试用例）

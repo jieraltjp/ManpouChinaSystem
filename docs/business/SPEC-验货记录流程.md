@@ -145,17 +145,17 @@ DELETE /api/v1/qc-records/{id}
 
 > 🔴 待实现  ✅ 已实现
 
-- [ ] 🔴 `qc_record` 数据库表（含 BaseEntity 审计字段）
-- [ ] 🔴 `QcRecord` 实体（聚合根）
-- [ ] 🔴 `QcResult` 枚举（PASS / FAIL）
-- [ ] 🔴 `QcStatus` 枚举（PENDING / COMPLETED / RETURN_REQUESTED）
-- [ ] 🔴 `QcRecordRepository` 接口
-- [ ] 🔴 `QcRecordAssembler` 转换器
-- [ ] 🔴 `QcRecordCreateCmd` / `QcRecordUpdateCmd` / `QcRecordPageQuery` DTO
-- [ ] 🔴 `QcRecordUseCase` 业务用例
-- [ ] 🔴 `QcRecordController` REST 接口
-- [ ] 🔴 `@/api/inspection.ts` 前端 API 客户端
-- [ ] 🔴 `InspectionPage.vue` 列表页（接真实 API）
-- [ ] 🔴 新规验货弹窗（关联采购单 + 自动带入）
-- [ ] 🔴 验货详情抽屉
-- [ ] 🔴 SPEC 进度更新至 `SPEC-发注管理流程.md`
+- [ ] 🔴 `qc_record` 数据库表（实体已定义，JPA 自动建表）
+- [x] ✅ `QcRecord` 实体（聚合根，28字段）
+- [x] ✅ `QcResult` 枚举（PASS / FAIL）
+- [x] ✅ `QcStatus` 枚举（PENDING / COMPLETED / RETURN_REQUESTED）
+- [x] ✅ `QcRecordRepository` 接口
+- [x] ✅ `QcRecordAssembler` 转换器
+- [x] ✅ `QcRecordCreateCmd` / `QcRecordUpdateCmd` / `QcRecordPageQuery` DTO
+- [x] ✅ `QcRecordUseCase` 业务用例
+- [x] ✅ `QcRecordController` REST 接口
+- [x] ✅ `@/api/inspection.ts` 前端 API 客户端
+- [x] ✅ `InspectionPage.vue` 列表页（接真实 API，含 images 字段）
+- [x] ✅ 新规验货弹窗（关联采购单 + 自动带入）
+- [x] ✅ 验货详情抽屉（含 images 展示）
+- [x] ✅ SPEC 进度更新至 `SPEC-发注管理流程.md`
