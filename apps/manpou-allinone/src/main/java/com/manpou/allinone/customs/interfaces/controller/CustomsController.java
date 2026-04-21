@@ -6,7 +6,7 @@ import com.manpou.allinone.customs.application.dto.CustomsQuery;
 import com.manpou.allinone.customs.application.dto.CustomsUpdateCmd;
 import com.manpou.allinone.customs.application.usecase.CustomsUseCase;
 import com.manpou.allinone.common.annotation.Idempotent;
-import com.manpou.allinone.common.result.Result;
+import com.manpou.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -314,14 +314,14 @@
                 <version>${spring-boot.version}</version>
             </dependency>
             <!-- ========== 服务韧性：Resilience4j（熔断/重试/限流） ========== -->
-            <!-- 详见 docs/core/11-服务韧性设计.md -->
+            <!-- 详见 docs/pro/00-root-project.md -->
             <dependency>
                 <groupId>io.github.resilience4j</groupId>
                 <artifactId>resilience4j-spring-boot3</artifactId>
                 <version>2.2.0</version>
             </dependency>
             <!-- ========== 安全：Spring Security + JWT ========== -->
-            <!-- 详见 docs/core/10-认证授权与权限模型.md -->
+            <!-- 详见 docs/pro/00-root-project.md -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-security</artifactId>

@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
  * - JPA 持久化：通过反射（{@link jakarta.persistence.Access#FIELD}）读写私有字段
  * - 业务层：新对象通过默认构造器创建，再调用 setter 注入（由领域方法引导）
  *
- * @see <a href="docs/core/10-认证授权与权限模型.md">认证授权规范 §2.2</a>
+ * @see <a href="docs/pro/02-user-service.md">Phase 0 user-service §认证授权</a>
  */
 @Entity
 @Table(name = "signing_key", indexes = {

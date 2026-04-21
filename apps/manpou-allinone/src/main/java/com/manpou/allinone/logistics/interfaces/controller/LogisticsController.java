@@ -6,7 +6,7 @@ import com.manpou.allinone.logistics.application.dto.LogisticsQuery;
 import com.manpou.allinone.logistics.application.dto.LogisticsUpdateCmd;
 import com.manpou.allinone.logistics.application.usecase.LogisticsUseCase;
 import com.manpou.allinone.common.annotation.Idempotent;
-import com.manpou.allinone.common.result.Result;
+import com.manpou.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

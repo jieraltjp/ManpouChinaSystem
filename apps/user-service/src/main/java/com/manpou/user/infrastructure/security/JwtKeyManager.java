@@ -40,7 +40,7 @@ import java.util.UUID;
  * 2. 若无记录：从 classpath 引导（兼容旧部署）
  * 3. 若有记录：从文件系统加载对应私钥
  *
- * 详见 docs/core/10-认证授权与权限模型.md §2.2
+ * 详见 docs/pro/02-user-service.md §认证授权
  */
 @Slf4j
 @Component

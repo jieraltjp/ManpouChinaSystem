@@ -15,8 +15,8 @@
 │              渐变背景 (#667eea → #764ba2)        │
 │                                                  │
 │         ┌──────────────────────────┐            │
-│         │    企业应用平台            │            │
-│         │    Enterprise Platform    │            │
+│         │  MANPOU 企业管理系统      │            │
+│         │    MANPOU Enterprise      │            │
 │         ├──────────────────────────┤            │
 │         │  用户名                   │            │
 │         │  [________________________] │            │
@@ -68,8 +68,8 @@
     <el-card class="login-card" shadow="hover">
       <template #header>
         <div class="card-header">
-          <h2>企业应用平台</h2>
-          <p class="subtitle">Enterprise Platform</p>
+          <h2>MANPOU 企业管理系统</h2>
+          <p class="subtitle">MANPOU Enterprise</p>
         </div>
       </template>
 

@@ -6,7 +6,7 @@ import com.manpou.allinone.warehouse.application.dto.WarehouseQuery;
 import com.manpou.allinone.warehouse.application.dto.WarehouseUpdateCmd;
 import com.manpou.allinone.warehouse.application.usecase.WarehouseUseCase;
 import com.manpou.allinone.common.annotation.Idempotent;
-import com.manpou.allinone.common.result.Result;
+import com.manpou.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

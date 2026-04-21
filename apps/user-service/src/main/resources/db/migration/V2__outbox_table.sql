@@ -2,7 +2,7 @@
 -- Flyway 迁移脚本：Outbox 消息表
 -- 文件命名：V{版本号}__{简短描述}.sql
 -- 版本号使用 4 位数字，如 V0001、V0002
--- 详见 docs/core/12a-Saga与Outbox模式.md §3.2
+-- 详见 docs/pro/02-user-service.md §Outbox 模式
 -- ============================================================
 
 -- Outbox 表：用于可靠消息投递（Outbox 模式）

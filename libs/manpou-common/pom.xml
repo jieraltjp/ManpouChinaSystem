@@ -17,6 +17,8 @@
         <lombok.version>1.18.44</lombok.version>
         <jackson.version>2.17.0</jackson.version>
         <slf4j.version>2.0.13</slf4j.version>
+        <spring-boot.version>3.2.5</spring-boot.version>
+        <spring-cloud-alibaba.version>2023.0.1.2</spring-cloud-alibaba.version>
     </properties>
 
     <dependencies>
@@ -35,6 +37,24 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
+        </dependency>
+        <!-- Spring Boot auto-configuration (for ConfigSourceAutoConfiguration) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <!-- Spring context (for Environment abstraction) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>6.1.7</version>
+        </dependency>
+        <!-- Nacos SDK (for NacosConfigSource) -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+            <version>${spring-cloud-alibaba.version}</version>
         </dependency>
     </dependencies>
 

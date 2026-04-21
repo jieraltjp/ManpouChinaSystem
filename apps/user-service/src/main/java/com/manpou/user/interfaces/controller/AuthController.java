@@ -19,7 +19,7 @@ import java.util.Map;
  * 认证接口。
  *
  * 职责：登录（获取 Token）、刷新 Token、获取公钥。
- * 详见 docs/core/10-认证授权与权限模型.md §2
+ * 详见 docs/pro/02-user-service.md §认证授权
  */
 @Slf4j
 @RestController
@@ -32,7 +32,7 @@ public class AuthController {
 
     /**
      * 获取 RSA 公钥（前端用于验签 RS256 Token）。
-     * 详见 docs/core/10-认证授权与权限模型.md §2.2
+     * 详见 docs/pro/02-user-service.md §认证授权.2
      */
     @GetMapping("/public-key")
     public Result<PublicKeyVO> publicKey() {

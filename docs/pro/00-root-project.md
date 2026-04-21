@@ -1,4 +1,4 @@
-# 项目概览：ManpouChinaSystem（满铺中国系统）
+# 项目概览：ManpouChinaSystem（MANPOU 企业管理系统）
 
 > **文档角色**：架构师视角 → 项目全局
 > **对应角色文档**：`docs/role/02-架构师视角分析.md`
