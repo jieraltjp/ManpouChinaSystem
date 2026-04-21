@@ -1,6 +1,6 @@
 package com.manpou.warehouse.infrastructure.config;
 
-import com.manpou.warehouse.common.time.Clock;
+import com.manpou.common.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;

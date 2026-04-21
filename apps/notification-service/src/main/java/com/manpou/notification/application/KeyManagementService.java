@@ -1,7 +1,7 @@
 package com.manpou.notification.application;
 
 import com.manpou.notification.domain.port.SigningKeyPort;
-import com.manpou.notification.common.time.Clock;
+import com.manpou.common.time.Clock;
 import com.manpou.notification.domain.model.SigningKey;
 import com.manpou.notification.domain.model.SigningKeyStatus;
 import com.manpou.notification.domain.repository.SigningKeyRepository;

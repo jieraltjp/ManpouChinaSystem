@@ -64,28 +64,28 @@ public enum ShipmentStatus {
     private static java.util.Map<ShipmentStatus, java.util.Set<ShipmentStatus>> transitions() {
         return java.util.Map.ofEntries(
             // ===== 初始状态（可相互跳转，也可进入発注待/OEM）=====
-            entry(未定, java.util.Set.of(未定, 予定, 發注待, OEM)),
-            entry(予定, java.util.Set.of(未定, 予定, 發注待, OEM)),
+            entry(未定, java.util.Set.of(未定, 予定, 発注待, OEM)),
+            entry(予定, java.util.Set.of(未定, 予定, 発注待, OEM)),
 
             // ===== 発注待分支（永康/直送/OEM 三选一）=====
-            entry(OEM,      java.util.Set.of(未定, 予定, 發注待, OEM)),
-            entry(發注待, java.util.Set.of(未定, 予定, 永康, 直送, OEM)),
+            entry(OEM,      java.util.Set.of(未定, 予定, 発注待, OEM)),
+            entry(発注待, java.util.Set.of(未定, 予定, 永康, 直送, OEM)),
 
             // ===== 永康路径 =====
-            entry(永康,   java.util.Set.of(未定, 予定, 入庫着)),
-            entry(直送,   java.util.Set.of(未定, 入庫着)),
-            entry(入庫着, java.util.Set.of(未定, 檢品, 現地檢品)),
+            entry(永康,   java.util.Set.of(未定, 予定, 倉庫着)),
+            entry(直送,   java.util.Set.of(未定, 倉庫着)),
+            entry(倉庫着, java.util.Set.of(未定, 検品, 現地検品)),
 
             // ===== 検品分支 =====
-            entry(檢品,      java.util.Set.of(未定, エア便, 輸出, 入庫着)),
-            entry(現地檢品, java.util.Set.of(未定, エア便, 輸出, メーカー直送, 入庫着)),
+            entry(検品,      java.util.Set.of(未定, エア便, 輸出, 倉庫着)),
+            entry(現地検品, java.util.Set.of(未定, エア便, 輸出, メーカー直送, 倉庫着)),
 
             // ===== 跨境 =====
-            entry(エア便,     java.util.Set.of(未定, 通關)),
-            entry(輸出,      java.util.Set.of(未定, 通關)),
+            entry(エア便,     java.util.Set.of(未定, 通関)),
+            entry(輸出,      java.util.Set.of(未定, 通関)),
 
             // ===== 入日 =====
-            entry(通關,   java.util.Set.of(未定, 日本着)),
+            entry(通関,   java.util.Set.of(未定, 日本着)),
             entry(日本着, java.util.Set.of(未定, 会計)),
             entry(会計,   java.util.Set.of(未定, 完了)),
 
@@ -93,7 +93,7 @@ public enum ShipmentStatus {
             entry(メーカー直送, java.util.Set.of(未定, 完了)),
 
             // ===== 退货（独立状态）=====
-            entry(退販, java.util.Set.of(未定, 完了))
+            entry(退货, java.util.Set.of(未定, 完了))
         );
     }
 

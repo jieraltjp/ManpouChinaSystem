@@ -11,7 +11,7 @@
   <artifactId>notification-service</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <name>${project.groupId}:notification-service</name>
-  <description>procurement服务</description>
+  <description>notification服务</description>
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -48,6 +48,11 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.manpou</groupId>
+      <artifactId>manpou-common</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>io.jsonwebtoken</groupId>

@@ -1,6 +1,6 @@
 package com.manpou.finance.infrastructure.config;
 
-import com.manpou.finance.common.time.Clock;
+import com.manpou.common.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

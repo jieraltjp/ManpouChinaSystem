@@ -1,7 +1,7 @@
 package com.manpou.user.application;
 
 import com.manpou.user.domain.port.SigningKeyPort;
-import com.manpou.user.common.time.Clock;
+import com.manpou.common.time.Clock;
 import com.manpou.user.domain.model.SigningKey;
 import com.manpou.user.domain.model.SigningKeyStatus;
 import com.manpou.user.domain.repository.SigningKeyRepository;

@@ -1,6 +1,6 @@
 package com.manpou.logistics.infrastructure.config;
 
-import com.manpou.logistics.common.time.Clock;
+import com.manpou.common.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

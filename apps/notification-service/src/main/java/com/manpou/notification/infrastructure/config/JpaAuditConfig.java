@@ -1,6 +1,6 @@
 package com.manpou.notification.infrastructure.config;
 
-import com.manpou.notification.common.time.Clock;
+import com.manpou.common.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;

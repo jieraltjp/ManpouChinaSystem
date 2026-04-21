@@ -1,6 +1,6 @@
 package com.manpou.user.infrastructure.config;
 
-import com.manpou.user.common.time.Clock;
+import com.manpou.common.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
