@@ -1,6 +1,6 @@
 package com.manpou.customs.common.exception;
 
-import com.manpou.customs.common.result.Result;
+import com.manpou.common.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;

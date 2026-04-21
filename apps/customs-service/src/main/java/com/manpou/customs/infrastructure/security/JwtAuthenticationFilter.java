@@ -1,6 +1,6 @@
 package com.manpou.customs.infrastructure.security;
 
-import com.manpou.customs.common.result.Result;
+import com.manpou.common.result.Result;
 import com.manpou.customs.infrastructure.security.JwtService.JwtClaims;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;

@@ -6,7 +6,7 @@ import com.manpou.logistics.application.dto.ExampleQuery;
 import com.manpou.logistics.application.dto.ExampleUpdateCmd;
 import com.manpou.logistics.application.usecase.ExampleUseCase;
 import com.manpou.logistics.common.annotation.Idempotent;
-import com.manpou.logistics.common.result.Result;
+import com.manpou.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

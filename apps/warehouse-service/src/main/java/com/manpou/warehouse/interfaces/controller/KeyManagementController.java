@@ -1,7 +1,7 @@
 package com.manpou.warehouse.interfaces.controller;
 
 import com.manpou.warehouse.application.KeyManagementService;
-import com.manpou.warehouse.common.result.Result;
+import com.manpou.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

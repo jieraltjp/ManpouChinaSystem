@@ -1,7 +1,7 @@
 package com.manpou.finance.infrastructure.security;
 
 import com.manpou.finance.domain.port.SigningKeyPort;
-import com.manpou.finance.common.time.Clock;
+import com.manpou.common.time.Clock;
 import com.manpou.finance.domain.model.SigningKey;
 import com.manpou.finance.domain.model.SigningKeyStatus;
 import com.manpou.finance.domain.repository.SigningKeyRepository;

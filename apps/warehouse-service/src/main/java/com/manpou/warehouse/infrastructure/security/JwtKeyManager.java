@@ -1,7 +1,7 @@
 package com.manpou.warehouse.infrastructure.security;
 
 import com.manpou.warehouse.domain.port.SigningKeyPort;
-import com.manpou.warehouse.common.time.Clock;
+import com.manpou.common.time.Clock;
 import com.manpou.warehouse.domain.model.SigningKey;
 import com.manpou.warehouse.domain.model.SigningKeyStatus;
 import com.manpou.warehouse.domain.repository.SigningKeyRepository;

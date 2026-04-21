@@ -1,4 +1,4 @@
-package com.manpou.finance.common.result;
+package com.manpou.common.result;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,10 +19,8 @@ import java.util.Objects;
  * - message 用于展示给用户
  * - payload 为 null 时不序列化（节省带宽）
  *
- * INTJ 审判：@Data 已被移除。
- * 原因：Lombok @Data 生成的 equals/hashCode 使用全部 5 个字段，
- * 若 T=Result&lt;X&gt;（自引用），equals() 会递归爆炸。
- * 修复：显式只比较 code + message，与 data 无关。
+ * INTJ 铁律：equals/hashCode 仅比较 code + message，
+ * 避免 T=Result&lt;X&gt; 自引用时递归爆炸。
  *
  * @param <T> 响应数据类型
  */
@@ -60,7 +58,7 @@ public class Result<T> {
         return Result.<T>builder().code("ok").message("success").payload(payload).build();
     }
 
-    public static <T> Result<T> ok(String message, T data) {
+    public static <T> Result<T> ok(String message, T payload) {
         return Result.<T>builder().code("ok").message(message).payload(payload).build();
     }
 

@@ -17,6 +17,7 @@
     </properties>
 
     <modules>
+        <module>libs/manpou-common</module>
         <module>apps/user-service</module>
         <module>apps/product-service</module>
         <module>apps/procurement-service</module>

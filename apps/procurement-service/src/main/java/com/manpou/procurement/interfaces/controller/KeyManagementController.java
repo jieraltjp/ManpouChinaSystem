@@ -1,7 +1,7 @@
 package com.manpou.procurement.interfaces.controller;
 
 import com.manpou.procurement.application.KeyManagementService;
-import com.manpou.procurement.common.result.Result;
+import com.manpou.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

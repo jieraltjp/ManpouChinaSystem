@@ -1,6 +1,6 @@
 package com.manpou.finance.infrastructure.security;
 
-import com.manpou.finance.common.result.Result;
+import com.manpou.common.result.Result;
 import com.manpou.finance.infrastructure.security.JwtService.JwtClaims;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;

@@ -1,7 +1,7 @@
 package com.manpou.notification.interfaces.controller;
 
 import com.manpou.notification.application.KeyManagementService;
-import com.manpou.notification.common.result.Result;
+import com.manpou.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

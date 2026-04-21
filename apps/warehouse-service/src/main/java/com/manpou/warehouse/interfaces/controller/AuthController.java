@@ -1,6 +1,7 @@
 package com.manpou.warehouse.interfaces.controller;
 
-import com.manpou.warehouse.common.result.Result;
+import com.manpou.common.result.Result;
+import com.manpou.common.security.TokenConstants;
 import com.manpou.warehouse.infrastructure.security.JwtKeyManager;
 import com.manpou.warehouse.infrastructure.security.JwtService;
 import jakarta.validation.Valid;
@@ -37,7 +38,7 @@ public class AuthController {
     public Result<PublicKeyVO> publicKey() {
         return Result.ok(new PublicKeyVO(
             jwtKeyManager.getCurrentKid(),
-            "RS256",
+            TokenConstants.ALGORITHM_RS256,
             jwtKeyManager.getPublicKeyPem()
         ));
     }
@@ -58,7 +59,7 @@ public class AuthController {
         String token = jwtService.generateAccessToken(userId, username, roles, permissions, tenantId, kid);
         log.info("User {} logged in, issued RS256 token (kid={})", username, kid);
 
-        return Result.ok(new LoginVO(token, 900, "Bearer", kid));
+        return Result.ok(new LoginVO(token, TokenConstants.ACCESS_TOKEN_TTL_SECONDS, TokenConstants.BEARER_PREFIX, kid));
     }
 
     // ==================== DTO ====================

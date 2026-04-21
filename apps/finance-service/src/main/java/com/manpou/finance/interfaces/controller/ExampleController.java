@@ -6,7 +6,7 @@ import com.manpou.finance.application.dto.ExampleQuery;
 import com.manpou.finance.application.dto.ExampleUpdateCmd;
 import com.manpou.finance.application.usecase.ExampleUseCase;
 import com.manpou.finance.common.annotation.Idempotent;
-import com.manpou.finance.common.result.Result;
+import com.manpou.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

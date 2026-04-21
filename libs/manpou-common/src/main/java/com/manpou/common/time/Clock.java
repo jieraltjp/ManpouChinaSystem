@@ -1,4 +1,4 @@
-package com.manpou.customs.common.time;
+package com.manpou.common.time;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -14,8 +14,6 @@ import java.time.ZoneId;
  * - 单元测试：注入 mock clock，控制时间流逝
  * - 多时区：注入不同时区的 clock，不改业务代码
  * - 事件溯源：注入固定 clock，重放历史事件
- *
- * @see SystemClock
  */
 public interface Clock {
 

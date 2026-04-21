@@ -1,7 +1,7 @@
 package com.manpou.customs.interfaces.controller;
 
 import com.manpou.customs.application.KeyManagementService;
-import com.manpou.customs.common.result.Result;
+import com.manpou.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
