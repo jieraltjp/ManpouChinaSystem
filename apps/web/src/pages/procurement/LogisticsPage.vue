@@ -324,7 +324,8 @@ async function loadData() {
     const data = res.data.data
     tableData.value = data.content
     pagination.total = data.totalElements
-  } catch {
+  } catch (e) {
+    console.error('[LogisticsPage] loadData failed', e)
     ElMessage.error('加载调配计划失败')
   } finally {
     loading.value = false
@@ -353,7 +354,7 @@ async function searchProcurement(query: string) {
   try {
     const res = await procurementApi.list({ page: 0, pageSize: 20, productCode: query })
     procurementList.value = res.data.data.content
-  } catch { procurementList.value = [] }
+  } catch (e) { console.error('[LogisticsPage] searchProcurement failed', e); procurementList.value = [] }
   finally { procurementLoading.value = false }
 }
 
@@ -404,7 +405,8 @@ async function onSubmit() {
     ElMessage.success('调配计划创建成功')
     dialogVisible.value = false
     loadData()
-  } catch {
+  } catch (e) {
+    console.error('[LogisticsPage] onSubmit failed', e)
     ElMessage.error('创建调配计划失败')
   } finally {
     submitting.value = false

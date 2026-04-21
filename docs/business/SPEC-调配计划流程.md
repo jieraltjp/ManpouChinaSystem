@@ -34,24 +34,23 @@
 | 字段 | 来源 | 必填 | 说明 |
 |------|------|------|------|
 | `id` | 系统 | — | 主键 |
-| `logisticsCode` | 系统生成 | — | 格式：`L-YYYYMMDD-NNN`（如 L-20260421-001） |
+| `planCode` | 系统生成 | — | 格式：`L-YYYYMMDD-NNN`（如 L-20260421-001） |
 | `procurementId` | 用户选择 | | 关联采购单（FK → procurement.id）；拼柜时可为空 |
 | `factoryId` | 自动带入 | | 工厂ID（来自 Procurement） |
-| `factoryName` | 自动带入 | | 工厂名称（来自 Procurement → Factory） |
 | `productCode` | 自动带入 | ✅ | 主货号（来自 Procurement） |
 | `subProductCode` | 自动带入 | | 子货号（来自 Procurement） |
-| `cargoLength` | 用户输入 | | 货物长度(cm) |
-| `cargoWidth` | 用户输入 | | 货物宽度(cm) |
-| `cargoHeight` | 用户输入 | | 货物高度(cm) |
-| `cargoVolume` | 用户计算 | | 体积(m³) = 长×宽×高 / 1,000,000 |
-| `cargoWeight` | 用户输入 | | 货物重量(kg) |
+| `cargoLengthCm` | 用户输入 | | 货物长度(cm) |
+| `cargoWidthCm` | 用户输入 | | 货物宽度(cm) |
+| `cargoHeightCm` | 用户输入 | | 货物高度(cm) |
+| `cargoVolumeCbm` | 用户计算 | | 体积(m³) = 长×宽×高 / 1,000,000 |
+| `cargoWeightKg` | 用户输入 | | 货物重量(kg) |
 | `quantity` | 自动带入 | | 数量（来自 Procurement） |
 | `requiresQc` | 自动带入 | | 是否需要检测（来自 Procurement） |
 | `planType` | 用户选择 | ✅ | 调配类型：`SEA`（海运）/ `AIR`（空运）/ `CONSOLIDATION`（拼柜） |
 | `estimatedShipDate` | 用户输入 | | 预计发货日 |
 | `actualShipDate` | 用户输入 | | 实际发货日 |
 | `containerId` | 装柜后赋值 | | 货柜编号（装柜后关联 container.id） |
-| `consolidationPoolId` | 加入拼柜池 | | 所属拼柜池ID |
+| `poolId` | 加入拼柜池 | | 所属拼柜池ID（consolidation_pool.id） |
 | `status` | 系统 | ✅ | 状态：`PLANNED` → `BOOKED` → `IN_TRANSIT` → `DELIVERED` |
 | `remarks` | 用户输入 | | 备注 |
 
@@ -139,7 +138,7 @@ DELIVERED（已送达）[终态]
 
 | 事件 | 自动带入 |
 |------|----------|
-| 选择采购单 | factoryId、factoryName、productCode、subProductCode、quantity、requiresQc |
+| 选择采购单 | factoryId、productCode、subProductCode、quantity、requiresQc |
 | 选择调配类型 | 更新 status → PLANNED |
 | 装柜完成 | containerId 赋值，status → IN_TRANSIT |
 | 拼柜合并 | 加入 consolidationPool.totalWeight / totalVolume |

@@ -54,7 +54,6 @@ public class LogisticsPlanAssembler {
         entity.setPlanCode(generatePlanCode());
         entity.setProductCode(cmd.getProductCode());
         copyCreate(cmd, entity);
-        entity.calculateVolume();
         return entity;
     }
 

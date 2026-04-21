@@ -33,27 +33,30 @@
 | `productCode` | 自动带入 | ✅ | 主货号（来自 Procurement） |
 | `subProductCode` | 自动带入 | | 子货号/颜色（来自 Procurement） |
 | `qcUserId` | 用户选择 | ✅ | 验货负责人（开单人） |
-| `orderDate` | 自动带入 | | 下单日（来自 Procurement） |
-| `taxRefund` | 用户选择 | | 是否退税（YES / NO） |
-| `destination` | 自动带入 | | 目的地（来自 Procurement） |
-| `quantity` | 自动带入 | | 订购数量（来自 Procurement） |
+| `qcType` | 用户选择 | | 验货方式：`ONSITE`（现场）/ `REMOTE`（仓库异地） |
+| `qcDate` | 用户输入 | ✅ | 验货日期 |
+| `result` | 用户选择 | ✅ | 验货结果：`PASS`（合格）/ `FAIL`（不合格） |
+| `status` | 系统 | | 默认 `PENDING` → `COMPLETED`（终态） |
 | `inspectionCount` | 用户输入 | ✅ | 检品数（实际检验数量） |
 | `passedCount` | 用户输入 | ✅ | 合格数量 |
-| `defectiveCount` | 用户计算 | | 不良数量 = inspectionCount - passedCount |
-| `defectRate` | 用户计算 | | 不良率 = defectiveCount / inspectionCount × 100% |
+| `defectiveCount` | 用户输入 | | 不良数量（手动输入或自动 = inspectionCount - passedCount） |
 | `boxCount` | 用户输入 | | 箱数 |
-| `boxLength` | 用户输入 | | 箱子长度(cm) |
-| `boxWidth` | 用户输入 | | 箱子宽度(cm) |
-| `boxHeight` | 用户输入 | | 箱子高度(cm) |
+| `boxLengthCm` | 用户输入 | | 箱子长度(cm) |
+| `boxWidthCm` | 用户输入 | | 箱子宽度(cm) |
+| `boxHeightCm` | 用户输入 | | 箱子高度(cm) |
 | `netWeightPerUnit` | 用户输入 | | 单个净重(kg) |
 | `grossWeight` | 用户输入 | | 毛重(kg) |
-| `taxInclusivePrice` | 用户输入 | | 含税价 |
+| `taxInclusivePrice` | 用户输入 | | 含税价（元） |
 | `material` | 自动带入 | | 材质（来自 Procurement） |
-| `qcDate` | 用户输入 | ✅ | 验货日期 |
+| `taxRefund` | 用户选择 | | 是否退税 |
 | `qcStandard` | 用户输入 | | 验收标准 |
-| `result` | 用户选择 | ✅ | 验货结果：`PASS`（合格）/ `FAIL`（不合格） |
 | `remarks` | 用户输入 | | 备注 |
-| `status` | 系统 | | 默认 `PENDING` → `COMPLETED`（终态） |
+| `images` | 用户上传 | | 缺陷照片URL列表（JSON数组） |
+| `destination` | 自动带入 | | 目的地（来自 Procurement） |
+| `quantity` | 自动带入 | | 订购数量（来自 Procurement） |
+| `orderDate` | 自动带入 | | 下单日（来自 Procurement） |
+
+> 🔴 规划中：`defectRate`（不良率 = defectiveCount / inspectionCount × 100%）字段待后续实现
 
 ---
 

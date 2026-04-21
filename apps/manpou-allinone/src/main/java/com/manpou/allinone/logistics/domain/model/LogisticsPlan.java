@@ -89,6 +89,8 @@ public class LogisticsPlan extends BaseEntity {
     @Column(name = "remarks", length = 512)
     private String remarks;               // 备注
 
+    private static final BigDecimal CM3_TO_M3 = new BigDecimal("1000000");
+
     // ===== 领域方法 =====
 
     /** 计算体积(m³)。 */
@@ -97,7 +99,7 @@ public class LogisticsPlan extends BaseEntity {
             this.cargoVolumeCbm = cargoLengthCm
                     .multiply(cargoWidthCm)
                     .multiply(cargoHeightCm)
-                    .divide(new BigDecimal("1000000"), 6, java.math.RoundingMode.HALF_UP);
+                    .divide(CM3_TO_M3, 6, java.math.RoundingMode.HALF_UP);
         }
     }
 

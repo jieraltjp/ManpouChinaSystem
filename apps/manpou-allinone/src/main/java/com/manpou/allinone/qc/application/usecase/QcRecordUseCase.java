@@ -59,6 +59,7 @@ public class QcRecordUseCase {
             }
         }
         QcRecord entity = qcRecordAssembler.toEntity(cmd);
+        entity.calculateDefectiveCount();
         QcRecord saved = qcRecordRepository.save(entity);
         log.info("[QcRecord] created, traceId={}, id={}, qcCode={}, result={}",
                 null, saved.getId(), saved.getQcCode(), saved.getResult());

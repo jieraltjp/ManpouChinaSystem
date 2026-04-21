@@ -68,7 +68,6 @@ public class QcRecordAssembler {
         entity.setProcurementId(cmd.getProcurementId());
         entity.setProductCode(cmd.getProductCode());
         copyCreate(cmd, entity);
-        entity.calculateDefectiveCount();
         return entity;
     }
 

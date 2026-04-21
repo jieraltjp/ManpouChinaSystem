@@ -386,6 +386,7 @@ async function loadData() {
     tableData.value = data.content
     pagination.total = data.totalElements
   } catch (e: unknown) {
+    console.error('[InspectionPage] loadData failed', e)
     ElMessage.error('加载验货记录失败')
   } finally {
     loading.value = false
@@ -414,7 +415,7 @@ async function searchProcurement(query: string) {
   try {
     const res = await procurementApi.list({ page: 0, pageSize: 20, productCode: query })
     procurementList.value = res.data.data.content
-  } catch { procurementList.value = [] }
+  } catch (e) { console.error('[InspectionPage] searchProcurement failed', e); procurementList.value = [] }
   finally { procurementLoading.value = false }
 }
 
@@ -484,7 +485,8 @@ async function onSubmit() {
     ElMessage.success('验货记录创建成功')
     dialogVisible.value = false
     loadData()
-  } catch {
+  } catch (e) {
+    console.error('[InspectionPage] onSubmit failed', e)
     ElMessage.error('创建验货记录失败')
   } finally {
     submitting.value = false

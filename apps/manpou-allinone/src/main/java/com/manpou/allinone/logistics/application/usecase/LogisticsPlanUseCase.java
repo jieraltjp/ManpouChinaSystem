@@ -54,6 +54,7 @@ public class LogisticsPlanUseCase {
     @Transactional
     public Long create(LogisticsPlanCreateCmd cmd) {
         LogisticsPlan entity = logisticsPlanAssembler.toEntity(cmd);
+        entity.calculateVolume();
         LogisticsPlan saved = logisticsPlanRepository.save(entity);
         log.info("[LogisticsPlan] created, traceId={}, id={}, planCode={}, planType={}",
                 null, saved.getId(), saved.getPlanCode(), saved.getPlanType());
