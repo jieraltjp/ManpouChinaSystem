@@ -17,6 +17,8 @@ public interface FactoryRepository extends JpaRepository<Factory, Long> {
 
     Optional<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName);
 
+    Page<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName, Pageable pageable);
+
     List<Factory> findAllByIsDeletedFalse();
 
     Page<Factory> findAllByIsDeletedFalse(Pageable pageable);

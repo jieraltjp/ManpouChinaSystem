@@ -11,8 +11,8 @@
 | 发注单（Procurement） | ✅ 完成 | ✅ CRUD+报价计算+终态校验+前端对接+完整FSM流转+工厂内嵌（v1.3.0） | manpou-allinone Phase A ✅ |
 | 补货需求（ReplenishmentDemand） | ✅ 完成 | ✅ CRUD + 自动带入发注单 | manpou-allinone Phase A ✅ |
 | 工厂（Factory） | ✅ 完成 | ✅ 无独立页面，内嵌于发注单表单（v1.3.0） | manpou-allinone ✅ |
-| 调配计划（LogisticsPlan） | 🟡 设计中 | 🟡 骨架已生成（LogisticsStatus） | — |
-| 验货记录（QcRecord） | 🟡 设计中 | 🟡 骨架已生成（QcStatus） | — |
+| 调配计划（LogisticsPlan） | ✅ 完成 | ✅ 实体+Repository+UseCase+Controller+前端页面（v1.3.0） | — |
+| 验货记录（QcRecord） | ✅ 完成 | ✅ 实体+Repository+UseCase+Controller+前端页面（v1.3.0） | — |
 | 商品目录（Product） | ✅ 完成 | 🔴 未实现 | — |
 | 货柜管理（Container） | ✅ 完成 | 🔴 未实现 | — |
 | 财务结算（FinanceRecord） | ✅ 完成 | 🔴 未实现 | — |

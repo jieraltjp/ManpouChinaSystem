@@ -48,7 +48,6 @@ public class ProcurementAssembler {
     public Procurement toEntity(ProcurementCreateCmd cmd) {
         Procurement entity = new Procurement();
         copyToEntity(cmd, entity);
-        entity.calculateEstimatedPriceJpy();
         return entity;
     }
 
@@ -100,9 +99,5 @@ public class ProcurementAssembler {
         if (cmd.getDestination() != null) entity.setDestination(cmd.getDestination());
         if (cmd.getCustomerCompany() != null) entity.setCustomerCompany(cmd.getCustomerCompany());
         if (cmd.getStatus() != null) entity.updateStatus(cmd.getStatus());
-        // 价格变动时重新计算估算价
-        if (cmd.getPriceRmb() != null || cmd.getExchangeRate() != null || cmd.getTaxPoint() != null) {
-            entity.calculateEstimatedPriceJpy();
-        }
     }
 }

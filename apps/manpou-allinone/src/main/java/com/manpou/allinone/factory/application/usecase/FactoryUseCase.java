@@ -37,7 +37,7 @@ public class FactoryUseCase {
         if (query.getStatus() != null) {
             page = factoryRepository.findByStatusAndIsDeletedFalse(query.getStatus(), pageRequest);
         } else if (query.getFactoryName() != null && !query.getFactoryName().isBlank()) {
-            page = factoryRepository.findAllByIsDeletedFalse(pageRequest);
+            page = factoryRepository.findByFactoryNameAndIsDeletedFalse(query.getFactoryName(), pageRequest);
         } else {
             page = factoryRepository.findAllByIsDeletedFalse(pageRequest);
         }

@@ -31,6 +31,10 @@ import java.math.BigDecimal;
 @Setter
 public class Procurement extends BaseEntity {
 
+    private static final BigDecimal CONSOLIDATION_FEE = new BigDecimal("1.02");
+    private static final BigDecimal PROFIT_MARGIN     = new BigDecimal("1.2");
+    private static final BigDecimal EXCHANGE_BUFFER  = new BigDecimal("1.05");
+
     // ===== 关联 =====
     @Column(name = "factory_id")
     private Long factoryId;             // 关联工厂ID（FK → factory.id）
@@ -122,10 +126,10 @@ public class Procurement extends BaseEntity {
         }
         BigDecimal base = priceRmb
                 .divide(taxPoint, 4, java.math.RoundingMode.HALF_UP)
-                .multiply(new BigDecimal("1.02"))
-                .multiply(new BigDecimal("1.2"))
+                .multiply(CONSOLIDATION_FEE)
+                .multiply(PROFIT_MARGIN)
                 .multiply(exchangeRate)
-                .multiply(new BigDecimal("1.05"));
+                .multiply(EXCHANGE_BUFFER);
         this.estimatedPriceJpy = base.setScale(2, java.math.RoundingMode.HALF_UP);
     }
 

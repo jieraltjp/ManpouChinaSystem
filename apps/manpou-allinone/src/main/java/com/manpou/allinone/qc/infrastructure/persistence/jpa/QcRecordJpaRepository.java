@@ -1,28 +1,23 @@
-package com.manpou.allinone.qc.domain.repository;
+package com.manpou.allinone.qc.infrastructure.persistence.jpa;
 
 import com.manpou.allinone.qc.domain.model.QcRecord;
 import com.manpou.allinone.qc.domain.model.QcResult;
+import com.manpou.allinone.qc.domain.repository.QcRecordRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 /**
- * 验货记录仓库接口（领域层契约，不感知 JPA）。
+ * JPA 持久化适配器（基础设施层）。
+ * 同时满足领域接口契约和 JPA 能力。
  */
-public interface QcRecordRepository {
-
-    Optional<QcRecord> findById(Long id);
-
-    Optional<QcRecord> findByIdAndIsDeletedFalse(Long id);
+@Repository
+public interface QcRecordJpaRepository extends QcRecordRepository, JpaRepository<QcRecord, Long> {
 
     Optional<QcRecord> findByQcCodeAndIsDeletedFalse(String qcCode);
-
-    QcRecord save(QcRecord entity);
-
-    void deleteById(Long id);
-
-    Page<QcRecord> findAllByIsDeletedFalse(Pageable pageable);
 
     Page<QcRecord> findByResultAndIsDeletedFalse(QcResult result, Pageable pageable);
 

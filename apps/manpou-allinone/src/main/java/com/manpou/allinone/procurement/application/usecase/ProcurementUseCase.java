@@ -71,6 +71,7 @@ public class ProcurementUseCase {
     @Transactional
     public Long create(ProcurementCreateCmd cmd) {
         Procurement entity = procurementAssembler.toEntity(cmd);
+        entity.calculateEstimatedPriceJpy();
         Procurement saved = procurementRepository.save(entity);
         log.info("[Procurement] created, traceId={}, id={}, productCode={}, estimatedPriceJpy={}",
                 MDC.get(TraceFilter.TRACE_ID_KEY),
@@ -88,6 +89,9 @@ public class ProcurementUseCase {
         Procurement entity = procurementRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("Procurement", id));
         procurementAssembler.copyToEntity(cmd, entity);
+        if (cmd.getPriceRmb() != null || cmd.getExchangeRate() != null || cmd.getTaxPoint() != null) {
+            entity.calculateEstimatedPriceJpy();
+        }
         procurementRepository.save(entity);
         log.info("[Procurement] updated, traceId={}, id={}, status={}",
                 MDC.get(TraceFilter.TRACE_ID_KEY), id, entity.getStatus());

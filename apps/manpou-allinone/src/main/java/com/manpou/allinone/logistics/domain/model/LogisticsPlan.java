@@ -113,7 +113,12 @@ public class LogisticsPlan extends BaseEntity {
         if (isTerminal()) {
             throw new com.manpou.allinone.common.exception.BusinessException(
                     "logistics.cannot_modify_delivered",
-                    "调配计划已完成，禁止状态变更");
+                    "已完成状态禁止任何变更");
+        }
+        if (!status.canTransitionTo(newStatus)) {
+            throw new com.manpou.allinone.common.exception.BusinessException(
+                    "logistics.invalid_status_transition",
+                    String.format("状态「%s」不允许跳转至「%s」", status.name(), newStatus.name()));
         }
         this.status = newStatus;
     }

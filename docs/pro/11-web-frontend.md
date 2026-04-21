@@ -95,8 +95,11 @@ apps/web/
 |------|------|------|------|
 | 登录 | `/login` | LoginPage | ✅ |
 | 仪表盘 | `/dashboard` | DashboardPage | ✅ |
-| 发注单管理 | `/procurement/order` | OrderPage | ✅ |
 | 示例列表 | `/examples` | ExamplesPage | ✅ |
+| 补货需求 | `/procurement/demand` | DemandPage | ✅ |
+| 发注单管理 | `/procurement/order` | OrderPage | ✅ |
+| 验货记录 | `/procurement/inspection` | InspectionPage | ✅ |
+| 调配计划 | `/procurement/logistics` | LogisticsPage | ✅ |
 | 仓储列表 | `/warehouse` | WarehouseListPage | 🔴 待实现 |
 | 报关管理 | `/customs` | CustomsListPage | 🔴 待实现 |
 | 物流管理 | `/logistics` | LogisticsListPage | 🔴 待实现 |
@@ -104,7 +107,7 @@ apps/web/
 | 商品管理 | `/product` | ProductListPage | 🔴 待实现 |
 | 用户管理 | `/user` | UserListPage | 🔴 待实现 |
 
-> 发注单管理（`/test`）已迁移至 `/procurement/order`（OrderPage.vue），支持关联需求带入与工厂选择。
+> 发注管理 4 个子页面：`/procurement/demand`（补货需求）、`/procurement/order`（发注单）、`/procurement/inspection`（验货记录）、`/procurement/logistics`（调配计划），均已完整实现并对接真实 API。
 
 ---
 

@@ -1,27 +1,22 @@
-package com.manpou.allinone.logistics.domain.repository;
+package com.manpou.allinone.logistics.infrastructure.persistence.jpa;
 
 import com.manpou.allinone.logistics.domain.model.LogisticsPlan;
 import com.manpou.allinone.logistics.domain.model.LogisticsStatus;
 import com.manpou.allinone.logistics.domain.model.PlanType;
+import com.manpou.allinone.logistics.domain.repository.LogisticsPlanRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 /**
- * 调配计划仓库接口（领域层契约，不感知 JPA）。
+ * JPA 持久化适配器（基础设施层）。
+ * 同时满足领域接口契约和 JPA 能力。
  */
-public interface LogisticsPlanRepository {
-
-    Optional<LogisticsPlan> findById(Long id);
-
-    Optional<LogisticsPlan> findByIdAndIsDeletedFalse(Long id);
-
-    LogisticsPlan save(LogisticsPlan entity);
-
-    void deleteById(Long id);
-
-    Page<LogisticsPlan> findAllByIsDeletedFalse(Pageable pageable);
+@Repository
+public interface LogisticsPlanJpaRepository extends LogisticsPlanRepository, JpaRepository<LogisticsPlan, Long> {
 
     Page<LogisticsPlan> findByStatusAndIsDeletedFalse(LogisticsStatus status, Pageable pageable);
 

@@ -83,15 +83,16 @@ public enum DemandStatus {
 ```
 Factory（聚合根）
 ├── id: Long
+├── factoryCode: String             # 工厂编码（唯一键，如 F-20260421-001）
 ├── factoryName: String              # 工厂名称
 ├── location: String                 # 工厂位置（省/市）
 ├── roughLocation: String            # 粗略位置（工业区/园区/镇）
 ├── contactName: String              # 联系人名称
 ├── contactPhone: String             # 联系人电话
 ├── status: FactoryStatus            # ACTIVE | INACTIVE
-├── createdBy: String
-├── createdAt: LocalDateTime
-├── updatedAt: LocalDateTime
+├── createBy: String
+├── createTime: LocalDateTime
+├── updateTime: LocalDateTime
 │
 └── 领域方法
     └── linkProductCode(code)        # 关联该厂生产的货号

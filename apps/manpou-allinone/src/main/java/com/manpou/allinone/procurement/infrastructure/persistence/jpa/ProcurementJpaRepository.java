@@ -1,29 +1,22 @@
-package com.manpou.allinone.procurement.domain.repository;
+package com.manpou.allinone.procurement.infrastructure.persistence.jpa;
 
 import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.model.ShipmentStatus;
+import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * 发注单仓库接口（领域层契约，不感知 JPA）。
+ * JPA 持久化适配器（基础设施层）。
+ * 同时满足领域接口契约和 JPA 能力。
  */
-public interface ProcurementRepository {
-
-    Optional<Procurement> findById(Long id);
-
-    Optional<Procurement> findByIdAndIsDeletedFalse(Long id);
-
-    Procurement save(Procurement entity);
-
-    void deleteById(Long id);
-
-    List<Procurement> findAllByIsDeletedFalse();
-
-    Page<Procurement> findAllByIsDeletedFalse(Pageable pageable);
+@Repository
+public interface ProcurementJpaRepository extends ProcurementRepository, JpaRepository<Procurement, Long> {
 
     Page<Procurement> findByStatusAndIsDeletedFalse(ShipmentStatus status, Pageable pageable);
 
