@@ -61,16 +61,23 @@ src/main/resources/
 | 字段 | DB 列名 | 说明 |
 |------|---------|------|
 | id | id | 主键 |
-| productCode | product_code | 商品代码（关联 Product.productCode） |
+| factoryId | factory_id | 关联工厂（FK → factory.id） |
+| productCode | product_code | 主货号（关联 Product.masterCode） |
+| subProductCode | sub_product_code | 子货号/枝番（颜色，如 re/wh/bk） |
 | quantity | quantity | 订购数量 |
+| material | material | 材质 |
+| requiresQc | requires_qc | 是否需要检测 |
 | priceRmb | price_rmb | 人民币单价 |
 | exchangeRate | exchange_rate | CNY→JPY 汇率 |
 | taxPoint | tax_point | 票点（默认 1.1） |
-| billingMethod | billing_method | 计费方式 |
+| billingType | billing_type | 报关类型（ZHE_LU_KAI_PIAO/CHAO_HUI_TUI_SHUI/NO_REFUND/OTHER） |
 | estimatedPriceJpy | estimated_price_jpy | 估算批发价 JPY（自动计算） |
-| orderDate | order_date | 下单日（1688下单日期） |
+| customsRemarks | customs_remarks | 报关备注 |
+| instructionManual | instruction_manual | 说明书 |
+| orderDate | order_date | 下单日 |
 | factoryShipDate | factory_ship_date | 厂家出货日 |
 | plannedShipDate | planned_ship_date | 计划出货日 |
+| actualShipDate | actual_ship_date | 实际出货日 |
 | productLead | product_lead | 商品担当 |
 | japanLead | japan_lead | 日本担当 |
 | chinaLead | china_lead | 中国担当 |
@@ -87,35 +94,39 @@ estimatedPriceJpy = (priceRmb / taxPoint × 1.02 × 1.2) × exchangeRate × 1.05
 
 ## 4. 状态机
 
-### 状态枚举（ShipmentStatus）
+### 状态枚举（ShipmentStatus，共 19 个）
 
 ```
-未定 → 発注待 → 永康/直送 → 倉庫着 → 検品/現地検品 → ...
-  → エア便/輸出 → 通関 → 日本着 → 会計 → 完了
+未定 → 発注待 → 永康/直送/OEM → 倉庫着 → 検品/現地検品 → ...
+  → エア便/輸出 → 国内通関 → 通関 → 日本着 → 日本通関完了 → 会計 → 完了
 ```
 
 | 状态 | 说明 | 终态 |
 |------|------|------|
 | 未定 | 还未下单，仅记录需求 | |
+| 予定 | 预计发注 | |
+| OEM | OEM 定制产品路径 | |
 | 発注待 | 已录入商品，等待下单 | |
 | 永康 | 货物发往永康仓 | |
 | 直送 | 厂家直接发货（不经永康仓） | |
-| OEM | OEM 定制产品路径 | |
 | 倉庫着 | 货物到达仓库 | |
 | 現地検品 | 现场异地验货 | |
 | 検品 | 仓库验货 | |
 | エア便 | 空运 | |
 | メーカー直送 | 厂家直送 | |
 | 輸出 | 已出口 | |
-| 通関 | 已报关 | |
+| 国内通関 | 国内报关 | |
+| 通関 | 日本报关 | |
 | 日本着 | 已到日本 | |
+| 日本通関完了 | 日本清关完成 | |
 | 会計 | 财务结算 | |
 | 完了 | 全流程结束 | ✅ |
 | 退货 | 退货（独立处理） | |
 
 **路径说明**：
-- 永康路径：未定 → 発注待 → 永康 → 倉庫着 → 検品 → エア便/輸出 → 通関 → 日本着 → 会計 → 完了
-- OEM 路径：未定 → 発注待 → OEM → 倉庫着 → 現地検品 → メーカー直送 → 完了
+- 永康路径：未定 → 発注待 → 永康 → 倉庫着 → 検品 → エア便/輸出 → 国内通関 → 通関 → 日本着 → 日本通関完了 → 会計 → 完了
+- OEM 路径：未定 → 発注待 → OEM → 倉庫着 → 現地検品 → メーカー直送 → 日本着 → 日本通関完了 → 会計 → 完了
+- 直送路径：未定 → 発注待 → 直送 → 倉庫着 → 検品/現地検品 → エア便/輸出 → 国内通関 → 通関 → 日本着 → 日本通関完了 → 会計 → 完了
 
 ---
 
@@ -146,7 +157,7 @@ procurement.updateStatus(ShipmentStatus.発注待);
 procurement.resetToUndecided();
 ```
 
-> ⚠️ 完整状态流转校验（validateTransition）待实现，当前仅检查终态。
+> ✅ 完整状态流转校验（`canTransitionTo`）已在 `ShipmentStatus` 中实现。
 
 ---
 
@@ -160,7 +171,7 @@ procurement.resetToUndecided();
 
 ## 8. 行动项
 
-- [ ] **Phase A**：完整状态流转校验（validateTransition）
+- [x] **Phase A**：完整状态流转校验（canTransitionTo）✅
 - [ ] **Phase B**：验货（QC）功能
 - [ ] **Phase B**：货柜管理
 - [ ] **Phase B**：财务结算

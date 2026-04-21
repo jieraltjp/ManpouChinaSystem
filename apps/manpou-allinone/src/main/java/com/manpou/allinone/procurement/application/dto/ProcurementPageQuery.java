@@ -1,6 +1,7 @@
 package com.manpou.allinone.procurement.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.manpou.allinone.procurement.domain.model.BillingType;
 import com.manpou.allinone.procurement.domain.model.ShipmentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 
 /**
  * 发注单分页查询响应 DTO。
- * 与 docs/business/API-发注管理.md §1.2 响应字段对齐。
+ * 与 docs/business/SPEC-发注管理流程.md §3.2 完全对齐。
  */
 @Data
 @Builder
@@ -22,23 +23,47 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProcurementPageQuery {
 
+    // ===== 关联 =====
     private Long id;
-    private String productCode;         // 商品代码
-    private Integer quantity;           // 订购数量
-    private BigDecimal priceRmb;        // 人民币单价
-    private BigDecimal exchangeRate;    // 汇率
-    private BigDecimal taxPoint;        // 票点
+    private Long factoryId;              // 关联工厂ID
+
+    // ===== 商品信息 =====
+    private String productCode;         // 主货号
+    private String subProductCode;     // 子货号/枝番（颜色）
+    private String material;            // 材质
+    private Boolean requiresQc;        // 是否需要检测
+    private Integer quantity;          // 订购数量
+
+    // ===== 价格信息 =====
+    private BigDecimal priceRmb;       // 人民币单价
+    private BigDecimal exchangeRate;   // 汇率
+    private BigDecimal taxPoint;       // 票点
+    private BillingType billingType;   // 报关类型（v1.3.0 新增）
     private BigDecimal estimatedPriceJpy; // 估算批发价 JPY
-    private String billingMethod;        // 计费方式
-    private LocalDate orderDate;        // 下单日
-    private LocalDate factoryShipDate;  // 厂家出货日
-    private LocalDate plannedShipDate;  // 计划出货日
-    private String productLead;         // 商品担当
-    private String japanLead;           // 日本担当
+
+    // ===== 报关与说明 =====
+    private String customsRemarks;     // 报关备注
+    private String instructionManual;  // 说明书
+
+    // ===== 日期 =====
+    private LocalDate orderDate;       // 下单日
+    private LocalDate factoryShipDate; // 厂家出货日
+    private LocalDate plannedShipDate; // 计划出货日（交货期）
+    private LocalDate actualShipDate;  // 实际出货日（v1.3.0 新增）
+
+    // ===== 担当 =====
+    private String productLead;        // 商品担当
+    private String japanLead;          // 日本担当
     private String chinaLead;          // 中国担当
-    private String destination;         // 发送目的地
-    private String customerCompany;     // 客户公司
-    private ShipmentStatus status;     // 状态
+
+    // ===== 发货信息 =====
+    private String destination;        // 发送目的地
+    private String customerCompany;    // 客户公司
+
+    // ===== 状态 =====
+    private ShipmentStatus status;    // 状态
+
+    // ===== 审计 =====
     private String createBy;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

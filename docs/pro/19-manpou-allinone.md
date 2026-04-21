@@ -44,11 +44,11 @@
 Phase 0（现状）
 ┌─────────────────────────────────────────────────┐
 │ manpou-allinone (18090)                          │
-│ product + warehouse + customs + logistics         │
-│ + finance + notification                          │
+│ procurement + product + warehouse + customs +     │
+│ logistics + finance + notification                │
 │                                                  │
 │ 优点：单进程调试、零服务间延迟、无版本协调          │
-│ 缺点：6 领域共享 JVM，单点故障互相影响            │
+│ 缺点：7 领域共享 JVM，单点故障互相影响            │
 └─────────────────────────────────────────────────┘
 
 Phase 3-4（业务填充后，按 Kafka Topic 边界拆分）

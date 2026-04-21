@@ -157,7 +157,20 @@
       "Bash(mkdir -p \"D:/Programme/java/ManpouChinaSystem/libs/manpou-common/src/main/java/com/manpou/common/time\")",
       "Bash(mkdir -p \"D:/Programme/java/ManpouChinaSystem/libs/manpou-common/src/main/java/com/manpou/common/security\")",
       "Bash(cmd *)",
-      "Bash(printf '@echo off\\\\ncall \"D:/Programme/java/ManpouChinaSystem/scripts/start-all.bat\" status > \"%%TEMP%%\\\\\\\\start_test_out.txt\" 2> \"%%TEMP%%\\\\\\\\start_test_err.txt\"\\\\nexit\\\\n')"
+      "Bash(printf '@echo off\\\\ncall \"D:/Programme/java/ManpouChinaSystem/scripts/start-all.bat\" status > \"%%TEMP%%\\\\\\\\start_test_out.txt\" 2> \"%%TEMP%%\\\\\\\\start_test_err.txt\"\\\\nexit\\\\n')",
+      "Bash(unzip -l \"D:/Programme/java/ManpouChinaSystem/apps/manpou-allinone/target/manpou-allinone-1.0.0-SNAPSHOT.jar\")",
+      "Bash(unzip -p \"D:/Programme/java/ManpouChinaSystem/apps/manpou-allinone/target/manpou-allinone-1.0.0-SNAPSHOT.jar\" \"BOOT-INF/classes/keys/private.pem\")",
+      "Bash(mvn package *)",
+      "Bash(unzip -p \"D:/Programme/java/ManpouChinaSystem/apps/manpou-allinone/target/manpou-allinone-1.0.0-SNAPSHOT.jar\" \"BOOT-INF/classes/com/manpou/allinone/infrastructure/security/JwtKeyManager.class\")",
+      "Bash(xargs md5sum *)",
+      "Bash(xargs diff *)",
+      "Bash(mvn install *)",
+      "mcp__ide__getDiagnostics",
+      "Bash(dir /b \"D:\\\\Programme\\\\java\\\\ManpouChinaSystem\\\\apps\\\\web\")",
+      "Bash(sed -i 's/const map: Record<string, string>/const statusTypeMap: Record<string, string>/g' apps/web/src/pages/procurement/OrderPage.vue)",
+      "Bash(sed -i 's/return map\\\\[status\\\\]/return statusTypeMap[status]/g' apps/web/src/pages/procurement/OrderPage.vue)",
+      "Bash(sed -i 's|import type { FormInstance, FormRules } from '\\\\''element-plus'\\\\''|import type { FormInstance, FormRules } from '\\\\''element-plus'\\\\''\\\\nimport { ElMessage } from '\\\\''element-plus'\\\\''|' apps/web/src/pages/auth/LoginPage.vue)",
+      "Bash(sed -i s/billingMethod/billingType/g apps/web/src/pages/test/TestPage.vue apps/web/src/pages/procurement/OrderPage.vue)"
     ]
   }
 }

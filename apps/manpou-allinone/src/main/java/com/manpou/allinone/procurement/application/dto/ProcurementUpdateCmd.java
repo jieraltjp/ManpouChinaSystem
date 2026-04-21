@@ -1,5 +1,6 @@
 package com.manpou.allinone.procurement.application.dto;
 
+import com.manpou.allinone.procurement.domain.model.BillingType;
 import com.manpou.allinone.procurement.domain.model.ShipmentStatus;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -11,47 +12,68 @@ import java.time.LocalDate;
 
 /**
  * 更新发注单命令对象（部分更新）。
- * 与 docs/business/API-发注管理.md §1.4 完全对齐。
+ * 与 docs/business/SPEC-发注管理流程.md §3.2 完全对齐。
  */
 @Data
 public class ProcurementUpdateCmd {
 
-    @Length(max = 32, message = "商品代码最多 32 字符")
-    private String productCode;
+    // ===== 关联 =====
+    private Long factoryId;           // 关联工厂ID
+
+    // ===== 商品信息 =====
+    @Length(max = 32)
+    private String productCode;       // 主货号
+
+    @Length(max = 64)
+    private String subProductCode;   // 子货号/枝番（颜色）
+
+    @Length(max = 64)
+    private String material;          // 材质
+
+    private Boolean requiresQc;      // 是否需要检测
 
     @Positive(message = "数量必须为正数")
-    private Integer quantity;
+    private Integer quantity;        // 订购数量
 
+    // ===== 价格信息 =====
     @PositiveOrZero(message = "人民币单价不能为负")
-    private BigDecimal priceRmb;
+    private BigDecimal priceRmb;     // 人民币单价
 
     @Positive(message = "汇率必须为正数")
-    private BigDecimal exchangeRate;
+    private BigDecimal exchangeRate; // CNY→JPY 汇率
 
-    private BigDecimal taxPoint;
+    private BigDecimal taxPoint;     // 票点
 
-    private String billingMethod;
+    private BillingType billingType; // 报关类型（v1.3.0 新增）
 
-    private LocalDate orderDate;
+    // ===== 报关与说明 =====
+    @Length(max = 512)
+    private String customsRemarks;  // 报关备注
 
-    private LocalDate factoryShipDate;
+    private String instructionManual; // 说明书
 
-    private LocalDate plannedShipDate;
+    // ===== 日期 =====
+    private LocalDate orderDate;      // 下单日
+    private LocalDate factoryShipDate; // 厂家出货日
+    private LocalDate plannedShipDate;  // 计划出货日
+    private LocalDate actualShipDate;   // 实际出货日
+
+    // ===== 担当 =====
+    @Length(max = 64)
+    private String productLead;     // 商品担当
 
     @Length(max = 64)
-    private String productLead;
+    private String japanLead;       // 日本担当
 
     @Length(max = 64)
-    private String japanLead;
+    private String chinaLead;       // 中国担当
 
-    @Length(max = 64)
-    private String chinaLead;
+    // ===== 发货信息 =====
+    @Length(max = 128)
+    private String destination;     // 发送目的地
 
     @Length(max = 128)
-    private String destination;
+    private String customerCompany; // 客户公司
 
-    @Length(max = 128)
-    private String customerCompany;
-
-    private ShipmentStatus status;     // 状态推进
+    private ShipmentStatus status;  // 状态推进
 }

@@ -1,10 +1,10 @@
 # 发注管理 — API 契约
 
-> **版本**: 1.2.0
-> **更新**: 2026-04-20
-> **依据**: `docs/发注管理体系升级.pdf` + `docs/新発注管理-設計図.xlsx`
+> **版本**: 1.3.0
+> **更新**: 2026-04-21
+> **依据**: `docs/发注管理体系升级.pdf` + `docs/新発注管理-設計図.xlsx` + `SPEC-发注管理流程.md`
 
-> ⚠️ **代码实现进度**: 发注单 CRUD ✅ 已实现 · 商品目录 🔴 骨架 · 验货/货柜/财务/退货 🔴 未实现
+> ⚠️ **代码实现进度**: 发注单 CRUD ✅ 已实现 · 完整状态流转校验 ✅ 已实现 · 商品目录 🔴 骨架 · 验货/货柜/财务/退货 🔴 未实现
 
 ---
 
@@ -38,7 +38,7 @@ POST /api/v1/procurements
   "priceRmb": 45.00,
   "exchangeRate": 21.5,
   "taxPoint": 1.1,
-  "billingMethod": "METHOD_A",
+  "billingType": "ZHE_LU_KAI_PIAO",
   "orderDate": "2026-04-20",
   "factoryShipDate": "2026-05-01",
   "plannedShipDate": "2026-05-10",
@@ -60,7 +60,7 @@ POST /api/v1/procurements
 | priceRmb | 人民币价格 | ✅ | 人民币单价 |
 | exchangeRate | 汇率 | ✅ | CNY→JPY 汇率 |
 | taxPoint | 票点 | ✅ | 默认 1.1 |
-| billingMethod | 计费方式 | ✅ | 计算方式 |
+| billingType | 计费方式 | ✅ | 报关类型（ZHE_LU_KAI_PIAO/CHAO_HUI_TUI_SHUI/NO_REFUND/OTHER） |
 | orderDate | 下单日 | | 1688 下单日期 |
 | factoryShipDate | 厂家出货日 | | 厂家发货日期 |
 | plannedShipDate | 计划出货日 | | 计划发货日期 |
@@ -102,7 +102,7 @@ GET /api/v1/procurements
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| status | string | 状态过滤（未定/発注待/永康/倉庫着/検品/エア便/輸出/通関/日本着/会計/完了/退货） |
+| status | string | 状态过滤（未定/予定/OEM/発注待/永康/直送/倉庫着/現地検品/検品/エア便/メーカー直送/輸出/国内通関/通関/日本着/日本通関完了/会計/完了/退货） |
 | productCode | string | 商品代码 |
 | customerCompany | string | 客户公司 |
 | page | int | 页码，默认 0（0-indexed） |
@@ -152,7 +152,7 @@ GET /api/v1/procurements/{id}
     "exchangeRate": 21.5,
     "taxPoint": 1.1,
     "estimatedPriceJpy": 11321.25,
-    "billingMethod": "METHOD_A",
+    "billingType": "ZHE_LU_KAI_PIAO",
     "orderDate": "2026-04-20",
     "factoryShipDate": "2026-05-01",
     "plannedShipDate": "2026-05-10",
@@ -184,28 +184,29 @@ PATCH /api/v1/procurements/{id}
 }
 ```
 
-**状态推进规则**（与 SPEC §5 完全一致）：
+**状态推进规则**（与 `ShipmentStatus.java` FSM 完全一致，详见 SPEC-发注管理流程.md §5）：
 
 | 当前状态 | 可转向 |
 |----------|--------|
-| 未定 | 発注待 |
-| 未定 | OEM |
-| 未定 | 直送 |
-| 発注待 | 永康 |
-| 発注待 | 直送 |
-| 永康 | 倉庫着 |
-| 直送 | 倉庫着 |
-| 倉庫着 | 検品 |
-| 倉庫着 | 現地検品 |
-| 現地検品 | メーカー直送 |
-| 検品 | エア便 |
-| 検品 | 輸出 |
-| エア便 | 日本着 |
-| 輸出 | 通関 |
-| 通関 | 日本着 |
-| 日本着 | 会計 |
-| 会計 | 完了 |
+| 未定 | 未定 / 予定 / 発注待 / OEM |
+| 予定 | 未定 / 予定 / 発注待 / OEM |
+| OEM | 未定 / 予定 / 発注待 / OEM |
+| 発注待 | 未定 / 予定 / 永康 / 直送 / OEM |
+| 永康 | 未定 / 倉庫着 |
+| 直送 | 未定 / 倉庫着 |
+| 倉庫着 | 未定 / 検品 / 現地検品 |
+| 検品 | 未定 / エア便 / 輸出 / 倉庫着 |
+| 現地検品 | 未定 / メーカー直送 / 倉庫着 |
+| エア便 | 未定 / 国内通関 |
+| 輸出 | 未定 / 国内通関 |
+| メーカー直送 | 未定 / 日本着 |
+| 国内通関 | 未定 / 通関 |
+| 通関 | 未定 / 日本着 |
+| 日本着 | 未定 / 日本通関完了 |
+| 日本通関完了 | 未定 / 会計 |
+| 会計 | 未定 / 完了 |
 | 完了 | —（终态，禁止任何变更） |
+| 退货 | 未定 / 完了 |
 
 
 ---

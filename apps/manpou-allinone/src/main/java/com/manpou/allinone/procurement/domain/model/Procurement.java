@@ -15,75 +15,95 @@ import java.math.BigDecimal;
 
 /**
  * 发注单实体（对应 Excel 出货单弹窗）。
- * 与 docs/business/SPEC-发注管理流程.md §2.1 完全对齐。
- *
- * 业务含义：一次发注 = 多条商品行 + 状态追踪。
+ * 与 docs/business/SPEC-发注管理流程.md §2.1 + DOMAIN v1.3.0 完全对齐。
  */
 @Entity
 @Table(name = "procurement", indexes = {
         @Index(name = "idx_procurement_product_code", columnList = "product_code"),
         @Index(name = "idx_procurement_status", columnList = "status"),
-        @Index(name = "idx_procurement_create_time", columnList = "create_time")
+        @Index(name = "idx_procurement_create_time", columnList = "create_time"),
+        @Index(name = "idx_procurement_factory_id", columnList = "factory_id"),
+        @Index(name = "idx_procurement_sub_product_code", columnList = "sub_product_code"),
+        @Index(name = "idx_procurement_order_date", columnList = "order_date")
 })
 @Access(AccessType.FIELD)
 @Getter
 @Setter
 public class Procurement extends BaseEntity {
 
+    // ===== 关联 =====
+    @Column(name = "factory_id")
+    private Long factoryId;             // 关联工厂ID（FK → factory.id）
+
     // ===== 商品信息 =====
     @Column(name = "product_code", nullable = false, length = 32)
-    private String productCode;          // 商品代码（关联 Product.productCode）
+    private String productCode;         // 主货号（关联 Product.masterCode）
+
+    @Column(name = "sub_product_code", length = 64)
+    private String subProductCode;     // 子货号/枝番（颜色，如 re/wh/bk）
+
+    @Column(name = "material", length = 64)
+    private String material;            // 材质
+
+    @Column(name = "requires_qc")
+    private Boolean requiresQc;        // 是否需要检测
 
     @Column(name = "quantity", nullable = false)
-    private Integer quantity;             // 订购数量
+    private Integer quantity;          // 订购数量
 
+    // ===== 价格信息 =====
     @Column(name = "price_rmb", nullable = false, precision = 12, scale = 2)
-    private BigDecimal priceRmb;          // 人民币单价
+    private BigDecimal priceRmb;       // 人民币单价
 
     @Column(name = "exchange_rate", nullable = false, precision = 10, scale = 4)
-    private BigDecimal exchangeRate;      // CNY→JPY 汇率
+    private BigDecimal exchangeRate;   // CNY→JPY 汇率
 
     @Column(name = "tax_point", nullable = false, precision = 5, scale = 4)
-    private BigDecimal taxPoint;          // 票点（默认 1.1）
+    private BigDecimal taxPoint;       // 票点（默认 1.1）
 
-    @Column(name = "billing_method", length = 32)
-    private String billingMethod;         // 计费方式（METHOD_A 等）
+    @Enumerated(EnumType.STRING)
+    @Column(name = "billing_type", length = 32)
+    private BillingType billingType;   // 报关类型（v1.3.0 新增）
 
-    // ===== 价格计算结果（只读） =====
-    /**
-     * 批发价 JPY（自动计算）。
-     * 公式：(priceRmb / taxPoint × 1.02 × 1.2) × exchangeRate × 1.05
-     * 前端实时计算，后端存储结果。
-     */
     @Column(name = "estimated_price_jpy", precision = 14, scale = 2)
-    private BigDecimal estimatedPriceJpy; // 估算批发价 JPY
+    private BigDecimal estimatedPriceJpy; // 估算批发价 JPY（只读计算字段）
+
+    // ===== 报关与说明 =====
+    @Column(name = "customs_remarks", length = 512)
+    private String customsRemarks;    // 报关备注（v1.3.0 新增）
+
+    @Column(name = "instruction_manual", columnDefinition = "TEXT")
+    private String instructionManual; // 说明书（v1.3.0 新增）
 
     // ===== 日期 =====
     @Column(name = "order_date")
-    private java.time.LocalDate orderDate;        // 下单日（1688下单日期）
+    private java.time.LocalDate orderDate;       // 下单日
 
     @Column(name = "factory_ship_date")
-    private java.time.LocalDate factoryShipDate;  // 厂家出货日
+    private java.time.LocalDate factoryShipDate; // 厂家出货日
 
     @Column(name = "planned_ship_date")
-    private java.time.LocalDate plannedShipDate;  // 计划出货日
+    private java.time.LocalDate plannedShipDate; // 计划出货日（交货期）
+
+    @Column(name = "actual_ship_date")
+    private java.time.LocalDate actualShipDate;  // 实际出货日（v1.3.0 新增）
 
     // ===== 担当 =====
     @Column(name = "product_lead", length = 64)
-    private String productLead;          // 商品担当
+    private String productLead;        // 商品担当
 
     @Column(name = "japan_lead", length = 64)
-    private String japanLead;             // 日本担当
+    private String japanLead;          // 日本担当
 
     @Column(name = "china_lead", length = 64)
-    private String chinaLead;             // 中国担当
+    private String chinaLead;          // 中国担当
 
     // ===== 发货信息 =====
     @Column(name = "destination", length = 128)
-    private String destination;           // 发送目的地
+    private String destination;        // 发送目的地
 
     @Column(name = "customer_company", length = 128)
-    private String customerCompany;        // 客户公司
+    private String customerCompany;    // 客户公司
 
     // ===== 状态 =====
     @Enumerated(EnumType.STRING)
@@ -109,7 +129,9 @@ public class Procurement extends BaseEntity {
         this.estimatedPriceJpy = base.setScale(2, java.math.RoundingMode.HALF_UP);
     }
 
-    /** 更新状态（终态禁止修改，非法转换抛出 BusinessException） */
+    /**
+     * 更新状态（终态禁止修改）。
+     */
     public void updateStatus(ShipmentStatus newStatus) {
         if (this.status.isTerminal()) {
             throw new com.manpou.allinone.common.exception.BusinessException(
@@ -124,7 +146,9 @@ public class Procurement extends BaseEntity {
         this.status = newStatus;
     }
 
-    /** 重置为未定 */
+    /**
+     * 重置为未定。
+     */
     public void resetToUndecided() {
         if (this.status.isTerminal()) {
             throw new com.manpou.allinone.common.exception.BusinessException(

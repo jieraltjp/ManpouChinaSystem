@@ -13,7 +13,7 @@
         :model="form"
         :rules="rules"
         label-position="top"
-        @submit.prevent="handleLogin"
+        @submit.prevent="submitLogin"
       >
         <el-form-item label="用户名" prop="username">
           <el-input
@@ -32,7 +32,7 @@
             :prefix-icon="Lock"
             autocomplete="current-password"
             show-password
-            @keyup.enter="handleLogin"
+            @keyup.enter="submitLogin"
           />
         </el-form-item>
 
@@ -41,7 +41,7 @@
             type="primary"
             class="login-btn"
             :loading="loading"
-            @click="handleLogin"
+            @click="submitLogin"
           >
             登录
           </el-button>
@@ -57,6 +57,7 @@ import { ref, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { User, Lock } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
@@ -76,7 +77,7 @@ const rules: FormRules = {
   password: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
 }
 
-async function handleLogin() {
+async function submitLogin() {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
 

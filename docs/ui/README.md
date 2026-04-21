@@ -14,6 +14,7 @@
 | [02-仪表盘](pages/02-dashboard.md) | `/dashboard` | JWT 状态 + 快捷入口 |
 | [03-示例列表](pages/03-examples.md) | `/examples` | 基础 CRUD 演示 |
 | [04-采购单管理](pages/04-procurement.md) | `/test` | 采购单管理（测试页） |
+| [06-发注管理UI设计-步骤1-4](06-发注管理UI设计-步骤1-4.md) | — | 发注管理全链路UI设计（补货/发注单/工厂/验货/调配） |
 
 ---
 

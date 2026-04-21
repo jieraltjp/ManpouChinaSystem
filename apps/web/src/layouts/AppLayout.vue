@@ -19,15 +19,33 @@
           <template #title>仪表盘</template>
         </el-menu-item>
 
-        <el-menu-item index="/examples">
-          <el-icon><Document /></el-icon>
-          <template #title>示例列表</template>
-        </el-menu-item>
-
-        <el-menu-item index="/test">
-          <el-icon><ShoppingCart /></el-icon>
-          <template #title>采购单管理</template>
-        </el-menu-item>
+        <!-- 发注管理 -->
+        <el-sub-menu index="procurement" :popper-class="'sidebar-popper'">
+          <template #title>
+            <el-icon><ShoppingCart /></el-icon>
+            <span v-if="!isCollapsed">发注管理</span>
+          </template>
+          <el-menu-item index="/procurement/demand">
+            <el-icon><FolderOpened /></el-icon>
+            <template #title>01 补货需求</template>
+          </el-menu-item>
+          <el-menu-item index="/procurement/order">
+            <el-icon><ShoppingCart /></el-icon>
+            <template #title>02 发注单</template>
+          </el-menu-item>
+          <el-menu-item index="/procurement/factory">
+            <el-icon><OfficeBuilding /></el-icon>
+            <template #title>03 工厂管理</template>
+          </el-menu-item>
+          <el-menu-item index="/procurement/inspection">
+            <el-icon><CircleCheck /></el-icon>
+            <template #title>04 验货记录</template>
+          </el-menu-item>
+          <el-menu-item index="/procurement/logistics">
+            <el-icon><Van /></el-icon>
+            <template #title>05 调配计划</template>
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-aside>
 
@@ -71,7 +89,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, Document, ShoppingCart } from '@element-plus/icons-vue'
+import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, OfficeBuilding, CircleCheck, Van } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
@@ -126,6 +144,26 @@ function onCommand(cmd: string) {
   background: transparent;
 }
 
+/* 子菜单标题行 */
+.sidebar-menu :deep(.el-sub-menu__title) {
+  color: #C0C4CC;
+  border-radius: 0 8px 8px 0;
+  margin: 2px 8px;
+  width: calc(100% - 16px);
+  transition: all var(--transition-fast);
+}
+.sidebar-menu :deep(.el-sub-menu__title:hover) {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+
+/* 激活父级菜单（发注管理）时橙色 */
+.sidebar-menu :deep(.el-sub-menu.is-active .el-sub-menu__title) {
+  background: rgba(232,101,10,0.12) !important;
+  border-left: 3px solid var(--color-primary);
+  color: var(--color-primary-light) !important;
+}
+
 /* 菜单项 */
 .sidebar-menu :deep(.el-menu-item) {
   color: #C0C4CC;
@@ -133,13 +171,14 @@ function onCommand(cmd: string) {
   margin: 2px 8px;
   width: calc(100% - 16px);
   transition: all var(--transition-fast);
+  padding-left: 48px !important;
 }
 .sidebar-menu :deep(.el-menu-item:hover) {
   background: rgba(255,255,255,0.06);
   color: #fff;
 }
 
-/* 激活项：橙色左边框 + 淡橙背景 */
+/* 激活菜单项：橙色左边框 + 淡橙背景 */
 .sidebar-menu :deep(.el-menu-item.is-active) {
   background: rgba(232,101,10,0.15) !important;
   border-left: 3px solid var(--color-primary);

@@ -1,7 +1,7 @@
-# 数据库设计文档
+# 数据库设计文档（Legacy）
 
-> 数据库即单一真相来源（Single Source of Truth）。
-> 所有 ORM 映射、API 契约均以此文档为准。
+> ⚠️ **已废弃**：本文档为旧版设计，已被 `DB-发注管理数据库设计-步骤1-4.md` 取代。
+> 以下 procurement 表结构仍保留，但 `billing_method` 等旧字段已不准确，请以新文档为准。
 >
 > 连接信息：`application-local.yml`（不提交仓库）
 
@@ -105,7 +105,7 @@
 | `exchange_rate` | `DECIMAL(10,4)` | `BigDecimal exchangeRate` | CNY→JPY 汇率 |
 | `tax_point` | `DECIMAL(5,4)` | `BigDecimal taxPoint` | 票点（默认 1.1） |
 | `estimated_price_jpy` | `DECIMAL(14,2)` | `BigDecimal estimatedPriceJpy` | 估算批发价（计算字段） |
-| `billing_method` | `VARCHAR(32)` | `String billingMethod` | 计费方式（可选） |
+| `billing_type` | `ENUM('ZHE_LU_KAI_PIAO','CHAO_HUI_TUI_SHUI','NO_REFUND','OTHER')` | `BillingType billingType` | 报关类型 |
 | `order_date` | `DATE` | `LocalDate orderDate` | 下单日 |
 | `factory_ship_date` | `DATE` | `LocalDate factoryShipDate` | 厂家出货日 |
 | `planned_ship_date` | `DATE` | `LocalDate plannedShipDate` | 计划出货日 |

@@ -58,18 +58,23 @@
 | `エア便` | エア便 | success（绿） | 空运 |
 | `メーカー直送` | メーカー直送 | success（绿） | 厂家直送 |
 | `輸出` | 輸出 | success（绿） | 已出口 |
-| `通関` | 通関 | success（绿） | 已报关 |
+| `国内通関` | 国内通関 | success（绿） | 国内报关 |
+| `通関` | 通関 | success（绿） | 日本报关 |
 | `日本着` | 日本着 | success（绿） | 已到日本 |
+| `日本通関完了` | 日本通関完了 | success（绿） | 日本清关完成 |
 | `会計` | 会計 | warning（橙） | 财务结算 |
 | `完了` | 完了 | info（灰） | **终态**，禁止任何变更 |
 | `退货` | 退货 | danger（红） | 退货 |
 
-### 状态路径（SPEC §5）
+### 状态路径（SPEC §4）
 
 ```
-永康路径：未定/未定/OEM → 発注待 → 永康/直送 → 倉庫着 → 検品/現地検品 → エア便/輸出 → 通関 → 日本着 → 会計 → 完了
-OEM路径：未定/未定/OEM → 発注待 → OEM → 倉庫着 → 現地検品 → メーカー直送 → 完了
-直送路径：未定/未定/OEM → 発注待 → 直送 → 倉庫着 → 検品/現地検品 → ...
+永康路径：未定/未定/OEM → 発注待 → 永康/直送 → 倉庫着 → 検品/現地検品
+        → エア便/輸出 → 国内通関 → 通関 → 日本着 → 日本通関完了 → 会計 → 完了
+OEM路径：未定/未定/OEM → 発注待 → OEM → 倉庫着 → 現地検品 → メーカー直送
+        → 日本着 → 日本通関完了 → 会計 → 完了
+直送路径：未定/未定/OEM → 発注待 → 直送 → 倉庫着 → 検品/現地検品 → エア便/輸出
+        → 国内通関 → 通関 → 日本着 → 日本通関完了 → 会計 → 完了
 ```
 
 ---
@@ -129,7 +134,7 @@ TestPage.vue
 │   └── "新规发注" 按钮
 ├── 筛选栏 (el-card, shadow=never)
 │   ├── 商品代码输入（placeholder: 如 de077）
-│   ├── 状态下拉（17个选项）
+│   ├── 状态下拉（19个选项）
 │   ├── 客户公司输入
 │   ├── 查询按钮（primary）
 │   └── 重置按钮
@@ -162,7 +167,7 @@ TestPage.vue
 | `exchangeRate` | `exchangeRate` | CNY→JPY 汇率 |
 | `taxPoint` | `taxPoint` | 票点（默认 1.1） |
 | `estimatedPriceJpy` | `estimatedPriceJpy` | 估算批发价（前端计算，后端存储） |
-| `billingMethod` | `billingMethod` | 计费方式 |
+| `billingType` | `billingType` | 报关类型 |
 | `orderDate` | `orderDate` | 下单日（yyyy-MM-dd） |
 | `factoryShipDate` | `factoryShipDate` | 厂家出货日 |
 | `plannedShipDate` | `plannedShipDate` | 计划出货日 |

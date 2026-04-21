@@ -8,7 +8,7 @@
 
 | 模块 | 文档状态 | 代码实现 | 备注 |
 |------|---------|---------|------|
-| 发注单（Procurement） | ✅ 完成 | ✅ CRUD+报价计算+终态校验+前端对接 | manpou-allinone Phase A ✅ | 状态推进完整流转规则待实现 |
+| 发注单（Procurement） | ✅ 完成 | ✅ CRUD+报价计算+终态校验+前端对接+完整FSM流转 | manpou-allinone Phase A ✅ | ✅ canTransitionTo 已实现 |
 | 商品目录（Product） | ✅ 完成 | 🔴 未实现 | manpou-allinone product 模块替换骨架 |
 | 货柜管理（Container） | ✅ 完成 | 🔴 未实现 | — |
 | 财务结算（FinanceRecord） | ✅ 完成 | 🔴 未实现 | — |
@@ -26,7 +26,7 @@
 | 00 | [SPEC-发注管理流程.md](./SPEC-发注管理流程.md) | 需求背景、功能范围、状态机、测试清单 |
 | 01 | [API-发注管理.md](./API-发注管理.md) | REST 接口契约、请求/响应格式、错误码 |
 | 02 | [DOMAIN-发注管理领域模型.md](./DOMAIN-发注管理领域模型.md) | 聚合根、值对象、枚举、仓储接口、领域服务 |
-| DB | [../database/DB-漫普中国系统数据库设计.md](../database/DB-漫普中国系统数据库设计.md) | 表清单、实体-表映射、字段类型规范 |
+| DB | [../database/DB-发注管理数据库设计-步骤1-4.md](../database/DB-发注管理数据库设计-步骤1-4.md) | 表清单、实体-表映射（v1.3.0） |
 
 ---
 
