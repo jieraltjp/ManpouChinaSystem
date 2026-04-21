@@ -12,7 +12,7 @@
 | `01-login.png` | 登录页 `/login` | 待补充 |
 | `02-dashboard.png` | 仪表盘 `/dashboard` | 待补充 |
 | `03-examples.png` | 示例管理 `/examples` | 待补充 |
-| `04-procurement.png` | 采购单管理 `/test` | 待补充 |
+| `04-procurement.png` | 发注单管理 `/procurement/order` | 待补充 |
 
 ---
 
