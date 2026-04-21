@@ -198,18 +198,19 @@ DELETE /api/v1/consolidation-pools/{poolId}/items/{itemId}
 - [ ] 🔴 `container` 数据库表
 - [ ] 🔴 `consolidation_pool` 数据库表
 - [ ] 🔴 `consolidation_pool_item` 数据库表（拼柜池明细）
-- [ ] 🔴 `LogisticsPlan` 实体
+- [x] ✅ `LogisticsPlan` 实体（domain/model/LogisticsPlan.java）
 - [ ] 🔴 `Container` 实体
 - [ ] 🔴 `ConsolidationPool` 实体 + `ConsolidationPoolItem`
-- [ ] 🔴 `LogisticsPlanStatus` 枚举（PLANNED / BOOKED / IN_TRANSIT / DELIVERED）
+- [x] ✅ `LogisticsStatus` 枚举（PLANNED / BOOKED / IN_TRANSIT / DELIVERED）
 - [ ] 🔴 `ContainerStatus` 枚举
-- [ ] 🔴 `PlanType` 枚举（SEA / AIR / CONSOLIDATION）
-- [ ] 🔴 Repository 接口 × 3
-- [ ] 🔴 Assembler 转换器 × 3
-- [ ] 🔴 UseCase × 3
-- [ ] 🔴 Controller × 3
-- [ ] 🔴 `@/api/logistics.ts` 前端 API 客户端
-- [ ] 🔴 `LogisticsPage.vue` 列表页（接真实 API）
-- [ ] 🔴 新增调配弹窗
-- [ ] 🔴 调配详情抽屉
-- [ ] 🔴 SPEC 进度更新至 `SPEC-发注管理流程.md`
+- [x] ✅ `PlanType` 枚举（SEA / AIR / CONSOLIDATION）
+- [x] ✅ Repository 接口（LogisticsPlanRepository.java）
+- [x] ✅ Assembler 转换器（LogisticsPlanAssembler.java）
+- [x] ✅ UseCase（LogisticsPlanUseCase.java）
+- [x] ✅ Controller（LogisticsController.java）
+- [x] ✅ `@/api/logistics.ts` 前端 API 客户端
+- [x] ✅ `LogisticsPage.vue` 列表页（接真实 API）
+- [x] ✅ 新增调配弹窗
+- [x] ✅ 调配详情抽屉
+- [x] ✅ SPEC 进度更新至 `SPEC-发注管理流程.md`
+- [x] ✅ 单元测试（LogisticsPlanUseCaseTest，12 个测试用例）
