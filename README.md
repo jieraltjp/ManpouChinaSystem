@@ -45,9 +45,9 @@ ManpouChinaSystem/
 ├── docs/
 │   ├── index.md              # 文档导航
 │   ├── pro/                  # 项目专属文档
-│   ├── desigin/              # 构建指南
+│   ├── design/               # 构建指南
 │   ├── role/                 # 角色视角
-│   ├── ui/                   # 前端UI
+│   ├── ui/                   # 前端UI（含橙色主题方案）
 │   └── check/                # 审计报告
 ├── .github/
 │   └── workflows/
@@ -72,31 +72,46 @@ ManpouChinaSystem/
 | 构建工具 | Vite | 5.x |
 | 包管理 | npm | — |
 
-## 快速开始
+## 快速开始（Phase 0 — 三服务）
 
-### 1. 启动基础设施
+Phase 0 使用单体架构，所需服务数量最少，一键启动。
+
+### 启动全部服务
 
 ```bash
-cd docker
-docker compose up -d
+# Windows（推荐）
+scripts\restart-all.bat all
+
+# 或分步：停止 → 启动
+scripts\stop-all.bat all
+scripts\start-all.bat all
 ```
 
-### 2. 编译服务
+### 单服务控制
 
 ```bash
-# 编译单个服务
-cd apps/user-service
-./mvnw clean package -DskipTests
-
-# 编译所有服务
-./scripts/build-all.sh
+scripts\start-all.bat manpou   # 仅启动后端（端口 18090）
+scripts\start-all.bat user      # 仅启动用户服务（端口 18081）
+scripts\start-all.bat web       # 仅启动前端（端口 13000）
+scripts\start-all.bat status    # 查询运行状态
 ```
 
-### 3. 启动服务
+### 服务访问地址
+
+| 服务 | 地址 |
+|------|------|
+| 前端 | http://localhost:13000 |
+| Swagger UI | http://localhost:18090/swagger-ui/index.html |
+| user-service API | http://localhost:18081 |
+
+### 编译单个服务
 
 ```bash
+cd apps/manpou-allinone
+mvn package -DskipTests -q -Drevision=1.0.0
+
 cd apps/user-service
-./mvnw spring-boot:run
+mvn package -DskipTests -q -Drevision=1.0.0
 ```
 
 ## 团队成员
@@ -114,12 +129,12 @@ cd apps/user-service
 
 | 文档 | 说明 |
 |------|------|
-| [01-项目规划与架构设计](docs/desigin/01-项目规划与架构设计.md) | 限界上下文、领域模型 |
-| [02-环境准备](docs/desigin/02-环境准备.md) | 开发环境配置 |
-| [03-后端服务生成](docs/desigin/03-后端服务生成.md) | 微服务生成 |
-| [04-前端项目生成](docs/desigin/04-前端项目生成.md) | 前端配置 |
-| [05-领域模块开发](docs/desigin/05-领域模块开发.md) | 业务模块开发 |
-| [06-配置与部署](docs/desigin/06-配置与部署.md) | Docker、CI/CD |
+| [01-项目规划与架构设计](docs/design/01-项目规划与架构设计.md) | 限界上下文、领域模型 |
+| [02-环境准备](docs/design/02-环境准备.md) | 开发环境配置 |
+| [03-后端服务生成](docs/design/03-后端服务生成.md) | 微服务生成 |
+| [04-前端项目生成](docs/design/04-前端项目生成.md) | 前端配置 |
+| [05-领域模块开发](docs/design/05-领域模块开发.md) | 业务模块开发 |
+| [06-配置与部署](docs/design/06-配置与部署.md) | Docker、CI/CD |
 
 ---
 
