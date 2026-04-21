@@ -80,9 +80,8 @@ ManpouChinaSystem/
 | 服务 | 端口 | 上下文路径 | 备注 |
 |------|------|-----------|------|
 | api-gateway | 18080 | / | 统一入口 |
-| **manpou-allinone** | **18090** | / | ⚡ Phase 0：6 领域合一 |
+| **manpou-allinone** | **18090** | / | ⚡ Phase 0：7 领域合一（含发注/仓储/报关等） |
 | user-service | 18081 | / | JWT 认证 |
-| procurement-service | 18083 | / | 核心业务：发注单 |
 | warehouse-service | 18084 | / | ⚡ 后期独立 |
 | customs-service | 18085 | / | ⚡ 后期独立 |
 | logistics-service | 18086 | / | ⚡ 后期独立 |
@@ -166,7 +165,7 @@ docker-compose -f docker-compose.yml up -d
 | 资源 | 地址 |
 |------|------|
 | 前端 | http://localhost:13000 |
-| Swagger UI（procurement） | http://localhost:18083/swagger-ui/index.html |
+| Swagger UI（procurement） | http://localhost:18090/swagger-ui/index.html |
 | Swagger UI（user） | http://localhost:18081/swagger-ui/index.html |
 | Nacos（需 Docker） | http://localhost:8848/nacos |
 | Kafka UI（需 Docker） | http://localhost:8090 |
