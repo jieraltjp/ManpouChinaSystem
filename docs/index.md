@@ -47,7 +47,7 @@ docs/
 | 16 | `16-config-center.md` | `config/` | Checkstyle + Nacos 配置模板 |
 | 17 | `17-服务间认证.md` | — | JWT Token 透明传递、RS256 验签机制 |
 | 18 | `18-可插拔基础设施.md` | — | Docker/Redis/Kafka/Nacos 可选接入原则 |
-| 19 | `19-manpou-allinone.md` | `apps/manpou-allinone/` | 6 领域合一单体、Phase 0 策略 |
+| 19 | `19-manpou-allinone.md` | `apps/manpou-allinone/` | 7 领域合一单体、Phase 0 策略 |
 | 20 | `20-ubuntu-deploy-dev.md` | — | Ubuntu 轻量部署、Systemd 服务、Phase 0 三服务 |
 
 ---

@@ -42,7 +42,7 @@
 
 | Topic | 事件 | 动作 |
 |-------|------|------|
-| `procurement.events` | `PurchaseOrderApproved` | 发送邮件通知 |
+| `procurement.events` | `ProcurementApproved` | 发送邮件通知 |
 | `warehouse.events` | `GoodsArrived` | 发送到货通知 |
 | `customs.events` | `DocumentsConfirmed` | 发送单据完成通知 |
 | `logistics.events` | `ContainerSealed` | 发送封柜通知 |

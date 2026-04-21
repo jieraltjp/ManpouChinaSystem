@@ -105,8 +105,8 @@ CREATE TABLE arrival_record (
 
 | Topic | 事件 | 动作 |
 |-------|------|------|
-| `procurement.events` | `PurchaseOrderApproved` | 创建到货记录 |
-| `procurement.events` | `PurchaseOrderShipped` | 更新物流状态 |
+| `procurement.events` | `ProcurementApproved` | 创建到货记录 |
+| `procurement.events` | `ProcurementShipped` | 更新物流状态 |
 
 ---
 

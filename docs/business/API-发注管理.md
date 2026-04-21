@@ -33,15 +33,22 @@ POST /api/v1/procurements
 **请求体**（对应 Excel 出货单弹窗）：
 ```json
 {
+  "factoryId": 1,
   "productCode": "de077",
+  "subProductCode": "re",
+  "material": "plastic",
+  "requiresQc": true,
   "quantity": 500,
   "priceRmb": 45.00,
   "exchangeRate": 21.5,
   "taxPoint": 1.1,
   "billingType": "ZHE_LU_KAI_PIAO",
+  "customsRemarks": "浙鲁开票",
+  "instructionManual": "中日英三语",
   "orderDate": "2026-04-20",
   "factoryShipDate": "2026-05-01",
   "plannedShipDate": "2026-05-10",
+  "actualShipDate": "2026-05-08",
   "productLead": "王琳琳",
   "japanLead": "张云",
   "chinaLead": "田中",
@@ -55,15 +62,22 @@ POST /api/v1/procurements
 
 | 字段 | Excel 名称 | 必填 | 说明 |
 |------|-----------|------|------|
-| productCode | 货号 | ✅ | 商品代码（关联 Product 表） |
+| factoryId | 工厂 | | 关联工厂（FK → factory.id） |
+| productCode | 货号 | ✅ | 主货号（关联 Product 表） |
+| subProductCode | 子货号 | | 枝番/颜色（re/wh/bk） |
+| material | 材质 | | 材质 |
+| requiresQc | 必要检测 | | 是否需要检测 |
 | quantity | 数量 | ✅ | 订购数量 |
 | priceRmb | 人民币价格 | ✅ | 人民币单价 |
-| exchangeRate | 汇率 | ✅ | CNY→JPY 汇率 |
-| taxPoint | 票点 | ✅ | 默认 1.1 |
-| billingType | 计费方式 | ✅ | 报关类型（ZHE_LU_KAI_PIAO/CHAO_HUI_TUI_SHUI/NO_REFUND/OTHER） |
+| exchangeRate | 汇率 | ✅ | CNY→JPY 汇率（默认 21.5） |
+| taxPoint | 票点 | | 默认 1.1 |
+| billingType | 计费方式 | | 报关类型（ZHE_LU_KAI_PIAO/CHAO_HUI_TUI_SHUI/NO_REFUND/OTHER） |
+| customsRemarks | 报关备注 | | 报关备注 |
+| instructionManual | 说明书 | | 说明书内容 |
 | orderDate | 下单日 | | 1688 下单日期 |
 | factoryShipDate | 厂家出货日 | | 厂家发货日期 |
 | plannedShipDate | 计划出货日 | | 计划发货日期 |
+| actualShipDate | 实际出货日 | | 实际发货日期 |
 | productLead | 商品担当 | | 负责人 |
 | japanLead | 日本担当 | | 日本侧负责人 |
 | chinaLead | 中国担当 | | 中国侧负责人 |
@@ -80,13 +94,8 @@ estimatedPriceJpy = (priceRmb / taxPoint * 1.02 * 1.2) * exchangeRate * 1.05
 ```json
 {
   "code": "ok",
-  "data": {
-    "id": 1,
-    "productCode": "de077",
-    "estimatedPriceJpy": 11321.25,
-    "status": "未定",
-    "createdAt": "2026-04-20T10:00:00+09:00"
-  }
+  "message": "发注单创建成功",
+  "data": 1
 }
 ```
 
@@ -116,13 +125,32 @@ GET /api/v1/procurements
     "content": [
       {
         "id": 1,
+        "factoryId": 1,
         "productCode": "de077",
+        "subProductCode": "re",
+        "material": "plastic",
+        "requiresQc": true,
         "quantity": 500,
+        "priceRmb": 45.00,
+        "exchangeRate": 21.5,
+        "taxPoint": 1.1,
+        "billingType": "ZHE_LU_KAI_PIAO",
         "estimatedPriceJpy": 11321.25,
-        "status": "倉庫着",
-        "productLead": "王琳琳",
+        "customsRemarks": "浙鲁开票",
+        "instructionManual": "中日英三语",
+        "orderDate": "2026-04-20",
+        "factoryShipDate": "2026-05-01",
         "plannedShipDate": "2026-05-10",
-        "createdAt": "2026-04-20T10:00:00+09:00"
+        "actualShipDate": "2026-05-08",
+        "productLead": "王琳琳",
+        "japanLead": "张云",
+        "chinaLead": "田中",
+        "destination": "名古屋倉庫",
+        "customerCompany": "永康株式会社",
+        "status": "倉庫着",
+        "createBy": "admin",
+        "createTime": "2026-04-20T10:00:00+09:00",
+        "updateTime": "2026-04-20T10:00:00+09:00"
       }
     ],
     "totalElements": 42,
@@ -146,24 +174,32 @@ GET /api/v1/procurements/{id}
   "code": "ok",
   "data": {
     "id": 1,
+    "factoryId": 1,
     "productCode": "de077",
+    "subProductCode": "re",
+    "material": "plastic",
+    "requiresQc": true,
     "quantity": 500,
     "priceRmb": 45.00,
     "exchangeRate": 21.5,
     "taxPoint": 1.1,
-    "estimatedPriceJpy": 11321.25,
     "billingType": "ZHE_LU_KAI_PIAO",
+    "estimatedPriceJpy": 11321.25,
+    "customsRemarks": "浙鲁开票",
+    "instructionManual": "中日英三语",
     "orderDate": "2026-04-20",
     "factoryShipDate": "2026-05-01",
     "plannedShipDate": "2026-05-10",
+    "actualShipDate": "2026-05-08",
     "productLead": "王琳琳",
     "japanLead": "张云",
     "chinaLead": "田中",
     "destination": "名古屋倉庫",
     "customerCompany": "永康株式会社",
     "status": "未定",
-    "createdAt": "...",
-    "updatedAt": "..."
+    "createBy": "admin",
+    "createTime": "2026-04-20T10:00:00+09:00",
+    "updateTime": "2026-04-20T10:00:00+09:00"
   }
 }
 ```

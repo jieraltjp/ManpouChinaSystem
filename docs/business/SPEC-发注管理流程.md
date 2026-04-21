@@ -76,15 +76,20 @@
 | requiresQc | 用户选择 | ✅ | 是否需要检测 |
 | chinaLead | 用户输入 | ✅ | 中国担当 |
 | priceRmb | 用户输入 | ✅ | 商品单价（元） |
+| exchangeRate | 用户输入 | ✅ | CNY→JPY 汇率（默认 21.5） |
 | taxPoint | 用户输入 | | 票点（默认 1.1） |
 | billingType | 用户选择 | ✅ | 报关类型（浙鲁开票/超慧退税/不退税） |
+| estimatedPriceJpy | 自动计算 | | 估算批发价 JPY（公式计算） |
 | customsRemarks | 用户输入 | | 报关备注 |
+| instructionManual | 用户输入 | | 说明书 |
 | orderDate | 用户输入 | | 下单日 |
+| factoryShipDate | 用户输入 | | 厂家出货日 |
 | plannedShipDate | 用户输入 | | 预计出货日（交货期） |
 | actualShipDate | 用户输入 | | 实际出货日 |
-| instructionManual | 用户输入 | | 说明书 |
-| destination | 自动带入 | | 目的地（来自 ReplenishmentDemand） |
+| productLead | 用户输入 | | 商品担当 |
 | japanLead | 自动带入 | | 日本担当（来自 ReplenishmentDemand） |
+| destination | 自动带入 | | 目的地（来自 ReplenishmentDemand） |
+| customerCompany | 用户输入 | | 客户公司 |
 | status | 系统 | | default=未定 → 转为 発注待 |
 
 ### 3.3 第三步：验收（QcRecord）
@@ -204,9 +209,11 @@
 
 | 当前状态 | 触发动作 | 下一状态 |
 |----------|----------|----------|
-| PENDING（需求） | 转采购 | 発注待 |
-| 未定/未定 | 下单 | 発注待 |
-| 未定/未定 | OEM下单 | OEM |
+| （ReplenishmentDemand PENDING） | 转采购 | 発注待 |
+| 未定 | 预计发注 | 予定 |
+| 未定 | 下单 | 発注待 |
+| 未定 | OEM下单 | OEM |
+| 未定 | 重置 | 未定 |
 | 発注待 | 永康仓发货 | 永康 |
 | 発注待 | 厂家直送（不经永康） | 直送 |
 | 永康 | 到达仓库 | 倉庫着 |
@@ -216,6 +223,7 @@
 | 現地検品 | 确认发货 | メーカー直送 |
 | 検品 | 体积/重量达标 | エア便 |
 | 検品 | 超体积/重量，需海运 | 輸出 |
+| 検品 | 退回复检 | 倉庫着 |
 | エア便 | 国内报关 | 国内通関 |
 | 輸出 | 国内报关 | 国内通関 |
 | 国内通関 | 日本报关 | 通関 |
@@ -264,17 +272,21 @@
 
 ## 8. 测试清单
 
-- [ ] 新规 ReplenishmentDemand：补货类型 + 新品采购类型区分
-- [ ] 补货需求转采购：CONVERTED 状态推进
-- [ ] Product 主/子货号结构：颜色变体查询
-- [ ] OEM路径完整流转
-- [ ] 永康路径完整流转（含国内通関/日本通関完了）
-- [ ] 空运路径完整流转
-- [ ] QcRecord 独立聚合根：PASS/FAIL 流程
-- [ ] LogisticsPlan 调配：海运/空运/拼柜
-- [ ] 退货状态触发
-- [ ] 报价公式计算验证
-- [ ] 完了后禁止修改
-- [ ] 担当者权限隔离
-- [ ] 第五步国内报关（字段确认后）
-- [ ] 第六步日本清关（字段确认后）
+> ✅ = 已实现（代码验证通过）  🔴 = 待实现
+
+- [ ] 🔴 新规 ReplenishmentDemand：补货类型 + 新品采购类型区分
+- [ ] 🔴 补货需求转采购：CONVERTED 状态推进
+- [ ] 🔴 Product 主/子货号结构：颜色变体查询
+- [x] ✅ OEM路径完整流转（canTransitionTo FSM 支持）
+- [x] ✅ 永康路径完整流转（含国内通関/日本通関完了，FSM 支持）
+- [x] ✅ 空运路径完整流转（FSM 支持）
+- [x] ✅ 直送路径完整流转（FSM 支持）
+- [ ] 🔴 QcRecord 独立聚合根：PASS/FAIL 流程
+- [ ] 🔴 LogisticsPlan 调配：海运/空运/拼柜
+- [x] ✅ 退货状态触发（退货 state exists in ShipmentStatus）
+- [x] ✅ 报价公式计算验证（calculateEstimatedPriceJpy 已实现）
+- [x] ✅ 完了后禁止修改（isTerminal + BusinessException）
+- [x] ✅ FSM 无效转换拒绝（canTransitionTo 校验）
+- [ ] 🔴 担当者权限隔离
+- [ ] 🔴 第五步国内报关 DomesticCustomsRecord（字段待定）
+- [ ] 🔴 第六步日本清关 JapanCustomsRecord（字段待定）

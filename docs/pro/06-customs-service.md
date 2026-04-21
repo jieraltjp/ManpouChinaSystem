@@ -67,7 +67,7 @@ CREATE TABLE export_document (
 | Topic | 事件 | 动作 |
 |-------|------|------|
 | `warehouse.events` | `InspectionCompleted` | 生成出口单据 |
-| `procurement.events` | `PurchaseOrderApproved` | 预生成 INVOICE |
+| `procurement.events` | `ProcurementApproved` | 预生成 INVOICE |
 
 ---
 

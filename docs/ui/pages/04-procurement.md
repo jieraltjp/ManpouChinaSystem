@@ -15,10 +15,13 @@
 │  [折叠]                              [头像] 用户名 [▼]  │
 ├──────────┬──────────────────────────────────────────────┤
 │          │  发注单管理                    [新规发注]      │
-│ MANPOU  │  ┌─────────────────────────────────────────┐ │
-│ ─────── │  │ 商品代码：[____] 状态：[全部▼]        │ │
-│ 仪表盘   │  │ 客户公司：[____]        [查询] [重置] │ │
-│ 发注单 ● │  └─────────────────────────────────────────┘ │
+│ MANPOU  │  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐      │
+│ ─────── │  │ 总数 │ │进行中│ │已完成│ │ 退货 │      │
+│ 仪表盘   │  │  42  │ │  28  │ │  12  │ │   2  │      │
+│ 发注单 ● │  ├──────┴───────────────────────────────┤ │
+│          │  │ 商品代码：[____] 状态：[全部▼]        │ │
+│          │  │ 客户公司：[____]        [查询] [重置] │ │
+│          │  └─────────────────────────────────────────┘ │
 │          │  ┌─────────────────────────────────────────┐ │
 │          │  │商品代码│数量│估算批发价│客户公司│状态│操作│ │
 │          │  │de077  │ 100│ 1,255.99│ XX会社│未定│详情│ │
@@ -132,6 +135,11 @@ TestPage.vue
 ├── 页面头部
 │   ├── 标题 "发注单管理"
 │   └── "新规发注" 按钮
+├── 统计行 (el-row, 4个统计卡)
+│   ├── 发注单总数（橙色 Document 图标）
+│   ├── 进行中（橙色 Clock 图标）
+│   ├── 已完成（绿色 CircleCheck 图标）
+│   └── 退货（红色 Warning 图标）
 ├── 筛选栏 (el-card, shadow=never)
 │   ├── 商品代码输入（placeholder: 如 de077）
 │   ├── 状态下拉（19个选项）
@@ -149,11 +157,17 @@ TestPage.vue
 │   ├── 创建时间（yyyy-MM-dd HH:mm:ss 格式）
 │   └── 操作（详情 / 编辑 / 删除）
 ├── 分页（bottom-right, background）
-└── 详情抽屉 (el-drawer, rtl, 600px)
-    ├── 完整字段 (el-descriptions, column=2, border)
-    ├── 创建时间 / 更新时间
+└── 详情抽屉 (el-drawer, rtl, 600px, el-descriptions column=2)
+    ├── 商品代码 / 数量 / 人民币单价 / 汇率
+    ├── 票点 / 估算批发价(JPY) / 状态 / 计费方式
+    ├── 客户公司 / 下单日 / 厂家出货日 / 计划出货日
+    ├── 商品担当 / 日本担当 / 中国担当
+    ├── 发送目的地（跨列）
+    ├── 创建时间 / 更新时间（跨列）
     └── 底部操作（关闭 / 编辑）
 ```
+
+> **注意**：详情抽屉字段取自 `ProcurementPageQuery`（全部 23 个字段），前端按 UI 需要展示部分字段。
 
 ---
 
@@ -161,16 +175,23 @@ TestPage.vue
 
 | 前端字段 | API 字段 | 说明 |
 |---------|---------|------|
-| `productCode` | `productCode` | 商品代码 |
+| `factoryId` | `factoryId` | 关联工厂 |
+| `productCode` | `productCode` | 主货号 |
+| `subProductCode` | `subProductCode` | 子货号/枝番（颜色） |
 | `quantity` | `quantity` | 订购数量 |
+| `material` | `material` | 材质 |
+| `requiresQc` | `requiresQc` | 是否需要检测 |
 | `priceRmb` | `priceRmb` | 人民币单价 |
 | `exchangeRate` | `exchangeRate` | CNY→JPY 汇率 |
 | `taxPoint` | `taxPoint` | 票点（默认 1.1） |
-| `estimatedPriceJpy` | `estimatedPriceJpy` | 估算批发价（前端计算，后端存储） |
 | `billingType` | `billingType` | 报关类型 |
+| `estimatedPriceJpy` | `estimatedPriceJpy` | 估算批发价（前端计算，后端存储） |
+| `customsRemarks` | `customsRemarks` | 报关备注 |
+| `instructionManual` | `instructionManual` | 说明书 |
 | `orderDate` | `orderDate` | 下单日（yyyy-MM-dd） |
 | `factoryShipDate` | `factoryShipDate` | 厂家出货日 |
 | `plannedShipDate` | `plannedShipDate` | 计划出货日 |
+| `actualShipDate` | `actualShipDate` | 实际出货日 |
 | `productLead` | `productLead` | 商品担当 |
 | `japanLead` | `japanLead` | 日本担当 |
 | `chinaLead` | `chinaLead` | 中国担当 |

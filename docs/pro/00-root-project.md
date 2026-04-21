@@ -23,7 +23,7 @@
 ManpouChinaSystem/
 ├── apps/
 │   ├── java-service/         # [Parent POM] 所有 Java 服务的父 pom
-│   ├── manpou-allinone/      # 6 领域合一 jar（端口 18090）⚡ Phase 0
+│   ├── manpou-allinone/      # 7 领域合一 jar（端口 18090）⚡ Phase 0
 │   ├── user-service/         # 用户认证 + 权限管理（端口 18081）
 │   ├── procurement-service/  # 发注管理（端口 18083）
 │   ├── warehouse-service/    # 仓储管理（端口 18084）⚡ 后期独立

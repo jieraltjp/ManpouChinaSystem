@@ -186,8 +186,8 @@ flowchart TB
         N["notification-service\n通知推送"]
     end
 
-    PROC_P -->|"PurchaseOrderApproved"| T1
-    PROC_P -->|"PurchaseOrderShipped"| T1
+    PROC_P -->|"ProcurementApproved"| T1
+    PROC_P -->|"ProcurementShipped"| T1
     PROC_P -->|"CustomsCleared"| T2
     PROC_P -->|"Shipped"| T3
 
