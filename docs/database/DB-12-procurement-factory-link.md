@@ -72,7 +72,7 @@ ALTER TABLE procurement
 
 > `idx_procurement_factory_id` 索引已在 `Procurement` 实体中声明，但 DB 尚未创建。
 
-### 3.2 V5 Flyway 迁移脚本
+### 3.2 V6 Flyway 迁移脚本
 
 ```sql
 -- ============================================================
@@ -229,7 +229,7 @@ if (query.getFactoryId() != null) {
 
 | 步骤 | 操作 | 风险 |
 |------|------|------|
-| 1 | 执行 V5 迁移（ALTER TABLE） | 低：仅新增列 |
+| 1 | 执行 V6 迁移（ALTER TABLE） | 低：仅新增列 |
 | 2 | 更新 `ProcurementAssembler`（注入 FactoryRepository） | 低：新增依赖 |
 | 3 | 更新 `ProcurementUseCase.create`（校验 factoryId） | 中：现有数据 factory_id 全为 NULL，需确认兼容 |
 | 4 | 更新 `ProcurementAssembler.toDto`（填充 factoryName） | 低 |
