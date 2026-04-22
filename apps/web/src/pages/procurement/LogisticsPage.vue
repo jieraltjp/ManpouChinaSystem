@@ -1,10 +1,10 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2 class="page-title">调配计划</h2>
+      <h2 class="page-title">{{ $t('logistics.title') }}</h2>
       <div class="header-actions">
         <el-button type="primary" @click="onNew">
-          <el-icon><Plus /></el-icon> 新增调配
+          <el-icon><Plus /></el-icon> {{ $t('logistics.newButton') }}
         </el-button>
       </div>
     </div>
@@ -14,7 +14,7 @@
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#E8650A"><Van /></el-icon></div>
-            <div><div class="stat-value">{{ pagination.total }}</div><div class="stat-label">全部调配</div></div>
+            <div><div class="stat-value">{{ pagination.total }}</div><div class="stat-label">{{ $t('logistics.stat.total') }}</div></div>
           </div>
         </el-card>
       </el-col>
@@ -22,7 +22,7 @@
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#1E40AF"><Top /></el-icon></div>
-            <div><div class="stat-value">{{ bookedCount }}</div><div class="stat-label">已订舱</div></div>
+            <div><div class="stat-value">{{ bookedCount }}</div><div class="stat-label">{{ $t('logistics.stat.booked') }}</div></div>
           </div>
         </el-card>
       </el-col>
@@ -30,7 +30,7 @@
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
             <div class="stat-icon-wrap"><el-icon class="icon-transit" color="#7C3AED"><Loading /></el-icon></div>
-            <div><div class="stat-value">{{ transitCount }}</div><div class="stat-label">运输中</div></div>
+            <div><div class="stat-value">{{ transitCount }}</div><div class="stat-label">{{ $t('logistics.stat.inTransit') }}</div></div>
           </div>
         </el-card>
       </el-col>
@@ -38,69 +38,69 @@
 
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filterForm">
-        <el-form-item label="调配类型">
-          <el-select v-model="filterForm.planType" placeholder="全部" clearable style="width:140px">
-            <el-option value="SEA" label="海运" />
-            <el-option value="AIR" label="空运" />
-            <el-option value="CONSOLIDATION" label="拼柜" />
+        <el-form-item :label="$t('logistics.filter.planType')">
+          <el-select v-model="filterForm.planType" :placeholder="$t('logistics.filter.all')" clearable style="width:140px">
+            <el-option value="SEA" :label="$t('logistics.planType.SEA')" />
+            <el-option value="AIR" :label="$t('logistics.planType.AIR')" />
+            <el-option value="CONSOLIDATION" :label="$t('logistics.planType.CONSOLIDATION')" />
           </el-select>
         </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="filterForm.status" placeholder="全部" clearable style="width:140px">
-            <el-option value="PLANNED" label="调配中" />
-            <el-option value="BOOKED" label="已订舱" />
-            <el-option value="IN_TRANSIT" label="运输中" />
-            <el-option value="DELIVERED" label="已送达" />
+        <el-form-item :label="$t('logistics.filter.status')">
+          <el-select v-model="filterForm.status" :placeholder="$t('logistics.filter.all')" clearable style="width:140px">
+            <el-option value="PLANNED" :label="$t('logistics.status.PLANNED')" />
+            <el-option value="BOOKED" :label="$t('logistics.status.BOOKED')" />
+            <el-option value="IN_TRANSIT" :label="$t('logistics.status.IN_TRANSIT')" />
+            <el-option value="DELIVERED" :label="$t('logistics.status.DELIVERED')" />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSearchFromButton">查询</el-button>
-          <el-button @click="onReset">重置</el-button>
+          <el-button type="primary" @click="onSearchFromButton">{{ $t('logistics.filter.search') }}</el-button>
+          <el-button @click="onReset">{{ $t('logistics.filter.reset') }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
 
     <el-card class="table-card" shadow="never">
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
-        <el-table-column prop="planCode" label="调配编号" width="160" />
-        <el-table-column prop="factoryName" label="关联工厂" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="productCode" label="货号" width="120">
+        <el-table-column prop="planCode" :label="$t('logistics.column.planCode')" width="160" />
+        <el-table-column prop="factoryName" :label="$t('logistics.column.factoryName')" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="productCode" :label="$t('logistics.column.productCode')" width="120">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="planType" label="调配类型" width="100" align="center">
+        <el-table-column prop="planType" :label="$t('logistics.column.planType')" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="planTypeTag(row.planType)" size="small">{{ planTypeLabel(row.planType) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="cargoWeightKg" label="货物重量" width="100" align="right">
+        <el-table-column prop="cargoWeightKg" :label="$t('logistics.column.cargoWeightKg')" width="100" align="right">
           <template #default="{ row }">
             {{ row.cargoWeightKg ? row.cargoWeightKg + 'kg' : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="cargoVolumeCbm" label="体积" width="90" align="right">
+        <el-table-column prop="cargoVolumeCbm" :label="$t('logistics.column.cargoVolumeCbm')" width="90" align="right">
           <template #default="{ row }">
             {{ row.cargoVolumeCbm ? row.cargoVolumeCbm.toFixed(4) + 'm³' : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="requiresQc" label="需要检测" width="90" align="center">
+        <el-table-column prop="requiresQc" :label="$t('logistics.column.requiresQc')" width="90" align="center">
           <template #default="{ row }">
             <el-tag :type="row.requiresQc ? 'warning' : 'success'" size="small">
-              {{ row.requiresQc ? '需检测' : '无需' }}
+              {{ row.requiresQc ? $t('logistics.requiresQc.yes') : $t('logistics.requiresQc.no') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="100" align="center">
+        <el-table-column prop="status" :label="$t('logistics.column.status')" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="logisticsStatusType(row.status)" size="small">
               {{ logisticsStatusLabel(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="120" fixed="right" align="center">
+        <el-table-column :label="$t('logistics.column.action')" width="120" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click.stop="onView(row)">详情</el-button>
+            <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('logistics.action.detail') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -120,12 +120,12 @@
     </el-card>
 
     <!-- 新增调配弹窗 -->
-    <el-dialog v-model="dialogVisible" title="新增调配" width="640px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="$t('logistics.dialog.newTitle')" width="640px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="formRules" label-width="100px">
-        <el-form-item label="关联采购单" prop="procurementId">
+        <el-form-item :label="$t('logistics.dialog.procurement')" prop="procurementId">
           <el-select
             v-model="form.procurementId"
-            placeholder="请选择采购单"
+            :placeholder="$t('logistics.dialog.procurementPlaceholder')"
             filterable
             remote
             :remote-method="searchProcurement"
@@ -141,115 +141,115 @@
             />
           </el-select>
         </el-form-item>
-        <el-divider content-position="left"><span class="divider-label">货物信息</span></el-divider>
+        <el-divider content-position="left"><span class="divider-label">{{ $t('logistics.dialog.cargoInfo') }}</span></el-divider>
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="货号" prop="productCode">
-              <el-input v-model="form.productCode" placeholder="主货号" />
+            <el-form-item :label="$t('logistics.dialog.productCode')" prop="productCode">
+              <el-input v-model="form.productCode" :placeholder="$t('logistics.dialog.productCodePlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="子货号">
-              <el-input v-model="form.subProductCode" placeholder="子货号/枝番" />
+            <el-form-item :label="$t('logistics.dialog.subProductCode')">
+              <el-input v-model="form.subProductCode" :placeholder="$t('logistics.dialog.subProductCodePlaceholder')" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="调配类型" prop="planType">
-              <el-select v-model="form.planType" placeholder="请选择" style="width:100%">
-                <el-option value="SEA" label="海运" />
-                <el-option value="AIR" label="空运" />
-                <el-option value="CONSOLIDATION" label="拼柜" />
+            <el-form-item :label="$t('logistics.dialog.planType')" prop="planType">
+              <el-select v-model="form.planType" :placeholder="$t('logistics.dialog.selectPlaceholder')" style="width:100%">
+                <el-option value="SEA" :label="$t('logistics.planType.SEA')" />
+                <el-option value="AIR" :label="$t('logistics.planType.AIR')" />
+                <el-option value="CONSOLIDATION" :label="$t('logistics.planType.CONSOLIDATION')" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="需要检测">
+            <el-form-item :label="$t('logistics.dialog.requiresQc')">
               <el-switch v-model="form.requiresQc" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="16">
           <el-col :span="8">
-            <el-form-item label="货物长(cm)">
+            <el-form-item :label="$t('logistics.dialog.cargoLengthCm')">
               <el-input-number v-model="form.cargoLengthCm" :min="0" style="width:100%" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="货物宽(cm)">
+            <el-form-item :label="$t('logistics.dialog.cargoWidthCm')">
               <el-input-number v-model="form.cargoWidthCm" :min="0" style="width:100%" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="货物高(cm)">
+            <el-form-item :label="$t('logistics.dialog.cargoHeightCm')">
               <el-input-number v-model="form.cargoHeightCm" :min="0" style="width:100%" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="货物重量(kg)">
+            <el-form-item :label="$t('logistics.dialog.cargoWeightKg')">
               <el-input-number v-model="form.cargoWeightKg" :min="0" :precision="3" style="width:100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="数量">
+            <el-form-item :label="$t('logistics.dialog.quantity')">
               <el-input-number v-model="form.quantity" :min="0" style="width:100%" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-divider content-position="left"><span class="divider-label">发货计划</span></el-divider>
+        <el-divider content-position="left"><span class="divider-label">{{ $t('logistics.dialog.shipPlan') }}</span></el-divider>
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="预计发货日">
-              <el-date-picker v-model="form.estimatedShipDate" type="date" value-format="YYYY-MM-DD" placeholder="选择日期" style="width:100%" />
+            <el-form-item :label="$t('logistics.dialog.estimatedShipDate')">
+              <el-date-picker v-model="form.estimatedShipDate" type="date" value-format="YYYY-MM-DD" :placeholder="$t('logistics.dialog.datePlaceholder')" style="width:100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="实际发货日">
-              <el-date-picker v-model="form.actualShipDate" type="date" value-format="YYYY-MM-DD" placeholder="选择日期" style="width:100%" />
+            <el-form-item :label="$t('logistics.dialog.actualShipDate')">
+              <el-date-picker v-model="form.actualShipDate" type="date" value-format="YYYY-MM-DD" :placeholder="$t('logistics.dialog.datePlaceholder')" style="width:100%" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="备注">
-          <el-input v-model="form.remarks" type="textarea" :rows="2" placeholder="备注信息" />
+        <el-form-item :label="$t('logistics.dialog.remarks')">
+          <el-input v-model="form.remarks" type="textarea" :rows="2" :placeholder="$t('logistics.dialog.remarksPlaceholder')" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="onSubmit">保存</el-button>
+        <el-button @click="dialogVisible = false">{{ $t('logistics.dialog.cancel') }}</el-button>
+        <el-button type="primary" :loading="submitting" @click="onSubmit">{{ $t('logistics.dialog.save') }}</el-button>
       </template>
     </el-dialog>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" title="调配详情" size="560px" direction="rtl">
+    <el-drawer v-model="drawerVisible" :title="$t('logistics.drawerTitle')" size="560px" direction="rtl">
       <el-descriptions :column="2" border v-if="currentRow">
-        <el-descriptions-item label="调配编号">{{ currentRow.planCode }}</el-descriptions-item>
-        <el-descriptions-item label="调配类型">
+        <el-descriptions-item :label="$t('logistics.column.planCode')">{{ currentRow.planCode }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.planType')">
           <el-tag :type="planTypeTag(currentRow.planType)" size="small">{{ planTypeLabel(currentRow.planType) }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="货号">
+        <el-descriptions-item :label="$t('logistics.column.productCode')">
           <span class="product-code">{{ currentRow.productCode }}</span>
         </el-descriptions-item>
-        <el-descriptions-item label="关联工厂">{{ currentRow.factoryName || (currentRow.factoryId ? `ID:${currentRow.factoryId}` : '-') }}</el-descriptions-item>
-        <el-descriptions-item label="状态">
+        <el-descriptions-item :label="$t('logistics.column.factoryName')">{{ currentRow.factoryName || (currentRow.factoryId ? `ID:${currentRow.factoryId}` : '-') }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.status')">
           <el-tag :type="logisticsStatusType(currentRow.status)" size="small">{{ logisticsStatusLabel(currentRow.status) }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="货物尺寸" :span="2">{{ cargoDimension }}</el-descriptions-item>
-        <el-descriptions-item label="货物重量">{{ currentRow.cargoWeightKg ? currentRow.cargoWeightKg + 'kg' : '-' }}</el-descriptions-item>
-        <el-descriptions-item label="体积">{{ currentRow.cargoVolumeCbm ? currentRow.cargoVolumeCbm.toFixed(4) + 'm³' : '-' }}</el-descriptions-item>
-        <el-descriptions-item label="数量">{{ currentRow.quantity ?? '-' }}</el-descriptions-item>
-        <el-descriptions-item label="需要检测">
+        <el-descriptions-item :label="$t('logistics.dialog.cargoDimension')" :span="2">{{ cargoDimension }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.cargoWeightKg')">{{ currentRow.cargoWeightKg ? currentRow.cargoWeightKg + 'kg' : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.cargoVolumeCbm')">{{ currentRow.cargoVolumeCbm ? currentRow.cargoVolumeCbm.toFixed(4) + 'm³' : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.dialog.quantity')">{{ currentRow.quantity ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.requiresQc')">
           <el-tag :type="currentRow.requiresQc ? 'warning' : 'success'" size="small">
-            {{ currentRow.requiresQc ? '需检测' : '无需' }}
+            {{ currentRow.requiresQc ? $t('logistics.requiresQc.yes') : $t('logistics.requiresQc.no') }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="预计发货日">{{ currentRow.estimatedShipDate || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="实际发货日">{{ currentRow.actualShipDate || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="备注" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="创建时间">{{ currentRow.createTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="更新时间">{{ currentRow.updateTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.dialog.estimatedShipDate')">{{ currentRow.estimatedShipDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.dialog.actualShipDate')">{{ currentRow.actualShipDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.dialog.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.dialog.createTime')">{{ currentRow.createTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.dialog.updateTime')">{{ currentRow.updateTime || '-' }}</el-descriptions-item>
       </el-descriptions>
     </el-drawer>
   </div>
@@ -261,6 +261,7 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Van, Top, Loading } from '@element-plus/icons-vue'
 import { logisticsApi, type LogisticsPlanVO, type LogisticsStatus, type PlanType } from '@/api/logistics'
 import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
+import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -278,6 +279,8 @@ const tableData = ref<LogisticsPlanVO[]>([])
 const procurementList = ref<ProcurementPageVO[]>([])
 
 const formRef = ref<FormInstance>()
+const { t } = useI18n()
+
 const form = reactive({
   procurementId: undefined as number | undefined,
   factoryId: undefined as number | undefined,
@@ -296,9 +299,9 @@ const form = reactive({
 })
 
 const formRules: FormRules = {
-  procurementId: [{ required: true, message: '请选择关联采购单', trigger: 'change' }],
-  productCode: [{ required: true, message: '请输入货号', trigger: 'blur' }],
-  planType: [{ required: true, message: '请选择调配类型', trigger: 'change' }],
+  procurementId: [{ required: true, message: () => t('logistics.validation.procurementRequired'), trigger: 'change' }],
+  productCode: [{ required: true, message: () => t('logistics.validation.productCodeRequired'), trigger: 'blur' }],
+  planType: [{ required: true, message: () => t('logistics.validation.planTypeRequired'), trigger: 'change' }],
 }
 
 const bookedCount = computed(() => tableData.value.filter(r => r.status === 'BOOKED').length)
@@ -328,7 +331,7 @@ async function loadData() {
     pagination.total = data.totalElements
   } catch (e) {
     console.error('[LogisticsPage] loadData failed', e)
-    ElMessage.error('加载调配计划失败')
+    ElMessage.error(t('logistics.message.loadFailed'))
   } finally {
     loading.value = false
   }
@@ -404,12 +407,12 @@ async function onSubmit() {
       actualShipDate: form.actualShipDate || undefined,
       remarks: form.remarks || undefined,
     })
-    ElMessage.success('调配计划创建成功')
+    ElMessage.success(t('logistics.message.createSuccess'))
     dialogVisible.value = false
     loadData()
   } catch (e) {
     console.error('[LogisticsPage] onSubmit failed', e)
-    ElMessage.error('创建调配计划失败')
+    ElMessage.error(t('logistics.message.createFailed'))
   } finally {
     submitting.value = false
   }
@@ -421,7 +424,7 @@ function onView(row: LogisticsPlanVO) {
 }
 
 function planTypeLabel(type?: string): string {
-  return { SEA: '海运', AIR: '空运', CONSOLIDATION: '拼柜' }[type ?? ''] ?? type ?? '-'
+  return { SEA: t('logistics.planType.SEA'), AIR: t('logistics.planType.AIR'), CONSOLIDATION: t('logistics.planType.CONSOLIDATION') }[type ?? ''] ?? type ?? '-'
 }
 
 function planTypeTag(type?: string): string {
@@ -429,7 +432,7 @@ function planTypeTag(type?: string): string {
 }
 
 function logisticsStatusLabel(status?: string): string {
-  return { PLANNED: '调配中', BOOKED: '已订舱', IN_TRANSIT: '运输中', DELIVERED: '已送达' }[status ?? ''] ?? status ?? '-'
+  return { PLANNED: t('logistics.status.PLANNED'), BOOKED: t('logistics.status.BOOKED'), IN_TRANSIT: t('logistics.status.IN_TRANSIT'), DELIVERED: t('logistics.status.DELIVERED') }[status ?? ''] ?? status ?? '-'
 }
 
 function logisticsStatusType(status?: string): string {

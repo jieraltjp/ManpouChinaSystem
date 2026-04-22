@@ -3,8 +3,8 @@
     <el-card class="login-card" shadow="hover">
       <template #header>
         <div class="card-header">
-          <h2>漫普中国管理系统</h2>
-          <p class="subtitle">Manpou China System</p>
+          <h2>{{ $t('auth.title') }}</h2>
+          <p class="subtitle">{{ $t('auth.subtitle') }}</p>
         </div>
       </template>
 
@@ -15,20 +15,20 @@
         label-position="top"
         @submit.prevent="submitLogin"
       >
-        <el-form-item label="用户名" prop="username">
+        <el-form-item :label="$t('auth.username')" prop="username">
           <el-input
             v-model="form.username"
-            placeholder="请输入用户名"
+            :placeholder="$t('auth.usernamePlaceholder')"
             :prefix-icon="User"
             autocomplete="username"
           />
         </el-form-item>
 
-        <el-form-item label="密码" prop="password">
+        <el-form-item :label="$t('auth.password')" prop="password">
           <el-input
             v-model="form.password"
             type="password"
-            placeholder="请输入密码"
+            :placeholder="$t('auth.passwordPlaceholder')"
             :prefix-icon="Lock"
             autocomplete="current-password"
             show-password
@@ -43,7 +43,7 @@
             :loading="loading"
             @click="submitLogin"
           >
-            登录
+            {{ $t('auth.login') }}
           </el-button>
         </el-form-item>
       </el-form>
@@ -59,10 +59,12 @@ import { User, Lock } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
+const { t } = useI18n()
 
 const formRef = ref<FormInstance>()
 const loading = ref(false)
@@ -73,8 +75,8 @@ const form = reactive({
 })
 
 const rules: FormRules = {
-  username: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
-  password: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
+  username: [{ required: true, message: () => t('auth.usernameRequired'), trigger: 'blur' }],
+  password: [{ required: true, message: () => t('auth.passwordRequired'), trigger: 'blur' }],
 }
 
 async function submitLogin() {
@@ -88,7 +90,7 @@ async function submitLogin() {
     router.push(redirect)
   } catch (err) {
     console.error('[LoginPage] login failed', err)
-    ElMessage.error('登录失败，请检查用户名和密码')
+    ElMessage.error(t('auth.loginFailed'))
   } finally {
     loading.value = false
   }

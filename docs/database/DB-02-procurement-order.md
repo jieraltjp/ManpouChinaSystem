@@ -76,20 +76,22 @@ CREATE TABLE procurement (
 
 ## 3. product（商品目录）🟡部分
 
-**对应**: `Product` 聚合根（部分字段已实现，hsCode/taxPoint 待新增）
+**对应**: `Product` 聚合根（完整设计见 `DB-10-product.md`）
+
+> 本节列出步骤2发注单直接引用的核心字段。完整字段（含 hs_code、tax_point、unit_price_rmb、product_factory 多对多）见 `DB-10-product.md`。
 
 ```sql
--- 已有字段
+-- 步骤2直接引用字段
 CREATE TABLE product (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
     master_code        VARCHAR(32)  NOT NULL COMMENT '主货号（如 odn012）',
-    sub_code           VARCHAR(64) COMMENT '子货号/枝番（如 re=红色）',
+    sub_code           VARCHAR(64)  COMMENT '子货号/色号（如 re=红色）',
     name               VARCHAR(128) COMMENT '日文名称',
     name_zh            VARCHAR(128) COMMENT '中文名称',
     name_en            VARCHAR(128) COMMENT '英文名称',
-    color_name         VARCHAR(64) COMMENT '颜色名称',
-    material           VARCHAR(64) COMMENT '材质',
-    product_category   VARCHAR(20) COMMENT 'OEM / ORDINARY / FACTORY_DIRECT',
+    color_name         VARCHAR(64)  COMMENT '颜色名称',
+    material           VARCHAR(64)  COMMENT '材质',
+    product_category   VARCHAR(20)  COMMENT 'OEM / ORDINARY / FACTORY_DIRECT',
     length_cm          DECIMAL(8,2) COMMENT '单品长(cm)',
     width_cm           DECIMAL(8,2) COMMENT '单品宽(cm)',
     height_cm          DECIMAL(8,2) COMMENT '单品高(cm)',
@@ -99,7 +101,7 @@ CREATE TABLE product (
     package_width_cm   DECIMAL(8,2) COMMENT '外箱宽(cm)',
     package_depth_cm   DECIMAL(8,2) COMMENT '外箱深(cm)',
     package_weight_kg  DECIMAL(10,4) COMMENT '外箱毛重',
-    warehouse          VARCHAR(64) COMMENT '仓库归属',
+    warehouse          VARCHAR(64)  COMMENT '仓库归属',
     requires_qc        BOOLEAN COMMENT '是否需要检测',
     remarks            VARCHAR(512) COMMENT '备注',
     update_time        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -108,9 +110,9 @@ CREATE TABLE product (
     INDEX idx_master_code (master_code)
 );
 
--- TODO（待新增字段）:
-ALTER TABLE product ADD COLUMN hs_code VARCHAR(20) COMMENT 'HS编码（报关用）';
-ALTER TABLE product ADD COLUMN tax_point DECIMAL(5,4) DEFAULT 1.1 COMMENT '票点';
+-- 完整字段见 DB-10-product.md：
+-- hs_code / tax_point / unit_price_rmb / name_ja / gross_weight_kg
+-- declaration_elements / image_url / origin / product_factory 多对多关联表
 ```
 
 ---

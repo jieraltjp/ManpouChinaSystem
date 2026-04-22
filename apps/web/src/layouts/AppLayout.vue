@@ -3,8 +3,8 @@
     <!-- 侧边栏 -->
     <el-aside :width="isCollapsed ? '64px' : '220px'" class="sidebar">
       <div class="logo">
-        <span v-if="!isCollapsed">漫普中国</span>
-        <span v-else>MC</span>
+        <span v-if="!isCollapsed">{{ $t('app.logo') }}</span>
+        <span v-else>{{ $t('app.logoShort') }}</span>
       </div>
 
       <el-menu
@@ -16,30 +16,30 @@
       >
         <el-menu-item index="/dashboard">
           <el-icon><DataBoard /></el-icon>
-          <template #title>仪表盘</template>
+          <template #title>{{ $t('menu.dashboard') }}</template>
         </el-menu-item>
 
         <!-- 发注管理 -->
         <el-sub-menu index="procurement" :popper-class="'sidebar-popper'">
           <template #title>
             <el-icon><ShoppingCart /></el-icon>
-            <span v-if="!isCollapsed">发注管理</span>
+            <span v-if="!isCollapsed">{{ $t('menu.procurement') }}</span>
           </template>
           <el-menu-item index="/procurement/demand">
             <el-icon><FolderOpened /></el-icon>
-            <template #title>01 补货需求</template>
+            <template #title>{{ $t('menu.demand') }}</template>
           </el-menu-item>
           <el-menu-item index="/procurement/order">
             <el-icon><ShoppingCart /></el-icon>
-            <template #title>02 发注单</template>
+            <template #title>{{ $t('menu.order') }}</template>
           </el-menu-item>
           <el-menu-item index="/procurement/inspection">
             <el-icon><CircleCheck /></el-icon>
-            <template #title>03 验货记录</template>
+            <template #title>{{ $t('menu.inspection') }}</template>
           </el-menu-item>
           <el-menu-item index="/procurement/logistics">
             <el-icon><Van /></el-icon>
-            <template #title>04 调配计划</template>
+            <template #title>{{ $t('menu.logistics') }}</template>
           </el-menu-item>
         </el-sub-menu>
       </el-menu>
@@ -56,6 +56,12 @@
         </div>
 
         <div class="header-right">
+          <!-- 语言切换 -->
+          <el-select v-model="currentLocale" size="small" style="margin-right: 12px; width: 80px;" @change="onLocaleChange">
+            <el-option value="zh" label="中文" />
+            <el-option value="ja" label="日本語" />
+          </el-select>
+
           <el-dropdown @command="onCommand">
             <span class="user-info">
               <el-avatar :size="32" icon="UserFilled" />
@@ -66,7 +72,7 @@
               <el-dropdown-menu>
                 <el-dropdown-item command="logout">
                   <el-icon><SwitchButton /></el-icon>
-                  退出登录
+                  {{ $t('app.logout') }}
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -87,13 +93,37 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
+import type { Locale } from '@/locales'
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import ja from 'element-plus/dist/locale/ja.mjs'
+import ElementPlus from 'element-plus'
 
 const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
+const { locale } = useI18n()
 
 const isCollapsed = ref(false)
 const activeMenu = computed(() => route.path)
+const currentLocale = ref<Locale>(locale.value as Locale)
+
+function onLocaleChange(newLocale: Locale) {
+  locale.value = newLocale
+  localStorage.setItem('locale', newLocale)
+  // 动态切换 Element Plus locale（通过重新挂载组件树实现）
+  const elApp = document.querySelector('#app')
+  if (elApp) {
+    const vueApp = (elApp as any).__vue_app__
+    if (vueApp) {
+      // 获取已注册的 ElementPlus 插件实例并更新其 locale
+      const elPlusGlobal = vueApp.config.globalProperties.$ELEMENT
+      if (elPlusGlobal) {
+        elPlusGlobal.locale = newLocale === 'ja' ? ja : zhCn
+      }
+    }
+  }
+}
 
 function onCommand(cmd: string) {
   if (cmd === 'logout') {

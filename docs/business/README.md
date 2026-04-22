@@ -32,6 +32,7 @@
 | B-07 | [SPEC-B07-退税-步骤7.md](./SPEC-B07-退税-步骤7.md) | TaxRefundRecord ⚡占位 |
 | B-08 | [SPEC-B08-运营销售-步骤8.md](./SPEC-B08-运营销售-步骤8.md) | SalesRecord ⚡占位 |
 | B-09 | [SPEC-B09-订单总览-API设计.md](./SPEC-B09-订单总览-API设计.md) | **核心视图**：聚合接口设计 ✅ |
+| B-10 | [SPEC-B10-商品目录-产品管理.md](./SPEC-B10-商品目录-产品管理.md) | Product + product_factory 多对多设计 🟡 |
 | B-API | [API-发注管理.md](./API-发注管理.md) | REST 接口契约 |
 | B-DOMAIN | [DOMAIN-发注管理领域模型.md](./DOMAIN-发注管理领域模型.md) | 聚合根、值对象、枚举、仓储接口 |
 | B-PLAN | [SPEC-B04-调配计划-步骤4.md](./SPEC-B04-调配计划-步骤4.md) | LogisticsPlan 状态机（PLANNED→BOOKED→IN_TRANSIT→DELIVERED） |
@@ -43,6 +44,7 @@
 
 | 步号 | 业务文档 | UI文档 | 数据库文档 |
 |------|---------|--------|-----------|
+| 00 | B-10 商品目录 | 10-product.md | DB-11 product + product_factory |
 | 01 | B-01 补货需求 | 01-demand.md | DB-01 procurement-demand |
 | 02 | B-02 发注单+工厂 | 02-procurement.md | DB-02 procurement-order |
 | 03 | B-03 验货记录 | 03-inspection.md | DB-03 inspection |
