@@ -762,6 +762,17 @@
       "times": "×",
       "dash": "—",
       "perUnit": "/件"
+    },
+    "locale": {
+      "zh": "中文",
+      "ja": "日本語"
+    },
+    "user": "User",
+    "error": {
+      "network": "网络异常，请重试",
+      "tokenExpired": "登录已过期，请重新登录",
+      "forbidden": "无权限访问该资源",
+      "server": "服务器错误："
     }
   },
   "validation": {

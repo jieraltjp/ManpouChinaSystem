@@ -5,6 +5,9 @@
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessage } from 'element-plus'
+import { i18n } from '@/locales'
+
+const t = (key: string) => i18n.global.t(key)
 
 const client = axios.create({
   baseURL: '/api/v1',
@@ -25,7 +28,7 @@ client.interceptors.response.use(
   (res) => res,
   (err) => {
     if (!err.response) {
-      ElMessage.error('Network error, please try again')
+      ElMessage.error(t('common.error.network'))
       return Promise.reject(err)
     }
 
@@ -36,11 +39,11 @@ client.interceptors.response.use(
       const auth = useAuthStore()
       auth.logout()
       window.location.href = '/login'
-      ElMessage.error('登录已过期，请重新登录')
+      ElMessage.error(t('common.error.tokenExpired'))
     } else if (status === 403) {
-      ElMessage.error('无权限访问该资源')
+      ElMessage.error(t('common.error.forbidden'))
     } else if (status >= 500) {
-      ElMessage.error(`服务器错误：${message}`)
+      ElMessage.error(t('common.error.server') + message)
     } else {
       ElMessage.error(message)
     }

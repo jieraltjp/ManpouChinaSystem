@@ -639,12 +639,13 @@
   },
   "product": {
     "title": "商品ディレクトリ",
-    "newButton": "新規录入",
+    "newButton": "新規追加",
     "stat": {
       "total": "商品総数"
     },
     "filter": {
       "masterCode": "主品番",
+      "masterCodePlaceholder": "主品番",
       "keyword": "キーワード",
       "keywordPlaceholder": "中文/英文名称",
       "hsCode": "HSコード",
@@ -674,6 +675,7 @@
       "subCode": "子品番",
       "nameZh": "中文名称",
       "nameEn": "英文名称",
+      "nameJa": "日本語名称",
       "hsCode": "HSコード",
       "unitPriceRmb": "税込単価(CNY)",
       "netWeight": "正味重量",
@@ -681,7 +683,7 @@
       "lengthCm": "長さ(cm)",
       "widthCm": "幅(cm)",
       "heightCm": "高さ(cm)",
-      "origin": "<minimax:tool_call>",
+      "origin": "原装国",
       "material": "材質",
       "unit": "単位",
       "exportCategory": "輸出分類",
@@ -712,12 +714,22 @@
       "lengthCm": "長さ(cm)",
       "widthCm": "幅(cm)",
       "heightCm": "高さ(cm)",
-      "origin": "</minimax:tool_call>",
+      "origin": "原装国",
       "originPlaceholder": "例：中国",
       "material": "材質",
       "materialPlaceholder": "例：plastic/metal",
       "unit": "単位",
       "unitPlaceholder": "例：個/套/箱",
+      "nameJa": "日本語名称",
+      "nameJaPlaceholder": "日本語名称",
+      "taxPoint": "インボイス係数",
+      "taxPointPlaceholder": "デフォルト 1.1",
+      "taxRate": "增值税率",
+      "taxRatePlaceholder": "デフォルト 0.1",
+      "declarationElements": "申告要素",
+      "declarationElementsPlaceholder": "材質|住所|ブランド",
+      "remarks": "備考",
+      "remarksPlaceholder": "備考情報",
       "exportCategory": "輸出分類",
       "exportCategoryPlaceholder": "輸出分類",
       "factory": "関連工場",
@@ -729,7 +741,12 @@
     },
     "validation": {
       "masterCodeRequired": "主品番は必須です",
-      "nameZhRequired": "中文名称は必須です"
+      "nameZhRequired": "中文名称は必須です",
+      "nameJaRequired": "日本語名称は必須です",
+      "taxPointRequired": "インボイス係数は必須です",
+      "taxRateRequired": "增值税率は必須です",
+      "declarationElementsRequired": "申告要素は必須です",
+      "remarksRequired": "備考は必須です"
     },
     "message": {
       "deleteConfirm": "商品「{code}」を削除しますか？",
@@ -750,6 +767,11 @@
     "close": "閉じる",
     "loading": "読み込み中...",
     "noData": "データがありません",
+    "locale": {
+      "zh": "中文",
+      "ja": "日本語"
+    },
+    "user": "User",
     "units": {
       "kg": "kg",
       "cm": "cm",
@@ -762,6 +784,12 @@
       "times": "×",
       "dash": "—",
       "perUnit": "/個"
+    },
+    "error": {
+      "network": "ネットワークエラー、再試行してください",
+      "tokenExpired": "ログイン期限切れです。再度ログインしてください",
+      "forbidden": "このリソースにアクセスする権限がありません",
+      "server": "サーバーエラー："
     }
   },
   "validation": {

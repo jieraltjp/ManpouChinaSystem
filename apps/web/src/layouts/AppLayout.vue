@@ -62,14 +62,14 @@
         <div class="header-right">
           <!-- 语言切换 -->
           <el-select v-model="currentLocale" size="small" style="margin-right: 12px; width: 80px;" @change="onLocaleChange">
-            <el-option value="zh" label="中文" />
-            <el-option value="ja" label="日本語" />
+            <el-option value="zh" :label="$t('common.locale.zh')" />
+            <el-option value="ja" :label="$t('common.locale.ja')" />
           </el-select>
 
           <el-dropdown @command="onCommand">
             <span class="user-info">
               <el-avatar :size="32" icon="UserFilled" />
-              <span class="username">{{ auth.claims?.username || 'User' }}</span>
+              <span class="username">{{ auth.claims?.username || $t('common.user') }}</span>
               <el-icon><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
