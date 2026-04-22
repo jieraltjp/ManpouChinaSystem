@@ -2,7 +2,7 @@
 
 > **版本**: 1.0.0
 > **创建**: 2026-04-22
-> **状态**: 🔄 设计中
+> **状态**: ✅ 已实现（2026-04-22）
 > **影响页面**: `DemandPage.vue`（补货需求列表页）
 > **对应后端**: `ProductController` / `ProductUseCase`
 > **对应文档**: `SPEC-B01-补货需求-步骤1.md` · `DB-01-procurement-demand.md`

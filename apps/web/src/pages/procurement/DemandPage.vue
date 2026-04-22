@@ -322,7 +322,7 @@ function onConvert(row: DemandPageVO) {
     query: {
       demandId: String(row.id),
       productCode: row.productCode,
-      subProductCode: row.subProductCode || '',
+      subProductCode: (row.subProductCodes || []).join(','),
       destination: row.destination || '',
       japanLead: row.japanLead || '',
       quantity: String(row.quantity),

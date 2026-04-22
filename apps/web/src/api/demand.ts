@@ -12,7 +12,8 @@ export interface DemandPageVO {
   demandCode: string
   demandType: DemandType
   productCode: string
-  subProductCode?: string
+  /** 子货号数组；单个时为单元素列表（JSON 数组格式） */
+  subProductCodes?: string[]
   quantity: number
   destination?: string
   japanLead?: string
@@ -34,7 +35,8 @@ export interface DemandPageResponse {
 export interface CreateDemandRequest {
   demandType: DemandType
   productCode: string
-  subProductCode?: string
+  /** 子货号数组 */
+  subProductCodes?: string[]
   quantity: number
   destination?: string
   japanLead?: string
@@ -44,7 +46,8 @@ export interface CreateDemandRequest {
 export interface UpdateDemandRequest {
   demandType?: DemandType
   productCode?: string
-  subProductCode?: string
+  /** 子货号数组 */
+  subProductCodes?: string[]
   quantity?: number
   destination?: string
   japanLead?: string

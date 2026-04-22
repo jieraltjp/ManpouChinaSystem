@@ -1,8 +1,9 @@
 # SPEC-B10 — 商品目录业务规格（商品类）
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
+> **更新**: 2026-04-22（v1.1.0：新增 suggest 自动补全 API）
 > **创建**: 2026-04-22
-> **状态**: 🟡设计阶段
+> **状态**: ✅ 已实现
 > **业务步号**: 00（基础设施/商品目录）
 > **对应数据库文档**: `docs/database/DB-11-product.md`
 > **对应 UI 文档**: `docs/ui/pages/10-product.md`（待创建）
@@ -245,26 +246,28 @@ CREATE TABLE product_factory (
 
 ## 6. 与步骤1（补货需求）的集成
 
-步骤1（`SPEC-B01`）录入补货需求时，需要从商品目录查询/选择商品：
+步骤1（`SPEC-B01`）录入补货需求时，通过两个 suggest 端点实现主/子货号自动补全：
 
 ```
-补货需求录入页面
-├── [商品选择器] → 查询 product 表 → 显示 masterCode / nameZh / nameEn
-├── 选中商品后
-│   ├── 自动代入：productCode (masterCode+subCode)
-│   ├── 自动代入：nameZh / nameEn
-│   ├── 自动代入：unit / hsCode
-│   └── 自动代入：weightGrossKg / dimensions
-└── 用户仅填数量和目的地
+补货需求录入页面（DemandPage.vue）
+├── [主货号 el-select] → GET /products/suggest/master-codes?keyword={kw}
+│   返回：{ masterCode, nameZh, colorCount }
+├── 选中主货号后
+│   └── [子货号 el-select] → GET /products/suggest/sub-codes?masterCode={code}
+│       返回：{ subCode, colorName }[]
+└── 用户填数量、目的地、日本担当
 ```
 
-**ProductQuery 用例**：
+> 对应设计文档：`docs/design/FEATURE-货号自动补全与多子货号选择.md`
+
+**ProductUseCase 用例**：
 
 ```java
-// 查询商品目录
-Product findByMasterCode(String masterCode);
-List<Product> searchByKeyword(String keyword, int page, int pageSize);
-List<ProductFactory> findFactoriesByProductId(Long productId);
+// 主货号自动补全（步骤1补货需求页调用）
+List<MasterCodeSuggestVO> suggestMasterCodes(String keyword);
+
+// 子货号候选项（按主货号过滤，步骤1补货需求页调用）
+List<SubCodeSuggestVO> suggestSubCodes(String masterCode);
 ```
 
 ---
@@ -292,7 +295,10 @@ List<ProductFactory> findFactoriesByProductId(Long productId);
 - [x] ✅ `ProductFactoryJpaRepository` JPA 持久化适配器
 - [x] ✅ `ProductAssembler` DTO 转换器
 - [x] ✅ `ProductUseCase` 用例服务（含唯一性校验）
-- [x] ✅ `ProductController` REST 控制器（7个端点）
+- [x] ✅ `ProductController` REST 控制器（9个端点，含 suggest）
+- [x] ✅ `/suggest/master-codes` 主货号自动补全端点
+- [x] ✅ `/suggest/sub-codes` 子货号候选项端点
+- [x] ✅ `MasterCodeSuggestVO` / `SubCodeSuggestVO` DTO
 - [x] ✅ `ProductPage.vue` 前端商品管理页面
 - [x] ✅ `product.ts` 前端 API 客户端
 - [x] ✅ `V3__product_tables.sql` Flyway 迁移脚本
