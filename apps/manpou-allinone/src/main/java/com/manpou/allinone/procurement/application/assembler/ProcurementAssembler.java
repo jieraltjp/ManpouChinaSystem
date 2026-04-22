@@ -1,5 +1,7 @@
 package com.manpou.allinone.procurement.application.assembler;
 
+import com.manpou.allinone.factory.domain.model.Factory;
+import com.manpou.allinone.factory.domain.repository.FactoryRepository;
 import com.manpou.allinone.procurement.application.dto.ProcurementCreateCmd;
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
 import com.manpou.allinone.procurement.application.dto.ProcurementUpdateCmd;
@@ -13,10 +15,24 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcurementAssembler {
 
+    private final FactoryRepository factoryRepository;
+
+    public ProcurementAssembler(FactoryRepository factoryRepository) {
+        this.factoryRepository = factoryRepository;
+    }
+
     public ProcurementPageQuery toDto(Procurement entity) {
+        String factoryName = null;
+        if (entity.getFactoryId() != null) {
+            factoryName = factoryRepository
+                    .findByIdAndIsDeletedFalse(entity.getFactoryId())
+                    .map(Factory::getFactoryName)
+                    .orElse(null);
+        }
         return ProcurementPageQuery.builder()
                 .id(entity.getId())
                 .factoryId(entity.getFactoryId())
+                .factoryName(factoryName)
                 .productCode(entity.getProductCode())
                 .subProductCode(entity.getSubProductCode())
                 .material(entity.getMaterial())
@@ -77,7 +93,7 @@ public class ProcurementAssembler {
     }
 
     public void copyToEntity(ProcurementUpdateCmd cmd, Procurement entity) {
-        if (cmd.getFactoryId() != null) entity.setFactoryId(cmd.getFactoryId());
+        // factoryId 不允许在更新时修改，由 UseCase 层校验
         if (cmd.getProductCode() != null) entity.setProductCode(cmd.getProductCode());
         if (cmd.getSubProductCode() != null) entity.setSubProductCode(cmd.getSubProductCode());
         if (cmd.getMaterial() != null) entity.setMaterial(cmd.getMaterial());

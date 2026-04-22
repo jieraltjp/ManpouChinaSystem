@@ -92,6 +92,7 @@
             <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
+        <el-table-column prop="factoryName" label="关联工厂" min-width="140" show-overflow-tooltip />
         <el-table-column prop="quantity" label="数量" width="80" align="right" />
         <el-table-column prop="estimatedPriceJpy" label="估算批发价(JPY)" width="150" align="right">
           <template #default="{ row }">
@@ -141,7 +142,7 @@
     <!-- 详情抽屉 -->
     <el-drawer v-model="drawerVisible" title="发注单详情" size="600px" direction="rtl">
       <el-descriptions :column="2" border v-if="currentRow">
-        <el-descriptions-item label="关联工厂">{{ currentRow.factoryId || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="关联工厂">{{ currentRow.factoryName || (currentRow.factoryId ? `ID:${currentRow.factoryId}` : '-') }}</el-descriptions-item>
         <el-descriptions-item label="商品代码">{{ currentRow.productCode }}</el-descriptions-item>
         <el-descriptions-item label="子货号">{{ currentRow.subProductCode || '-' }}</el-descriptions-item>
         <el-descriptions-item label="数量">{{ currentRow.quantity }}</el-descriptions-item>

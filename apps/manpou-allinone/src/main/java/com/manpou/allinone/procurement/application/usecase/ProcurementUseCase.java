@@ -67,27 +67,42 @@ public class ProcurementUseCase {
 
     /**
      * 创建发注单。
+     * factoryId 为必填，且工厂必须存在且未被逻辑删除。
      */
     @Transactional
     public Long create(ProcurementCreateCmd cmd) {
+        // 校验关联工厂
+        if (cmd.getFactoryId() == null) {
+            throw BusinessException.invalidParam("关联工厂不能为空");
+        }
+        procurementAssembler.toEntity(cmd); // 触发 assembler 中 factoryId 校验
+
         Procurement entity = procurementAssembler.toEntity(cmd);
         entity.calculateEstimatedPriceJpy();
         Procurement saved = procurementRepository.save(entity);
-        log.info("[Procurement] created, traceId={}, id={}, productCode={}, estimatedPriceJpy={}",
+        log.info("[Procurement] created, traceId={}, id={}, productCode={}, factoryId={}, factoryName={}",
                 MDC.get(TraceFilter.TRACE_ID_KEY),
                 saved.getId(),
                 saved.getProductCode(),
-                saved.getEstimatedPriceJpy());
+                saved.getFactoryId(),
+                saved.getFactoryId());
         return saved.getId();
     }
 
     /**
      * 更新发注单（部分更新，含状态推进）。
+     * factoryId 不允许修改。
      */
     @Transactional
     public void update(Long id, ProcurementUpdateCmd cmd) {
         Procurement entity = procurementRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("Procurement", id));
+
+        // factoryId 不允许修改
+        if (cmd.getFactoryId() != null && !cmd.getFactoryId().equals(entity.getFactoryId())) {
+            throw BusinessException.invalidParam("发注单关联工厂不允许修改");
+        }
+
         procurementAssembler.copyToEntity(cmd, entity);
         if (cmd.getPriceRmb() != null || cmd.getExchangeRate() != null || cmd.getTaxPoint() != null) {
             entity.calculateEstimatedPriceJpy();

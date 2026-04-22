@@ -9,6 +9,7 @@ import com.manpou.allinone.factory.application.dto.FactoryQuery;
 import com.manpou.allinone.factory.application.dto.FactoryUpdateCmd;
 import com.manpou.allinone.factory.domain.model.Factory;
 import com.manpou.allinone.factory.domain.repository.FactoryRepository;
+import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FactoryUseCase {
 
     private final FactoryRepository factoryRepository;
+    private final ProcurementRepository procurementRepository;
     private final FactoryAssembler assembler;
 
     @Transactional(readOnly = true)
@@ -70,10 +72,20 @@ public class FactoryUseCase {
                 MDC.get(TraceFilter.TRACE_ID_KEY), id, entity.getCooperationStatus());
     }
 
+    /**
+     * 删除工厂。
+     * 校验规则：有未终态发注单（状态非"完了"/"退货"）关联时拒绝删除。
+     */
     @Transactional
     public void delete(Long id) {
         Factory entity = factoryRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("Factory", id));
+
+        // 校验无未终态发注单关联
+        if (procurementRepository.existsActiveByFactoryId(id)) {
+            throw BusinessException.invalidParam("该工厂存在未终态发注单，无法删除");
+        }
+
         entity.markDeleted();
         factoryRepository.save(entity);
         log.info("[Factory] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);

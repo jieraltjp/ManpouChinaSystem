@@ -30,4 +30,8 @@ public interface ProcurementRepository {
     Page<Procurement> findByProductCodeAndIsDeletedFalse(String productCode, Pageable pageable);
 
     Page<Procurement> findByCustomerCompanyAndIsDeletedFalse(String customerCompany, Pageable pageable);
+
+    Page<Procurement> findByFactoryIdAndIsDeletedFalse(Long factoryId, Pageable pageable);
+
+    boolean existsActiveByFactoryId(Long factoryId);
 }

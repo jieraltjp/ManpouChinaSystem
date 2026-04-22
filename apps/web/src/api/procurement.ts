@@ -18,6 +18,7 @@ export const BILLING_TYPE_OPTIONS: { value: BillingType; label: string }[] = [
 export interface ProcurementPageVO {
   id: number
   factoryId?: number            // 关联工厂ID
+  factoryName?: string          // 关联工厂名称（DB-11）
   productCode: string          // 主货号
   subProductCode?: string     // 子货号/枝番（颜色）
   material?: string            // 材质
