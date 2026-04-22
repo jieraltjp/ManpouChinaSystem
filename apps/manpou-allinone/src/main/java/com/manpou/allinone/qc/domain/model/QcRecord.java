@@ -129,7 +129,7 @@ public class QcRecord extends BaseEntity {
         if (isTerminal()) {
             throw new com.manpou.allinone.common.exception.BusinessException(
                     "qc.cannot_modify_completed",
-                    "已完成/退货状态禁止任何变更");
+                    "终态禁止状态变更");
         }
         if (!status.canTransitionTo(newStatus)) {
             throw new com.manpou.allinone.common.exception.BusinessException(

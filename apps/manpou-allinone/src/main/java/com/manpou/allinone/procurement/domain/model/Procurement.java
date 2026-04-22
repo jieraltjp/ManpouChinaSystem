@@ -140,7 +140,7 @@ public class Procurement extends BaseEntity {
         if (this.status.isTerminal()) {
             throw new com.manpou.allinone.common.exception.BusinessException(
                     "business.cannot_modify_closed",
-                    "完了状态禁止任何状态变更");
+                    "终态禁止状态变更");
         }
         if (!this.status.canTransitionTo(newStatus)) {
             throw new com.manpou.allinone.common.exception.BusinessException(
@@ -156,7 +156,7 @@ public class Procurement extends BaseEntity {
     public void resetToUndecided() {
         if (this.status.isTerminal()) {
             throw new com.manpou.allinone.common.exception.BusinessException(
-                    "business.cannot_modify_closed", "完了状态禁止任何变更");
+                    "business.cannot_modify_closed", "终态禁止状态变更");
         }
         this.status = ShipmentStatus.未定;
     }

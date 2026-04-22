@@ -113,7 +113,7 @@ public class LogisticsPlan extends BaseEntity {
         if (isTerminal()) {
             throw new com.manpou.allinone.common.exception.BusinessException(
                     "logistics.cannot_modify_delivered",
-                    "已完成状态禁止任何变更");
+                    "终态禁止状态变更");
         }
         if (!status.canTransitionTo(newStatus)) {
             throw new com.manpou.allinone.common.exception.BusinessException(

@@ -1,31 +1,24 @@
-package com.manpou.allinone.factory.domain.repository;
+package com.manpou.allinone.factory.infrastructure.persistence.jpa;
 
 import com.manpou.allinone.factory.domain.model.Factory;
 import com.manpou.allinone.factory.domain.model.FactoryStatus;
+import com.manpou.allinone.factory.domain.repository.FactoryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
- * 工厂仓库接口（领域层契约，不感知 JPA）。
+ * JPA 持久化适配器（基础设施层）。
+ * 同时满足领域接口契约和 JPA 能力。
  */
-public interface FactoryRepository {
-
-    Optional<Factory> findById(Long id);
+@Repository
+public interface FactoryJpaAdapter extends FactoryRepository, org.springframework.data.jpa.repository.JpaRepository<Factory, Long> {
 
     Optional<Factory> findByIdAndIsDeletedFalse(Long id);
 
     Optional<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName);
-
-    Factory save(Factory entity);
-
-    void deleteById(Long id);
-
-    List<Factory> findAllByIsDeletedFalse();
-
-    Page<Factory> findAllByIsDeletedFalse(Pageable pageable);
 
     Page<Factory> findByStatusAndIsDeletedFalse(FactoryStatus status, Pageable pageable);
 

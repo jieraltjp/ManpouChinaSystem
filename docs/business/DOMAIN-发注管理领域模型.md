@@ -216,7 +216,6 @@ QcRecord（聚合根）
 ├── inspectionCount: Integer         # 检品数（新增）
 ├── boxCount: Integer               # 箱数（新增）
 ├── boxDimensions: BoxDimension      # 箱子尺寸（新增）
-├── serialNumbers: List<String>     # 序列号列表（新增）
 ├── netWeightPerUnit: BigDecimal     # 单个净重（新增）
 ├── grossWeight: BigDecimal          # 毛重（新增）
 ├── taxInclusivePrice: BigDecimal   # 含税价（新增）
