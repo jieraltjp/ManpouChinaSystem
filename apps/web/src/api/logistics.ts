@@ -1,6 +1,6 @@
 /**
  * 调配计划 API 客户端。
- * 与 SPEC-调配计划流程.md 完全对齐。
+ * 与 docs/business/SPEC-B04-调配计划-步骤4.md §API设计 完全对齐。
  */
 import client from './client'
 

@@ -1,6 +1,6 @@
 /**
  * 工厂管理 API 客户端。
- * 与 DB-10 factory.md 完全对齐（v1.4.0）。
+ * 与 docs/database/DB-10-factory.md 完全对齐。
  */
 import client from './client'
 

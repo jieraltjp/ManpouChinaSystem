@@ -1,6 +1,6 @@
 /**
  * 验货记录 API 客户端。
- * 与 SPEC-验货记录流程.md 完全对齐。
+ * 与 docs/business/SPEC-B03-验货记录-步骤3.md §API设计 完全对齐。
  */
 import client from './client'
 

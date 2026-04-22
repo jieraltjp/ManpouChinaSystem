@@ -1,6 +1,6 @@
 /**
  * 补货需求单 API 客户端。
- * 与 docs/business/SPEC-发注管理流程.md §3.1 完全对齐。
+ * 与 docs/business/SPEC-B01-补货需求-步骤1.md §API设计 完全对齐。
  */
 import client from './client'
 
