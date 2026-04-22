@@ -170,7 +170,14 @@
       "Bash(sed -i 's/const map: Record<string, string>/const statusTypeMap: Record<string, string>/g' apps/web/src/pages/procurement/OrderPage.vue)",
       "Bash(sed -i 's/return map\\\\[status\\\\]/return statusTypeMap[status]/g' apps/web/src/pages/procurement/OrderPage.vue)",
       "Bash(sed -i 's|import type { FormInstance, FormRules } from '\\\\''element-plus'\\\\''|import type { FormInstance, FormRules } from '\\\\''element-plus'\\\\''\\\\nimport { ElMessage } from '\\\\''element-plus'\\\\''|' apps/web/src/pages/auth/LoginPage.vue)",
-      "Bash(sed -i s/billingMethod/billingType/g apps/web/src/pages/test/TestPage.vue apps/web/src/pages/procurement/OrderPage.vue)"
+      "Bash(sed -i s/billingMethod/billingType/g apps/web/src/pages/test/TestPage.vue apps/web/src/pages/procurement/OrderPage.vue)",
+      "Bash(tasklist)",
+      "Bash(/c/Python311/python.exe *)",
+      "Bash(/c/xampp/mysql/bin/mysql.exe *)",
+      "Bash(taskkill //PID 269888)",
+      "Bash(taskkill //F //PID 269888)",
+      "Bash(java -Xms512m -Xmx1024m -jar target/manpou-allinone-*.jar --server.port=18090 --spring.profiles.active=local)",
+      "Bash(echo \"Started with PID $!\")"
     ]
   }
 }

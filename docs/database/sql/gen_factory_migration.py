@@ -255,7 +255,7 @@ def main():
 
     out.append(",\n".join(lines) + ";")
     out.append("")
-    out.append(f"-- 迁移完成: {len(lines)} 条记录写入 factory 表")
+    out.append(f"-- 迁移完成: {len(lines)} 条记录写入 factory 表（跳过 {len(SKIP_IDS)} 条测试/无效数据）")
 
     result = "\n".join(out)
     with open(OUTPUT_SQL, "w", encoding="utf-8") as f:
@@ -271,6 +271,7 @@ def main():
     for cat, cnt in sorted(cat_counts.items(), key=lambda x: -x[1]):
         print(f"  {cat}: {cnt}", file=sys.stderr)
     print(f"\nGenerated: {OUTPUT_SQL}")
+    print(f"Total skipped (test/invalid): {len(SKIP_IDS)}")
     print(f"Total records migrated: {len(lines)}")
 
 if __name__ == "__main__":
