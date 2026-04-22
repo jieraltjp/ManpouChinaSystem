@@ -572,7 +572,7 @@ public interface QcRecordRepository extends JpaRepository<QcRecord, Long> {
 public interface LogisticsPlanRepository extends JpaRepository<LogisticsPlan, Long> {
     List<LogisticsPlan> findByStatus(LogisticsStatus status);
     List<LogisticsPlan> findByProcurementId(Long procurementId);
-    List<LogisticsPlan> findByPlanType(LogisticsPlanType type);
+    List<LogisticsPlan> findByPlanType(PlanType type);
 }
 ```
 

@@ -105,7 +105,7 @@
 
 - `defectiveCount = inspectionCount - passedCount`（前端实时显示；后端 `QcRecordAssembler.copyUpdate()` 也会触发 `calculateDefectiveCount()`）
 - `result` 由验货员根据检品数和合格数判断，手动选择 `PASS` 或 `FAIL`
-- `boxDimensions` 存入 `boxLengthCm × boxWidthCm × boxHeightCm`
+- 箱子尺寸分别存入 `boxLengthCm` / `boxWidthCm` / `boxHeightCm`
 
 ### 4.4 业务规则
 
@@ -138,7 +138,7 @@
 - 调配页面预填充：
   - `procurementId`（来自 QcRecord）
   - `productCode` / `subProductCode`（来自 QcRecord）
-  - `cargoLengthCm / WidthCm / HeightCm`（来自 QcRecord.boxDimensions）
+  - `cargoLengthCm` / `cargoWidthCm` / `cargoHeightCm`（来自 QcRecord.boxLengthCm / boxWidthCm / boxHeightCm）
   - `cargoWeightKg`（来自 QcRecord.grossWeight）
 
 ---
