@@ -1,6 +1,7 @@
 # SPEC-B01 — 补货需求业务规格（步骤1）
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
+> **更新**: 2026-04-22（v1.1.0：新增商品自动补全 API 与 DemandPage 前端改造）
 > **创建**: 2026-04-22
 > **状态**: ✅ 已实现
 > **业务步号**: 01（补货需求/新品采购）
@@ -104,6 +105,6 @@ GET    /api/v1/products/suggest/sub-codes?masterCode={code}    # 子货号候选
 - [x] ✅ `ReplenishmentDemandController` REST 控制器
 - [x] ✅ `@/api/demand.ts` 前端 API 客户端
 - [x] ✅ `DemandPage.vue` 页面骨架
-- [ ] 🔴 主货号自动补全（el-select remote）
-- [ ] 🔴 子货号多选（el-select multiple）
-- [ ] 🔴 `ProductController` suggest 端点
+- [x] ✅ 主货号自动补全（el-select remote + 300ms 防抖）
+- [x] ✅ 子货号多选（el-select multiple + filterable + allow-create）
+- [x] ✅ `ProductController` suggest 端点（/suggest/master-codes + /suggest/sub-codes）
