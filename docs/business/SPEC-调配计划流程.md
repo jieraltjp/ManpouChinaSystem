@@ -3,7 +3,7 @@
 > **版本**: 1.0.0
 > **创建**: 2026-04-21
 > **状态**: 设计中
-> **依据**: `SPEC-发注管理流程.md` §3.4 + `06-发注管理UI设计-步骤1-4.md` §3.5
+> **依据**: `SPEC-B04-调配计划-步骤4.md` §2
 > **前置依赖**: Procurement ✅ 已实现 · QcRecord 🔴 验货记录（可并行）
 
 ---
@@ -211,5 +211,5 @@ DELETE /api/v1/consolidation-pools/{poolId}/items/{itemId}
 - [x] ✅ `LogisticsPage.vue` 列表页（接真实 API，含 factoryId 列）
 - [x] ✅ 新增调配弹窗
 - [x] ✅ 调配详情抽屉（含 factoryId）
-- [x] ✅ SPEC 进度更新至 `SPEC-发注管理流程.md`
+- [x] ✅ SPEC 进度更新至 `SPEC-B04-调配计划-步骤4.md`
 - [x] ✅ 单元测试（LogisticsPlanUseCaseTest，12 个测试用例）

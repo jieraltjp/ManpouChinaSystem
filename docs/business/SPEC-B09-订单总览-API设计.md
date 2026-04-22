@@ -3,7 +3,7 @@
 > **版本**: 1.0.0
 > **创建**: 2026-04-22
 > **状态**: 设计中
-> **对应前端**: `OrderOverviewPage.vue` · `docs/ui/pages/11-order-overview.md`
+> **对应前端**: `OrderOverviewPage.vue` · `docs/ui/pages/09-order-overview.md`
 > **核心**: 以 Procurement.id 为锚点，聚合全链路 8 步数据
 
 ---
@@ -135,7 +135,6 @@ GET /api/v1/orders/{procurementId}/overview
   "grossWeight": "1100.0000",
   "qcDate": "2026-04-18",
   "qcUserId": 3,
-  "qcUserName": "质检员A",
   "status": "COMPLETED"
 }
 ```
@@ -159,10 +158,7 @@ GET /api/v1/orders/{procurementId}/overview
   "cargoWeightKg": "1100.0000",
   "quantity": 200,
   "requiresQc": true,
-  "containerId": 1,
-  "containerNo": "TEMU1234567",
-  "departurePort": "宁波",
-  "arrivalPort": "東京",
+  "containerId": 1,        // ⚠️ containerNo/departurePort/arrivalPort 待 Container 实体实现后补充
   "estimatedShipDate": "2026-04-20",
   "actualShipDate": "2026-04-19"
 }

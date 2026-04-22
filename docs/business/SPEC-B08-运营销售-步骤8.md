@@ -3,7 +3,7 @@
 > **版本**: 1.0.0
 > **创建**: 2026-04-22
 > **状态**: 占位（字段和触发时机待确认）
-> **对应前端**: `SalesOperationsPage.vue` · `docs/ui/pages/10-sales.md`
+> **对应前端**: `SalesOperationsPage.vue` · `docs/ui/pages/08-sales.md`
 > **前置**: TaxRefundRecord / JapanCustomsRecord 已完成
 > **反馈**: 步骤8 → 步骤1（补货需求 / 新品立项）
 
@@ -176,7 +176,7 @@ POST   /api/v1/sales-records/{id}/generate-replenishment  # 生成补货需求
 - [ ] 🔴 `SalesRecordUseCase` 用例服务（含库存管理 + 退货率计算）
 - [ ] 🔴 `SalesRecordController` REST 控制器
 - [ ] 🔴 `@/api/salesRecord.ts` 前端 API 客户端
-- [ ] 🔴 `SalesOperationsPage.vue` 页面（`docs/ui/pages/10-sales.md`）
+- [ ] 🔴 `SalesOperationsPage.vue` 页面（`docs/ui/pages/08-sales.md`）
 - [ ] 🔴 `SalesRecordUseCaseTest` 单元测试
 - [ ] 🔴 聚合接口 `GET /api/v1/orders/{id}/overview` 更新
 - [ ] 🔴 反馈循环：`generate-replenishment` 联动 ReplenishmentDemand

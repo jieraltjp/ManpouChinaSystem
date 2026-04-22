@@ -3,7 +3,7 @@
 > **版本**: 1.0.0
 > **创建**: 2026-04-22
 > **状态**: 占位（字段待确认）
-> **对应前端**: `DomesticCustomsPage.vue` · `docs/ui/pages/07-domestic-customs.md`
+> **对应前端**: `DomesticCustomsPage.vue` · `docs/ui/pages/05-domestic-customs.md`
 > **前置**: LogisticsPlan.status = IN_TRANSIT
 > **后续**: JapanCustomsRecord（步骤6）
 
@@ -133,6 +133,6 @@ PATCH  /api/v1/domestic-customs/{id}/reject     # 驳回
 - [ ] 🔴 `DomesticCustomsUseCase` 用例服务
 - [ ] 🔴 `DomesticCustomsController` REST 控制器
 - [ ] 🔴 `@/api/domesticCustoms.ts` 前端 API 客户端
-- [ ] 🔴 `DomesticCustomsPage.vue` 页面（`docs/ui/pages/07-domestic-customs.md`）
+- [ ] 🔴 `DomesticCustomsPage.vue` 页面（`docs/ui/pages/05-domestic-customs.md`）
 - [ ] 🔴 `DomesticCustomsUseCaseTest` 单元测试
 - [ ] 🔴 聚合接口 `GET /api/v1/orders/{id}/overview` 更新

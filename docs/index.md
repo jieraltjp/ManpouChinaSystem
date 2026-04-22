@@ -97,7 +97,7 @@ docs/
 | `pages/01-login.md` | 登录页设计：字段、校验、OAuth 入口 |
 | `pages/02-dashboard.md` | 仪表盘设计：图表、统计数据、快捷入口 |
 | `pages/03-examples.md` | 示例列表页设计：CRUD 表格、分页、筛选 |
-| `pages/04-procurement.md` | 发注单页面设计：流程状态、多步骤表单 |
+| `pages/02-procurement.md` | 发注单页面设计：流程状态、多步骤表单 |
 | `screenshots/` | 页面截图存放目录 |
 
 ---

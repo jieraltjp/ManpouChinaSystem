@@ -144,8 +144,8 @@ ExamplesPage.vue
 | `apps/web/src/api/client.ts` | Axios 实例 |
 | `apps/web/src/stores/auth.ts` | 认证状态（权限校验） |
 | `docs/ui/pages/02-dashboard.md` | 上一页：仪表盘 |
-| `docs/ui/pages/04-procurement.md` | 下一页：采购单管理 |
+| `docs/ui/pages/02-procurement.md` | 下一页：采购单管理 |
 
 ---
 
-*上一页：[02-仪表盘](./02-dashboard.md) | 下一页：[04-采购单管理](./04-procurement.md)*
+*上一页：[02-仪表盘](./02-dashboard.md) | 下一页：[04-调配计划](./04-logistics.md)*

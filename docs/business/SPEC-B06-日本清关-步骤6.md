@@ -3,7 +3,7 @@
 > **版本**: 1.0.0
 > **创建**: 2026-04-22
 > **状态**: 占位（字段待确认）
-> **对应前端**: `JapanCustomsPage.vue` · `docs/ui/pages/08-japan-customs.md`
+> **对应前端**: `JapanCustomsPage.vue` · `docs/ui/pages/06-japan-customs.md`
 > **前置**: DomesticCustomsRecord.status = CLEARED
 > **后续**: TaxRefundRecord（步骤7）/ FinanceRecord
 
@@ -128,6 +128,6 @@ PATCH  /api/v1/japan-customs/{id}/fail     # 清关失败
 - [ ] 🔴 `JapanCustomsUseCase` 用例服务
 - [ ] 🔴 `JapanCustomsController` REST 控制器
 - [ ] 🔴 `@/api/japanCustoms.ts` 前端 API 客户端
-- [ ] 🔴 `JapanCustomsPage.vue` 页面（`docs/ui/pages/08-japan-customs.md`）
+- [ ] 🔴 `JapanCustomsPage.vue` 页面（`docs/ui/pages/06-japan-customs.md`）
 - [ ] 🔴 `JapanCustomsUseCaseTest` 单元测试
 - [ ] 🔴 聚合接口 `GET /api/v1/orders/{id}/overview` 更新

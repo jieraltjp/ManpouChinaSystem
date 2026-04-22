@@ -1,0 +1,209 @@
+# SPEC-B02 — 发注单业务规格（步骤2）
+
+> **版本**: 1.0.0
+> **创建**: 2026-04-22
+> **状态**: ✅ 已实现
+> **业务步号**: 02（发注单+工厂管理）
+> **对应 UI 文档**: `docs/ui/pages/02-procurement.md`
+> **对应数据库文档**: `docs/database/DB-02-procurement-order.md`
+
+---
+
+## 1. 业务背景
+
+发注单（Procurement）是采购流程的核心实体。以补货需求（ReplenishmentDemand）为入口，录入工厂信息、商品信息、价格信息后完成下单。工厂（Factory）无独立页面，完全内嵌于发注单表单中。
+
+**流程**：ReplenishmentDemand → Procurement → 下单
+
+---
+
+## 2. 聚合根
+
+### 2.1 ReplenishmentDemand（补货需求单）
+
+> **入口**：步骤1已创建，此处引用。
+
+```
+ReplenishmentDemand（聚合根）
+├── id: Long
+├── demandCode: String           # D-YYYYMMDD-NNN
+├── demandType: DemandType        # REPLENISHMENT / NEW_PURCHASE
+├── productCode: String           # 主货号
+├── subProductCode: String        # 子货号（颜色变体）
+├── quantity: Integer            # 需求量
+├── destination: String          # 目的地
+├── japanLead: String            # 日本担当
+├── status: DemandStatus        # PENDING → CONVERTED → CANCELLED
+├── linkedProcurementId: Long    # 关联采购单（CONVERTED后赋值）
+└── 领域方法
+    ├── convertToProcurement()   # 转为发注单
+    └── cancel()                 # 取消需求
+```
+
+### 2.2 Factory（工厂）
+
+> **内嵌**：无独立页面，工厂选择器内嵌于发注单表单，支持新建/编辑。
+
+```
+Factory（聚合根）
+├── id: Long
+├── factoryCode: String         # F-YYYYMMDD-NNN
+├── factoryName: String          # 工厂名称
+├── location: String             # 省/市
+├── roughLocation: String        # 粗略位置（工业区/园区/镇）
+├── contactName: String         # 联系人
+├── contactPhone: String        # 联系电话
+├── status: FactoryStatus      # ACTIVE / INACTIVE
+└── 领域方法
+    └── linkProductCode(code)   # 关联货号
+```
+
+### 2.3 Procurement（发注单）
+
+> **核心**：对应业务流第二步下单。
+
+```
+Procurement（聚合根）
+├── id: Long
+├── factoryId: Long             # 关联工厂
+├── productCode: String          # 主货号
+├── subProductCode: String       # 子货号/枝番
+├── material: String            # 材质
+├── requiresQc: Boolean         # 是否需要检测
+├── quantity: Integer           # 订购数量
+├── priceRmb: BigDecimal       # 人民币单价
+├── exchangeRate: BigDecimal   # CNY→JPY 汇率
+├── taxPoint: BigDecimal       # 票点（默认 1.1）
+├── billingType: BillingType    # 报关类型
+├── estimatedPriceJpy: BigDecimal  # 估算批发价（自动计算）
+├── customsRemarks: String      # 报关备注
+├── instructionManual: String    # 说明书
+├── orderDate: LocalDate       # 下单日
+├── factoryShipDate: LocalDate  # 厂家出货日
+├── plannedShipDate: LocalDate # 预计出货日（交货期）
+├── actualShipDate: LocalDate  # 实际出货日
+├── productLead: String        # 商品担当
+├── japanLead: String          # 日本担当
+├── chinaLead: String          # 中国担当
+├── destination: String        # 发送目的地
+├── customerCompany: String    # 客户公司
+├── status: ShipmentStatus     # 19态（含完了终态）
+└── 领域方法
+    ├── calculateEstimatedPriceJpy()  # 估算批发价
+    ├── updateStatus(ShipmentStatus)   # 状态推进（含FSM校验）
+    └── resetToUndecided()            # 重置为未定
+```
+
+---
+
+## 3. 状态枚举
+
+### 3.1 DemandStatus（需求状态）
+
+```java
+public enum DemandStatus {
+    PENDING,     // 待确认
+    CONVERTED,  // 已转采购
+    CANCELLED   // 已取消
+}
+```
+
+### 3.2 FactoryStatus（工厂状态）
+
+```java
+public enum FactoryStatus {
+    ACTIVE,    // 正常合作
+    INACTIVE   // 已停止合作
+}
+```
+
+### 3.3 BillingType（报关类型）
+
+```java
+public enum BillingType {
+    ZHE_LU_KAI_PIAO,     // 浙鲁开票
+    CHAO_HUI_TUI_SHUI,   // 超慧退税
+    NO_REFUND,           // 不退税
+    OTHER                // 其他
+}
+```
+
+### 3.4 ShipmentStatus（发注单状态）
+
+19态，详见 `DOMAIN-发注管理领域模型.md` §3。
+
+---
+
+## 4. 价格计算公式
+
+```
+估算批发价 JPY = (priceRmb / taxPoint × 1.02 × 1.2) × exchangeRate × 1.05
+```
+
+| 常量 | 值 | 说明 |
+|------|-----|------|
+| CONSOLIDATION_FEE | 1.02 | 集拼费 |
+| PROFIT_MARGIN | 1.2 | 利润率 |
+| EXCHANGE_BUFFER | 1.05 | 汇率缓冲 |
+
+---
+
+## 5. API 设计
+
+### ReplenishmentDemandController
+
+```
+GET    /api/v1/demands?page=&pageSize=&demandType=&productCode=&status=
+GET    /api/v1/demands/{id}
+POST   /api/v1/demands
+PATCH  /api/v1/demands/{id}
+POST   /api/v1/demands/{id}/convert    # 转采购 → 创建 Procurement
+DELETE /api/v1/demands/{id}
+```
+
+### FactoryController
+
+```
+GET    /api/v1/factories?page=&pageSize=&factoryName=&status=
+GET    /api/v1/factories/{id}
+POST   /api/v1/factories
+PATCH  /api/v1/factories/{id}
+DELETE /api/v1/factories/{id}
+```
+
+### ProcurementController
+
+```
+GET    /api/v1/procurements?page=&pageSize=&status=&productCode=&customerCompany=
+GET    /api/v1/procurements/{id}
+POST   /api/v1/procurements
+PATCH  /api/v1/procurements/{id}
+DELETE /api/v1/procurements/{id}
+```
+
+---
+
+## 6. 代码实现状态
+
+- [x] ✅ `ReplenishmentDemand` 聚合根实体
+- [x] ✅ `DemandType` 枚举
+- [x] ✅ `DemandStatus` 枚举
+- [x] ✅ `ReplenishmentDemandRepository` 领域接口
+- [x] ✅ `ReplenishmentDemandUseCase` 用例服务
+- [x] ✅ `ReplenishmentDemandController` REST 控制器
+- [x] ✅ `Factory` 聚合根实体（内嵌表单）
+- [x] ✅ `FactoryRepository` 领域接口 + JPA 适配器
+- [x] ✅ `FactoryUseCase` 用例服务
+- [x] ✅ `FactoryAssembler` DTO 转换器
+- [x] ✅ `Procurement` 聚合根实体（含常量 + FSM + 报价计算）
+- [x] ✅ `ShipmentStatus` 枚举（含 `isTerminal()` + `canTransitionTo()` + 完整FSM map）
+- [x] ✅ `BillingType` 枚举
+- [x] ✅ `ProcurementRepository` 领域接口 + JPA 适配器
+- [x] ✅ `ProcurementUseCase` 用例服务
+- [x] ✅ `ProcurementAssembler` DTO 转换器
+- [x] ✅ `ProcurementController` REST 控制器
+- [x] ✅ `ProcurementUseCaseTest` 单元测试（14个用例，全部通过）
+- [x] ✅ `FactoryUseCaseTest` 单元测试（8个用例，全部通过）
+- [x] ✅ `@/api/order.ts` 前端 API 客户端
+- [x] ✅ `OrderPage.vue` 页面（已对接真实 API）
+- [x] ✅ 工厂内嵌选择器（新建/编辑）

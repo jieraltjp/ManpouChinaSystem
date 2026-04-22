@@ -3,7 +3,7 @@
 > **版本**: 1.0.0
 > **创建**: 2026-04-22
 > **状态**: 占位（字段和规则待确认）
-> **对应前端**: `TaxRefundPage.vue` · `docs/ui/pages/09-tax-refund.md`
+> **对应前端**: `TaxRefundPage.vue` · `docs/ui/pages/07-tax-refund.md`
 > **前置**: JapanCustomsRecord.status = CLEARED（货物抵达日本）
 > **后续**: SalesRecord（步骤8）/ FinanceRecord
 
@@ -131,6 +131,6 @@ PATCH  /api/v1/tax-refunds/{id}/no-refund   # 标记不退税
 - [ ] 🔴 `TaxRefundUseCase` 用例服务（含理论退税计算）
 - [ ] 🔴 `TaxRefundController` REST 控制器
 - [ ] 🔴 `@/api/taxRefund.ts` 前端 API 客户端
-- [ ] 🔴 `TaxRefundPage.vue` 页面（`docs/ui/pages/09-tax-refund.md`）
+- [ ] 🔴 `TaxRefundPage.vue` 页面（`docs/ui/pages/07-tax-refund.md`）
 - [ ] 🔴 `TaxRefundUseCaseTest` 单元测试（含理论计算验证）
 - [ ] 🔴 聚合接口 `GET /api/v1/orders/{id}/overview` 更新

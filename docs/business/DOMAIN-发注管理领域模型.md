@@ -215,7 +215,9 @@ QcRecord（聚合根）
 ├── defectiveCount: Integer          # 不良数量
 ├── inspectionCount: Integer         # 检品数（新增）
 ├── boxCount: Integer               # 箱数（新增）
-├── boxDimensions: BoxDimension      # 箱子尺寸（新增）
+├── boxLengthCm: BigDecimal           # 箱子长(cm)
+├── boxWidthCm: BigDecimal            # 箱子宽(cm)
+├── boxHeightCm: BigDecimal           # 箱子高(cm)
 ├── netWeightPerUnit: BigDecimal     # 单个净重（新增）
 ├── grossWeight: BigDecimal          # 毛重（新增）
 ├── taxInclusivePrice: BigDecimal   # 含税价（新增）
@@ -324,18 +326,6 @@ ConsolidationPool（聚合根）
 ---
 
 ## 2. 值对象
-
-### BoxDimension（箱子尺寸 — 新增）
-
-```
-BoxDimension（值对象）
-├── lengthCm: BigDecimal    # 长(cm)
-├── widthCm: BigDecimal     # 宽(cm)
-├── heightCm: BigDecimal    # 高(cm)
-│
-└── 计算属性
-    └── volumeCbm = lengthCm × widthCm × heightCm / 1_000_000
-```
 
 ### Container（货柜信息）
 

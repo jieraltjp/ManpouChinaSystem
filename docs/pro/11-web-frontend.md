@@ -212,7 +212,7 @@ npm run build
 | [docs/ui/pages/01-login.md](../ui/pages/01-login.md) | 登录页 |
 | [docs/ui/pages/02-dashboard.md](../ui/pages/02-dashboard.md) | 仪表盘 |
 | [docs/ui/pages/03-examples.md](../ui/pages/03-examples.md) | 示例列表 |
-| [docs/ui/pages/04-procurement.md](../ui/pages/04-procurement.md) | 采购单管理 |
+| [docs/ui/pages/04-logistics.md](../ui/pages/04-logistics.md) | 调配计划 |
 
 ---
 
