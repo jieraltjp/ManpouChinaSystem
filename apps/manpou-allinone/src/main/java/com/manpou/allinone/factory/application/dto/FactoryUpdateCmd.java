@@ -1,26 +1,51 @@
 package com.manpou.allinone.factory.application.dto;
 
-import com.manpou.allinone.factory.domain.model.FactoryStatus;
+import com.manpou.allinone.factory.domain.model.CooperationStatus;
+import com.manpou.allinone.factory.domain.model.FactoryCategory;
+import com.manpou.allinone.factory.domain.model.PaymentTerms;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.hibernate.validator.constraints.Length;
+
+import java.math.BigDecimal;
 
 @Data
 public class FactoryUpdateCmd {
 
-    @Length(max = 128)
+    @Size(max = 128)
     private String factoryName;
 
-    @Length(max = 128)
-    private String location;
+    private FactoryCategory category;
 
-    @Length(max = 128)
+    @Size(max = 64)
+    private String province;
+
+    @Size(max = 64)
+    private String city;
+
+    @Size(max = 64)
+    private String county;
+
+    @Size(max = 500)
     private String roughLocation;
 
-    @Length(max = 64)
+    private BigDecimal longitude;
+    private BigDecimal latitude;
+
+    @Size(max = 64)
     private String contactName;
 
-    @Length(max = 32)
+    @Size(max = 32)
     private String contactPhone;
 
-    private FactoryStatus status;
+    @Size(max = 64)
+    private String contactWechat;
+
+    @Size(max = 32)
+    private String contactQq;
+
+    private CooperationStatus cooperationStatus;
+    private PaymentTerms paymentTerms;
+
+    @Size(max = 500)
+    private String notes;
 }

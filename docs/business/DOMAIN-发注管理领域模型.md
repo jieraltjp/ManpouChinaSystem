@@ -1,12 +1,12 @@
 # 发注管理 — 领域模型
 
-> **版本**: 1.3.0
-> **更新**: 2026-04-21
+> **版本**: 1.4.0
+> **更新**: 2026-04-22
 > **依据**: 业务流分析（8步全链路） + `SPEC-B02-发注单-步骤2.md`
 
 > **代码实现进度**:
 > Procurement ✅ 已实现（v1.3.0，含 factoryId/subProductCode/billingType 等） · Product 🔴 待开发
-> · ReplenishmentDemand ✅ · Factory ✅（无独立页面，内嵌于发注单） · QcRecord ✅（聚合根）
+> · ReplenishmentDemand ✅ · Factory ✅（v1.4.0 字段扩展，详见 DB-10-factory.md） · QcRecord ✅（聚合根）
 > · LogisticsPlan ✅（聚合根） · DomesticCustoms 🔴 待定 · JapanCustoms 🔴 待定
 
 ---
@@ -83,27 +83,60 @@ public enum DemandStatus {
 ```
 Factory（聚合根）
 ├── id: Long
-├── factoryCode: String             # 工厂编码（唯一键，如 F-20260421-001）
-├── factoryName: String              # 工厂名称
-├── location: String                 # 工厂位置（省/市）
-├── roughLocation: String            # 粗略位置（工业区/园区/镇）
-├── contactName: String              # 联系人名称
-├── contactPhone: String             # 联系人电话
-├── status: FactoryStatus            # ACTIVE | INACTIVE
+├── factoryCode: String             # 工厂编号（F-YYYYMMDD-NNN）
+├── factoryName: String             # 工厂名称
+├── category: FactoryCategory        # 分类（TOOLS/TEXTILE/PLASTIC/...）
+├── province: String                # 省
+├── city: String                    # 市
+├── county: String                  # 县/区
+├── roughLocation: String           # 详细地址（粗略）
+├── longitude: BigDecimal           # 经度
+├── latitude: BigDecimal            # 纬度
+├── contactName: String             # 联系人
+├── contactPhone: String             # 手机号
+├── contactWechat: String           # 微信号
+├── contactQq: String              # QQ号
+├── cooperationStatus: CooperationStatus  # 合作状态
+├── paymentTerms: PaymentTerms      # 账期
+├── notes: String                   # 备注
 ├── createBy: String
 ├── createTime: LocalDateTime
 ├── updateTime: LocalDateTime
 │
 └── 领域方法
-    └── linkProductCode(code)        # 关联该厂生产的货号
+    └── linkProductCode(code)       # 关联货号
 ```
 
-**FactoryStatus 枚举：**
+**CooperationStatus 枚举：**
 
 ```java
-public enum FactoryStatus {
-    ACTIVE,     // 正常合作
-    INACTIVE    // 已停止合作
+public enum CooperationStatus {
+    ACTIVE,     // 合作中
+    SUSPENDED,  // 已暂停
+    ELIMINATED, // 已淘汰
+    POTENTIAL   // 潜在合作
+}
+```
+
+**FactoryCategory 枚举：**
+
+```java
+public enum FactoryCategory {
+    TOOLS, TEXTILE, PLASTIC, ELECTRONICS,
+    FURNITURE, AUTO_PARTS, SPORTS, PET,
+    MEDICAL, CRAFTS, CHEMICAL, OTHER
+}
+```
+
+**PaymentTerms 枚举：**
+
+```java
+public enum PaymentTerms {
+    CASH,   // 现结
+    NET_30, // 月结30天
+    NET_60, // 月结60天
+    NET_90, // 月结90天
+    CREDIT  // 信用账期
 }
 ```
 
@@ -528,9 +561,17 @@ public interface ReplenishmentDemandRepository extends JpaRepository<Replenishme
 ### FactoryRepository
 
 ```java
-public interface FactoryRepository extends JpaRepository<Factory, Long> {
-    Optional<Factory> findByFactoryName(String factoryName);
-    List<Factory> findByStatus(FactoryStatus status);
+public interface FactoryRepository {
+    Optional<Factory> findById(Long id);
+    Optional<Factory> findByIdAndIsDeletedFalse(Long id);
+    Optional<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName);
+    Factory save(Factory entity);
+    void deleteById(Long id);
+    List<Factory> findAllByIsDeletedFalse();
+    Page<Factory> findAllByIsDeletedFalse(Pageable pageable);
+    Page<Factory> findByCooperationStatusAndIsDeletedFalse(CooperationStatus status, Pageable pageable);
+    Page<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName, Pageable pageable);
+    boolean existsByIsDeletedFalse();
 }
 ```
 

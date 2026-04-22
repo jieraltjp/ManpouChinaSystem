@@ -34,8 +34,8 @@ public class FactoryUseCase {
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
         Page<Factory> page;
-        if (query.getStatus() != null) {
-            page = factoryRepository.findByStatusAndIsDeletedFalse(query.getStatus(), pageRequest);
+        if (query.getCooperationStatus() != null) {
+            page = factoryRepository.findByCooperationStatusAndIsDeletedFalse(query.getCooperationStatus(), pageRequest);
         } else if (query.getFactoryName() != null && !query.getFactoryName().isBlank()) {
             page = factoryRepository.findByFactoryNameAndIsDeletedFalse(query.getFactoryName(), pageRequest);
         } else {
@@ -66,8 +66,8 @@ public class FactoryUseCase {
                 .orElseThrow(() -> BusinessException.notFound("Factory", id));
         assembler.copyToEntity(cmd, entity);
         factoryRepository.save(entity);
-        log.info("[Factory] updated, traceId={}, id={}, status={}",
-                MDC.get(TraceFilter.TRACE_ID_KEY), id, entity.getStatus());
+        log.info("[Factory] updated, traceId={}, id={}, cooperationStatus={}",
+                MDC.get(TraceFilter.TRACE_ID_KEY), id, entity.getCooperationStatus());
     }
 
     @Transactional

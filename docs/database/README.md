@@ -8,7 +8,7 @@
 
 | 编号 | 含义 |
 |------|------|
-| DB-01 ~ DB-09 | 数据库步号（与业务步号/UI步号一一对应） |
+| DB-01 ~ DB-09, DB-10 | 数据库步号（与业务步号对应；DB-10 为工厂专项扩展） |
 
 ---
 
@@ -17,7 +17,8 @@
 | 编号 | 文档 | 业务步号 | 状态 | 说明 |
 |------|------|---------|------|------|
 | DB-01 | [DB-01-procurement-demand.md](DB-01-procurement-demand.md) | 01 | ✅ | replenishment_demand 表 |
-| DB-02 | [DB-02-procurement-order.md](DB-02-procurement-order.md) | 02 | ✅ | procurement + factory 表 |
+| DB-02 | [DB-02-procurement-order.md](DB-02-procurement-order.md) | 02 | ✅ | procurement 表 |
+| DB-10 | [DB-10-factory.md](DB-10-factory.md) | 02 | 🔄 | factory 表（v1.4.0 字段扩展） |
 | DB-03 | [DB-03-inspection.md](DB-03-inspection.md) | 03 | ✅ | qc_record 表 |
 | DB-04 | [DB-04-logistics.md](DB-04-logistics.md) | 04 | ✅/⚡ | logistics_plan ✅ · container/consolidation_pool ⚡占位 |
 | DB-05 | [DB-05-domestic-customs.md](DB-05-domestic-customs.md) | 05 | ⚡占位 | domestic_customs_record 表 |

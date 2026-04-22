@@ -48,12 +48,21 @@ ReplenishmentDemand（聚合根）
 Factory（聚合根）
 ├── id: Long
 ├── factoryCode: String         # F-YYYYMMDD-NNN
-├── factoryName: String          # 工厂名称
-├── location: String             # 省/市
-├── roughLocation: String        # 粗略位置（工业区/园区/镇）
+├── factoryName: String         # 工厂名称
+├── category: FactoryCategory    # 分类（TOOLS/TEXTILE/PLASTIC/...）
+├── province: String             # 省
+├── city: String                 # 市
+├── county: String              # 县/区
+├── roughLocation: String       # 详细地址（粗略）
+├── longitude: BigDecimal       # 经度
+├── latitude: BigDecimal        # 纬度
 ├── contactName: String         # 联系人
-├── contactPhone: String        # 联系电话
-├── status: FactoryStatus      # ACTIVE / INACTIVE
+├── contactPhone: String        # 手机号
+├── contactWechat: String       # 微信号
+├── contactQq: String          # QQ号
+├── cooperationStatus: CooperationStatus  # 合作状态
+├── paymentTerms: PaymentTerms  # 账期
+├── notes: String              # 备注
 └── 领域方法
     └── linkProductCode(code)   # 关联货号
 ```
@@ -108,12 +117,36 @@ public enum DemandStatus {
 }
 ```
 
-### 3.2 FactoryStatus（工厂状态）
+### 3.2 CooperationStatus（合作状态）
 
 ```java
-public enum FactoryStatus {
-    ACTIVE,    // 正常合作
-    INACTIVE   // 已停止合作
+public enum CooperationStatus {
+    ACTIVE,     // 合作中
+    SUSPENDED,  // 已暂停
+    ELIMINATED, // 已淘汰
+    POTENTIAL   // 潜在合作
+}
+```
+
+**FactoryCategory（分类）:**
+
+```java
+public enum FactoryCategory {
+    TOOLS, TEXTILE, PLASTIC, ELECTRONICS,
+    FURNITURE, AUTO_PARTS, SPORTS, PET,
+    MEDICAL, CRAFTS, CHEMICAL, OTHER
+}
+```
+
+**PaymentTerms（账期）:**
+
+```java
+public enum PaymentTerms {
+    CASH,   // 现结
+    NET_30, // 月结30天
+    NET_60, // 月结60天
+    NET_90, // 月结90天
+    CREDIT  // 信用账期
 }
 ```
 

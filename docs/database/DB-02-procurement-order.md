@@ -15,7 +15,7 @@
 | 序号 | 表名 | 聚合根 | 状态 |
 |------|------|--------|------|
 | 1 | `procurement` | Procurement | ✅ 已实现 |
-| 2 | `factory` | Factory | ✅ 已实现 |
+| 2 | `factory` | Factory | ✅ 已实现（字段更新见 DB-10） |
 | 3 | `product` | Product | 🟡 部分实现 |
 
 ---
@@ -68,27 +68,9 @@ CREATE TABLE procurement (
 
 ## 2. factory（工厂）
 
-**对应**: `Factory` 聚合根
+**对应**: `Factory` 聚合根（完整设计见 `DB-10-factory.md`）
 
-```sql
-CREATE TABLE factory (
-    id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    factory_code       VARCHAR(32)  NOT NULL UNIQUE COMMENT 'F-YYYYMMDD-NNN',
-    factory_name       VARCHAR(128) NOT NULL COMMENT '工厂名称',
-    location           VARCHAR(128) COMMENT '省/市',
-    rough_location    VARCHAR(128) COMMENT '粗略位置（工业区/园区/镇）',
-    contact_name       VARCHAR(64) COMMENT '联系人',
-    contact_phone     VARCHAR(32) COMMENT '联系电话',
-    status             VARCHAR(20)  NOT NULL DEFAULT 'ACTIVE' COMMENT 'ACTIVE / INACTIVE',
-    create_time        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    create_by          VARCHAR(64)  NOT NULL,
-    update_by          VARCHAR(64)  NOT NULL,
-    is_deleted          BOOLEAN      NOT NULL DEFAULT FALSE,
-    INDEX idx_factory_name (factory_name),
-    INDEX idx_factory_status (status)
-);
-```
+> **重大更新（v1.4.0）**: `location` 拆分为 `province`/`city`/`county`；`status` 替换为 `cooperationStatus`（CooperationStatus）；新增 `category`/`paymentTerms`/`contactWechat`/`contactQq`/`longitude`/`latitude` 等字段。详见 `DB-10-factory.md`。
 
 ---
 

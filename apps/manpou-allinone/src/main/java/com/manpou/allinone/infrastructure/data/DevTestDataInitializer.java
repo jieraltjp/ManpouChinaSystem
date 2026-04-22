@@ -1,7 +1,8 @@
 package com.manpou.allinone.infrastructure.data;
 
+import com.manpou.allinone.factory.domain.model.CooperationStatus;
 import com.manpou.allinone.factory.domain.model.Factory;
-import com.manpou.allinone.factory.domain.model.FactoryStatus;
+import com.manpou.allinone.factory.domain.model.PaymentTerms;
 import com.manpou.allinone.factory.domain.repository.FactoryRepository;
 import com.manpou.allinone.procurement.domain.model.BillingType;
 import com.manpou.allinone.procurement.domain.model.Procurement;
@@ -50,12 +51,15 @@ public class DevTestDataInitializer implements CommandLineRunner {
         }
 
         // ===== Step 1: 工厂基础数据 =====
-        Factory f1 = factoryOf("F-20260421-001", "金华市恒旺箱包厂", "浙江省金华市", "金东工业区",
-                "李强", "13805791234", FactoryStatus.ACTIVE);
-        Factory f2 = factoryOf("F-20260421-002", "永康市东亚五金制品厂", "浙江省金华市永康市", "永康镇工业园",
-                "王芳", "13905798876", FactoryStatus.ACTIVE);
-        Factory f3 = factoryOf("F-20260421-003", "广州鑫达皮具厂", "广东省广州市", "白云区狮岭镇",
-                "陈明", "13603001234", FactoryStatus.INACTIVE);
+        Factory f1 = factoryOf("F-20260421-001", "金华市恒旺箱包厂", "浙江省", "金华市", "",
+                "金东工业区", "李强", "13805791234", "", "",
+                CooperationStatus.ACTIVE, PaymentTerms.NET_30);
+        Factory f2 = factoryOf("F-20260421-002", "永康市东亚五金制品厂", "浙江省", "金华市", "永康市",
+                "永康镇工业园", "王芳", "13905798876", "", "",
+                CooperationStatus.ACTIVE, PaymentTerms.NET_30);
+        Factory f3 = factoryOf("F-20260421-003", "广州鑫达皮具厂", "广东省", "广州市", "",
+                "白云区狮岭镇", "陈明", "13603001234", "", "",
+                CooperationStatus.SUSPENDED, PaymentTerms.NET_30);
 
         factoryRepository.save(f1);
         factoryRepository.save(f2);
@@ -123,17 +127,23 @@ public class DevTestDataInitializer implements CommandLineRunner {
         log.info("[DevTestData] 初始化完成: 3 工厂 / 5 需求 / 5 发注单");
     }
 
-    private Factory factoryOf(String code, String name, String location,
+    private Factory factoryOf(String code, String name, String province, String city, String county,
                                String roughLocation, String contact, String phone,
-                               FactoryStatus status) {
+                               String wechat, String qq,
+                               CooperationStatus cooperationStatus, PaymentTerms paymentTerms) {
         Factory f = new Factory();
         f.setFactoryCode(code);
         f.setFactoryName(name);
-        f.setLocation(location);
+        f.setProvince(province);
+        f.setCity(city);
+        f.setCounty(county);
         f.setRoughLocation(roughLocation);
         f.setContactName(contact);
         f.setContactPhone(phone);
-        f.setStatus(status);
+        f.setContactWechat(wechat);
+        f.setContactQq(qq);
+        f.setCooperationStatus(cooperationStatus);
+        f.setPaymentTerms(paymentTerms);
         return f;
     }
 

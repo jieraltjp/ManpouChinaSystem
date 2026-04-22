@@ -1,7 +1,7 @@
 package com.manpou.allinone.factory.domain.repository;
 
+import com.manpou.allinone.factory.domain.model.CooperationStatus;
 import com.manpou.allinone.factory.domain.model.Factory;
-import com.manpou.allinone.factory.domain.model.FactoryStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -27,7 +27,7 @@ public interface FactoryRepository {
 
     Page<Factory> findAllByIsDeletedFalse(Pageable pageable);
 
-    Page<Factory> findByStatusAndIsDeletedFalse(FactoryStatus status, Pageable pageable);
+    Page<Factory> findByCooperationStatusAndIsDeletedFalse(CooperationStatus cooperationStatus, Pageable pageable);
 
     Page<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName, Pageable pageable);
 

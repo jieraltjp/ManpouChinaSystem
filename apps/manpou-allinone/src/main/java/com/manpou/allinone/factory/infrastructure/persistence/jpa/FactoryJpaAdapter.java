@@ -1,7 +1,7 @@
 package com.manpou.allinone.factory.infrastructure.persistence.jpa;
 
+import com.manpou.allinone.factory.domain.model.CooperationStatus;
 import com.manpou.allinone.factory.domain.model.Factory;
-import com.manpou.allinone.factory.domain.model.FactoryStatus;
 import com.manpou.allinone.factory.domain.repository.FactoryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +21,7 @@ public interface FactoryJpaAdapter extends FactoryRepository, org.springframewor
 
     Optional<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName);
 
-    Page<Factory> findByStatusAndIsDeletedFalse(FactoryStatus status, Pageable pageable);
+    Page<Factory> findByCooperationStatusAndIsDeletedFalse(CooperationStatus cooperationStatus, Pageable pageable);
 
     Page<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName, Pageable pageable);
 

@@ -152,7 +152,7 @@
 | 字段 | 来源 | 说明 |
 |------|------|------|
 | factoryName | Factory.factoryName | 工厂名称 |
-| factoryLocation | Factory.location | 工厂位置（省/市） |
+| factoryLocation | Factory.province + Factory.city | 工厂位置（省/市） |
 | factoryRoughLocation | Factory.roughLocation | 粗略位置（工业区/园区） |
 | contactName | Factory.contactName | 联系人名称 |
 | contactPhone | Factory.contactPhone | 联系人电话 |

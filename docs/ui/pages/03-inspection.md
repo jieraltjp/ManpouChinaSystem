@@ -180,7 +180,7 @@
 | 采购单搜索选择器 | P1 | InspectionPage.vue 已有（fromDemand 逻辑可复用） |
 | sellerName 自动代入 | ✅ P1 | ✅ `QcRecordUseCase.create()` 已实现 |
 | 验货完成按钮 | ✅ P1 | ✅ 已实现：`PATCH /api/v1/qc-records/{id}` + body `{status: "COMPLETED"}` |
-| 序列号输入 | P2 | `serialNumbers` 字段不在 QcRecord 实体中，已移除；如需实现请新增实体 |
+| 序列号输入 | P2 | 暂不规划；QcRecord 无此字段 |
 | 缺陷照片上传 | P2 | MinIO 文件上传，显示缩略图 |
 | 创建调配预填充 | P1 | LogisticsPage.vue 解析 `fromQc` query 参数 |
 
