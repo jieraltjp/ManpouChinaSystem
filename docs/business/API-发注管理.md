@@ -314,32 +314,20 @@ GET /api/v1/products/{code}/dimensions
 
 ## 3. 验货（検品 / 現地検品）
 
-### 3.1 提交验货结果
-
-```
-POST /api/v1/procurements/{id}/qc
-```
-
-**请求体**：
-```json
-{
-  "qcType": "ONSITE",
-  "qcUserId": 3,
-  "result": "PASS",
-  "passedCount": 498,
-  "defectiveCount": 2,
-  "images": ["https://cdn.example.com/qc/defect1.jpg"],
-  "remarks": "外箱轻微破损"
-}
-```
-
-**qcType**：`ONSITE`(検品/仓库验货) | `REMOTE`(現地検品/现场异地)
+> ⚠️ **已迁移**：验货记录为独立模块，不在发注单下嵌套。
+> 验货 API 详见 `SPEC-B03-验货记录-步骤3.md`。
+>
+> | 操作 | Endpoint |
+> |------|----------|
+> | 创建验货记录 | `POST /api/v1/qc-records` |
+> | 更新验货记录 | `PATCH /api/v1/qc-records/{id}` |
+> | 查询验货记录 | `GET /api/v1/qc-records?procurementId={id}` |
 
 ---
 
 ## 4. 货柜管理
 
-### 4.1 录入货柜
+> 🔴 **待实现**：Container 聚合根未实现，API 路径待定。
 
 ```
 POST /api/v1/containers
@@ -361,7 +349,7 @@ POST /api/v1/containers
 
 ## 5. 财务结算（会計）
 
-### 5.1 财务结算
+> 🔴 **待实现**：FinanceRecord 聚合根未实现，API 路径待定。
 
 ```
 POST /api/v1/procurements/{id}/finance
@@ -382,7 +370,7 @@ POST /api/v1/procurements/{id}/finance
 
 ## 6. 退货管理
 
-### 6.1 创建退货记录
+> 🔴 **待实现**：退货记录聚合根未实现，API 路径待定。
 
 ```
 POST /api/v1/procurements/{id}/returns

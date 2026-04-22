@@ -23,7 +23,7 @@
 | procurement | `/api/v1/procurements` | procurement-service（Kafka topic: procurement-events） | ✅ CRUD+报价计算 |
 | factory | `/api/v1/factories` | factory-service | ✅ domain层+FSM |
 | qc | `/api/v1/qc-records` | qc-service | ✅ domain层+FSM |
-| logistics | `/api/v1/logistics` | logistics-service（Kafka topic: logistics-events） | ✅ domain层+FSM |
+| logistics | `/api/v1/logistics-plans` | logistics-service（Kafka topic: logistics-events） | ✅ domain层+FSM |
 | replenishment | `/api/v1/demands` | replenishment-service | ✅ CRUD+转采购 |
 | product | `/api/v1/products` | product-service（Kafka topic: product-events） | 🔴 骨架 |
 | customs | `/api/v1/customs` | customs-service（Kafka topic: customs-events） | 🔴 骨架 |

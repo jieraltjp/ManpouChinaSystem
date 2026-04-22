@@ -72,7 +72,7 @@
 | `/api/v1/products/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
 | `/api/v1/warehouse/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
 | `/api/v1/customs/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
-| `/api/v1/logistics/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
+| `/api/v1/logistics-plans/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
 | `/api/v1/finance/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
 | `/api/v1/notifications/**` | manpou-allinone | 18090 | ✅ JWT，熔断 |
 | `/actuator/**` | forward:/actuator | — | ❌ 白名单 |
