@@ -69,6 +69,7 @@ public class LogisticsPlan extends BaseEntity {
     @Column(name = "cargo_volume_cbm", precision = 10, scale = 6)
     private BigDecimal cargoVolumeCbm;     // 体积(m³)
 
+    @Column(name = "quantity")
     private Integer quantity;            // 数量
 
     @Column(name = "requires_qc")
