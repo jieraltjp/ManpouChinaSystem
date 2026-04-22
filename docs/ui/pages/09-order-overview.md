@@ -5,7 +5,7 @@
 > **路由**: `/procurement/overview`
 > **组件**: `OrderOverviewPage.vue`
 > **对应后端**: `GET /api/v1/orders/{id}/overview` 聚合接口
-> **依赖文档**: `SPEC-全链路业务流索引.md` · `SPEC-订单总览-API设计.md`
+> **依赖文档**: `SPEC-B01-全链路总览.md` · `SPEC-B09-订单总览-API设计.md`
 > **前置**: 至少有一条 Procurement 记录
 
 ---
@@ -194,11 +194,11 @@
 |------|------|
 | `planCode` | 调配编号 |
 | `planType` | 海运 / 空运 / 拼柜 |
-| `cargoDimensions` | 货物尺寸 |
+| `cargoLengthCm` / `cargoWidthCm` / `cargoHeightCm` | 货物尺寸（cm） |
 | `cargoWeightKg` | 重量 |
-| `containerNo` | 货柜号 |
-| `departurePort` | 出发港 |
-| `arrivalPort` | 目的港 |
+| `containerId` | 货柜ID（Container 实体） |
+| `departurePort` | 出发港（Container 实体） |
+| `arrivalPort` | 目的港（Container 实体） |
 | `estimatedShipDate` | 预计发货日 |
 | `actualShipDate` | 实际发货日 |
 | `status` | PLANNED / BOOKED / IN_TRANSIT / DELIVERED |

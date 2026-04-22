@@ -55,7 +55,6 @@ GET /api/v1/orders/{procurementId}/overview
 ```json
 {
   "id": 1,
-  "procurementCode": "P-20260421-001",
   "factoryId": 10,
   "productCode": "odn012",
   "subProductCode": "re",

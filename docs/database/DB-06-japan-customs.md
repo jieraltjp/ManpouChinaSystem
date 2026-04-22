@@ -4,8 +4,8 @@
 > **创建**: 2026-04-22
 > **状态**: 🔴 占位（字段待确认）
 > **业务步号**: 06（日本清关）
-> **对应业务文档**: `SPEC-B01-全链路总览.md` §第六步 · `SPEC-日本清关-步骤6.md`
-> **对应 UI 文档**: `docs/ui/pages/08-japan-customs.md`
+> **对应业务文档**: `SPEC-B01-全链路总览.md` · `SPEC-B06-日本清关-步骤6.md`
+> **对应 UI 文档**: `docs/ui/pages/06-japan-customs.md`
 > **对应后端聚合根**: `JapanCustomsRecord`
 
 ---

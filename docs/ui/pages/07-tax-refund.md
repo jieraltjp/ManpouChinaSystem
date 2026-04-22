@@ -5,7 +5,7 @@
 > **路由**: `/finance/tax-refund`
 > **组件**: `TaxRefundPage.vue`（占位）
 > **对应后端**: `TaxRefundRecord` 聚合根（待实现）
-> **依赖文档**: `SPEC-全链路业务流索引.md` §第七步
+> **依赖文档**: `SPEC-B01-全链路总览.md` · `SPEC-B07-退税-步骤7.md`
 > **前置步骤**: 步骤6（日本清关已放行 JapanCustomsRecord.status = CLEARED）
 > **后续步骤**: 步骤8（运营销售 SalesRecord）
 

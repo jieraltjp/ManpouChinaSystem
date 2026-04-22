@@ -5,7 +5,7 @@
 > **路由**: `/customs/domestic`
 > **组件**: `DomesticCustomsPage.vue`（占位）
 > **对应后端**: `DomesticCustomsRecord` 聚合根（待实现）
-> **依赖文档**: `SPEC-全链路业务流索引.md` §第五步 · `DOMAIN-发注管理领域模型.md` §4
+> **依赖文档**: `SPEC-B01-全链路总览.md` · `SPEC-B05-国内报关-步骤5.md`
 > **前置步骤**: 步骤4（调配计划已发货 LogisticsPlan.status = IN_TRANSIT）
 > **后续步骤**: 步骤6（日本清关 JapanCustomsRecord）
 
@@ -46,7 +46,7 @@
 
 ## 3. 表格列定义（待确认字段）
 
-> ⚠️ 以下字段来源于 `SPEC-全链路业务流索引.md` §第五步，**待业务方提供真实报关单样本后确认**。
+> ⚠️ 以下字段来源于 `SPEC-B05-国内报关-步骤5.md`，**待业务方提供真实报关单样本后确认**。
 
 | 列名 | 字段 | 来源 | 说明 |
 |------|------|------|------|
@@ -78,7 +78,7 @@
 | 关联采购单 | 用户选择 | 选择 LogisticsPlan 或 Procurement |
 | 货号 | 自动代入 | — |
 | 商品名称 | 自动代入 | 来自 Product.nameZh |
-| 起运港 | 自动代入 | 来自 LogisticsPlan.departurePort |
+| 起运港 | 自动代入 | 来自 Container.departurePort（Container 实体实现后补充） |
 
 **用户填入（待确认）**：
 

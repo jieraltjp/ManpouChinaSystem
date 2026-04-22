@@ -46,7 +46,7 @@
 
 ## 2. 状态枚举
 
-> 与 `ShipmentStatus` 后端枚举完全对齐，详见 `docs/business/SPEC-发注管理流程.md §5`。
+> 与 `ShipmentStatus` 后端枚举完全对齐，详见 `docs/business/DOMAIN-发注管理领域模型.md`。
 
 | 值 | 中文 | Tag 颜色 | 说明 |
 |------|------|---------|------|
@@ -229,7 +229,7 @@ OrderPage.vue
 | `apps/web/src/api/procurement.ts` | API 类型与请求封装 |
 | `apps/manpou-allinone/.../ProcurementController.java` | 后端 REST 接口 |
 | `apps/manpou-allinone/.../ShipmentStatus.java` | 状态枚举 + FSM 规则 |
-| `docs/business/SPEC-发注管理流程.md` | 业务规格文档 |
+| `docs/business/SPEC-B02-发注单-步骤2.md` | 业务规格文档 |
 | `docs/business/DOMAIN-发注管理领域模型.md` | 领域模型 |
 
 ---

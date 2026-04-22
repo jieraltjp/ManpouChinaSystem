@@ -4,8 +4,8 @@
 > **创建**: 2026-04-22
 > **状态**: 🔴 占位（字段待确认）
 > **业务步号**: 05（国内报关）
-> **对应业务文档**: `SPEC-B01-全链路总览.md` §第五步 · `SPEC-国内报关-步骤5.md`
-> **对应 UI 文档**: `docs/ui/pages/07-domestic-customs.md`
+> **对应业务文档**: `SPEC-B01-全链路总览.md` · `SPEC-B05-国内报关-步骤5.md`
+> **对应 UI 文档**: `docs/ui/pages/05-domestic-customs.md`
 > **对应后端聚合根**: `DomesticCustomsRecord`
 
 ---

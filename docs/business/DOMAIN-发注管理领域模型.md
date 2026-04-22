@@ -2,7 +2,7 @@
 
 > **版本**: 1.3.0
 > **更新**: 2026-04-21
-> **依据**: 业务流分析（6步重构） + `docs/发注管理体系升级.pdf`
+> **依据**: 业务流分析（8步全链路） + `SPEC-B02-发注单-步骤2.md`
 
 > **代码实现进度**:
 > Procurement ✅ 已实现（v1.3.0，含 factoryId/subProductCode/billingType 等） · Product 🔴 待开发
@@ -224,7 +224,7 @@ QcRecord（聚合根）
 ├── material: String                # 材质（新增）
 ├── taxRefund: Boolean              # 是否退税（新增）
 ├── qcStandard: String             # 验收标准（新增）
-├── images: List<String>           # 缺陷照片URL列表
+├── images: String                # 缺陷照片URL列表（JSON数组）
 ├── remarks: String                # 备注
 ├── qcDate: LocalDate               # 验货日期（新增）
 ├── createdBy: String
@@ -232,9 +232,9 @@ QcRecord（聚合根）
 ├── updatedAt: LocalDateTime
 │
 └── 领域方法
-    ├── pass(inspectionCount, passedCount)  # 验货通过
-    ├── fail(reason)                         # 验货不通过，触发退货
-    └── calculateDefectRate()                # 计算不良率 = defectiveCount / (passedCount + defectiveCount)
+    ├── calculateDefectiveCount()  # 不良数 = inspectionCount - passedCount
+    ├── pass()                      # 验货通过
+    └── fail(reason)                 # 验货不通过，触发退货
 ```
 
 ---

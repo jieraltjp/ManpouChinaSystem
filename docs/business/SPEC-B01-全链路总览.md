@@ -237,7 +237,7 @@
 |------|------|------|
 | procurementId | LogisticsPlan.procurementId | 关联调配计划 |
 | productCode | LogisticsPlan.productCode | 自动带入 |
-| boxDimensions | LogisticsPlan.cargoDimensions | 箱子尺寸作为货物尺寸参考 |
+| boxLengthCm/boxWidthCm/boxHeightCm | LogisticsPlan.cargoLengthCm/widthCm/heightCm | 箱子尺寸作为货物尺寸参考 |
 | result | 质量判定 | PASS → 进入调配；FAIL → 触发退货流程 |
 
 ### 缺口分析
@@ -271,7 +271,7 @@
 
 | 字段 | 来源 | 说明 |
 |------|------|------|
-| boxDimensions | QcRecord.boxDimensions | 箱子尺寸作为货物尺寸 |
+| boxLengthCm/boxWidthCm/boxHeightCm | QcRecord.boxLengthCm/boxWidthCm/boxHeightCm | 箱子尺寸作为货物尺寸 |
 | grossWeight | QcRecord.grossWeight | 毛重作为货物重量参考 |
 
 **来自用户**（调配现场填入）:

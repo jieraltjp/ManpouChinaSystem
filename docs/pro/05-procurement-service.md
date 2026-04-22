@@ -186,6 +186,6 @@ procurement.resetToUndecided();
 | `docs/business/README.md` | 业务文档总览 + 实现进度 |
 | `docs/business/API-发注管理.md` | API 契约 |
 | `docs/business/DOMAIN-发注管理领域模型.md` | 领域模型 |
-| `docs/business/SPEC-发注管理流程.md` | 需求规格 + 状态机规则 |
+| `docs/business/SPEC-B02-发注单-步骤2.md` | 需求规格 + 状态机规则 |
 | `docs/pro/19-manpou-allinone.md` | manpou-allinone 整体文档 |
 | `apps/manpou-allinone/` | 代码实现 |

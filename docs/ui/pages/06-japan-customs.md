@@ -5,7 +5,7 @@
 > **路由**: `/customs/japan`
 > **组件**: `JapanCustomsPage.vue`（占位）
 > **对应后端**: `JapanCustomsRecord` 聚合根（待实现）
-> **依赖文档**: `SPEC-全链路业务流索引.md` §第六步 · `DOMAIN-发注管理领域模型.md` §4
+> **依赖文档**: `SPEC-B01-全链路总览.md` · `SPEC-B06-日本清关-步骤6.md`
 > **前置步骤**: 步骤5（国内报关已放行 DomesticCustomsRecord.status = CLEARED）
 > **后续步骤**: 步骤7（退税 TaxRefundRecord）
 
@@ -46,14 +46,14 @@
 
 ## 3. 表格列定义（待确认字段）
 
-> ⚠️ 以下字段来源于 `SPEC-全链路业务流索引.md` §第六步，**待业务方提供真实清关文件样本后确认**。
+> ⚠️ 以下字段来源于 `SPEC-B06-日本清关-步骤6.md`，**待业务方提供真实清关文件样本后确认**。
 
 | 列名 | 字段 | 来源 | 说明 |
 |------|------|------|------|
 | 入境报关号 | `customsEntryNo` | 系统/海关返回 | — |
 | 采购单号 | `procurementId` | 关联 | — |
 | 货号 | `productCode` | 来自 Procurement | — |
-| 目的港 | `arrivalPort` | 来自 LogisticsPlan | — |
+| 目的港 | `arrivalPort` | 来自 Container（Container 实体实现后补充） | — |
 | 到达日期 | `arrivalDate` | 用户输入 | — |
 | 清关行 | `customsBroker` | 用户输入 | — |
 | 清关行电话 | `brokerPhone` | 用户输入 | — |
@@ -79,7 +79,7 @@
 |------|------|------|
 | 关联采购单 | 用户选择 | — |
 | 货号 | 自动代入 | — |
-| 目的港 | 自动代入 | 来自 LogisticsPlan.arrivalPort |
+| 目的港 | 自动代入 | 来自 Container.arrivalPort（Container 实体实现后补充） |
 | 申报重量 | 自动代入 | 来自 LogisticsPlan.cargoWeightKg |
 | 申报体积 | 自动代入 | 来自 LogisticsPlan.cargoVolumeCbm |
 
