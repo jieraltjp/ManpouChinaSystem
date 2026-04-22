@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS goods_staging (
     buyer               VARCHAR(100) DEFAULT NULL,
     remark              TEXT         DEFAULT NULL,
     last_used           DATE         DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品数据临时 staging 表（迁移用）';
+);
 
 -- ============================================================
 -- 步骤0.5：导入 goods.sql 数据到 staging 表
@@ -136,16 +136,10 @@ SELECT
     NULL                    AS width_cm,
     NULL                    AS height_cm,
 
-    -- 重量：g → kg（字段原始单位为克）
-    CASE WHEN weight_net IS NOT NULL AND weight_net > 0
-         THEN weight_net / 1000.0
-         ELSE NULL
-    END                    AS net_weight_kg,
+    -- 重量：goods.sql weight_gross/weight_net 单位为 kg（decimal 3位小数），直接映射
+    weight_net             AS net_weight_kg,
 
-    CASE WHEN weight_gross IS NOT NULL AND weight_gross > 0
-         THEN weight_gross / 1000.0
-         ELSE NULL
-    END                    AS gross_weight_kg,
+    weight_gross            AS gross_weight_kg,
 
     -- 价格（字段原始单位为 CNY）
     unit_price             AS unit_price_rmb,
@@ -163,7 +157,7 @@ SELECT
 
     NULLIF(declaration_elements, '') AS declaration_elements,
 
-    -- 外箱数量：box_qty 字段示例 "1" / "5" / "500"
+    -- 外箱数量：box_qty 字段示例 "1" / "5" / "500"（纯数字才迁移）
     CASE
         WHEN box_qty IS NOT NULL
              AND box_qty REGEXP '^[0-9]+$'
@@ -183,11 +177,15 @@ WHERE
     -- 过滤占位记录
     AND sku NOT LIKE '%厂家%'
     AND sku NOT LIKE '%各一个%'
-    AND sku NOT REGEXP '^[一-龥]+$'
+    -- 过滤纯中文货号（MySQL REGEXP 写法）
+    AND NOT (
+        LENGTH(sku) = CHAR_LENGTH(sku)
+        AND sku REGEXP '^[一-龥]'
+    )
     AND LENGTH(sku) > 1
     -- 至少有一个名称
     AND (name_en IS NOT NULL OR name_zh IS NOT NULL)
-    -- 过滤无意义记录
+    -- 过滤无意义记录（unit_price IS NOT NULL 且 > 0）
     AND unit_price IS NOT NULL
     AND unit_price > 0
 ;
@@ -237,8 +235,49 @@ WHERE
     AND g.factory_name != ''
     AND g.sku NOT LIKE '%厂家%'
     AND g.sku NOT LIKE '%各一个%'
-    AND g.sku NOT REGEXP '^[一-龥]+$'
-ON DUPLICATE KEY UPDATE update_time = NOW();
+    AND NOT (
+        LENGTH(g.sku) = CHAR_LENGTH(g.sku)
+        AND g.sku REGEXP '^[一-龥]'
+    )
+-- 防止重复插入：先删除已存在的关联，再插入新记录
+-- 注意：ON DUPLICATE KEY UPDATE 对 product_factory JOIN 场景不适用，改用 DELETE + INSERT 模式
+DELETE FROM product_factory
+WHERE product_id IN (
+    SELECT p.id
+    FROM goods_staging g
+    JOIN product p ON (
+        CASE WHEN LOCATE('-', g.sku) > 0
+             THEN SUBSTRING(g.sku, 1, LOCATE('-', g.sku) - 1)
+             ELSE g.sku
+        END = p.master_code
+    )
+    JOIN factory f ON f.factory_name = g.factory_name
+    WHERE g.sku IS NOT NULL AND g.sku != ''
+);
+
+-- 再插入新关联
+INSERT INTO product_factory (
+    product_id, factory_id, supplier_sku, moq, unit_price_rmb, is_preferred, create_time, update_time
+)
+SELECT
+    p.id, f.id, g.sku, 1, g.unit_price, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM goods_staging g
+JOIN product p ON (
+    CASE WHEN LOCATE('-', g.sku) > 0
+         THEN SUBSTRING(g.sku, 1, LOCATE('-', g.sku) - 1)
+         ELSE g.sku
+    END = p.master_code
+)
+JOIN factory f ON f.factory_name = g.factory_name
+WHERE
+    g.sku IS NOT NULL AND g.sku != ''
+    AND g.factory_name IS NOT NULL AND g.factory_name != ''
+    AND g.sku NOT LIKE '%厂家%'
+    AND g.sku NOT LIKE '%各一个%'
+    AND NOT (
+        LENGTH(g.sku) = CHAR_LENGTH(g.sku)
+        AND g.sku REGEXP '^[一-龥]'
+    );
 
 -- ============================================================
 -- 步骤3：更新 last_used_date（按 master_code 取最大日期）
