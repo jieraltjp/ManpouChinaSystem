@@ -1,7 +1,7 @@
 # SPEC-B10 — 商品目录业务规格（商品类）
 
-> **版本**: 1.1.0
-> **更新**: 2026-04-22（v1.1.0：新增 suggest 自动补全 API）
+> **版本**: 1.2.0
+> **更新**: 2026-04-22（v1.2.0：前端 i18n + pagination bug修复；后端 V5/V6 迁移脚本待执行）
 > **创建**: 2026-04-22
 > **状态**: ✅ 已实现
 > **业务步号**: 00（基础设施/商品目录）
@@ -309,11 +309,11 @@ List<SubCodeSuggestVO> suggestSubCodes(String masterCode);
 - [x] ✅ `/suggest/master-codes` 主货号自动补全端点
 - [x] ✅ `/suggest/sub-codes` 子货号候选项端点
 - [x] ✅ `MasterCodeSuggestVO` / `SubCodeSuggestVO` DTO
-- [x] ✅ `ProductPage.vue` 前端商品管理页面
+- [x] ✅ `ProductPage.vue` 前端商品管理页面（i18n完成，pagination bug已修复）
 - [x] ✅ `product.ts` 前端 API 客户端
 - [x] ✅ `V3__product_tables.sql` Flyway 迁移脚本
-- [ ] 🔴 商品迁移脚本（goods.sql 782条 → product 表）
-- [ ] 🔴 商品-工厂关联迁移（factory_name → product_factory）
+- [ ] 🔴 `V7__product_data_migration.sql` 商品数据迁移（goods.sql 781条 → product 表； staging → product + product_factory）
+- [ ] 🔴 商品-工厂关联迁移（已含于 V7 步骤2）
 
 ---
 

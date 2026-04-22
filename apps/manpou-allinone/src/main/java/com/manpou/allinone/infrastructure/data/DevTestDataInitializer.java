@@ -30,7 +30,7 @@ import java.time.LocalDate;
  * - 5 条补货需求（混合状态）
  * - 5 条发注单（混合状态）
  *
- * 与 docs/business/SPEC-发注管理流程.md §3 完全对齐。
+ * 与 docs/business/SPEC-B02-发注单-步骤2.md §API设计 完全对齐。
  */
 @Slf4j
 @Component

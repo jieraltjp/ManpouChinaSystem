@@ -78,7 +78,7 @@ ALTER TABLE procurement
 -- ============================================================
 -- V5__procurement_factory_link.sql
 -- procurement 表新增 factory_id 关联
--- 对应: DB-11 §3
+-- 对应: DB-12 §3
 -- ============================================================
 
 ALTER TABLE procurement

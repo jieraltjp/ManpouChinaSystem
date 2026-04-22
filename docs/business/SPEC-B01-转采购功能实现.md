@@ -19,7 +19,7 @@
 
 **前置条件：**
 - 需求状态 = `PENDING`（只有待确认可转）
-- `factoryId` 必填（DB-11 要求）
+- `factoryId` 必填（DB-12 要求）
 
 **转换后：**
 - 需求单 `status` → `CONVERTED`
