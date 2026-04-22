@@ -204,12 +204,12 @@ ALTER TABLE replenishment_demand
 
 ```java
 @GetMapping("/suggest/master-codes")
-public Result<List<MasterCodeVO>> suggestMasterCodes(@RequestParam String keyword) {
+public Result<List<MasterCodeSuggestVO>> suggestMasterCodes(@RequestParam String keyword) {
     return Result.ok(productUseCase.suggestMasterCodes(keyword));
 }
 
 @GetMapping("/suggest/sub-codes")
-public Result<List<SubCodeVO>> suggestSubCodes(@RequestParam String masterCode) {
+public Result<List<SubCodeSuggestVO>> suggestSubCodes(@RequestParam String masterCode) {
     return Result.ok(productUseCase.suggestSubCodes(masterCode));
 }
 ```

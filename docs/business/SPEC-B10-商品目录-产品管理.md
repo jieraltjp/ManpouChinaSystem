@@ -270,6 +270,16 @@ List<MasterCodeSuggestVO> suggestMasterCodes(String keyword);
 List<SubCodeSuggestVO> suggestSubCodes(String masterCode);
 ```
 
+**响应 DTO 字段**：
+
+```java
+// MasterCodeSuggestVO
+{ masterCode: String, nameZh: String, colorCount: Integer }
+
+// SubCodeSuggestVO
+{ subCode: String, colorName: String }
+```
+
 ---
 
 ## 7. 状态与约束

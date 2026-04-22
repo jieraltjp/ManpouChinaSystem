@@ -39,8 +39,8 @@ public class ReplenishmentDemand extends BaseEntity {
     @Column(name = "product_code", nullable = false, length = 32)
     private String productCode;       // 主货号
 
-    @Column(name = "sub_product_code", length = 64)
-    private String subProductCode;  // 子货号/枝番（颜色）
+    @Column(name = "sub_product_code", length = 512)
+    private String subProductCode;  // 子货号/枝番（颜色），存储 JSON 数组或单个字符串
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;        // 需求量

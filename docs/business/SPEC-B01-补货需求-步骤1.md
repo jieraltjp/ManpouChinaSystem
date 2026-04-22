@@ -30,7 +30,7 @@ ReplenishmentDemand（聚合根）
 ├── demandCode: String           # D-YYYYMMDD-NNN
 ├── demandType: DemandType        # REPLENISHMENT(补货) / NEW_PURCHASE(新品采购)
 ├── productCode: String           # 主货号
-├── subProductCode: String        # 子货号（新品可为空）
+├── subProductCodes: List<String> # 子货号列表（JSON 存储；新品可为空）
 ├── quantity: Integer           # 需求量
 ├── destination: String         # 目的地
 ├── japanLead: String           # 日本担当
