@@ -29,7 +29,31 @@
   },
   "dashboard": {
     "title": "仪表盘",
-    "welcome": "欢迎回来"
+    "welcome": "欢迎回来",
+    "stat": {
+      "currentUser": "当前用户",
+      "role": "角色",
+      "tenant": "租户",
+      "tokenRemaining": "Token 剩余"
+    },
+    "jwt": {
+      "title": "JWT Claims",
+      "userIdSub": "User ID (sub)",
+      "tenantId": "Tenant ID",
+      "roles": "角色",
+      "permissions": "权限",
+      "issuedAt": "Issued At",
+      "expiresAt": "Expires At"
+    },
+    "shortcut": {
+      "title": "快捷入口",
+      "orderManagement": "发注单管理",
+      "factoryManagement": "工厂管理",
+      "relogin": "重新登录"
+    },
+    "token": {
+      "expired": "已过期"
+    }
   },
   "demand": {
     "title": "补货需求",
@@ -90,7 +114,10 @@
       "japanLeadPlaceholder": "日本担当姓名",
       "remarks": "备注",
       "cancel": "取消",
-      "save": "保存"
+      "save": "保存",
+      "colorCount": "{count}个颜色",
+      "selectColorVariant": "选择颜色变体（或手动输入）",
+      "selectMasterCodeFirst": "请先选择主货号"
     },
     "validation": {
       "demandTypeRequired": "请选择需求类型",
@@ -300,6 +327,11 @@
       "deleteConfirmTitle": "删除确认",
       "factoryCreateSuccess": "工厂创建成功",
       "detail": "详情"
+    },
+    "common": {
+      "yes": "是",
+      "no": "否",
+      "RMB": "RMB"
     }
   },
   "inspection": {
@@ -605,6 +637,108 @@
       "updateSuccess": "更新成功"
     }
   },
+  "product": {
+    "title": "商品目录",
+    "newButton": "新规录入",
+    "stat": {
+      "total": "商品总数"
+    },
+    "filter": {
+      "masterCode": "主货号",
+      "keyword": "关键词",
+      "keywordPlaceholder": "中文/英文名称",
+      "hsCode": "HS编码",
+      "search": "查询",
+      "reset": "重置"
+    },
+    "column": {
+      "masterCode": "主货号",
+      "subCode": "子货号",
+      "nameZh": "中文名称",
+      "nameEn": "英文名称",
+      "hsCode": "HS编码",
+      "unitPriceRmb": "含税单价(CNY)",
+      "origin": "原产国",
+      "material": "材质",
+      "unit": "单位",
+      "action": "操作"
+    },
+    "action": {
+      "detail": "详情",
+      "edit": "编辑",
+      "delete": "删除"
+    },
+    "drawer": {
+      "title": "商品详情",
+      "masterCode": "主货号",
+      "subCode": "子货号",
+      "nameZh": "中文名称",
+      "nameEn": "英文名称",
+      "hsCode": "HS编码",
+      "unitPriceRmb": "含税单价(CNY)",
+      "netWeight": "净重",
+      "grossWeight": "毛重",
+      "lengthCm": "长(cm)",
+      "widthCm": "宽(cm)",
+      "heightCm": "高(cm)",
+      "origin": "原产国",
+      "material": "材质",
+      "unit": "单位",
+      "exportCategory": "出口分类",
+      "factory": "关联工厂",
+      "notes": "备注",
+      "createTime": "创建时间",
+      "updateTime": "更新时间",
+      "close": "关闭",
+      "edit": "编辑"
+    },
+    "dialog": {
+      "newTitle": "新增商品",
+      "editTitle": "编辑商品",
+      "masterCode": "主货号",
+      "masterCodePlaceholder": "如 odn001",
+      "subCode": "子货号",
+      "subCodePlaceholder": "如 re/wh/bk",
+      "nameZh": "中文名称",
+      "nameZhPlaceholder": "中文名称",
+      "nameEn": "英文名称",
+      "nameEnPlaceholder": "English name",
+      "hsCode": "HS编码",
+      "hsCodePlaceholder": "HS编码",
+      "unitPriceRmb": "含税单价(CNY)",
+      "netWeight": "净重(kg)",
+      "grossWeight": "毛重(kg)",
+      "cargoSize": "货物尺寸",
+      "lengthCm": "长(cm)",
+      "widthCm": "宽(cm)",
+      "heightCm": "高(cm)",
+      "origin": "原产国",
+      "originPlaceholder": "如 中国",
+      "material": "材质",
+      "materialPlaceholder": "如 plastic/metal",
+      "unit": "单位",
+      "unitPlaceholder": "如 件/套/箱",
+      "exportCategory": "出口分类",
+      "exportCategoryPlaceholder": "出口分类",
+      "factory": "关联工厂",
+      "factoryPlaceholder": "选择工厂",
+      "notes": "备注",
+      "notesPlaceholder": "备注信息",
+      "cancel": "取消",
+      "save": "保存"
+    },
+    "validation": {
+      "masterCodeRequired": "主货号不能为空",
+      "nameZhRequired": "中文名称不能为空"
+    },
+    "message": {
+      "deleteConfirm": "确认删除商品「{code}」？",
+      "deleteConfirmTitle": "删除确认",
+      "deleteSuccess": "删除成功",
+      "createSuccess": "创建成功",
+      "updateSuccess": "更新成功"
+    }
+  },
   "common": {
     "search": "查询",
     "reset": "重置",
@@ -615,7 +749,20 @@
     "edit": "编辑",
     "close": "关闭",
     "loading": "加载中...",
-    "noData": "暂无数据"
+    "noData": "暂无数据",
+    "units": {
+      "kg": "kg",
+      "cm": "cm",
+      "m3": "m³",
+      "cny": "¥",
+      "jpy": "JPY",
+      "rmb": "RMB"
+    },
+    "format": {
+      "times": "×",
+      "dash": "—",
+      "perUnit": "/件"
+    }
   },
   "validation": {
     "required": "此字段为必填项"

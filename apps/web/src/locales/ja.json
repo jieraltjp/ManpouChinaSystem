@@ -29,7 +29,31 @@
   },
   "dashboard": {
     "title": "ダッシュボード",
-    "welcome": "おかえりなさい"
+    "welcome": "おかえりなさい",
+    "stat": {
+      "currentUser": "現在のユーザー",
+      "role": "役割",
+      "tenant": "テナント",
+      "tokenRemaining": "トークン残り"
+    },
+    "jwt": {
+      "title": "JWT Claims",
+      "userIdSub": "User ID (sub)",
+      "tenantId": "Tenant ID",
+      "roles": "役割",
+      "permissions": "権限",
+      "issuedAt": "Issued At",
+      "expiresAt": "Expires At"
+    },
+    "shortcut": {
+      "title": "クイックアクセス",
+      "orderManagement": "発注書管理",
+      "factoryManagement": "工場管理",
+      "relogin": "再ログイン"
+    },
+    "token": {
+      "expired": "期限切れ"
+    }
   },
   "demand": {
     "title": "補充需求管理",
@@ -90,7 +114,10 @@
       "japanLeadPlaceholder": "日本担当氏名",
       "remarks": "備考",
       "cancel": "キャンセル",
-      "save": "保存"
+      "save": "保存",
+      "colorCount": "{count}色展開",
+      "selectColorVariant": "カラーVariantを選択（または手動入力）",
+      "selectMasterCodeFirst": "先に主品番を選択してください"
     },
     "validation": {
       "demandTypeRequired": "需求タイプを選択してください",
@@ -300,6 +327,11 @@
       "deleteConfirmTitle": "削除確認",
       "factoryCreateSuccess": "工場の作成が完了しました",
       "detail": "詳細"
+    },
+    "common": {
+      "yes": "はい",
+      "no": "いいえ",
+      "RMB": "RMB"
     }
   },
   "inspection": {
@@ -605,6 +637,108 @@
       "updateSuccess": "更新が完了しました"
     }
   },
+  "product": {
+    "title": "商品ディレクトリ",
+    "newButton": "新規录入",
+    "stat": {
+      "total": "商品総数"
+    },
+    "filter": {
+      "masterCode": "主品番",
+      "keyword": "キーワード",
+      "keywordPlaceholder": "中文/英文名称",
+      "hsCode": "HSコード",
+      "search": "検索",
+      "reset": "リセット"
+    },
+    "column": {
+      "masterCode": "主品番",
+      "subCode": "子品番",
+      "nameZh": "中文名称",
+      "nameEn": "英文名称",
+      "hsCode": "HSコード",
+      "unitPriceRmb": "税込単価(CNY)",
+      "origin": "原産国",
+      "material": "材質",
+      "unit": "単位",
+      "action": "操作"
+    },
+    "action": {
+      "detail": "詳細",
+      "edit": "編集",
+      "delete": "削除"
+    },
+    "drawer": {
+      "title": "商品詳細",
+      "masterCode": "主品番",
+      "subCode": "子品番",
+      "nameZh": "中文名称",
+      "nameEn": "英文名称",
+      "hsCode": "HSコード",
+      "unitPriceRmb": "税込単価(CNY)",
+      "netWeight": "正味重量",
+      "grossWeight": "総重量",
+      "lengthCm": "長さ(cm)",
+      "widthCm": "幅(cm)",
+      "heightCm": "高さ(cm)",
+      "origin": "<minimax:tool_call>",
+      "material": "材質",
+      "unit": "単位",
+      "exportCategory": "輸出分類",
+      "factory": "関連工場",
+      "notes": "備考",
+      "createTime": "作成日時",
+      "updateTime": "更新日時",
+      "close": "閉じる",
+      "edit": "編集"
+    },
+    "dialog": {
+      "newTitle": "新規商品追加",
+      "editTitle": "商品編集",
+      "masterCode": "主品番",
+      "masterCodePlaceholder": "例：odn001",
+      "subCode": "子品番",
+      "subCodePlaceholder": "例：re/wh/bk",
+      "nameZh": "中文名称",
+      "nameZhPlaceholder": "中文名称",
+      "nameEn": "英文名称",
+      "nameEnPlaceholder": "English name",
+      "hsCode": "HSコード",
+      "hsCodePlaceholder": "HSコード",
+      "unitPriceRmb": "税込単価(CNY)",
+      "netWeight": "正味重量(kg)",
+      "grossWeight": "総重量(kg)",
+      "cargoSize": "货物サイズ",
+      "lengthCm": "長さ(cm)",
+      "widthCm": "幅(cm)",
+      "heightCm": "高さ(cm)",
+      "origin": "</minimax:tool_call>",
+      "originPlaceholder": "例：中国",
+      "material": "材質",
+      "materialPlaceholder": "例：plastic/metal",
+      "unit": "単位",
+      "unitPlaceholder": "例：個/套/箱",
+      "exportCategory": "輸出分類",
+      "exportCategoryPlaceholder": "輸出分類",
+      "factory": "関連工場",
+      "factoryPlaceholder": "工場を選択",
+      "notes": "備考",
+      "notesPlaceholder": "備考情報",
+      "cancel": "キャンセル",
+      "save": "保存"
+    },
+    "validation": {
+      "masterCodeRequired": "主品番は必須です",
+      "nameZhRequired": "中文名称は必須です"
+    },
+    "message": {
+      "deleteConfirm": "商品「{code}」を削除しますか？",
+      "deleteConfirmTitle": "削除確認",
+      "deleteSuccess": "削除が完了しました",
+      "createSuccess": "作成が完了しました",
+      "updateSuccess": "更新が完了しました"
+    }
+  },
   "common": {
     "search": "検索",
     "reset": "リセット",
@@ -615,7 +749,20 @@
     "edit": "編集",
     "close": "閉じる",
     "loading": "読み込み中...",
-    "noData": "データがありません"
+    "noData": "データがありません",
+    "units": {
+      "kg": "kg",
+      "cm": "cm",
+      "m3": "m³",
+      "cny": "¥",
+      "jpy": "JPY",
+      "rmb": "RMB"
+    },
+    "format": {
+      "times": "×",
+      "dash": "—",
+      "perUnit": "/個"
+    }
   },
   "validation": {
     "required": "この項目は必須です"

@@ -173,7 +173,7 @@
             >
               <span style="font-weight:600">{{ item.masterCode }}</span>
               <span v-if="item.nameZh" style="color:#999;font-size:12px;margin-left:8px">{{ item.nameZh }}</span>
-              <span v-if="item.colorCount > 0" style="color:#E8650A;font-size:11px;float:right">{{ item.colorCount }}个颜色</span>
+              <span v-if="item.colorCount > 0" style="color:#E8650A;font-size:11px;float:right">{{ $t('demand.dialog.colorCount', { count: item.colorCount }) }}</span>
             </el-option>
           </el-select>
         </el-form-item>
@@ -186,7 +186,7 @@
             default-first-option
             :disabled="!formData.productCode"
             :loading="subCodeLoading"
-            :placeholder="formData.productCode ? '选择颜色变体（或手动输入）' : '请先选择主货号'"
+            :placeholder="formData.productCode ? $t('demand.dialog.selectColorVariant') : $t('demand.dialog.selectMasterCodeFirst')"
             style="width:100%"
             @focus="loadSubCodeOptions"
           >

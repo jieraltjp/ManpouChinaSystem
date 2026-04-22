@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <h2 class="page-title">仪表盘</h2>
+    <h2 class="page-title">{{ $t('dashboard.title') }}</h2>
 
     <!-- 欢迎卡片 -->
     <el-row :gutter="16" class="stat-row">
@@ -10,7 +10,7 @@
             <el-icon class="stat-icon" color="#409eff"><User /></el-icon>
             <div>
               <div class="stat-value">{{ auth.claims?.username || '—' }}</div>
-              <div class="stat-label">当前用户</div>
+              <div class="stat-label">{{ $t('dashboard.stat.currentUser') }}</div>
             </div>
           </div>
         </el-card>
@@ -22,7 +22,7 @@
             <el-icon class="stat-icon" color="#67c23a"><Key /></el-icon>
             <div>
               <div class="stat-value">{{ auth.claims?.roles?.join(', ') || '—' }}</div>
-              <div class="stat-label">角色</div>
+              <div class="stat-label">{{ $t('dashboard.stat.role') }}</div>
             </div>
           </div>
         </el-card>
@@ -34,7 +34,7 @@
             <el-icon class="stat-icon" color="#e6a23c"><OfficeBuilding /></el-icon>
             <div>
               <div class="stat-value">{{ auth.claims?.tenantId || '—' }}</div>
-              <div class="stat-label">租户</div>
+              <div class="stat-label">{{ $t('dashboard.stat.tenant') }}</div>
             </div>
           </div>
         </el-card>
@@ -46,7 +46,7 @@
             <el-icon class="stat-icon" color="#f56c6c"><Timer /></el-icon>
             <div>
               <div class="stat-value">{{ tokenExpiry }}</div>
-              <div class="stat-label">Token 剩余</div>
+              <div class="stat-label">{{ $t('dashboard.stat.tokenRemaining') }}</div>
             </div>
           </div>
         </el-card>
@@ -56,16 +56,16 @@
     <!-- JWT 信息 -->
     <el-card shadow="hover" class="info-card">
       <template #header>
-        <span>JWT Claims</span>
+        <span>{{ $t('dashboard.jwt.title') }}</span>
       </template>
       <el-descriptions :column="2" border>
-        <el-descriptions-item label="User ID (sub)">
+        <el-descriptions-item :label="$t('dashboard.jwt.userIdSub')">
           {{ auth.claims?.sub || '—' }}
         </el-descriptions-item>
-        <el-descriptions-item label="Tenant ID">
+        <el-descriptions-item :label="$t('dashboard.jwt.tenantId')">
           {{ auth.claims?.tenantId || '—' }}
         </el-descriptions-item>
-        <el-descriptions-item label="Roles">
+        <el-descriptions-item :label="$t('dashboard.jwt.roles')">
           <el-tag
             v-for="role in auth.claims?.roles"
             :key="role"
@@ -75,7 +75,7 @@
             {{ role }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="Permissions">
+        <el-descriptions-item :label="$t('dashboard.jwt.permissions')">
           <el-tag
             v-for="perm in auth.claims?.permissions"
             :key="perm"
@@ -86,10 +86,10 @@
             {{ perm }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="Issued At">
+        <el-descriptions-item :label="$t('dashboard.jwt.issuedAt')">
           {{ issuedAt }}
         </el-descriptions-item>
-        <el-descriptions-item label="Expires At">
+        <el-descriptions-item :label="$t('dashboard.jwt.expiresAt')">
           {{ expiresAt }}
         </el-descriptions-item>
       </el-descriptions>
@@ -98,20 +98,20 @@
     <!-- 快捷入口 -->
     <el-card shadow="hover" class="info-card mt-16">
       <template #header>
-        <span>快捷入口</span>
+        <span>{{ $t('dashboard.shortcut.title') }}</span>
       </template>
       <el-space wrap>
         <el-button type="primary" @click="$router.push('/procurement/order')">
           <el-icon><Document /></el-icon>
-          发注单管理
+          {{ $t('dashboard.shortcut.orderManagement') }}
         </el-button>
         <el-button type="primary" @click="$router.push('/procurement/factory')">
           <el-icon><OfficeBuilding /></el-icon>
-          工厂管理
+          {{ $t('dashboard.shortcut.factoryManagement') }}
         </el-button>
         <el-button @click="handleRelogin">
           <el-icon><SwitchButton /></el-icon>
-          重新登录
+          {{ $t('dashboard.shortcut.relogin') }}
         </el-button>
       </el-space>
     </el-card>
@@ -123,7 +123,9 @@ import { computed } from 'vue'
 import { User, Key, OfficeBuilding, Timer, SwitchButton } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import dayjs from 'dayjs'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const auth = useAuthStore()
 
 function handleRelogin() {
@@ -140,7 +142,7 @@ const expiresAt = computed(() =>
 const tokenExpiry = computed(() => {
   if (!auth.claims?.exp) return '—'
   const remaining = dayjs.unix(auth.claims.exp).diff(dayjs(), 'minute')
-  return remaining > 0 ? `${remaining} min` : '已过期'
+  return remaining > 0 ? `${remaining} min` : t('dashboard.token.expired')
 })
 </script>
 

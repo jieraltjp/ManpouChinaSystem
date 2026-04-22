@@ -118,7 +118,7 @@
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('order.message.detail') }}</el-button>
             <el-button link type="primary" size="small" @click.stop="onEdit(row)"
-              :disabled="row.status === '完了'">{{ $t('demand.action.edit') }}</el-button>
+              :disabled="row.status === COMPLETED_STATUS">{{ $t('demand.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)"
               :disabled="!deletableStatuses.includes(row.status)">{{ $t('common.delete') }}</el-button>
           </template>
@@ -232,7 +232,7 @@
           </el-col>
           <el-col :span="8">
             <el-form-item :label="$t('order.dialog.requiresQc')">
-              <el-switch v-model="formData.requiresQc" active-text="是" inactive-text="否" />
+              <el-switch v-model="formData.requiresQc" :active-text="$t('order.common.yes')" :inactive-text="$t('order.common.no')" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -441,11 +441,13 @@ const router = useRouter()
 const { t, locale: localeRef } = useI18n()
 const currentLocale = computed(() => localeRef.value)
 
+const COMPLETED_STATUS = '完了'
+const RETURNED_STATUS = '退货'
 const deletableStatuses = ['未定', '発注待']
 
 const ORDER_STATUSES = [
   '未定', '予定', 'OEM', '発注待', '永康', '直送', '倉庫着', '検品', '現地検品',
-  'エア便', 'メーカー直送', '輸出', '国内通関', '通関', '日本着', '日本通関完了', '会計', '完了', '退货',
+  'エア便', 'メーカー直送', '輸出', '国内通関', '通関', '日本着', '日本通関完了', '会計', COMPLETED_STATUS, RETURNED_STATUS,
 ]
 
 const statusOptionsWithI18n = computed(() =>
@@ -491,7 +493,7 @@ function onDemandChange(demandId: number | null) {
   const d = demandOptions.value.find(x => x.id === demandId)
   if (!d) return
   formData.productCode = d.productCode
-  formData.subProductCode = d.subProductCode || ''
+  formData.subProductCode = d.subProductCodes?.[0] || ''
   formData.destination = d.destination || ''
   formData.japanLead = d.japanLead || ''
   formData.quantity = d.quantity
@@ -506,7 +508,7 @@ function prefillFromDemand(demand: DemandPageVO) {
   dialogMode.value = 'create'
   Object.assign(formData, defaultFormData())
   formData.productCode = demand.productCode
-  formData.subProductCode = demand.subProductCode || ''
+  formData.subProductCode = demand.subProductCodes?.[0] || ''
   formData.destination = demand.destination || ''
   formData.japanLead = demand.japanLead || ''
   formData.quantity = demand.quantity
@@ -601,13 +603,13 @@ async function onFactorySubmit() {
 }
 
 const activeCount = computed(() =>
-  tableRows.value.filter(r => r.status !== '完了' && r.status !== '退货').length,
+  tableRows.value.filter(r => r.status !== COMPLETED_STATUS && r.status !== RETURNED_STATUS).length,
 )
 const completedCount = computed(() =>
-  tableRows.value.filter(r => r.status === '完了').length,
+  tableRows.value.filter(r => r.status === COMPLETED_STATUS).length,
 )
 const returnedCount = computed(() =>
-  tableRows.value.filter(r => r.status === '退货').length,
+  tableRows.value.filter(r => r.status === RETURNED_STATUS).length,
 )
 
 const previewPriceJpy = computed(() => {
