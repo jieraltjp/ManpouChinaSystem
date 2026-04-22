@@ -562,20 +562,23 @@
 
 ### 工厂表（Factory）
 
-**对应文档**: `DOMAIN-发注管理领域模型.md` §1.2
-**对应代码**: `Factory` ✅ 已实现（字段不完整）
+**对应文档**: `DB-10-factory.md` · `DOMAIN-发注管理领域模型.md` §1.2
+**对应代码**: `Factory` ✅ 已实现（v1.4.0 字段完整）
 
-| 字段 | 现状 | 补充建议 |
+| 字段 | 现状 | 说明 |
 |------|------|------|
+| factoryCode | ✅ 已有（F-YYYYMMDD-NNN） | — |
 | factoryName | ✅ 已有 | — |
-| location (省/市) | ✅ 已有（location + roughLocation） | 拆分为 province / city / district |
+| province / city / county | ✅ 已有 | location 已拆分为省/市/县三级 |
+| roughLocation | ✅ 已有 | 详细地址 |
+| longitude / latitude | ✅ 已有 | 经纬度 |
 | contactName | ✅ 已有 | — |
 | contactPhone | ✅ 已有 | — |
-| 微信 | 🔴 无 | 需新增 wechat 字段 |
-| QQ | 🔴 无 | 需新增 qq 字段 |
-| longitude / latitude | 🔴 无 | 需新增 for 物流跟踪 |
-| factoryCode | ✅ 已有（F-YYYYMMDD-NNN） | — |
-| status | ✅ 已有（ACTIVE/INACTIVE） | 关联退货率阈值 |
+| contactWechat | ✅ 已有 | — |
+| contactQq | ✅ 已有 | — |
+| category | ✅ 已有（FactoryCategory） | 12种行业分类 |
+| cooperationStatus | ✅ 已有（CooperationStatus） | 替代原 status |
+| paymentTerms | ✅ 已有（PaymentTerms） | CASH/NET_30/60/90/CREDIT |
 
 ---
 

@@ -7,6 +7,15 @@ import re
 import sys
 from datetime import datetime
 
+def clean_field(val: str) -> str:
+    val = val.strip()
+    if val.lower() == "null":
+        return ""
+    if val.startswith("'") and val.endswith("'"):
+        val = val[1:-1]
+    val = val.replace("''", "'")
+    return val
+
 COMPANIES_SQL = "companies.sql"
 OUTPUT_SQL = "V4__factory_migration.sql"
 
@@ -25,6 +34,9 @@ CATEGORY_KEYWORDS = [
     (["化工", "涂料", "颜料", "涂层"], "CHEMICAL"),
 ]
 
+# Entries that are test data, locations, or malformed — skip migration
+SKIP_IDS = {9, 21, 22, 30, 42}
+
 def infer_category(name: str) -> str:
     for keywords, cat in CATEGORY_KEYWORDS:
         for kw in keywords:
@@ -40,7 +52,6 @@ def unescape(s: str) -> str:
 
 def parse_tuple(s: str) -> list:
     """Parse a VALUES (...) tuple into individual field strings."""
-    # Remove outer parens
     s = s.strip()
     if s.startswith("(") and s.endswith(")"):
         s = s[1:-1]
@@ -60,44 +71,40 @@ def parse_tuple(s: str) -> list:
             in_str = not in_str
             current += ch
         elif ch == ',' and not in_str:
-            fields.append(current.strip())
+            fields.append(current)
             current = ""
         else:
             current += ch
-    if current.strip():
-        fields.append(current.strip())
+    if current:
+        fields.append(current)
     return fields
 
 def parse_insert_values(sql_text: str):
-    """Extract fields from INSERT statements."""
-    # Match: INSERT INTO `companies` VALUES (...);
-    insert_pattern = re.compile(r"INSERT INTO `companies` VALUES\s*\(.{10,3000}\);", re.IGNORECASE | re.DOTALL)
-    for m in insert_pattern.finditer(sql_text):
-        raw = m.group()
-        # Extract inner tuple
-        inner_start = raw.index("VALUES") + len("VALUES")
-        inner = raw[inner_start:].strip()
+    """Extract fields from INSERT statements, line by line."""
+    for line in sql_text.split("\n"):
+        ul = line.upper()
+        if "INSERT INTO" not in ul or "`COMPANIES`" not in ul or "VALUES" not in ul:
+            continue
+        # Extract the tuple part between VALUES ( and );
+        try:
+            start = line.index("VALUES") + len("VALUES")
+            end = line.rindex(";")
+            inner = line[start:end].strip()
+        except ValueError:
+            continue
+
         fields = parse_tuple(inner)
-        # fields: [id, name, province, city, district, address, longitude, latitude, created_at, updated_at, is_deleted, deleted_at]
         if len(fields) < 12:
             continue
 
-        def clean_field(val: str) -> str:
-            val = val.strip()
-            # Strip outer single quotes if present
-            if val.startswith("'") and val.endswith("'"):
-                val = val[1:-1]
-            # Replace escaped quotes ''
-            val = val.replace("''", "'")
-            return val
-
-        is_del = clean_field(fields[10])
-        lon_raw = clean_field(fields[6])
-        lat_raw = clean_field(fields[7])
         try:
             record_id = int(clean_field(fields[0]))
         except ValueError:
             record_id = 0
+
+        lon_raw = clean_field(fields[6])
+        lat_raw = clean_field(fields[7])
+        is_del = clean_field(fields[10])
         yield {
             "id": record_id,
             "name": clean_field(fields[1]),
@@ -133,30 +140,56 @@ def generate_alters():
 -- 对应: DB-10-factory.md §3 数据迁移策略
 -- ============================================================
 
--- Step 1: 扩展 factory 表（新增字段）
+-- Step 1: 扩展 factory 表（逐列添加，避免 MySQL 批量 ADD COLUMN 限制）
 -- 如果 factory 表已由 Hibernate ddl-auto=update 创建，需要补充以下列
 ALTER TABLE factory
-    ADD COLUMN IF NOT EXISTS category           VARCHAR(32)  NOT NULL  DEFAULT 'OTHER'  COMMENT '分类: TOOLS/TEXTILE/PLASTIC/ELECTRONICS/FURNITURE/AUTO_PARTS/SPORTS/PET/MEDICAL/CRAFTS/CHEMICAL/OTHER'  AFTER factory_name,
-    ADD COLUMN IF NOT EXISTS province           VARCHAR(64)  NOT NULL  DEFAULT ''       COMMENT '省'  AFTER category,
-    ADD COLUMN IF NOT EXISTS city               VARCHAR(64)  NOT NULL  DEFAULT ''       COMMENT '市'  AFTER province,
-    ADD COLUMN IF NOT EXISTS county             VARCHAR(64)  NOT NULL  DEFAULT ''       COMMENT '县/区'  AFTER city,
-    ADD COLUMN IF NOT EXISTS longitude          DECIMAL(11,8)          DEFAULT NULL     COMMENT '经度'  AFTER county,
-    ADD COLUMN IF NOT EXISTS latitude           DECIMAL(11,8)          DEFAULT NULL     COMMENT '纬度'  AFTER longitude,
-    ADD COLUMN IF NOT EXISTS contact_wechat     VARCHAR(64)            DEFAULT NULL     COMMENT '微信号'  AFTER contact_phone,
-    ADD COLUMN IF NOT EXISTS contact_qq         VARCHAR(32)            DEFAULT NULL     COMMENT 'QQ号'  AFTER contact_wechat,
-    ADD COLUMN IF NOT EXISTS cooperation_status VARCHAR(32) NOT NULL  DEFAULT 'POTENTIAL'  COMMENT '合作状态: ACTIVE/SUSPENDED/ELIMINATED/POTENTIAL'  AFTER contact_qq,
-    ADD COLUMN IF NOT EXISTS payment_terms      VARCHAR(64) NOT NULL  DEFAULT 'NET_30'  COMMENT '账期: CASH/NET_30/NET_60/NET_90/CREDIT'  AFTER cooperation_status,
-    ADD COLUMN IF NOT EXISTS notes             VARCHAR(500)           DEFAULT NULL      COMMENT '备注'  AFTER payment_terms;
+    ADD COLUMN category           VARCHAR(32)  NOT NULL  DEFAULT 'OTHER'  COMMENT '分类: TOOLS/TEXTILE/PLASTIC/ELECTRONICS/FURNITURE/AUTO_PARTS/SPORTS/PET/MEDICAL/CRAFTS/CHEMICAL/OTHER';
+
+ALTER TABLE factory
+    ADD COLUMN province           VARCHAR(64)  NOT NULL  DEFAULT ''  COMMENT '省';
+
+ALTER TABLE factory
+    ADD COLUMN city              VARCHAR(64)  NOT NULL  DEFAULT ''  COMMENT '市';
+
+ALTER TABLE factory
+    ADD COLUMN county            VARCHAR(64)  NOT NULL  DEFAULT ''  COMMENT '县/区';
+
+ALTER TABLE factory
+    ADD COLUMN longitude         DECIMAL(11,8)  DEFAULT NULL  COMMENT '经度';
+
+ALTER TABLE factory
+    ADD COLUMN latitude          DECIMAL(11,8)  DEFAULT NULL  COMMENT '纬度';
+
+ALTER TABLE factory
+    ADD COLUMN contact_wechat   VARCHAR(64)  DEFAULT NULL  COMMENT '微信号';
+
+ALTER TABLE factory
+    ADD COLUMN contact_qq       VARCHAR(32)  DEFAULT NULL  COMMENT 'QQ号';
+
+ALTER TABLE factory
+    ADD COLUMN cooperation_status VARCHAR(32)  NOT NULL  DEFAULT 'POTENTIAL'  COMMENT '合作状态: ACTIVE/SUSPENDED/ELIMINATED/POTENTIAL';
+
+ALTER TABLE factory
+    ADD COLUMN payment_terms     VARCHAR(64)  NOT NULL  DEFAULT 'NET_30'  COMMENT '账期: CASH/NET_30/NET_60/NET_90/CREDIT';
+
+ALTER TABLE factory
+    ADD COLUMN notes            VARCHAR(500)  DEFAULT NULL  COMMENT '备注';
 
 -- Step 2: 添加缺失索引
 ALTER TABLE factory
-    ADD INDEX IF NOT EXISTS idx_factory_category (category),
-    ADD INDEX IF NOT EXISTS idx_factory_cooperation_status (cooperation_status),
-    ADD INDEX IF NOT EXISTS idx_factory_province (province),
-    ADD INDEX IF NOT EXISTS idx_factory_city (city);
+    ADD INDEX idx_factory_category (category);
 
--- Step 3: 删除旧列（可选，安全做法是先注释掉，确认后再执行）
--- ALTER TABLE factory DROP COLUMN IF EXISTS location;
+ALTER TABLE factory
+    ADD INDEX idx_factory_cooperation_status (cooperation_status);
+
+ALTER TABLE factory
+    ADD INDEX idx_factory_province (province);
+
+ALTER TABLE factory
+    ADD INDEX idx_factory_city (city);
+
+-- Step 3: 删除旧列（确认新列数据正确后执行）
+-- ALTER TABLE factory DROP COLUMN location;
 """
 
 def main():
@@ -183,7 +216,7 @@ def main():
 
     out = [generate_alters()]
     out.append("-- Step 4: 从 companies 迁移数据到 factory")
-    out.append("-- 注意: is_deleted=1 的记录不迁移（已删除）")
+    out.append("-- 注意: is_deleted=1 或属于测试/无效数据的记录不迁移")
     out.append("")
     out.append("INSERT INTO factory (")
     out.append("    id, factory_code, factory_name, category,")
@@ -196,6 +229,9 @@ def main():
     lines = []
     for i, r in enumerate(records):
         if r["is_deleted"]:
+            continue
+        if r["id"] in SKIP_IDS:
+            print(f"  Skipping test/junk entry id={r['id']} name={r['name']}", file=sys.stderr)
             continue
         cat = infer_category(r["name"])
 
@@ -228,7 +264,7 @@ def main():
     # Summary
     cat_counts = {}
     for r in records:
-        if not r["is_deleted"]:
+        if not r["is_deleted"] and r["id"] not in SKIP_IDS:
             cat = infer_category(r["name"])
             cat_counts[cat] = cat_counts.get(cat, 0) + 1
     print("Category distribution:", file=sys.stderr)
