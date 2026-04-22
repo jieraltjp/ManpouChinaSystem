@@ -1,9 +1,11 @@
 package com.manpou.allinone.product.interfaces.controller;
 
+import com.manpou.allinone.product.application.dto.MasterCodeSuggestVO;
 import com.manpou.allinone.product.application.dto.ProductCreateCmd;
 import com.manpou.allinone.product.application.dto.ProductPageQuery;
 import com.manpou.allinone.product.application.dto.ProductQuery;
 import com.manpou.allinone.product.application.dto.ProductUpdateCmd;
+import com.manpou.allinone.product.application.dto.SubCodeSuggestVO;
 import com.manpou.allinone.product.application.usecase.ProductUseCase;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.common.result.Result;
@@ -11,6 +13,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 商品 Controller。
@@ -50,6 +54,22 @@ public class ProductController {
     @GetMapping("/code/{masterCode}")
     public Result<ProductPageQuery> getByMasterCode(@PathVariable String masterCode) {
         return Result.ok(productUseCase.getByMasterCode(masterCode));
+    }
+
+    /**
+     * 主货号自动补全（步骤1补货需求页调用）。
+     */
+    @GetMapping("/suggest/master-codes")
+    public Result<List<MasterCodeSuggestVO>> suggestMasterCodes(@RequestParam String keyword) {
+        return Result.ok(productUseCase.suggestMasterCodes(keyword));
+    }
+
+    /**
+     * 子货号候选项（按主货号过滤，步骤1补货需求页调用）。
+     */
+    @GetMapping("/suggest/sub-codes")
+    public Result<List<SubCodeSuggestVO>> suggestSubCodes(@RequestParam String masterCode) {
+        return Result.ok(productUseCase.suggestSubCodes(masterCode));
     }
 
     /**

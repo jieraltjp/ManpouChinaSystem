@@ -1,10 +1,10 @@
-# DB-10 — 商品目录数据库设计
+# DB-11 — 商品目录数据库设计
 
 > **版本**: 1.0.0
 > **创建**: 2026-04-22
-> **状态**: 🟡设计阶段
+> **状态**: ✅ 已实现
 > **对应业务文档**: `docs/business/SPEC-B10-商品目录-产品管理.md`
-> **对应 UI 文档**: `docs/ui/pages/10-product.md`
+> **对应 UI 文档**: `docs/ui/pages/10-product.md`（待创建）
 > **历史参考**: `docs/database/sql/goods.sql`（782条原始数据）
 
 ---

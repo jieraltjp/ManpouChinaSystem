@@ -33,4 +33,24 @@ public interface ProductJpaRepository extends ProductRepository, JpaRepository<P
     Page<Product> findByHsCodeAndIsDeletedFalse(@Param("hsCode") String hsCode, Pageable pageable);
 
     List<Product> findByMasterCodeAndIsDeletedFalse(String masterCode);
+
+    /** 主货号模糊搜索（去重），用于自动补全 */
+    @Query("SELECT DISTINCT p.masterCode FROM Product p WHERE p.masterCode LIKE %:kw% AND p.isDeleted = false")
+    List<String> findDistinctMasterCodeByKeyword(@Param("kw") String keyword);
+
+    /** 主货号模糊搜索（含名称和颜色数量），限制返回条数 */
+    @Query(value = """
+        SELECT p.master_code, p.name_zh,
+               (SELECT COUNT(*) FROM product c WHERE c.master_code = p.master_code AND c.is_deleted = 0 AND c.sub_code IS NOT NULL AND c.sub_code != '') as color_count
+        FROM product p
+        WHERE p.master_code LIKE %:kw% AND p.is_deleted = 0
+        GROUP BY p.master_code, p.name_zh
+        ORDER BY p.master_code
+        LIMIT 20
+        """, nativeQuery = true)
+    List<Object[]> findMasterCodeSuggestions(@Param("kw") String keyword);
+
+    /** 按主货号查询所有子货号候选项（用于多选） */
+    @Query("SELECT p.subCode, p.colorName FROM Product p WHERE p.masterCode = :masterCode AND p.isDeleted = false AND p.subCode IS NOT NULL AND p.subCode != '' ORDER BY p.subCode")
+    List<Object[]> findSubCodesByMasterCode(@Param("masterCode") String masterCode);
 }

@@ -6,12 +6,16 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.List;
+
 @Data
 public class ReplenishmentDemandUpdateCmd {
 
     private DemandType demandType;
     private String productCode;
-    private String subProductCode;
+
+    /** 子货号列表 */
+    private List<@Length(max = 64) String> subProductCodes;
 
     @Positive(message = "需求量必须为正数")
     private Integer quantity;

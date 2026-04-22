@@ -283,13 +283,19 @@ List<ProductFactory> findFactoriesByProductId(Long productId);
 
 ## 8. 代码实现状态
 
-- [ ] 🔴 `Product` 聚合根实体（新增）
-- [ ] 🔴 `ProductFactory` 关联实体（新增）
-- [ ] 🔴 `ProductCategory` 枚举（新增）
-- [ ] 🔴 `ProductRepository` 领域接口（新增）
-- [ ] 🔴 `ProductFactoryRepository` 领域接口（新增）
-- [ ] 🔴 `ProductUseCase` 用例服务（新增）
-- [ ] 🔴 `ProductController` REST 控制器（新增）
+- [x] ✅ `Product` 聚合根实体（`manpou-allinone/.../product/domain/model/Product.java`）
+- [x] ✅ `ProductFactory` 关联实体（`manpou-allinone/.../product/domain/model/ProductFactory.java`）
+- [x] ✅ `ProductCategory` 枚举（`manpou-allinone/.../product/domain/model/ProductCategory.java`）
+- [x] ✅ `ProductRepository` 领域接口（`manpou-allinone/.../product/domain/repository/ProductRepository.java`）
+- [x] ✅ `ProductFactoryRepository` 领域接口（`manpou-allinone/.../product/domain/repository/ProductFactoryRepository.java`）
+- [x] ✅ `ProductJpaRepository` JPA 持久化适配器
+- [x] ✅ `ProductFactoryJpaRepository` JPA 持久化适配器
+- [x] ✅ `ProductAssembler` DTO 转换器
+- [x] ✅ `ProductUseCase` 用例服务（含唯一性校验）
+- [x] ✅ `ProductController` REST 控制器（7个端点）
+- [x] ✅ `ProductPage.vue` 前端商品管理页面
+- [x] ✅ `product.ts` 前端 API 客户端
+- [x] ✅ `V3__product_tables.sql` Flyway 迁移脚本
 - [ ] 🔴 商品迁移脚本（goods.sql 782条 → product 表）
 - [ ] 🔴 商品-工厂关联迁移（factory_name → product_factory）
 

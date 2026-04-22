@@ -1,12 +1,14 @@
 # DB-01 — 补货需求数据库设计
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
+> **更新**: 2026-04-22（v1.1.0：sub_product_code 扩展为 VARCHAR(512)，支持 JSON 数组）
 > **状态**: ✅ 已实现
 > **业务步号**: 01（补货需求）
 > **对应业务文档**: `SPEC-B01-全链路总览.md` §第一步
 > **对应 UI 文档**: `docs/ui/pages/01-demand.md`
 > **对应后端聚合根**: `ReplenishmentDemand`
+> **对应设计文档**: `docs/design/FEATURE-货号自动补全与多子货号选择.md`
 
 ---
 
@@ -28,7 +30,7 @@ CREATE TABLE replenishment_demand (
     demand_code     VARCHAR(32)  NOT NULL UNIQUE COMMENT '需求编号 D-YYYYMMDD-NNN',
     demand_type     VARCHAR(20)  NOT NULL COMMENT 'REPLENISHMENT(补货) / NEW_PURCHASE(新品采购)',
     product_code    VARCHAR(32)  NOT NULL COMMENT '主货号',
-    sub_product_code VARCHAR(64) COMMENT '子货号/颜色（如 re=红色）',
+    sub_product_code VARCHAR(512) COMMENT '子货号：单个时存字符串（如 "re"），多个时存 JSON 数组（如 ["re","wh","bk"]）',
     quantity        INT          NOT NULL COMMENT '需求量',
     destination     VARCHAR(128) COMMENT '目的地',
     japan_lead      VARCHAR(64)  COMMENT '日本担当',
@@ -55,7 +57,7 @@ CREATE TABLE replenishment_demand (
 | demandCode | `demand_code` | VARCHAR(32) | 格式 `D-YYYYMMDD-NNN` |
 | demandType | `demand_type` | VARCHAR(20) | REPLENISHMENT / NEW_PURCHASE |
 | productCode | `product_code` | VARCHAR(32) | 主货号 |
-| subProductCode | `sub_product_code` | VARCHAR(64) | 子货号 |
+| subProductCode | `sub_product_code` | VARCHAR(512) | 子货号：单个存字符串，多个存 JSON 数组 |
 | quantity | `quantity` | INT | 需求量 |
 | destination | `destination` | VARCHAR(128) | 目的地 |
 | japanLead | `japan_lead` | VARCHAR(64) | 日本担当 |
@@ -78,4 +80,5 @@ CREATE TABLE replenishment_demand (
 - [x] ✅ `ReplenishmentDemandUseCase` 用例服务
 - [x] ✅ `ReplenishmentDemandController` REST 控制器
 - [x] ✅ `ReplenishmentDemandAssembler` DTO 转换器
+- [x] ✅ `V6__demand_sub_product_extend.sql` 迁移脚本
 - [ ] 🔴 `ReplenishmentDemandUseCaseTest` 单元测试（待补充）

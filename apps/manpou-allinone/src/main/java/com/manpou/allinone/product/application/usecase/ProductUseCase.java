@@ -1,12 +1,16 @@
 package com.manpou.allinone.product.application.usecase;
 
 import com.manpou.allinone.common.exception.BusinessException;
+
+import java.util.List;
 import com.manpou.allinone.common.filter.TraceFilter;
 import com.manpou.allinone.product.application.assembler.ProductAssembler;
+import com.manpou.allinone.product.application.dto.MasterCodeSuggestVO;
 import com.manpou.allinone.product.application.dto.ProductCreateCmd;
 import com.manpou.allinone.product.application.dto.ProductPageQuery;
 import com.manpou.allinone.product.application.dto.ProductQuery;
 import com.manpou.allinone.product.application.dto.ProductUpdateCmd;
+import com.manpou.allinone.product.application.dto.SubCodeSuggestVO;
 import com.manpou.allinone.product.domain.model.Product;
 import com.manpou.allinone.product.domain.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -117,5 +121,38 @@ public class ProductUseCase {
         entity.markDeleted();
         productRepository.save(entity);
         log.info("[Product] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
+    }
+
+    /**
+     * 主货号自动补全。
+     */
+    @Transactional(readOnly = true)
+    public List<MasterCodeSuggestVO> suggestMasterCodes(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return List.of();
+        }
+        return productRepository.findMasterCodeSuggestions(keyword.trim()).stream()
+                .map(row -> MasterCodeSuggestVO.builder()
+                        .masterCode((String) row[0])
+                        .nameZh((String) row[1])
+                        .colorCount(row[2] == null ? 0 : ((Number) row[2]).intValue())
+                        .build())
+                .toList();
+    }
+
+    /**
+     * 子货号候选项（按主货号过滤）。
+     */
+    @Transactional(readOnly = true)
+    public List<SubCodeSuggestVO> suggestSubCodes(String masterCode) {
+        if (masterCode == null || masterCode.isBlank()) {
+            return List.of();
+        }
+        return productRepository.findSubCodesByMasterCode(masterCode.trim()).stream()
+                .map(row -> SubCodeSuggestVO.builder()
+                        .subCode((String) row[0])
+                        .colorName((String) row[1])
+                        .build())
+                .toList();
     }
 }

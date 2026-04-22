@@ -41,6 +41,10 @@
             <el-icon><Van /></el-icon>
             <template #title>{{ $t('menu.logistics') }}</template>
           </el-menu-item>
+          <el-menu-item index="/procurement/product">
+            <el-icon><Goods /></el-icon>
+            <template #title>{{ $t('menu.product') }}</template>
+          </el-menu-item>
         </el-sub-menu>
       </el-menu>
     </el-aside>
@@ -91,7 +95,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van } from '@element-plus/icons-vue'
+import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, Goods } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
 import type { Locale } from '@/locales'

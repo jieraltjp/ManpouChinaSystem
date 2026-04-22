@@ -114,6 +114,17 @@ export interface UpdateProductRequest {
   remarks?: string
 }
 
+export interface MasterCodeSuggestVO {
+  masterCode: string
+  nameZh?: string
+  colorCount: number
+}
+
+export interface SubCodeSuggestVO {
+  subCode: string
+  colorName?: string
+}
+
 export const productApi = {
   list(params: { page?: number; pageSize?: number; masterCode?: string; keyword?: string; hsCode?: string }) {
     return client.get<{ code: string; data: ProductPageResponse }>('/products', { params })
@@ -132,5 +143,15 @@ export const productApi = {
   },
   delete(id: number) {
     return client.delete<{ code: string }>(`/products/${id}`)
+  },
+  suggestMasterCodes(keyword: string) {
+    return client.get<{ code: string; data: MasterCodeSuggestVO[] }>('/products/suggest/master-codes', {
+      params: { keyword },
+    })
+  },
+  suggestSubCodes(masterCode: string) {
+    return client.get<{ code: string; data: SubCodeSuggestVO[] }>('/products/suggest/sub-codes', {
+      params: { masterCode },
+    })
   },
 }

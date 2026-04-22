@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.List;
+
 @Data
 public class ReplenishmentDemandCreateCmd {
 
@@ -16,8 +18,8 @@ public class ReplenishmentDemandCreateCmd {
     @Length(max = 32)
     private String productCode;    // 主货号
 
-    @Length(max = 64)
-    private String subProductCode; // 子货号/枝番（颜色）
+    /** 子货号列表（JSON 数组格式）；单个时传单元素列表 */
+    private List<@Length(max = 64) String> subProductCodes;
 
     @NotNull(message = "需求量不能为空")
     @Positive(message = "需求量必须为正数")

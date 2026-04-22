@@ -88,7 +88,12 @@
             <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="subProductCode" :label="$t('demand.column.subProductCode')" width="100" />
+        <el-table-column :label="$t('demand.column.subProductCode')" width="150">
+          <template #default="{ row }">
+            <span v-if="!row.subProductCodes || row.subProductCodes.length === 0">—</span>
+            <el-tag v-else v-for="code in row.subProductCodes" :key="code" size="small" style="margin-right:4px">{{ code }}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="quantity" :label="$t('demand.column.quantity')" width="80" align="right" />
         <el-table-column prop="destination" :label="$t('demand.column.destination')" min-width="100" show-overflow-tooltip />
         <el-table-column prop="japanLead" :label="$t('demand.column.japanLead')" width="100" />
@@ -149,10 +154,49 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="$t('demand.dialog.productCode')" prop="productCode">
-          <el-input v-model="formData.productCode" :placeholder="$t('demand.dialog.productCodePlaceholder')" />
+          <el-select
+            v-model="formData.productCode"
+            filterable
+            remote
+            reserve-keyword
+            :remote-method="searchMasterCode"
+            :loading="masterCodeLoading"
+            :placeholder="$t('demand.dialog.productCodePlaceholder')"
+            style="width:100%"
+            @change="onMasterCodeChange"
+          >
+            <el-option
+              v-for="item in masterCodeOptions"
+              :key="item.masterCode"
+              :label="item.masterCode + (item.nameZh ? ' — ' + item.nameZh : '')"
+              :value="item.masterCode"
+            >
+              <span style="font-weight:600">{{ item.masterCode }}</span>
+              <span v-if="item.nameZh" style="color:#999;font-size:12px;margin-left:8px">{{ item.nameZh }}</span>
+              <span v-if="item.colorCount > 0" style="color:#E8650A;font-size:11px;float:right">{{ item.colorCount }}个颜色</span>
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item :label="$t('demand.dialog.subProductCode')">
-          <el-input v-model="formData.subProductCode" :placeholder="$t('demand.dialog.subProductCodePlaceholder')" />
+        <el-form-item :label="$t('demand.dialog.subProductCode')" prop="subProductCodes">
+          <el-select
+            v-model="formData.subProductCodes"
+            multiple
+            filterable
+            allow-create
+            default-first-option
+            :disabled="!formData.productCode"
+            :loading="subCodeLoading"
+            :placeholder="formData.productCode ? '选择颜色变体（或手动输入）' : '请先选择主货号'"
+            style="width:100%"
+            @focus="loadSubCodeOptions"
+          >
+            <el-option
+              v-for="item in subCodeOptions"
+              :key="item.subCode"
+              :label="(item.colorName || item.subCode) + ' (' + item.subCode + ')'"
+              :value="item.subCode"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item :label="$t('demand.dialog.quantity')" prop="quantity">
           <el-input-number v-model="formData.quantity" :min="1" style="width:100%" />
@@ -181,10 +225,16 @@ import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, Clock, Warning, CircleCheck } from '@element-plus/icons-vue'
 import { demandApi, type DemandPageVO, type CreateDemandRequest, type UpdateDemandRequest } from '@/api/demand'
+import { productApi, type MasterCodeSuggestVO, type SubCodeSuggestVO } from '@/api/product'
 import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
 const submitting = ref(false)
+const masterCodeLoading = ref(false)
+const subCodeLoading = ref(false)
+const masterCodeOptions = ref<MasterCodeSuggestVO[]>([])
+const subCodeOptions = ref<SubCodeSuggestVO[]>([])
+const loadedSubCodesFor = ref<string>('')
 const dialogVisible = ref(false)
 const dialogMode = ref<'create' | 'update'>('create')
 const currentRow = ref<DemandPageVO | null>(null)
@@ -204,7 +254,7 @@ const convertedCount = computed(() => tableData.value.filter(r => r.status === '
 const defaultFormData = (): CreateDemandRequest => ({
   demandType: 'REPLENISHMENT',
   productCode: '',
-  subProductCode: '',
+  subProductCodes: [],
   quantity: 1,
   destination: '',
   japanLead: '',
@@ -253,10 +303,11 @@ function onNew() {
 function onEdit(row: DemandPageVO) {
   dialogMode.value = 'update'
   currentRow.value = row
+  // subProductCodes 由后端返回数组格式，直接赋值
   Object.assign(formData, {
     demandType: row.demandType,
     productCode: row.productCode,
-    subProductCode: row.subProductCode || '',
+    subProductCodes: row.subProductCodes || [],
     quantity: row.quantity,
     destination: row.destination || '',
     japanLead: row.japanLead || '',
@@ -281,6 +332,52 @@ function onConvert(row: DemandPageVO) {
 
 function onViewLinked(row: DemandPageVO) {
   router.push({ path: '/procurement/order', query: { procurementId: String(row.linkedProcurementId) } })
+}
+
+let masterCodeTimer: ReturnType<typeof setTimeout>
+async function searchMasterCode(query: string) {
+  clearTimeout(masterCodeTimer)
+  if (!query || query.length < 1) {
+    masterCodeOptions.value = []
+    return
+  }
+  masterCodeTimer = setTimeout(async () => {
+    masterCodeLoading.value = true
+    try {
+      const res = await productApi.suggestMasterCodes(query)
+      masterCodeOptions.value = res.data.data || []
+    } catch (e) {
+      console.error('[DemandPage] searchMasterCode failed', e)
+      masterCodeOptions.value = []
+    } finally {
+      masterCodeLoading.value = false
+    }
+  }, 300)
+}
+
+function onMasterCodeChange(val: string) {
+  formData.subProductCodes = []
+  subCodeOptions.value = []
+  loadedSubCodesFor.value = ''
+  if (val) {
+    loadSubCodeOptions()
+  }
+}
+
+async function loadSubCodeOptions() {
+  const masterCode = formData.productCode
+  if (!masterCode || loadedSubCodesFor.value === masterCode) return
+  loadedSubCodesFor.value = masterCode
+  subCodeLoading.value = true
+  try {
+    const res = await productApi.suggestSubCodes(masterCode)
+    subCodeOptions.value = res.data.data || []
+  } catch (e) {
+    console.error('[DemandPage] loadSubCodeOptions failed', e)
+    subCodeOptions.value = []
+  } finally {
+    subCodeLoading.value = false
+  }
 }
 
 async function onRevertConversion(row: DemandPageVO) {

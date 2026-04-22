@@ -71,14 +71,26 @@ public enum DemandStatus {
 
 ## 5. API 设计
 
+### 5.1 补货需求 API
+
 ```
 GET    /api/v1/demands?page=&pageSize=&demandType=&productCode=&status=
 GET    /api/v1/demands/{id}
 POST   /api/v1/demands
 PATCH  /api/v1/demands/{id}
 POST   /api/v1/demands/{id}/convert    # 转采购
+POST   /api/v1/demands/{id}/revert     # 撤销转换
 DELETE /api/v1/demands/{id}
 ```
+
+### 5.2 商品自动补全 API（补货页主/子货号选择）
+
+```
+GET    /api/v1/products/suggest/master-codes?keyword={keyword}   # 主货号下拉补全
+GET    /api/v1/products/suggest/sub-codes?masterCode={code}    # 子货号候选项
+```
+
+> 对应设计文档：`docs/design/FEATURE-货号自动补全与多子货号选择.md`
 
 ---
 
@@ -88,8 +100,10 @@ DELETE /api/v1/demands/{id}
 - [x] ✅ `DemandType` 枚举
 - [x] ✅ `DemandStatus` 枚举
 - [x] ✅ `ReplenishmentDemandRepository` 领域接口
-- [x] ✅ `ReplenishmentDemandUseCase` 用例服务（含 convert 逻辑）
+- [x] ✅ `ReplenishmentDemandUseCase` 用例服务（含 convert + revertConversion）
 - [x] ✅ `ReplenishmentDemandController` REST 控制器
 - [x] ✅ `@/api/demand.ts` 前端 API 客户端
 - [x] ✅ `DemandPage.vue` 页面骨架
-- [ ] 🔴 `DemandPage.vue` 完整实现（转采购预填充 + 商品选择器）
+- [ ] 🔴 主货号自动补全（el-select remote）
+- [ ] 🔴 子货号多选（el-select multiple）
+- [ ] 🔴 `ProductController` suggest 端点

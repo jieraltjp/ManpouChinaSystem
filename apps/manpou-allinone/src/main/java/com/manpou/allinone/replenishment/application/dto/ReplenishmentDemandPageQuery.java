@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -21,7 +22,8 @@ public class ReplenishmentDemandPageQuery {
     private String demandCode;
     private DemandType demandType;
     private String productCode;
-    private String subProductCode;
+    /** 子货号数组（JSON 解析后）；单个时为单元素列表 */
+    private List<String> subProductCodes;
     private Integer quantity;
     private String destination;
     private String japanLead;
