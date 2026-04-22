@@ -284,7 +284,7 @@
             {{ { PENDING: '待验货', COMPLETED: '已完成', RETURN_REQUESTED: '退货' }[currentRow.status] ?? currentRow.status }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="验货类型">{{ { ONSITE: '现场验货', REMOTE: '远程验货' }[currentRow.qcType ?? ''] || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="验货类型">{{ { ONSITE: '现场验货', REMOTE: '远程验货', _: '-' }[currentRow.qcType ?? '_'] || '-' }}</el-descriptions-item>
         <el-descriptions-item label="验货日期">{{ currentRow.qcDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="卖家名称" :span="2">{{ currentRow.sellerName || '-' }}</el-descriptions-item>
         <el-descriptions-item label="目的地">{{ currentRow.destination || '-' }}</el-descriptions-item>
@@ -475,10 +475,8 @@ async function onSubmit() {
       qcType: form.qcType,
       qcDate: form.qcDate || undefined,
       result: form.result,
-      status: form.status,
       inspectionCount: form.inspectionCount,
       passedCount: form.passedCount,
-      defectiveCount: form.defectiveCount,
       boxCount: form.boxCount,
       boxLengthCm: form.boxLengthCm,
       boxWidthCm: form.boxWidthCm,

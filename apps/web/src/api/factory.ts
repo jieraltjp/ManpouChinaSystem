@@ -1,20 +1,33 @@
 /**
  * 工厂管理 API 客户端。
- * 与 docs/business/SPEC-发注管理流程.md §3.2 完全对齐。
+ * 与 DB-10 factory.md 完全对齐（v1.4.0）。
  */
 import client from './client'
 
-export type FactoryStatus = 'ACTIVE' | 'INACTIVE'
+export type CooperationStatus = 'ACTIVE' | 'SUSPENDED' | 'ELIMINATED' | 'POTENTIAL'
+export type FactoryCategory =
+  | 'TOOLS' | 'TEXTILE' | 'PLASTIC' | 'ELECTRONICS' | 'FURNITURE'
+  | 'AUTO_PARTS' | 'SPORTS' | 'PET' | 'MEDICAL' | 'CRAFTS' | 'CHEMICAL' | 'OTHER'
+export type PaymentTerms = 'CASH' | 'NET_30' | 'NET_60' | 'NET_90' | 'CREDIT'
 
 export interface FactoryPageVO {
   id: number
   factoryCode: string
   factoryName: string
-  location?: string
+  category?: FactoryCategory
+  province?: string
+  city?: string
+  county?: string
   roughLocation?: string
+  longitude?: number
+  latitude?: number
   contactName?: string
   contactPhone?: string
-  status: FactoryStatus
+  contactWechat?: string
+  contactQq?: string
+  cooperationStatus?: CooperationStatus
+  paymentTerms?: PaymentTerms
+  notes?: string
   createBy?: string
   createTime?: string
   updateTime?: string
@@ -29,23 +42,42 @@ export interface FactoryPageResponse {
 
 export interface CreateFactoryRequest {
   factoryName: string
-  location?: string
+  category?: FactoryCategory
+  province?: string
+  city?: string
+  county?: string
   roughLocation?: string
+  longitude?: number
+  latitude?: number
   contactName?: string
   contactPhone?: string
+  contactWechat?: string
+  contactQq?: string
+  cooperationStatus?: CooperationStatus
+  paymentTerms?: PaymentTerms
+  notes?: string
 }
 
 export interface UpdateFactoryRequest {
   factoryName?: string
-  location?: string
+  category?: FactoryCategory
+  province?: string
+  city?: string
+  county?: string
   roughLocation?: string
+  longitude?: number
+  latitude?: number
   contactName?: string
   contactPhone?: string
-  status?: FactoryStatus
+  contactWechat?: string
+  contactQq?: string
+  cooperationStatus?: CooperationStatus
+  paymentTerms?: PaymentTerms
+  notes?: string
 }
 
 export const factoryApi = {
-  list(params: { page?: number; pageSize?: number; factoryName?: string; status?: string }) {
+  list(params: { page?: number; pageSize?: number; factoryName?: string; cooperationStatus?: string }) {
     return client.get<{ code: string; data: FactoryPageResponse }>('/factories', { params })
   },
   get(id: number) {

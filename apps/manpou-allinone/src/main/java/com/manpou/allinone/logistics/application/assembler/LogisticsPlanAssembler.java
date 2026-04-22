@@ -1,5 +1,7 @@
 package com.manpou.allinone.logistics.application.assembler;
 
+import com.manpou.allinone.factory.domain.model.Factory;
+import com.manpou.allinone.factory.domain.repository.FactoryRepository;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanCreateCmd;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanPageQuery;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanUpdateCmd;
@@ -13,6 +15,12 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public class LogisticsPlanAssembler {
 
+    private final FactoryRepository factoryRepository;
+
+    public LogisticsPlanAssembler(FactoryRepository factoryRepository) {
+        this.factoryRepository = factoryRepository;
+    }
+
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final AtomicLong SEQ = new AtomicLong(System.currentTimeMillis() % 1000);
 
@@ -22,11 +30,19 @@ public class LogisticsPlanAssembler {
     }
 
     public LogisticsPlanPageQuery toDto(LogisticsPlan entity) {
+        String factoryName = null;
+        if (entity.getFactoryId() != null) {
+            factoryName = factoryRepository
+                    .findByIdAndIsDeletedFalse(entity.getFactoryId())
+                    .map(Factory::getFactoryName)
+                    .orElse(null);
+        }
         return LogisticsPlanPageQuery.builder()
                 .id(entity.getId())
                 .planCode(entity.getPlanCode())
                 .procurementId(entity.getProcurementId())
                 .factoryId(entity.getFactoryId())
+                .factoryName(factoryName)
                 .productCode(entity.getProductCode())
                 .subProductCode(entity.getSubProductCode())
                 .planType(entity.getPlanType())

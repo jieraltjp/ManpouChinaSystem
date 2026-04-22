@@ -350,27 +350,61 @@
     </el-dialog>
 
     <!-- 工厂新建/编辑弹窗 -->
-    <el-dialog v-model="factoryDialogVisible" :title="factoryDialogMode === 'create' ? '新增工厂' : '编辑工厂'" width="520px">
+    <el-dialog v-model="factoryDialogVisible" :title="factoryDialogMode === 'create' ? '新增工厂' : '编辑工厂'" width="640px">
       <el-form ref="factoryFormRef" :model="factoryFormData" :rules="factoryFormRules" label-width="110px">
         <el-form-item label="工厂名称" prop="factoryName">
           <el-input v-model="factoryFormData.factoryName" placeholder="工厂全称" />
         </el-form-item>
-        <el-form-item label="工厂位置">
-          <el-input v-model="factoryFormData.location" placeholder="省/市，如 浙江省金华市" />
+        <el-row :gutter="12">
+          <el-col :span="8">
+            <el-form-item label="省份">
+              <el-input v-model="factoryFormData.province" placeholder="省/自治区" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="城市">
+              <el-input v-model="factoryFormData.city" placeholder="市" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="区县">
+              <el-input v-model="factoryFormData.county" placeholder="区/县" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="详细地址">
+          <el-input v-model="factoryFormData.roughLocation" placeholder="工业区/镇/园区/街道门牌号" />
         </el-form-item>
-        <el-form-item label="粗略位置">
-          <el-input v-model="factoryFormData.roughLocation" placeholder="工业区/镇/园区" />
-        </el-form-item>
-        <el-form-item label="联系人">
-          <el-input v-model="factoryFormData.contactName" placeholder="联系人姓名" />
-        </el-form-item>
-        <el-form-item label="联系电话">
-          <el-input v-model="factoryFormData.contactPhone" placeholder="手机或座机" />
-        </el-form-item>
-        <el-form-item v-if="factoryDialogMode === 'update'" label="状态">
-          <el-select v-model="factoryFormData.status" style="width:100%">
+        <el-row :gutter="12">
+          <el-col :span="12">
+            <el-form-item label="联系人">
+              <el-input v-model="factoryFormData.contactName" placeholder="联系人姓名" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系电话">
+              <el-input v-model="factoryFormData.contactPhone" placeholder="手机或座机" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="12">
+          <el-col :span="12">
+            <el-form-item label="微信号">
+              <el-input v-model="factoryFormData.contactWechat" placeholder="微信号" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="QQ号">
+              <el-input v-model="factoryFormData.contactQq" placeholder="QQ号" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item v-if="factoryDialogMode === 'update'" label="合作状态">
+          <el-select v-model="factoryFormData.cooperationStatus" style="width:100%" clearable placeholder="选择状态">
             <el-option value="ACTIVE" label="合作中" />
-            <el-option value="INACTIVE" label="已停止" />
+            <el-option value="SUSPENDED" label="已暂停" />
+            <el-option value="ELIMINATED" label="已淘汰" />
+            <el-option value="POTENTIAL" label="潜在合作" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -387,7 +421,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, Clock, CircleCheck, Warning, Document, Edit } from '@element-plus/icons-vue'
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest, BILLING_TYPE_OPTIONS } from '@/api/procurement'
-import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest, type FactoryStatus } from '@/api/factory'
+import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest } from '@/api/factory'
 import { demandApi, type DemandPageVO } from '@/api/demand'
 
 const loading = ref(false)
@@ -474,15 +508,22 @@ const factoryCurrentRow = ref<FactoryPageVO | null>(null)
 const factoryFormRef = ref<FormInstance>()
 const factorySubmitting = ref(false)
 
-const defaultFactoryForm = (): CreateFactoryRequest & { status?: FactoryStatus } => ({
+const defaultFactoryForm = (): CreateFactoryRequest => ({
   factoryName: '',
-  location: '',
+  province: '',
+  city: '',
+  county: '',
   roughLocation: '',
   contactName: '',
   contactPhone: '',
+  contactWechat: '',
+  contactQq: '',
+  cooperationStatus: undefined,
+  paymentTerms: undefined,
+  notes: '',
 })
 
-const factoryFormData = reactive<CreateFactoryRequest & { status?: FactoryStatus }>(defaultFactoryForm())
+const factoryFormData = reactive<CreateFactoryRequest>(defaultFactoryForm())
 const factoryFormRules = {
   factoryName: [{ required: true, message: '工厂名称不能为空', trigger: 'blur' }],
 }
@@ -511,11 +552,17 @@ function onFactoryEdit(row: FactoryPageVO) {
   factoryCurrentRow.value = row
   Object.assign(factoryFormData, {
     factoryName: row.factoryName,
-    location: row.location || '',
+    province: row.province || '',
+    city: row.city || '',
+    county: row.county || '',
     roughLocation: row.roughLocation || '',
     contactName: row.contactName || '',
     contactPhone: row.contactPhone || '',
-    status: row.status,
+    contactWechat: row.contactWechat || '',
+    contactQq: row.contactQq || '',
+    cooperationStatus: row.cooperationStatus,
+    paymentTerms: row.paymentTerms,
+    notes: row.notes || '',
   })
   factoryDialogVisible.value = true
 }

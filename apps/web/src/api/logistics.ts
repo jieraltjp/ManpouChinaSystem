@@ -12,6 +12,7 @@ export interface LogisticsPlanVO {
   planCode: string
   procurementId?: number
   factoryId?: number
+  factoryName?: string   // 关联工厂名称（来自 factory 表 JOIN）
   productCode: string
   subProductCode?: string
   planType: PlanType

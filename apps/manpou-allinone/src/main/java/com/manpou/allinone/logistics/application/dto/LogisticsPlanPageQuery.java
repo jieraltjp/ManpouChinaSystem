@@ -17,6 +17,7 @@ public class LogisticsPlanPageQuery {
     private String planCode;
     private Long procurementId;
     private Long factoryId;
+    private String factoryName;       // 关联工厂名称（来自 factory 表 JOIN）
     private String productCode;
     private String subProductCode;
     private PlanType planType;

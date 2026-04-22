@@ -101,9 +101,13 @@
         <span>快捷入口</span>
       </template>
       <el-space wrap>
-        <el-button type="primary" @click="$router.push('/examples')">
+        <el-button type="primary" @click="$router.push('/procurement/order')">
           <el-icon><Document /></el-icon>
-          示例列表
+          发注单管理
+        </el-button>
+        <el-button type="primary" @click="$router.push('/procurement/factory')">
+          <el-icon><OfficeBuilding /></el-icon>
+          工厂管理
         </el-button>
         <el-button @click="handleRelogin">
           <el-icon><SwitchButton /></el-icon>
@@ -116,7 +120,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { User, Key, OfficeBuilding, Timer, Document, SwitchButton } from '@element-plus/icons-vue'
+import { User, Key, OfficeBuilding, Timer, SwitchButton } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import dayjs from 'dayjs'
 
