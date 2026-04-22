@@ -76,12 +76,12 @@
         </el-table-column>
         <el-table-column prop="cargoWeightKg" :label="$t('logistics.column.cargoWeightKg')" width="100" align="right">
           <template #default="{ row }">
-            {{ row.cargoWeightKg ? row.cargoWeightKg + 'kg' : '-' }}
+            {{ row.cargoWeightKg ? row.cargoWeightKg + $t('common.units.kg') : '' }}
           </template>
         </el-table-column>
         <el-table-column prop="cargoVolumeCbm" :label="$t('logistics.column.cargoVolumeCbm')" width="90" align="right">
           <template #default="{ row }">
-            {{ row.cargoVolumeCbm ? row.cargoVolumeCbm.toFixed(4) + 'm³' : '-' }}
+            {{ row.cargoVolumeCbm ? row.cargoVolumeCbm.toFixed(4) + $t('common.units.m3') : '' }}
           </template>
         </el-table-column>
         <el-table-column prop="requiresQc" :label="$t('logistics.column.requiresQc')" width="90" align="center">
@@ -237,8 +237,8 @@
           <el-tag :type="logisticsStatusType(currentRow.status)" size="small">{{ logisticsStatusLabel(currentRow.status) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.dialog.cargoDimension')" :span="2">{{ cargoDimension }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.column.cargoWeightKg')">{{ currentRow.cargoWeightKg ? currentRow.cargoWeightKg + 'kg' : '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.column.cargoVolumeCbm')">{{ currentRow.cargoVolumeCbm ? currentRow.cargoVolumeCbm.toFixed(4) + 'm³' : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.cargoWeightKg')">{{ currentRow.cargoWeightKg ? currentRow.cargoWeightKg + $t('common.units.kg') : '' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.cargoVolumeCbm')">{{ currentRow.cargoVolumeCbm ? currentRow.cargoVolumeCbm.toFixed(4) + $t('common.units.m3') : '' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.dialog.quantity')">{{ currentRow.quantity ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.column.requiresQc')">
           <el-tag :type="currentRow.requiresQc ? 'warning' : 'success'" size="small">
@@ -314,7 +314,7 @@ const cargoDimension = computed(() => {
   if (r.cargoLengthCm) parts.push(String(r.cargoLengthCm))
   if (r.cargoWidthCm) parts.push(String(r.cargoWidthCm))
   if (r.cargoHeightCm) parts.push(String(r.cargoHeightCm))
-  return parts.length ? parts.join('×') + 'cm' : '-'
+  return parts.length ? parts.join(t('common.format.times')) + t('common.units.cm') : '-'
 })
 
 async function loadData() {

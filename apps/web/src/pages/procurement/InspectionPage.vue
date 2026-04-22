@@ -293,9 +293,9 @@
         <el-descriptions-item :label="$t('inspection.column.passedCount')">{{ currentRow.passedCount ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.defectiveCount')">{{ currentRow.defectiveCount ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.boxCount')">{{ currentRow.boxCount ?? '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('inspection.dialog.netWeightPerUnit')">{{ currentRow.netWeightPerUnit ? currentRow.netWeightPerUnit + 'kg' : '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('inspection.dialog.grossWeight')">{{ currentRow.grossWeight ? currentRow.grossWeight + 'kg' : '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('inspection.dialog.taxInclusivePrice')">{{ currentRow.taxInclusivePrice ? '¥' + currentRow.taxInclusivePrice : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('inspection.dialog.netWeightPerUnit')">{{ currentRow.netWeightPerUnit ? currentRow.netWeightPerUnit + $t('common.units.kg') : '' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('inspection.dialog.grossWeight')">{{ currentRow.grossWeight ? currentRow.grossWeight + $t('common.units.kg') : '' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('inspection.dialog.taxInclusivePrice')">{{ currentRow.taxInclusivePrice ? $t('common.units.cny') + currentRow.taxInclusivePrice : '' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.boxDimension')" :span="2">{{ boxDimension }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.material')">{{ currentRow.material || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.taxRefund')">{{ currentRow.taxRefund ? $t('inspection.yes') : $t('inspection.no') }}</el-descriptions-item>
@@ -386,7 +386,7 @@ const boxDimension = computed(() => {
   if (r.boxLengthCm) parts.push(r.boxLengthCm)
   if (r.boxWidthCm) parts.push(r.boxWidthCm)
   if (r.boxHeightCm) parts.push(r.boxHeightCm)
-  return parts.length ? parts.join('×') + 'cm' : '-'
+  return parts.length ? parts.join(t('common.format.times')) + t('common.units.cm') : '-'
 })
 
 async function loadData() {
