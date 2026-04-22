@@ -74,6 +74,21 @@ public class ReplenishmentDemand extends BaseEntity {
         this.linkedProcurementId = procurementId;
     }
 
+    /**
+     * 撤销转换。
+     * 适用于：发注单被删除后，需求单需重新转采购。
+     * 条件：状态必须为 CONVERTED。
+     */
+    public void revertConversion() {
+        if (this.status != DemandStatus.CONVERTED) {
+            throw new com.manpou.allinone.common.exception.BusinessException(
+                    "demand.not_converted",
+                    "需求单未转换，无需撤销");
+        }
+        this.status = DemandStatus.PENDING;
+        this.linkedProcurementId = null;
+    }
+
     /** 取消需求 */
     public void cancel() {
         if (this.status != DemandStatus.PENDING) {

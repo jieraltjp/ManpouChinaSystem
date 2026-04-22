@@ -1,11 +1,11 @@
 <template>
   <div class="test-page">
     <div class="page-header">
-      <h2 class="page-title">发注单管理</h2>
+      <h2 class="page-title">{{ $t('order.title') }}</h2>
       <div class="header-actions">
         <el-button type="primary" @click="onNew">
           <el-icon><Plus /></el-icon>
-          新规发注
+          {{ $t('order.newButton') }}
         </el-button>
       </div>
     </div>
@@ -18,7 +18,7 @@
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#E8650A"><Document /></el-icon></div>
             <div>
               <div class="stat-value">{{ pagination.total }}</div>
-              <div class="stat-label">发注单总数</div>
+              <div class="stat-label">{{ $t('order.stat.total') }}</div>
             </div>
           </div>
         </el-card>
@@ -29,7 +29,7 @@
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#E8650A"><Clock /></el-icon></div>
             <div>
               <div class="stat-value">{{ activeCount }}</div>
-              <div class="stat-label">进行中</div>
+              <div class="stat-label">{{ $t('order.stat.active') }}</div>
             </div>
           </div>
         </el-card>
@@ -40,7 +40,7 @@
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#16A34A"><CircleCheck /></el-icon></div>
             <div>
               <div class="stat-value">{{ completedCount }}</div>
-              <div class="stat-label">已完成</div>
+              <div class="stat-label">{{ $t('order.stat.completed') }}</div>
             </div>
           </div>
         </el-card>
@@ -51,7 +51,7 @@
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#DC2626"><Warning /></el-icon></div>
             <div>
               <div class="stat-value">{{ returnedCount }}</div>
-              <div class="stat-label">退货</div>
+              <div class="stat-label">{{ $t('order.stat.returned') }}</div>
             </div>
           </div>
         </el-card>
@@ -61,20 +61,20 @@
     <!-- 筛选栏 -->
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filterForm">
-        <el-form-item label="商品代码">
-          <el-input v-model="filterForm.productCode" placeholder="如 de077" clearable style="width: 140px" />
+        <el-form-item :label="$t('order.filter.productCode')">
+          <el-input v-model="filterForm.productCode" :placeholder="$t('order.filter.productCodePlaceholder')" clearable style="width: 140px" />
         </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="filterForm.status" placeholder="全部" clearable style="width: 140px">
-            <el-option v-for="s in statusOptions" :key="s.value" :label="s.label" :value="s.value" />
+        <el-form-item :label="$t('order.filter.status')">
+          <el-select v-model="filterForm.status" :placeholder="$t('order.filter.all')" clearable style="width: 140px">
+            <el-option v-for="s in statusOptionsWithI18n" :key="s.value" :label="s.label" :value="s.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="客户公司">
-          <el-input v-model="filterForm.customerCompany" placeholder="客户公司" clearable style="width: 160px" />
+        <el-form-item :label="$t('order.filter.customerCompany')">
+          <el-input v-model="filterForm.customerCompany" :placeholder="$t('order.filter.customerCompanyPlaceholder')" clearable style="width: 160px" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="loadData">查询</el-button>
-          <el-button @click="onReset">重置</el-button>
+          <el-button type="primary" @click="loadData">{{ $t('order.filter.search') }}</el-button>
+          <el-button @click="onReset">{{ $t('order.filter.reset') }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -87,40 +87,40 @@
         stripe
         style="width: 100%"
       >
-        <el-table-column prop="productCode" label="商品代码" width="120">
+        <el-table-column prop="productCode" :label="$t('order.column.productCode')" width="120">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="factoryName" label="关联工厂" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="quantity" label="数量" width="80" align="right" />
-        <el-table-column prop="estimatedPriceJpy" label="估算批发价(JPY)" width="150" align="right">
+        <el-table-column prop="factoryName" :label="$t('order.column.factoryName')" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="quantity" :label="$t('order.column.quantity')" width="80" align="right" />
+        <el-table-column prop="estimatedPriceJpy" :label="$t('order.column.estimatedPriceJpy')" width="150" align="right">
           <template #default="{ row }">
             {{ row.estimatedPriceJpy ? row.estimatedPriceJpy.toLocaleString() : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="customerCompany" label="客户公司" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="productLead" label="商品担当" width="100" />
-        <el-table-column prop="plannedShipDate" label="计划出货日" width="130" />
-        <el-table-column prop="status" label="状态" width="110" align="center">
+        <el-table-column prop="customerCompany" :label="$t('order.column.customerCompany')" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="productLead" :label="$t('order.column.productLead')" width="100" />
+        <el-table-column prop="plannedShipDate" :label="$t('order.column.plannedShipDate')" width="130" />
+        <el-table-column prop="status" :label="$t('order.column.status')" width="110" align="center">
           <template #default="{ row }">
             <el-tag :type="statusType(row.status)" size="small">
               {{ statusLabel(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="160">
+        <el-table-column prop="createTime" :label="$t('order.column.createTime')" width="160">
           <template #default="{ row }">
-            {{ row.createTime ? new Date(row.createTime).toLocaleString('zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
+            {{ row.createTime ? new Date(row.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right" align="center">
+        <el-table-column :label="$t('order.column.action')" width="150" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click.stop="onView(row)">详情</el-button>
+            <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('order.message.detail') }}</el-button>
             <el-button link type="primary" size="small" @click.stop="onEdit(row)"
-              :disabled="row.status === '完了'">编辑</el-button>
+              :disabled="row.status === '完了'">{{ $t('demand.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)"
-              :disabled="!deletableStatuses.includes(row.status)">删除</el-button>
+              :disabled="!deletableStatuses.includes(row.status)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -140,65 +140,65 @@
     </el-card>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" title="发注单详情" size="600px" direction="rtl">
+    <el-drawer v-model="drawerVisible" :title="$t('order.drawerTitle')" size="600px" direction="rtl">
       <el-descriptions :column="2" border v-if="currentRow">
-        <el-descriptions-item label="关联工厂">{{ currentRow.factoryName || (currentRow.factoryId ? `ID:${currentRow.factoryId}` : '-') }}</el-descriptions-item>
-        <el-descriptions-item label="商品代码">{{ currentRow.productCode }}</el-descriptions-item>
-        <el-descriptions-item label="子货号">{{ currentRow.subProductCode || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="数量">{{ currentRow.quantity }}</el-descriptions-item>
-        <el-descriptions-item label="材质">{{ currentRow.material || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="需要检测">{{ currentRow.requiresQc ? '是' : '否' }}</el-descriptions-item>
-        <el-descriptions-item label="人民币单价">{{ currentRow.priceRmb }}</el-descriptions-item>
-        <el-descriptions-item label="汇率">{{ currentRow.exchangeRate }}</el-descriptions-item>
-        <el-descriptions-item label="票点">{{ currentRow.taxPoint }}</el-descriptions-item>
-        <el-descriptions-item label="估算批发价(JPY)">{{ currentRow.estimatedPriceJpy?.toLocaleString() }}</el-descriptions-item>
-        <el-descriptions-item label="报关类型">{{ billingTypeLabel(currentRow.billingType) }}</el-descriptions-item>
-        <el-descriptions-item label="报关备注" :span="2">{{ currentRow.customsRemarks || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="说明书" :span="2">{{ currentRow.instructionManual || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="状态">
+        <el-descriptions-item :label="$t('order.drawer.factory')">{{ currentRow.factoryName || (currentRow.factoryId ? `ID:${currentRow.factoryId}` : '-') }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.productCode')">{{ currentRow.productCode }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.subProductCode')">{{ currentRow.subProductCode || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.quantity')">{{ currentRow.quantity }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.material')">{{ currentRow.material || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.requiresQc')">{{ currentRow.requiresQc ? $t('order.drawer.yes') : $t('order.drawer.no') }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.priceRmb')">{{ currentRow.priceRmb }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.exchangeRate')">{{ currentRow.exchangeRate }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.taxPoint')">{{ currentRow.taxPoint }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.estimatedPriceJpy')">{{ currentRow.estimatedPriceJpy?.toLocaleString() }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.billingType')">{{ billingTypeLabel(currentRow.billingType) }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.customsRemarks')" :span="2">{{ currentRow.customsRemarks || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.instructionManual')" :span="2">{{ currentRow.instructionManual || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.status')">
           <el-tag :type="statusType(currentRow.status)" size="small">
             {{ statusLabel(currentRow.status) }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="客户公司">{{ currentRow.customerCompany || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="下单日">{{ currentRow.orderDate || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="厂家出货日">{{ currentRow.factoryShipDate || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="计划出货日">{{ currentRow.plannedShipDate || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="实际出货日">{{ currentRow.actualShipDate || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="商品担当">{{ currentRow.productLead || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="日本担当">{{ currentRow.japanLead || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="中国担当">{{ currentRow.chinaLead || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="发送目的地" :span="2">{{ currentRow.destination || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="创建时间" :span="2">{{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString('zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
-        <el-descriptions-item label="更新时间" :span="2">{{ currentRow.updateTime ? new Date(currentRow.updateTime).toLocaleString('zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.customerCompany')">{{ currentRow.customerCompany || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.orderDate')">{{ currentRow.orderDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.factoryShipDate')">{{ currentRow.factoryShipDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.plannedShipDate')">{{ currentRow.plannedShipDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.actualShipDate')">{{ currentRow.actualShipDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.productLead')">{{ currentRow.productLead || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.japanLead')">{{ currentRow.japanLead || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.chinaLead')">{{ currentRow.chinaLead || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.destination')" :span="2">{{ currentRow.destination || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.createTime')" :span="2">{{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.updateTime')" :span="2">{{ currentRow.updateTime ? new Date(currentRow.updateTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
       </el-descriptions>
 
       <div class="drawer-actions">
-        <el-button @click="drawerVisible = false">关闭</el-button>
-        <el-button type="primary" @click="onEdit(currentRow)">编辑</el-button>
+        <el-button @click="drawerVisible = false">{{ $t('order.drawer.close') }}</el-button>
+        <el-button type="primary" @click="onEdit(currentRow)">{{ $t('order.drawer.edit') }}</el-button>
       </div>
     </el-drawer>
 
     <!-- 新建/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? '新规发注' : '编辑发注单'" width="800px">
+    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? $t('order.newDialogTitle') : $t('order.editDialogTitle')" width="800px">
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="110px">
         <!-- 关联需求（创建时可选） -->
-        <el-form-item v-if="dialogMode === 'create'" label="关联需求">
-          <el-select v-model="selectedDemandId" placeholder="从补货需求带入商品信息（可选）" clearable filterable style="width:100%" @change="onDemandChange">
-            <el-option v-for="d in demandOptions" :key="d.id" :label="`${d.demandCode} | ${d.productCode} | ${d.demandType === 'NEW_PURCHASE' ? '新品采购' : '补货'} | ${d.status}`" :value="d.id" />
+        <el-form-item v-if="dialogMode === 'create'" :label="$t('order.dialog.linkedDemand')">
+          <el-select v-model="selectedDemandId" :placeholder="$t('order.dialog.linkedDemandPlaceholder')" clearable filterable style="width:100%" @change="onDemandChange">
+            <el-option v-for="d in demandOptions" :key="d.id" :label="`${d.demandCode} | ${d.productCode} | ${d.demandType === 'NEW_PURCHASE' ? $t('demand.type.newPurchase') : $t('demand.type.replenishment')} | ${demandStatusLabel(d.status)}`" :value="d.id" />
           </el-select>
         </el-form-item>
 
         <!-- 选择工厂（必填） -->
-        <el-form-item label="选择工厂" prop="factoryId">
+        <el-form-item :label="$t('order.dialog.selectFactory')" prop="factoryId">
           <div class="factory-select-row">
-            <el-select v-model="formData.factoryId" placeholder="请选择工厂" filterable style="flex:1" :disabled="dialogMode === 'update'" @change="onFactorySelected">
+            <el-select v-model="formData.factoryId" :placeholder="$t('order.dialog.selectFactoryPlaceholder')" filterable style="flex:1" :disabled="dialogMode === 'update'" @change="onFactorySelected">
               <el-option v-for="f in factoryOptions" :key="f.id" :label="`${f.factoryName}（${f.factoryCode}）`" :value="f.id" />
             </el-select>
             <el-button size="small" :disabled="dialogMode === 'update'" @click="onFactoryNew">
-              <el-icon><Plus /></el-icon> 新建
+              <el-icon><Plus /></el-icon> {{ $t('order.dialog.factoryNew') }}
             </el-button>
-            <el-tooltip content="编辑选中工厂" placement="top">
+            <el-tooltip :content="$t('order.dialog.factoryEdit')" placement="top">
               <el-button size="small" :disabled="!formData.factoryId || dialogMode === 'update'" @click="onFactoryEditCurrent">
                 <el-icon><Edit /></el-icon>
               </el-button>
@@ -209,29 +209,29 @@
         <!-- 商品信息 -->
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="商品代码" prop="productCode">
-              <el-input v-model="formData.productCode" placeholder="如 de077" />
+            <el-form-item :label="$t('order.dialog.productCode')" prop="productCode">
+              <el-input v-model="formData.productCode" :placeholder="$t('order.dialog.productCodePlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="子货号">
-              <el-input v-model="formData.subProductCode" placeholder="如 re/wh/bk（颜色）" />
+            <el-form-item :label="$t('order.dialog.subProductCode')">
+              <el-input v-model="formData.subProductCode" :placeholder="$t('order.dialog.subProductCodePlaceholder')" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="16">
           <el-col :span="8">
-            <el-form-item label="数量" prop="quantity">
+            <el-form-item :label="$t('order.dialog.quantity')" prop="quantity">
               <el-input-number v-model="formData.quantity" :min="1" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="材质">
-              <el-input v-model="formData.material" placeholder="如 plastic/metal" />
+            <el-form-item :label="$t('order.dialog.material')">
+              <el-input v-model="formData.material" :placeholder="$t('order.dialog.materialPlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="需要检测">
+            <el-form-item :label="$t('order.dialog.requiresQc')">
               <el-switch v-model="formData.requiresQc" active-text="是" inactive-text="否" />
             </el-form-item>
           </el-col>
@@ -239,22 +239,22 @@
         <!-- 价格 -->
         <el-row :gutter="16">
           <el-col :span="8">
-            <el-form-item label="人民币单价" prop="priceRmb">
+            <el-form-item :label="$t('order.dialog.priceRmb')" prop="priceRmb">
               <el-input-number v-model="formData.priceRmb" :min="0" :precision="2" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="汇率" prop="exchangeRate">
+            <el-form-item :label="$t('order.dialog.exchangeRate')" prop="exchangeRate">
               <el-input-number v-model="formData.exchangeRate" :min="0.0001" :precision="4" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="票点" prop="taxPoint">
+            <el-form-item :label="$t('order.dialog.taxPoint')" prop="taxPoint">
               <el-input-number v-model="formData.taxPoint" :min="0.0001" :precision="4" style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="估算批发价">
+        <el-form-item :label="$t('order.dialog.estimatedPricePreview')">
           <div class="price-preview">
             <span class="price-value">{{ previewPriceJpy }}</span>
             <span class="price-unit">JPY</span>
@@ -262,155 +262,155 @@
           </div>
         </el-form-item>
         <!-- 报关类型 -->
-        <el-form-item label="报关类型">
-          <el-select v-model="formData.billingType" placeholder="选择报关类型" clearable style="width: 100%">
-            <el-option v-for="opt in BILLING_TYPE_OPTIONS" :key="opt.value" :value="opt.value" :label="opt.label" />
+        <el-form-item :label="$t('order.dialog.billingType')">
+          <el-select v-model="formData.billingType" :placeholder="$t('order.dialog.billingTypePlaceholder')" clearable style="width: 100%">
+            <el-option v-for="opt in BILLING_TYPE_OPTIONS" :key="opt.value" :value="opt.value" :label="billingTypeLabel(opt.value)" />
           </el-select>
         </el-form-item>
-        <!-- 第五行：报关备注 + 说明书 -->
+        <!-- 报关备注 + 说明书 -->
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="报关备注">
-              <el-input v-model="formData.customsRemarks" placeholder="报关备注" />
+            <el-form-item :label="$t('order.dialog.customsRemarks')">
+              <el-input v-model="formData.customsRemarks" :placeholder="$t('order.dialog.customsRemarksPlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="说明书">
-              <el-input v-model="formData.instructionManual" placeholder="说明书备注" />
+            <el-form-item :label="$t('order.dialog.instructionManual')">
+              <el-input v-model="formData.instructionManual" :placeholder="$t('order.dialog.instructionManualPlaceholder')" />
             </el-form-item>
           </el-col>
         </el-row>
-        <!-- 第六行：客户公司 + 发送目的地 -->
+        <!-- 客户公司 + 发送目的地 -->
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="客户公司">
-              <el-input v-model="formData.customerCompany" placeholder="客户公司名称" />
+            <el-form-item :label="$t('order.dialog.customerCompany')">
+              <el-input v-model="formData.customerCompany" :placeholder="$t('order.dialog.customerCompanyPlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="发送目的地">
-              <el-input v-model="formData.destination" placeholder="如 名古屋倉庫" />
+            <el-form-item :label="$t('order.dialog.destination')">
+              <el-input v-model="formData.destination" :placeholder="$t('order.dialog.destinationPlaceholder')" />
             </el-form-item>
           </el-col>
         </el-row>
-        <!-- 第七行：担当 -->
+        <!-- 担当 -->
         <el-row :gutter="16">
           <el-col :span="8">
-            <el-form-item label="商品担当">
-              <el-input v-model="formData.productLead" placeholder="商品担当" />
+            <el-form-item :label="$t('order.dialog.productLead')">
+              <el-input v-model="formData.productLead" :placeholder="$t('order.dialog.productLeadPlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="日本担当">
-              <el-input v-model="formData.japanLead" placeholder="日本担当" />
+            <el-form-item :label="$t('order.dialog.japanLead')">
+              <el-input v-model="formData.japanLead" :placeholder="$t('order.dialog.japanLeadPlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="中国担当">
-              <el-input v-model="formData.chinaLead" placeholder="中国担当" />
+            <el-form-item :label="$t('order.dialog.chinaLead')">
+              <el-input v-model="formData.chinaLead" :placeholder="$t('order.dialog.chinaLeadPlaceholder')" />
             </el-form-item>
           </el-col>
         </el-row>
-        <!-- 第八行：日期 -->
+        <!-- 日期 -->
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="下单日">
+            <el-form-item :label="$t('order.dialog.orderDate')">
               <el-date-picker v-model="formData.orderDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="厂家出货日">
+            <el-form-item :label="$t('order.dialog.factoryShipDate')">
               <el-date-picker v-model="formData.factoryShipDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="计划出货日">
+            <el-form-item :label="$t('order.dialog.plannedShipDate')">
               <el-date-picker v-model="formData.plannedShipDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="实际出货日">
+            <el-form-item :label="$t('order.dialog.actualShipDate')">
               <el-date-picker v-model="formData.actualShipDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
         <!-- 状态（仅更新模式） -->
-        <el-form-item v-if="dialogMode === 'update'" label="状态" prop="status">
+        <el-form-item v-if="dialogMode === 'update'" :label="$t('order.dialog.status')" prop="status">
           <el-select v-model="formData.status" style="width: 100%">
-            <el-option v-for="s in statusOptions" :key="s.value" :label="s.label" :value="s.value" />
+            <el-option v-for="s in statusOptionsWithI18n" :key="s.value" :label="s.label" :value="s.value" />
           </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="onSubmit">保存</el-button>
+        <el-button @click="dialogVisible = false">{{ $t('order.dialog.cancel') }}</el-button>
+        <el-button type="primary" :loading="submitting" @click="onSubmit">{{ $t('order.dialog.save') }}</el-button>
       </template>
     </el-dialog>
 
     <!-- 工厂新建/编辑弹窗 -->
-    <el-dialog v-model="factoryDialogVisible" :title="factoryDialogMode === 'create' ? '新增工厂' : '编辑工厂'" width="640px">
+    <el-dialog v-model="factoryDialogVisible" :title="factoryDialogMode === 'create' ? $t('order.factoryDialog.newTitle') : $t('order.factoryDialog.editTitle')" width="640px">
       <el-form ref="factoryFormRef" :model="factoryFormData" :rules="factoryFormRules" label-width="110px">
-        <el-form-item label="工厂名称" prop="factoryName">
-          <el-input v-model="factoryFormData.factoryName" placeholder="工厂全称" />
+        <el-form-item :label="$t('order.factoryDialog.factoryName')" prop="factoryName">
+          <el-input v-model="factoryFormData.factoryName" :placeholder="$t('order.factoryDialog.factoryNamePlaceholder')" />
         </el-form-item>
         <el-row :gutter="12">
           <el-col :span="8">
-            <el-form-item label="省份">
-              <el-input v-model="factoryFormData.province" placeholder="省/自治区" />
+            <el-form-item :label="$t('order.factoryDialog.province')">
+              <el-input v-model="factoryFormData.province" :placeholder="$t('order.factoryDialog.provincePlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="城市">
-              <el-input v-model="factoryFormData.city" placeholder="市" />
+            <el-form-item :label="$t('order.factoryDialog.city')">
+              <el-input v-model="factoryFormData.city" :placeholder="$t('order.factoryDialog.cityPlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="区县">
-              <el-input v-model="factoryFormData.county" placeholder="区/县" />
+            <el-form-item :label="$t('order.factoryDialog.county')">
+              <el-input v-model="factoryFormData.county" :placeholder="$t('order.factoryDialog.countyPlaceholder')" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="详细地址">
-          <el-input v-model="factoryFormData.roughLocation" placeholder="工业区/镇/园区/街道门牌号" />
+        <el-form-item :label="$t('order.factoryDialog.roughLocation')">
+          <el-input v-model="factoryFormData.roughLocation" :placeholder="$t('order.factoryDialog.roughLocationPlaceholder')" />
         </el-form-item>
         <el-row :gutter="12">
           <el-col :span="12">
-            <el-form-item label="联系人">
-              <el-input v-model="factoryFormData.contactName" placeholder="联系人姓名" />
+            <el-form-item :label="$t('order.factoryDialog.contactName')">
+              <el-input v-model="factoryFormData.contactName" :placeholder="$t('order.factoryDialog.contactNamePlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="联系电话">
-              <el-input v-model="factoryFormData.contactPhone" placeholder="手机或座机" />
+            <el-form-item :label="$t('order.factoryDialog.contactPhone')">
+              <el-input v-model="factoryFormData.contactPhone" :placeholder="$t('order.factoryDialog.contactPhonePlaceholder')" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="12">
           <el-col :span="12">
-            <el-form-item label="微信号">
-              <el-input v-model="factoryFormData.contactWechat" placeholder="微信号" />
+            <el-form-item :label="$t('order.factoryDialog.wechat')">
+              <el-input v-model="factoryFormData.contactWechat" :placeholder="$t('order.factoryDialog.wechatPlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="QQ号">
-              <el-input v-model="factoryFormData.contactQq" placeholder="QQ号" />
+            <el-form-item :label="$t('order.factoryDialog.qq')">
+              <el-input v-model="factoryFormData.contactQq" :placeholder="$t('order.factoryDialog.qqPlaceholder')" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item v-if="factoryDialogMode === 'update'" label="合作状态">
-          <el-select v-model="factoryFormData.cooperationStatus" style="width:100%" clearable placeholder="选择状态">
-            <el-option value="ACTIVE" label="合作中" />
-            <el-option value="SUSPENDED" label="已暂停" />
-            <el-option value="ELIMINATED" label="已淘汰" />
-            <el-option value="POTENTIAL" label="潜在合作" />
+        <el-form-item v-if="factoryDialogMode === 'update'" :label="$t('order.factoryDialog.cooperationStatus')">
+          <el-select v-model="factoryFormData.cooperationStatus" style="width:100%" clearable :placeholder="$t('order.filter.all')">
+            <el-option value="ACTIVE" :label="$t('order.cooperationStatus.ACTIVE')" />
+            <el-option value="SUSPENDED" :label="$t('order.cooperationStatus.SUSPENDED')" />
+            <el-option value="ELIMINATED" :label="$t('order.cooperationStatus.ELIMINATED')" />
+            <el-option value="POTENTIAL" :label="$t('order.cooperationStatus.POTENTIAL')" />
           </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="factoryDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="factorySubmitting" @click="onFactorySubmit">保存</el-button>
+        <el-button @click="factoryDialogVisible = false">{{ $t('order.factoryDialog.cancel') }}</el-button>
+        <el-button type="primary" :loading="factorySubmitting" @click="onFactorySubmit">{{ $t('order.factoryDialog.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -418,11 +418,13 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, Clock, CircleCheck, Warning, Document, Edit } from '@element-plus/icons-vue'
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest, BILLING_TYPE_OPTIONS } from '@/api/procurement'
 import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest } from '@/api/factory'
 import { demandApi, type DemandPageVO } from '@/api/demand'
+import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -432,29 +434,23 @@ const dialogMode = ref<'create' | 'update'>('create')
 const currentRow = ref<ProcurementPageVO | null>(null)
 const formRef = ref<FormInstance>()
 
+// 转采购模式：记录当前需求ID，提交后调用 convert API
+const convertingDemandId = ref<number | null>(null)
+const route = useRoute()
+const router = useRouter()
+const { t, locale: localeRef } = useI18n()
+const currentLocale = computed(() => localeRef.value)
+
 const deletableStatuses = ['未定', '発注待']
 
-const statusOptions = [
-  { value: '未定', label: '未定' },
-  { value: '予定', label: '予定' },
-  { value: 'OEM', label: 'OEM' },
-  { value: '発注待', label: '発注待' },
-  { value: '永康', label: '永康' },
-  { value: '直送', label: '直送' },
-  { value: '倉庫着', label: '倉庫着' },
-  { value: '検品', label: '検品' },
-  { value: '現地検品', label: '現地検品' },
-  { value: 'エア便', label: 'エア便' },
-  { value: 'メーカー直送', label: 'メーカー直送' },
-  { value: '輸出', label: '輸出' },
-  { value: '国内通関', label: '国内通関' },
-  { value: '通関', label: '通関' },
-  { value: '日本着', label: '日本着' },
-  { value: '日本通関完了', label: '日本通関完了' },
-  { value: '会計', label: '会計' },
-  { value: '完了', label: '完了' },
-  { value: '退货', label: '退货' },
+const ORDER_STATUSES = [
+  '未定', '予定', 'OEM', '発注待', '永康', '直送', '倉庫着', '検品', '現地検品',
+  'エア便', 'メーカー直送', '輸出', '国内通関', '通関', '日本着', '日本通関完了', '会計', '完了', '退货',
 ]
+
+const statusOptionsWithI18n = computed(() =>
+  ORDER_STATUSES.map(value => ({ value, label: statusLabel(value) })),
+)
 
 const filterForm = reactive({
   productCode: '',
@@ -501,6 +497,22 @@ function onDemandChange(demandId: number | null) {
   formData.quantity = d.quantity
 }
 
+/**
+ * 转采购入口：从需求单带入数据并打开发注单弹窗。
+ * DemandPage 点击"转采购"时通过 defineExpose 调用此方法。
+ */
+function prefillFromDemand(demand: DemandPageVO) {
+  convertingDemandId.value = demand.id
+  dialogMode.value = 'create'
+  Object.assign(formData, defaultFormData())
+  formData.productCode = demand.productCode
+  formData.subProductCode = demand.subProductCode || ''
+  formData.destination = demand.destination || ''
+  formData.japanLead = demand.japanLead || ''
+  formData.quantity = demand.quantity
+  dialogVisible.value = true
+}
+
 // ===== 工厂管理 =====
 const factoryDialogVisible = ref(false)
 const factoryDialogMode = ref<'create' | 'update'>('create')
@@ -525,7 +537,7 @@ const defaultFactoryForm = (): CreateFactoryRequest => ({
 
 const factoryFormData = reactive<CreateFactoryRequest>(defaultFactoryForm())
 const factoryFormRules = {
-  factoryName: [{ required: true, message: '工厂名称不能为空', trigger: 'blur' }],
+  factoryName: [{ required: true, message: () => t('order.validation.factoryNameRequired'), trigger: 'blur' }],
 }
 
 function onFactoryNew() {
@@ -575,10 +587,10 @@ async function onFactorySubmit() {
     try {
       if (factoryDialogMode.value === 'create') {
         await factoryApi.create(factoryFormData as CreateFactoryRequest)
-        ElMessage.success('工厂创建成功')
+        ElMessage.success(t('order.message.factoryCreateSuccess'))
       } else if (factoryCurrentRow.value) {
         await factoryApi.update(factoryCurrentRow.value.id, factoryFormData as UpdateFactoryRequest)
-        ElMessage.success('更新成功')
+        ElMessage.success(t('order.message.updateSuccess'))
       }
       factoryDialogVisible.value = false
       await loadFactories()
@@ -633,29 +645,29 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string } => ({
 const formData = reactive<CreateProcurementRequest & { status?: string }>(defaultFormData())
 
 const formRules = {
-  factoryId: [{ required: true, message: '请选择工厂', trigger: 'change' }],
+  factoryId: [{ required: true, message: () => t('order.validation.factoryRequired'), trigger: 'change' }],
   productCode: [
-    { required: true, message: '商品代码不能为空', trigger: 'blur' },
-    { max: 32, message: '商品代码最多 32 字符', trigger: 'blur' },
+    { required: true, message: () => t('order.validation.productCodeRequired'), trigger: 'blur' },
+    { max: 32, message: () => t('order.validation.productCodeMaxLength'), trigger: 'blur' },
   ],
   quantity: [
-    { required: true, message: '数量不能为空', trigger: 'blur' },
-    { type: 'number', min: 1, message: '数量必须为正整数', trigger: 'blur' },
+    { required: true, message: () => t('order.validation.quantityRequired'), trigger: 'blur' },
+    { type: 'number', min: 1, message: () => t('order.validation.quantityPositive'), trigger: 'blur' },
   ],
   priceRmb: [
-    { required: true, message: '人民币单价不能为空', trigger: 'blur' },
-    { type: 'number', min: 0, message: '人民币单价不能为负', trigger: 'blur' },
+    { required: true, message: () => t('order.validation.priceRmbRequired'), trigger: 'blur' },
+    { type: 'number', min: 0, message: () => t('order.validation.priceRmbNonNegative'), trigger: 'blur' },
   ],
   exchangeRate: [
-    { required: true, message: '汇率不能为空', trigger: 'blur' },
-    { type: 'number', min: 0.0001, message: '汇率必须为正数', trigger: 'blur' },
+    { required: true, message: () => t('order.validation.exchangeRateRequired'), trigger: 'blur' },
+    { type: 'number', min: 0.0001, message: () => t('order.validation.exchangeRatePositive'), trigger: 'blur' },
   ],
   taxPoint: [
-    { required: true, message: '票点不能为空', trigger: 'blur' },
-    { type: 'number', min: 0.0001, message: '票点必须为正数', trigger: 'blur' },
+    { required: true, message: () => t('order.validation.taxPointRequired'), trigger: 'blur' },
+    { type: 'number', min: 0.0001, message: () => t('order.validation.taxPointPositive'), trigger: 'blur' },
   ],
-  customerCompany: [{ max: 128, message: '客户公司最多 128 字符', trigger: 'blur' }],
-  destination: [{ max: 128, message: '发送目的地最多 128 字符', trigger: 'blur' }],
+  customerCompany: [{ max: 128, message: () => t('order.validation.customerCompanyMaxLength'), trigger: 'blur' }],
+  destination: [{ max: 128, message: () => t('order.validation.destinationMaxLength'), trigger: 'blur' }],
 }
 
 async function loadData() {
@@ -737,16 +749,16 @@ function onEdit(row: ProcurementPageVO | null) {
 async function onDelete(row: ProcurementPageVO) {
   try {
     await ElMessageBox.confirm(
-      `确认删除发注单「${row.productCode}」（${row.quantity}件）？`,
-      '删除确认',
-      { confirmButtonText: '删除', cancelButtonText: '取消', type: 'warning' }
+      t('order.message.deleteConfirm', { productCode: row.productCode, quantity: row.quantity }),
+      t('order.message.deleteConfirmTitle'),
+      { confirmButtonText: t('common.delete'), cancelButtonText: t('common.cancel'), type: 'warning' },
     )
   } catch {
     return
   }
   try {
     await procurementApi.delete(row.id)
-    ElMessage.success('删除成功')
+    ElMessage.success(t('order.message.deleteSuccess'))
     drawerVisible.value = false
     currentRow.value = null
     loadData()
@@ -787,7 +799,14 @@ async function onSubmit() {
           status: formData.status || undefined,
         }
         await procurementApi.create(req)
-        ElMessage.success('发注单创建成功')
+        const savedMsg = convertingDemandId.value !== null ? t('order.message.createSuccessConverting') : t('order.message.createSuccess')
+        ElMessage.success(savedMsg)
+        // 若为转采购模式，则关联需求单
+        if (convertingDemandId.value !== null) {
+          await demandApi.convertToProcurement(convertingDemandId.value, req.factoryId as number)
+          ElMessage.success(t('order.message.demandConverted'))
+          convertingDemandId.value = null
+        }
       } else if (currentRow.value) {
         const req: UpdateProcurementRequest = {
           factoryId: formData.factoryId || undefined,
@@ -815,7 +834,7 @@ async function onSubmit() {
         }
         const updatedId = currentRow.value.id
         await procurementApi.update(updatedId, req)
-        ElMessage.success('发注单更新成功')
+        ElMessage.success(t('order.message.updateSuccess'))
         // 同步更新表格当前行，避免整体刷新
         const idx = tableRows.value.findIndex(r => r.id === updatedId)
         if (idx !== -1) {
@@ -832,7 +851,7 @@ async function onSubmit() {
 }
 
 function statusLabel(status: string): string {
-  return statusOptions.find(s => s.value === status)?.label ?? status
+  return t(`order.status.${status}` as any, { default: status })
 }
 
 function statusType(status: string): string {
@@ -859,16 +878,29 @@ function statusType(status: string): string {
 }
 
 function billingTypeLabel(val: string | undefined): string {
-  const map: Record<string, string> = {
-    ZHE_LU_KAI_PIAO: '浙鲁开票',
-    CHAO_HUI_TUI_SHUI: '超慧退税',
-    NO_REFUND: '不退税',
-    OTHER: '其他',
-  }
-  return val ? (map[val] ?? val) : '—'
+  return val ? t(`order.billingType.${val}` as any, { default: val }) : '—'
 }
 
-onMounted(() => { loadData(); loadFactories(); loadDemands() })
+onMounted(() => {
+  loadData()
+  loadFactories()
+  loadDemands()
+  // 处理来自 DemandPage "转采购" 的 query params
+  if (route.query.demandId) {
+    convertingDemandId.value = Number(route.query.demandId)
+    dialogMode.value = 'create'
+    Object.assign(formData, defaultFormData())
+    formData.productCode = (route.query.productCode as string) || ''
+    formData.subProductCode = (route.query.subProductCode as string) || ''
+    formData.destination = (route.query.destination as string) || ''
+    formData.japanLead = (route.query.japanLead as string) || ''
+    formData.quantity = Number(route.query.quantity) || 1
+    dialogVisible.value = true
+    router.replace({ path: '/procurement/order' })
+  }
+})
+
+defineExpose({ prefillFromDemand })
 </script>
 
 <style scoped>

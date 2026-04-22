@@ -87,6 +87,21 @@ public class ReplenishmentDemandUseCase {
                 MDC.get(TraceFilter.TRACE_ID_KEY), demandId, procurementId);
     }
 
+    /**
+     * 撤销转换。
+     * 将 demand 状态回退为 PENDING，清除 linkedProcurementId。
+     * 适用于：关联发注单被删除后，需求需重新转采购。
+     */
+    @Transactional
+    public void revertConversion(Long demandId) {
+        ReplenishmentDemand entity = demandRepository.findByIdAndIsDeletedFalse(demandId)
+                .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", demandId));
+        entity.revertConversion();
+        demandRepository.save(entity);
+        log.info("[ReplenishmentDemand] conversion reverted, traceId={}, demandId={}",
+                MDC.get(TraceFilter.TRACE_ID_KEY), demandId);
+    }
+
     @Transactional
     public void delete(Long id) {
         ReplenishmentDemand entity = demandRepository.findByIdAndIsDeletedFalse(id)

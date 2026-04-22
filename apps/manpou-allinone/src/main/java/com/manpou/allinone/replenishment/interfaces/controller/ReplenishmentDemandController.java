@@ -58,4 +58,15 @@ public class ReplenishmentDemandController {
         demandUseCase.convertToProcurement(id, procurementId);
         return Result.ok("需求单已转为采购单", null);
     }
+
+    /**
+     * 撤销转换。
+     * 将需求单状态回退为 PENDING，清除 linkedProcurementId。
+     * POST /api/v1/demands/{id}/revert
+     */
+    @PostMapping("/{id}/revert")
+    public Result<Void> revertConversion(@PathVariable("id") Long id) {
+        demandUseCase.revertConversion(id);
+        return Result.ok("已撤销转换，需求单可重新转采购", null);
+    }
 }

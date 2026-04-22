@@ -1,10 +1,10 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2 class="page-title">补货需求</h2>
+      <h2 class="page-title">{{ $t('demand.title') }}</h2>
       <div class="header-actions">
         <el-button type="primary" @click="onNew">
-          <el-icon><Plus /></el-icon> 新规录入
+          <el-icon><Plus /></el-icon> {{ $t('demand.newButton') }}
         </el-button>
       </div>
     </div>
@@ -17,7 +17,7 @@
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#E8650A"><Clock /></el-icon></div>
             <div>
               <div class="stat-value">{{ pagination.total }}</div>
-              <div class="stat-label">全部需求</div>
+              <div class="stat-label">{{ $t('demand.stat.total') }}</div>
             </div>
           </div>
         </el-card>
@@ -28,7 +28,7 @@
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#D97706"><Warning /></el-icon></div>
             <div>
               <div class="stat-value">{{ pendingCount }}</div>
-              <div class="stat-label">待确认</div>
+              <div class="stat-label">{{ $t('demand.stat.pending') }}</div>
             </div>
           </div>
         </el-card>
@@ -39,7 +39,7 @@
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#16A34A"><CircleCheck /></el-icon></div>
             <div>
               <div class="stat-value">{{ convertedCount }}</div>
-              <div class="stat-label">已转采购</div>
+              <div class="stat-label">{{ $t('demand.stat.converted') }}</div>
             </div>
           </div>
         </el-card>
@@ -49,25 +49,25 @@
     <!-- 筛选 -->
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filterForm">
-        <el-form-item label="需求类型">
-          <el-select v-model="filterForm.demandType" placeholder="全部" clearable style="width:140px">
-            <el-option value="REPLENISHMENT" label="补货（非新品）" />
-            <el-option value="NEW_PURCHASE" label="新品采购" />
+        <el-form-item :label="$t('demand.filter.demandType')">
+          <el-select v-model="filterForm.demandType" :placeholder="$t('demand.filter.all')" clearable style="width:140px">
+            <el-option value="REPLENISHMENT" :label="$t('demand.type.replenishment')" />
+            <el-option value="NEW_PURCHASE" :label="$t('demand.type.newPurchase')" />
           </el-select>
         </el-form-item>
-        <el-form-item label="货号">
-          <el-input v-model="filterForm.productCode" placeholder="主货号" clearable style="width:140px" />
+        <el-form-item :label="$t('demand.filter.productCode')">
+          <el-input v-model="filterForm.productCode" :placeholder="$t('demand.dialog.productCodePlaceholder')" clearable style="width:140px" />
         </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="filterForm.status" placeholder="全部" clearable style="width:140px">
-            <el-option value="PENDING" label="待确认" />
-            <el-option value="CONVERTED" label="已转采购" />
-            <el-option value="CANCELLED" label="已取消" />
+        <el-form-item :label="$t('demand.filter.status')">
+          <el-select v-model="filterForm.status" :placeholder="$t('demand.filter.all')" clearable style="width:140px">
+            <el-option value="PENDING" :label="$t('demand.status.PENDING')" />
+            <el-option value="CONVERTED" :label="$t('demand.status.CONVERTED')" />
+            <el-option value="CANCELLED" :label="$t('demand.status.CANCELLED')" />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="loadData">查询</el-button>
-          <el-button @click="onReset">重置</el-button>
+          <el-button type="primary" @click="loadData">{{ $t('demand.filter.search') }}</el-button>
+          <el-button @click="onReset">{{ $t('demand.filter.reset') }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -75,46 +75,51 @@
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
-        <el-table-column prop="demandCode" label="需求编号" width="160" />
-        <el-table-column prop="demandType" label="类型" width="130" align="center">
+        <el-table-column prop="demandCode" :label="$t('demand.column.demandCode')" width="160" />
+        <el-table-column prop="demandType" :label="$t('demand.column.demandType')" width="130" align="center">
           <template #default="{ row }">
             <el-tag :type="row.demandType === 'NEW_PURCHASE' ? 'warning' : 'primary'" size="small">
-              {{ row.demandType === 'NEW_PURCHASE' ? '新品采购' : '补货（非新品）' }}
+              {{ row.demandType === 'NEW_PURCHASE' ? $t('demand.type.newPurchase') : $t('demand.type.replenishment') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="productCode" label="主货号" width="120">
+        <el-table-column prop="productCode" :label="$t('demand.column.productCode')" width="120">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="subProductCode" label="子货号" width="100" />
-        <el-table-column prop="quantity" label="数量" width="80" align="right" />
-        <el-table-column prop="destination" label="目的地" min-width="100" show-overflow-tooltip />
-        <el-table-column prop="japanLead" label="日本担当" width="100" />
-        <el-table-column prop="status" label="状态" width="100" align="center">
+        <el-table-column prop="subProductCode" :label="$t('demand.column.subProductCode')" width="100" />
+        <el-table-column prop="quantity" :label="$t('demand.column.quantity')" width="80" align="right" />
+        <el-table-column prop="destination" :label="$t('demand.column.destination')" min-width="100" show-overflow-tooltip />
+        <el-table-column prop="japanLead" :label="$t('demand.column.japanLead')" width="100" />
+        <el-table-column prop="status" :label="$t('demand.column.status')" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="demandStatusType(row.status)" size="small">
               {{ demandStatusLabel(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="录入时间" width="160">
+        <el-table-column prop="createTime" :label="$t('demand.column.createTime')" width="160">
           <template #default="{ row }">
-            {{ row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-' }}
+            {{ row.createTime ? new Date(row.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN') : '-' }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="220" fixed="right" align="center">
+        <el-table-column :label="$t('demand.column.action')" width="260" fixed="right" align="center">
           <template #default="{ row }">
             <el-button v-if="row.status === 'PENDING'" link type="primary" size="small" @click.stop="onConvert(row)">
-              转采购
+              {{ $t('demand.action.convert') }}
             </el-button>
-            <el-button v-if="row.status === 'CONVERTED'" link type="primary" size="small" @click.stop="onViewLinked(row)">
-              查看采购单
-            </el-button>
-            <el-button link type="primary" size="small" @click.stop="onEdit(row)">编辑</el-button>
+            <template v-if="row.status === 'CONVERTED'">
+              <el-button link type="primary" size="small" @click.stop="onViewLinked(row)">
+                {{ $t('demand.action.viewLinked') }}
+              </el-button>
+              <el-button link type="warning" size="small" @click.stop="onRevertConversion(row)">
+                {{ $t('demand.action.revert') }}
+              </el-button>
+            </template>
+            <el-button link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('demand.action.edit') }}</el-button>
             <el-button v-if="row.status === 'PENDING'" link type="danger" size="small" @click.stop="onDelete(row)">
-              删除
+              {{ $t('demand.action.delete') }}
             </el-button>
           </template>
         </el-table-column>
@@ -135,36 +140,36 @@
     </el-card>
 
     <!-- 新建/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? '新规录入 — 补货需求' : '编辑需求'" width="560px">
+    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? $t('demand.newDialogTitle') : $t('demand.editDialogTitle')" width="560px">
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="120px">
-        <el-form-item label="需求类型" prop="demandType">
+        <el-form-item :label="$t('demand.dialog.demandType')" prop="demandType">
           <el-radio-group v-model="formData.demandType">
-            <el-radio value="REPLENISHMENT">补货（非新品）</el-radio>
-            <el-radio value="NEW_PURCHASE">新品采购</el-radio>
+            <el-radio value="REPLENISHMENT">{{ $t('demand.type.replenishment') }}</el-radio>
+            <el-radio value="NEW_PURCHASE">{{ $t('demand.type.newPurchase') }}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="主货号" prop="productCode">
-          <el-input v-model="formData.productCode" placeholder="如 odn012" />
+        <el-form-item :label="$t('demand.dialog.productCode')" prop="productCode">
+          <el-input v-model="formData.productCode" :placeholder="$t('demand.dialog.productCodePlaceholder')" />
         </el-form-item>
-        <el-form-item label="子货号（颜色）">
-          <el-input v-model="formData.subProductCode" placeholder="如 re / wh / bk" />
+        <el-form-item :label="$t('demand.dialog.subProductCode')">
+          <el-input v-model="formData.subProductCode" :placeholder="$t('demand.dialog.subProductCodePlaceholder')" />
         </el-form-item>
-        <el-form-item label="需求量" prop="quantity">
+        <el-form-item :label="$t('demand.dialog.quantity')" prop="quantity">
           <el-input-number v-model="formData.quantity" :min="1" style="width:100%" />
         </el-form-item>
-        <el-form-item label="目的地">
-          <el-input v-model="formData.destination" placeholder="如 名古屋 / 久留米" />
+        <el-form-item :label="$t('demand.dialog.destination')">
+          <el-input v-model="formData.destination" :placeholder="$t('demand.dialog.destinationPlaceholder')" />
         </el-form-item>
-        <el-form-item label="日本担当">
-          <el-input v-model="formData.japanLead" placeholder="日本担当姓名" />
+        <el-form-item :label="$t('demand.dialog.japanLead')">
+          <el-input v-model="formData.japanLead" :placeholder="$t('demand.dialog.japanLeadPlaceholder')" />
         </el-form-item>
-        <el-form-item label="备注">
+        <el-form-item :label="$t('demand.dialog.remarks')">
           <el-input v-model="formData.remarks" type="textarea" :rows="2" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="onSubmit">保存</el-button>
+        <el-button @click="dialogVisible = false">{{ $t('demand.dialog.cancel') }}</el-button>
+        <el-button type="primary" :loading="submitting" @click="onSubmit">{{ $t('demand.dialog.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -172,9 +177,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, Clock, Warning, CircleCheck } from '@element-plus/icons-vue'
 import { demandApi, type DemandPageVO, type CreateDemandRequest, type UpdateDemandRequest } from '@/api/demand'
+import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -182,6 +189,10 @@ const dialogVisible = ref(false)
 const dialogMode = ref<'create' | 'update'>('create')
 const currentRow = ref<DemandPageVO | null>(null)
 const formRef = ref<FormInstance>()
+
+const router = useRouter()
+const { t, locale: localeRef } = useI18n()
+const currentLocale = computed(() => localeRef.value)
 
 const filterForm = reactive({ demandType: '', productCode: '', status: '' })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
@@ -202,9 +213,9 @@ const defaultFormData = (): CreateDemandRequest => ({
 const formData = reactive<CreateDemandRequest>(defaultFormData())
 
 const formRules = {
-  demandType: [{ required: true, message: '请选择需求类型', trigger: 'change' }],
-  productCode: [{ required: true, message: '主货号不能为空', trigger: 'blur' }],
-  quantity: [{ required: true, message: '需求量不能为空', trigger: 'blur' }],
+  demandType: [{ required: true, message: () => t('demand.validation.demandTypeRequired'), trigger: 'change' }],
+  productCode: [{ required: true, message: () => t('demand.validation.productCodeRequired'), trigger: 'blur' }],
+  quantity: [{ required: true, message: () => t('demand.validation.quantityRequired'), trigger: 'blur' }],
 }
 
 async function loadData() {
@@ -254,23 +265,50 @@ function onEdit(row: DemandPageVO) {
   dialogVisible.value = true
 }
 
-function onConvert(_row: DemandPageVO) {
-  ElMessage.info('请先在「发注单」页面创建采购单，然后在需求列表中关联。')
+function onConvert(row: DemandPageVO) {
+  router.push({
+    path: '/procurement/order',
+    query: {
+      demandId: String(row.id),
+      productCode: row.productCode,
+      subProductCode: row.subProductCode || '',
+      destination: row.destination || '',
+      japanLead: row.japanLead || '',
+      quantity: String(row.quantity),
+    },
+  })
 }
 
 function onViewLinked(row: DemandPageVO) {
-  if (row.linkedProcurementId) {
-    ElMessage.info(`关联采购单ID: ${row.linkedProcurementId}`)
-  }
+  router.push({ path: '/procurement/order', query: { procurementId: String(row.linkedProcurementId) } })
+}
+
+async function onRevertConversion(row: DemandPageVO) {
+  try {
+    await ElMessageBox.confirm(
+      t('demand.message.revertConfirm'),
+      t('demand.message.revertConfirmTitle'),
+      { confirmButtonText: t('common.confirm'), cancelButtonText: t('common.cancel'), type: 'warning' }
+    )
+  } catch { return }
+  try {
+    await demandApi.revertConversion(row.id)
+    ElMessage.success(t('demand.message.revertSuccess'))
+    loadData()
+  } catch { /* interceptor */ }
 }
 
 async function onDelete(row: DemandPageVO) {
   try {
-    await ElMessageBox.confirm(`确认删除需求「${row.demandCode}」？`, '删除确认', { type: 'warning' })
+    await ElMessageBox.confirm(
+      t('demand.message.deleteConfirm', { code: row.demandCode }),
+      t('demand.message.deleteConfirmTitle'),
+      { type: 'warning' },
+    )
   } catch { return }
   try {
     await demandApi.delete(row.id)
-    ElMessage.success('删除成功')
+    ElMessage.success(t('demand.message.deleteSuccess'))
     loadData()
   } catch { /* interceptor */ }
 }
@@ -283,10 +321,10 @@ async function onSubmit() {
     try {
       if (dialogMode.value === 'create') {
         await demandApi.create(formData as CreateDemandRequest)
-        ElMessage.success('需求录入成功')
+        ElMessage.success(t('demand.message.createSuccess'))
       } else if (currentRow.value) {
         await demandApi.update(currentRow.value.id, formData as UpdateDemandRequest)
-        ElMessage.success('更新成功')
+        ElMessage.success(t('demand.message.updateSuccess'))
       }
       dialogVisible.value = false
       loadData()
@@ -297,7 +335,7 @@ async function onSubmit() {
 }
 
 function demandStatusLabel(status: string): string {
-  return { PENDING: '待确认', CONVERTED: '已转采购', CANCELLED: '已取消' }[status] ?? status
+  return { PENDING: t('demand.status.PENDING'), CONVERTED: t('demand.status.CONVERTED'), CANCELLED: t('demand.status.CANCELLED') }[status] ?? status
 }
 
 function demandStatusType(status: string): string {

@@ -71,4 +71,8 @@ export const demandApi = {
   convertToProcurement(id: number, procurementId: number) {
     return client.post<{ code: string }>(`/demands/${id}/convert?procurementId=${procurementId}`)
   },
+  /** 撤销转换：将状态回退为 PENDING，清除 linkedProcurementId */
+  revertConversion(id: number) {
+    return client.post<{ code: string }>(`/demands/${id}/revert`)
+  },
 }
