@@ -6,24 +6,36 @@
 
 ## 文档索引
 
-| 文档 | 页面路径 | 说明 |
-|------|---------|------|
-| [ARCHITECTURE](ARCHITECTURE.md) | — | 系统架构图（前端视角） |
-| [05-UI改版方案-橙色商业主题](05-UI改版方案-橙色商业主题.md) | — | 橙色商业主题设计系统（CSS 变量 + 配色 + 组件规范） |
-| [01-登录页](pages/01-login.md) | `/login` | MANPOU 登录 |
-| [02-仪表盘](pages/02-dashboard.md) | `/dashboard` | JWT 状态 + 快捷入口 |
-| [03-示例列表](pages/03-examples.md) | `/examples` | 基础 CRUD 演示 |
-| [04-发注单管理](pages/04-procurement.md) | `/procurement/order` | 发注单管理（OrderPage.vue） |
-| [06-发注管理UI设计-步骤1-4](06-发注管理UI设计-步骤1-4.md) | — | 发注管理全链路UI设计（补货/发注单/工厂/验货/调配） |
+| 编号 | 文档 | 页面路径 | 说明 |
+|------|------|---------|------|
+| — | [ARCHITECTURE](ARCHITECTURE.md) | — | 系统架构图（前端视角） |
+| — | [05-UI改版方案-橙色商业主题](05-UI改版方案-橙色商业主题.md) | — | 橙色商业主题设计系统 |
+| 01 | [pages/01-login.md](pages/01-login.md) | `/login` | MANPOU 登录 |
+| 02 | [pages/02-dashboard.md](pages/02-dashboard.md) | `/dashboard` | JWT 状态 + 快捷入口 |
+| 03 | [pages/03-examples.md](pages/03-examples.md) | `/examples` | 基础 CRUD 演示 |
+| 04 | [pages/04-procurement.md](pages/04-procurement.md) | `/procurement/order` | 发注单管理 |
+| 05 | [pages/05-demand.md](pages/05-demand.md) | `/procurement/demand` | 补货需求（步骤1） |
+| 06 | [pages/06-inspection.md](pages/06-inspection.md) | `/procurement/inspection` | 验货记录（步骤3） |
+| 07 | [pages/07-domestic-customs.md](pages/07-domestic-customs.md) | `/customs/domestic` | 国内报关（步骤5）⚡占位 |
+| 08 | [pages/08-japan-customs.md](pages/08-japan-customs.md) | `/customs/japan` | 日本清关（步骤6）⚡占位 |
+| 09 | [pages/09-tax-refund.md](pages/09-tax-refund.md) | `/finance/tax-refund` | 退税（步骤7）⚡占位 |
+| 10 | [pages/10-sales.md](pages/10-sales.md) | `/sales/operations` | 运营销售（步骤8）⚡占位 |
+| 11 | [pages/11-order-overview.md](pages/11-order-overview.md) | `/procurement/overview` | **订单总览**（核心视图） |
+| — | [06-发注管理UI设计-步骤1-4](06-发注管理UI设计-步骤1-4.md) | — | 发注管理全链路UI设计（历史文档） |
 
-### 发注管理子路由（`/procurement/*`）
+### 路由总览
 
-| 路由 | 组件 | 说明 |
-|------|------|------|
-| `/procurement/demand` | DemandPage.vue | 补货需求单 |
-| `/procurement/order` | OrderPage.vue | 发注单管理 |
-| `/procurement/inspection` | InspectionPage.vue | 验货记录 |
-| `/procurement/logistics` | LogisticsPage.vue | 调配计划 |
+| 路由 | 组件 | 步骤 | 状态 |
+|------|------|------|------|
+| `/procurement/demand` | DemandPage.vue | 步骤1 | ✅ 已实现 |
+| `/procurement/order` | OrderPage.vue | 步骤2 | ✅ 已实现 |
+| `/procurement/inspection` | InspectionPage.vue | 步骤3 | ✅ 已实现 |
+| `/procurement/logistics` | LogisticsPage.vue | 步骤4 | ✅ 已实现 |
+| `/customs/domestic` | DomesticCustomsPage.vue | 步骤5 | ⚡占位 |
+| `/customs/japan` | JapanCustomsPage.vue | 步骤6 | ⚡占位 |
+| `/finance/tax-refund` | TaxRefundPage.vue | 步骤7 | ⚡占位 |
+| `/sales/operations` | SalesOperationsPage.vue | 步骤8 | ⚡占位 |
+| `/procurement/overview` | OrderOverviewPage.vue | 核心视图 | 🟡设计中 |
 
 ---
 

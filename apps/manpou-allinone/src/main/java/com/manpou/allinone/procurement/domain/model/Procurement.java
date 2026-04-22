@@ -41,7 +41,7 @@ public class Procurement extends BaseEntity {
 
     // ===== 商品信息 =====
     @Column(name = "product_code", nullable = false, length = 32)
-    private String productCode;         // 主货号（关联 Product.masterCode）
+    private String productCode;         // 主货号（待关联 Product.masterCode）
 
     @Column(name = "sub_product_code", length = 64)
     private String subProductCode;     // 子货号/枝番（颜色，如 re/wh/bk）
