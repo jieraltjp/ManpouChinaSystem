@@ -80,5 +80,5 @@ CREATE TABLE replenishment_demand (
 - [x] ✅ `ReplenishmentDemandUseCase` 用例服务
 - [x] ✅ `ReplenishmentDemandController` REST 控制器
 - [x] ✅ `ReplenishmentDemandAssembler` DTO 转换器
-- [x] ✅ `V6__demand_sub_product_extend.sql` 迁移脚本（sub_product_code VARCHAR(64) → VARCHAR(512)）
+- [x] ✅ `V7__demand_sub_product_extend.sql` 迁移脚本（sub_product_code VARCHAR(64) → VARCHAR(512)）
 - [ ] 🔴 `ReplenishmentDemandUseCaseTest` 单元测试（待补充）
