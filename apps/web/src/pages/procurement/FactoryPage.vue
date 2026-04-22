@@ -1,10 +1,10 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2 class="page-title">工厂管理</h2>
+      <h2 class="page-title">{{ $t('factory.title') }}</h2>
       <div class="header-actions">
         <el-button type="primary" @click="onNew">
-          <el-icon><Plus /></el-icon> 新增工厂
+          <el-icon><Plus /></el-icon> {{ $t('factory.newButton') }}
         </el-button>
       </div>
     </div>
@@ -17,7 +17,7 @@
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#E8650A"><OfficeBuilding /></el-icon></div>
             <div>
               <div class="stat-value">{{ pagination.total }}</div>
-              <div class="stat-label">工厂总数</div>
+              <div class="stat-label">{{ $t('factory.stat.total') }}</div>
             </div>
           </div>
         </el-card>
@@ -28,7 +28,7 @@
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#16A34A"><CircleCheck /></el-icon></div>
             <div>
               <div class="stat-value">{{ activeCount }}</div>
-              <div class="stat-label">合作中</div>
+              <div class="stat-label">{{ $t('factory.stat.active') }}</div>
             </div>
           </div>
         </el-card>
@@ -39,7 +39,7 @@
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#D97706"><Clock /></el-icon></div>
             <div>
               <div class="stat-value">{{ potentialCount }}</div>
-              <div class="stat-label">潜在合作</div>
+              <div class="stat-label">{{ $t('factory.stat.potential') }}</div>
             </div>
           </div>
         </el-card>
@@ -49,20 +49,17 @@
     <!-- 筛选 -->
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filterForm">
-        <el-form-item label="工厂名称">
-          <el-input v-model="filterForm.factoryName" placeholder="工厂名称" clearable style="width:160px" />
+        <el-form-item :label="$t('factory.filter.factoryName')">
+          <el-input v-model="filterForm.factoryName" :placeholder="$t('factory.filter.factoryName')" clearable style="width:160px" />
         </el-form-item>
-        <el-form-item label="合作状态">
-          <el-select v-model="filterForm.cooperationStatus" placeholder="全部" clearable style="width:140px">
-            <el-option value="ACTIVE" label="合作中" />
-            <el-option value="SUSPENDED" label="已暂停" />
-            <el-option value="ELIMINATED" label="已淘汰" />
-            <el-option value="POTENTIAL" label="潜在合作" />
+        <el-form-item :label="$t('factory.filter.cooperationStatus')">
+          <el-select v-model="filterForm.cooperationStatus" :placeholder="$t('factory.filter.all')" clearable style="width:140px">
+            <el-option v-for="s in cooperationOptions" :key="s.value" :value="s.value" :label="s.label" />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="loadData">查询</el-button>
-          <el-button @click="onReset">重置</el-button>
+          <el-button type="primary" @click="loadData">{{ $t('factory.filter.search') }}</el-button>
+          <el-button @click="onReset">{{ $t('factory.filter.reset') }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -70,30 +67,30 @@
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
-        <el-table-column prop="factoryCode" label="工厂编号" width="160" />
-        <el-table-column prop="factoryName" label="工厂名称" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="category" label="分类" width="100" align="center">
+        <el-table-column prop="factoryCode" :label="$t('factory.column.factoryCode')" width="160" />
+        <el-table-column prop="factoryName" :label="$t('factory.column.factoryName')" min-width="160" show-overflow-tooltip />
+        <el-table-column prop="category" :label="$t('factory.column.category')" width="100" align="center">
           <template #default="{ row }">
             <el-tag size="small" type="info">{{ categoryLabel(row.category) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="province" label="省份" width="90" />
-        <el-table-column prop="city" label="城市" width="90" />
-        <el-table-column prop="roughLocation" label="详细地址" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="contactName" label="联系人" width="100" />
-        <el-table-column prop="contactPhone" label="联系电话" width="130" />
-        <el-table-column prop="cooperationStatus" label="合作状态" width="100" align="center">
+        <el-table-column prop="province" :label="$t('factory.column.province')" width="90" />
+        <el-table-column prop="city" :label="$t('factory.column.city')" width="90" />
+        <el-table-column prop="roughLocation" :label="$t('factory.column.roughLocation')" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="contactName" :label="$t('factory.column.contactName')" width="100" />
+        <el-table-column prop="contactPhone" :label="$t('factory.column.contactPhone')" width="130" />
+        <el-table-column prop="cooperationStatus" :label="$t('factory.column.cooperationStatus')" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="cooperationStatusTag(row.cooperationStatus)" size="small">
               {{ cooperationStatusLabel(row.cooperationStatus) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right" align="center">
+        <el-table-column :label="$t('factory.column.action')" width="150" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click.stop="onView(row)">详情</el-button>
-            <el-button link type="primary" size="small" @click.stop="onEdit(row)">编辑</el-button>
-            <el-button link type="danger" size="small" @click.stop="onDelete(row)">删除</el-button>
+            <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('factory.action.detail') }}</el-button>
+            <el-button link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('factory.action.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('factory.action.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -113,116 +110,116 @@
     </el-card>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" title="工厂详情" size="600px" direction="rtl">
+    <el-drawer v-model="drawerVisible" :title="$t('factory.drawer.title')" size="600px" direction="rtl">
       <el-descriptions :column="2" border v-if="currentRow">
-        <el-descriptions-item label="工厂编号">{{ currentRow.factoryCode }}</el-descriptions-item>
-        <el-descriptions-item label="合作状态">
+        <el-descriptions-item :label="$t('factory.drawer.factoryCode')">{{ currentRow.factoryCode }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.cooperationStatus')">
           <el-tag :type="cooperationStatusTag(currentRow.cooperationStatus)" size="small">
             {{ cooperationStatusLabel(currentRow.cooperationStatus) }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="工厂名称" :span="2">{{ currentRow.factoryName }}</el-descriptions-item>
-        <el-descriptions-item label="分类">
+        <el-descriptions-item :label="$t('factory.drawer.factoryName')" :span="2">{{ currentRow.factoryName }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.category')">
           <el-tag size="small" type="info">{{ categoryLabel(currentRow.category) }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="账期">{{ paymentTermsLabel(currentRow.paymentTerms) }}</el-descriptions-item>
-        <el-descriptions-item label="地址" :span="2">
+        <el-descriptions-item :label="$t('factory.drawer.paymentTerms')">{{ paymentTermsLabel(currentRow.paymentTerms) }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.address')" :span="2">
           {{ [currentRow.province, currentRow.city, currentRow.county, currentRow.roughLocation].filter(Boolean).join('') || '-' }}
         </el-descriptions-item>
-        <el-descriptions-item label="联系人">{{ currentRow.contactName || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="联系电话">{{ currentRow.contactPhone || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="微信号">{{ currentRow.contactWechat || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="QQ号">{{ currentRow.contactQq || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="备注" :span="2">{{ currentRow.notes || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="创建时间" :span="2">{{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString('zh-CN') : '-' }}</el-descriptions-item>
-        <el-descriptions-item label="更新时间" :span="2">{{ currentRow.updateTime ? new Date(currentRow.updateTime).toLocaleString('zh-CN') : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.contactName')">{{ currentRow.contactName || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.contactPhone')">{{ currentRow.contactPhone || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.contactWechat')">{{ currentRow.contactWechat || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.contactQq')">{{ currentRow.contactQq || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.notes')" :span="2">{{ currentRow.notes || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.createTime')" :span="2">{{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(locale === 'ja' ? 'ja-JP' : 'zh-CN') : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.updateTime')" :span="2">{{ currentRow.updateTime ? new Date(currentRow.updateTime).toLocaleString(locale === 'ja' ? 'ja-JP' : 'zh-CN') : '-' }}</el-descriptions-item>
       </el-descriptions>
       <div class="drawer-actions">
-        <el-button @click="drawerVisible = false">关闭</el-button>
-        <el-button type="primary" @click="onEdit(currentRow)">编辑</el-button>
+        <el-button @click="drawerVisible = false">{{ $t('factory.drawer.close') }}</el-button>
+        <el-button type="primary" @click="onEdit(currentRow)">{{ $t('factory.drawer.edit') }}</el-button>
       </div>
     </el-drawer>
 
     <!-- 新建/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? '新增工厂' : '编辑工厂'" width="680px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? $t('factory.dialog.newTitle') : $t('factory.dialog.editTitle')" width="680px" destroy-on-close>
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="110px">
-        <el-form-item label="工厂名称" prop="factoryName">
-          <el-input v-model="formData.factoryName" placeholder="工厂全称" />
+        <el-form-item :label="$t('factory.dialog.factoryName')" prop="factoryName">
+          <el-input v-model="formData.factoryName" :placeholder="$t('factory.dialog.factoryNamePlaceholder')" />
         </el-form-item>
         <el-row :gutter="16">
           <el-col :span="8">
-            <el-form-item label="分类">
-              <el-select v-model="formData.category" placeholder="选择分类" clearable style="width:100%">
-                <el-option v-for="c in CATEGORY_OPTIONS" :key="c.value" :value="c.value" :label="c.label" />
+            <el-form-item :label="$t('factory.dialog.category')">
+              <el-select v-model="formData.category" :placeholder="$t('factory.dialog.categoryPlaceholder')" clearable style="width:100%">
+                <el-option v-for="c in categoryOptions" :key="c.value" :value="c.value" :label="c.label" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="合作状态">
-              <el-select v-model="formData.cooperationStatus" placeholder="选择状态" clearable style="width:100%">
-                <el-option v-for="s in COOPERATION_OPTIONS" :key="s.value" :value="s.value" :label="s.label" />
+            <el-form-item :label="$t('factory.dialog.cooperationStatus')">
+              <el-select v-model="formData.cooperationStatus" :placeholder="$t('factory.dialog.cooperationStatusPlaceholder')" clearable style="width:100%">
+                <el-option v-for="s in cooperationOptions" :key="s.value" :value="s.value" :label="s.label" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="账期">
-              <el-select v-model="formData.paymentTerms" placeholder="选择账期" clearable style="width:100%">
-                <el-option v-for="p in PAYMENT_OPTIONS" :key="p.value" :value="p.value" :label="p.label" />
+            <el-form-item :label="$t('factory.dialog.paymentTerms')">
+              <el-select v-model="formData.paymentTerms" :placeholder="$t('factory.dialog.paymentTermsPlaceholder')" clearable style="width:100%">
+                <el-option v-for="p in paymentTermsOptions" :key="p.value" :value="p.value" :label="p.label" />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="16">
           <el-col :span="8">
-            <el-form-item label="省份">
-              <el-input v-model="formData.province" placeholder="省/自治区" />
+            <el-form-item :label="$t('factory.dialog.province')">
+              <el-input v-model="formData.province" :placeholder="$t('factory.dialog.provincePlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="城市">
-              <el-input v-model="formData.city" placeholder="市" />
+            <el-form-item :label="$t('factory.dialog.city')">
+              <el-input v-model="formData.city" :placeholder="$t('factory.dialog.cityPlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="区县">
-              <el-input v-model="formData.county" placeholder="区/县" />
+            <el-form-item :label="$t('factory.dialog.county')">
+              <el-input v-model="formData.county" :placeholder="$t('factory.dialog.countyPlaceholder')" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="详细地址">
-          <el-input v-model="formData.roughLocation" placeholder="工业区/镇/园区/街道门牌号" />
+        <el-form-item :label="$t('factory.dialog.roughLocation')">
+          <el-input v-model="formData.roughLocation" :placeholder="$t('factory.dialog.roughLocationPlaceholder')" />
         </el-form-item>
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="联系人">
-              <el-input v-model="formData.contactName" placeholder="联系人姓名" />
+            <el-form-item :label="$t('factory.dialog.contactName')">
+              <el-input v-model="formData.contactName" :placeholder="$t('factory.dialog.contactNamePlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="联系电话">
-              <el-input v-model="formData.contactPhone" placeholder="手机或座机" />
+            <el-form-item :label="$t('factory.dialog.contactPhone')">
+              <el-input v-model="formData.contactPhone" :placeholder="$t('factory.dialog.contactPhonePlaceholder')" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="微信号">
-              <el-input v-model="formData.contactWechat" placeholder="微信号" />
+            <el-form-item :label="$t('factory.dialog.contactWechat')">
+              <el-input v-model="formData.contactWechat" :placeholder="$t('factory.dialog.contactWechatPlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="QQ号">
-              <el-input v-model="formData.contactQq" placeholder="QQ号" />
+            <el-form-item :label="$t('factory.dialog.contactQq')">
+              <el-input v-model="formData.contactQq" :placeholder="$t('factory.dialog.contactQqPlaceholder')" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="备注">
-          <el-input v-model="formData.notes" type="textarea" :rows="2" placeholder="备注信息" />
+        <el-form-item :label="$t('factory.dialog.notes')">
+          <el-input v-model="formData.notes" type="textarea" :rows="2" :placeholder="$t('factory.dialog.notesPlaceholder')" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="onSubmit">保存</el-button>
+        <el-button @click="dialogVisible = false">{{ $t('factory.dialog.cancel') }}</el-button>
+        <el-button type="primary" :loading="submitting" @click="onSubmit">{{ $t('factory.dialog.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -233,36 +230,17 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, OfficeBuilding, CircleCheck, Clock } from '@element-plus/icons-vue'
 import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest, type CooperationStatus, type FactoryCategory, type PaymentTerms } from '@/api/factory'
+import { useI18n } from 'vue-i18n'
 
-const CATEGORY_OPTIONS: { value: FactoryCategory; label: string }[] = [
-  { value: 'TOOLS', label: '五金工具' },
-  { value: 'TEXTILE', label: '纺织服装' },
-  { value: 'PLASTIC', label: '塑料制品' },
-  { value: 'ELECTRONICS', label: '电子电器' },
-  { value: 'FURNITURE', label: '家具家居' },
-  { value: 'AUTO_PARTS', label: '汽车配件' },
-  { value: 'SPORTS', label: '运动户外' },
-  { value: 'PET', label: '宠物用品' },
-  { value: 'MEDICAL', label: '医疗器械' },
-  { value: 'CRAFTS', label: '工艺礼品' },
-  { value: 'CHEMICAL', label: '化工材料' },
-  { value: 'OTHER', label: '其他' },
-]
+const { t, locale } = useI18n()
 
-const COOPERATION_OPTIONS: { value: CooperationStatus; label: string }[] = [
-  { value: 'ACTIVE', label: '合作中' },
-  { value: 'SUSPENDED', label: '已暂停' },
-  { value: 'ELIMINATED', label: '已淘汰' },
-  { value: 'POTENTIAL', label: '潜在合作' },
-]
+const CATEGORY_KEYS: FactoryCategory[] = ['TOOLS', 'TEXTILE', 'PLASTIC', 'ELECTRONICS', 'FURNITURE', 'AUTO_PARTS', 'SPORTS', 'PET', 'MEDICAL', 'CRAFTS', 'CHEMICAL', 'OTHER']
+const COOPERATION_KEYS: CooperationStatus[] = ['ACTIVE', 'SUSPENDED', 'ELIMINATED', 'POTENTIAL']
+const PAYMENT_KEYS: PaymentTerms[] = ['CASH', 'NET_30', 'NET_60', 'NET_90', 'CREDIT']
 
-const PAYMENT_OPTIONS: { value: PaymentTerms; label: string }[] = [
-  { value: 'CASH', label: '现结' },
-  { value: 'NET_30', label: '月结30天' },
-  { value: 'NET_60', label: '月结60天' },
-  { value: 'NET_90', label: '月结90天' },
-  { value: 'CREDIT', label: '信用账期' },
-]
+const categoryOptions = computed(() => CATEGORY_KEYS.map(k => ({ value: k, label: t(`factory.category.${k}`) })))
+const cooperationOptions = computed(() => COOPERATION_KEYS.map(k => ({ value: k, label: t(`factory.cooperationStatus.${k}`) })))
+const paymentTermsOptions = computed(() => PAYMENT_KEYS.map(k => ({ value: k, label: t(`factory.paymentTerms.${k}`) })))
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -298,7 +276,7 @@ const defaultFormData = (): CreateFactoryRequest => ({
 const formData = reactive<CreateFactoryRequest>(defaultFormData())
 
 const formRules = {
-  factoryName: [{ required: true, message: '工厂名称不能为空', trigger: 'blur' }],
+  factoryName: [{ required: true, message: () => t('factory.validation.factoryNameRequired'), trigger: 'blur' }],
 }
 
 async function loadData() {
@@ -364,11 +342,15 @@ function onEdit(row: FactoryPageVO | null) {
 
 async function onDelete(row: FactoryPageVO) {
   try {
-    await ElMessageBox.confirm(`确认删除工厂「${row.factoryName}」？`, '删除确认', { type: 'warning' })
+    await ElMessageBox.confirm(
+      t('factory.message.deleteConfirm', { name: row.factoryName }),
+      t('factory.message.deleteConfirmTitle'),
+      { type: 'warning' }
+    )
   } catch { return }
   try {
     await factoryApi.delete(row.id)
-    ElMessage.success('删除成功')
+    ElMessage.success(t('factory.message.deleteSuccess'))
     loadData()
   } catch { /* interceptor */ }
 }
@@ -381,10 +363,10 @@ async function onSubmit() {
     try {
       if (dialogMode.value === 'create') {
         await factoryApi.create(formData as CreateFactoryRequest)
-        ElMessage.success('工厂创建成功')
+        ElMessage.success(t('factory.message.createSuccess'))
       } else if (currentRow.value) {
         await factoryApi.update(currentRow.value.id, formData as UpdateFactoryRequest)
-        ElMessage.success('更新成功')
+        ElMessage.success(t('factory.message.updateSuccess'))
       }
       dialogVisible.value = false
       loadData()
@@ -395,7 +377,7 @@ async function onSubmit() {
 }
 
 function cooperationStatusLabel(s?: string): string {
-  return COOPERATION_OPTIONS.find(o => o.value === s)?.label ?? s ?? '-'
+  return t(`factory.cooperationStatus.${s}` as any, { default: s ?? '-' })
 }
 
 function cooperationStatusTag(s?: string): string {
@@ -403,11 +385,11 @@ function cooperationStatusTag(s?: string): string {
 }
 
 function categoryLabel(c?: string): string {
-  return CATEGORY_OPTIONS.find(o => o.value === c)?.label ?? c ?? '-'
+  return t(`factory.category.${c}` as any, { default: c ?? '-' })
 }
 
 function paymentTermsLabel(p?: string): string {
-  return PAYMENT_OPTIONS.find(o => o.value === p)?.label ?? p ?? '-'
+  return t(`factory.paymentTerms.${p}` as any, { default: p ?? '-' })
 }
 
 onMounted(() => loadData())

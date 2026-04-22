@@ -12,7 +12,8 @@
     "order": "02 発注書",
     "inspection": "03 検品記録",
     "logistics": "04 配送計画",
-    "factory": "工場管理"
+    "factory": "工場管理",
+    "product": "商品ディレクトリ"
   },
   "auth": {
     "login": "ログイン",
@@ -487,7 +488,122 @@
   },
   "factory": {
     "title": "工場管理",
-    "newButton": "新規录入"
+    "newButton": "新規录入",
+    "stat": {
+      "total": "工場総数",
+      "active": "協力中",
+      "potential": "潜在協力"
+    },
+    "filter": {
+      "factoryName": "工場名称",
+      "cooperationStatus": "協力状態",
+      "all": "すべて",
+      "search": "検索",
+      "reset": "リセット"
+    },
+    "column": {
+      "factoryCode": "工場番号",
+      "factoryName": "工場名称",
+      "category": "分類",
+      "province": "省份",
+      "city": "都市",
+      "roughLocation": "詳細住所",
+      "contactName": "連絡先",
+      "contactPhone": "連絡先電話",
+      "cooperationStatus": "協力状態",
+      "action": "操作"
+    },
+    "action": {
+      "detail": "詳細",
+      "edit": "編集",
+      "delete": "削除"
+    },
+    "drawer": {
+      "title": "工場詳細",
+      "factoryCode": "工場番号",
+      "factoryName": "工場名称",
+      "category": "分類",
+      "paymentTerms": "支払条件",
+      "address": "住所",
+      "contactName": "連絡先",
+      "contactPhone": "連絡先電話",
+      "contactWechat": "WeChat",
+      "contactQq": "QQ番号",
+      "notes": "備考",
+      "createTime": "作成日時",
+      "updateTime": "更新日時",
+      "close": "閉じる",
+      "edit": "編集"
+    },
+    "dialog": {
+      "newTitle": "新規工場追加",
+      "editTitle": "工場編集",
+      "factoryName": "工場名称",
+      "factoryNamePlaceholder": "工場正式名称",
+      "category": "分類",
+      "categoryPlaceholder": "分類を選択",
+      "cooperationStatus": "協力状態",
+      "cooperationStatusPlaceholder": "状態を選択",
+      "paymentTerms": "支払条件",
+      "paymentTermsPlaceholder": "支払条件を選択",
+      "province": "省份",
+      "provincePlaceholder": "省/自治区",
+      "city": "都市",
+      "cityPlaceholder": "市",
+      "county": "区县",
+      "countyPlaceholder": "区/県",
+      "roughLocation": "詳細住所",
+      "roughLocationPlaceholder": "工業区/鎮/パーク/番地",
+      "contactName": "連絡先",
+      "contactNamePlaceholder": "連絡先氏名",
+      "contactPhone": "連絡先電話",
+      "contactPhonePlaceholder": "手机または電話",
+      "contactWechat": "WeChat",
+      "contactWechatPlaceholder": "WeChat番号",
+      "contactQq": "QQ番号",
+      "contactQqPlaceholder": "QQ番号",
+      "notes": "備考",
+      "notesPlaceholder": "備考情報",
+      "cancel": "キャンセル",
+      "save": "保存"
+    },
+    "cooperationStatus": {
+      "ACTIVE": "協力中",
+      "SUSPENDED": "一時停止",
+      "ELIMINATED": "已淘汰",
+      "POTENTIAL": "潜在協力"
+    },
+    "category": {
+      "TOOLS": "五金工具",
+      "TEXTILE": "紡織服装",
+      "PLASTIC": "塑料製品",
+      "ELECTRONICS": "電子機器",
+      "FURNITURE": "家具家居",
+      "AUTO_PARTS": "自動車部品",
+      "SPORTS": "スポーツ·レジャー",
+      "PET": "ペット用品",
+      "MEDICAL": "医療器械",
+      "CRAFTS": "工芸礼品",
+      "CHEMICAL": "化工材料",
+      "OTHER": "その他"
+    },
+    "paymentTerms": {
+      "CASH": "現金払い",
+      "NET_30": "月締め30日",
+      "NET_60": "月締め60日",
+      "NET_90": "月締め90日",
+      "CREDIT": "信用支払"
+    },
+    "validation": {
+      "factoryNameRequired": "工場名称は必須です"
+    },
+    "message": {
+      "deleteConfirm": "工場「{name}」を削除しますか？",
+      "deleteConfirmTitle": "削除確認",
+      "deleteSuccess": "削除が完了しました",
+      "createSuccess": "工場の作成が完了しました",
+      "updateSuccess": "更新が完了しました"
+    }
   },
   "common": {
     "search": "検索",

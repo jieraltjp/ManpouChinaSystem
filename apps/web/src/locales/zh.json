@@ -12,7 +12,8 @@
     "order": "02 发注单",
     "inspection": "03 验货记录",
     "logistics": "04 调配计划",
-    "factory": "工厂管理"
+    "factory": "工厂管理",
+    "product": "商品目录"
   },
   "auth": {
     "login": "登录",
@@ -401,7 +402,6 @@
     }
   },
   "logistics": {
-  "logistics": {
     "title": "调配计划",
     "newButton": "新增调配",
     "stat": {
@@ -488,7 +488,122 @@
   },
   "factory": {
     "title": "工厂管理",
-    "newButton": "新规录入"
+    "newButton": "新规录入",
+    "stat": {
+      "total": "工厂总数",
+      "active": "合作中",
+      "potential": "潜在合作"
+    },
+    "filter": {
+      "factoryName": "工厂名称",
+      "cooperationStatus": "合作状态",
+      "all": "全部",
+      "search": "查询",
+      "reset": "重置"
+    },
+    "column": {
+      "factoryCode": "工厂编号",
+      "factoryName": "工厂名称",
+      "category": "分类",
+      "province": "省份",
+      "city": "城市",
+      "roughLocation": "详细地址",
+      "contactName": "联系人",
+      "contactPhone": "联系电话",
+      "cooperationStatus": "合作状态",
+      "action": "操作"
+    },
+    "action": {
+      "detail": "详情",
+      "edit": "编辑",
+      "delete": "删除"
+    },
+    "drawer": {
+      "title": "工厂详情",
+      "factoryCode": "工厂编号",
+      "factoryName": "工厂名称",
+      "category": "分类",
+      "paymentTerms": "账期",
+      "address": "地址",
+      "contactName": "联系人",
+      "contactPhone": "联系电话",
+      "contactWechat": "微信号",
+      "contactQq": "QQ号",
+      "notes": "备注",
+      "createTime": "创建时间",
+      "updateTime": "更新时间",
+      "close": "关闭",
+      "edit": "编辑"
+    },
+    "dialog": {
+      "newTitle": "新增工厂",
+      "editTitle": "编辑工厂",
+      "factoryName": "工厂名称",
+      "factoryNamePlaceholder": "工厂全称",
+      "category": "分类",
+      "categoryPlaceholder": "选择分类",
+      "cooperationStatus": "合作状态",
+      "cooperationStatusPlaceholder": "选择状态",
+      "paymentTerms": "账期",
+      "paymentTermsPlaceholder": "选择账期",
+      "province": "省份",
+      "provincePlaceholder": "省/自治区",
+      "city": "城市",
+      "cityPlaceholder": "市",
+      "county": "区县",
+      "countyPlaceholder": "区/县",
+      "roughLocation": "详细地址",
+      "roughLocationPlaceholder": "工业区/镇/园区/街道门牌号",
+      "contactName": "联系人",
+      "contactNamePlaceholder": "联系人姓名",
+      "contactPhone": "联系电话",
+      "contactPhonePlaceholder": "手机或座机",
+      "contactWechat": "微信号",
+      "contactWechatPlaceholder": "微信号",
+      "contactQq": "QQ号",
+      "contactQqPlaceholder": "QQ号",
+      "notes": "备注",
+      "notesPlaceholder": "备注信息",
+      "cancel": "取消",
+      "save": "保存"
+    },
+    "cooperationStatus": {
+      "ACTIVE": "合作中",
+      "SUSPENDED": "已暂停",
+      "ELIMINATED": "已淘汰",
+      "POTENTIAL": "潜在合作"
+    },
+    "category": {
+      "TOOLS": "五金工具",
+      "TEXTILE": "纺织服装",
+      "PLASTIC": "塑料制品",
+      "ELECTRONICS": "电子电器",
+      "FURNITURE": "家具家居",
+      "AUTO_PARTS": "汽车配件",
+      "SPORTS": "运动户外",
+      "PET": "宠物用品",
+      "MEDICAL": "医疗器械",
+      "CRAFTS": "工艺礼品",
+      "CHEMICAL": "化工材料",
+      "OTHER": "其他"
+    },
+    "paymentTerms": {
+      "CASH": "现结",
+      "NET_30": "月结30天",
+      "NET_60": "月结60天",
+      "NET_90": "月结90天",
+      "CREDIT": "信用账期"
+    },
+    "validation": {
+      "factoryNameRequired": "工厂名称不能为空"
+    },
+    "message": {
+      "deleteConfirm": "确认删除工厂「{name}」？",
+      "deleteConfirmTitle": "删除确认",
+      "deleteSuccess": "删除成功",
+      "createSuccess": "工厂创建成功",
+      "updateSuccess": "更新成功"
+    }
   },
   "common": {
     "search": "查询",
@@ -505,6 +620,4 @@
   "validation": {
     "required": "此字段为必填项"
   }
-}
-
 }
