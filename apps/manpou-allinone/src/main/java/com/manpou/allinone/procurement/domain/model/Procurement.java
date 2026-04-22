@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 
 /**
  * 发注单实体（对应 Excel 出货单弹窗）。
- * 与 docs/business/SPEC-发注管理流程.md §2.1 + DOMAIN v1.3.0 完全对齐。
+ * 与 docs/business/SPEC-B02-发注单-步骤2.md §2 聚合根 完全对齐。
  */
 @Entity
 @Table(name = "procurement", indexes = {

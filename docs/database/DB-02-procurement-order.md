@@ -16,7 +16,7 @@
 |------|------|--------|------|
 | 1 | `procurement` | Procurement | ✅ 已实现 |
 | 2 | `factory` | Factory | ✅ 已实现（字段更新见 DB-10） |
-| 3 | `product` | Product | 🟡 部分实现 |
+| 3 | `product` | Product | ✅ 已实现（详细设计见 DB-11-product.md） |
 
 ---
 

@@ -1,8 +1,8 @@
-# DB-11 — 发注单与工厂关联
+# DB-12 — 发注单与工厂关联
 
 > **版本**: 1.0.0
 > **创建**: 2026-04-22
-> **状态**: 🔄 设计中
+> **状态**: ✅ 已实现
 > **对应 UI**: `docs/ui/pages/02-procurement.md` §6 组件结构
 > **对应实体**: `com.manpou.allinone.procurement.domain.model.Procurement`
 > **关联设计文档**: `DB-10-factory.md`

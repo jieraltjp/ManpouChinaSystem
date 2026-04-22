@@ -15,7 +15,7 @@ import lombok.Setter;
 /**
  * 补货需求单实体。
  * 对应业务流第一步入口：非新品补货 or 新品采购。
- * 与 docs/business/SPEC-发注管理流程.md §3.1 完全对齐。
+ * 与 docs/business/SPEC-B01-补货需求-步骤1.md §2 聚合根 完全对齐。
  */
 @Entity
 @Table(name = "replenishment_demand", indexes = {

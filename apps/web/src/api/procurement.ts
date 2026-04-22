@@ -1,6 +1,7 @@
 /**
  * 发注单 API 客户端。
- * 与 docs/business/SPEC-发注管理流程.md §3.2 完全对齐。
+ * 与 docs/business/SPEC-B02-发注单-步骤2.md §API设计 完全对齐。
+ * 与 docs/database/DB-02-procurement-order.md 完全对齐。
  */
 import client from './client'
 
@@ -18,7 +19,7 @@ export const BILLING_TYPE_OPTIONS: { value: BillingType; label: string }[] = [
 export interface ProcurementPageVO {
   id: number
   factoryId?: number            // 关联工厂ID
-  factoryName?: string          // 关联工厂名称（DB-11）
+  factoryName?: string          // 关联工厂名称（来自 DB-10 Factory 表，Assembler 查库填充）
   productCode: string          // 主货号
   subProductCode?: string     // 子货号/枝番（颜色）
   material?: string            // 材质

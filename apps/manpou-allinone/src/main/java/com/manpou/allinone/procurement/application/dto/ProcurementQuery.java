@@ -5,7 +5,7 @@ import lombok.Data;
 
 /**
  * 发注单分页查询请求参数。
- * 与 docs/business/API-发注管理.md §1.2 Query 参数对齐。
+ * 与 docs/business/SPEC-B02-发注单-步骤2.md §API设计 完全对齐。
  */
 @Data
 public class ProcurementQuery {

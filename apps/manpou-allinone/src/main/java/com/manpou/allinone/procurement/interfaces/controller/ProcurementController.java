@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 发注单 Controller。
- * 与 docs/business/API-发注管理.md §1 完全对齐。
+ * 与 docs/business/SPEC-B02-发注单-步骤2.md §API设计 完全对齐。
  * 职责：参数校验、调用 Application 层、返回标准化响应。
  * 禁止在此层写业务逻辑。
  */
@@ -57,7 +57,7 @@ public class ProcurementController {
     /**
      * 更新发注单（部分更新，含状态推进）。
      * PATCH /api/v1/procurements/{id}
-     * 状态推进规则见 docs/business/SPEC-发注管理流程.md §5。
+     * 状态推进规则见 docs/business/SPEC-B02-发注单-步骤2.md §4 状态流转。
      */
     @PatchMapping("/{id}")
     public Result<Void> update(@PathVariable("id") Long id,

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 /**
  * 更新发注单命令对象（部分更新）。
- * 与 docs/business/SPEC-发注管理流程.md §3.2 完全对齐。
+ * 与 docs/business/SPEC-B02-发注单-步骤2.md §API设计 完全对齐。
  */
 @Data
 public class ProcurementUpdateCmd {

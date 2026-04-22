@@ -261,7 +261,7 @@ async function loadData() {
   loading.value = true
   try {
     const res = await productApi.list({
-      page: pagination.page,
+      page: pagination.page - 1,
       pageSize: pagination.pageSize,
       masterCode: filterForm.masterCode || undefined,
       keyword: filterForm.keyword || undefined,

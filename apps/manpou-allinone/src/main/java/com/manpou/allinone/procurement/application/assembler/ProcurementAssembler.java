@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * DTO ↔ Entity 转换器。
- * 与 docs/business/SPEC-发注管理流程.md §3.2 完全对齐。
+ * 与 docs/business/SPEC-B02-发注单-步骤2.md §API设计 完全对齐。
  */
 @Component
 public class ProcurementAssembler {
