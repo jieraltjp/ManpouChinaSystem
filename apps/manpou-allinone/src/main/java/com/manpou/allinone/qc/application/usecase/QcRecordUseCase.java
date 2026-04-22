@@ -1,6 +1,10 @@
 package com.manpou.allinone.qc.application.usecase;
 
 import com.manpou.allinone.common.exception.BusinessException;
+import com.manpou.allinone.factory.domain.model.Factory;
+import com.manpou.allinone.factory.domain.repository.FactoryRepository;
+import com.manpou.allinone.procurement.domain.model.Procurement;
+import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import com.manpou.allinone.qc.application.assembler.QcRecordAssembler;
 import com.manpou.allinone.qc.application.dto.QcRecordCreateCmd;
 import com.manpou.allinone.qc.application.dto.QcRecordPageQuery;
@@ -25,6 +29,8 @@ public class QcRecordUseCase {
 
     private final QcRecordRepository qcRecordRepository;
     private final QcRecordAssembler qcRecordAssembler;
+    private final ProcurementRepository procurementRepository;
+    private final FactoryRepository factoryRepository;
 
     @Transactional(readOnly = true)
     public Page<QcRecordPageQuery> pageQuery(QcRecordQuery query) {
@@ -57,6 +63,18 @@ public class QcRecordUseCase {
             if (cmd.getInspectionCount() < cmd.getPassedCount()) {
                 throw new BusinessException("qc.invalid_count", "合格数量不能大于检品数");
             }
+        }
+        // K-03: 自动代入 sellerName ← Factory.factoryName（当 sellerName 未填时）
+        if (cmd.getSellerName() == null && cmd.getProcurementId() != null) {
+            procurementRepository.findByIdAndIsDeletedFalse(cmd.getProcurementId())
+                    .ifPresent(procurement -> {
+                        if (procurement.getFactoryId() != null) {
+                            factoryRepository.findByIdAndIsDeletedFalse(procurement.getFactoryId())
+                                    .map(Factory::getFactoryName)
+                                    .filter(name -> !name.isBlank())
+                                    .ifPresent(cmd::setSellerName);
+                        }
+                    });
         }
         QcRecord entity = qcRecordAssembler.toEntity(cmd);
         entity.calculateDefectiveCount();

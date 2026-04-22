@@ -30,4 +30,6 @@ public interface FactoryRepository {
     Page<Factory> findByStatusAndIsDeletedFalse(FactoryStatus status, Pageable pageable);
 
     Page<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName, Pageable pageable);
+
+    boolean existsByIsDeletedFalse();
 }
