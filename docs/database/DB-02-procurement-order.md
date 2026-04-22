@@ -76,9 +76,9 @@ CREATE TABLE procurement (
 
 ## 3. product（商品目录）🟡部分
 
-**对应**: `Product` 聚合根（完整设计见 `DB-10-product.md`）
+**对应**: `Product` 聚合根（完整设计见 `DB-11-product.md`）
 
-> 本节列出步骤2发注单直接引用的核心字段。完整字段（含 hs_code、tax_point、unit_price_rmb、product_factory 多对多）见 `DB-10-product.md`。
+> 本节列出步骤2发注单直接引用的核心字段。完整字段（含 hs_code、tax_point、unit_price_rmb、product_factory 多对多）见 `DB-11-product.md`。
 
 ```sql
 -- 步骤2直接引用字段
@@ -110,7 +110,7 @@ CREATE TABLE product (
     INDEX idx_master_code (master_code)
 );
 
--- 完整字段见 DB-10-product.md：
+-- 完整字段见 DB-11-product.md：
 -- hs_code / tax_point / unit_price_rmb / name_ja / gross_weight_kg
 -- declaration_elements / image_url / origin / product_factory 多对多关联表
 ```

@@ -26,7 +26,7 @@
 | DB-07 | [DB-07-tax-refund.md](DB-07-tax-refund.md) | 07 | ⚡占位 | tax_refund_record 表 |
 | DB-08 | [DB-08-sales.md](DB-08-sales.md) | 08 | ⚡占位 | sales_record 表 |
 | DB-09 | [DB-09-order-overview.md](DB-09-order-overview.md) | 09 | 🟡设计中 | 聚合查询设计（无新表） |
-| DB-11 | [DB-10-product.md](DB-10-product.md) | — | 🟡设计中 | product + product_factory 表 |
+| DB-11 | [DB-11-product.md](DB-11-product.md) | — | 🟡设计中 | product + product_factory 表 |
 | — | [DB-漫普中国系统数据库设计.md](DB-漫普中国系统数据库设计.md) | — | ✅ | 系统总览 |
 | — | [DB-发注管理数据库设计-步骤1-4.md](DB-发注管理数据库设计-步骤1-4.md) | — | ✅ | 历史文档（步骤1-4合并版） |
 

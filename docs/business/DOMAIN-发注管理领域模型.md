@@ -1,13 +1,12 @@
 # 发注管理 — 领域模型
 
-> **版本**: 1.4.0
+> **版本**: 1.5.0
 > **更新**: 2026-04-22
 > **依据**: 业务流分析（8步全链路） + `SPEC-B02-发注单-步骤2.md`
 
 > **代码实现进度**:
-> Procurement ✅ 已实现（v1.3.0，含 factoryId/subProductCode/billingType 等） · Product 🔴 待开发
-> · ReplenishmentDemand ✅ · Factory ✅（v1.4.0 字段扩展，详见 DB-10-factory.md） · QcRecord ✅（聚合根）
-> · LogisticsPlan ✅（聚合根） · DomesticCustoms 🔴 待定 · JapanCustoms 🔴 待定
+> Procurement ✅ 已实现（v1.3.0） · Product ✅ 已实现（完整字段，含 hsCode/taxPoint/多语言名称） · ReplenishmentDemand ✅
+> · Factory ✅（v1.4.0，详见 DB-10-factory.md） · QcRecord ✅ · LogisticsPlan ✅ · DomesticCustoms 🔴 待定 · JapanCustoms 🔴 待定
 
 ---
 
@@ -184,43 +183,54 @@ Procurement（聚合根）
 
 ### 1.4 Product（商品目录 — 聚合根）
 
-> 对应业务流所有步骤的商品基础信息。新增主/子货号结构支持颜色变体。
+> 对应业务流所有步骤的商品基础信息。支持主/子货号结构（颜色变体）。
 
 ```
 Product（聚合根）
 ├── id: Long
-├── masterCode: String               # 主货号（唯一键，如 odn012）（新增）
-├── subCode: String                  # 子货号/枝番（如 re=红色, wh=白色, bk=黑色）（新增）
-├── name: String                     # 日文名称
-├── nameZh: String                  # 中文名称
-├── nameEn: String                  # 英文名称
-├── colorName: String               # 颜色名称（日文：黒/白/赤）（新增）
-├── material: String                 # 材质（新增）
-├── productCategory: ProductCategory # 商品类型（新增）
-├── heightCm: BigDecimal             # 高(cm)
-├── widthCm: BigDecimal              # 宽(cm)
-├── depthCm: BigDecimal              # 深(cm)
-├── weightKg: BigDecimal            # 单个净重(kg)
-├── unitsPerPackage: Integer         # 段ボール入数（每包数量）
-├── packageHeightCm: BigDecimal
-├── packageWidthCm: BigDecimal
-├── packageDepthCm: BigDecimal
-├── packageWeightKg: BigDecimal
-├── remarks: String                  # 备注（箱规不固定 / 整托不固定）
-├── warehouse: String               # 仓库（名古屋/久留米/永康）
-├── requiresQc: Boolean             # 是否需要检测（新增）
-├── updatedBy: String
-├── updatedAt: LocalDateTime
+├── masterCode: String               # 主货号（如 odn012）
+├── subCode: String                 # 子货号/色号（如 re=红色，可为空）
+├── nameJa: String                  # 日文名称（日本用）
+├── nameEn: String                 # 英文名称（报关用）
+├── nameZh: String                 # 中文名称（中国用）
+├── imageUrl: String               # 商品图片 URL
+├── colorName: String              # 颜色名称
+├── material: String               # 材质
+├── category: ProductCategory      # OEM / ORDINARY / FACTORY_DIRECT
+├── origin: String                 # 原产国
+├── unit: String                   # 计量单位（个/台/套）
+├── lengthCm: BigDecimal          # 单品长(cm)
+├── widthCm: BigDecimal           # 单品宽(cm)
+├── heightCm: BigDecimal           # 单品高(cm)
+├── volumeCbm: BigDecimal          # 单品体积(m³)（自动计算）
+├── netWeightKg: BigDecimal        # 净重(kg)
+├── grossWeightKg: BigDecimal      # 毛重(kg)
+├── unitPriceRmb: BigDecimal       # 含税单价(CNY)
+├── taxPoint: BigDecimal          # 票点（默认 1.1）
+├── taxRate: BigDecimal           # 增值税率（默认 0.1）
+├── hsCode: String                # HS编码（8-10位）
+├── declarationElements: String    # 申报要素
+├── unitsPerPackage: Integer      # 段ボール入数（每箱数量）
+├── packageLengthCm: BigDecimal  # 外箱长(cm)
+├── packageWidthCm: BigDecimal    # 外箱宽(cm)
+├── packageHeightCm: BigDecimal   # 外箱高(cm)
+├── packageVolumeCbm: BigDecimal  # 外箱体积(m³)
+├── packageWeightKg: BigDecimal   # 外箱毛重(kg)
+├── warehouse: String             # 仓库归属
+├── requiresQc: Boolean          # 是否需要检测
+├── remarks: String               # 备注
+├── lastUsedDate: LocalDate      # 最近使用日期
+├── createBy / createTime / updateTime
 │
-├── 计算属性（只读）
-│   ├── dimensionSum = heightCm + widthCm + depthCm
-│   └── packageDimensions = packageHeightCm × packageWidthCm × packageDepthCm
-│
-└── 唯一键
-    └── masterCode + subCode（复合唯一键）
+└── 领域方法
+    ├── calculateVolume()              # 计算单品体积
+    ├── calculatePackageVolume()       # 计算外箱体积
+    └── getFullCode()                 # 返回 masterCode-subCode 完整货号
 ```
 
-**ProductCategory 枚举（新增）：**
+**唯一键**: `(masterCode, subCode)` — 复合唯一
+
+**ProductCategory 枚举：**
 
 ```java
 public enum ProductCategory {
@@ -228,6 +238,26 @@ public enum ProductCategory {
     ORDINARY,      // 普货
     FACTORY_DIRECT // 厂家出口
 }
+```
+
+### 1.5 ProductFactory（商品-工厂关联 — 关联实体）
+
+> 多对多关系，记录每个工厂生产的商品及其特定属性（供应商货号/MOQ/单价）。
+
+```
+ProductFactory（关联实体）
+├── id: Long
+├── productId: Long              # FK → product.id
+├── factoryId: Long              # FK → factory.id
+├── supplierSku: String          # 供应商内部货号
+├── moq: Integer               # 最小起订量
+├── leadTimeDays: Integer       # 交货周期(天)
+├── unitPriceRmb: BigDecimal   # 该工厂的含税单价
+├── isPreferred: Boolean        # 是否首选供应商
+├── createTime / updateTime
+│
+└── 唯一键
+    └── (productId, factoryId)
 ```
 
 ---
@@ -589,12 +619,38 @@ public interface ProcurementRepository extends JpaRepository<Procurement, Long> 
 ### ProductRepository
 
 ```java
-public interface ProductRepository extends JpaRepository<Product, Long> {
-    Optional<Product> findByMasterCodeAndSubCode(String masterCode, String subCode);
-    List<Product> findByMasterCode(String masterCode);           // 查所有颜色变体
-    List<Product> findByWarehouse(String warehouse);
-    List<Product> findByProductCategory(ProductCategory category);
-    List<Product> findByRequiresQc(Boolean requiresQc);
+public interface ProductRepository {
+    Optional<Product> findById(Long id);
+    Optional<Product> findByIdAndIsDeletedFalse(Long id);
+    Optional<Product> findByMasterCodeAndIsDeletedFalse(String masterCode);
+    Optional<Product> findByMasterCodeAndSubCodeAndIsDeletedFalse(String masterCode, String subCode);
+    Product save(Product entity);
+    void deleteById(Long id);
+    List<Product> findAllByIsDeletedFalse();
+    Page<Product> findAllByIsDeletedFalse(Pageable pageable);
+    Page<Product> findByMasterCodeAndIsDeletedFalse(String masterCode, Pageable pageable);
+    Page<Product> findByNameZhContainingAndIsDeletedFalse(String keyword, Pageable pageable);
+    Page<Product> findByHsCodeAndIsDeletedFalse(String hsCode, Pageable pageable);
+}
+
+> **实现**: `ProductJpaRepository`（`infrastructure/persistence/jpa/`）同时继承本接口和 `JpaRepository<Product, Long>`。
+
+### ProductFactoryRepository
+
+```java
+public interface ProductFactoryRepository {
+    List<ProductFactory> findByProductIdAndIsDeletedFalse(Long productId);
+    List<ProductFactory> findByFactoryIdAndIsDeletedFalse(Long factoryId);
+    Optional<ProductFactory> findByProductIdAndFactoryId(Long productId, Long factoryId);
+}
+
+### ProductFactoryRepository
+
+```java
+public interface ProductFactoryRepository {
+    List<ProductFactory> findByProductIdAndIsDeletedFalse(Long productId);
+    List<ProductFactory> findByFactoryIdAndIsDeletedFalse(Long factoryId);
+    Optional<ProductFactory> findByProductIdAndFactoryId(Long productId, Long factoryId);
 }
 ```
 

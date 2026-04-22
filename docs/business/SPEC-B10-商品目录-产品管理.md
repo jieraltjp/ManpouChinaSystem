@@ -4,8 +4,8 @@
 > **创建**: 2026-04-22
 > **状态**: 🟡设计阶段
 > **业务步号**: 00（基础设施/商品目录）
-> **对应数据库文档**: `docs/database/DB-10-product.md`
-> **对应 UI 文档**: `docs/ui/pages/10-product.md`
+> **对应数据库文档**: `docs/database/DB-11-product.md`
+> **对应 UI 文档**: `docs/ui/pages/10-product.md`（待创建）
 > **前置步骤**: 无（商品目录是所有业务步的基础数据）
 
 ---

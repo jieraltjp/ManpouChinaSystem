@@ -4,7 +4,7 @@ import lombok.Data;
 
 /**
  * 分页查询请求参数。
- * 仅包含分页与筛选条件，不包含业务字段。
+ * 对应 docs/business/SPEC-B10 §2.1 API 设计。
  */
 @Data
 public class ProductQuery {
@@ -15,6 +15,12 @@ public class ProductQuery {
     /** 每页条数 */
     private Integer pageSize = 20;
 
-    /** 关键词（按 name 模糊匹配） */
+    /** 主货号（精确匹配） */
+    private String masterCode;
+
+    /** 关键词（按中文名称/英文名称模糊匹配） */
     private String keyword;
+
+    /** HS编码（精确匹配） */
+    private String hsCode;
 }

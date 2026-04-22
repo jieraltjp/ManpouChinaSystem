@@ -177,7 +177,13 @@
       "Bash(taskkill //PID 269888)",
       "Bash(taskkill //F //PID 269888)",
       "Bash(java -Xms512m -Xmx1024m -jar target/manpou-allinone-*.jar --server.port=18090 --spring.profiles.active=local)",
-      "Bash(echo \"Started with PID $!\")"
+      "Bash(echo \"Started with PID $!\")",
+      "Bash(xxd src/locales/zh.json)",
+      "Bash(cd /d/D:\\\\\\\\Programme\\\\\\\\java\\\\\\\\ManpouChinaSystem\\\\\\\\apps\\\\\\\\manpou-allinone)",
+      "Bash(awk NR>=505 && NR<=515 *)",
+      "Bash(awk NR>=488 && NR<=508 *)",
+      "Bash(awk NR>=490 && NR<=510 *)",
+      "Bash(iconv -f GBK -t UTF-8)"
     ]
   }
 }

@@ -5,10 +5,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
-import ja from 'element-plus/dist/locale/ja.mjs'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import 'dayjs/locale/ja'
 
@@ -30,14 +27,11 @@ setLocale(storedLocale)
 app.use(createPinia())
 app.use(router)
 app.use(i18n)
-app.use(ElementPlus, {
-  locale: storedLocale === 'ja' ? ja : zhCn,
-})
+app.use(ElementPlus)
 
 // 暴露语言切换方法供全局使用
 app.config.globalProperties.$setLocale = (locale: Locale) => {
   setLocale(locale)
-  app.use(ElementPlus, { locale: locale === 'ja' ? ja : zhCn })
 }
 
 app.mount('#app')

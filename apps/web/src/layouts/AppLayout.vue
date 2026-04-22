@@ -95,9 +95,6 @@ import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderO
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
 import type { Locale } from '@/locales'
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
-import ja from 'element-plus/dist/locale/ja.mjs'
-import ElementPlus from 'element-plus'
 
 const auth = useAuthStore()
 const route = useRoute()
@@ -106,23 +103,11 @@ const { locale } = useI18n()
 
 const isCollapsed = ref(false)
 const activeMenu = computed(() => route.path)
-const currentLocale = ref<Locale>(locale.value as Locale)
+const currentLocale = computed(() => locale.value as Locale)
 
 function onLocaleChange(newLocale: Locale) {
   locale.value = newLocale
   localStorage.setItem('locale', newLocale)
-  // 动态切换 Element Plus locale（通过重新挂载组件树实现）
-  const elApp = document.querySelector('#app')
-  if (elApp) {
-    const vueApp = (elApp as any).__vue_app__
-    if (vueApp) {
-      // 获取已注册的 ElementPlus 插件实例并更新其 locale
-      const elPlusGlobal = vueApp.config.globalProperties.$ELEMENT
-      if (elPlusGlobal) {
-        elPlusGlobal.locale = newLocale === 'ja' ? ja : zhCn
-      }
-    }
-  }
 }
 
 function onCommand(cmd: string) {

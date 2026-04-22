@@ -185,7 +185,7 @@
         <!-- 关联需求（创建时可选） -->
         <el-form-item v-if="dialogMode === 'create'" :label="$t('order.dialog.linkedDemand')">
           <el-select v-model="selectedDemandId" :placeholder="$t('order.dialog.linkedDemandPlaceholder')" clearable filterable style="width:100%" @change="onDemandChange">
-            <el-option v-for="d in demandOptions" :key="d.id" :label="`${d.demandCode} | ${d.productCode} | ${d.demandType === 'NEW_PURCHASE' ? $t('demand.type.newPurchase') : $t('demand.type.replenishment')} | ${demandStatusLabel(d.status)}`" :value="d.id" />
+            <el-option v-for="d in demandOptions" :key="d.id" :label="`${d.demandCode} | ${d.productCode} | ${d.demandType === 'NEW_PURCHASE' ? $t('demand.type.newPurchase') : $t('demand.type.replenishment')} | ${$t('demand.status.' + d.status as any)}`" :value="d.id" />
           </el-select>
         </el-form-item>
 

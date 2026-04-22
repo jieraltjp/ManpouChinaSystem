@@ -13,7 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 示例 Controller。
+ * 商品 Controller。
+ * 对应 docs/business/SPEC-B10-商品目录-产品管理.md §2.1 API 设计。
  * 职责：参数校验、调用 Application 层、返回标准化响应。
  * 禁止在此层写业务逻辑。
  */
@@ -26,6 +27,9 @@ public class ProductController {
 
     /**
      * 分页查询商品列表。
+     * GET /api/v1/products?keyword=柜子&page=1&pageSize=20
+     * GET /api/v1/products?masterCode=in041&page=1&pageSize=20
+     * GET /api/v1/products?hsCode=9403200000
      */
     @GetMapping
     public Result<Page<ProductPageQuery>> list(ProductQuery query) {
@@ -41,25 +45,31 @@ public class ProductController {
     }
 
     /**
+     * 根据主货号查询（步骤1商品选择器调用）。
+     */
+    @GetMapping("/code/{masterCode}")
+    public Result<ProductPageQuery> getByMasterCode(@PathVariable String masterCode) {
+        return Result.ok(productUseCase.getByMasterCode(masterCode));
+    }
+
+    /**
      * 创建商品。
-     * 使用 @Idempotent 注解实现幂等性，防止网络重试导致重复创建。
-     * 客户端需在请求头携带 X-Idempotency-Key: {uuid}
      */
     @PostMapping
     @Idempotent(ttl = 24 * 60 * 60)
     public Result<Long> create(@Valid @RequestBody ProductCreateCmd cmd) {
         Long id = productUseCase.create(cmd);
-        return Result.ok("创建成功", id);
+        return Result.ok("商品创建成功", id);
     }
 
     /**
-     * 更新商品。
+     * 更新商品（部分更新）。
      */
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody ProductUpdateCmd cmd) {
         productUseCase.update(id, cmd);
-        return Result.ok("更新成功", null);
+        return Result.ok("商品更新成功", null);
     }
 
     /**
@@ -68,6 +78,6 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         productUseCase.delete(id);
-        return Result.ok("删除成功", null);
+        return Result.ok("商品删除成功", null);
     }
 }
