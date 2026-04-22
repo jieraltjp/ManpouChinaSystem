@@ -5,7 +5,7 @@
 > **路由**: `/procurement/inspection`
 > **组件**: `InspectionPage.vue`
 > **对应后端**: `QcRecord` 聚合根
-> **依赖文档**: `SPEC-全链路业务流索引.md` §第三步 · `SPEC-验货记录流程.md`
+> **依赖文档**: `SPEC-B01-全链路总览.md` · `SPEC-B03-验货记录-步骤3.md`
 > **前置步骤**: 步骤2（发注单 Procurement 已下单）
 > **后续步骤**: 步骤4（调配计划 LogisticsPlan）
 
@@ -178,8 +178,8 @@
 | 项目 | 优先级 | 说明 |
 |------|--------|------|
 | 采购单搜索选择器 | P1 | InspectionPage.vue 已有（fromDemand 逻辑可复用） |
-| sellerName 自动代入 | P1 | 选采购单后查询 Factory.factoryName |
-| 验货完成按钮 | P1 | 需实现 PATCH `/api/v1/qc-records/{id}/complete` |
+| sellerName 自动代入 | ✅ P1 | ✅ `QcRecordUseCase.create()` 已实现 |
+| 验货完成按钮 | ✅ P1 | ✅ 已实现：`PATCH /api/v1/qc-records/{id}` + body `{status: "COMPLETED"}` |
 | 序列号输入 | P2 | `serialNumbers` 为 JSON 数组，界面待设计 |
 | 缺陷照片上传 | P2 | MinIO 文件上传，显示缩略图 |
 | 创建调配预填充 | P1 | LogisticsPage.vue 解析 `fromQc` query 参数 |

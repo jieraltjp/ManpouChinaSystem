@@ -1,8 +1,8 @@
-# 项目文档：manpou-allinone（7 领域合一单体）
+# 项目文档：manpou-allinone（8 领域合一单体）
 
 > **视角**：INTJ 战略 — 极简先行，演进无价
 > **原则**：最好的架构不是设计出来的，是业务长出来的
-> **最后更新**：2026-04-20
+> **最后更新**：2026-04-22
 
 ---
 
@@ -13,20 +13,21 @@
 | 服务名 | manpou-allinone |
 | 端口 | 18090 |
 | 包前缀 | `com.manpou.allinone` |
-| 定位 | **7 领域合一单体 jar**，后期按 Kafka Topic 边界逐步拆分 |
-| 当前状态 | ✅ 已完成编译 + 冒烟测试 + 发注单 CRUD |
+| 定位 | **8 领域合一单体 jar**，后期按 Kafka Topic 边界逐步拆分 |
+| 当前状态 | ✅ 编译通过 · 发注单 CRUD · 验货记录 · 调配计划 · 工厂管理 |
 
 **合并领域**：
 
 | 领域 | API 前缀 | 后期拆分目标 | 当前状态 |
 |------|---------|------------|---------|
 | procurement | `/api/v1/procurements` | procurement-service（Kafka topic: procurement-events） | ✅ CRUD+报价计算 |
+| factory | `/api/v1/factories` | factory-service | ✅ domain层+FSM |
+| qc | `/api/v1/qc-records` | qc-service | ✅ domain层+FSM |
+| logistics | `/api/v1/logistics` | logistics-service（Kafka topic: logistics-events） | ✅ domain层+FSM |
+| replenishment | `/api/v1/demands` | replenishment-service | ✅ CRUD+转采购 |
 | product | `/api/v1/products` | product-service（Kafka topic: product-events） | 🔴 骨架 |
-| warehouse | `/api/v1/warehouse` | warehouse-service（Kafka topic: warehouse-events） | 🔴 骨架 |
 | customs | `/api/v1/customs` | customs-service（Kafka topic: customs-events） | 🔴 骨架 |
-| logistics | `/api/v1/logistics` | logistics-service（Kafka topic: logistics-events） | 🔴 骨架 |
 | finance | `/api/v1/finance` | finance-service（Kafka topic: finance-events） | 🔴 骨架 |
-| notification | `/api/v1/notifications` | notification-service（Kafka topic: notification-events） | 🔴 骨架 |
 
 **保留独立**：
 
@@ -44,11 +45,11 @@
 Phase 0（现状）
 ┌─────────────────────────────────────────────────┐
 │ manpou-allinone (18090)                          │
-│ procurement + product + warehouse + customs +     │
-│ logistics + finance + notification                │
+│ procurement + factory + qc + logistics +          │
+│ replenishment + product + customs + finance       │
 │                                                  │
 │ 优点：单进程调试、零服务间延迟、无版本协调          │
-│ 缺点：7 领域共享 JVM，单点故障互相影响            │
+│ 缺点：8 领域共享 JVM，单点故障互相影响            │
 └─────────────────────────────────────────────────┘
 
 Phase 3-4（业务填充后，按 Kafka Topic 边界拆分）

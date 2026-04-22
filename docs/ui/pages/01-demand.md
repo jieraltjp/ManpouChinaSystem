@@ -5,7 +5,7 @@
 > **路由**: `/procurement/demand`
 > **组件**: `DemandPage.vue`
 > **对应后端**: `ReplenishmentDemand` 聚合根
-> **依赖文档**: `SPEC-全链路业务流索引.md` §第一步
+> **依赖文档**: `SPEC-B01-全链路总览.md` · `SPEC-B01-补货需求-步骤1.md`
 
 ---
 
@@ -86,7 +86,7 @@
 
 ### 4.4 提交
 
-- POST `/api/v1/replenishment-demands`
+- POST `/api/v1/demands`
 - 成功后刷新列表；弹窗关闭
 
 ---
@@ -111,7 +111,7 @@
 
 ### 5.3 后端联动
 
-- 调用 `POST /api/v1/replenishment-demands/{id}/convert`
+- 调用 `POST /api/v1/demands/{id}/convert`
 - 后端创建 Procurement 实体，状态推进为 `CONVERTED`
 
 ---

@@ -34,8 +34,8 @@
 | B-09 | [SPEC-B09-订单总览-API设计.md](./SPEC-B09-订单总览-API设计.md) | **核心视图**：聚合接口设计 ✅ |
 | B-API | [API-发注管理.md](./API-发注管理.md) | REST 接口契约 |
 | B-DOMAIN | [DOMAIN-发注管理领域模型.md](./DOMAIN-发注管理领域模型.md) | 聚合根、值对象、枚举、仓储接口 |
-| B-PLAN | [SPEC-调配计划流程.md](./SPEC-调配计划流程.md) | LogisticsPlan 状态机（PLANNED→BOOKED→IN_TRANSIT→DELIVERED） |
-| B-INSPECT | [SPEC-验货记录流程.md](./SPEC-验货记录流程.md) | QcRecord 状态机（COMPLETED/RETURN_REQUESTED） |
+| B-PLAN | [SPEC-B04-调配计划-步骤4.md](./SPEC-B04-调配计划-步骤4.md) | LogisticsPlan 状态机（PLANNED→BOOKED→IN_TRANSIT→DELIVERED） |
+| B-INSPECT | [SPEC-B03-验货记录-步骤3.md](./SPEC-B03-验货记录-步骤3.md) | QcRecord 状态机（COMPLETED/RETURN_REQUESTED） |
 
 ---
 
