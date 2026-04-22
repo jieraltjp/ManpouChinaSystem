@@ -20,15 +20,15 @@
 | UI-01 | [pages/01-login.md](pages/01-login.md) | `/login` | — | ✅ |
 | UI-02 | [pages/02-dashboard.md](pages/02-dashboard.md) | `/dashboard` | — | ✅ |
 | UI-03 | [pages/03-examples.md](pages/03-examples.md) | `/examples` | — | ✅ |
-| UI-04 | [pages/02-procurement.md](pages/02-procurement.md) | `/procurement/order` | 02 | ✅ |
-| UI-05 | [pages/04-logistics.md](pages/04-logistics.md) | `/procurement/logistics` | 04 | ⚡占位 |
-| UI-06 | [pages/01-demand.md](pages/01-demand.md) | `/procurement/demand` | 01 | ✅ |
-| UI-07 | [pages/03-inspection.md](pages/03-inspection.md) | `/procurement/inspection` | 03 | ✅ |
-| UI-08 | [pages/05-domestic-customs.md](pages/05-domestic-customs.md) | `/customs/domestic` | 05 | ⚡占位 |
-| UI-09 | [pages/06-japan-customs.md](pages/06-japan-customs.md) | `/customs/japan` | 06 | ⚡占位 |
-| UI-10 | [pages/07-tax-refund.md](pages/07-tax-refund.md) | `/finance/tax-refund` | 07 | ⚡占位 |
-| UI-11 | [pages/08-sales.md](pages/08-sales.md) | `/sales/operations` | 08 | ⚡占位 |
-| UI-12 | [pages/09-order-overview.md](pages/09-order-overview.md) | `/procurement/overview` | 09 | 🟡设计中 |
+| UI-01 | [pages/01-demand.md](pages/01-demand.md) | `/procurement/demand` | 01 | ✅ |
+| UI-02 | [pages/02-procurement.md](pages/02-procurement.md) | `/procurement/order` | 02 | ✅ |
+| UI-03 | [pages/03-inspection.md](pages/03-inspection.md) | `/procurement/inspection` | 03 | ✅ |
+| UI-04 | [pages/04-logistics.md](pages/04-logistics.md) | `/procurement/logistics` | 04 | ⚡占位 |
+| UI-05 | [pages/05-domestic-customs.md](pages/05-domestic-customs.md) | `/customs/domestic` | 05 | ⚡占位 |
+| UI-06 | [pages/06-japan-customs.md](pages/06-japan-customs.md) | `/customs/japan` | 06 | ⚡占位 |
+| UI-07 | [pages/07-tax-refund.md](pages/07-tax-refund.md) | `/finance/tax-refund` | 07 | ⚡占位 |
+| UI-08 | [pages/08-sales.md](pages/08-sales.md) | `/sales/operations` | 08 | ⚡占位 |
+| UI-09 | [pages/09-order-overview.md](pages/09-order-overview.md) | `/procurement/overview` | 09 | 🟡设计中 |
 | — | [05-UI改版方案-橙色商业主题.md](05-UI改版方案-橙色商业主题.md) | — | — | ✅ |
 | — | [ARCHITECTURE.md](ARCHITECTURE.md) | — | — | ✅ |
 
