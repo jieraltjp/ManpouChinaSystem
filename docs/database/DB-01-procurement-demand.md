@@ -5,7 +5,7 @@
 > **更新**: 2026-04-22（v1.1.0：sub_product_code 扩展为 VARCHAR(512)，支持 JSON 数组）
 > **状态**: ✅ 已实现
 > **业务步号**: 01（补货需求）
-> **对应业务文档**: `SPEC-B01-全链路总览.md` §第一步
+> **对应业务文档**: `SPEC-B00-全链路总览.md` §第一步
 > **对应 UI 文档**: `docs/ui/pages/01-demand.md`
 > **对应后端聚合根**: `ReplenishmentDemand`
 > **对应设计文档**: `docs/design/FEATURE-货号自动补全与多子货号选择.md`

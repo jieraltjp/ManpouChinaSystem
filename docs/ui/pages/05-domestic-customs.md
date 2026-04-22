@@ -5,7 +5,7 @@
 > **路由**: `/customs/domestic`
 > **组件**: `DomesticCustomsPage.vue`（占位）
 > **对应后端**: `DomesticCustomsRecord` 聚合根（待实现）
-> **依赖文档**: `SPEC-B01-全链路总览.md` · `SPEC-B05-国内报关-步骤5.md`
+> **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B05-国内报关-步骤5.md`
 > **前置步骤**: 步骤4（调配计划已发货 LogisticsPlan.status = IN_TRANSIT）
 > **后续步骤**: 步骤6（日本清关 JapanCustomsRecord）
 

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * 商品分类。
- * 对应 docs/database/DB-10-product.md §3 枚举定义。
+ * 对应 docs/database/DB-11-product.md §3 枚举定义。
  */
 @Getter
 @RequiredArgsConstructor

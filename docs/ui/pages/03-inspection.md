@@ -5,7 +5,7 @@
 > **路由**: `/procurement/inspection`
 > **组件**: `InspectionPage.vue`
 > **对应后端**: `QcRecord` 聚合根
-> **依赖文档**: `SPEC-B01-全链路总览.md` · `SPEC-B03-验货记录-步骤3.md`
+> **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B03-验货记录-步骤3.md`
 > **前置步骤**: 步骤2（发注单 Procurement 已下单）
 > **后续步骤**: 步骤4（调配计划 LogisticsPlan）
 

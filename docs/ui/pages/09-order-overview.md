@@ -5,7 +5,7 @@
 > **路由**: `/procurement/overview`
 > **组件**: `OrderOverviewPage.vue`
 > **对应后端**: `GET /api/v1/orders/{id}/overview` 聚合接口
-> **依赖文档**: `SPEC-B01-全链路总览.md` · `SPEC-B09-订单总览-API设计.md`
+> **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B09-订单总览-API设计.md`
 > **前置**: 至少有一条 Procurement 记录
 
 ---

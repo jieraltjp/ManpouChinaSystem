@@ -5,7 +5,7 @@
 > **路由**: `/procurement/demand`
 > **组件**: `DemandPage.vue`
 > **对应后端**: `ReplenishmentDemand` 聚合根
-> **依赖文档**: `SPEC-B01-全链路总览.md` · `SPEC-B01-补货需求-步骤1.md`
+> **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B01-补货需求-步骤1.md`
 
 ---
 

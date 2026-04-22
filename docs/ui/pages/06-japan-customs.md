@@ -5,7 +5,7 @@
 > **路由**: `/customs/japan`
 > **组件**: `JapanCustomsPage.vue`（占位）
 > **对应后端**: `JapanCustomsRecord` 聚合根（待实现）
-> **依赖文档**: `SPEC-B01-全链路总览.md` · `SPEC-B06-日本清关-步骤6.md`
+> **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B06-日本清关-步骤6.md`
 > **前置步骤**: 步骤5（国内报关已放行 DomesticCustomsRecord.status = CLEARED）
 > **后续步骤**: 步骤7（退税 TaxRefundRecord）
 
