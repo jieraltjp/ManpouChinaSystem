@@ -1,8 +1,8 @@
 package com.manpou.allinone.procurement.usecase;
 
 import com.manpou.allinone.common.exception.BusinessException;
+import com.manpou.allinone.factory.domain.model.CooperationStatus;
 import com.manpou.allinone.factory.domain.model.Factory;
-import com.manpou.allinone.factory.domain.model.FactoryStatus;
 import com.manpou.allinone.factory.domain.repository.FactoryRepository;
 import com.manpou.allinone.procurement.application.dto.ProcurementCreateCmd;
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
@@ -55,8 +55,9 @@ class ProcurementUseCaseTest {
         Factory factory = new Factory();
         factory.setFactoryCode("F-TEST-001");
         factory.setFactoryName("测试工厂");
-        factory.setLocation("浙江省杭州市");
-        factory.setStatus(FactoryStatus.ACTIVE);
+        factory.setProvince("浙江省");
+        factory.setCity("杭州市");
+        factory.setCooperationStatus(CooperationStatus.ACTIVE);
         savedFactory = factoryRepository.save(factory);
 
         Procurement p = new Procurement();
@@ -152,7 +153,7 @@ class ProcurementUseCaseTest {
     void delete未定态_succeeds() {
         procurementUseCase.delete(savedProcurement.getId());
 
-        Procurement deleted = procurementRepository.findByIdAndIsDeletedFalse(savedProcurement.getId()).orElse(null);
+        Procurement deleted = procurementRepository.findByIdAndDeletedIsFalse(savedProcurement.getId()).orElse(null);
         assertThat(deleted).isNull();
     }
 

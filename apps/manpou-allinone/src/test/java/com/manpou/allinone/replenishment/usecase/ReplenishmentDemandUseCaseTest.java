@@ -122,7 +122,7 @@ class ReplenishmentDemandUseCaseTest {
     void delete_pendingDemand_succeeds() {
         demandUseCase.delete(savedDemand.getId());
 
-        ReplenishmentDemand deleted = demandRepository.findByIdAndIsDeletedFalse(savedDemand.getId()).orElse(null);
+        ReplenishmentDemand deleted = demandRepository.findByIdAndDeletedIsFalse(savedDemand.getId()).orElse(null);
         assertThat(deleted).isNull();
     }
 

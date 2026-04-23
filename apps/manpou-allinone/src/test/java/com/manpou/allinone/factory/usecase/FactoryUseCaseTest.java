@@ -6,8 +6,9 @@ import com.manpou.allinone.factory.application.dto.FactoryPageQuery;
 import com.manpou.allinone.factory.application.dto.FactoryQuery;
 import com.manpou.allinone.factory.application.dto.FactoryUpdateCmd;
 import com.manpou.allinone.factory.application.usecase.FactoryUseCase;
+import com.manpou.allinone.factory.domain.model.CooperationStatus;
 import com.manpou.allinone.factory.domain.model.Factory;
-import com.manpou.allinone.factory.domain.model.FactoryStatus;
+import com.manpou.allinone.factory.domain.model.FactoryCategory;
 import com.manpou.allinone.factory.domain.repository.FactoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,11 +46,12 @@ class FactoryUseCaseTest {
         Factory factory = new Factory();
         factory.setFactoryCode("F-20260401-TEST");
         factory.setFactoryName("测试箱包厂");
-        factory.setLocation("浙江省杭州市");
+        factory.setProvince("浙江省");
+        factory.setCity("杭州市");
         factory.setRoughLocation("萧山区工业园");
         factory.setContactName("测试联系人");
         factory.setContactPhone("13800000000");
-        factory.setStatus(FactoryStatus.ACTIVE);
+        factory.setCooperationStatus(CooperationStatus.ACTIVE);
         savedFactory = factoryRepository.save(factory);
     }
 
@@ -58,7 +60,7 @@ class FactoryUseCaseTest {
         FactoryPageQuery result = factoryUseCase.getById(savedFactory.getId());
         assertThat(result.getId()).isEqualTo(savedFactory.getId());
         assertThat(result.getFactoryName()).isEqualTo("测试箱包厂");
-        assertThat(result.getStatus()).isEqualTo(FactoryStatus.ACTIVE);
+        assertThat(result.getCooperationStatus()).isEqualTo(CooperationStatus.ACTIVE);
     }
 
     @Test
@@ -72,7 +74,8 @@ class FactoryUseCaseTest {
     void create_savesEntity() {
         FactoryCreateCmd cmd = new FactoryCreateCmd();
         cmd.setFactoryName("新建工厂");
-        cmd.setLocation("广东省深圳市");
+        cmd.setProvince("广东省");
+        cmd.setCity("深圳市");
         cmd.setRoughLocation("龙华区");
         cmd.setContactName("新建联系人");
         cmd.setContactPhone("13900000000");
@@ -88,13 +91,13 @@ class FactoryUseCaseTest {
     void update_modifiesEntity() {
         FactoryUpdateCmd cmd = new FactoryUpdateCmd();
         cmd.setFactoryName("更新后的工厂名");
-        cmd.setStatus(FactoryStatus.INACTIVE);
+        cmd.setCooperationStatus(CooperationStatus.SUSPENDED);
 
         factoryUseCase.update(savedFactory.getId(), cmd);
 
         Factory updated = factoryRepository.findById(savedFactory.getId()).orElseThrow();
         assertThat(updated.getFactoryName()).isEqualTo("更新后的工厂名");
-        assertThat(updated.getStatus()).isEqualTo(FactoryStatus.INACTIVE);
+        assertThat(updated.getCooperationStatus()).isEqualTo(CooperationStatus.SUSPENDED);
     }
 
     @Test
@@ -110,7 +113,7 @@ class FactoryUseCaseTest {
     void delete_marksDeleted() {
         factoryUseCase.delete(savedFactory.getId());
 
-        Factory deleted = factoryRepository.findByIdAndIsDeletedFalse(savedFactory.getId()).orElse(null);
+        Factory deleted = factoryRepository.findByIdAndDeletedIsFalse(savedFactory.getId()).orElse(null);
         assertThat(deleted).isNull();
     }
 
@@ -131,10 +134,10 @@ class FactoryUseCaseTest {
         FactoryQuery query = new FactoryQuery();
         query.setPage(0);
         query.setPageSize(20);
-        query.setStatus(FactoryStatus.ACTIVE);
+        query.setCooperationStatus(CooperationStatus.ACTIVE);
 
         var result = factoryUseCase.pageQuery(query);
 
-        assertThat(result.getContent()).allMatch(f -> f.getStatus() == FactoryStatus.ACTIVE);
+        assertThat(result.getContent()).allMatch(f -> f.getCooperationStatus() == CooperationStatus.ACTIVE);
     }
 }
