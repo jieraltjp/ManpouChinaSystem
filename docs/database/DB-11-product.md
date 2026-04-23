@@ -140,9 +140,9 @@ CREATE TABLE product_factory (
     -- 索引与约束
     UNIQUE KEY uk_product_factory (product_id, factory_id),
     INDEX idx_product_id (product_id),
-    INDEX idx_factory_id (factory_id)
-
-    -- 注：外键约束（fk_pf_product / fk_pf_factory）在 DB 中不存在，由 JPA 逻辑外键维护
+    INDEX idx_factory_id (factory_id),
+    CONSTRAINT fk_pf_product FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE,
+    CONSTRAINT fk_pf_factory FOREIGN KEY (factory_id) REFERENCES factory(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品-工厂多对多关联';
 ```
 

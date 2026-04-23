@@ -1,8 +1,9 @@
 # 页面规格 — 订单总览（核心视图）
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
-> **路由**: `/procurement/overview`
+> **更新**: 2026-04-23（v1.1.0：路由修正 /procurement/overview → /base/overview）
+> **路由**: `/base/overview`
 > **组件**: `OrderOverviewPage.vue`
 > **对应后端**: `GET /api/v1/orders/{id}/overview` 聚合接口
 > **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B09-订单总览-API设计.md`

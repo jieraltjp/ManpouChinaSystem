@@ -70,7 +70,7 @@ public class RouteConfig {
                     .circuitBreaker(c -> c.setName("allinoneCustoms").setFallbackUri("forward:/fallback")))
                 .uri(allinoneServiceUri))
             // 物流管理 → allinone
-            .route("allinone-logistics", r -> r.path("/api/v1/logistics/**")
+            .route("allinone-logistics", r -> r.path("/api/v1/logistics-plans/**")
                 .filters(f -> f.stripPrefix(0)
                     .circuitBreaker(c -> c.setName("allinoneLogistics").setFallbackUri("forward:/fallback")))
                 .uri(allinoneServiceUri))
