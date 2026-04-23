@@ -2,6 +2,10 @@ package com.manpou.common.config;
 
 import com.alibaba.cloud.nacos.NacosConfigManager;
 import com.alibaba.nacos.api.config.listener.Listener;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -39,11 +43,12 @@ import java.util.concurrent.Executor;
  *   <li>本地缓存：避免每次 get() 都访问 Nacos Server</li>
  * </ul>
  *
- * <p>TODO（Phase B）：</p>
+ * <p>已完成（Phase B）：</p>
  * <ul>
- *   <li>接入 NacosConfigManager#getConfigService()</li>
- *   <li>实现 getConfigAndSignListener() 监听变更</li>
- *   <li>单元测试（mock Nacos Server）</li>
+ *   <li>✓ 接入 NacosConfigManager#getConfigService()</li>
+ *   <li>✓ 配置变更监听（addListener + receiveConfigInfo）</li>
+ *   <li>✓ Jackson YAML/JSON 双格式解析（extractValue）</li>
+ *   <li>□ 单元测试（mock Nacos Server）</li>
  * </ul>
  */
 public class NacosConfigSource implements ConfigSource {
@@ -52,12 +57,16 @@ public class NacosConfigSource implements ConfigSource {
 
     private final Environment env;
     private final NacosConfigManager nacosManager;
+    private final ObjectMapper yamlMapper;
+    private final ObjectMapper jsonMapper;
 
     private final ConcurrentHashMap<String, String> localCache = new ConcurrentHashMap<>();
 
     public NacosConfigSource(Environment env, NacosConfigManager nacosManager) {
         this.env = env;
         this.nacosManager = nacosManager;
+        this.yamlMapper = new ObjectMapper(new YAMLFactory());
+        this.jsonMapper = new ObjectMapper();
     }
 
     @Override
@@ -93,10 +102,12 @@ public class NacosConfigSource implements ConfigSource {
 
                         @Override
                         public void receiveConfigInfo(String configInfo) {
-                            // 解析 configInfo（JSON/YAML）并匹配 key
-                            // TODO: 实现配置解析和 key 匹配
                             log.info("[NacosConfigSource] 收到配置变更: dataId={}, group={}", dataId, group);
-                            listener.onChange(key, extractValue(configInfo, key));
+                            String value = extractValue(configInfo, key);
+                            if (value != null) {
+                                localCache.put(key, value);
+                            }
+                            listener.onChange(key, value);
                         }
                     }
             );
@@ -113,11 +124,36 @@ public class NacosConfigSource implements ConfigSource {
 
     /**
      * 从配置内容（JSON/YAML）中提取指定 key 的值。
-     * TODO: 替换为 SnakeYAML 或 Jackson 解析
+     * 支持嵌套 key 如 server.address、datasource.pool.maxSize。
+     * 格式自动检测：内容以 { 或 [ 开头按 JSON 解析，其余按 YAML 解析。
      */
     private String extractValue(String content, String key) {
-        // 临时实现：简单 key=value 行解析
-        if (content == null) return null;
+        if (content == null || content.isBlank()) return null;
+
+        String trimmed = content.trim();
+        try {
+            ObjectMapper mapper = (trimmed.startsWith("{") || trimmed.startsWith("["))
+                    ? jsonMapper : yamlMapper;
+            JsonNode root = mapper.readTree(trimmed);
+            return findValue(root, key);
+        } catch (JsonProcessingException e) {
+            log.debug("[NacosConfigSource] 解析失败，回退到 flat 格式: key={}", key);
+            return extractFlatValue(content, key);
+        }
+    }
+
+    private String findValue(JsonNode node, String key) {
+        String[] parts = key.split("\\.");
+        JsonNode current = node;
+        for (String part : parts) {
+            if (current == null || !current.isContainerNode()) return null;
+            current = current.path(part);
+        }
+        if (current.isMissingNode() || current.isNull()) return null;
+        return current.isScalar() ? current.asText() : current.toString();
+    }
+
+    private String extractFlatValue(String content, String key) {
         for (String line : content.split("\n")) {
             int eq = line.indexOf('=');
             if (eq > 0 && line.substring(0, eq).trim().equals(key)) {

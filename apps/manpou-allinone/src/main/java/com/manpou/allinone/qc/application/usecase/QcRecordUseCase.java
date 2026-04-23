@@ -1,9 +1,7 @@
 package com.manpou.allinone.qc.application.usecase;
 
 import com.manpou.allinone.common.exception.BusinessException;
-import com.manpou.allinone.factory.domain.model.Factory;
-import com.manpou.allinone.factory.domain.repository.FactoryRepository;
-import com.manpou.allinone.procurement.domain.model.Procurement;
+import com.manpou.allinone.common.port.FactoryQueryPort;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import com.manpou.allinone.qc.application.assembler.QcRecordAssembler;
 import com.manpou.allinone.qc.application.dto.QcRecordCreateCmd;
@@ -30,7 +28,7 @@ public class QcRecordUseCase {
     private final QcRecordRepository qcRecordRepository;
     private final QcRecordAssembler qcRecordAssembler;
     private final ProcurementRepository procurementRepository;
-    private final FactoryRepository factoryRepository;
+    private final FactoryQueryPort factoryQueryPort;
 
     @Transactional(readOnly = true)
     public Page<QcRecordPageQuery> pageQuery(QcRecordQuery query) {
@@ -69,8 +67,8 @@ public class QcRecordUseCase {
             procurementRepository.findByIdAndDeletedIsFalse(cmd.getProcurementId())
                     .ifPresent(procurement -> {
                         if (procurement.getFactoryId() != null) {
-                            factoryRepository.findByIdAndDeletedIsFalse(procurement.getFactoryId())
-                                    .map(Factory::getFactoryName)
+                            factoryQueryPort.findByIdAndDeletedIsFalse(procurement.getFactoryId())
+                                    .map(f -> f.getFactoryName())
                                     .filter(name -> !name.isBlank())
                                     .ifPresent(cmd::setSellerName);
                         }

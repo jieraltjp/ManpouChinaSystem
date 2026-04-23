@@ -1,0 +1,662 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.manpou:manpou-allinone >---------------------
+[INFO] Building manpou-allinone 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] Parameter 'gitSearchRepo' is unknown for plugin 'git-commit-id-maven-plugin:8.0.2:revision (default)'
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ manpou-allinone ---
+[INFO] Deleting D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\target
+[INFO] 
+[INFO] --- flatten:1.6.0:clean (flatten.clean) @ manpou-allinone ---
+[INFO] Deleting D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\.flattened-pom.xml
+[INFO] 
+[INFO] --- flatten:1.6.0:flatten (flatten) @ manpou-allinone ---
+[INFO] Generating flattened POM of project com.manpou:manpou-allinone:jar:1.0.0-SNAPSHOT...
+[INFO] 
+[INFO] --- git-commit-id:8.0.2:revision (default) @ manpou-allinone ---
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ manpou-allinone ---
+[INFO] Copying 32 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ manpou-allinone ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 216 source files with javac [forked debug target 17] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] ��^ -source 17 ��N?�u�n?��?�I�ʒu
+  �s?�u�n?��?�I�ʒu�\��?�v?�����ٖ@�� JDK 17 ��?�s
+    ��?�g�p --release 17 ���s�� -source 17 -target 17�C��?���??�u�n?��?�I�ʒu
+D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\product\domain\repository\ProductRepository.java:[31,18] ??: �ߍݐڌ� ProductRepository����?�����@ findByMasterCodeAndDeletedIsFalse(String)
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\product\infrastructure\persistence\jpa\ProductJpaRepository.java:[35,18] ??: �ߍݐڌ� ProductJpaRepository����?�����@ findByMasterCodeAndDeletedIsFalse(String)
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\result\Result.java:[51,21] ??: �Q�s������
+  ����:   ���@ <T>builder()
+  �ʒu: ? Result
+  ����, T��?�^?��:
+    T?�W�ߍݕ��@ <T>ok()�������IObject
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\result\Result.java:[55,21] ??: �Q�s������
+  ����:   ���@ <T>builder()
+  �ʒu: ? Result
+  ����, T��?�^?��:
+    T?�W�ߍݕ��@ <T>ok(T)�������IObject
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\result\Result.java:[59,21] ??: �Q�s������
+  ����:   ���@ <T>builder()
+  �ʒu: ? Result
+  ����, T��?�^?��:
+    T?�W�ߍݕ��@ <T>ok(String,T)�������IObject
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\result\Result.java:[63,21] ??: �Q�s������
+  ����:   ���@ <T>builder()
+  �ʒu: ? Result
+  ����, T��?�^?��:
+    T?�W�ߍݕ��@ <T>fail(String,String)�������IObject
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\result\Result.java:[67,21] ??: �Q�s������
+  ����:   ���@ <T>builder()
+  �ʒu: ? Result
+  ����, T��?�^?��:
+    T?�W�ߍݕ��@ <T>fail(String,String,String)�������IObject
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[60,16] ??: �Q�s������
+  ����:   ?�� log
+  �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[61,16] ??: �Q�s������
+  ����:   ?�� log
+  �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[92,16] ??: �Q�s������
+  ����:   ?�� log
+  �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[95,16] ??: �Q�s������
+  ����:   ?�� log
+  �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[101,8] ??: �Q�s������
+  ����:   ?�� log
+  �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[107,8] ??: �Q�s������
+  ����:   ?�� log
+  �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[112,8] ??: �Q�s������
+  ����:   ?�� log
+  �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[65,64] ??: �Q�s������
+  ����:   ���@ getKid()
+  �ʒu: ?�^?SigningKey�I?�� key
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[77,14] ??: �Q�s������
+  ����:   ���@ setKid(String)
+  �ʒu: ?�^?SigningKey�I?�� newKey
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[78,14] ??: �Q�s������
+  ����:   ���@ setPublicKeyPem(String)
+  �ʒu: ?�^?SigningKey�I?�� newKey
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[79,14] ??: �Q�s������
+  ����:   ���@ setPrivateKeyPath(String)
+  �ʒu: ?�^?SigningKey�I?�� newKey
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[81,14] ??: �Q�s������
+  ����:   ���@ setCreateTime(LocalDateTime)
+  �ʒu: ?�^?SigningKey�I?�� newKey
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[87,48] ??: �Q�s������
+  ����:   ���@ getKid()
+  �ʒu: ?�^?SigningKey�I?�� saved
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[88,20] ??: �Q�s������
+  ����:   ���@ getKid()
+  �ʒu: ?�^?SigningKey�I?�� saved
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[97,35] ??: �Q�s������
+  ����:   ���@ getKid()
+  �ʒu: ?�^?SigningKey�I?�� k
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[97,47] ??: �Q�s������
+  ����:   ���@ getStatus()
+  �ʒu: ?�^?SigningKey�I?�� k
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[97,69] ??: �Q�s������
+  ����:   ���@ getCreateTime()
+  �ʒu: ?�^?SigningKey�I?�� k
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[16,31] ??: �Q�s������
+  ����:   ���@ builder()
+  �ʒu: ? CustomsPageQuery
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[17,26] ??: �Q�s������
+  ����:   ���@ getId()
+  �ʒu: ?�^?CustomsExample�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[18,28] ??: �Q�s������
+  ����:   ���@ getName()
+  �ʒu: ?�^?CustomsExample�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[19,30] ??: �Q�s������
+  ����:   ���@ getStatus()
+  �ʒu: ?�^?CustomsExample�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[20,32] ??: �Q�s������
+  ����:   ���@ getCreateBy()
+  �ʒu: ?�^?CustomsExample�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[21,34] ??: �Q�s������
+  ����:   ���@ getCreateTime()
+  �ʒu: ?�^?CustomsExample�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[22,34] ??: �Q�s������
+  ����:   ���@ getUpdateTime()
+  �ʒu: ?�^?CustomsExample�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[28,25] ??: �Q�s������
+  ����:   ���@ getName()
+  �ʒu: ?�^?CustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[33,15] ??: �Q�s������
+  ����:   ���@ getName()
+  �ʒu: ?�^?CustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[33,52] ??: �Q�s������
+  ����:   ���@ getName()
+  �ʒu: ?�^?CustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[34,15] ??: �Q�s������
+  ����:   ���@ getStatus()
+  �ʒu: ?�^?CustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[34,60] ??: �Q�s������
+  ����:   ���@ getStatus()
+  �ʒu: ?�^?CustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[23,15] ??: �Q�s������
+  ����:   ���@ getProcurementId()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[23,71] ??: �Q�s������
+  ����:   ���@ getProcurementId()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[24,15] ??: �Q�s������
+  ����:   ���@ getDomesticCustomsId()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[24,79] ??: �Q�s������
+  ����:   ���@ getDomesticCustomsId()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[25,15] ??: �Q�s������
+  ����:   ���@ getLogisticsPlanId()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[25,75] ??: �Q�s������
+  ����:   ���@ getLogisticsPlanId()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[26,15] ??: �Q�s������
+  ����:   ���@ getArrivalDate()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[26,67] ??: �Q�s������
+  ����:   ���@ getArrivalDate()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[27,15] ??: �Q�s������
+  ����:   ���@ getCustomsBroker()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[27,71] ??: �Q�s������
+  ����:   ���@ getCustomsBroker()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[28,15] ??: �Q�s������
+  ����:   ���@ getBrokerPhone()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[28,67] ??: �Q�s������
+  ����:   ���@ getBrokerPhone()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[29,15] ??: �Q�s������
+  ����:   ���@ getBrokerContact()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[29,71] ??: �Q�s������
+  ����:   ���@ getBrokerContact()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[30,15] ??: �Q�s������
+  ����:   ���@ getArrivalPort()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[30,67] ??: �Q�s������
+  ����:   ���@ getArrivalPort()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[31,15] ??: �Q�s������
+  ����:   ���@ getDeclaredWeightKg()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[31,77] ??: �Q�s������
+  ����:   ���@ getDeclaredWeightKg()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[32,15] ??: �Q�s������
+  ����:   ���@ getDeclaredVolumeCbm()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[32,79] ??: �Q�s������
+  ����:   ���@ getDeclaredVolumeCbm()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[33,15] ??: �Q�s������
+  ����:   ���@ getRemarks()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[33,59] ??: �Q�s������
+  ����:   ���@ getRemarks()
+  �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[37,15] ??: �Q�s������
+  ����:   ���@ getArrivalDate()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[37,67] ??: �Q�s������
+  ����:   ���@ getArrivalDate()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[38,15] ??: �Q�s������
+  ����:   ���@ getCustomsBroker()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[38,71] ??: �Q�s������
+  ����:   ���@ getCustomsBroker()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[39,15] ??: �Q�s������
+  ����:   ���@ getBrokerPhone()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[39,67] ??: �Q�s������
+  ����:   ���@ getBrokerPhone()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[40,15] ??: �Q�s������
+  ����:   ���@ getBrokerContact()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[40,71] ??: �Q�s������
+  ����:   ���@ getBrokerContact()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[41,15] ??: �Q�s������
+  ����:   ���@ getArrivalPort()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[41,67] ??: �Q�s������
+  ����:   ���@ getArrivalPort()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[42,15] ??: �Q�s������
+  ����:   ���@ getDeclaredWeightKg()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[42,77] ??: �Q�s������
+  ����:   ���@ getDeclaredWeightKg()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[43,15] ??: �Q�s������
+  ����:   ���@ getDeclaredVolumeCbm()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[43,79] ??: �Q�s������
+  ����:   ���@ getDeclaredVolumeCbm()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[44,15] ??: �Q�s������
+  ����:   ���@ getRemarks()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[44,59] ??: �Q�s������
+  ����:   ���@ getRemarks()
+  �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[48,36] ??: �Q�s������
+  ����:   ���@ builder()
+  �ʒu: ? JapanCustomsPageQuery
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[49,26] ??: �Q�s������
+  ����:   ���@ getId()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[50,38] ??: �Q�s������
+  ����:   ���@ getCustomsEntryNo()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[51,37] ??: �Q�s������
+  ����:   ���@ getProcurementId()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[52,41] ??: �Q�s������
+  ����:   ���@ getDomesticCustomsId()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[53,39] ??: �Q�s������
+  ����:   ���@ getLogisticsPlanId()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[54,30] ??: �Q�s������
+  ����:   ���@ getStatus()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[54,59] ??: �Q�s������
+  ����:   ���@ getStatus()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[55,35] ??: �Q�s������
+  ����:   ���@ getArrivalDate()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[56,37] ??: �Q�s������
+  ����:   ���@ getCustomsBroker()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[57,35] ??: �Q�s������
+  ����:   ���@ getBrokerPhone()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[58,37] ??: �Q�s������
+  ����:   ���@ getBrokerContact()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[59,38] ??: �Q�s������
+  ����:   ���@ getImportDutyPaid()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[60,42] ??: �Q�s������
+  ����:   ���@ getConsumptionTaxPaid()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[61,37] ??: �Q�s������
+  ����:   ���@ getClearanceDate()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[62,35] ??: �Q�s������
+  ����:   ���@ getArrivalPort()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[63,40] ??: �Q�s������
+  ����:   ���@ getDeclaredWeightKg()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[64,41] ??: �Q�s������
+  ����:   ���@ getDeclaredVolumeCbm()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[65,31] ??: �Q�s������
+  ����:   ���@ getRemarks()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[66,32] ??: �Q�s������
+  ����:   ���@ getCreateBy()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[67,34] ??: �Q�s������
+  ����:   ���@ getCreateTime()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[67,67] ??: �Q�s������
+  ����:   ���@ getCreateTime()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[68,34] ??: �Q�s������
+  ����:   ���@ getUpdateTime()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[68,67] ??: �Q�s������
+  ����:   ���@ getUpdateTime()
+  �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\usecase\CustomsUseCase.java:[39,22] ??: �Q�s������
+  ����:   ���@ getPage()
+  �ʒu: ?�^?CustomsQuery�I?�� query
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\usecase\CustomsUseCase.java:[40,30] ??: �Q�s������
+  ����:   ���@ getPageSize()
+  �ʒu: ?�^?CustomsQuery�I?�� query
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.865 s
+[INFO] Finished at: 2026-04-23T15:21:00+09:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project manpou-allinone: Compilation failure: Compilation failure: 
+[ERROR] ��^ -source 17 ��N?�u�n?��?�I�ʒu
+[ERROR]   �s?�u�n?��?�I�ʒu�\��?�v?�����ٖ@�� JDK 17 ��?�s
+[ERROR]     ��?�g�p --release 17 ���s�� -source 17 -target 17�C��?���??�u�n?��?�I�ʒu
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\product\domain\repository\ProductRepository.java:[31,18] ??: �ߍݐڌ� ProductRepository����?�����@ findByMasterCodeAndDeletedIsFalse(String)
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\product\infrastructure\persistence\jpa\ProductJpaRepository.java:[35,18] ??: �ߍݐڌ� ProductJpaRepository����?�����@ findByMasterCodeAndDeletedIsFalse(String)
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\result\Result.java:[51,21] ??: �Q�s������
+[ERROR]   ����:   ���@ <T>builder()
+[ERROR]   �ʒu: ? Result
+[ERROR]   ����, T��?�^?��:
+[ERROR]     T?�W�ߍݕ��@ <T>ok()�������IObject
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\result\Result.java:[55,21] ??: �Q�s������
+[ERROR]   ����:   ���@ <T>builder()
+[ERROR]   �ʒu: ? Result
+[ERROR]   ����, T��?�^?��:
+[ERROR]     T?�W�ߍݕ��@ <T>ok(T)�������IObject
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\result\Result.java:[59,21] ??: �Q�s������
+[ERROR]   ����:   ���@ <T>builder()
+[ERROR]   �ʒu: ? Result
+[ERROR]   ����, T��?�^?��:
+[ERROR]     T?�W�ߍݕ��@ <T>ok(String,T)�������IObject
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\result\Result.java:[63,21] ??: �Q�s������
+[ERROR]   ����:   ���@ <T>builder()
+[ERROR]   �ʒu: ? Result
+[ERROR]   ����, T��?�^?��:
+[ERROR]     T?�W�ߍݕ��@ <T>fail(String,String)�������IObject
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\result\Result.java:[67,21] ??: �Q�s������
+[ERROR]   ����:   ���@ <T>builder()
+[ERROR]   �ʒu: ? Result
+[ERROR]   ����, T��?�^?��:
+[ERROR]     T?�W�ߍݕ��@ <T>fail(String,String,String)�������IObject
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[60,16] ??: �Q�s������
+[ERROR]   ����:   ?�� log
+[ERROR]   �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[61,16] ??: �Q�s������
+[ERROR]   ����:   ?�� log
+[ERROR]   �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[92,16] ??: �Q�s������
+[ERROR]   ����:   ?�� log
+[ERROR]   �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[95,16] ??: �Q�s������
+[ERROR]   ����:   ?�� log
+[ERROR]   �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[101,8] ??: �Q�s������
+[ERROR]   ����:   ?�� log
+[ERROR]   �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[107,8] ??: �Q�s������
+[ERROR]   ����:   ?�� log
+[ERROR]   �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\common\filter\TraceFilter.java:[112,8] ??: �Q�s������
+[ERROR]   ����:   ?�� log
+[ERROR]   �ʒu: ? TraceFilter
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[65,64] ??: �Q�s������
+[ERROR]   ����:   ���@ getKid()
+[ERROR]   �ʒu: ?�^?SigningKey�I?�� key
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[77,14] ??: �Q�s������
+[ERROR]   ����:   ���@ setKid(String)
+[ERROR]   �ʒu: ?�^?SigningKey�I?�� newKey
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[78,14] ??: �Q�s������
+[ERROR]   ����:   ���@ setPublicKeyPem(String)
+[ERROR]   �ʒu: ?�^?SigningKey�I?�� newKey
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[79,14] ??: �Q�s������
+[ERROR]   ����:   ���@ setPrivateKeyPath(String)
+[ERROR]   �ʒu: ?�^?SigningKey�I?�� newKey
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[81,14] ??: �Q�s������
+[ERROR]   ����:   ���@ setCreateTime(LocalDateTime)
+[ERROR]   �ʒu: ?�^?SigningKey�I?�� newKey
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[87,48] ??: �Q�s������
+[ERROR]   ����:   ���@ getKid()
+[ERROR]   �ʒu: ?�^?SigningKey�I?�� saved
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[88,20] ??: �Q�s������
+[ERROR]   ����:   ���@ getKid()
+[ERROR]   �ʒu: ?�^?SigningKey�I?�� saved
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[97,35] ??: �Q�s������
+[ERROR]   ����:   ���@ getKid()
+[ERROR]   �ʒu: ?�^?SigningKey�I?�� k
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[97,47] ??: �Q�s������
+[ERROR]   ����:   ���@ getStatus()
+[ERROR]   �ʒu: ?�^?SigningKey�I?�� k
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\KeyManagementService.java:[97,69] ??: �Q�s������
+[ERROR]   ����:   ���@ getCreateTime()
+[ERROR]   �ʒu: ?�^?SigningKey�I?�� k
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[16,31] ??: �Q�s������
+[ERROR]   ����:   ���@ builder()
+[ERROR]   �ʒu: ? CustomsPageQuery
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[17,26] ??: �Q�s������
+[ERROR]   ����:   ���@ getId()
+[ERROR]   �ʒu: ?�^?CustomsExample�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[18,28] ??: �Q�s������
+[ERROR]   ����:   ���@ getName()
+[ERROR]   �ʒu: ?�^?CustomsExample�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[19,30] ??: �Q�s������
+[ERROR]   ����:   ���@ getStatus()
+[ERROR]   �ʒu: ?�^?CustomsExample�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[20,32] ??: �Q�s������
+[ERROR]   ����:   ���@ getCreateBy()
+[ERROR]   �ʒu: ?�^?CustomsExample�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[21,34] ??: �Q�s������
+[ERROR]   ����:   ���@ getCreateTime()
+[ERROR]   �ʒu: ?�^?CustomsExample�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[22,34] ??: �Q�s������
+[ERROR]   ����:   ���@ getUpdateTime()
+[ERROR]   �ʒu: ?�^?CustomsExample�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[28,25] ??: �Q�s������
+[ERROR]   ����:   ���@ getName()
+[ERROR]   �ʒu: ?�^?CustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[33,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getName()
+[ERROR]   �ʒu: ?�^?CustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[33,52] ??: �Q�s������
+[ERROR]   ����:   ���@ getName()
+[ERROR]   �ʒu: ?�^?CustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[34,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getStatus()
+[ERROR]   �ʒu: ?�^?CustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\CustomsAssembler.java:[34,60] ??: �Q�s������
+[ERROR]   ����:   ���@ getStatus()
+[ERROR]   �ʒu: ?�^?CustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[23,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getProcurementId()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[23,71] ??: �Q�s������
+[ERROR]   ����:   ���@ getProcurementId()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[24,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getDomesticCustomsId()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[24,79] ??: �Q�s������
+[ERROR]   ����:   ���@ getDomesticCustomsId()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[25,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getLogisticsPlanId()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[25,75] ??: �Q�s������
+[ERROR]   ����:   ���@ getLogisticsPlanId()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[26,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getArrivalDate()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[26,67] ??: �Q�s������
+[ERROR]   ����:   ���@ getArrivalDate()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[27,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getCustomsBroker()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[27,71] ??: �Q�s������
+[ERROR]   ����:   ���@ getCustomsBroker()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[28,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getBrokerPhone()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[28,67] ??: �Q�s������
+[ERROR]   ����:   ���@ getBrokerPhone()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[29,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getBrokerContact()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[29,71] ??: �Q�s������
+[ERROR]   ����:   ���@ getBrokerContact()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[30,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getArrivalPort()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[30,67] ??: �Q�s������
+[ERROR]   ����:   ���@ getArrivalPort()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[31,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getDeclaredWeightKg()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[31,77] ??: �Q�s������
+[ERROR]   ����:   ���@ getDeclaredWeightKg()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[32,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getDeclaredVolumeCbm()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[32,79] ??: �Q�s������
+[ERROR]   ����:   ���@ getDeclaredVolumeCbm()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[33,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getRemarks()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[33,59] ??: �Q�s������
+[ERROR]   ����:   ���@ getRemarks()
+[ERROR]   �ʒu: ?�^?JapanCustomsCreateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[37,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getArrivalDate()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[37,67] ??: �Q�s������
+[ERROR]   ����:   ���@ getArrivalDate()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[38,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getCustomsBroker()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[38,71] ??: �Q�s������
+[ERROR]   ����:   ���@ getCustomsBroker()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[39,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getBrokerPhone()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[39,67] ??: �Q�s������
+[ERROR]   ����:   ���@ getBrokerPhone()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[40,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getBrokerContact()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[40,71] ??: �Q�s������
+[ERROR]   ����:   ���@ getBrokerContact()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[41,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getArrivalPort()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[41,67] ??: �Q�s������
+[ERROR]   ����:   ���@ getArrivalPort()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[42,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getDeclaredWeightKg()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[42,77] ??: �Q�s������
+[ERROR]   ����:   ���@ getDeclaredWeightKg()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[43,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getDeclaredVolumeCbm()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[43,79] ??: �Q�s������
+[ERROR]   ����:   ���@ getDeclaredVolumeCbm()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[44,15] ??: �Q�s������
+[ERROR]   ����:   ���@ getRemarks()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[44,59] ??: �Q�s������
+[ERROR]   ����:   ���@ getRemarks()
+[ERROR]   �ʒu: ?�^?JapanCustomsUpdateCmd�I?�� cmd
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[48,36] ??: �Q�s������
+[ERROR]   ����:   ���@ builder()
+[ERROR]   �ʒu: ? JapanCustomsPageQuery
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[49,26] ??: �Q�s������
+[ERROR]   ����:   ���@ getId()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[50,38] ??: �Q�s������
+[ERROR]   ����:   ���@ getCustomsEntryNo()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[51,37] ??: �Q�s������
+[ERROR]   ����:   ���@ getProcurementId()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[52,41] ??: �Q�s������
+[ERROR]   ����:   ���@ getDomesticCustomsId()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[53,39] ??: �Q�s������
+[ERROR]   ����:   ���@ getLogisticsPlanId()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[54,30] ??: �Q�s������
+[ERROR]   ����:   ���@ getStatus()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[54,59] ??: �Q�s������
+[ERROR]   ����:   ���@ getStatus()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[55,35] ??: �Q�s������
+[ERROR]   ����:   ���@ getArrivalDate()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[56,37] ??: �Q�s������
+[ERROR]   ����:   ���@ getCustomsBroker()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[57,35] ??: �Q�s������
+[ERROR]   ����:   ���@ getBrokerPhone()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[58,37] ??: �Q�s������
+[ERROR]   ����:   ���@ getBrokerContact()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[59,38] ??: �Q�s������
+[ERROR]   ����:   ���@ getImportDutyPaid()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[60,42] ??: �Q�s������
+[ERROR]   ����:   ���@ getConsumptionTaxPaid()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[61,37] ??: �Q�s������
+[ERROR]   ����:   ���@ getClearanceDate()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[62,35] ??: �Q�s������
+[ERROR]   ����:   ���@ getArrivalPort()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[63,40] ??: �Q�s������
+[ERROR]   ����:   ���@ getDeclaredWeightKg()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[64,41] ??: �Q�s������
+[ERROR]   ����:   ���@ getDeclaredVolumeCbm()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[65,31] ??: �Q�s������
+[ERROR]   ����:   ���@ getRemarks()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[66,32] ??: �Q�s������
+[ERROR]   ����:   ���@ getCreateBy()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[67,34] ??: �Q�s������
+[ERROR]   ����:   ���@ getCreateTime()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[67,67] ??: �Q�s������
+[ERROR]   ����:   ���@ getCreateTime()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[68,34] ??: �Q�s������
+[ERROR]   ����:   ���@ getUpdateTime()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\assembler\JapanCustomsAssembler.java:[68,67] ??: �Q�s������
+[ERROR]   ����:   ���@ getUpdateTime()
+[ERROR]   �ʒu: ?�^?JapanCustomsRecord�I?�� entity
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\usecase\CustomsUseCase.java:[39,22] ??: �Q�s������
+[ERROR]   ����:   ���@ getPage()
+[ERROR]   �ʒu: ?�^?CustomsQuery�I?�� query
+[ERROR] D:\Programme\java\ManpouChinaSystem\apps\manpou-allinone\src\main\java\com\manpou\allinone\customs\application\usecase\CustomsUseCase.java:[40,30] ??: �Q�s������
+[ERROR]   ����:   ���@ getPageSize()
+[ERROR]   �ʒu: ?�^?CustomsQuery�I?�� query
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

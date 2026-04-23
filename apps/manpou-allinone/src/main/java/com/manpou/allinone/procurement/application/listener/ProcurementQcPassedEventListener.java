@@ -1,14 +1,12 @@
 package com.manpou.allinone.procurement.application.listener;
 
-import com.manpou.allinone.product.domain.model.Product;
-import com.manpou.allinone.product.domain.repository.ProductRepository;
+import com.manpou.allinone.common.port.ProductQueryPort;
+import com.manpou.allinone.common.port.QcQueryPort;
 import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.model.ShipmentStatus;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import com.manpou.allinone.qc.domain.event.QcRecordCompletedEvent;
 import com.manpou.allinone.qc.domain.model.QcRecord;
-import com.manpou.allinone.qc.domain.model.QcType;
-import com.manpou.allinone.qc.domain.repository.QcRecordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,8 +32,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class ProcurementQcPassedEventListener {
 
     private final ProcurementRepository procurementRepository;
-    private final ProductRepository productRepository;
-    private final QcRecordRepository qcRecordRepository;
+    private final ProductQueryPort productQueryPort;
+    private final QcQueryPort qcQueryPort;
 
     @TransactionalEventListener(phase = org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT)
     public void onQcPassed(QcRecordCompletedEvent evt) {
@@ -47,8 +45,7 @@ public class ProcurementQcPassedEventListener {
             return;
         }
         try {
-            // 查询真实 QcRecord 获取 qcType（空运推荐的关键依据）
-            QcRecord qcRecord = qcRecordRepository.findByIdAndDeletedIsFalse(evt.getQcRecordId()).orElse(null);
+            QcRecord qcRecord = qcQueryPort.findById(evt.getQcRecordId()).orElse(null);
             if (qcRecord == null) {
                 log.warn("[Procurement] QC record not found for event, qcId={}", evt.getQcRecordId());
                 return;
@@ -62,16 +59,12 @@ public class ProcurementQcPassedEventListener {
                 return;
             }
             ShipmentStatus current = procurement.getStatus();
-            // 仅当处于検品或現地検品时才推进（防止重复推进）
             if (current != ShipmentStatus.検品 && current != ShipmentStatus.現地検品) {
                 log.info("[Procurement] QC passed but procurement status={} not in [検品,現地検品], skip, procurementId={}",
                         current, evt.getProcurementId());
                 return;
             }
-            // 拉取 Product 尺寸用于空运判定
-            Product product = productRepository
-                    .findByMasterCodeAndDeletedIsFalse(evt.getProductCode())
-                    .orElse(null);
+            var product = productQueryPort.findByMasterCode(evt.getProductCode()).orElse(null);
             ShipmentStatus suggested = procurement.suggestNextStatus(qcRecord, product);
             procurement.updateStatus(suggested);
             procurementRepository.save(procurement);

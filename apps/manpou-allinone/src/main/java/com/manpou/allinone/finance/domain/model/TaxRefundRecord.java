@@ -1,7 +1,7 @@
 package com.manpou.allinone.finance.domain.model;
 
 import com.manpou.allinone.domain.model.BaseEntity;
-import com.manpou.allinone.procurement.domain.model.BillingType;
+import com.manpou.allinone.common.enums.BillingType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

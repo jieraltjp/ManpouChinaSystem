@@ -334,7 +334,22 @@
       "Bash(ls /codegen)",
       "Read(//d/Programme/**)",
       "Read(//d/Programme/java/**)",
-      "Bash(echo \"EXIT_CODE:$?\")"
+      "Bash(echo \"EXIT_CODE:$?\")",
+      "Bash(ls target/classes/com/manpou/allinone/common/result/)",
+      "Bash(ls target/maven-status/)",
+      "Bash(dir /a \"D:\\\\Programme\\\\java\\\\ManpouChinaSystem\\\\apps\\\\java-service\")",
+      "Bash(./mvnw -f libs/manpou-common/pom.xml compile -q)",
+      "Bash(mvn -f libs/manpou-common/pom.xml compile -q)",
+      "Bash(xmllint --noout apps/java-service/pom.xml)",
+      "Bash(mvn dependency:build-classpath -DincludeScope=compile -Dmdep.outputFile=cp.txt)",
+      "Bash(rm -rf /tmp/test_compile)",
+      "Bash(mkdir -p /tmp/test_compile)",
+      "Bash(javac -proc:only -processor lombok.launch.AnnotationProcessorHider -cp ~/.m2/repository/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar src/main/java/com/manpou/allinone/common/result/Result.java)",
+      "WebFetch(domain:www.jb51.net)",
+      "Bash(mvn *)",
+      "Bash(\"C:/Program Files/Eclipse Adoptium/jdk-21.0.10.7-hotspot/bin/javap.exe\" -p D:/Programme/java/ManpouChinaSystem/apps/user-service/target/classes/com/manpou/user/domain/model/BaseEntity.class)",
+      "Bash(mv src/main/java/com/manpou/allinone/customs src/main/java/com/manpou/allinone/customs.bak)",
+      "Bash(mv src/main/java/com/manpou/allinone/logistics src/main/java/com/manpou/allinone/logistics.bak)"
     ]
   }
 }

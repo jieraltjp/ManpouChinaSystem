@@ -1,7 +1,6 @@
 package com.manpou.allinone.product.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.manpou.allinone.factory.domain.model.CooperationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,5 +31,5 @@ public class ProductFactoryVO {
     private String city;
     private String contactName;
     private String contactPhone;
-    private CooperationStatus cooperationStatus;
+    private String cooperationStatus;
 }

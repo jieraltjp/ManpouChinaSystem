@@ -1,6 +1,6 @@
 package com.manpou.allinone.finance.application.dto;
 
-import com.manpou.allinone.procurement.domain.model.BillingType;
+import com.manpou.allinone.common.enums.BillingType;
 import lombok.Data;
 
 import java.math.BigDecimal;

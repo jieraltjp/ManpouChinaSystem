@@ -2,6 +2,7 @@ package com.manpou.allinone.factory.application.usecase;
 
 import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.common.filter.TraceFilter;
+import com.manpou.allinone.common.port.ProcurementPort;
 import com.manpou.allinone.factory.application.assembler.FactoryAssembler;
 import com.manpou.allinone.factory.application.dto.FactoryCreateCmd;
 import com.manpou.allinone.factory.application.dto.FactoryPageQuery;
@@ -9,7 +10,6 @@ import com.manpou.allinone.factory.application.dto.FactoryQuery;
 import com.manpou.allinone.factory.application.dto.FactoryUpdateCmd;
 import com.manpou.allinone.factory.domain.model.Factory;
 import com.manpou.allinone.factory.domain.repository.FactoryRepository;
-import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FactoryUseCase {
 
     private final FactoryRepository factoryRepository;
-    private final ProcurementRepository procurementRepository;
+    private final ProcurementPort procurementPort;
     private final FactoryAssembler assembler;
 
     @Transactional(readOnly = true)
@@ -82,7 +82,7 @@ public class FactoryUseCase {
                 .orElseThrow(() -> BusinessException.notFound("Factory", id));
 
         // 校验无未终态发注单关联
-        if (procurementRepository.existsActiveByFactoryId(id)) {
+        if (procurementPort.existsActiveByFactoryId(id)) {
             throw BusinessException.invalidParam("该工厂存在未终态发注单，无法删除");
         }
 

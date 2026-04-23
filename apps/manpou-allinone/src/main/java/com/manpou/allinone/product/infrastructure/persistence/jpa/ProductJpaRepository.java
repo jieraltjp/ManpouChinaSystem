@@ -32,8 +32,6 @@ public interface ProductJpaRepository extends ProductRepository, JpaRepository<P
     @Query("SELECT p FROM Product p WHERE p.hsCode = :hsCode AND p.deleted = false")
     Page<Product> findByHsCodeAndDeletedIsFalse(@Param("hsCode") String hsCode, Pageable pageable);
 
-    List<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
-
     /** 主货号模糊搜索（去重），用于自动补全 */
     @Query("SELECT DISTINCT p.masterCode FROM Product p WHERE p.masterCode LIKE %:kw% AND p.deleted = false")
     List<String> findDistinctMasterCodeByKeyword(@Param("kw") String keyword);

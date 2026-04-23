@@ -61,7 +61,6 @@ public final class ConfigSourceFactory {
      * @param source 配置源类型：properties / local / nacos
      * @return 对应的 ConfigSource 实现
      */
-    @SuppressWarnings("deprecation")
     public static ConfigSource create(Environment env, String source) {
         return switch (source.toLowerCase()) {
             case "local" -> {

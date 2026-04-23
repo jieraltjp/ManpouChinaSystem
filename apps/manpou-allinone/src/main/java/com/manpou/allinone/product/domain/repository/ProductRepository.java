@@ -28,7 +28,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findByHsCodeAndDeletedIsFalse(String hsCode, Pageable pageable);
 
-    List<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
+    List<Product> findAllByMasterCodeAndDeletedIsFalse(String masterCode);
 
     List<String> findDistinctMasterCodeByKeyword(String keyword);
 

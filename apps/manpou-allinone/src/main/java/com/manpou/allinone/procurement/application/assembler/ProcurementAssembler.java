@@ -1,7 +1,6 @@
 package com.manpou.allinone.procurement.application.assembler;
 
-import com.manpou.allinone.factory.domain.model.Factory;
-import com.manpou.allinone.factory.domain.repository.FactoryRepository;
+import com.manpou.allinone.common.port.FactoryQueryPort;
 import com.manpou.allinone.procurement.application.dto.ProcurementCreateCmd;
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
 import com.manpou.allinone.procurement.application.dto.ProcurementUpdateCmd;
@@ -15,18 +14,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcurementAssembler {
 
-    private final FactoryRepository factoryRepository;
+    private final FactoryQueryPort factoryQueryPort;
 
-    public ProcurementAssembler(FactoryRepository factoryRepository) {
-        this.factoryRepository = factoryRepository;
+    public ProcurementAssembler(FactoryQueryPort factoryQueryPort) {
+        this.factoryQueryPort = factoryQueryPort;
     }
 
     public ProcurementPageQuery toDto(Procurement entity) {
         String factoryName = null;
         if (entity.getFactoryId() != null) {
-            factoryName = factoryRepository
+            factoryName = factoryQueryPort
                     .findByIdAndDeletedIsFalse(entity.getFactoryId())
-                    .map(Factory::getFactoryName)
+                    .map(f -> f.getFactoryName())
                     .orElse(null);
         }
         return ProcurementPageQuery.builder()

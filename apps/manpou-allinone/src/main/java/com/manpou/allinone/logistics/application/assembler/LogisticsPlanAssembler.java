@@ -1,7 +1,6 @@
 package com.manpou.allinone.logistics.application.assembler;
 
-import com.manpou.allinone.factory.domain.model.Factory;
-import com.manpou.allinone.factory.domain.repository.FactoryRepository;
+import com.manpou.allinone.common.port.FactoryQueryPort;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanCreateCmd;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanPageQuery;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanUpdateCmd;
@@ -15,10 +14,10 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public class LogisticsPlanAssembler {
 
-    private final FactoryRepository factoryRepository;
+    private final FactoryQueryPort factoryQueryPort;
 
-    public LogisticsPlanAssembler(FactoryRepository factoryRepository) {
-        this.factoryRepository = factoryRepository;
+    public LogisticsPlanAssembler(FactoryQueryPort factoryQueryPort) {
+        this.factoryQueryPort = factoryQueryPort;
     }
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -32,9 +31,9 @@ public class LogisticsPlanAssembler {
     public LogisticsPlanPageQuery toDto(LogisticsPlan entity) {
         String factoryName = null;
         if (entity.getFactoryId() != null) {
-            factoryName = factoryRepository
+            factoryName = factoryQueryPort
                     .findByIdAndDeletedIsFalse(entity.getFactoryId())
-                    .map(Factory::getFactoryName)
+                    .map(f -> f.getFactoryName())
                     .orElse(null);
         }
         return LogisticsPlanPageQuery.builder()
