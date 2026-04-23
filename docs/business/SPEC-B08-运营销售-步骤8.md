@@ -1,8 +1,8 @@
 # 运营销售 — 业务规格（步骤8）
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-23（补充元数据字段）
+> **更新**: 2026-04-23（v1.2.0：实现 JapanCustoms→SalesRecord 自动创建 + SalesRecord→ReplenishmentDemand 反馈循环 + SalesChannel 枚举）
 > **状态**: ✅ 已实现
 > **路由**: `/sales/operations`
 > **对应前端**: `SalesOperationsPage.vue` · `docs/ui/pages/08-sales.md`
@@ -73,11 +73,14 @@ public enum SalesStatus {
     DISCONTINUED   // 已下架（终态）
 }
 
+```java
+// SalesStatus 已在上方定义
+
 public enum SalesChannel {
-    AMAZON,
-    MERCARI,
-   自家サイト,
-    OTHER
+    AMAZON,     // Amazon 销售平台
+    MERCALI,   // メルカリ二手平台
+    SELF_SITE, // 自社サイト自有网站
+    OTHER      // 其他渠道
 }
 ```
 
@@ -179,5 +182,7 @@ DELETE /api/v1/sales-records/{id}                   # 删除（非终态）
 - [x] ✅ `SalesOperationsPage.vue` 页面（`apps/web/src/pages/sales/SalesOperationsPage.vue`）
 - [x] ✅ DB migration `V14__sales_record_table.sql`
 - [x] ✅ 聚合接口 `GET /api/v1/orders/{id}/overview` step8 集成（`OrderOverviewUseCase`）
-- [ ] 🔴 反馈循环：`generate-replenishment` 联动 ReplenishmentDemand（待实现）
+- [x] ✅ `SalesChannel` 枚举（AMAZON / MERCALI / SELF_SITE / OTHER）
+- [x] ✅ JapanCustomsClearedEvent + JapanCustomsClearedEventListener（清关完成→自动创建 SalesRecord）
+- [x] ✅ ReplenishmentDemandNeededEvent + SalesLowStockEventListener（低库存→自动创建 ReplenishmentDemand）
 - [ ] 🔴 第三方销售平台 API 接入（Amazon/メルカリ）
