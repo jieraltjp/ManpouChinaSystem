@@ -1,6 +1,6 @@
 package com.manpou.allinone.infrastructure.security;
 
-import com.manpou.common.result.Result;
+import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.infrastructure.security.JwtService.JwtClaims;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;

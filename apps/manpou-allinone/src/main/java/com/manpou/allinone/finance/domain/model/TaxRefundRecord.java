@@ -1,6 +1,6 @@
 package com.manpou.allinone.finance.domain.model;
 
-import com.manpou.allinone.finance.domain.model.BaseEntity;
+import com.manpou.allinone.domain.model.BaseEntity;
 import com.manpou.allinone.procurement.domain.model.BillingType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -30,10 +30,6 @@ public class TaxRefundRecord extends BaseEntity {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static long SEQ = System.currentTimeMillis() % 1000;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Column(name = "refund_code", length = 32)
     private String refundCode;  // 退税编号（TR-YYYYMMDD-NNN）

@@ -24,6 +24,9 @@ public class ProductCreateCmd {
     @Size(max = 64, message = "子货号最多 64 字符")
     private String subCode;           // 子货号/色号
 
+    @Size(max = 64)
+    private String janCode;          // JANコード
+
     // ===== 多语言名称 =====
     @Size(max = 128)
     private String nameJa;            // 日文名称
@@ -47,11 +50,20 @@ public class ProductCreateCmd {
 
     private ProductCategory category; // OEM / ORDINARY / FACTORY_DIRECT
 
+    @Size(max = 32)
+    private String status;          // 商品区分（通常/予約）
+
     @Size(max = 100)
     private String origin;           // 原产国
 
     @Size(max = 50)
     private String unit;             // 计量单位
+
+    private Integer quantities;       // 数量
+    private Integer cartonQty;        // 箱数
+    private BigDecimal amountRmb;     // 金额(RMB)
+    @Size(max = 255)
+    private String materialJa;        // 材质（日文）
 
     // ===== 单品尺寸 =====
     private BigDecimal lengthCm;
@@ -69,7 +81,10 @@ public class ProductCreateCmd {
 
     // ===== 报关 =====
     @Size(max = 20)
-    private String hsCode;            // HS编码
+    private String hsCode;            // HS编码（中国）
+
+    @Size(max = 20)
+    private String hsCodeJp;          // 日本HS编码（税番）
 
     private String declarationElements; // 申报要素
 

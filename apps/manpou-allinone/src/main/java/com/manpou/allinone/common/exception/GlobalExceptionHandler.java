@@ -1,6 +1,6 @@
 package com.manpou.allinone.common.exception;
 
-import com.manpou.common.result.Result;
+import com.manpou.allinone.common.result.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

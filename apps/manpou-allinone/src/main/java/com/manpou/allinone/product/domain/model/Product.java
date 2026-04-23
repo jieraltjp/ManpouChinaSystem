@@ -1,6 +1,6 @@
 package com.manpou.allinone.product.domain.model;
 
-import com.manpou.allinone.product.domain.model.BaseEntity;
+import com.manpou.allinone.domain.model.BaseEntity;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Column;
@@ -22,6 +22,7 @@ import java.math.RoundingMode;
 @Table(name = "product", indexes = {
         @Index(name = "idx_master_code", columnList = "master_code"),
         @Index(name = "idx_hs_code", columnList = "hs_code"),
+        @Index(name = "idx_hs_code_jp", columnList = "hs_code_jp"),
         @Index(name = "idx_name_zh", columnList = "name_zh"),
         @Index(name = "idx_create_time", columnList = "create_time")
 })
@@ -36,6 +37,9 @@ public class Product extends BaseEntity {
 
     @Column(name = "sub_code", length = 64)
     private String subCode;           // 子货号/色号（如 re=红色，可为空）
+
+    @Column(name = "jan_code", length = 64)
+    private String janCode;          // JANコード（出货单位标记）
 
     // ===== 多语言名称 =====
     @Column(name = "name_ja", length = 128)
@@ -62,11 +66,26 @@ public class Product extends BaseEntity {
     @Column(name = "category", length = 20)
     private ProductCategory category; // OEM / ORDINARY / FACTORY_DIRECT
 
+    @Column(name = "status", length = 32)
+    private String status;           // 商品区分（通常/予約）
+
     @Column(name = "origin", length = 100)
     private String origin;           // 原产国
 
     @Column(name = "unit", length = 50)
     private String unit;              // 计量单位（个/台/套）
+
+    @Column(name = "quantities")
+    private Integer quantities;       // 数量
+
+    @Column(name = "carton_qty")
+    private Integer cartonQty;        // 箱数
+
+    @Column(name = "amount_rmb", precision = 14, scale = 4)
+    private BigDecimal amountRmb;     // 金额(RMB) = 单价 × 数量
+
+    @Column(name = "material_ja", length = 255)
+    private String materialJa;        // 材质（日文）
 
     // ===== 单品尺寸 =====
     @Column(name = "length_cm", precision = 8, scale = 2)
@@ -100,7 +119,10 @@ public class Product extends BaseEntity {
 
     // ===== 报关 =====
     @Column(name = "hs_code", length = 20)
-    private String hsCode;            // HS编码
+    private String hsCode;            // HS编码（中国）
+
+    @Column(name = "hs_code_jp", length = 20)
+    private String hsCodeJp;          // 日本HS编码（税番）
 
     @Column(name = "declaration_elements", columnDefinition = "TEXT")
     private String declarationElements; // 申报要素

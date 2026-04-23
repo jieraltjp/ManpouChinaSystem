@@ -40,7 +40,7 @@ def val(v):
     v = v.strip()
     if v == 'NULL':
         return None
-    return v.strip("'")
+    return v.strip("'").strip()
 
 goods_by_sku = {}
 for ins in inserts:
@@ -50,9 +50,11 @@ for ins in inserts:
             sku = val(parts[1])
             if not sku:
                 continue
-            m = re.match(r'^([a-zA-Z0-9]+)-([a-zA-Z0-9]+)$', sku)
+            # sub_code 存完整SKU（直接存，不拆分）
+            sub_code = sku
+            # master_code: 第一个-前面的部分，无-则=sku
+            m = re.match(r'^([a-zA-Z0-9]+)-', sku)
             master_code = m.group(1) if m else sku
-            sub_code = m.group(2) if m else None
             goods_by_sku[sku] = {
                 'master_code': master_code,
                 'sub_code': sub_code,
@@ -68,7 +70,6 @@ for ins in inserts:
                 'box_qty': val(parts[11]),
                 'origin': val(parts[13]),
                 'factory_name': val(parts[14]),
-                'buyer': val(parts[15]),
             }
     except Exception:
         pass
@@ -91,9 +92,10 @@ for row in db_rows[1:]:
         decl = name_zh + '|' + material_ja
     elif name_zh:
         decl = name_zh
-    m = re.match(r'^([a-zA-Z0-9]+)-([a-zA-Z0-9]+)$', sku)
+    # sub_code 存完整SKU，master_code 取第一个-前的部分
+    m = re.match(r'^([a-zA-Z0-9]+)-', sku)
     master_code = m.group(1) if m else sku
-    sub_code = m.group(2) if m else None
+    sub_code = sku
     db_by_sku[sku] = {
         'master_code': master_code,
         'sub_code': sub_code,
@@ -111,16 +113,15 @@ for row in db_rows[1:]:
         'material_ja': material_ja,
     }
 
-# Build merged records keyed by (master_code, sub_code)
 merged = {}
 for sku, g in goods_by_sku.items():
-    key = (g['master_code'], g['sub_code'])
+    key = g['sub_code']  # sub_code 已经是完整SKU
     if key not in merged:
         merged[key] = {'master_code': g['master_code'], 'sub_code': g['sub_code']}
     merged[key]['goods'] = g
 
 for sku, d in db_by_sku.items():
-    key = (d['master_code'], d['sub_code'])
+    key = d['sub_code']
     if key not in merged:
         merged[key] = {'master_code': d['master_code'], 'sub_code': d['sub_code']}
     merged[key]['db'] = d
@@ -139,26 +140,24 @@ def sql_num(v):
         return 'NULL'
 
 header = [
-    "-- =============================================================",
-    "-- Migration: goods.sql + DB.json -> product",
-    "-- Generated: 2026-04-23",
-    "-- Merge strategy:",
-    "--   hs_code, origin -> goods.sql priority (structured product data)",
-    "--   unit_price, weight, name_en, declaration_elements -> DB.json priority (manifest data)",
-    "-- =============================================================",
-    "",
-    "SET FOREIGN_KEY_CHECKS=0;",
-    "",
-    "-- Step 1: Add temp unique key for upsert by (master_code, sub_code)",
-    "ALTER TABLE `product` ADD UNIQUE INDEX `uk_master_sub` (`master_code`(32), `sub_code`(32));",
-    "",
+    '-- =============================================================',
+    '-- Migration: goods.sql + DB.json -> product',
+    '-- Generated: 2026-04-23',
+    '-- Merge: goods.sql -> hs_code/origin, DB.json -> all others',
+    '-- =============================================================',
+    '',
+    'SET FOREIGN_KEY_CHECKS=0;',
+    '',
+    '-- Step 1: Add temp unique key for upsert',
+    'ALTER TABLE `product` ADD UNIQUE INDEX `uk_master_sub` (`master_code`(32), `sub_code`(32));',
+    '',
 ]
 
 output_lines = []
 output_lines.extend(header)
 count = 0
 
-for key, rec in sorted(merged.items(), key=lambda x: (x[0][0] or '', x[0][1] or '')):
+for key, rec in sorted(merged.items(), key=lambda x: (x[0] or '')):
     master_code = rec['master_code']
     sub_code = rec['sub_code']
     if not master_code:
@@ -213,6 +212,7 @@ for key, rec in sorted(merged.items(), key=lambda x: (x[0][0] or '', x[0][1] or 
         updates.append('material_ja = ' + sql_str(material_ja))
 
     update_clause = ', '.join(updates) if updates else 'master_code = master_code'
+
     sql = (
         "INSERT INTO `product` "
         "(master_code, sub_code, hs_code, name_en, name_zh, name_ja, unit_price_rmb, unit, "
@@ -232,13 +232,13 @@ for key, rec in sorted(merged.items(), key=lambda x: (x[0][0] or '', x[0][1] or 
     output_lines.append(sql)
     count += 1
 
-output_lines.append("")
-output_lines.append("SET FOREIGN_KEY_CHECKS=1;")
-output_lines.append("")
-output_lines.append("-- Step 2: Remove temp unique key")
-output_lines.append("ALTER TABLE `product` DROP INDEX `uk_master_sub`;")
-output_lines.append("")
-output_lines.append("-- Total upsert records: " + str(count))
+output_lines.append('')
+output_lines.append('SET FOREIGN_KEY_CHECKS=1;')
+output_lines.append('')
+output_lines.append('-- Step 2: Remove temp unique key')
+output_lines.append('ALTER TABLE `product` DROP INDEX `uk_master_sub`;')
+output_lines.append('')
+output_lines.append('-- Total upsert records: ' + str(count))
 
 sql_content = '\n'.join(output_lines)
 
@@ -250,13 +250,14 @@ only_g = sum(1 for r in merged.values() if 'goods' in r and 'db' not in r)
 only_d = sum(1 for r in merged.values() if 'db' in r and 'goods' not in r)
 
 stats = (
-    f"goods.sql SKUs: {len(goods_by_sku)}\n"
-    f"DB.json SKUs: {len(db_by_sku)}\n"
-    f"Total merged: {count}\n"
-    f"Overlap (both): {overlap}\n"
-    f"Only goods.sql: {only_g}\n"
-    f"Only DB.json: {only_d}\n"
-)
+    "goods.sql SKUs: {}\n"
+    "DB.json SKUs: {}\n"
+    "Total merged: {}\n"
+    "Overlap (both): {}\n"
+    "Only goods.sql: {}\n"
+    "Only DB.json: {}\n"
+).format(len(goods_by_sku), len(db_by_sku), count, overlap, only_g, only_d)
+
 with open(r'd:/Programme/java/ManpouChinaSystem/docs/database/sql/migration_stats.txt', 'w', encoding='utf-8') as f:
     f.write(stats)
 

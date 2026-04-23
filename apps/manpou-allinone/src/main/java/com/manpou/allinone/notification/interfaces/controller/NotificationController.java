@@ -6,7 +6,7 @@ import com.manpou.allinone.notification.application.dto.NotificationQuery;
 import com.manpou.allinone.notification.application.dto.NotificationUpdateCmd;
 import com.manpou.allinone.notification.application.usecase.NotificationUseCase;
 import com.manpou.allinone.common.annotation.Idempotent;
-import com.manpou.common.result.Result;
+import com.manpou.allinone.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

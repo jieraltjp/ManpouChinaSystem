@@ -27,6 +27,7 @@ public class ProductPageQuery {
     private Long id;
     private String masterCode;
     private String subCode;
+    private String janCode;
 
     // ===== 名称 =====
     private String nameJa;
@@ -40,8 +41,13 @@ public class ProductPageQuery {
     private String colorName;
     private String material;
     private ProductCategory category;
+    private String status;
     private String origin;
     private String unit;
+    private Integer quantities;
+    private Integer cartonQty;
+    private BigDecimal amountRmb;
+    private String materialJa;
 
     // ===== 尺寸 =====
     private BigDecimal lengthCm;
@@ -60,6 +66,7 @@ public class ProductPageQuery {
 
     // ===== 报关 =====
     private String hsCode;
+    private String hsCodeJp;
     private String declarationElements;
 
     // ===== 外箱 =====

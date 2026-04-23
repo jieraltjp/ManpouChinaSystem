@@ -21,6 +21,9 @@ public class ProductUpdateCmd {
     @Length(max = 64)
     private String subCode;
 
+    @Length(max = 64)
+    private String janCode;
+
     @Length(max = 128)
     private String nameJa;
 
@@ -41,6 +44,9 @@ public class ProductUpdateCmd {
 
     private ProductCategory category;
 
+    @Length(max = 32)
+    private String status;
+
     @Length(max = 100)
     private String origin;
 
@@ -60,6 +66,16 @@ public class ProductUpdateCmd {
 
     @Length(max = 20)
     private String hsCode;
+
+    @Length(max = 20)
+    private String hsCodeJp;
+
+    private Integer quantities;
+    private Integer cartonQty;
+    private BigDecimal amountRmb;
+
+    @Length(max = 255)
+    private String materialJa;
 
     private String declarationElements;
 

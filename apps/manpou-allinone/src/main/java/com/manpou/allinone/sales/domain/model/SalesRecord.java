@@ -1,6 +1,6 @@
 package com.manpou.allinone.sales.domain.model;
 
-import com.manpou.common.domain.model.BaseEntity;
+import com.manpou.allinone.domain.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

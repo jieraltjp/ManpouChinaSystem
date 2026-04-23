@@ -1,7 +1,7 @@
 package com.manpou.allinone.logistics.interfaces.controller;
 
 import com.manpou.allinone.common.annotation.Idempotent;
-import com.manpou.common.result.Result;
+import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanCreateCmd;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanPageQuery;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanQuery;

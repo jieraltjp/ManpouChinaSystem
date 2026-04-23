@@ -1,0 +1,28 @@
+-- =============================================================
+-- Migration: V24__product_field_extend.sql
+-- Date: 2026-04-23
+-- Desc: Add jan_code, status, hs_code_jp + fix warehouse/remarks
+-- =============================================================
+-- This is a record of DB changes made directly. Key changes:
+--
+-- 1. Added hs_code_jp column (Japanese HS code / 税番)
+--    Populated via goods_hs_mapping join:
+--    product.id = goods_master.id = goods_hs_mapping.goods_id
+--    Result: 4999 rows, CN HS: 2003, JP HS: 629
+--
+-- 2. Added jan_code column (JANコード from goods_master)
+--    All 4999 rows populated
+--
+-- 3. Added status column (商品区分: 通常/予約 from goods_master)
+--    All 4999 rows populated
+--
+-- 4. Added quantities, carton_qty, amount_rmb, material_ja columns
+--    (Populated from DB.json via gen_migration.py)
+--
+-- 5. Cleared warehouse (was wrongly filled with 取扱区分)
+--    warehouse now NULL for all rows
+--
+-- 6. Cleaned remarks: removed 通常/予約 (4051 rows)
+--    Real remarks preserved (浙鲁, 已改品名, etc. = 15 rows)
+--
+-- 7. Column reorder: see V25__product_column_reorder.sql

@@ -1,6 +1,6 @@
 package com.manpou.allinone.interfaces.controller;
 
-import com.manpou.common.result.Result;
+import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.product.application.KeyManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

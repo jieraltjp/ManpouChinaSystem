@@ -1,4 +1,4 @@
-package com.manpou.allinone.notification.domain.model;
+package com.manpou.allinone.domain.model;
 
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
@@ -20,10 +20,6 @@ import java.time.LocalDateTime;
 /**
  * 所有业务实体的基类。
  * 包含审计字段和逻辑删除标记。
- * 子类必须映射到具体的数据库表。
- *
- * 访问策略：显式 field-access。
- * 所有字段通过 JPA/AuditListener 注入，不对外暴露 setter。
  */
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
@@ -40,25 +36,19 @@ public abstract class BaseEntity {
     private LocalDateTime createTime;
 
     @LastModifiedDate
-    @Column(name = "update_time", nullable = false)
+    @Column(name = "update_time", nullable = false, updatable = false)
     private LocalDateTime updateTime;
 
     @CreatedBy
     @Column(name = "create_by", nullable = false, updatable = false, length = 64)
-    private String createBy;
+    private String createBy = "SYSTEM";
 
     @LastModifiedBy
     @Column(name = "update_by", nullable = false, length = 64)
-    private String updateBy;
+    private String updateBy = "SYSTEM";
 
-    /**
-     * 逻辑删除标记：false=未删除，true=已删除。
-     * 查询时框架自动过滤已删除记录。
-     */
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
-
-    // ===== 领域方法 =====
 
     /** 逻辑删除（不物理删除数据）。 */
     public void markDeleted() {

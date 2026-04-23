@@ -14,7 +14,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <lombok.version>1.18.44</lombok.version>
+        <lombok.version>1.18.46</lombok.version>
         <jackson.version>2.17.0</jackson.version>
         <slf4j.version>2.0.13</slf4j.version>
         <spring-boot.version>3.2.5</spring-boot.version>
@@ -38,6 +38,12 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
+        <!-- Spring Data JPA（供 BaseEntity 审计注解使用） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
         <!-- Spring Boot auto-configuration (for ConfigSourceAutoConfiguration) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -55,13 +61,6 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
             <version>${spring-cloud-alibaba.version}</version>
-        </dependency>
-        <!-- Spring Data JPA（供 BaseEntity 审计注解使用） -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>${spring-boot.version}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

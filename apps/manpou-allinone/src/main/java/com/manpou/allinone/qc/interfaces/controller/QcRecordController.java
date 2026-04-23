@@ -1,6 +1,6 @@
 package com.manpou.allinone.qc.interfaces.controller;
 
-import com.manpou.common.result.Result;
+import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.qc.application.dto.QcRecordCreateCmd;
 import com.manpou.allinone.qc.application.dto.QcRecordPageQuery;
 import com.manpou.allinone.qc.application.dto.QcRecordQuery;

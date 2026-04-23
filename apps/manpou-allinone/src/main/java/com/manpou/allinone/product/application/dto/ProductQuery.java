@@ -9,8 +9,8 @@ import lombok.Data;
 @Data
 public class ProductQuery {
 
-    /** 当前页（从 1 开始） */
-    private Integer page = 1;
+    /** 当前页（从 0 开始，与 Spring Data Page 一致） */
+    private Integer page = 0;
 
     /** 每页条数 */
     private Integer pageSize = 20;

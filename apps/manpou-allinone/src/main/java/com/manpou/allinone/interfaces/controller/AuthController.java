@@ -1,7 +1,7 @@
 package com.manpou.allinone.interfaces.controller;
 
-import com.manpou.common.result.Result;
-import com.manpou.common.security.TokenConstants;
+import com.manpou.allinone.common.result.Result;
+import com.manpou.allinone.common.security.TokenConstants;
 import com.manpou.allinone.infrastructure.security.JwtKeyManager;
 import com.manpou.allinone.infrastructure.security.JwtService;
 import jakarta.validation.Valid;

@@ -1,6 +1,6 @@
 package com.manpou.allinone.factory.domain.model;
 
-import com.manpou.allinone.procurement.domain.model.BaseEntity;
+import com.manpou.allinone.domain.model.BaseEntity;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Column;

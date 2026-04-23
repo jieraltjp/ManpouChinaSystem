@@ -18,6 +18,7 @@ public class ProductAssembler {
                 .id(entity.getId())
                 .masterCode(entity.getMasterCode())
                 .subCode(entity.getSubCode())
+                .janCode(entity.getJanCode())
                 .nameJa(entity.getNameJa())
                 .nameEn(entity.getNameEn())
                 .nameZh(entity.getNameZh())
@@ -25,6 +26,7 @@ public class ProductAssembler {
                 .colorName(entity.getColorName())
                 .material(entity.getMaterial())
                 .category(entity.getCategory())
+                .status(entity.getStatus())
                 .origin(entity.getOrigin())
                 .unit(entity.getUnit())
                 .lengthCm(entity.getLengthCm())
@@ -37,6 +39,11 @@ public class ProductAssembler {
                 .taxPoint(entity.getTaxPoint())
                 .taxRate(entity.getTaxRate())
                 .hsCode(entity.getHsCode())
+                .hsCodeJp(entity.getHsCodeJp())
+                .quantities(entity.getQuantities())
+                .cartonQty(entity.getCartonQty())
+                .amountRmb(entity.getAmountRmb())
+                .materialJa(entity.getMaterialJa())
                 .declarationElements(entity.getDeclarationElements())
                 .unitsPerPackage(entity.getUnitsPerPackage())
                 .packageLengthCm(entity.getPackageLengthCm())
@@ -63,6 +70,7 @@ public class ProductAssembler {
     public void copyToEntity(ProductCreateCmd cmd, Product entity) {
         entity.setMasterCode(cmd.getMasterCode());
         if (cmd.getSubCode() != null) entity.setSubCode(cmd.getSubCode());
+        if (cmd.getJanCode() != null) entity.setJanCode(cmd.getJanCode());
         if (cmd.getNameJa() != null) entity.setNameJa(cmd.getNameJa());
         if (cmd.getNameEn() != null) entity.setNameEn(cmd.getNameEn());
         if (cmd.getNameZh() != null) entity.setNameZh(cmd.getNameZh());
@@ -70,6 +78,7 @@ public class ProductAssembler {
         if (cmd.getColorName() != null) entity.setColorName(cmd.getColorName());
         if (cmd.getMaterial() != null) entity.setMaterial(cmd.getMaterial());
         if (cmd.getCategory() != null) entity.setCategory(cmd.getCategory());
+        if (cmd.getStatus() != null) entity.setStatus(cmd.getStatus());
         if (cmd.getOrigin() != null) entity.setOrigin(cmd.getOrigin());
         if (cmd.getUnit() != null) entity.setUnit(cmd.getUnit());
         if (cmd.getLengthCm() != null) entity.setLengthCm(cmd.getLengthCm());
@@ -81,6 +90,11 @@ public class ProductAssembler {
         if (cmd.getTaxPoint() != null) entity.setTaxPoint(cmd.getTaxPoint());
         if (cmd.getTaxRate() != null) entity.setTaxRate(cmd.getTaxRate());
         if (cmd.getHsCode() != null) entity.setHsCode(cmd.getHsCode());
+        if (cmd.getHsCodeJp() != null) entity.setHsCodeJp(cmd.getHsCodeJp());
+        if (cmd.getQuantities() != null) entity.setQuantities(cmd.getQuantities());
+        if (cmd.getCartonQty() != null) entity.setCartonQty(cmd.getCartonQty());
+        if (cmd.getAmountRmb() != null) entity.setAmountRmb(cmd.getAmountRmb());
+        if (cmd.getMaterialJa() != null) entity.setMaterialJa(cmd.getMaterialJa());
         if (cmd.getDeclarationElements() != null) entity.setDeclarationElements(cmd.getDeclarationElements());
         if (cmd.getUnitsPerPackage() != null) entity.setUnitsPerPackage(cmd.getUnitsPerPackage());
         if (cmd.getPackageLengthCm() != null) entity.setPackageLengthCm(cmd.getPackageLengthCm());
@@ -98,6 +112,7 @@ public class ProductAssembler {
     public void copyToEntity(ProductUpdateCmd cmd, Product entity) {
         if (cmd.getMasterCode() != null) entity.setMasterCode(cmd.getMasterCode());
         if (cmd.getSubCode() != null) entity.setSubCode(cmd.getSubCode());
+        if (cmd.getJanCode() != null) entity.setJanCode(cmd.getJanCode());
         if (cmd.getNameJa() != null) entity.setNameJa(cmd.getNameJa());
         if (cmd.getNameEn() != null) entity.setNameEn(cmd.getNameEn());
         if (cmd.getNameZh() != null) entity.setNameZh(cmd.getNameZh());
@@ -105,6 +120,7 @@ public class ProductAssembler {
         if (cmd.getColorName() != null) entity.setColorName(cmd.getColorName());
         if (cmd.getMaterial() != null) entity.setMaterial(cmd.getMaterial());
         if (cmd.getCategory() != null) entity.setCategory(cmd.getCategory());
+        if (cmd.getStatus() != null) entity.setStatus(cmd.getStatus());
         if (cmd.getOrigin() != null) entity.setOrigin(cmd.getOrigin());
         if (cmd.getUnit() != null) entity.setUnit(cmd.getUnit());
         if (cmd.getLengthCm() != null) entity.setLengthCm(cmd.getLengthCm());
@@ -116,6 +132,11 @@ public class ProductAssembler {
         if (cmd.getTaxPoint() != null) entity.setTaxPoint(cmd.getTaxPoint());
         if (cmd.getTaxRate() != null) entity.setTaxRate(cmd.getTaxRate());
         if (cmd.getHsCode() != null) entity.setHsCode(cmd.getHsCode());
+        if (cmd.getHsCodeJp() != null) entity.setHsCodeJp(cmd.getHsCodeJp());
+        if (cmd.getQuantities() != null) entity.setQuantities(cmd.getQuantities());
+        if (cmd.getCartonQty() != null) entity.setCartonQty(cmd.getCartonQty());
+        if (cmd.getAmountRmb() != null) entity.setAmountRmb(cmd.getAmountRmb());
+        if (cmd.getMaterialJa() != null) entity.setMaterialJa(cmd.getMaterialJa());
         if (cmd.getDeclarationElements() != null) entity.setDeclarationElements(cmd.getDeclarationElements());
         if (cmd.getUnitsPerPackage() != null) entity.setUnitsPerPackage(cmd.getUnitsPerPackage());
         if (cmd.getPackageLengthCm() != null) entity.setPackageLengthCm(cmd.getPackageLengthCm());

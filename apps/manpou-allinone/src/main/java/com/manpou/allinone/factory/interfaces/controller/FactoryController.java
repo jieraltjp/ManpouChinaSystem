@@ -1,6 +1,6 @@
 package com.manpou.allinone.factory.interfaces.controller;
 
-import com.manpou.common.result.Result;
+import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.factory.application.dto.FactoryCreateCmd;
 import com.manpou.allinone.factory.application.dto.FactoryPageQuery;
 import com.manpou.allinone.factory.application.dto.FactoryQuery;

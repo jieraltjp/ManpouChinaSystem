@@ -1,7 +1,7 @@
 package com.manpou.allinone.customs.domain.model;
 
 import com.manpou.allinone.common.exception.BusinessException;
-import com.manpou.allinone.customs.domain.model.BaseEntity;
+import com.manpou.allinone.domain.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,10 +30,6 @@ public class JapanCustomsRecord extends BaseEntity {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static long SEQ = System.currentTimeMillis() % 1000;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Column(name = "customs_entry_no", length = 64)
     private String customsEntryNo;  // 入境报关号（格式：JC-YYYYMMDD-NNN）

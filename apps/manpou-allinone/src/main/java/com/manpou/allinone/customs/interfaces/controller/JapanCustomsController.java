@@ -3,7 +3,7 @@ package com.manpou.allinone.customs.interfaces.controller;
 import com.manpou.allinone.customs.application.dto.*;
 import com.manpou.allinone.customs.application.usecase.JapanCustomsUseCase;
 import com.manpou.allinone.common.annotation.Idempotent;
-import com.manpou.common.result.Result;
+import com.manpou.allinone.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

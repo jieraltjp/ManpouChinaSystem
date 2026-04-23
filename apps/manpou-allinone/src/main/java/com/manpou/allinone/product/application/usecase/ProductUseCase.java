@@ -1,22 +1,17 @@
 package com.manpou.allinone.product.application.usecase;
 
 import com.manpou.allinone.common.exception.BusinessException;
+
+import java.util.List;
 import com.manpou.allinone.common.filter.TraceFilter;
-import com.manpou.allinone.factory.application.assembler.FactoryAssembler;
-import com.manpou.allinone.factory.application.dto.FactoryPageQuery;
-import com.manpou.allinone.factory.domain.model.Factory;
-import com.manpou.allinone.factory.domain.repository.FactoryRepository;
 import com.manpou.allinone.product.application.assembler.ProductAssembler;
 import com.manpou.allinone.product.application.dto.MasterCodeSuggestVO;
 import com.manpou.allinone.product.application.dto.ProductCreateCmd;
-import com.manpou.allinone.product.application.dto.ProductFactoryVO;
 import com.manpou.allinone.product.application.dto.ProductPageQuery;
 import com.manpou.allinone.product.application.dto.ProductQuery;
 import com.manpou.allinone.product.application.dto.ProductUpdateCmd;
 import com.manpou.allinone.product.application.dto.SubCodeSuggestVO;
 import com.manpou.allinone.product.domain.model.Product;
-import com.manpou.allinone.product.domain.model.ProductFactory;
-import com.manpou.allinone.product.domain.repository.ProductFactoryRepository;
 import com.manpou.allinone.product.domain.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,25 +22,28 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+/**
+ * 商品用例服务。
+ * 负责编排业务操作，不含领域逻辑。
+ * 对应 docs/business/SPEC-B10-商品目录-产品管理.md §2.1。
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductUseCase {
 
     private final ProductRepository productRepository;
-    private final ProductFactoryRepository productFactoryRepository;
-    private final FactoryRepository factoryRepository;
     private final ProductAssembler productAssembler;
-    private final FactoryAssembler factoryAssembler;
 
+    /**
+     * 分页查询。
+     * 支持：按主货号精确、按关键词模糊、按 HS编码精确。
+     */
     @Transactional(readOnly = true)
     public Page<ProductPageQuery> pageQuery(ProductQuery query) {
+        int pageIndex = query.getPage() == null ? 0 : Math.max(0, query.getPage());
         PageRequest pageRequest = PageRequest.of(
-                (query.getPage() - 1),
+                pageIndex,
                 Math.min(query.getPageSize(), 100),
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
@@ -57,11 +55,14 @@ public class ProductUseCase {
         } else if (query.getKeyword() != null && !query.getKeyword().isBlank()) {
             page = productRepository.findByNameZhContainingAndIsDeletedFalse(query.getKeyword(), pageRequest);
         } else {
-            page = productRepository.findAll(pageRequest);
+            page = productRepository.findAllByIsDeletedFalse(pageRequest);
         }
         return page.map(productAssembler::toDto);
     }
 
+    /**
+     * 根据 ID 查询。
+     */
     @Transactional(readOnly = true)
     public ProductPageQuery getById(Long id) {
         Product entity = productRepository.findByIdAndIsDeletedFalse(id)
@@ -69,6 +70,9 @@ public class ProductUseCase {
         return productAssembler.toDto(entity);
     }
 
+    /**
+     * 根据主货号查询（用于步骤1商品选择器自动代入）。
+     */
     @Transactional(readOnly = true)
     public ProductPageQuery getByMasterCode(String masterCode) {
         Product entity = productRepository.findByMasterCodeAndIsDeletedFalse(masterCode)
@@ -76,8 +80,12 @@ public class ProductUseCase {
         return productAssembler.toDto(entity);
     }
 
+    /**
+     * 创建。
+     */
     @Transactional
     public Long create(ProductCreateCmd cmd) {
+        // 唯一性校验：masterCode + subCode
         productRepository.findByMasterCodeAndSubCodeAndIsDeletedFalse(
                 cmd.getMasterCode(), cmd.getSubCode()
         ).ifPresent(existing -> {
@@ -92,6 +100,9 @@ public class ProductUseCase {
         return saved.getId();
     }
 
+    /**
+     * 更新。
+     */
     @Transactional
     public void update(Long id, ProductUpdateCmd cmd) {
         Product entity = productRepository.findByIdAndIsDeletedFalse(id)
@@ -101,6 +112,9 @@ public class ProductUseCase {
         log.info("[Product] updated, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 
+    /**
+     * 逻辑删除。
+     */
     @Transactional
     public void delete(Long id) {
         Product entity = productRepository.findByIdAndIsDeletedFalse(id)
@@ -110,6 +124,9 @@ public class ProductUseCase {
         log.info("[Product] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 
+    /**
+     * 主货号自动补全。
+     */
     @Transactional(readOnly = true)
     public List<MasterCodeSuggestVO> suggestMasterCodes(String keyword) {
         if (keyword == null || keyword.isBlank()) {
@@ -124,6 +141,9 @@ public class ProductUseCase {
                 .toList();
     }
 
+    /**
+     * 子货号候选项（按主货号过滤）。
+     */
     @Transactional(readOnly = true)
     public List<SubCodeSuggestVO> suggestSubCodes(String masterCode) {
         if (masterCode == null || masterCode.isBlank()) {
@@ -135,42 +155,5 @@ public class ProductUseCase {
                         .colorName((String) row[1])
                         .build())
                 .toList();
-    }
-
-    /**
-     * 查询商品关联的工厂列表（用于详情抽屉展示）。
-     */
-    @Transactional(readOnly = true)
-    public List<ProductFactoryVO> getProductFactories(Long productId) {
-        if (!productRepository.existsById(productId)) {
-            throw BusinessException.notFound("Product", productId);
-        }
-        List<ProductFactory> pfs = productFactoryRepository.findByProductId(productId);
-        if (pfs.isEmpty()) {
-            return List.of();
-        }
-        List<Long> factoryIds = pfs.stream().map(ProductFactory::getFactoryId).toList();
-        List<Factory> factories = factoryRepository.findByIdInAndIsDeletedFalse(factoryIds);
-        Map<Long, Factory> factoryMap = factories.stream()
-                .collect(Collectors.toMap(Factory::getId, f -> f));
-        return pfs.stream().map(pf -> {
-            Factory factory = factoryMap.get(pf.getFactoryId());
-            return ProductFactoryVO.builder()
-                    .productId(pf.getProductId())
-                    .factoryId(pf.getFactoryId())
-                    .supplierSku(pf.getSupplierSku())
-                    .moq(pf.getMoq())
-                    .leadTimeDays(pf.getLeadTimeDays())
-                    .unitPriceRmb(pf.getUnitPriceRmb())
-                    .isPreferred(pf.getIsPreferred())
-                    .factoryCode(factory != null ? factory.getFactoryCode() : null)
-                    .factoryName(factory != null ? factory.getFactoryName() : null)
-                    .province(factory != null ? factory.getProvince() : null)
-                    .city(factory != null ? factory.getCity() : null)
-                    .contactName(factory != null ? factory.getContactName() : null)
-                    .contactPhone(factory != null ? factory.getContactPhone() : null)
-                    .cooperationStatus(factory != null ? factory.getCooperationStatus() : null)
-                    .build();
-        }).toList();
     }
 }

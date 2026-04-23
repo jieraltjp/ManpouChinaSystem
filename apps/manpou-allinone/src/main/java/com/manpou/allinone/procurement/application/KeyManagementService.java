@@ -1,7 +1,7 @@
 package com.manpou.allinone.procurement.application;
 
 import com.manpou.allinone.common.time.Clock;
-import com.manpou.common.security.PemParser;
+import com.manpou.allinone.common.security.PemParser;
 import com.manpou.allinone.domain.model.SigningKey;
 import com.manpou.allinone.domain.model.SigningKeyStatus;
 import com.manpou.allinone.domain.port.SigningKeyPort;

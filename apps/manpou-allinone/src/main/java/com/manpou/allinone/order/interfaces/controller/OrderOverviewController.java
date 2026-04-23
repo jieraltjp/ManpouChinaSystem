@@ -1,6 +1,6 @@
 package com.manpou.allinone.order.interfaces.controller;
 
-import com.manpou.common.result.Result;
+import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.order.application.dto.OrderOverviewPageVO;
 import com.manpou.allinone.order.application.usecase.OrderOverviewUseCase;
 import com.manpou.allinone.procurement.application.assembler.ProcurementAssembler;
