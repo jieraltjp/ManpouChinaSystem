@@ -687,7 +687,54 @@ vite.config.ts proxy → localhost:18080  # API Gateway
 
 ---
 
-## 总结：十七条铁律
+## Lesson 25: JPA Domain Repository 禁止加 @Repository，避免与 JpaAdapter 重复 Bean
+
+### 问题
+
+Spring 启动失败：
+```
+Error creating bean with name 'productUseCase' ...
+Unsatisfied dependency expressed through constructor parameter 0:
+No qualifying bean of type 'ProductRepository' available:
+expected single matching bean but found 2: productRepository,productJpaRepository
+```
+
+### 根因
+
+```java
+// ProductRepository — 领域层接口，加了 @Repository
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Long> { ... }
+
+// ProductJpaRepository — 基础设施层 JPA 实现，也 extends ProductRepository
+@Repository
+public interface ProductJpaRepository extends ProductRepository, JpaRepository<Product, Long> { }
+```
+
+Spring 扫描时，`ProductRepository`（领域接口，带 `@Repository`）和 `ProductJpaRepository`（继承领域接口）都被注册为 bean，bean ID 分别为 `productRepository` 和 `productJpaRepository`。
+
+### 解决方案
+
+**领域层接口不加 `@Repository`，只由 JPA 适配器注册：**
+
+```java
+// ✅ 正确：领域接口无 @Repository
+public interface ProductRepository extends JpaRepository<Product, Long> { ... }
+
+// ✅ 正确：JPA 适配器带 @Repository
+@Repository
+public interface ProductJpaRepository extends ProductRepository, JpaRepository<Product, Long> { }
+```
+
+### 预防
+
+- 所有同时有 `XxxRepository`（领域接口）和 `XxxJpaAdapter`/`XxxJpaRepository`（基础设施实现）的模块，领域接口**禁止加 `@Repository`**
+- Spring Boot 的 `@EnableJpaRepositories` 会自动扫描所有 `@Repository` 的接口，无论包路径
+- 最佳实践：领域接口和 JPA 适配器放不同子包，用 `@EnableJpaRepositories(basePackages = ...)` 精确控制扫描范围
+
+---
+
+## 总结：十八条铁律
 
 ### 工程实践（代码层）
 
@@ -737,7 +784,8 @@ vite.config.ts proxy → localhost:18080  # API Gateway
 | 16 | 前端类型从 OpenAPI schema 生成，禁止手动对齐 | 字段不匹配 |
 | 21 | BaseEntity 用 @MappedSuperclass，所有实体继承 | 审计字段不一致 |
 | 24 | 测试数据提取禁止用字符串解析（grep），用专业 API 库 | 测试脆弱 |
+| 25 | 领域层 Repository 禁止加 @Repository，避免与 JPA Adapter 重复 Bean | Spring 启动失败（bean 歧义） |
 
 ---
 
-*来源：git log（2026-04-10 ~ 04-23，104 commits）· docs/check/99-全面审计报告.md · docs/check/101~105 · docs/role/02-架构师视角.md · docs/pro/17-服务间认证.md · 2026-04-23 全量解耦重构会话*
+*来源：git log（2026-04-10 ~ 04-23，104 commits）· docs/check/99-全面审计报告.md · docs/check/101~105 · docs/role/02-架构师视角.md · docs/pro/17-服务间认证.md · 2026-04-23 全量解耦重构会话 · 2026-04-23 运行时 Bean 歧义修复会话*

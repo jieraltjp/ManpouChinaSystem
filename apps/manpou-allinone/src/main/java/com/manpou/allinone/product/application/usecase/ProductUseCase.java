@@ -13,9 +13,11 @@ import com.manpou.allinone.product.application.dto.ProductUpdateCmd;
 import com.manpou.allinone.product.application.dto.SubCodeSuggestVO;
 import com.manpou.allinone.product.domain.model.Product;
 import com.manpou.allinone.product.domain.repository.ProductRepository;
+import com.manpou.allinone.product.infrastructure.persistence.jpa.ProductJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,11 +31,20 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ProductUseCase {
 
     private final ProductRepository productRepository;
+    private final ProductJpaRepository productJpaRepository;
     private final ProductAssembler productAssembler;
+
+    public ProductUseCase(
+            @Qualifier("productJpaRepository") ProductRepository productRepository,
+            ProductJpaRepository productJpaRepository,
+            ProductAssembler productAssembler) {
+        this.productRepository = productRepository;
+        this.productJpaRepository = productJpaRepository;
+        this.productAssembler = productAssembler;
+    }
 
     /**
      * 分页查询。
@@ -131,7 +142,7 @@ public class ProductUseCase {
         if (keyword == null || keyword.isBlank()) {
             return List.of();
         }
-        return productRepository.findMasterCodeSuggestions(keyword.trim()).stream()
+        return productJpaRepository.findMasterCodeSuggestions(keyword.trim()).stream()
                 .map(row -> MasterCodeSuggestVO.builder()
                         .masterCode((String) row[0])
                         .nameZh((String) row[1])
@@ -148,7 +159,7 @@ public class ProductUseCase {
         if (masterCode == null || masterCode.isBlank()) {
             return List.of();
         }
-        return productRepository.findSubCodesByMasterCode(masterCode.trim()).stream()
+        return productJpaRepository.findSubCodesByMasterCode(masterCode.trim()).stream()
                 .map(row -> SubCodeSuggestVO.builder()
                         .subCode((String) row[0])
                         .colorName((String) row[1])

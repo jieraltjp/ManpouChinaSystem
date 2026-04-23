@@ -13,4 +13,8 @@ public interface ProductQueryPort {
     Optional<Product> findByMasterCode(String masterCode);
 
     List<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
+
+    List<Object[]> findMasterCodeSuggestions(String keyword);
+
+    List<Object[]> findSubCodesByMasterCode(String masterCode);
 }
