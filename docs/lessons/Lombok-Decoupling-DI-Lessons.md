@@ -266,8 +266,478 @@ Model 重构后（`Factory` 从 `location`/`status` 改为 `province`/`city`/`co
 
 | # | 铁律 | 违反后果 |
 |---|------|---------|
-| 1 | 跨模块依赖走 Port 接口，domain model 只用 common.enums/exception | Lombok 失效，编译顺序破坏 |
-| 2 | 领域模型禁止 import 其他模块的 entity/VO | 编译耦合，业务逻辑膨胀在 domain |
-| 3 | JPA Repository 继承链 → 用 @Qualifier 显式指定 bean | Spring 启动失败 |
-| 4 | BusinessException API 添加前必须搜索全项目确认不冲突 | 编译失败，API 歧义 |
+| 1 | 跨模块走 Port 接口，domain model 只用 common.enums/exception | Lombok 失效，编译顺序破坏 |
+| 2 | Domain model 禁止引用其他模块 Entity | 编译耦合，业务逻辑膨胀在 domain |
+| 3 | JPA Repository 继承链 → @Qualifier 显式指定 bean | Spring 启动失败 |
+| 4 | BusinessException API 添加前搜索全项目确认不冲突 | 编译失败，API 歧义 |
 | 5 | Model 重构后测试必须同步 | 测试编译失败，技术债累积 |
+
+---
+
+## Lesson 6: JPA Repository 方法名不一致导致编译失败
+
+### 问题
+
+```
+error: conflicting: ProductRepository 中的抽象方法 findByMasterCodeAndDeletedIsFalse(String)
+error: conflicting: ProductJpaRepository 中的抽象方法 findByMasterCodeAndDeletedIsFalse(String)
+```
+
+### 根因
+
+Java 不允许同名方法不同返回类型共存于同一接口。
+
+### 解决方案
+
+重命名，不依赖返回类型区分：
+
+```java
+// ProductRepository — 保留 Optional 版本
+Optional<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
+// 另起不同名
+List<Product> findAllByMasterCodeAndDeletedIsFalse(String masterCode);
+
+// ProductJpaRepository — 移除重复声明（父接口已有）
+```
+
+### 预防
+
+- Repository 方法命名不依赖返回类型区分同名方法
+- 子接口不重复声明父接口已有方法（除非有 `@Query` 自定义实现）
+
+---
+
+## Lesson 7: Windows 环境脚本必须用 Git Bash 执行
+
+### 问题
+
+脚本在 CMD/PowerShell 报错，不识别 `./` 和 `#!/usr/bin/env bash` 语法。
+
+### 解决方案
+
+始终使用 Git Bash：
+
+```bash
+# ✅ 正确
+./scripts/start-all.sh
+
+# ❌ 错误：直接在 CMD 中运行 .sh
+```
+
+---
+
+## Lesson 8: Flyway 禁用后 V4 迁移数据不会自动导入
+
+### 问题
+
+500 条工厂数据写在 `V4__factory_migration.sql` 中，但 Flyway 全局禁用，数据从不导入。
+
+### 根因
+
+```
+# application.yml
+flyway.enabled: false
+```
+
+Hibernate `ddl-auto: update` 只管表结构，不管数据。Flyway 禁用 = 数据迁移不执行。
+
+### 预防
+
+- Flyway 数据迁移（INSERT）与表结构管理（CREATE/ALTER）是两回事
+- 禁用 Flyway 时，数据初始化必须走 DevTestDataInitializer
+- 确认哪些是"环境基础设施数据"（Initializer），哪些是"测试数据"
+
+---
+
+## Lesson 9: JWT 私钥路径必须在 classpath 和文件系统双重保险
+
+### 问题
+
+启动报错：`RSA 私钥未找到`
+
+### 根因
+
+`JwtKeyManager` 只查单一路径，部署环境路径不一致。
+
+### 解决方案
+
+优先级：classpath > 文件系统：
+
+```java
+// 1. 先查 classpath（随 jar 打包，部署一致性高）
+// 2. 再查文件系统（本地开发 / 自定义路径）
+```
+
+### 预防
+
+- 密钥/证书类资源始终支持双路径
+- 生产部署时 classpath 优先，减少环境差异
+
+---
+
+## Lesson 10: DTO 与 Entity 混用导致 Order 模块依赖 Procurement
+
+### 问题
+
+`OrderOverviewController` 返回 `Page<ProcurementPageQuery>`，Order 直接引用了 Procurement 的 DTO。
+
+### 根因
+
+API 返回类型用了对方模块的 DTO，模块边界模糊。
+
+### 解决方案
+
+每个模块定义自己的 API DTO，通过 Assembler 转换：
+
+```java
+// Order 模块自己定义
+public class OrderProcurementSelectorDTO { ... }
+
+// ProcurementAssembler 提供转换方法
+public OrderProcurementSelectorDTO toOrderProcurementSelectorDto(Procurement entity) { ... }
+
+// Controller 使用自己模块的 DTO
+public Result<Page<OrderProcurementSelectorDTO>> selector(...) { ... }
+```
+
+### 预防
+
+- Controller 的请求/响应类型必须属于自己的模块
+- 定期审计 Controller 返回类型的包路径，发现跨模块引用立即拆分
+
+---
+
+## 总结：十条铁律
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 1 | 跨模块走 Port 接口，domain model 只用 common.enums/exception | Lombok 失效 |
+| 2 | Domain model 禁止引用其他模块 Entity | 编译耦合 |
+| 3 | JPA Repository 继承链 → @Qualifier 显式指定 bean | Spring 启动失败 |
+| 4 | BusinessException API 添加前搜索全项目 | 编译失败 |
+| 5 | Model 重构后测试必须同步 | 测试编译失败 |
+| 6 | Repository 方法不依赖返回类型区分同名方法 | 编译失败 |
+| 7 | Windows 用 Git Bash 执行 .sh 脚本 | 脚本报错 |
+| 8 | Flyway 禁用时数据初始化走 DevTestDataInitializer | 数据不导入 |
+| 9 | 密钥/证书资源走 classpath + 文件系统双路径 | 启动失败 |
+| 10 | Controller 返回类型必须属于自己模块 | 模块边界模糊 |
+
+---
+
+## Lesson 11: 文档与代码同步必须持续进行，不能积累
+
+### 问题
+
+从 git log 看到大量重复的"审计一致性修复"提交：
+
+```
+docs: fix: 审计一致性修复 — 补全缺失字段 + 更新实现状态 + 修复过期路由引用
+docs: fix: 全量文档审计 — 补全缺失字段 + 更新实现状态 + 修复过期路由引用
+docs: fix: 前后端 SPEC + UI 页面文档 + 前端页面三方对齐
+docs: 审计一致性修复 — entity注解/文档DTO名/重复行/字段对齐
+docs: 审计一致性修复 — demand.ts类型 + SPEC-B10/DB-11状态对齐
+docs: fix: 全面审计一致性修复 — 文档路径/状态/DTO/分页
+```
+
+历史审计轮次：Round 1 → Round 2 → Round 3 → Round 4，每轮都修上轮的残留问题。
+
+### 根因
+
+- 文档更新和代码提交不同步
+- 审计只在文档写完后进行，不是持续过程
+- 命名不一致（ShippingOrder vs Procurement、LogisticsPlanType vs PlanType）在开发中期才被发现
+
+### 解决方案
+
+**"文档即代码"规范：**
+
+| 场景 | 规范 |
+|------|------|
+| 新增 API | 文档和代码同 commit |
+| 重构字段 | 文档和代码同 commit，或文档先于代码 |
+| 新增枚举 | 文档和代码同 commit，SPEC 枚举表同步更新 |
+| 每完成一个 UseCase | 立即更新 docs/business 对应 SPEC 状态 ✅/🔴 |
+
+**预防：**
+
+- CI 中可加入文档校验（docstring 与 Javadoc 一致性检查）
+- PR 必须包含文档更新，无文档 = 无 PR
+- 定期小规模审计（每周），不要积累成大规模重构
+
+---
+
+## Lesson 12: i18n 必须从第一天规划，不能后期打补丁
+
+### 问题
+
+从 git log 看到 i18n 修复了 4 轮：
+
+```
+fix: i18n 审计 round 1 — DashboardPage 全量 i18n化
+fix: i18n 审计 round 2 — zh.json 重复key + FactoryPage 全量 i18n化
+fix: i18n 审计 round 3 — LogisticsPage/InspectionPage 单位符号 i18n化
+fix: i18n 审计 round 4 — client.ts 错误消息 + AppLayout 语言选择器
+fix: i18n 审计 round 5 — zh.json 重复key + FactoryPage 全量 i18n化
+```
+
+### 根因
+
+- i18n 没有纳入前端骨架设计
+- 硬编码中文字符串散落在 Vue 组件中，遗漏率高
+- 没有 i18n linter 或 CI 检查
+
+### 解决方案
+
+- **第一天**：选定 i18n 方案（vue-i18n），配置 `zh.json` / `en.json`，在 `vite.config.ts` 中配置 plugin
+- **组件规范**：所有用户可见文本必须是 `{{ $t('key') }}`，禁止硬编码
+- **CI 检查**：`vue-i18n-extract` 或 ESLint rule 检查未翻译 key
+- **占位符原则**：先写英文 key 值（如 `order.status.pending`），后配翻译
+
+### 预防
+
+- 前端骨架生成时，vite 模板必须包含 vue-i18n 插件
+- `npm run lint` 包含 i18n 检查
+
+---
+
+## Lesson 13: Flyway 迁移版本号必须提前规划，避免重编号
+
+### 问题
+
+```
+fix: Flyway 迁移文件 V3→V8，修复 V7→V8 MySQL 语法
+fix: DB文档版本号同步 — DB-01 V6→V7, DB-12 V5→V6（配合Flyway迁移重编号）
+```
+
+迁移脚本版本号被改过多次，每次重编号都有风险（checksum 不一致）。
+
+### 根因
+
+- 没有预先规划 Flyway 版本号空间
+- 迁移脚本在开发过程中随意插入，导致编号断层
+- Flyway 禁用时误以为不需要规划
+
+### 解决方案
+
+**Flyway 版本号规划：**
+
+```
+V1__init_schema.sql              — 建表骨架（所有模块基础表）
+V2__outbox_table.sql             — 事件表
+V3__signing_key_table.sql        — JWT 密钥表
+V10__factory_seed.sql             — 基础数据（V10起留足空间插队）
+V11__product_category_seed.sql    — 商品分类
+V20__shipment_status_enum.sql    — 大版本功能
+```
+
+**原则：**
+
+- 基础设施表从 V1-V9
+- 每个业务模块基础数据从 V10, V20, V30, ... 起跳（留 10 个版本空间）
+- 紧急修复插队用 V10_1__fix_xxx.sql 或 V10_hotfix__xxx.sql
+
+### 预防
+
+- 在 `docs/database/README.md` 中维护 Flyway 版本路线图
+- Flyway 启用后，修改已执行脚本前先 `flyway:repair`
+
+---
+
+## Lesson 14: 命名一致性必须在开发前锁定，禁止中途改名
+
+### 问题
+
+历史命名不一致导致的返工：
+
+| 旧命名（错误） | 新命名（正确） | 发现时机 |
+|-------------|-------------|---------|
+| `ShippingOrder` | `Procurement` | 开发中期，文档审计发现 |
+| `LogisticsPlanType` | `PlanType` | 开发中期 |
+| `FactoryStatus` | `CooperationStatus` | 重构时 |
+| `/api/v1/logistics` | `/api/v1/logistics-plans` | 第三轮审计 |
+| `Vite proxy → 192.168.12.198:18090` | `Vite proxy → localhost:18080` | 实际部署时 |
+
+### 根因
+
+- 骨架代码中默认命名没有经过评审
+- API 命名没有遵循 RESTful 规范
+- 没有 API 命名规范文档
+
+### 解决方案
+
+**命名锁定流程：**
+
+```
+1. 写 docs/business/SPEC-*.md 时，同时定义：
+   - Domain 实体名（如 Procurement 而非 ShippingOrder）
+   - API 路径（如 /logistics-plans 而非 /logistics）
+   - 枚举值（如 CooperationStatus 而非 FactoryStatus）
+
+2. codegen 生成骨架后，先审命名再开发
+
+3. 枚举改名：
+   - 旧值保留（数据库兼容）
+   - 新值作为替代
+   - Migration: UPDATE SET status = 'SUSPENDED' WHERE status = 'INACTIVE'
+```
+
+### 预防
+
+- 每个模块开发前，先过"命名评审"
+- REST API 命名规范：资源用复数名词，嵌套路径不超过 2 层
+
+---
+
+## Lesson 15: 单体优先，但提前规划好未来拆分的边界
+
+### 策略（已验证正确）
+
+```
+Phase 0: manpou-allinone（7→8领域合一，端口18090）
+         └── 快速验证业务，不引入分布式复杂度
+
+Phase B: 按 Kafka Topic 边界逐步拆分
+         procurement → warehouse-service
+         logistics → logistics-service
+         customs → customs-service
+```
+
+### 教训
+
+如果当初在 allinone 里把领域混在一起（无边界），后续拆分会非常痛苦。正确的做法是：
+
+- **现在**：模块内部分层清晰（domain/application/interfaces），但部署在同一 JAR
+- **未来**：每个模块抽取为独立服务，只需改 POM 依赖 + 引入 Kafka
+- **禁止**：在单体阶段使用"临时全局变量"或跨模块直接调用而不走 Port
+
+---
+
+## Lesson 16: 前端 API 客户端类型必须与后端 DTO 严格对齐
+
+### 问题
+
+历史前端字段与后端不一致：
+
+```
+TestPage.vue 字段（orderNo/priority 等）← 无后端对应
+DemandPage.vue 的 /replenishment-demands ← 旧 endpoint
+```
+
+### 根因
+
+- 前端从设计稿/文档生成，后端从 JPA 实体生成，两边独立演进
+- 没有类型共享机制（后端 DTO 未生成前端 TypeScript 类型）
+
+### 解决方案
+
+**OpenAPI 契约优先：**
+
+```yaml
+# docs/api/SPEC-B02-procurement.yml
+openapi: 3.0.0
+paths:
+  /api/v1/procurements:
+    post:
+      requestBody:
+        $ref: './components/schemas/ProcurementCreate.yaml'
+      responseBody:
+        $ref: './components/schemas/ProcurementPageQuery.yaml'
+```
+
+- 后端实现严格按 OpenAPI schema
+- 前端从 OpenAPI 生成 TypeScript 类型（`openapi-typescript-codegen`）
+- 双方各自生成，互不依赖源码
+
+### 预防
+
+- 后端 DTO 变更 → 必须更新 OpenAPI schema → 触发前端类型重新生成
+- 没有 OpenAPI schema 变更 = 不允许合入
+
+---
+
+## Lesson 17: 环境差异（dev/staging/prod）配置必须标准化
+
+### 问题
+
+```
+# 旧配置（混乱）
+vite.config.ts proxy → 192.168.12.198:18090  # VPN 地址，本地无法访问
+
+# 新配置（正确）
+vite.config.ts proxy → localhost:18080  # API Gateway
+```
+
+### 根因
+
+- 开发环境用了生产 VPN 内网 IP，本地无法访问
+- 没有本地开发等效配置
+
+### 解决方案
+
+```
+开发环境（localhost）：
+  前端 → localhost:18080 (Gateway) → localhost:18090 (manpou-allinone)
+
+环境配置优先级：
+  1. .env.local（本地覆盖，最高优先级）
+  2. .env.development（开发默认值）
+  3. vite.config.ts proxy 配置（仅 dev）
+  4. .env.production（生产默认值）
+```
+
+---
+
+## 总结：十七条铁律
+
+### 工程实践（代码层）
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 1 | 跨模块走 Port 接口，domain model 只用 common.enums/exception | Lombok 失效 |
+| 2 | Domain model 禁止引用其他模块 Entity | 编译耦合 |
+| 3 | JPA Repository 继承链 → @Qualifier 显式指定 bean | Spring 启动失败 |
+| 4 | BusinessException API 添加前搜索全项目 | 编译失败 |
+| 5 | Model 重构后测试必须同步 | 测试编译失败 |
+| 6 | Repository 方法不依赖返回类型区分同名方法 | 编译失败 |
+| 22 | JPA 持久化字段必须显式标注 @Column | 列映射错误 |
+| 23 | 枚举注释必须与业务语义严格对齐 | 理解歧义 |
+
+### 工程实践（环境/部署）
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 7 | Windows 用 Git Bash 执行 .sh 脚本 | 脚本报错 |
+| 8 | Flyway 禁用时数据初始化走 DevTestDataInitializer | 数据不导入 |
+| 9 | 密钥/证书资源走 classpath + 文件系统双路径 | 启动失败 |
+| 17 | 开发环境配置走 .env.local/proxy，本地必须可运行 | 环境差异 |
+| 18 | private.pem 仅存于签发中心服务，禁止全量分发 | 安全漏洞 |
+| 20 | 分页约定 page=0 vs page=1 必须在开发前锁定 | 前后端不对齐 |
+
+### 架构/模块化
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 10 | Controller 返回类型必须属于自己模块 | 模块边界模糊 |
+| 15 | 单体内部分层清晰，提前规划拆分边界 | 未来拆分成本高 |
+| 19 | 共享代码抽取到 common 模块，禁止服务内联重复 | 代码冗余 |
+
+### 文档/命名
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 11 | 文档和代码同 commit，持续审计不积累 | 多轮返工，版本 drift |
+| 12 | i18n 从第一天规划，禁止后期打补丁 | 4轮返工，key 遗漏 |
+| 13 | Flyway 版本号提前规划，留足空间禁止重编号 | checksum 不一致 |
+| 14 | 命名在开发前锁定，禁止中途改名 | 大量迁移返工 |
+
+### 前端/契约/测试
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 16 | 前端类型从 OpenAPI schema 生成，禁止手动对齐 | 字段不匹配 |
+| 21 | BaseEntity 用 @MappedSuperclass，所有实体继承 | 审计字段不一致 |
+| 24 | 测试数据提取禁止用字符串解析（grep），用专业 API 库 | 测试脆弱 |
+
+---
+
+*来源：git log（2026-04-10 ~ 04-23，104 commits）· docs/check/99-全面审计报告.md · docs/check/101~105 · docs/role/02-架构师视角.md · docs/pro/17-服务间认证.md · 2026-04-23 全量解耦重构会话*
