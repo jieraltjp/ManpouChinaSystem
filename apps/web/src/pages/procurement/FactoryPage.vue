@@ -69,13 +69,9 @@
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
         <el-table-column prop="factoryCode" :label="$t('factory.column.factoryCode')" width="160" />
         <el-table-column prop="factoryName" :label="$t('factory.column.factoryName')" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="category" :label="$t('factory.column.category')" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag size="small" type="info">{{ categoryLabel(row.category) }}</el-tag>
-          </template>
-        </el-table-column>
         <el-table-column prop="province" :label="$t('factory.column.province')" width="90" />
         <el-table-column prop="city" :label="$t('factory.column.city')" width="90" />
+        <el-table-column prop="county" :label="$t('factory.column.county')" width="90" />
         <el-table-column prop="roughLocation" :label="$t('factory.column.roughLocation')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="contactName" :label="$t('factory.column.contactName')" width="100" />
         <el-table-column prop="contactPhone" :label="$t('factory.column.contactPhone')" width="130" />
@@ -119,13 +115,11 @@
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('factory.drawer.factoryName')" :span="2">{{ currentRow.factoryName }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('factory.drawer.category')">
-          <el-tag size="small" type="info">{{ categoryLabel(currentRow.category) }}</el-tag>
-        </el-descriptions-item>
         <el-descriptions-item :label="$t('factory.drawer.paymentTerms')">{{ paymentTermsLabel(currentRow.paymentTerms) }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('factory.drawer.address')" :span="2">
-          {{ [currentRow.province, currentRow.city, currentRow.county, currentRow.roughLocation].filter(Boolean).join('') || '-' }}
-        </el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.province')">{{ currentRow.province || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.city')">{{ currentRow.city || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.county')">{{ currentRow.county || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('factory.drawer.roughLocation')" :span="2">{{ currentRow.roughLocation || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('factory.drawer.contactName')">{{ currentRow.contactName || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('factory.drawer.contactPhone')">{{ currentRow.contactPhone || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('factory.drawer.contactWechat')">{{ currentRow.contactWechat || '-' }}</el-descriptions-item>
@@ -147,13 +141,6 @@
           <el-input v-model="formData.factoryName" :placeholder="$t('factory.dialog.factoryNamePlaceholder')" />
         </el-form-item>
         <el-row :gutter="16">
-          <el-col :span="8">
-            <el-form-item :label="$t('factory.dialog.category')">
-              <el-select v-model="formData.category" :placeholder="$t('factory.dialog.categoryPlaceholder')" clearable style="width:100%">
-                <el-option v-for="c in categoryOptions" :key="c.value" :value="c.value" :label="c.label" />
-              </el-select>
-            </el-form-item>
-          </el-col>
           <el-col :span="8">
             <el-form-item :label="$t('factory.dialog.cooperationStatus')">
               <el-select v-model="formData.cooperationStatus" :placeholder="$t('factory.dialog.cooperationStatusPlaceholder')" clearable style="width:100%">
@@ -229,16 +216,14 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, OfficeBuilding, CircleCheck, Clock } from '@element-plus/icons-vue'
-import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest, type CooperationStatus, type FactoryCategory, type PaymentTerms } from '@/api/factory'
+import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest, type CooperationStatus, type PaymentTerms } from '@/api/factory'
 import { useI18n } from 'vue-i18n'
 
 const { t, locale } = useI18n()
 
-const CATEGORY_KEYS: FactoryCategory[] = ['TOOLS', 'TEXTILE', 'PLASTIC', 'ELECTRONICS', 'FURNITURE', 'AUTO_PARTS', 'SPORTS', 'PET', 'MEDICAL', 'CRAFTS', 'CHEMICAL', 'OTHER']
 const COOPERATION_KEYS: CooperationStatus[] = ['ACTIVE', 'SUSPENDED', 'ELIMINATED', 'POTENTIAL']
 const PAYMENT_KEYS: PaymentTerms[] = ['CASH', 'NET_30', 'NET_60', 'NET_90', 'CREDIT']
 
-const categoryOptions = computed(() => CATEGORY_KEYS.map(k => ({ value: k, label: t(`factory.category.${k}`) })))
 const cooperationOptions = computed(() => COOPERATION_KEYS.map(k => ({ value: k, label: t(`factory.cooperationStatus.${k}`) })))
 const paymentTermsOptions = computed(() => PAYMENT_KEYS.map(k => ({ value: k, label: t(`factory.paymentTerms.${k}`) })))
 
@@ -259,7 +244,6 @@ const potentialCount = computed(() => tableData.value.filter(r => r.cooperationS
 
 const defaultFormData = (): CreateFactoryRequest => ({
   factoryName: '',
-  category: undefined,
   province: '',
   city: '',
   county: '',
@@ -324,7 +308,6 @@ function onEdit(row: FactoryPageVO | null) {
   currentRow.value = row
   Object.assign(formData, {
     factoryName: row?.factoryName ?? '',
-    category: row?.category ?? undefined,
     province: row?.province ?? '',
     city: row?.city ?? '',
     county: row?.county ?? '',
@@ -382,10 +365,6 @@ function cooperationStatusLabel(s?: string): string {
 
 function cooperationStatusTag(s?: string): string {
   return { ACTIVE: 'success', SUSPENDED: 'warning', ELIMINATED: 'danger', POTENTIAL: 'info' }[s ?? ''] ?? 'info'
-}
-
-function categoryLabel(c?: string): string {
-  return t(`factory.category.${c}` as any, { default: c ?? '-' })
 }
 
 function paymentTermsLabel(p?: string): string {

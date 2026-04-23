@@ -1,11 +1,12 @@
 # 日本清关 — 业务规格（步骤6）
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
-> **状态**: 占位（字段待确认）
-> **对应前端**: `JapanCustomsPage.vue` · `docs/ui/pages/06-japan-customs.md`
+> **更新**: 2026-04-22 — DB迁移 + 前端页面已完善
+> **状态**: ✅ 已实现（B06 日本清关核心 CRUD + 生命周期流转）
+> **对应前端**: `JapanCustomsPage.vue`（`apps/web/src/pages/customs/JapanCustomsPage.vue`）· `docs/ui/pages/06-japan-customs.md`
 > **前置**: DomesticCustomsRecord.status = CLEARED
-> **后续**: TaxRefundRecord（步骤7）/ FinanceRecord
+> **后续**: TaxRefundRecord（步骤7）— ✅ 已实现
 
 ---
 
@@ -120,14 +121,14 @@ PATCH  /api/v1/japan-customs/{id}/fail     # 清关失败
 
 ## 7. 代码实现清单
 
-- [ ] 🔴 `JapanCustomsRecord` 聚合根实体
-- [ ] 🔴 `JapanCustomsStatus` 枚举（含 `isTerminal()` + `canTransitionTo()`）
-- [ ] 🔴 `JapanCustomsRepository` 领域接口
-- [ ] 🔴 `JapanCustomsJpaRepository` JPA 适配器
-- [ ] 🔴 `JapanCustomsAssembler` DTO ↔ Entity 转换器
-- [ ] 🔴 `JapanCustomsUseCase` 用例服务
-- [ ] 🔴 `JapanCustomsController` REST 控制器
-- [ ] 🔴 `@/api/japanCustoms.ts` 前端 API 客户端
-- [ ] 🔴 `JapanCustomsPage.vue` 页面（`docs/ui/pages/06-japan-customs.md`）
+- [x] ✅ `JapanCustomsRecord` 聚合根实体
+- [x] ✅ `JapanCustomsStatus` 枚举（含 `isTerminal()` + `canTransitionTo()`）
+- [x] ✅ `JapanCustomsRepository` 领域接口（直接继承 JpaRepository）
+- [x] ✅ `JapanCustomsAssembler` DTO ↔ Entity 转换器
+- [x] ✅ `JapanCustomsUseCase` 用例服务
+- [x] ✅ `JapanCustomsController` REST 控制器
+- [x] ✅ `@/api/japanCustoms.ts` 前端 API 客户端
+- [x] ✅ `JapanCustomsPage.vue` 前端页面（`apps/web/src/pages/customs/JapanCustomsPage.vue`）
+- [x] ✅ `OrderOverviewUseCase` 已集成 JapanCustomsRecord（步骤6）
+- [x] ✅ DB迁移脚本 `V12__japan_customs_record_table.sql`
 - [ ] 🔴 `JapanCustomsUseCaseTest` 单元测试
-- [ ] 🔴 聚合接口 `GET /api/v1/orders/{id}/overview` 更新

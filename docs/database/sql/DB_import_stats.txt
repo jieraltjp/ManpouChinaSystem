@@ -1,0 +1,5 @@
+Total rows in DB.xlsx: 1877
+Existing SKUs in goods.sql: 781
+Duplicate SKU skip: 560
+New INSERTs generated: 1317
+Starting ID: 782, Ending ID: 2098

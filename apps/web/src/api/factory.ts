@@ -5,16 +5,19 @@
 import client from './client'
 
 export type CooperationStatus = 'ACTIVE' | 'SUSPENDED' | 'ELIMINATED' | 'POTENTIAL'
-export type FactoryCategory =
-  | 'TOOLS' | 'TEXTILE' | 'PLASTIC' | 'ELECTRONICS' | 'FURNITURE'
-  | 'AUTO_PARTS' | 'SPORTS' | 'PET' | 'MEDICAL' | 'CRAFTS' | 'CHEMICAL' | 'OTHER'
-export type PaymentTerms = 'CASH' | 'NET_30' | 'NET_60' | 'NET_90' | 'CREDIT'
+
+export interface FactoryStatsDTO {
+  total: number
+  active: number
+  potential: number
+  suspended: number
+  eliminated: number
+}
 
 export interface FactoryPageVO {
   id: number
   factoryCode: string
   factoryName: string
-  category?: FactoryCategory
   province?: string
   city?: string
   county?: string
@@ -26,7 +29,6 @@ export interface FactoryPageVO {
   contactWechat?: string
   contactQq?: string
   cooperationStatus?: CooperationStatus
-  paymentTerms?: PaymentTerms
   notes?: string
   createBy?: string
   createTime?: string
@@ -42,7 +44,6 @@ export interface FactoryPageResponse {
 
 export interface CreateFactoryRequest {
   factoryName: string
-  category?: FactoryCategory
   province?: string
   city?: string
   county?: string
@@ -54,13 +55,11 @@ export interface CreateFactoryRequest {
   contactWechat?: string
   contactQq?: string
   cooperationStatus?: CooperationStatus
-  paymentTerms?: PaymentTerms
   notes?: string
 }
 
 export interface UpdateFactoryRequest {
   factoryName?: string
-  category?: FactoryCategory
   province?: string
   city?: string
   county?: string
@@ -72,13 +71,15 @@ export interface UpdateFactoryRequest {
   contactWechat?: string
   contactQq?: string
   cooperationStatus?: CooperationStatus
-  paymentTerms?: PaymentTerms
   notes?: string
 }
 
 export const factoryApi = {
-  list(params: { page?: number; pageSize?: number; factoryName?: string; cooperationStatus?: string }) {
+  list(params: { page?: number; pageSize?: number; factoryName?: string; cooperationStatus?: string; province?: string; city?: string; county?: string }) {
     return client.get<{ code: string; data: FactoryPageResponse }>('/factories', { params })
+  },
+  stats() {
+    return client.get<{ code: string; data: FactoryStatsDTO }>('/factories/stats')
   },
   get(id: number) {
     return client.get<{ code: string; data: FactoryPageVO }>(`/factories/${id}`)

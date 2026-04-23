@@ -1,0 +1,50 @@
+[0] check
+    bytes: 636865636b
+[1] DESCRIPTION OF GOODS
+    bytes: 4445534352495054494f4e204f4620474f4f4453
+[2] ITEM NUMBER
+    bytes: 4954454d204e554d424552
+[3] quantities
+    bytes: 7175616e746974696573
+[4] 箱数
+    bytes: e7aeb1e695b0
+[5] UNIT PRICE（RMB ）
+    bytes: 554e4954205052494345efbc88524d4220efbc89
+[6] AMOUNT(RMB)
+    bytes: 414d4f554e5428524d4229
+[7] 材質
+    bytes: e69d90e8b3aa
+[8] ITEM NO
+    bytes: 4954454d204e4f
+[9] QUANTITY
+    bytes: 5155414e54495459
+[10] WEIGHT(NET)
+    bytes: 574549474854284e455429
+[11] WEIGHT(GROSS)
+    bytes: 5745494748542847524f535329
+[12] ヒーター
+    bytes: e38392e383bce382bfe383bc
+[13] ny567-a
+    bytes: 6e793536372d61
+[14] PCS
+    bytes: 504353
+[15] PU
+    bytes: 5055
+[16] KGS
+    bytes: 4b4753
+[17] heater
+    bytes: 686561746572
+[18] ブランケット
+    bytes: e38396e383a9e383b3e382b1e38383e38388
+[19] ny567-b
+    bytes: 6e793536372d62
+[20] ↑同梱
+    bytes: e28691e5908ce6a2b1
+[21] ポリエステル
+    bytes: e3839de383aae382a8e382b9e38386e383ab
+[22] blanket
+    bytes: 626c616e6b6574
+[23] キャリーカート
+    bytes: e382ade383a3e383aae383bce382abe383bce38388
+[24] wk010
+    bytes: 776b303130

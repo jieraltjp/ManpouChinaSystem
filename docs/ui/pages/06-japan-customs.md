@@ -1,21 +1,20 @@
 # 页面规格 — 步骤6：日本清关
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
-> **路由**: `/customs/japan`
-> **组件**: `JapanCustomsPage.vue`（占位）
-> **对应后端**: `JapanCustomsRecord` 聚合根（待实现）
-> **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B06-日本清关-步骤6.md`
+> **实现**: 2026-04-22
+> **状态**: ✅ 已实现
+> **路由**: `/procurement/japan-customs`
+> **组件**: `JapanCustomsPage.vue`（`apps/web/src/pages/customs/JapanCustomsPage.vue`）
+> **后端**: `JapanCustomsController` at `/api/v1/japan-customs`
 > **前置步骤**: 步骤5（国内报关已放行 DomesticCustomsRecord.status = CLEARED）
-> **后续步骤**: 步骤7（退税 TaxRefundRecord）
+> **后续步骤**: 步骤7（退税 TaxRefundRecord — ✅ 已实现）
 
 ---
 
 ## 1. 页面定位
 
 日本进口清关管理。对应业务流第六步。货物到港后，办理日本进口清关手续。
-
-> ⚠️ **占位页面** — 字段待业务方确认后补充完整设计。当前仅定义页面骨架。
 
 ---
 
@@ -121,16 +120,18 @@
 
 ---
 
-## 7. API 集成（骨架）
+## 7. API 集成
 
 | 操作 | Method | Endpoint | 状态 |
 |------|--------|----------|------|
-| 分页查询 | GET | `/api/v1/japan-customs?page=&pageSize=&procurementId=&status=` | 🔴待实现 |
-| 详情 | GET | `/api/v1/japan-customs/{id}` | 🔴待实现 |
-| 创建 | POST | `/api/v1/japan-customs` | 🔴待实现 |
-| 更新 | PATCH | `/api/v1/japan-customs/{id}` | 🔴待实现 |
-| 开始清关 | PATCH | `/api/v1/japan-customs/{id}/start` | 🔴待实现 |
-| 完成清关 | PATCH | `/api/v1/japan-customs/{id}/clear` | 🔴待实现 |
+| 分页查询 | GET | `/api/v1/japan-customs?page=&pageSize=&procurementId=&status=` | ✅ |
+| 详情 | GET | `/api/v1/japan-customs/{id}` | ✅ |
+| 创建 | POST | `/api/v1/japan-customs` | ✅ |
+| 更新 | PUT | `/api/v1/japan-customs/{id}` | ✅ |
+| 开始清关 | PATCH | `/api/v1/japan-customs/{id}/start` | ✅ |
+| 完成清关 | PATCH | `/api/v1/japan-customs/{id}/complete` | ✅ |
+| 标记失败 | PATCH | `/api/v1/japan-customs/{id}/fail` | ✅ |
+| 删除 | DELETE | `/api/v1/japan-customs/{id}` | ✅ |
 
 ---
 

@@ -1,11 +1,12 @@
 # 页面规格 — 步骤7：退税
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
+> **实现**: 2026-04-22
+> **状态**: ✅ 已实现
 > **路由**: `/finance/tax-refund`
-> **组件**: `TaxRefundPage.vue`（占位）
-> **对应后端**: `TaxRefundRecord` 聚合根（待实现）
-> **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B07-退税-步骤7.md`
+> **组件**: `TaxRefundPage.vue`（`apps/web/src/pages/finance/TaxRefundPage.vue`）
+> **后端**: `TaxRefundController` at `/api/v1/tax-refunds`
 > **前置步骤**: 步骤6（日本清关已放行 JapanCustomsRecord.status = CLEARED）
 > **后续步骤**: 步骤8（运营销售 SalesRecord）
 
@@ -15,11 +16,9 @@
 
 退税管理页面。对应业务流第七步。货物抵达日本后，根据采购单的报关类型（BillingType）判断是否需要退税，以及退税金额。
 
-> ⚠️ **占位页面** — 字段和触发时机待业务方确认。当前仅定义页面骨架。
-
 ---
 
-## 2. 布局结构（骨架）
+## 2. 布局结构
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
@@ -123,15 +122,16 @@
 
 ---
 
-## 8. API 集成（骨架）
+## 8. API 集成
 
 | 操作 | Method | Endpoint | 状态 |
 |------|--------|----------|------|
-| 分页查询 | GET | `/api/v1/tax-refunds?page=&pageSize=&procurementId=&status=` | 🔴待实现 |
-| 详情 | GET | `/api/v1/tax-refunds/{id}` | 🔴待实现 |
-| 创建 | POST | `/api/v1/tax-refunds` | 🔴待实现 |
-| 更新 | PATCH | `/api/v1/tax-refunds/{id}` | 🔴待实现 |
-| 标记完成 | PATCH | `/api/v1/tax-refunds/{id}/complete` | 🔴待实现 |
+| 分页查询 | GET | `/api/v1/tax-refunds?page=&pageSize=&procurementId=&status=` | ✅ |
+| 详情 | GET | `/api/v1/tax-refunds/{id}` | ✅ |
+| 创建 | POST | `/api/v1/tax-refunds` | ✅ |
+| 标记完成 | PATCH | `/api/v1/tax-refunds/{id}/complete` | ✅ |
+| 标记不退税 | PATCH | `/api/v1/tax-refunds/{id}/no-refund` | ✅ |
+| 删除 | DELETE | `/api/v1/tax-refunds/{id}` | ✅ |
 
 ---
 

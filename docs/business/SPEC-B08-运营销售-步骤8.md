@@ -1,8 +1,10 @@
 # 运营销售 — 业务规格（步骤8）
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
-> **状态**: 占位（字段和触发时机待确认）
+> **更新**: 2026-04-23（补充元数据字段）
+> **状态**: ✅ 已实现
+> **路由**: `/sales/operations`
 > **对应前端**: `SalesOperationsPage.vue` · `docs/ui/pages/08-sales.md`
 > **前置**: TaxRefundRecord / JapanCustomsRecord 已完成
 > **反馈**: 步骤8 → 步骤1（补货需求 / 新品立项）
@@ -141,14 +143,14 @@ Aggregate.returnRate > 0.10（某工厂商品的退货率）
 
 ```
 GET    /api/v1/sales-records?page=&pageSize=&productCode=&salesChannel=&status=
-GET    /api/v1/sales-records/{id}
-POST   /api/v1/sales-records
-PATCH  /api/v1/sales-records/{id}
-PATCH  /api/v1/sales-records/{id}/decrement-stock     # 销售出库
-PATCH  /api/v1/sales-records/{id}/increment-stock     # 退货入库
-PATCH  /api/v1/sales-records/{id}/discontinue        # 下架
 GET    /api/v1/sales-records/alerts                   # 库存预警列表
-POST   /api/v1/sales-records/{id}/generate-replenishment  # 生成补货需求
+GET    /api/v1/sales-records/{id}
+POST   /api/v1/sales-records                         # 新规上架
+PUT    /api/v1/sales-records/{id}                    # 更新信息
+PATCH  /api/v1/sales-records/{id}/stock              # 库存更新（卖出/退货）
+PATCH  /api/v1/sales-records/{id}/discontinue        # 下架
+PATCH  /api/v1/sales-records/{id}/relist             # 重新上架
+DELETE /api/v1/sales-records/{id}                   # 删除（非终态）
 ```
 
 ---
@@ -167,16 +169,15 @@ POST   /api/v1/sales-records/{id}/generate-replenishment  # 生成补货需求
 
 ## 7. 代码实现清单
 
-- [ ] 🔴 `SalesRecord` 聚合根实体
-- [ ] 🔴 `SalesStatus` 枚举（含 `isTerminal()` + `canTransitionTo()`）
-- [ ] 🔴 `SalesChannel` 枚举
-- [ ] 🔴 `SalesRecordRepository` 领域接口
-- [ ] 🔴 `SalesRecordJpaRepository` JPA 适配器
-- [ ] 🔴 `SalesRecordAssembler` DTO ↔ Entity 转换器
-- [ ] 🔴 `SalesRecordUseCase` 用例服务（含库存管理 + 退货率计算）
-- [ ] 🔴 `SalesRecordController` REST 控制器
-- [ ] 🔴 `@/api/salesRecord.ts` 前端 API 客户端
-- [ ] 🔴 `SalesOperationsPage.vue` 页面（`docs/ui/pages/08-sales.md`）
-- [ ] 🔴 `SalesRecordUseCaseTest` 单元测试
-- [ ] 🔴 聚合接口 `GET /api/v1/orders/{id}/overview` 更新
-- [ ] 🔴 反馈循环：`generate-replenishment` 联动 ReplenishmentDemand
+- [x] ✅ `SalesRecord` 聚合根实体
+- [x] ✅ `SalesStatus` 枚举（含 `isTerminal()` + `canTransitionTo()` + `isListed()`）
+- [x] ✅ `SalesRecordRepository` 领域接口
+- [x] ✅ `SalesRecordAssembler` DTO ↔ Entity 转换器
+- [x] ✅ `SalesRecordUseCase` 用例服务（含库存管理 + 退货率计算）
+- [x] ✅ `SalesRecordController` REST 控制器（`/api/v1/sales-records`）
+- [x] ✅ `@/api/salesOperations.ts` 前端 API 客户端
+- [x] ✅ `SalesOperationsPage.vue` 页面（`apps/web/src/pages/sales/SalesOperationsPage.vue`）
+- [x] ✅ DB migration `V14__sales_record_table.sql`
+- [x] ✅ 聚合接口 `GET /api/v1/orders/{id}/overview` step8 集成（`OrderOverviewUseCase`）
+- [ ] 🔴 反馈循环：`generate-replenishment` 联动 ReplenishmentDemand（待实现）
+- [ ] 🔴 第三方销售平台 API 接入（Amazon/メルカリ）

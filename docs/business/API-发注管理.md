@@ -4,7 +4,7 @@
 > **更新**: 2026-04-21
 > **依据**: `SPEC-B02-发注单-步骤2.md` + `DOMAIN-发注管理领域模型.md`
 
-> ⚠️ **代码实现进度**: 发注单 CRUD ✅ 已实现 · 完整状态流转校验 ✅ 已实现 · 商品目录 🔴 骨架 · 验货/货柜/财务/退货 🔴 未实现
+> ⚠️ **代码实现进度**: 发注单 CRUD ✅ 已实现 · 完整状态流转校验 ✅ 已实现 · 商品目录 ✅ 已实现（masterCode/subCode）· 验货记录 ✅ 已实现 · 货柜 🔴 占位 · 财务/通知/报关 🔴 Example 存根 · 财务/退货/空运推荐 🔴 未实现
 
 ---
 
@@ -263,34 +263,36 @@ DELETE /api/v1/procurements/{id}
 ### 2.1 创建/更新商品目录
 
 ```
-POST   /api/v1/products      — 新规商品
-PUT    /api/v1/products/{id} — 更新商品
+POST   /api/v1/products          — 新规商品
+PATCH  /api/v1/products/{id}     — 部分更新商品
+GET    /api/v1/products/code/{masterCode}   — 按 masterCode 查询
+GET    /api/v1/products/suggest/master-codes — 货号自动补全
+GET    /api/v1/products/suggest/sub-codes    — 子货号自动补全
 ```
 
-**请求体**（对应 Excel 商品管理表）：
+**请求体**（ProductCreateCmd / ProductUpdateCmd）：
 
-| 字段 | Excel 名称 | 必填 | 说明 |
-|------|-----------|------|------|
-| productCode | 商品コード | ✅ | 唯一键 |
-| name | 名称 | ✅ | 日文名称 |
-| nameZh | 中文名称 | | 中文商品名称 |
-| nameEn | 英文名称 | | 英文商品名称 |
-| heightCm | 高(cm) | | |
-| widthCm | 宽(cm) | | |
-| depthCm | 深(cm) | | |
-| weightKg | 重量(kg) | | |
-| unitsPerPackage | 段ボール入数 | | 每包数量 |
-| packageHeightCm | 包装高 | | |
-| packageWidthCm | 包装宽 | | |
-| packageDepthCm | 包装深 | | |
-| packageWeightKg | 包装重量 | | |
-| remarks | 备注 | | 箱规不固定/整托不固定 |
-| warehouse | 倉庫 | | 名古屋/久留米/永康 |
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| masterCode | String | ✅ | 主货号（唯一键，UNIQUE master_code+sub_code） |
+| subCode | String | | 子货号/颜色（如 a/b/m/L） |
+| nameZh | String | | 中文名称 |
+| nameEn | String | | 英文名称 |
+| nameJa | String | | 日文名称（来自 DB.xlsx） |
+| unitPriceRmb | Decimal | | 含税单价（元） |
+| taxRate | Decimal | | 税率，默认 0.1（10%） |
+| grossWeightKg | Decimal | | 毛重 kg（DB.xlsx 原始数据） |
+| netWeightKg | Decimal | | 净重 kg |
+| hsCode | String | | HS 编码（goods.sql 有，DB.xlsx 无） |
+| declarationElements | String | | 申报要素 |
+| unitsPerPackage | Integer | | 每箱数量 |
+| origin | String | | 原产国，默认"中国" |
+| unit | String | | 单位，默认 PCS |
+| remarks | String | | 备注 |
+| lastUsedDate | Date | | 最近使用日期 |
+| category | Enum | | OEM / ORDINARY / FACTORY_DIRECT |
 
-**计算字段**（自动）：
-```
-dimensionSum = heightCm + widthCm + depthCm
-```
+> ⚠️ **数据库字段映射**：`goods.sql` 来源有完整字段；`DB.xlsx` 来源仅含 `name_ja`、`unit_price`、`weight`，`hs_code`/`origin`/`factory` 均无。
 
 ---
 
@@ -304,11 +306,13 @@ GET /api/v1/products?warehouse=名古屋&remarks=箱规不固定
 
 ### 2.3 按商品代码获取尺寸
 
+> ⚠️ 此端点不存在。尺寸字段已内嵌在 `GET /api/v1/products/code/{masterCode}` 的完整响应中。
+
 ```
-GET /api/v1/products/{code}/dimensions
+GET /api/v1/products/code/{masterCode}
 ```
 
-返回：`{ heightCm, widthCm, depthCm, weightKg, unitsPerPackage, packageDimensions, warehouse }`
+返回字段包含：`lengthCm`, `widthCm`, `heightCm`, `volumeCbm`, `netWeightKg`, `grossWeightKg`, `unitsPerPackage`, `packageLengthCm`, `packageWidthCm`, `packageHeightCm`, `packageVolumeCbm`, `warehouse`。
 
 ---
 
@@ -401,3 +405,37 @@ POST /api/v1/procurements/{id}/returns
 | business.cannot_modify_closed | 422 | 完了（终态）后禁止任何变更 |
 | business.air_recommended | 200 | 空运推荐（warn级别提示） |
 | system.internal-error | 500 | 系统异常 |
+
+---
+
+## 8. Phase 2 扩展域（Example 存根）
+
+以下域已实现 API 骨架，但领域模型为 `Example` 存根（仅 `name`/`status`），实际字段待 Phase 2-8 实现：
+
+| 域 | 路径 | 状态 | 说明 |
+|---|------|------|------|
+| 仓库 | `/api/v1/warehouse` | 🟡 存根 | WarehouseExample（name/status） |
+| 通知 | `/api/v1/notifications` | 🟡 存根 | NotificationExample（name/status） |
+| 财务 | `/api/v1/finance` | 🟡 存根 | FinanceExample（name/status） |
+| 报关 | `/api/v1/customs` | 🟡 存根 | CustomsExample（name/status） |
+
+前端适配器：`web/src/api/{warehouse,notification,finance,customs}.ts`
+
+完整领域模型实现计划：
+- Phase 5/6（报关）：DomesticCustoms / JapanCustoms（含 submit/clear/reject 等状态机）
+- Phase 7（财务）：FinanceRecord（含 taxType, totalCostRmb, actualPaidRmb, currency）
+- Phase 7（退税）：TaxRefund（含 refundAmount, noRefund 标记）
+- Phase 8（销售）：SalesRecord（含 stock decrement/increment）
+
+---
+
+## 9. 未实现端点（文档占位，待 Phase 2-8 实现）
+
+| 文档路径 | 说明 | 阶段 |
+|---------|------|------|
+| `POST /api/v1/procurements/{id}/finance` | 财务结算关联 | Phase 7 |
+| `POST /api/v1/procurements/{id}/returns` | 退货管理 | Phase 8 |
+| `GET /api/v1/consolidation-pools/**` | 集拼池管理 | Phase 4 |
+| `GET /api/v1/containers/**` | 货柜管理 | Phase 4 |
+| `POST /api/v1/orders/{id}/overview` | 订单聚合总览 | Phase 4 |
+| `空运推荐`（自动） | 尺寸/重量达标自动推荐空运 | Phase 4 |

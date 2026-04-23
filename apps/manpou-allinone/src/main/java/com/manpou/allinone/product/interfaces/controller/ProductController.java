@@ -2,6 +2,7 @@ package com.manpou.allinone.product.interfaces.controller;
 
 import com.manpou.allinone.product.application.dto.MasterCodeSuggestVO;
 import com.manpou.allinone.product.application.dto.ProductCreateCmd;
+import com.manpou.allinone.product.application.dto.ProductFactoryVO;
 import com.manpou.allinone.product.application.dto.ProductPageQuery;
 import com.manpou.allinone.product.application.dto.ProductQuery;
 import com.manpou.allinone.product.application.dto.ProductUpdateCmd;
@@ -49,6 +50,14 @@ public class ProductController {
     }
 
     /**
+     * 查询商品关联的工厂列表。
+     */
+    @GetMapping("/{id}/factories")
+    public Result<List<ProductFactoryVO>> getProductFactories(@PathVariable Long id) {
+        return Result.ok(productUseCase.getProductFactories(id));
+    }
+
+    /**
      * 根据主货号查询（步骤1商品选择器调用）。
      */
     @GetMapping("/code/{masterCode}")
@@ -60,7 +69,7 @@ public class ProductController {
      * 主货号自动补全（步骤1补货需求页调用）。
      */
     @GetMapping("/suggest/master-codes")
-    public Result<List<MasterCodeSuggestVO>> suggestMasterCodes(@RequestParam String keyword) {
+    public Result<List<MasterCodeSuggestVO>> suggestMasterCodes(@RequestParam("keyword") String keyword) {
         return Result.ok(productUseCase.suggestMasterCodes(keyword));
     }
 
@@ -68,7 +77,7 @@ public class ProductController {
      * 子货号候选项（按主货号过滤，步骤1补货需求页调用）。
      */
     @GetMapping("/suggest/sub-codes")
-    public Result<List<SubCodeSuggestVO>> suggestSubCodes(@RequestParam String masterCode) {
+    public Result<List<SubCodeSuggestVO>> suggestSubCodes(@RequestParam("masterCode") String masterCode) {
         return Result.ok(productUseCase.suggestSubCodes(masterCode));
     }
 

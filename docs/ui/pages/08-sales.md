@@ -1,11 +1,12 @@
 # 页面规格 — 步骤8：运营销售
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
+> **实现**: 2026-04-22
+> **状态**: ✅ 已实现
 > **路由**: `/sales/operations`
-> **组件**: `SalesOperationsPage.vue`（占位）
-> **对应后端**: `SalesRecord` 聚合根（待实现）
-> **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B08-运营销售-步骤8.md`
+> **组件**: `SalesOperationsPage.vue`（`apps/web/src/pages/sales/SalesOperationsPage.vue`）
+> **后端**: `SalesRecordController` at `/api/v1/sales-records`
 > **前置步骤**: 步骤7（退税 TaxRefundRecord 已完成）/ 步骤6（日本清关完成后直接上架）
 > **反馈**: 步骤8 → 步骤1（补货需求 / 新品立项）
 
@@ -15,11 +16,9 @@
 
 运营销售管理页面。对应业务流第八步。货物在日本清关完成后上架销售，追踪库存、销售数据和退货情况。**关键：此步骤是反馈循环的起点**。
 
-> ⚠️ **占位页面** — 字段和触发时机待运营方确认。当前仅定义页面骨架。
-
 ---
 
-## 2. 布局结构（骨架）
+## 2. 布局结构
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
@@ -167,18 +166,19 @@
 
 ---
 
-## 8. API 集成（骨架）
+## 8. API 集成
 
 | 操作 | Method | Endpoint | 状态 |
 |------|--------|----------|------|
-| 分页查询 | GET | `/api/v1/sales-records?page=&pageSize=&productCode=&salesChannel=&status=` | 🔴待实现 |
-| 详情 | GET | `/api/v1/sales-records/{id}` | 🔴待实现 |
-| 创建上架 | POST | `/api/v1/sales-records` | 🔴待实现 |
-| 更新 | PATCH | `/api/v1/sales-records/{id}` | 🔴待实现 |
-| 库存扣减 | PATCH | `/api/v1/sales-records/{id}/decrement-stock` | 🔴待实现 |
-| 库存预警列表 | GET | `/api/v1/sales-records/alerts` | 🔴待实现 |
-| 生成补货需求 | POST | `/api/v1/sales-records/{id}/generate-replenishment` | 🔴待实现 |
-| 下架 | PATCH | `/api/v1/sales-records/{id}/discontinue` | 🔴待实现 |
+| 分页查询 | GET | `/api/v1/sales-records?page=&pageSize=&productCode=&salesChannel=&status=` | ✅ |
+| 库存预警列表 | GET | `/api/v1/sales-records/alerts` | ✅ |
+| 详情 | GET | `/api/v1/sales-records/{id}` | ✅ |
+| 创建上架 | POST | `/api/v1/sales-records` | ✅ |
+| 更新 | PUT | `/api/v1/sales-records/{id}` | ✅ |
+| 库存更新 | PATCH | `/api/v1/sales-records/{id}/stock` | ✅ |
+| 下架 | PATCH | `/api/v1/sales-records/{id}/discontinue` | ✅ |
+| 重新上架 | PATCH | `/api/v1/sales-records/{id}/relist` | ✅ |
+| 删除 | DELETE | `/api/v1/sales-records/{id}` | ✅ |
 
 ---
 

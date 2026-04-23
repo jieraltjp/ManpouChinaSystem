@@ -41,9 +41,57 @@
             <el-icon><Van /></el-icon>
             <template #title>{{ $t('menu.logistics') }}</template>
           </el-menu-item>
-          <el-menu-item index="/procurement/product">
+          <el-menu-item index="/procurement/customs">
+            <el-icon><DocumentCopy /></el-icon>
+            <template #title>{{ $t('menu.customs') }}</template>
+          </el-menu-item>
+          <el-menu-item index="/procurement/japan-customs">
+            <el-icon><Box /></el-icon>
+            <template #title>{{ $t('menu.japanCustoms') }}</template>
+          </el-menu-item>
+        </el-sub-menu>
+
+        <!-- 财务管理 -->
+        <el-sub-menu index="finance" :popper-class="'sidebar-popper'">
+          <template #title>
+            <el-icon><Money /></el-icon>
+            <span v-if="!isCollapsed">{{ $t('menu.finance') }}</span>
+          </template>
+          <el-menu-item index="/finance/tax-refund">
+            <el-icon><Tickets /></el-icon>
+            <template #title>{{ $t('menu.taxRefund') }}</template>
+          </el-menu-item>
+        </el-sub-menu>
+
+        <!-- 运营销售 -->
+        <el-sub-menu index="sales" :popper-class="'sidebar-popper'">
+          <template #title>
+            <el-icon><TrendCharts /></el-icon>
+            <span v-if="!isCollapsed">{{ $t('menu.sales') }}</span>
+          </template>
+          <el-menu-item index="/sales/operations">
+            <el-icon><Goods /></el-icon>
+            <template #title>{{ $t('menu.salesOperations') }}</template>
+          </el-menu-item>
+        </el-sub-menu>
+
+        <!-- 基础数据 -->
+        <el-sub-menu index="base" :popper-class="'sidebar-popper'">
+          <template #title>
+            <el-icon><Menu /></el-icon>
+            <span v-if="!isCollapsed">{{ $t('menu.base') }}</span>
+          </template>
+          <el-menu-item index="/base/factory">
+            <el-icon><OfficeBuilding /></el-icon>
+            <template #title>{{ $t('menu.factory') }}</template>
+          </el-menu-item>
+          <el-menu-item index="/base/product">
             <el-icon><Goods /></el-icon>
             <template #title>{{ $t('menu.product') }}</template>
+          </el-menu-item>
+          <el-menu-item index="/base/overview">
+            <el-icon><Document /></el-icon>
+            <template #title>{{ $t('menu.orderOverview') }}</template>
           </el-menu-item>
         </el-sub-menu>
       </el-menu>
@@ -95,7 +143,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, Goods } from '@element-plus/icons-vue'
+import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, DocumentCopy, Box, Goods, OfficeBuilding, Menu, Document, Money, Tickets, TrendCharts } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
 import type { Locale } from '@/locales'

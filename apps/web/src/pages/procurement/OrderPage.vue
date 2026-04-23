@@ -114,9 +114,10 @@
             {{ row.createTime ? new Date(row.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('order.column.action')" width="150" fixed="right" align="center">
+        <el-table-column :label="$t('order.column.action')" width="220" fixed="right" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('order.message.detail') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
             <el-button link type="primary" size="small" @click.stop="onEdit(row)"
               :disabled="row.status === COMPLETED_STATUS">{{ $t('demand.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)"
@@ -715,6 +716,10 @@ function onNew() {
 function onView(row: ProcurementPageVO) {
   currentRow.value = row
   drawerVisible.value = true
+}
+
+function onOverview(row: ProcurementPageVO) {
+  router.push('/base/overview/' + row.id)
 }
 
 function onEdit(row: ProcurementPageVO | null) {

@@ -2,7 +2,8 @@
 
 > **版本**: 1.0.0
 > **创建**: 2026-04-22
-> **状态**: 设计阶段
+> **更新**: 2026-04-23（补充元数据字段）
+> **状态**: ✅ 已实现
 > **对应 SPEC**: SPEC-B01-补货需求-步骤1.md §6 待办
 
 ---
@@ -101,9 +102,9 @@ POST /api/v1/demands/{id}/convert?procurementId=X  → 需求状态推进
 ## 4. 代码改动清单
 
 ### 前端
-- [ ] `DemandPage.vue`: `onConvert(row)` 实现预填+打开弹窗
-- [ ] `DemandPage.vue`: `onViewLinked(row)` 升级为打开发注单详情
-- [ ] `api/demand.ts`: `convertToProcurement` 返回值类型补全（`{ code: string; data: null }`）
+- [x] ✅ `OrderPage.vue`: `onConvert(row)` 实现预填+打开弹窗（转采购按钮已实现）
+- [x] ✅ `DemandPage.vue`: `onViewLinked(row)` 打开发注单详情
+- [x] ✅ `api/demand.ts`: `convertToProcurement` API 已实现
 
 ### 后端
 - [x] `POST /api/v1/demands/{id}/convert?procurementId=` ✅ 已实现

@@ -98,9 +98,10 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('logistics.column.action')" width="120" fixed="right" align="center">
+        <el-table-column :label="$t('logistics.column.action')" width="160" fixed="right" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('logistics.action.detail') }}</el-button>
+            <el-button v-if="row.procurementId" link type="warning" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -257,12 +258,14 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Van, Top, Loading } from '@element-plus/icons-vue'
 import { logisticsApi, type LogisticsPlanVO, type LogisticsStatus, type PlanType } from '@/api/logistics'
 import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
 
+const router = useRouter()
 const loading = ref(false)
 const submitting = ref(false)
 const dialogVisible = ref(false)
@@ -421,6 +424,10 @@ async function onSubmit() {
 function onView(row: LogisticsPlanVO) {
   currentRow.value = row
   drawerVisible.value = true
+}
+
+function onOverview(row: LogisticsPlanVO) {
+  router.push('/base/overview/' + row.procurementId)
 }
 
 function planTypeLabel(type?: string): string {

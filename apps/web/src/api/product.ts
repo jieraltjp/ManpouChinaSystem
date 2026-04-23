@@ -125,6 +125,23 @@ export interface SubCodeSuggestVO {
   colorName?: string
 }
 
+export interface ProductFactoryVO {
+  productId: number
+  factoryId: number
+  supplierSku?: string
+  moq?: number
+  leadTimeDays?: number
+  unitPriceRmb?: number
+  isPreferred?: boolean
+  factoryCode?: string
+  factoryName?: string
+  province?: string
+  city?: string
+  contactName?: string
+  contactPhone?: string
+  cooperationStatus?: string
+}
+
 export const productApi = {
   list(params: { page?: number; pageSize?: number; masterCode?: string; keyword?: string; hsCode?: string }) {
     return client.get<{ code: string; data: ProductPageResponse }>('/products', { params })
@@ -153,5 +170,8 @@ export const productApi = {
     return client.get<{ code: string; data: SubCodeSuggestVO[] }>('/products/suggest/sub-codes', {
       params: { masterCode },
     })
+  },
+  getProductFactories(id: number) {
+    return client.get<{ code: string; data: ProductFactoryVO[] }>(`/products/${id}/factories`)
   },
 }

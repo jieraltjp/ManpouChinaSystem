@@ -8,12 +8,20 @@
   "menu": {
     "dashboard": "ダッシュボード",
     "procurement": "発注管理",
-    "demand": "01 補充需求",
+    "demand": "01 補充需要",
     "order": "02 発注書",
     "inspection": "03 検品記録",
     "logistics": "04 配送計画",
+    "customs": "05 国内通関",
+    "japanCustoms": "06 日本通関",
+    "finance": "財務管理",
+    "taxRefund": "07 輸出退税",
+    "sales": "運営販売",
+    "salesOperations": "08 運営販売",
     "factory": "工場管理",
-    "product": "商品ディレクトリ"
+    "product": "商品ディレクトリ",
+    "base": "基礎データ",
+    "orderOverview": "注文一覧"
   },
   "auth": {
     "login": "ログイン",
@@ -56,17 +64,17 @@
     }
   },
   "demand": {
-    "title": "補充需求管理",
-    "newButton": "新規录入",
-    "newDialogTitle": "新規录入 — 補充需求",
-    "editDialogTitle": "需求編集",
+    "title": "補充需要管理",
+    "newButton": "新規入力",
+    "newDialogTitle": "新規入力 — 補充需要",
+    "editDialogTitle": "需要編集",
     "stat": {
-      "total": "全需求",
+      "total": "全需要",
       "pending": "確認待ち",
       "converted": "発注済み"
     },
     "filter": {
-      "demandType": "需求タイプ",
+      "demandType": "需要タイプ",
       "productCode": "品番",
       "status": "ステータス",
       "all": "すべて",
@@ -74,7 +82,7 @@
       "reset": "リセット"
     },
     "column": {
-      "demandCode": "需求番号",
+      "demandCode": "需要番号",
       "demandType": "タイプ",
       "productCode": "主品番",
       "subProductCode": "子品番",
@@ -82,7 +90,7 @@
       "destination": "出荷先",
       "japanLead": "日本担当",
       "status": "ステータス",
-      "createTime": "录入日時",
+      "createTime": "作成日時",
       "action": "操作"
     },
     "type": {
@@ -102,12 +110,12 @@
       "delete": "削除"
     },
     "dialog": {
-      "demandType": "需求タイプ",
+      "demandType": "需要タイプ",
       "productCode": "主品番",
       "productCodePlaceholder": "例：odn012",
       "subProductCode": "子品番（カラー）",
       "subProductCodePlaceholder": "例：re / wh / bk",
-      "quantity": "需求数量",
+      "quantity": "需要数量",
       "destination": "出荷先",
       "destinationPlaceholder": "例：名古屋 / 久留米",
       "japanLead": "日本担当",
@@ -120,19 +128,19 @@
       "selectMasterCodeFirst": "先に主品番を選択してください"
     },
     "validation": {
-      "demandTypeRequired": "需求タイプを選択してください",
+      "demandTypeRequired": "需要タイプを選択してください",
       "productCodeRequired": "主品番は必須です",
-      "quantityRequired": "需求数量は必須です"
+      "quantityRequired": "需要数量は必須です"
     },
     "message": {
-      "createSuccess": "需求の录入が完了しました",
+      "createSuccess": "需要の入力が完了しました",
       "updateSuccess": "更新が完了しました",
       "deleteSuccess": "削除が完了しました",
-      "deleteConfirm": "需求「{code}」を削除しますか？",
+      "deleteConfirm": "需要「{code}」を削除しますか？",
       "deleteConfirmTitle": "削除確認",
-      "revertConfirm": "変換取消後、需求は未確認状態に戻り、再変換が可能になります。続行しますか？",
+      "revertConfirm": "変換取消後、需要は未確認状態に戻り、再変換が可能になります。続行しますか？",
       "revertConfirmTitle": "変換取消の確認",
-      "revertSuccess": "変換取消が完了しました。需求は未確認状態に戻りました"
+      "revertSuccess": "変換取消が完了しました。需要は未確認状態に戻りました"
     }
   },
   "order": {
@@ -205,7 +213,7 @@
       "requiresQc": "検品要",
       "priceRmb": "元建て単価",
       "exchangeRate": "為替レート",
-      "taxPoint": "票点",
+      "taxPoint": "インボイス係数",
       "estimatedPriceJpy": "見積もり卸値(JPY)",
       "billingType": "通関タイプ",
       "customsRemarks": "通関備考",
@@ -228,8 +236,8 @@
       "edit": "編集"
     },
     "dialog": {
-      "linkedDemand": "関連需求",
-      "linkedDemandPlaceholder": "補充需求から商品情報を反映（任意）",
+      "linkedDemand": "関連需要",
+      "linkedDemandPlaceholder": "補充需要から商品情報を反映（任意）",
       "selectFactory": "工場選択",
       "selectFactoryPlaceholder": "工場を選択してください",
       "factoryNew": "新規",
@@ -244,7 +252,7 @@
       "requiresQc": "検品要",
       "priceRmb": "元建て単価",
       "exchangeRate": "為替レート",
-      "taxPoint": "票点",
+      "taxPoint": "インボイス係数",
       "estimatedPricePreview": "見積もり卸値",
       "billingType": "通関タイプ",
       "billingTypePlaceholder": "通関タイプを選択",
@@ -275,18 +283,18 @@
       "editTitle": "工場編集",
       "factoryName": "工場名称",
       "factoryNamePlaceholder": "工場正式名称",
-      "province": "省份",
+      "province": "省",
       "provincePlaceholder": "省/自治区",
       "city": "都市",
       "cityPlaceholder": "市",
-      "county": "区县",
+      "county": "区/県",
       "countyPlaceholder": "区/県",
       "roughLocation": "詳細住所",
       "roughLocationPlaceholder": "工業区/鎮/パーク/番地",
       "contactName": "担当者",
       "contactNamePlaceholder": "担当者氏名",
       "contactPhone": "連絡先",
-      "contactPhonePlaceholder": "手机または電話",
+      "contactPhonePlaceholder": "携帯または電話",
       "wechat": "WeChat",
       "wechatPlaceholder": "WeChat番号",
       "qq": "QQ番号",
@@ -311,16 +319,16 @@
       "priceRmbNonNegative": "元建て単価は負の数にできません",
       "exchangeRateRequired": "為替レートは必須です",
       "exchangeRatePositive": "為替レートは正の数である必要があります",
-      "taxPointRequired": "票点は必須です",
-      "taxPointPositive": "票点は正の数である必要があります",
+      "taxPointRequired": "インボイス係数は必須です",
+      "taxPointPositive": "インボイス係数は正の数である必要があります",
       "customerCompanyMaxLength": "顧客会社名は最大128文字",
       "destinationMaxLength": "出荷先は最大128文字",
       "factoryNameRequired": "工場名称は必須です"
     },
     "message": {
       "createSuccess": "発注書の作成が完了しました",
-      "createSuccessConverting": "発注書を作成しました。需求と関連付け中...",
-      "demandConverted": "需求を発注書に変換しました",
+      "createSuccessConverting": "発注書を作成しました。需要と関連付け中...",
+      "demandConverted": "需要を発注書に変換しました",
       "updateSuccess": "更新が完了しました",
       "deleteSuccess": "削除が完了しました",
       "deleteConfirm": "発注書「{productCode}」（{quantity}個）を削除しますか？",
@@ -336,7 +344,7 @@
   },
   "inspection": {
     "title": "検品記録",
-    "newButton": "新規录入",
+    "newButton": "新規入力",
     "newDialogTitle": "新規検品",
     "stat": {
       "total": "検品記録総数",
@@ -368,7 +376,7 @@
       "fail": "不合格"
     },
     "qcType": {
-      "onsite": " 현장検品",
+      "onsite": "現地検品",
       "remote": "リモート検品"
     },
     "qcStatus": {
@@ -395,7 +403,7 @@
       "result": "検品結果",
       "qcStatus": "検品ステータス",
       "boxCount": "カートン数",
-      "cargoInfo": "货物情報",
+      "cargoInfo": "貨物情報",
       "boxLengthCm": "カートン長(cm)",
       "boxWidthCm": "カートン幅(cm)",
       "boxHeightCm": "カートン高(cm)",
@@ -405,7 +413,7 @@
       "quantity": "数量",
       "taxRefund": "退税の有無",
       "material": "材質",
-      "materialPlaceholder": "例：綿/涤纶/ボール紙",
+      "materialPlaceholder": "例：綿/テトロン/ボール紙",
       "destination": "出荷先",
       "destinationPlaceholder": "例：東京/大阪",
       "qcStandard": "検品基準",
@@ -464,7 +472,7 @@
       "factoryName": "関連工場",
       "productCode": "品番",
       "planType": "配送タイプ",
-      "cargoWeightKg": "货物重量",
+      "cargoWeightKg": "貨物重量",
       "cargoVolumeCbm": "容積",
       "requiresQc": "検品要",
       "status": "ステータス",
@@ -481,7 +489,7 @@
       "newTitle": "新規追加",
       "procurement": "関連発注書",
       "procurementPlaceholder": "発注書を選択してください",
-      "cargoInfo": "货物情報",
+      "cargoInfo": "貨物情報",
       "productCode": "品番",
       "productCodePlaceholder": "主品番",
       "subProductCode": "子品番",
@@ -489,17 +497,17 @@
       "planType": "配送タイプ",
       "selectPlaceholder": "選択してください",
       "requiresQc": "検品要",
-      "cargoLengthCm": "货物長(cm)",
-      "cargoWidthCm": "货物幅(cm)",
-      "cargoHeightCm": "货物高(cm)",
-      "cargoWeightKg": "货物重量(kg)",
+      "cargoLengthCm": "貨物長(cm)",
+      "cargoWidthCm": "貨物幅(cm)",
+      "cargoHeightCm": "貨物高(cm)",
+      "cargoWeightKg": "貨物重量(kg)",
       "quantity": "数量",
       "shipPlan": "出荷計画",
       "estimatedShipDate": "予定出荷日",
       "actualShipDate": "実際出荷日",
       "remarks": "備考",
       "remarksPlaceholder": "備考情報",
-      "cargoDimension": "货物サイズ",
+      "cargoDimension": "貨物サイズ",
       "createTime": "作成日時",
       "updateTime": "更新日時",
       "datePlaceholder": "日付を選択",
@@ -520,7 +528,7 @@
   },
   "factory": {
     "title": "工場管理",
-    "newButton": "新規录入",
+    "newButton": "新規入力",
     "stat": {
       "total": "工場総数",
       "active": "協力中",
@@ -528,7 +536,15 @@
     },
     "filter": {
       "factoryName": "工場名称",
+      "factoryNamePlaceholder": "工場名称を入力",
       "cooperationStatus": "協力状態",
+      "cooperationStatusPlaceholder": "協力状態を選択",
+      "province": "省",
+      "provincePlaceholder": "省",
+      "city": "都市",
+      "cityPlaceholder": "都市",
+      "county": "区/県",
+      "countyPlaceholder": "区/県",
       "all": "すべて",
       "search": "検索",
       "reset": "リセット"
@@ -536,13 +552,16 @@
     "column": {
       "factoryCode": "工場番号",
       "factoryName": "工場名称",
-      "category": "分類",
-      "province": "省份",
+      "province": "省",
       "city": "都市",
+      "county": "区/県",
       "roughLocation": "詳細住所",
       "contactName": "連絡先",
       "contactPhone": "連絡先電話",
+      "contactWechat": "WeChat",
+      "contactQq": "QQ番号",
       "cooperationStatus": "協力状態",
+      "paymentTerms": "支払条件",
       "action": "操作"
     },
     "action": {
@@ -552,15 +571,30 @@
     },
     "drawer": {
       "title": "工場詳細",
+      "section": {
+        "basic": "基本情報",
+        "location": "地理情報",
+        "contact": "連絡先情報",
+        "cooperation": "協力情報",
+        "audit": "監査情報"
+      },
       "factoryCode": "工場番号",
       "factoryName": "工場名称",
-      "category": "分類",
+      "fullLocation": "詳細住所",
+      "province": "省",
+      "city": "都市",
+      "county": "区/県",
+      "roughLocation": "詳細住所",
+      "longitude": "経度",
+      "latitude": "緯度",
       "paymentTerms": "支払条件",
       "address": "住所",
       "contactName": "連絡先",
       "contactPhone": "連絡先電話",
       "contactWechat": "WeChat",
       "contactQq": "QQ番号",
+      "cooperationStatus": "協力状態",
+      "createBy": "作成者",
       "notes": "備考",
       "createTime": "作成日時",
       "updateTime": "更新日時",
@@ -568,28 +602,32 @@
       "edit": "編集"
     },
     "dialog": {
+      "section": {
+        "basic": "基本信息",
+        "location": "地理情報",
+        "contact": "連絡先情報",
+        "cooperation": "協力情報"
+      },
       "newTitle": "新規工場追加",
       "editTitle": "工場編集",
       "factoryName": "工場名称",
       "factoryNamePlaceholder": "工場正式名称",
-      "category": "分類",
-      "categoryPlaceholder": "分類を選択",
       "cooperationStatus": "協力状態",
       "cooperationStatusPlaceholder": "状態を選択",
       "paymentTerms": "支払条件",
       "paymentTermsPlaceholder": "支払条件を選択",
-      "province": "省份",
+      "province": "省",
       "provincePlaceholder": "省/自治区",
       "city": "都市",
       "cityPlaceholder": "市",
-      "county": "区县",
+      "county": "区/県",
       "countyPlaceholder": "区/県",
       "roughLocation": "詳細住所",
       "roughLocationPlaceholder": "工業区/鎮/パーク/番地",
       "contactName": "連絡先",
       "contactNamePlaceholder": "連絡先氏名",
       "contactPhone": "連絡先電話",
-      "contactPhonePlaceholder": "手机または電話",
+      "contactPhonePlaceholder": "携帯または電話",
       "contactWechat": "WeChat",
       "contactWechatPlaceholder": "WeChat番号",
       "contactQq": "QQ番号",
@@ -602,22 +640,8 @@
     "cooperationStatus": {
       "ACTIVE": "協力中",
       "SUSPENDED": "一時停止",
-      "ELIMINATED": "已淘汰",
+      "ELIMINATED": "廃止",
       "POTENTIAL": "潜在協力"
-    },
-    "category": {
-      "TOOLS": "五金工具",
-      "TEXTILE": "紡織服装",
-      "PLASTIC": "塑料製品",
-      "ELECTRONICS": "電子機器",
-      "FURNITURE": "家具家居",
-      "AUTO_PARTS": "自動車部品",
-      "SPORTS": "スポーツ·レジャー",
-      "PET": "ペット用品",
-      "MEDICAL": "医療器械",
-      "CRAFTS": "工芸礼品",
-      "CHEMICAL": "化工材料",
-      "OTHER": "その他"
     },
     "paymentTerms": {
       "CASH": "現金払い",
@@ -630,7 +654,7 @@
       "factoryNameRequired": "工場名称は必須です"
     },
     "message": {
-      "deleteConfirm": "工場「{name}」を削除しますか？",
+      "deleteConfirm": "工場「{name}」（{code}）を削除しますか？",
       "deleteConfirmTitle": "削除確認",
       "deleteSuccess": "削除が完了しました",
       "createSuccess": "工場の作成が完了しました",
@@ -678,21 +702,43 @@
       "nameJa": "日本語名称",
       "hsCode": "HSコード",
       "unitPriceRmb": "税込単価(CNY)",
+      "taxPoint": "インボイス係数",
+      "taxRate": "消費税率",
       "netWeight": "正味重量",
       "grossWeight": "総重量",
       "lengthCm": "長さ(cm)",
       "widthCm": "幅(cm)",
       "heightCm": "高さ(cm)",
-      "origin": "原装国",
+      "declarationElements": "申告要素",
+      "origin": "原産国",
       "material": "材質",
       "unit": "単位",
-      "exportCategory": "輸出分類",
-      "factory": "関連工場",
-      "notes": "備考",
+      "category": "商品分類",
+      "colorName": "カラー名称",
+      "warehouse": "倉庫所属",
+      "requiresQc": "品質検査要",
+      "imageUrl": "商品画像",
+      "remarks": "備考",
+      "lastUsedDate": "最終使用",
+      "unitsPerPackage": "ケース入数",
       "createTime": "作成日時",
       "updateTime": "更新日時",
       "close": "閉じる",
-      "edit": "編集"
+      "edit": "編集",
+      "section": {
+        "basicInfo": "基本情報",
+        "specInfo": "仕様情報",
+        "factories": "関連工場"
+      },
+      "noFactories": "関連工場なし",
+      "preferred": "優先",
+      "factoryCode": "工場番号",
+      "factoryLocation": "所在地",
+      "contact": "担当者",
+      "moq": "最小注文数",
+      "leadTimeDays": "リードタイム",
+      "unitPrice": "単価",
+      "days": "日"
     },
     "dialog": {
       "newTitle": "新規商品追加",
@@ -710,11 +756,11 @@
       "unitPriceRmb": "税込単価(CNY)",
       "netWeight": "正味重量(kg)",
       "grossWeight": "総重量(kg)",
-      "cargoSize": "货物サイズ",
+      "cargoSize": "貨物サイズ",
       "lengthCm": "長さ(cm)",
       "widthCm": "幅(cm)",
       "heightCm": "高さ(cm)",
-      "origin": "原装国",
+      "origin": "原産国",
       "originPlaceholder": "例：中国",
       "material": "材質",
       "materialPlaceholder": "例：plastic/metal",
@@ -724,7 +770,7 @@
       "nameJaPlaceholder": "日本語名称",
       "taxPoint": "インボイス係数",
       "taxPointPlaceholder": "デフォルト 1.1",
-      "taxRate": "增值税率",
+      "taxRate": "消費税率",
       "taxRatePlaceholder": "デフォルト 0.1",
       "declarationElements": "申告要素",
       "declarationElementsPlaceholder": "材質|住所|ブランド",
@@ -741,12 +787,7 @@
     },
     "validation": {
       "masterCodeRequired": "主品番は必須です",
-      "nameZhRequired": "中文名称は必須です",
-      "nameJaRequired": "日本語名称は必須です",
-      "taxPointRequired": "インボイス係数は必須です",
-      "taxRateRequired": "增值税率は必須です",
-      "declarationElementsRequired": "申告要素は必須です",
-      "remarksRequired": "備考は必須です"
+      "nameZhRequired": "中文名称は必須です"
     },
     "message": {
       "deleteConfirm": "商品「{code}」を削除しますか？",
@@ -754,6 +795,119 @@
       "deleteSuccess": "削除が完了しました",
       "createSuccess": "作成が完了しました",
       "updateSuccess": "更新が完了しました"
+    }
+  },
+  "orderOverview": {
+    "title": "注文一覧",
+    "back": "一覧に戻る",
+    "print": "印刷",
+    "loadFailed": "読み込み失敗",
+    "retry": "再試行",
+    "filter": {
+      "keyword": "キーワード",
+      "keywordPlaceholder": "品番/工場名",
+      "search": "検索",
+      "reset": "リセット"
+    },
+    "column": {
+      "productCode": "品番",
+      "factoryName": "工場",
+      "status": "ステータス",
+      "orderDate": "発注日",
+      "destination": "送り先",
+      "action": "操作"
+    },
+    "action": {
+      "view": "一覧"
+    },
+    "step1": {
+      "title": "ステップ1：補充需要",
+      "demandCode": "需要番号",
+      "demandType": "需要タイプ",
+      "productCode": "品番",
+      "quantity": "需要数量",
+      "destination": "送り先",
+      "japanLead": "担当者",
+      "status": "ステータス"
+    },
+    "step2": {
+      "title": "ステップ2：発注書情報",
+      "procurementCode": "発注番号",
+      "factoryName": "工場",
+      "productCode": "品番",
+      "quantity": "数量",
+      "priceRmb": "単価(CNY)",
+      "taxPoint": "インボイス係数",
+      "billingType": "通関タイプ",
+      "estimatedPriceJpy": "見積もり卸値(JPY)",
+      "orderDate": "発注日",
+      "plannedShipDate": "納期",
+      "actualShipDate": "実際出荷日",
+      "status": "ステータス"
+    },
+    "step3": {
+      "title": "ステップ3：検品記録",
+      "qcCode": "検品番号",
+      "result": "結果",
+      "inspectionCount": "検品数",
+      "passedCount": "合格数",
+      "defectiveCount": "不良数",
+      "qcDate": "検品日"
+    },
+    "step4": {
+      "title": "ステップ4：配送計画",
+      "planCode": "配送番号",
+      "planType": "輸送方法",
+      "cargoVolume": "容積(CBM)",
+      "cargoWeight": "重量(kg)",
+      "estimatedShipDate": "予定出荷日",
+      "actualShipDate": "実際出荷日",
+      "status": "ステータス"
+    },
+    "step5": {
+      "title": "ステップ5：国内通関",
+      "customsCode": "通関番号",
+      "productCode": "品番",
+      "status": "ステータス",
+      "estimatedValue": "申告価格"
+    },
+    "step6": {
+      "title": "ステップ6：日本通関",
+      "customsEntryNo": "入境通関番号",
+      "arrivalDate": "到着日",
+      "clearanceDate": "通関完了日",
+      "customsBroker": "通関業者",
+      "importDutyPaid": "輸入関税(JPY)",
+      "consumptionTaxPaid": "消費税(JPY)",
+      "arrivalPort": "仕向港",
+      "status": "ステータス"
+    },
+    "step7": {
+      "title": "ステップ7：退税",
+      "refundCode": "退税番号",
+      "estimatedRefundRmb": "理論退税額",
+      "actualRefundRmb": "実際退税額",
+      "refundDate": "退税日",
+      "status": "ステータス"
+    },
+    "step8": {
+      "title": "ステップ8：運営販売",
+      "recordCode": "販売番号",
+      "salesChannel": "販売チャネル",
+      "listingDate": "上架日",
+      "currentStock": "現在庫",
+      "salesQuantity": "累計販売数",
+      "returnRate": "退货率",
+      "sellingPriceJpy": "販売価格(JPY)",
+      "status": "ステータス"
+    },
+    "step": {
+      "notStarted": "記録なし",
+      "placeholder": "未実装",
+      "status": {
+        "completed": "完了",
+        "inProgress": "進行中"
+      }
     }
   },
   "common": {
@@ -794,5 +948,299 @@
   },
   "validation": {
     "required": "この項目は必須です"
+  },
+  "customs": {
+    "title": "国内通関",
+    "newButton": "新規通関",
+    "newDialogTitle": "通関書類作成",
+    "drawerTitle": "通関書類詳細",
+    "rejectDialogTitle": "通関書類却下",
+    "stat": {
+      "total": "通関書類総数",
+      "pending": "未提出",
+      "submitted": "提出済",
+      "cleared": "通関済"
+    },
+    "filter": {
+      "customsCode": "通関書類番号",
+      "customsCodePlaceholder": "通関書類番号を入力",
+      "procurementId": "仕入書類番号",
+      "procurementIdPlaceholder": "仕入書類ID",
+      "status": "ステータス"
+    },
+    "column": {
+      "customsCode": "通関書類番号",
+      "procurementId": "仕入書類番号",
+      "productCode": "商品コード",
+      "subProductCode": "枝番",
+      "quantity": "数量",
+      "estimatedValueCny": "想定価格(CNY)",
+      "status": "ステータス",
+      "createTime": "作成日時",
+      "action": "操作",
+      "factoryId": "工場ID"
+    },
+    "status": {
+      "pending": "未提出",
+      "submitted": "提出済",
+      "cleared": "通関済",
+      "rejected": "却下済"
+    },
+    "action": {
+      "detail": "詳細",
+      "submit": "提出",
+      "clear": "通関",
+      "reject": "却下"
+    },
+    "dialog": {
+      "procurementId": "仕入書類番号",
+      "procurementIdPlaceholder": "仕入書類IDを入力",
+      "productCode": "商品コード",
+      "productCodePlaceholder": "商品コードを入力",
+      "subProductCode": "枝番",
+      "subProductCodePlaceholder": "枝番を入力",
+      "quantity": "数量",
+      "estimatedValueCny": "想定価格(CNY)",
+      "factoryId": "工場ID",
+      "factoryIdPlaceholder": "工場IDを入力",
+      "remarks": "備考",
+      "remarksPlaceholder": "備考を入力",
+      "createBy": "作成者",
+      "createTime": "作成日時",
+      "updateTime": "更新日時"
+    },
+    "rejectDialog": {
+      "reasonLabel": "却下理由",
+      "reasonPlaceholder": "却下理由を入力"
+    },
+    "validation": {
+      "productCodeRequired": "商品コードは必須です"
+    },
+    "message": {
+      "loadFailed": "通関書類一覧の読み込みに失敗しました",
+      "createSuccess": "通関書類を作成しました",
+      "createFailed": "通関書類の作成に失敗しました",
+      "submitSuccess": "通関書類を提出しました",
+      "clearSuccess": "通関書類を通関しました",
+      "rejectSuccess": "通関書類を却下しました",
+      "deleteSuccess": "通関書類を削除しました",
+      "actionFailed": "操作に失敗しました",
+      "deleteConfirm": "この通関書類を削除しますか？"
+    }
+  },
+  "japanCustoms": {
+    "title": "日本通関",
+    "drawerTitle": "通関詳細",
+    "completeDialogTitle": "通関完了",
+    "failDialogTitle": "通関失敗をマーク",
+    "stat": {
+      "total": "通関書類総数",
+      "pending": "未通関",
+      "inProgress": "通関中",
+      "cleared": "通関済",
+      "failed": "通関失敗"
+    },
+    "filter": {
+      "entryNo": "入境通関番号",
+      "entryNoPlaceholder": "入境通関番号を入力",
+      "procurementId": "仕入書類番号",
+      "status": "ステータス"
+    },
+    "column": {
+      "entryNo": "入境通関番号",
+      "procurementId": "仕入書類番号",
+      "domesticCustomsId": "国内通関番号",
+      "arrivalPort": "到着港",
+      "arrivalDate": "到着日",
+      "broker": "通関業者",
+      "brokerPhone": "業者電話",
+      "brokerContact": "業者連絡先",
+      "weight": "申告重量",
+      "volume": "申告容積",
+      "importDuty": "輸入関税",
+      "consumptionTax": "消費税",
+      "clearanceDate": "通関日",
+      "status": "ステータス",
+      "remarks": "備考",
+      "action": "操作",
+      "createBy": "作成者",
+      "createTime": "作成日時"
+    },
+    "status": {
+      "pending": "未通関",
+      "inProgress": "通関中",
+      "cleared": "通関済",
+      "failed": "通関失敗"
+    },
+    "action": {
+      "detail": "詳細",
+      "start": "開始",
+      "complete": "完了",
+      "fail": "失敗"
+    },
+    "completeDialog": {
+      "importDuty": "輸入関税（JPY）",
+      "consumptionTax": "消費税（JPY）",
+      "clearanceDate": "通関完了日"
+    },
+    "failDialog": {
+      "reasonLabel": "失敗理由",
+      "reasonPlaceholder": "失敗理由を入力"
+    },
+    "message": {
+      "loadFailed": "通関書類一覧の読み込みに失敗しました",
+      "startSuccess": "通関を開始しました",
+      "completeSuccess": "通関が完了しました",
+      "failSuccess": "失敗をマークしました",
+      "deleteSuccess": "削除しました",
+      "actionFailed": "操作に失敗しました",
+      "deleteConfirm": "この通関記録を削除しますか？"
+    }
+  },
+  "taxRefund": {
+    "title": "輸出退税",
+    "drawerTitle": "退税詳細",
+    "completeDialogTitle": "退税完了",
+    "stat": {
+      "total": "退税申請総数",
+      "applying": "退税中",
+      "completed": "完了",
+      "noRefund": "退税なし"
+    },
+    "filter": {
+      "procurementId": "発注番号",
+      "status": "ステータス"
+    },
+    "column": {
+      "refundCode": "退税番号",
+      "procurementId": "発注番号",
+      "japanCustomsId": "日本通関番号",
+      "billingType": "請求タイプ",
+      "taxPoint": "税率",
+      "priceRmb": "単価(RMB)",
+      "quantity": "数量",
+      "estimatedRefundRmb": "見積退税額",
+      "actualRefundRmb": "実際退税額",
+      "refundDate": "退税日",
+      "refundBank": "退税銀行",
+      "status": "ステータス",
+      "remarks": "備考",
+      "action": "操作",
+      "createBy": "作成者",
+      "createTime": "作成日時"
+    },
+    "status": {
+      "applying": "退税中",
+      "completed": "完了",
+      "noRefund": "退税なし"
+    },
+    "action": {
+      "detail": "詳細",
+      "complete": "完了",
+      "noRefund": "退税なし"
+    },
+    "completeDialog": {
+      "actualRefundRmb": "実際退税金額（RMB）",
+      "refundDate": "退税日",
+      "refundDateRequired": "退税日を選択してください",
+      "refundBank": "退税銀行",
+      "refundBankPlaceholder": "退税銀行を入力（任意）"
+    },
+    "message": {
+      "loadFailed": "退税申請一覧の読み込みに失敗しました",
+      "completeSuccess": "退税が完了しました",
+      "noRefundSuccess": "退税なしとマークしました",
+      "actionFailed": "操作に失敗しました"
+    }
+  },
+  "sales": {
+    "title": "運営販売管理",
+    "newButton": "新規上架",
+    "newDialogTitle": "新規上架",
+    "drawerTitle": "販売詳細",
+    "stockDialogTitle": "在庫更新",
+    "alertButton": "在庫アラート",
+    "alertDialogTitle": "在庫アラート一覧",
+    "stat": {
+      "total": "販売商品数",
+      "listed": "通常販売",
+      "lowStock": "在庫警告",
+      "outOfStock": "在庫切れ",
+      "discontinued": "販売終了"
+    },
+    "filter": {
+      "productCode": "品番",
+      "productCodePlaceholder": "品番を入力",
+      "salesChannel": "販売チャネル",
+      "status": "ステータス"
+    },
+    "channel": {
+      "amazon": "Amazon",
+      "mercali": "メルカリ",
+      "selfSite": "自社サイト",
+      "other": "その他"
+    },
+    "column": {
+      "recordCode": "販売番号",
+      "procurementId": "発注番号",
+      "productCode": "品番",
+      "subProductCode": "子品番",
+      "salesChannel": "販売チャネル",
+      "currentStock": "現在庫",
+      "initialStock": "初期在庫",
+      "safetyStock": "安全在庫",
+      "salesQuantity": "累計販売数",
+      "returnedQuantity": "退货数",
+      "returnRate": "退货率",
+      "sellingPriceJpy": "販売価格(JPY)",
+      "listingDate": "上架日",
+      "status": "ステータス",
+      "remarks": "備考",
+      "action": "操作",
+      "createBy": "作成者",
+      "createTime": "作成日時"
+    },
+    "status": {
+      "listed": "通常販売",
+      "lowStock": "在庫警告",
+      "outOfStock": "在庫切れ",
+      "discontinued": "販売終了"
+    },
+    "action": {
+      "detail": "詳細",
+      "updateStock": "在庫",
+      "discontinue": "終了",
+      "relist": "再上架"
+    },
+    "form": {
+      "procurementId": "関連発注番号",
+      "productCode": "主品番",
+      "productCodePlaceholder": "例：de077",
+      "subProductCode": "子品番",
+      "salesChannel": "販売チャネル",
+      "listingDate": "上架日",
+      "initialStock": "初期在庫",
+      "safetyStock": "安全在庫",
+      "sellingPriceJpy": "販売価格（JPY）",
+      "remarks": "備考"
+    },
+    "stockDialog": {
+      "sold": "販売数",
+      "returned": "退货数"
+    },
+    "message": {
+      "loadFailed": "販売一覧の読み込みに失敗しました",
+      "createSuccess": "上架が完了しました",
+      "createFailed": "上架に失敗しました",
+      "updateSuccess": "在庫を更新しました",
+      "discontinueSuccess": "販売を終了しました",
+      "relistSuccess": "再上架しました",
+      "deleteSuccess": "削除しました",
+      "actionFailed": "操作に失敗しました",
+      "deleteConfirm": "この販売記録を削除しますか？"
+    },
+    "validation": {
+      "salesChannelRequired": "販売チャネルを選択してください"
+    }
   }
 }

@@ -1,8 +1,9 @@
-# UI-04 — 调配计划页面
+# UI-07 — 调配计划页面
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
-> **状态**: ⚡占位（当前内嵌于 `02-procurement.md`）
+> **更新**: 2026-04-22
+> **状态**: ✅（LogisticsController + LogisticsPage.vue 完整实现）
 > **对应业务步号**: 04（调配计划）
 > **对应业务文档**: `docs/business/SPEC-B04-调配计划-步骤4.md`
 > **对应数据库文档**: `docs/database/DB-04-logistics.md`

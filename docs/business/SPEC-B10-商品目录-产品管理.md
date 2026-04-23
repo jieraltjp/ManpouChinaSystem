@@ -1,12 +1,12 @@
 # SPEC-B10 — 商品目录业务规格（商品类）
 
-> **版本**: 1.2.0
-> **更新**: 2026-04-22（v1.2.0：前端 i18n + pagination bug修复；后端 V5/V6 迁移脚本待执行）
+> **版本**: 1.3.1
+> **更新**: 2026-04-23（v1.3.1：补全 UI 文档 `docs/ui/pages/10-product.md`）
 > **创建**: 2026-04-22
 > **状态**: ✅ 已实现
 > **业务步号**: 00（基础设施/商品目录）
 > **对应数据库文档**: `docs/database/DB-11-product.md`
-> **对应 UI 文档**: `docs/ui/pages/10-product.md`（待创建）
+> **对应 UI 文档**: `docs/ui/pages/10-product.md`
 > **前置步骤**: 无（商品目录是所有业务步的基础数据）
 
 ---
@@ -312,8 +312,16 @@ List<SubCodeSuggestVO> suggestSubCodes(String masterCode);
 - [x] ✅ `ProductPage.vue` 前端商品管理页面（i18n完成，pagination bug已修复）
 - [x] ✅ `product.ts` 前端 API 客户端
 - [x] ✅ `V3__product_tables.sql` Flyway 迁移脚本
-- [ ] 🔴 `V7__product_data_migration.sql` 商品数据迁移（goods.sql 781条 → product 表； staging → product + product_factory）
-- [ ] 🔴 商品-工厂关联迁移（已含于 V7 步骤2）
+- [x] ✅ `V4__product_tables.sql` 表结构（factory + product + product_factory，H2 兼容）
+- [x] ✅ `V5__factory_migration.sql` 工厂数据（500 条）
+- [x] ✅ `V6__procurement_factory_link.sql`（占位 no-op）
+- [x] ✅ `V7__demand_sub_product_extend.sql`（占位 no-op）
+- [x] ✅ `V9__goods_data_migration.sql`（占位 no-op，goods_staging 数据已并入 V8）
+- [x] ✅ `V10__product_data_migration.sql`（占位，真实数据由 V11 加载）
+- [x] ✅ `V11__product_seed_data.sql` 商品数据 ETL（**1971 条**；含 product_factory 关联 **781 条**）
+- [x] ✅ `V11__product_factory_data.sql` product_factory 关联（备选路径）
+
+> **数据验证**：后端 H2 启动成功，`GET /api/v1/products?size=0` → `totalElements: 1971`；`GET /api/v1/factories?size=0` → `totalElements: 500`。`product_factory` 关联 781 条已由 V11__product_seed_data.sql 加载。
 
 ---
 

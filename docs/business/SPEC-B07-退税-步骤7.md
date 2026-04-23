@@ -1,8 +1,9 @@
 # 退税 — 业务规格（步骤7）
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
-> **状态**: 占位（字段和规则待确认）
+> **更新**: 2026-04-23（补充元数据字段）
+> **状态**: ✅ 已实现
 > **对应前端**: `TaxRefundPage.vue` · `docs/ui/pages/07-tax-refund.md`
 > **前置**: JapanCustomsRecord.status = CLEARED（货物抵达日本）
 > **后续**: SalesRecord（步骤8）/ FinanceRecord
@@ -103,9 +104,9 @@ if (Procurement.billingType ∈ {ZHE_LU_KAI_PIAO, CHAO_HUI_TUI_SHUI}) {
 GET    /api/v1/tax-refunds?page=&pageSize=&procurementId=&status=
 GET    /api/v1/tax-refunds/{id}
 POST   /api/v1/tax-refunds
-PATCH  /api/v1/tax-refunds/{id}
 PATCH  /api/v1/tax-refunds/{id}/complete    # 标记完成
 PATCH  /api/v1/tax-refunds/{id}/no-refund   # 标记不退税
+DELETE /api/v1/tax-refunds/{id}            # 软删除（终态禁止删除）
 ```
 
 ---
@@ -123,14 +124,14 @@ PATCH  /api/v1/tax-refunds/{id}/no-refund   # 标记不退税
 
 ## 7. 代码实现清单
 
-- [ ] 🔴 `TaxRefundRecord` 聚合根实体
-- [ ] 🔴 `TaxRefundStatus` 枚举（含 `isTerminal()` + `canTransitionTo()`）
-- [ ] 🔴 `TaxRefundRepository` 领域接口
-- [ ] 🔴 `TaxRefundJpaRepository` JPA 适配器
-- [ ] 🔴 `TaxRefundAssembler` DTO ↔ Entity 转换器
-- [ ] 🔴 `TaxRefundUseCase` 用例服务（含理论退税计算）
-- [ ] 🔴 `TaxRefundController` REST 控制器
-- [ ] 🔴 `@/api/taxRefund.ts` 前端 API 客户端
-- [ ] 🔴 `TaxRefundPage.vue` 页面（`docs/ui/pages/07-tax-refund.md`）
+- [x] ✅ `TaxRefundRecord` 聚合根实体
+- [x] ✅ `TaxRefundStatus` 枚举（含 `isTerminal()` + `canTransitionTo()`）
+- [x] ✅ `TaxRefundRepository` 领域接口
+- [x] ✅ `TaxRefundAssembler` DTO ↔ Entity 转换器
+- [x] ✅ `TaxRefundUseCase` 用例服务（含理论退税计算）
+- [x] ✅ `TaxRefundController` REST 控制器（`/api/v1/tax-refunds`）
+- [x] ✅ `@/api/taxRefund.ts` 前端 API 客户端
+- [x] ✅ `TaxRefundPage.vue` 页面（`apps/web/src/pages/finance/TaxRefundPage.vue`）
+- [x] ✅ DB migration `V13__tax_refund_record_table.sql`
+- [x] ✅ 聚合接口 `GET /api/v1/orders/{id}/overview` step7 集成（`OrderOverviewUseCase`）
 - [ ] 🔴 `TaxRefundUseCaseTest` 单元测试（含理论计算验证）
-- [ ] 🔴 聚合接口 `GET /api/v1/orders/{id}/overview` 更新

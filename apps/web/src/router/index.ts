@@ -57,10 +57,70 @@ const routes: RouteRecordRaw[] = [
             meta: { titleKey: 'menu.logistics', requiresAuth: true },
           },
           {
+            path: 'customs',
+            name: 'Customs',
+            component: () => import('@/pages/customs/CustomsPage.vue'),
+            meta: { titleKey: 'menu.customs', requiresAuth: true },
+          },
+          {
+            path: 'japan-customs',
+            name: 'JapanCustoms',
+            component: () => import('@/pages/customs/JapanCustomsPage.vue'),
+            meta: { titleKey: 'menu.japanCustoms', requiresAuth: true },
+          },
+        ],
+      },
+      {
+        path: 'finance',
+        name: 'Finance',
+        redirect: '/finance/tax-refund',
+        meta: { titleKey: 'menu.finance', requiresAuth: true },
+        children: [
+          {
+            path: 'tax-refund',
+            name: 'TaxRefund',
+            component: () => import('@/pages/finance/TaxRefundPage.vue'),
+            meta: { titleKey: 'menu.taxRefund', requiresAuth: true },
+          },
+        ],
+      },
+      {
+        path: 'sales',
+        name: 'Sales',
+        redirect: '/sales/operations',
+        meta: { titleKey: 'menu.sales', requiresAuth: true },
+        children: [
+          {
+            path: 'operations',
+            name: 'SalesOperations',
+            component: () => import('@/pages/sales/SalesOperationsPage.vue'),
+            meta: { titleKey: 'menu.salesOperations', requiresAuth: true },
+          },
+        ],
+      },
+      {
+        path: 'base',
+        name: 'Base',
+        redirect: '/base/factory',
+        meta: { titleKey: 'menu.base', requiresAuth: true },
+        children: [
+          {
+            path: 'factory',
+            name: 'Factory',
+            component: () => import('@/pages/factory/FactoryPage.vue'),
+            meta: { titleKey: 'menu.factory', requiresAuth: true },
+          },
+          {
             path: 'product',
             name: 'Product',
             component: () => import('@/pages/product/ProductPage.vue'),
             meta: { titleKey: 'menu.product', requiresAuth: true },
+          },
+          {
+            path: 'overview',
+            name: 'OrderOverview',
+            component: () => import('@/pages/procurement/OrderOverviewPage.vue'),
+            meta: { titleKey: 'menu.orderOverview', requiresAuth: true },
           },
         ],
       },

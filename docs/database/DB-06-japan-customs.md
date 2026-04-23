@@ -2,7 +2,7 @@
 
 > **版本**: 1.0.0
 > **创建**: 2026-04-22
-> **状态**: 🔴 占位（字段待确认）
+> **状态**: 🟡 部分实现（字段已定义，实体已实现）
 > **业务步号**: 06（日本清关）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B06-日本清关-步骤6.md`
 > **对应 UI 文档**: `docs/ui/pages/06-japan-customs.md`
@@ -20,12 +20,11 @@
 
 ## 1. japan_customs_record（日本清关）🔴占位
 
-> ⚠️ 字段为占位，待业务方提供真实清关文件样本后确认。
+> ⚠️ 部分字段为占位，待业务方提供真实清关文件样本后确认。
 
 **对应**: `JapanCustomsRecord` 聚合根
 
 ```sql
--- TODO: 字段待业务方确认后补充完整
 CREATE TABLE japan_customs_record (
     id                    BIGINT AUTO_INCREMENT PRIMARY KEY,
     customs_entry_no      VARCHAR(64) COMMENT '入境报关号',
@@ -37,8 +36,8 @@ CREATE TABLE japan_customs_record (
     customs_broker        VARCHAR(128) COMMENT '清关行',
     broker_phone          VARCHAR(32) COMMENT '清关行电话',
     broker_contact        VARCHAR(64) COMMENT '清关行联系人',
-    import_duty_paid      BIGINT COMMENT '进口关税（JPY）',
-    consumption_tax_paid BIGINT COMMENT '消费税（JPY）',
+    import_duty_paid      DECIMAL(14,2) COMMENT '进口关税（JPY）',
+    consumption_tax_paid DECIMAL(14,2) COMMENT '消费税（JPY）',
     clearance_date        DATE COMMENT '清关完成日期',
     arrival_port          VARCHAR(64) COMMENT '目的港（来自 logistics_plan）',
     declared_weight_kg   DECIMAL(10,4) COMMENT '申报重量（来自 logistics_plan）',

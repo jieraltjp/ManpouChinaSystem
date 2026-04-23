@@ -1,11 +1,12 @@
 # 国内报关 — 业务规格（步骤5）
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
-> **状态**: 占位（字段待确认）
-> **对应前端**: `DomesticCustomsPage.vue` · `docs/ui/pages/05-domestic-customs.md`
+> **更新**: 2026-04-22 — 步骤6已实现，同步更新后续状态
+> **状态**: ✅ 已实现（B05 报关单核心 CRUD + 生命周期流转）
+> **对应前端**: `CustomsPage.vue`（`apps/web/src/pages/customs/CustomsPage.vue`）· `docs/ui/pages/05-domestic-customs.md`
 > **前置**: LogisticsPlan.status = IN_TRANSIT
-> **后续**: JapanCustomsRecord（步骤6）
+> **后续**: JapanCustomsRecord（步骤6）— ✅ 已实现
 
 ---
 
@@ -89,7 +90,7 @@ public enum DomesticCustomsStatus {
 
 **实现方式**：
 - 方案A：后端 UseCase 监听 LogisticsPlan 状态变更事件
-- 方案B：前端 LogisticsPage.vue 在操作「确认发货」时调用 POST `/api/v1/domestic-customs`
+- 方案B：前端 LogisticsPage.vue 在操作「确认发货」时调用 POST `/api/v1/customs`
 
 > ⚠️ 推荐方案A（后端事件驱动），但当前 Kafka 尚未引入，Phase 0 建议使用方案B。
 
@@ -97,16 +98,17 @@ public enum DomesticCustomsStatus {
 
 ## 5. API 设计
 
-### DomesticCustomsController
+### CustomsController
 
 ```
-GET    /api/v1/domestic-customs?page=&pageSize=&procurementId=&status=
-GET    /api/v1/domestic-customs/{id}
-POST   /api/v1/domestic-customs
-PATCH  /api/v1/domestic-customs/{id}
-PATCH  /api/v1/domestic-customs/{id}/submit      # 提交
-PATCH  /api/v1/domestic-customs/{id}/clear       # 放行
-PATCH  /api/v1/domestic-customs/{id}/reject     # 驳回
+GET    /api/v1/customs?page=&pageSize=&procurementId=&status=
+GET    /api/v1/customs/{id}
+POST   /api/v1/customs
+PUT    /api/v1/customs/{id}
+PATCH  /api/v1/customs/{id}/submit              # 提交
+PATCH  /api/v1/customs/{id}/clear              # 放行
+PATCH  /api/v1/customs/{id}/reject              # 驳回
+DELETE /api/v1/customs/{id}
 ```
 
 ---
@@ -125,14 +127,14 @@ PATCH  /api/v1/domestic-customs/{id}/reject     # 驳回
 
 ## 7. 代码实现清单
 
-- [ ] 🔴 `DomesticCustomsRecord` 聚合根实体
-- [ ] 🔴 `DomesticCustomsStatus` 枚举（含 `isTerminal()` + `canTransitionTo()`）
-- [ ] 🔴 `DomesticCustomsRepository` 领域接口
-- [ ] 🔴 `DomesticCustomsJpaRepository` JPA 适配器
-- [ ] 🔴 `DomesticCustomsAssembler` DTO ↔ Entity 转换器
-- [ ] 🔴 `DomesticCustomsUseCase` 用例服务
-- [ ] 🔴 `DomesticCustomsController` REST 控制器
-- [ ] 🔴 `@/api/domesticCustoms.ts` 前端 API 客户端
-- [ ] 🔴 `DomesticCustomsPage.vue` 页面（`docs/ui/pages/05-domestic-customs.md`）
-- [ ] 🔴 `DomesticCustomsUseCaseTest` 单元测试
-- [ ] 🔴 聚合接口 `GET /api/v1/orders/{id}/overview` 更新
+- [x] ✅ `DomesticCustomsRecord` 聚合根实体
+- [x] ✅ `DomesticCustomsStatus` 枚举（含 `isTerminal()` + `canTransitionTo()`）
+- [x] ✅ `DomesticCustomsRepository` 领域接口（直接继承 JpaRepository）
+- [x] ✅ `CustomsAssembler` DTO ↔ Entity 转换器
+- [x] ✅ `CustomsUseCase` 用例服务
+- [x] ✅ `CustomsController` REST 控制器
+- [x] ✅ `@/api/customs.ts` 前端 API 客户端
+- [x] ✅ `CustomsPage.vue` 前端页面（`apps/web/src/pages/customs/CustomsPage.vue`）
+- [ ] 🔴 `CustomsUseCaseTest` 单元测试
+- [x] ✅ `OrderOverviewUseCase` 已集成 DomesticCustomsRecord（步骤5）
+- [x] ✅ DB迁移脚本 `V17__domestic_customs_record_table.sql`

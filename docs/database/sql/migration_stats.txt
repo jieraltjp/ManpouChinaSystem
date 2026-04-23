@@ -1,0 +1,6 @@
+goods.sql SKUs: 778
+DB.json SKUs: 1877
+Total merged: 2098
+Overlap (both): 557
+Only goods.sql: 221
+Only DB.json: 1320

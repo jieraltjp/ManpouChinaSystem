@@ -12,8 +12,16 @@
     "order": "02 发注单",
     "inspection": "03 验货记录",
     "logistics": "04 调配计划",
+    "customs": "05 国内报关",
+    "japanCustoms": "06 日本清关",
+    "finance": "财务管理",
+    "taxRefund": "07 出口退税",
+    "sales": "运营销售",
+    "salesOperations": "08 运营销售",
     "factory": "工厂管理",
-    "product": "商品目录"
+    "product": "商品目录",
+    "base": "基础数据",
+    "orderOverview": "订单总览"
   },
   "auth": {
     "login": "登录",
@@ -528,7 +536,15 @@
     },
     "filter": {
       "factoryName": "工厂名称",
+      "factoryNamePlaceholder": "输入工厂名称",
       "cooperationStatus": "合作状态",
+      "cooperationStatusPlaceholder": "选择合作状态",
+      "province": "省",
+      "provincePlaceholder": "省",
+      "city": "市",
+      "cityPlaceholder": "市",
+      "county": "县/区",
+      "countyPlaceholder": "县/区",
       "all": "全部",
       "search": "查询",
       "reset": "重置"
@@ -536,13 +552,16 @@
     "column": {
       "factoryCode": "工厂编号",
       "factoryName": "工厂名称",
-      "category": "分类",
-      "province": "省份",
-      "city": "城市",
+      "province": "省",
+      "city": "市",
+      "county": "县/区",
       "roughLocation": "详细地址",
       "contactName": "联系人",
       "contactPhone": "联系电话",
+      "contactWechat": "微信",
+      "contactQq": "QQ",
       "cooperationStatus": "合作状态",
+      "paymentTerms": "账期",
       "action": "操作"
     },
     "action": {
@@ -552,15 +571,30 @@
     },
     "drawer": {
       "title": "工厂详情",
+      "section": {
+        "basic": "基本信息",
+        "location": "地理信息",
+        "contact": "联系方式",
+        "cooperation": "合作信息",
+        "audit": "审计信息"
+      },
       "factoryCode": "工厂编号",
       "factoryName": "工厂名称",
-      "category": "分类",
+      "fullLocation": "详细地址",
+      "province": "省份",
+      "city": "城市",
+      "county": "区县",
+      "roughLocation": "详细地址",
+      "longitude": "经度",
+      "latitude": "纬度",
       "paymentTerms": "账期",
       "address": "地址",
       "contactName": "联系人",
       "contactPhone": "联系电话",
       "contactWechat": "微信号",
       "contactQq": "QQ号",
+      "cooperationStatus": "合作状态",
+      "createBy": "创建人",
       "notes": "备注",
       "createTime": "创建时间",
       "updateTime": "更新时间",
@@ -568,12 +602,16 @@
       "edit": "编辑"
     },
     "dialog": {
+      "section": {
+        "basic": "基本信息",
+        "location": "地理信息",
+        "contact": "联系方式",
+        "cooperation": "合作信息"
+      },
       "newTitle": "新增工厂",
       "editTitle": "编辑工厂",
       "factoryName": "工厂名称",
       "factoryNamePlaceholder": "工厂全称",
-      "category": "分类",
-      "categoryPlaceholder": "选择分类",
       "cooperationStatus": "合作状态",
       "cooperationStatusPlaceholder": "选择状态",
       "paymentTerms": "账期",
@@ -605,20 +643,6 @@
       "ELIMINATED": "已淘汰",
       "POTENTIAL": "潜在合作"
     },
-    "category": {
-      "TOOLS": "五金工具",
-      "TEXTILE": "纺织服装",
-      "PLASTIC": "塑料制品",
-      "ELECTRONICS": "电子电器",
-      "FURNITURE": "家具家居",
-      "AUTO_PARTS": "汽车配件",
-      "SPORTS": "运动户外",
-      "PET": "宠物用品",
-      "MEDICAL": "医疗器械",
-      "CRAFTS": "工艺礼品",
-      "CHEMICAL": "化工材料",
-      "OTHER": "其他"
-    },
     "paymentTerms": {
       "CASH": "现结",
       "NET_30": "月结30天",
@@ -630,7 +654,7 @@
       "factoryNameRequired": "工厂名称不能为空"
     },
     "message": {
-      "deleteConfirm": "确认删除工厂「{name}」？",
+      "deleteConfirm": "确认删除工厂「{name}」（{code}）？",
       "deleteConfirmTitle": "删除确认",
       "deleteSuccess": "删除成功",
       "createSuccess": "工厂创建成功",
@@ -645,6 +669,7 @@
     },
     "filter": {
       "masterCode": "主货号",
+      "masterCodePlaceholder": "主货号",
       "keyword": "关键词",
       "keywordPlaceholder": "中文/英文名称",
       "hsCode": "HS编码",
@@ -674,23 +699,46 @@
       "subCode": "子货号",
       "nameZh": "中文名称",
       "nameEn": "英文名称",
+      "nameJa": "日文名称",
       "hsCode": "HS编码",
       "unitPriceRmb": "含税单价(CNY)",
-      "netWeight": "净重",
-      "grossWeight": "毛重",
+      "taxPoint": "票点",
+      "taxRate": "增值税率",
+      "netWeight": "净重(kg)",
+      "grossWeight": "毛重(kg)",
       "lengthCm": "长(cm)",
       "widthCm": "宽(cm)",
       "heightCm": "高(cm)",
+      "declarationElements": "申报要素",
       "origin": "原产国",
       "material": "材质",
       "unit": "单位",
-      "exportCategory": "出口分类",
-      "factory": "关联工厂",
-      "notes": "备注",
+      "category": "商品分类",
+      "colorName": "颜色名称",
+      "warehouse": "仓库归属",
+      "requiresQc": "需要质检",
+      "imageUrl": "商品图片",
+      "remarks": "备注",
+      "lastUsedDate": "最近使用",
+      "unitsPerPackage": "每箱数量",
       "createTime": "创建时间",
       "updateTime": "更新时间",
       "close": "关闭",
-      "edit": "编辑"
+      "edit": "编辑",
+      "section": {
+        "basicInfo": "基本信息",
+        "specInfo": "规格信息",
+        "factories": "关联工厂"
+      },
+      "noFactories": "暂无关联工厂",
+      "preferred": "首选",
+      "factoryCode": "工厂编号",
+      "factoryLocation": "所在地",
+      "contact": "联系人",
+      "moq": "最小起订量",
+      "leadTimeDays": "交货周期",
+      "unitPrice": "单价",
+      "days": "天"
     },
     "dialog": {
       "newTitle": "新增商品",
@@ -703,15 +751,23 @@
       "nameZhPlaceholder": "中文名称",
       "nameEn": "英文名称",
       "nameEnPlaceholder": "English name",
+      "nameJa": "日文名称",
+      "nameJaPlaceholder": "日本語名称",
       "hsCode": "HS编码",
       "hsCodePlaceholder": "HS编码",
       "unitPriceRmb": "含税单价(CNY)",
+      "taxPoint": "票点",
+      "taxPointPlaceholder": "默认 1.1",
+      "taxRate": "增值税率",
+      "taxRatePlaceholder": "默认 0.1",
       "netWeight": "净重(kg)",
       "grossWeight": "毛重(kg)",
       "cargoSize": "货物尺寸",
       "lengthCm": "长(cm)",
       "widthCm": "宽(cm)",
       "heightCm": "高(cm)",
+      "declarationElements": "申报要素",
+      "declarationElementsPlaceholder": "材质|用途|品牌",
       "origin": "原产国",
       "originPlaceholder": "如 中国",
       "material": "材质",
@@ -722,6 +778,8 @@
       "exportCategoryPlaceholder": "出口分类",
       "factory": "关联工厂",
       "factoryPlaceholder": "选择工厂",
+      "remarks": "备注",
+      "remarksPlaceholder": "备注信息",
       "notes": "备注",
       "notesPlaceholder": "备注信息",
       "cancel": "取消",
@@ -737,6 +795,119 @@
       "deleteSuccess": "删除成功",
       "createSuccess": "创建成功",
       "updateSuccess": "更新成功"
+    }
+  },
+  "orderOverview": {
+    "title": "订单总览",
+    "back": "返回列表",
+    "print": "打印",
+    "loadFailed": "加载失败",
+    "retry": "重试",
+    "filter": {
+      "keyword": "关键词",
+      "keywordPlaceholder": "货号/工厂名",
+      "search": "查询",
+      "reset": "重置"
+    },
+    "column": {
+      "productCode": "货号",
+      "factoryName": "工厂",
+      "status": "状态",
+      "orderDate": "下单日",
+      "destination": "目的地",
+      "action": "操作"
+    },
+    "action": {
+      "view": "总览"
+    },
+    "step1": {
+      "title": "步骤1：补货需求",
+      "demandCode": "需求编号",
+      "demandType": "需求类型",
+      "productCode": "货号",
+      "quantity": "需求量",
+      "destination": "目的地",
+      "japanLead": "担当",
+      "status": "状态"
+    },
+    "step2": {
+      "title": "步骤2：发注单信息",
+      "procurementCode": "发注编号",
+      "factoryName": "工厂",
+      "productCode": "货号",
+      "quantity": "数量",
+      "priceRmb": "单价(CNY)",
+      "taxPoint": "票点",
+      "billingType": "报关类型",
+      "estimatedPriceJpy": "估算批发价(JPY)",
+      "orderDate": "下单日",
+      "plannedShipDate": "交货期",
+      "actualShipDate": "实际出货日",
+      "status": "状态"
+    },
+    "step3": {
+      "title": "步骤3：验货记录",
+      "qcCode": "验货编号",
+      "result": "结果",
+      "inspectionCount": "检品数",
+      "passedCount": "合格数",
+      "defectiveCount": "不良数",
+      "qcDate": "验货日期"
+    },
+    "step4": {
+      "title": "步骤4：调配计划",
+      "planCode": "调配编号",
+      "planType": "运输方式",
+      "cargoVolume": "体积(CBM)",
+      "cargoWeight": "重量(kg)",
+      "estimatedShipDate": "预计发货日",
+      "actualShipDate": "实际发货日",
+      "status": "状态"
+    },
+    "step5": {
+      "title": "步骤5：国内报关",
+      "customsCode": "报关单号",
+      "productCode": "货号",
+      "status": "状态",
+      "estimatedValue": "申报价值"
+    },
+    "step6": {
+      "title": "步骤6：日本清关",
+      "customsEntryNo": "入境报关号",
+      "arrivalDate": "到达日期",
+      "clearanceDate": "清关完成日",
+      "customsBroker": "清关行",
+      "importDutyPaid": "进口关税(JPY)",
+      "consumptionTaxPaid": "消费税(JPY)",
+      "arrivalPort": "目的港",
+      "status": "状态"
+    },
+    "step7": {
+      "title": "步骤7：退税",
+      "refundCode": "退税编号",
+      "estimatedRefundRmb": "理论退税额",
+      "actualRefundRmb": "实际退税额",
+      "refundDate": "退税日期",
+      "status": "状态"
+    },
+    "step8": {
+      "title": "步骤8：运营销售",
+      "recordCode": "销售编号",
+      "salesChannel": "销售渠道",
+      "listingDate": "上架日期",
+      "currentStock": "当前库存",
+      "salesQuantity": "累计销量",
+      "returnRate": "退货率",
+      "sellingPriceJpy": "销售价(JPY)",
+      "status": "状态"
+    },
+    "step": {
+      "notStarted": "暂无记录",
+      "placeholder": "待实现",
+      "status": {
+        "completed": "已完成",
+        "inProgress": "进行中"
+      }
     }
   },
   "common": {
@@ -773,6 +944,300 @@
       "tokenExpired": "登录已过期，请重新登录",
       "forbidden": "无权限访问该资源",
       "server": "服务器错误："
+    }
+  },
+  "customs": {
+    "title": "国内报关",
+    "newButton": "新规报关",
+    "newDialogTitle": "创建报关单",
+    "drawerTitle": "报关单详情",
+    "rejectDialogTitle": "驳回报关单",
+    "stat": {
+      "total": "报关单总数",
+      "pending": "待提交",
+      "submitted": "已提交",
+      "cleared": "已放行"
+    },
+    "filter": {
+      "customsCode": "报关单号",
+      "customsCodePlaceholder": "请输入报关单号",
+      "procurementId": "采购单号",
+      "procurementIdPlaceholder": "采购单ID",
+      "status": "状态"
+    },
+    "column": {
+      "customsCode": "报关单号",
+      "procurementId": "采购单号",
+      "productCode": "货号",
+      "subProductCode": "子货号",
+      "quantity": "数量",
+      "estimatedValueCny": "预估货值(CNY)",
+      "status": "状态",
+      "createTime": "创建时间",
+      "action": "操作",
+      "factoryId": "工厂ID"
+    },
+    "status": {
+      "pending": "待提交",
+      "submitted": "已提交",
+      "cleared": "已放行",
+      "rejected": "已驳回"
+    },
+    "action": {
+      "detail": "详情",
+      "submit": "提交",
+      "clear": "放行",
+      "reject": "驳回"
+    },
+    "dialog": {
+      "procurementId": "采购单号",
+      "procurementIdPlaceholder": "请输入采购单ID",
+      "productCode": "货号",
+      "productCodePlaceholder": "请输入货号",
+      "subProductCode": "子货号",
+      "subProductCodePlaceholder": "请输入子货号",
+      "quantity": "数量",
+      "estimatedValueCny": "预估货值(CNY)",
+      "factoryId": "工厂ID",
+      "factoryIdPlaceholder": "请输入工厂ID",
+      "remarks": "备注",
+      "remarksPlaceholder": "请输入备注",
+      "createBy": "创建人",
+      "createTime": "创建时间",
+      "updateTime": "更新时间"
+    },
+    "rejectDialog": {
+      "reasonLabel": "驳回原因",
+      "reasonPlaceholder": "请输入驳回原因"
+    },
+    "validation": {
+      "productCodeRequired": "请输入货号"
+    },
+    "message": {
+      "loadFailed": "加载报关单列表失败",
+      "createSuccess": "报关单创建成功",
+      "createFailed": "报关单创建失败",
+      "submitSuccess": "报关单提交成功",
+      "clearSuccess": "报关单放行成功",
+      "rejectSuccess": "报关单已驳回",
+      "deleteSuccess": "报关单删除成功",
+      "actionFailed": "操作失败，请重试",
+      "deleteConfirm": "确定删除该报关单吗？"
+    }
+  },
+  "japanCustoms": {
+    "title": "日本清关",
+    "drawerTitle": "清关详情",
+    "completeDialogTitle": "完成清关",
+    "failDialogTitle": "标记清关失败",
+    "stat": {
+      "total": "清关单总数",
+      "pending": "待清关",
+      "inProgress": "清关中",
+      "cleared": "已放行",
+      "failed": "清关失败"
+    },
+    "filter": {
+      "entryNo": "入境报关号",
+      "entryNoPlaceholder": "请输入入境报关号",
+      "procurementId": "采购单号",
+      "status": "状态"
+    },
+    "column": {
+      "entryNo": "入境报关号",
+      "procurementId": "采购单号",
+      "domesticCustomsId": "国内报关号",
+      "arrivalPort": "目的港",
+      "arrivalDate": "到达日期",
+      "broker": "清关行",
+      "brokerPhone": "清关行电话",
+      "brokerContact": "清关行联系人",
+      "weight": "申报重量",
+      "volume": "申报体积",
+      "importDuty": "进口关税",
+      "consumptionTax": "消费税",
+      "clearanceDate": "清关日期",
+      "status": "状态",
+      "remarks": "备注",
+      "action": "操作",
+      "createBy": "创建人",
+      "createTime": "创建时间"
+    },
+    "status": {
+      "pending": "待清关",
+      "inProgress": "清关中",
+      "cleared": "已放行",
+      "failed": "清关失败"
+    },
+    "action": {
+      "detail": "详情",
+      "start": "开始",
+      "complete": "完成",
+      "fail": "失败"
+    },
+    "completeDialog": {
+      "importDuty": "进口关税（JPY）",
+      "consumptionTax": "消费税（JPY）",
+      "clearanceDate": "清关完成日期"
+    },
+    "failDialog": {
+      "reasonLabel": "失败原因",
+      "reasonPlaceholder": "请输入失败原因"
+    },
+    "message": {
+      "loadFailed": "加载清关列表失败",
+      "startSuccess": "开始清关成功",
+      "completeSuccess": "清关完成",
+      "failSuccess": "已标记失败",
+      "deleteSuccess": "删除成功",
+      "actionFailed": "操作失败，请重试",
+      "deleteConfirm": "确定删除该清关记录吗？"
+    }
+  },
+  "taxRefund": {
+    "title": "出口退税",
+    "drawerTitle": "退税详情",
+    "completeDialogTitle": "完成退税",
+    "stat": {
+      "total": "退税单总数",
+      "applying": "退税中",
+      "completed": "已完成",
+      "noRefund": "不退税"
+    },
+    "filter": {
+      "procurementId": "采购单号",
+      "status": "状态"
+    },
+    "column": {
+      "refundCode": "退税单号",
+      "procurementId": "采购单号",
+      "japanCustomsId": "日本清关号",
+      "billingType": "开票类型",
+      "taxPoint": "税点",
+      "priceRmb": "单价(RMB)",
+      "quantity": "数量",
+      "estimatedRefundRmb": "预估退税额",
+      "actualRefundRmb": "实际退税额",
+      "refundDate": "退税日期",
+      "refundBank": "退税银行",
+      "status": "状态",
+      "remarks": "备注",
+      "action": "操作",
+      "createBy": "创建人",
+      "createTime": "创建时间"
+    },
+    "status": {
+      "applying": "退税中",
+      "completed": "已完成",
+      "noRefund": "不退税"
+    },
+    "action": {
+      "detail": "详情",
+      "complete": "完成",
+      "noRefund": "不退税"
+    },
+    "completeDialog": {
+      "actualRefundRmb": "实际退税金额（RMB）",
+      "refundDate": "退税日期",
+      "refundDateRequired": "请选择退税日期",
+      "refundBank": "退税银行",
+      "refundBankPlaceholder": "请输入退税银行（选填）"
+    },
+    "message": {
+      "loadFailed": "加载退税列表失败",
+      "completeSuccess": "退税完成",
+      "noRefundSuccess": "已标记为不退税",
+      "actionFailed": "操作失败，请重试"
+    }
+  },
+  "sales": {
+    "title": "运营销售管理",
+    "newButton": "新规上架",
+    "newDialogTitle": "新规上架",
+    "drawerTitle": "销售详情",
+    "stockDialogTitle": "库存更新",
+    "alertButton": "库存预警",
+    "alertDialogTitle": "库存预警列表",
+    "stat": {
+      "total": "在售商品",
+      "listed": "正常销售",
+      "lowStock": "库存预警",
+      "outOfStock": "缺货",
+      "discontinued": "已下架"
+    },
+    "filter": {
+      "productCode": "货号",
+      "productCodePlaceholder": "请输入货号",
+      "salesChannel": "销售渠道",
+      "status": "状态"
+    },
+    "channel": {
+      "amazon": "Amazon",
+      "mercali": "メルカリ",
+      "selfSite": "自社サイト",
+      "other": "其他"
+    },
+    "column": {
+      "recordCode": "销售编号",
+      "procurementId": "采购单号",
+      "productCode": "货号",
+      "subProductCode": "子货号",
+      "salesChannel": "销售渠道",
+      "currentStock": "当前库存",
+      "initialStock": "初始库存",
+      "safetyStock": "安全库存",
+      "salesQuantity": "累计销量",
+      "returnedQuantity": "退货数量",
+      "returnRate": "退货率",
+      "sellingPriceJpy": "销售价(JPY)",
+      "listingDate": "上架日期",
+      "status": "状态",
+      "remarks": "备注",
+      "action": "操作",
+      "createBy": "创建人",
+      "createTime": "创建时间"
+    },
+    "status": {
+      "listed": "正常销售",
+      "lowStock": "库存预警",
+      "outOfStock": "缺货",
+      "discontinued": "已下架"
+    },
+    "action": {
+      "detail": "详情",
+      "updateStock": "库存",
+      "discontinue": "下架",
+      "relist": "重新上架"
+    },
+    "form": {
+      "procurementId": "关联采购单号",
+      "productCode": "主货号",
+      "productCodePlaceholder": "如 de077",
+      "subProductCode": "子货号",
+      "salesChannel": "销售渠道",
+      "listingDate": "上架日期",
+      "initialStock": "初始库存",
+      "safetyStock": "安全库存",
+      "sellingPriceJpy": "销售价（JPY）",
+      "remarks": "备注"
+    },
+    "stockDialog": {
+      "sold": "卖出数量",
+      "returned": "退货数量"
+    },
+    "message": {
+      "loadFailed": "加载销售列表失败",
+      "createSuccess": "上架成功",
+      "createFailed": "上架失败",
+      "updateSuccess": "库存更新成功",
+      "discontinueSuccess": "已下架",
+      "relistSuccess": "已重新上架",
+      "deleteSuccess": "删除成功",
+      "actionFailed": "操作失败，请重试",
+      "deleteConfirm": "确定删除该销售记录吗？"
+    },
+    "validation": {
+      "salesChannelRequired": "请选择销售渠道"
     }
   },
   "validation": {

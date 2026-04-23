@@ -2,12 +2,13 @@
 
 > **版本**: 1.0.0
 > **创建**: 2026-04-22
-> **路由**: `/customs/domestic`
-> **组件**: `DomesticCustomsPage.vue`（占位）
-> **对应后端**: `DomesticCustomsRecord` 聚合根（待实现）
+> **更新**: 2026-04-22 — 前端页面已实现
+> **路由**: `/procurement/customs`
+> **组件**: `CustomsPage.vue`（`apps/web/src/pages/customs/CustomsPage.vue`）
+> **对应后端**: `DomesticCustomsRecord` 聚合根（✅ 已实现）
 > **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B05-国内报关-步骤5.md`
 > **前置步骤**: 步骤4（调配计划已发货 LogisticsPlan.status = IN_TRANSIT）
-> **后续步骤**: 步骤6（日本清关 JapanCustomsRecord）
+> **后续步骤**: 步骤6（日本清关 JapanCustomsRecord — 待实现）
 
 ---
 
@@ -123,12 +124,14 @@
 
 | 操作 | Method | Endpoint | 状态 |
 |------|--------|----------|------|
-| 分页查询 | GET | `/api/v1/domestic-customs?page=&pageSize=&procurementId=&status=` | 🔴待实现 |
-| 详情 | GET | `/api/v1/domestic-customs/{id}` | 🔴待实现 |
-| 创建 | POST | `/api/v1/domestic-customs` | 🔴待实现 |
-| 更新 | PATCH | `/api/v1/domestic-customs/{id}` | 🔴待实现 |
-| 提交 | PATCH | `/api/v1/domestic-customs/{id}/submit` | 🔴待实现 |
-| 放行 | PATCH | `/api/v1/domestic-customs/{id}/clear` | 🔴待实现 |
+| 分页查询 | GET | `/api/v1/customs?page=&pageSize=&procurementId=&status=` | ✅已实现 |
+| 详情 | GET | `/api/v1/customs/{id}` | ✅已实现 |
+| 创建 | POST | `/api/v1/customs` | ✅已实现 |
+| 更新 | PUT | `/api/v1/customs/{id}` | ✅已实现 |
+| 提交 | PATCH | `/api/v1/customs/{id}/submit` | ✅已实现 |
+| 放行 | PATCH | `/api/v1/customs/{id}/clear` | ✅已实现 |
+| 驳回 | PATCH | `/api/v1/customs/{id}/reject` | ✅已实现 |
+| 删除 | DELETE | `/api/v1/customs/{id}` | ✅已实现 |
 
 ---
 
