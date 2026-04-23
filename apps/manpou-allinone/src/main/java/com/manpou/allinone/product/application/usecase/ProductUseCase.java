@@ -90,7 +90,6 @@ public class ProductUseCase {
                 cmd.getMasterCode(), cmd.getSubCode()
         ).ifPresent(existing -> {
             throw BusinessException.conflict(
-                    "product.duplicate_master_code",
                     String.format("货号 %s 已存在", cmd.getMasterCode()));
         });
         Product entity = productAssembler.toEntity(cmd);

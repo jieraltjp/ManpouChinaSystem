@@ -82,12 +82,17 @@ public class JwtService {
         return new JwtClaims(
             claims.getSubject(),
             claims.get(CLAIM_USERNAME, String.class),
-            claims.get(CLAIM_ROLES, List.class),
-            claims.get(CLAIM_PERMISSIONS, List.class),
+            castStringList(claims.get(CLAIM_ROLES)),
+            castStringList(claims.get(CLAIM_PERMISSIONS)),
             claims.get(CLAIM_TENANT_ID, String.class),
             claims.getIssuedAt().toInstant().getEpochSecond(),
             claims.getExpiration().toInstant().getEpochSecond()
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<String> castStringList(Object o) {
+        return (List<String>) o;
     }
 
     private Claims parseToken(String token) {

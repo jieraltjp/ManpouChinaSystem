@@ -61,7 +61,7 @@ public class SalesRecordUseCase {
 
     @Transactional
     public void update(Long id, SalesRecordUpdateCmd cmd) {
-        log.info("[SalesRecord] update, id={}, salesChannel={}, sellingPriceJpy={}", id, cmd.getSalesChannel(), cmd.getSellingPriceJpy());
+        log.info("[SalesRecord] update, id={}, sellingPriceJpy={}", id, cmd.getSellingPriceJpy());
         SalesRecord entity = salesRecordRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("SalesRecord", id));
         if (entity.isTerminal()) {

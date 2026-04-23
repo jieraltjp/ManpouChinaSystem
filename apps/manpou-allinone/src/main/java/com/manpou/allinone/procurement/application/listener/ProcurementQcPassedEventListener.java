@@ -2,15 +2,19 @@ package com.manpou.allinone.procurement.application.listener;
 
 import com.manpou.allinone.common.port.ProductQueryPort;
 import com.manpou.allinone.common.port.QcQueryPort;
+import com.manpou.allinone.product.domain.model.Product;
 import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.model.ShipmentStatus;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import com.manpou.allinone.qc.domain.event.QcRecordCompletedEvent;
 import com.manpou.allinone.qc.domain.model.QcRecord;
+import com.manpou.allinone.qc.domain.model.QcType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.math.BigDecimal;
 
 /**
  * 验货通过事件监听器。
@@ -65,7 +69,7 @@ public class ProcurementQcPassedEventListener {
                 return;
             }
             var product = productQueryPort.findByMasterCode(evt.getProductCode()).orElse(null);
-            ShipmentStatus suggested = procurement.suggestNextStatus(qcRecord, product);
+            ShipmentStatus suggested = resolveSuggestedStatus(current, qcRecord, product);
             procurement.updateStatus(suggested);
             procurementRepository.save(procurement);
             log.info("[Procurement] QC passed → auto-advanced, procurementId={}, {}→{}, qcType={}",
@@ -75,5 +79,26 @@ public class ProcurementQcPassedEventListener {
             log.error("[Procurement] Failed to auto-advance on QC pass, procurementId={}: {}",
                     evt.getProcurementId(), e.getMessage(), e);
         }
+    }
+
+    /**
+     * 根据 QC 类型和产品体积判断下一步状态。
+     * 规则（SPEC-B02 §5）：
+     *   - 現地検品(REMOTE) → メーカー直送
+     *   - 倉庫検品(ONSITE) + 体积≤0.5m³ → エア便（轻小件推荐空运）
+     *   - 倉庫検品(ONSITE) + 体积>0.5m³ → 輸出（海运）
+     */
+    private ShipmentStatus resolveSuggestedStatus(ShipmentStatus current, QcRecord qcRecord, Product product) {
+        if (current == ShipmentStatus.現地検品) {
+            return ShipmentStatus.メーカー直送;
+        }
+        if (qcRecord.getQcType() == QcType.ONSITE) {
+            if (product != null && product.getVolumeCbm() != null
+                    && product.getVolumeCbm().compareTo(new BigDecimal("0.5")) <= 0) {
+                return ShipmentStatus.エア便;
+            }
+            return ShipmentStatus.輸出;
+        }
+        return ShipmentStatus.輸出;
     }
 }

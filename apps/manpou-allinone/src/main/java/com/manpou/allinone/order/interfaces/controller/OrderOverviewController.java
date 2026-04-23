@@ -38,12 +38,7 @@ public class OrderOverviewController {
                 Math.min(query.getPageSize(), 100),
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<Procurement> page;
-        if (query.getKeyword() != null && !query.getKeyword().isBlank()) {
-            page = procurementRepository.findByKeywordAndDeletedIsFalse(query.getKeyword().trim(), pageRequest);
-        } else {
-            page = procurementRepository.findAllByDeletedIsFalse(pageRequest);
-        }
+        Page<Procurement> page = procurementRepository.findAllByDeletedIsFalse(pageRequest);
         return Result.ok(page.map(procurementAssembler::toDto));
     }
 }
