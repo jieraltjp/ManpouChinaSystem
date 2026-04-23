@@ -1,7 +1,7 @@
 # SPEC-B10 — 商品目录业务规格（商品类）
 
-> **版本**: 1.3.1
-> **更新**: 2026-04-23（v1.3.1：补全 UI 文档 `docs/ui/pages/10-product.md`）
+> **版本**: 1.4.0
+> **更新**: 2026-04-23（v1.4.0：新增7个字段 hs_code_jp/jan_code/status/quantities/carton_qty/amount_rmb/material_ja）
 > **创建**: 2026-04-22
 > **状态**: ✅ 已实现
 > **业务步号**: 00（基础设施/商品目录）
@@ -31,15 +31,37 @@ Product（聚合根）
 ├── id: Long
 ├── masterCode: String              # 主货号（如 odn012）
 ├── subCode: String                 # 子货号/色号（如 re=红色，可为空）
-├── nameJa: String                  # 日文名称（日本用）
-├── nameEn: String                  # 英文名称（报关用）
+├── janCode: String                # JANコード（出货单位标记，来自 goods_master.JANコード）
+│
+├── 名称
 ├── nameZh: String                  # 中文名称（中国用）
+├── nameEn: String                  # 英文名称（报关用）
+├── nameJa: String                  # 日文名称（日本用）
 ├── imageUrl: String                # 商品图片 URL
-├── colorName: String               # 颜色名称
-├── material: String                # 材质
+│
+├── 分类
 ├── category: ProductCategory       # OEM / ORDINARY / FACTORY_DIRECT
-├── origin: String                  # 产地/原产国
+├── status: String                  # 商品区分（通常/予約，来自 goods_master.商品区分）
+├── colorName: String               # 颜色名称
+│
+├── 材质
+├── material: String                # 材质（中文）
+├── materialJa: String              # 材质（日文，来自 DB.json）
+│
+├── 来源
+├── origin: String                  # 原产国（来自 DB.json / factory.origin）
+├── warehouse: String              # 仓库归属（来自商品分类标签）
+│
+├── 业务量
+├── quantities: Integer             # 数量（来自 DB.json）
+├── cartonQty: Integer            # 箱数（来自 DB.json）
 ├── unit: String                    # 计量单位（个/台/套）
+├── unitPriceRmb: BigDecimal        # 含税单价(CNY)
+├── amountRmb: BigDecimal         # 金额(RMB) = 单价 × 数量（来自 DB.json）
+│
+├── 税率
+├── taxRate: BigDecimal             # 增值税率（默认 0.10）
+├── taxPoint: BigDecimal            # 票点（默认 1.1）
 │
 ├── 尺寸字段
 ├── lengthCm: BigDecimal            # 单品长(cm)
@@ -51,13 +73,9 @@ Product（聚合根）
 ├── netWeightKg: BigDecimal         # 净重(kg)
 ├── grossWeightKg: BigDecimal       # 毛重(kg)
 │
-├── 价格字段
-├── unitPriceRmb: BigDecimal        # 含税单价(CNY)
-├── taxPoint: BigDecimal            # 票点（默认 1.1）
-├── taxRate: BigDecimal             # 增值税率（默认 0.10）
-│
 ├── 报关字段
-├── hsCode: String                  # HS编码（8-10位）
+├── hsCode: String                  # HS编码（中国，8-10位）
+├── hsCodeJp: String              # 日本HS编码（税番，来自 goods_hs_mapping → jp_hs_code）
 ├── declarationElements: String     # 申报要素
 │
 ├── 外箱字段
@@ -68,13 +86,12 @@ Product（聚合根）
 ├── packageVolumeCbm: BigDecimal   # 外箱体积(m³)
 ├── packageWeightKg: BigDecimal    # 外箱毛重(kg)
 │
-├── 仓库/质检
-├── warehouse: String               # 仓库归属
+├── 质检
 ├── requiresQc: Boolean             # 是否需要检测
 │
 ├── 其他
 ├── remarks: String                 # 备注
-├── lastUsedDate: LocalDate        # 最近使用日期（来自 goods.sql.last_used）
+├── lastUsedDate: LocalDate        # 最近使用日期
 ├── updateTime: LocalDateTime
 └── updateBy: String
 ```

@@ -1,7 +1,7 @@
 # DB-11 — 商品目录数据库设计
 
-> **版本**: 1.1.0
-> **更新**: 2026-04-22（v1.1.0：状态更正，与 SPEC-B10 v1.1.0 对齐）
+> **版本**: 1.2.0
+> **更新**: 2026-04-23（v1.2.0：新增7个字段+字段重排，与 SPEC-B10 v1.4.0 对齐）
 > **创建**: 2026-04-22
 > **状态**: ✅ 已实现
 > **对应业务文档**: `docs/business/SPEC-B10-商品目录-产品管理.md`
@@ -31,67 +31,82 @@ CREATE TABLE product (
     -- 货号（复合唯一索引）
     master_code            VARCHAR(32)  NOT NULL COMMENT '主货号（如 odn012）',
     sub_code               VARCHAR(64)  COMMENT '子货号/色号（如 re=红色，可为空）',
+    jan_code               VARCHAR(64)  COMMENT 'JANコード（出货单位标记，来自 goods_master.JANコード）',
 
-    -- 多语言名称
-    name_ja               VARCHAR(128) COMMENT '日文名称（日本用）',
-    name_en               VARCHAR(255) COMMENT '英文名称（报关用）',
+    -- 名称
     name_zh               VARCHAR(255) COMMENT '中文名称（中国用）',
+    name_en               VARCHAR(255) COMMENT '英文名称（报关用）',
+    name_ja               VARCHAR(128) COMMENT '日文名称（日本用）',
 
-    -- 图片
-    image_url              VARCHAR(512) COMMENT '商品图片 URL',
-
-    -- 基础属性
+    -- 分类
+    category               VARCHAR(20)  COMMENT 'OEM / ORDINARY / FACTORY_DIRECT',
+    status                 VARCHAR(32)  COMMENT '商品区分（通常/予約，来自 goods_master.商品区分）',
     color_name            VARCHAR(64)  COMMENT '颜色名称',
-    material              VARCHAR(64)  COMMENT '材质',
-    category              VARCHAR(20)  COMMENT 'OEM / ORDINARY / FACTORY_DIRECT',
-    origin                VARCHAR(100) COMMENT '原产国',
+
+    -- 材质
+    material               VARCHAR(64)  COMMENT '材质（中文）',
+    material_ja            VARCHAR(255) COMMENT '材质（日文，来自 DB.json）',
+
+    -- 来源
+    origin                VARCHAR(100) COMMENT '原产国（来自 DB.json / factory.origin）',
+    warehouse             VARCHAR(64)  COMMENT '仓库归属（来自商品分类标签）',
+
+    -- 业务量
+    quantities             INT          COMMENT '数量（来自 DB.json）',
+    carton_qty             INT          COMMENT '箱数（来自 DB.json）',
     unit                  VARCHAR(50)  COMMENT '计量单位（个/台/套）',
+    unit_price_rmb         DECIMAL(12,4) COMMENT '含税单价(CNY)',
+    amount_rmb             DECIMAL(14,4) COMMENT '金额(RMB) = 单价 × 数量（来自 DB.json）',
+
+    -- 税率
+    tax_rate               DECIMAL(5,4) DEFAULT 0.1000 COMMENT '增值税率（默认10%）',
+    tax_point              DECIMAL(5,4) DEFAULT 1.1    COMMENT '票点（默认1.1=含税）',
 
     -- 单品尺寸
-    length_cm             DECIMAL(8,2) COMMENT '单品长(cm)',
-    width_cm              DECIMAL(8,2) COMMENT '单品宽(cm)',
-    height_cm             DECIMAL(8,2) COMMENT '单品高(cm)',
-    volume_cbm            DECIMAL(10,6) COMMENT '单品体积(m³)，自动计算',
+    length_cm              DECIMAL(8,2) COMMENT '单品长(cm)',
+    width_cm               DECIMAL(8,2) COMMENT '单品宽(cm)',
+    height_cm              DECIMAL(8,2) COMMENT '单品高(cm)',
+    volume_cbm             DECIMAL(10,6) COMMENT '单品体积(m³)，自动计算',
 
     -- 重量
-    net_weight_kg         DECIMAL(10,4) COMMENT '净重(kg)',
-    gross_weight_kg       DECIMAL(10,4) COMMENT '毛重(kg)',
-
-    -- 价格
-    unit_price_rmb         DECIMAL(12,4) COMMENT '含税单价(CNY)',
-    tax_point              DECIMAL(5,4) DEFAULT 1.1 COMMENT '票点（默认1.1=含税）',
-    tax_rate               DECIMAL(5,4) DEFAULT 0.1000 COMMENT '增值税率（默认10%）',
+    gross_weight_kg        DECIMAL(10,4) COMMENT '毛重(kg)',
+    net_weight_kg          DECIMAL(10,4) COMMENT '净重(kg)',
 
     -- 报关
-    hs_code                VARCHAR(20) COMMENT 'HS编码（8-10位）',
-    declaration_elements   TEXT COMMENT '申报要素，如：材质|用途|品牌',
+    hs_code                VARCHAR(20)  COMMENT 'HS编码（中国，8-10位）',
+    hs_code_jp             VARCHAR(20)  COMMENT '日本HS编码（税番，来自 goods_hs_mapping → jp_hs_code）',
+    declaration_elements   TEXT          COMMENT '申报要素，如：材质|用途|品牌',
 
-    -- 外箱包装
-    units_per_package      INT COMMENT '段ボール入数（每箱数量）',
+    -- 外箱
+    units_per_package      INT          COMMENT '段ボール入数（每箱数量）',
     package_length_cm      DECIMAL(8,2) COMMENT '外箱长(cm)',
     package_width_cm       DECIMAL(8,2) COMMENT '外箱宽(cm)',
     package_height_cm      DECIMAL(8,2) COMMENT '外箱高(cm)',
     package_volume_cbm    DECIMAL(10,6) COMMENT '外箱体积(m³)',
-    package_weight_kg     DECIMAL(10,4) COMMENT '外箱毛重(kg)',
+    package_weight_kg      DECIMAL(10,4) COMMENT '外箱毛重(kg)',
 
-    -- 仓库/质检
-    warehouse             VARCHAR(64)  COMMENT '仓库归属',
-    requires_qc           BOOLEAN COMMENT '是否需要检测',
+    -- 质检
+    requires_qc            TINYINT(1)   COMMENT '是否需要检测（0/1）',
 
     -- 其他
+    image_url              VARCHAR(512) COMMENT '商品图片 URL',
     remarks               VARCHAR(512) COMMENT '备注',
-    last_used_date        DATE COMMENT '最近使用日期（来自 goods.sql.last_used）',
+    last_used_date        DATE         COMMENT '最近使用日期',
 
-    -- 系统字段
-    update_time           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    update_by             VARCHAR(64),
-    is_deleted            BOOLEAN NOT NULL DEFAULT FALSE,
+    -- 审计
+    create_by             VARCHAR(64)  NOT NULL DEFAULT '',
+    create_time           DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    is_deleted            TINYINT(1)   NOT NULL DEFAULT 0,
+    update_by             VARCHAR(64)  NOT NULL,
+    update_time           DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
 
     -- 索引
     UNIQUE KEY uk_master_sub (master_code, sub_code),
     INDEX idx_master_code (master_code),
     INDEX idx_hs_code (hs_code),
-    INDEX idx_name_zh (name_zh)
+    INDEX idx_hs_code_jp (hs_code_jp),
+    INDEX idx_name_zh (name_zh),
+    INDEX idx_create_time (create_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品目录';
 ```
 
@@ -209,6 +224,32 @@ SET p.package_length_cm = CAST(SUBSTRING_INDEX(g.box_desc, '*', 1) AS DECIMAL(8,
 
 ## 4. 与 DB-02 旧 product 表的差异
 
+| 差异 | 旧表（DB-02） | 新表（DB-11） |
+|------|--------------|--------------|
+| 货号结构 | `master_code` + `sub_code` | `master_code` + `sub_code`（完整SKU直接存） |
+| 名称字段 | `name`（日文） | `name_ja` + `name_en` + `name_zh` |
+| 重量字段 | `weight_kg`（净重） | `net_weight_kg` + `gross_weight_kg` |
+| 价格字段 | 无 | `unit_price_rmb` + `tax_point` + `tax_rate` |
+| HS编码 | 待新增 | `hs_code` + `hs_code_jp`（中国+日本） |
+| 报关要素 | 无 | `declaration_elements` |
+| 外箱字段 | `package_height/width/depth` | + `package_volume_cbm` + `package_weight_kg` |
+| 图片 | 无 | `image_url` |
+| 原产国 | 无 | `origin` |
+| 多工厂关联 | 无 | `product_factory` 关联表 |
+| 系统字段 | 无 | `is_deleted` 软删除 |
+| **新增字段** | - | `jan_code` `status` `quantities` `carton_qty` `amount_rmb` `material_ja` |
+
+## 4.1 数据迁移说明
+
+> 以下为历史参考。实际迁移通过 Python 脚本执行，参见 `docs/database/sql/`。
+
+- `goods_master` → `product`：sub_code 存完整SKU，master_code 取SKU第一个 `-` 前的部分
+- `goods_master.JANコード` → `product.jan_code`
+- `goods_master.商品区分` → `product.status`（同时映射至 `category`）
+- `goods_hs_mapping` → `product.hs_code` / `product.hs_code_jp`
+- `DB.json` → `product.quantities` / `carton_qty` / `amount_rmb` / `material_ja` / `origin`
+
+
 | 差异 | 旧表（DB-02） | 新表（DB-10） |
 |------|--------------|--------------|
 | 货号结构 | `master_code` + `sub_code`（已对齐） | 同左 |
@@ -225,7 +266,77 @@ SET p.package_length_cm = CAST(SUBSTRING_INDEX(g.box_desc, '*', 1) AS DECIMAL(8,
 
 ---
 
-## 5. E-R 图
+## 5. 数据迁移说明（历史）
+
+### 3.1 goods_master → product
+
+```sql
+-- 货号拆分规则：sku='in041-a' → master_code='in041', sub_code='in041-a'（存完整SKU）
+-- sub_code 直接存完整SKU，不拆分
+
+INSERT INTO product (
+    master_code, sub_code,
+    name_en, name_zh,
+    unit_price_rmb, tax_rate,
+    gross_weight_kg, net_weight_kg,
+    hs_code, declaration_elements,
+    units_per_package,
+    origin, remarks, last_used_date,
+    unit
+)
+SELECT
+    CASE
+        WHEN LOCATE('-', sku) > 0 THEN SUBSTRING_INDEX(sku, '-', 1)
+        ELSE sku
+    END AS master_code,
+    sku AS sub_code,
+    name_en, name_zh,
+    unit_price, tax_rate / 100,
+    weight_gross / 1000, weight_net / 1000,
+    hs_code, declaration_elements,
+    CAST(box_qty AS UNSIGNED),
+    origin, remark, last_used,
+    unit
+FROM esagf_oem.goods
+WHERE sku IS NOT NULL AND sku != '';
+```
+
+### 3.2 factory_name → product_factory 关联
+
+> ⚠️ 需要先完成 `factory.name` 标准化，然后通过名称匹配关联。
+
+```sql
+-- 临时：按工厂名称模糊匹配（不精确，仅作迁移参考）
+INSERT INTO product_factory (product_id, factory_id, is_preferred)
+SELECT
+    p.id,
+    f.id,
+    TRUE
+FROM esagf_oem.goods g
+JOIN product p ON p.master_code = (
+    CASE WHEN LOCATE('-', g.sku) > 0 THEN SUBSTRING_INDEX(g.sku, '-', 1) ELSE g.sku END
+)
+JOIN factory f ON f.factory_name LIKE CONCAT('%', g.factory_name, '%')
+LIMIT 100;
+```
+
+### 3.3 box_desc 解析外箱尺寸
+
+```sql
+-- 从 box_desc 中提取外箱尺寸
+-- 格式示例：'一个一箱', '5个装一箱', '20个装一箱'
+-- 尺寸示例：'193*23*28cm'（解析为长宽高）
+
+UPDATE product p
+JOIN esagf_oem.goods g ON (
+    CASE WHEN LOCATE('-', g.sku) > 0 THEN SUBSTRING_INDEX(g.sku, '-', 1) ELSE g.sku END
+) = p.master_code
+SET p.package_length_cm = CAST(SUBSTRING_INDEX(g.box_desc, '*', 1) AS DECIMAL(8,2));
+```
+
+---
+
+## 6. E-R 图
 
 ```
 ┌──────────────────────┐
@@ -274,7 +385,7 @@ SET p.package_length_cm = CAST(SUBSTRING_INDEX(g.box_desc, '*', 1) AS DECIMAL(8,
 
 ---
 
-## 6. 缺口阻塞
+## 7. 缺口阻塞
 
 | 项目 | 优先级 | 说明 |
 |------|--------|------|
@@ -283,3 +394,7 @@ SET p.package_length_cm = CAST(SUBSTRING_INDEX(g.box_desc, '*', 1) AS DECIMAL(8,
 | `box_desc` 尺寸解析 | **P1** | 部分 box_desc 含尺寸（如 `193*23*28cm`）需正则提取 |
 | 图片 URL | P1 | 现有数据无图片字段，需补充 |
 | `sub_code` 规范 | P1 | 颜色代码标准化（re/bl/wt 等） |
+| name_zh/en/unit/price | **P1** | 当前填充率仅19%，需重新运行 gen_migration.py 补充 |
+| origin | **P1** | 当前填充率仅14%，需从 DB.json 补充 |
+| warehouse | **P1** | 已清空，需从商品分类标签提取仓库归属 |
+| length/width/height/package_* | **P1** | 单品尺寸和外箱尺寸无数据源，待补充 |
