@@ -36,20 +36,20 @@ public class ReplenishmentDemandUseCase {
         );
         Page<ReplenishmentDemand> page;
         if (query.getStatus() != null) {
-            page = demandRepository.findByStatusAndIsDeletedFalse(query.getStatus(), pageRequest);
+            page = demandRepository.findByStatusAndDeletedIsFalse(query.getStatus(), pageRequest);
         } else if (query.getDemandType() != null) {
-            page = demandRepository.findByDemandTypeAndIsDeletedFalse(query.getDemandType(), pageRequest);
+            page = demandRepository.findByDemandTypeAndDeletedIsFalse(query.getDemandType(), pageRequest);
         } else if (query.getProductCode() != null && !query.getProductCode().isBlank()) {
-            page = demandRepository.findByProductCodeAndIsDeletedFalse(query.getProductCode(), pageRequest);
+            page = demandRepository.findByProductCodeAndDeletedIsFalse(query.getProductCode(), pageRequest);
         } else {
-            page = demandRepository.findAllByIsDeletedFalse(pageRequest);
+            page = demandRepository.findAllByDeletedIsFalse(pageRequest);
         }
         return page.map(assembler::toDto);
     }
 
     @Transactional(readOnly = true)
     public ReplenishmentDemandPageQuery getById(Long id) {
-        ReplenishmentDemand entity = demandRepository.findByIdAndIsDeletedFalse(id)
+        ReplenishmentDemand entity = demandRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", id));
         return assembler.toDto(entity);
     }
@@ -65,7 +65,7 @@ public class ReplenishmentDemandUseCase {
 
     @Transactional
     public void update(Long id, ReplenishmentDemandUpdateCmd cmd) {
-        ReplenishmentDemand entity = demandRepository.findByIdAndIsDeletedFalse(id)
+        ReplenishmentDemand entity = demandRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", id));
         assembler.copyToEntity(cmd, entity);
         demandRepository.save(entity);
@@ -79,7 +79,7 @@ public class ReplenishmentDemandUseCase {
      */
     @Transactional
     public void convertToProcurement(Long demandId, Long procurementId) {
-        ReplenishmentDemand entity = demandRepository.findByIdAndIsDeletedFalse(demandId)
+        ReplenishmentDemand entity = demandRepository.findByIdAndDeletedIsFalse(demandId)
                 .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", demandId));
         entity.convertToProcurement(procurementId);
         demandRepository.save(entity);
@@ -94,7 +94,7 @@ public class ReplenishmentDemandUseCase {
      */
     @Transactional
     public void revertConversion(Long demandId) {
-        ReplenishmentDemand entity = demandRepository.findByIdAndIsDeletedFalse(demandId)
+        ReplenishmentDemand entity = demandRepository.findByIdAndDeletedIsFalse(demandId)
                 .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", demandId));
         entity.revertConversion();
         demandRepository.save(entity);
@@ -104,7 +104,7 @@ public class ReplenishmentDemandUseCase {
 
     @Transactional
     public void delete(Long id) {
-        ReplenishmentDemand entity = demandRepository.findByIdAndIsDeletedFalse(id)
+        ReplenishmentDemand entity = demandRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", id));
         if (entity.getStatus() != DemandStatus.PENDING) {
             throw BusinessException.invalidParam("仅待确认状态可删除");

@@ -337,8 +337,9 @@ List<SubCodeSuggestVO> suggestSubCodes(String masterCode);
 - [x] ✅ `V10__product_data_migration.sql`（占位，真实数据由 V11 加载）
 - [x] ✅ `V11__product_seed_data.sql` 商品数据 ETL（**1971 条**；含 product_factory 关联 **781 条**）
 - [x] ✅ `V11__product_factory_data.sql` product_factory 关联（备选路径）
+- [x] 🔴 `goods_master` / `goods_hs_mapping` / `cn_factory_origin` 已从 MySQL 删除（数据已迁移至 product / product_factory）
 
-> **数据验证**：后端 H2 启动成功，`GET /api/v1/products?size=0` → `totalElements: 1971`；`GET /api/v1/factories?size=0` → `totalElements: 500`。`product_factory` 关联 781 条已由 V11__product_seed_data.sql 加载。
+> **数据验证**：MySQL `product` 表 4999 条，`product_factory` 关联 725 条（由 V11__product_seed_data.sql 加载）。`cn_hs_code` / `jp_hs_code` 保留供独立查询。
 
 ---
 
@@ -346,8 +347,12 @@ List<SubCodeSuggestVO> suggestSubCodes(String masterCode);
 
 | 项目 | 优先级 | 说明 |
 |------|--------|------|
-| `goods.sql` 数据清洗 | **P0** | `box_desc` 解析出尺寸（正则提取 cm/cm³） |
-| `factory_name` → `factory_id` 映射 | **P0** | companies.sql 有 546 条，但 goods.sql 中有部分名称不精确 |
-| `sub_code` 命名规范 | P1 | 统一颜色代码格式（re=红/bl=蓝/wt=白/...） |
-| 商品图片存储方案 | P1 | OSS / MinIO / 数据库 BLOB |
+| `box_desc` 尺寸解析 | **P1** | 部分 `box_desc` 含尺寸（如 `193*23*28cm`）需正则提取至 `package_*_cm` |
+| `sub_code` 命名规范 | P1 | 颜色代码标准化（re=红/bl=蓝/wt=白/...） |
+| warehouse 填充 | **P1** | 已清空，需从商品分类标签提取仓库归属 |
+| 图片存储方案 | P1 | OSS / MinIO / 数据库 BLOB |
 | 各工厂单价差异 | P2 | `product_factory.unit_price_rmb` 是否支持不同工厂不同价 |
+| ✅ `goods_master` 等已删除 | — | 原始数据表已从 MySQL 删除，数据已迁移完毕 |
+| ✅ hs_code / hs_code_jp | — | 已通过 V24 直接 MySQL 迁移完成（CN HS: 2003 条，JP HS: 629 条） |
+| ✅ warehouse / remarks 污染 | — | V24 已修复：warehouse 已清空，remarks 已清除 通常/予約 |
+| ✅ category 未映射 | — | V24 已通过 status → category CASE WHEN 映射（通常→ORDINARY，予約→FACTORY_DIRECT） |

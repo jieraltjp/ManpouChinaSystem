@@ -17,11 +17,11 @@ import java.util.Optional;
 @Repository
 public interface FinanceRepository extends JpaRepository<FinanceExample, Long> {
 
-    Optional<FinanceExample> findByNameAndIsDeletedFalse(String name);
+    Optional<FinanceExample> findByNameAndDeletedIsFalse(String name);
 
-    Optional<FinanceExample> findByIdAndIsDeletedFalse(Long id);
+    Optional<FinanceExample> findByIdAndDeletedIsFalse(Long id);
 
-    List<FinanceExample> findAllByIsDeletedFalse();
+    List<FinanceExample> findAllByDeletedIsFalse();
 
-    Page<FinanceExample> findAllByIsDeletedFalse(Pageable pageable);
+    Page<FinanceExample> findAllByDeletedIsFalse(Pageable pageable);
 }

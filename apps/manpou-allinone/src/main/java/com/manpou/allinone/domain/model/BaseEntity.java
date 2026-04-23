@@ -48,15 +48,15 @@ public abstract class BaseEntity {
     private String updateBy = "SYSTEM";
 
     @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
+    private Boolean deleted = false;
 
     /** 逻辑删除（不物理删除数据）。 */
     public void markDeleted() {
-        this.isDeleted = true;
+        this.deleted = true;
     }
 
     /** 判断是否已删除。 */
     public boolean isDeleted() {
-        return Boolean.TRUE.equals(this.isDeleted);
+        return Boolean.TRUE.equals(this.deleted);
     }
 }

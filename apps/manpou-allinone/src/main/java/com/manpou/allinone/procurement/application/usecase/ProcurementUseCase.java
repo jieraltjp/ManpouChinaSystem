@@ -44,13 +44,13 @@ public class ProcurementUseCase {
         );
         Page<Procurement> page;
         if (query.getStatus() != null) {
-            page = procurementRepository.findByStatusAndIsDeletedFalse(query.getStatus(), pageRequest);
+            page = procurementRepository.findByStatusAndDeletedIsFalse(query.getStatus(), pageRequest);
         } else if (query.getProductCode() != null && !query.getProductCode().isBlank()) {
-            page = procurementRepository.findByProductCodeAndIsDeletedFalse(query.getProductCode(), pageRequest);
+            page = procurementRepository.findByProductCodeAndDeletedIsFalse(query.getProductCode(), pageRequest);
         } else if (query.getCustomerCompany() != null && !query.getCustomerCompany().isBlank()) {
-            page = procurementRepository.findByCustomerCompanyAndIsDeletedFalse(query.getCustomerCompany(), pageRequest);
+            page = procurementRepository.findByCustomerCompanyAndDeletedIsFalse(query.getCustomerCompany(), pageRequest);
         } else {
-            page = procurementRepository.findAllByIsDeletedFalse(pageRequest);
+            page = procurementRepository.findAllByDeletedIsFalse(pageRequest);
         }
         return page.map(procurementAssembler::toDto);
     }
@@ -60,7 +60,7 @@ public class ProcurementUseCase {
      */
     @Transactional(readOnly = true)
     public ProcurementPageQuery getById(Long id) {
-        Procurement entity = procurementRepository.findByIdAndIsDeletedFalse(id)
+        Procurement entity = procurementRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("Procurement", id));
         return procurementAssembler.toDto(entity);
     }
@@ -95,7 +95,7 @@ public class ProcurementUseCase {
      */
     @Transactional
     public void update(Long id, ProcurementUpdateCmd cmd) {
-        Procurement entity = procurementRepository.findByIdAndIsDeletedFalse(id)
+        Procurement entity = procurementRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("Procurement", id));
 
         // factoryId 不允许修改
@@ -118,7 +118,7 @@ public class ProcurementUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        Procurement entity = procurementRepository.findByIdAndIsDeletedFalse(id)
+        Procurement entity = procurementRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("Procurement", id));
         ShipmentStatus current = entity.getStatus();
         if (current != ShipmentStatus.未定 && current != ShipmentStatus.発注待) {

@@ -40,9 +40,9 @@ public class OrderOverviewController {
         );
         Page<Procurement> page;
         if (query.getKeyword() != null && !query.getKeyword().isBlank()) {
-            page = procurementRepository.findByKeywordAndIsDeletedFalse(query.getKeyword().trim(), pageRequest);
+            page = procurementRepository.findByKeywordAndDeletedIsFalse(query.getKeyword().trim(), pageRequest);
         } else {
-            page = procurementRepository.findAllByIsDeletedFalse(pageRequest);
+            page = procurementRepository.findAllByDeletedIsFalse(pageRequest);
         }
         return Result.ok(page.map(procurementAssembler::toDto));
     }

@@ -15,23 +15,23 @@ public interface ProcurementRepository {
 
     Optional<Procurement> findById(Long id);
 
-    Optional<Procurement> findByIdAndIsDeletedFalse(Long id);
+    Optional<Procurement> findByIdAndDeletedIsFalse(Long id);
 
     Procurement save(Procurement entity);
 
     void deleteById(Long id);
 
-    List<Procurement> findAllByIsDeletedFalse();
+    List<Procurement> findAllByDeletedIsFalse();
 
-    Page<Procurement> findAllByIsDeletedFalse(Pageable pageable);
+    Page<Procurement> findAllByDeletedIsFalse(Pageable pageable);
 
-    Page<Procurement> findByStatusAndIsDeletedFalse(ShipmentStatus status, Pageable pageable);
+    Page<Procurement> findByStatusAndDeletedIsFalse(ShipmentStatus status, Pageable pageable);
 
-    Page<Procurement> findByProductCodeAndIsDeletedFalse(String productCode, Pageable pageable);
+    Page<Procurement> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
 
-    Page<Procurement> findByCustomerCompanyAndIsDeletedFalse(String customerCompany, Pageable pageable);
+    Page<Procurement> findByCustomerCompanyAndDeletedIsFalse(String customerCompany, Pageable pageable);
 
-    Page<Procurement> findByFactoryIdAndIsDeletedFalse(Long factoryId, Pageable pageable);
+    Page<Procurement> findByFactoryIdAndDeletedIsFalse(Long factoryId, Pageable pageable);
 
     boolean existsActiveByFactoryId(Long factoryId);
 }

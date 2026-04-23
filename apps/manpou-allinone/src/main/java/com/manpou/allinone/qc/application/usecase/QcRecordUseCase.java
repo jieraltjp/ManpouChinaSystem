@@ -39,20 +39,20 @@ public class QcRecordUseCase {
                 Sort.by(Sort.Direction.DESC, "createTime"));
         Page<QcRecord> page;
         if (query.getResult() != null) {
-            page = qcRecordRepository.findByResultAndIsDeletedFalse(query.getResult(), pageRequest);
+            page = qcRecordRepository.findByResultAndDeletedIsFalse(query.getResult(), pageRequest);
         } else if (query.getProductCode() != null && !query.getProductCode().isBlank()) {
-            page = qcRecordRepository.findByProductCodeAndIsDeletedFalse(query.getProductCode(), pageRequest);
+            page = qcRecordRepository.findByProductCodeAndDeletedIsFalse(query.getProductCode(), pageRequest);
         } else if (query.getProcurementId() != null) {
-            page = qcRecordRepository.findByProcurementIdAndIsDeletedFalse(query.getProcurementId(), pageRequest);
+            page = qcRecordRepository.findByProcurementIdAndDeletedIsFalse(query.getProcurementId(), pageRequest);
         } else {
-            page = qcRecordRepository.findAllByIsDeletedFalse(pageRequest);
+            page = qcRecordRepository.findAllByDeletedIsFalse(pageRequest);
         }
         return page.map(qcRecordAssembler::toDto);
     }
 
     @Transactional(readOnly = true)
     public QcRecordPageQuery getById(Long id) {
-        QcRecord entity = qcRecordRepository.findByIdAndIsDeletedFalse(id)
+        QcRecord entity = qcRecordRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> new BusinessException("qc.not_found", "验货记录不存在"));
         return qcRecordAssembler.toDto(entity);
     }
@@ -66,10 +66,10 @@ public class QcRecordUseCase {
         }
         // K-03: 自动代入 sellerName ← Factory.factoryName（当 sellerName 未填时）
         if (cmd.getSellerName() == null && cmd.getProcurementId() != null) {
-            procurementRepository.findByIdAndIsDeletedFalse(cmd.getProcurementId())
+            procurementRepository.findByIdAndDeletedIsFalse(cmd.getProcurementId())
                     .ifPresent(procurement -> {
                         if (procurement.getFactoryId() != null) {
-                            factoryRepository.findByIdAndIsDeletedFalse(procurement.getFactoryId())
+                            factoryRepository.findByIdAndDeletedIsFalse(procurement.getFactoryId())
                                     .map(Factory::getFactoryName)
                                     .filter(name -> !name.isBlank())
                                     .ifPresent(cmd::setSellerName);
@@ -86,7 +86,7 @@ public class QcRecordUseCase {
 
     @Transactional
     public void update(Long id, QcRecordUpdateCmd cmd) {
-        QcRecord entity = qcRecordRepository.findByIdAndIsDeletedFalse(id)
+        QcRecord entity = qcRecordRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> new BusinessException("qc.not_found", "验货记录不存在"));
         if (entity.isTerminal()) {
             throw new BusinessException("qc.cannot_modify_completed", "验货记录已完成，禁止修改");
@@ -107,7 +107,7 @@ public class QcRecordUseCase {
 
     @Transactional
     public void delete(Long id) {
-        QcRecord entity = qcRecordRepository.findByIdAndIsDeletedFalse(id)
+        QcRecord entity = qcRecordRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> new BusinessException("qc.not_found", "验货记录不存在"));
         if (entity.getStatus() != QcStatus.PENDING) {
             throw new BusinessException("qc.only_pending_delete", "仅待验货状态可删除");

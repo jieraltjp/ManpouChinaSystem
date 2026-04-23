@@ -38,8 +38,8 @@ public class Factory extends BaseEntity {
     @Column(name = "factory_code", unique = true, nullable = false, length = 32)
     private String factoryCode;     // 工厂编号（F-YYYYMMDD-NNN）
 
-    @Column(name = "factory_name", nullable = false, length = 128)
-    private String factoryName;     // 工厂名称
+    @Column(name = "factory_name", unique = true, nullable = false, length = 128)
+    private String factoryName;     // 工厂名称（业务唯一标识）
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false, length = 32)

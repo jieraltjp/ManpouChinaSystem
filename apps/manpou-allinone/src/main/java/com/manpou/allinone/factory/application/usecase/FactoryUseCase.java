@@ -37,18 +37,18 @@ public class FactoryUseCase {
         );
         Page<Factory> page;
         if (query.getCooperationStatus() != null) {
-            page = factoryRepository.findByCooperationStatusAndIsDeletedFalse(query.getCooperationStatus(), pageRequest);
+            page = factoryRepository.findByCooperationStatusAndDeletedIsFalse(query.getCooperationStatus(), pageRequest);
         } else if (query.getFactoryName() != null && !query.getFactoryName().isBlank()) {
-            page = factoryRepository.findByFactoryNameAndIsDeletedFalse(query.getFactoryName(), pageRequest);
+            page = factoryRepository.findByFactoryNameAndDeletedIsFalse(query.getFactoryName(), pageRequest);
         } else {
-            page = factoryRepository.findAllByIsDeletedFalse(pageRequest);
+            page = factoryRepository.findAllByDeletedIsFalse(pageRequest);
         }
         return page.map(assembler::toDto);
     }
 
     @Transactional(readOnly = true)
     public FactoryPageQuery getById(Long id) {
-        Factory entity = factoryRepository.findByIdAndIsDeletedFalse(id)
+        Factory entity = factoryRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("Factory", id));
         return assembler.toDto(entity);
     }
@@ -64,7 +64,7 @@ public class FactoryUseCase {
 
     @Transactional
     public void update(Long id, FactoryUpdateCmd cmd) {
-        Factory entity = factoryRepository.findByIdAndIsDeletedFalse(id)
+        Factory entity = factoryRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("Factory", id));
         assembler.copyToEntity(cmd, entity);
         factoryRepository.save(entity);
@@ -78,7 +78,7 @@ public class FactoryUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        Factory entity = factoryRepository.findByIdAndIsDeletedFalse(id)
+        Factory entity = factoryRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("Factory", id));
 
         // 校验无未终态发注单关联

@@ -40,7 +40,7 @@ public class FinanceUseCase {
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<FinanceExample> page = financeRepository.findAllByIsDeletedFalse(pageRequest);
+        Page<FinanceExample> page = financeRepository.findAllByDeletedIsFalse(pageRequest);
         return page.map(financeAssembler::toDto);
     }
 
@@ -49,7 +49,7 @@ public class FinanceUseCase {
      */
     @Transactional(readOnly = true)
     public FinancePageQuery getById(Long id) {
-        FinanceExample entity = financeRepository.findByIdAndIsDeletedFalse(id)
+        FinanceExample entity = financeRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("FinanceExample", id));
         return financeAssembler.toDto(entity);
     }
@@ -70,7 +70,7 @@ public class FinanceUseCase {
      */
     @Transactional
     public void update(Long id, FinanceUpdateCmd cmd) {
-        FinanceExample entity = financeRepository.findByIdAndIsDeletedFalse(id)
+        FinanceExample entity = financeRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("FinanceExample", id));
         financeAssembler.copyToEntity(cmd, entity);
         financeRepository.save(entity);
@@ -82,7 +82,7 @@ public class FinanceUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        FinanceExample entity = financeRepository.findByIdAndIsDeletedFalse(id)
+        FinanceExample entity = financeRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("FinanceExample", id));
         entity.markDeleted();
         financeRepository.save(entity);

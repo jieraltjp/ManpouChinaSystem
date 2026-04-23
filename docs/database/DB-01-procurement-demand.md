@@ -1,8 +1,8 @@
 # DB-01 — 补货需求数据库设计
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-22（v1.1.0：sub_product_code 扩展为 VARCHAR(512)，支持 JSON 数组）
+> **更新**: 2026-04-23（v1.2.0：补全缺失索引，与 DB 实际结构对齐）
 > **状态**: ✅ 已实现
 > **业务步号**: 01（补货需求）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` §第一步
@@ -41,9 +41,12 @@ CREATE TABLE replenishment_demand (
     create_by       VARCHAR(64)  NOT NULL,
     update_by       VARCHAR(64)  NOT NULL,
     is_deleted      BOOLEAN      NOT NULL DEFAULT FALSE,
-    INDEX idx_demand_product (product_code),
+    UNIQUE KEY demand_code (demand_code),
+    INDEX idx_demand_product_code (product_code),
     INDEX idx_demand_status (status),
-    INDEX idx_demand_type (demand_type)
+    INDEX idx_demand_type (demand_type),
+    INDEX idx_demand_linked_procurement (linked_procurement_id),
+    INDEX idx_demand_is_deleted (is_deleted)
 );
 ```
 

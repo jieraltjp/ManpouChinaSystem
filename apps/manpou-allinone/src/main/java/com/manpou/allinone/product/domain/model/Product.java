@@ -4,10 +4,12 @@ import com.manpou.allinone.domain.model.BaseEntity;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +21,9 @@ import java.math.RoundingMode;
  * 对应 docs/business/SPEC-B10-商品目录-产品管理.md §2.1。
  */
 @Entity
-@Table(name = "product", indexes = {
+@Table(name = "product",
+        uniqueConstraints = @UniqueConstraint(name = "uk_master_sub", columnNames = {"master_code", "sub_code"}),
+        indexes = {
         @Index(name = "idx_master_code", columnList = "master_code"),
         @Index(name = "idx_hs_code", columnList = "hs_code"),
         @Index(name = "idx_hs_code_jp", columnList = "hs_code_jp"),

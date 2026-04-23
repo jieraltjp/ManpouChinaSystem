@@ -14,19 +14,19 @@ public interface QcRecordRepository {
 
     Optional<QcRecord> findById(Long id);
 
-    Optional<QcRecord> findByIdAndIsDeletedFalse(Long id);
+    Optional<QcRecord> findByIdAndDeletedIsFalse(Long id);
 
-    Optional<QcRecord> findByQcCodeAndIsDeletedFalse(String qcCode);
+    Optional<QcRecord> findByQcCodeAndDeletedIsFalse(String qcCode);
 
     QcRecord save(QcRecord entity);
 
     void deleteById(Long id);
 
-    Page<QcRecord> findAllByIsDeletedFalse(Pageable pageable);
+    Page<QcRecord> findAllByDeletedIsFalse(Pageable pageable);
 
-    Page<QcRecord> findByResultAndIsDeletedFalse(QcResult result, Pageable pageable);
+    Page<QcRecord> findByResultAndDeletedIsFalse(QcResult result, Pageable pageable);
 
-    Page<QcRecord> findByProcurementIdAndIsDeletedFalse(Long procurementId, Pageable pageable);
+    Page<QcRecord> findByProcurementIdAndDeletedIsFalse(Long procurementId, Pageable pageable);
 
-    Page<QcRecord> findByProductCodeAndIsDeletedFalse(String productCode, Pageable pageable);
+    Page<QcRecord> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
 }

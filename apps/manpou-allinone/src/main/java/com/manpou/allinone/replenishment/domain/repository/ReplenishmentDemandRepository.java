@@ -14,17 +14,17 @@ import java.util.Optional;
 @Repository
 public interface ReplenishmentDemandRepository extends JpaRepository<ReplenishmentDemand, Long> {
 
-    Optional<ReplenishmentDemand> findByIdAndIsDeletedFalse(Long id);
+    Optional<ReplenishmentDemand> findByIdAndDeletedIsFalse(Long id);
 
-    List<ReplenishmentDemand> findAllByIsDeletedFalse();
+    List<ReplenishmentDemand> findAllByDeletedIsFalse();
 
-    Page<ReplenishmentDemand> findAllByIsDeletedFalse(Pageable pageable);
+    Page<ReplenishmentDemand> findAllByDeletedIsFalse(Pageable pageable);
 
-    Page<ReplenishmentDemand> findByStatusAndIsDeletedFalse(DemandStatus status, Pageable pageable);
+    Page<ReplenishmentDemand> findByStatusAndDeletedIsFalse(DemandStatus status, Pageable pageable);
 
-    Page<ReplenishmentDemand> findByDemandTypeAndIsDeletedFalse(DemandType type, Pageable pageable);
+    Page<ReplenishmentDemand> findByDemandTypeAndDeletedIsFalse(DemandType type, Pageable pageable);
 
-    Optional<ReplenishmentDemand> findByLinkedProcurementIdAndIsDeletedFalse(Long procurementId);
+    Optional<ReplenishmentDemand> findByLinkedProcurementIdAndDeletedIsFalse(Long procurementId);
 
-    Page<ReplenishmentDemand> findByProductCodeAndIsDeletedFalse(String productCode, Pageable pageable);
+    Page<ReplenishmentDemand> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
 }

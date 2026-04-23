@@ -40,7 +40,7 @@ public class CustomsUseCase {
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<CustomsExample> page = customsRepository.findAllByIsDeletedFalse(pageRequest);
+        Page<CustomsExample> page = customsRepository.findAllByDeletedIsFalse(pageRequest);
         return page.map(customsAssembler::toDto);
     }
 
@@ -49,7 +49,7 @@ public class CustomsUseCase {
      */
     @Transactional(readOnly = true)
     public CustomsPageQuery getById(Long id) {
-        CustomsExample entity = customsRepository.findByIdAndIsDeletedFalse(id)
+        CustomsExample entity = customsRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("CustomsExample", id));
         return customsAssembler.toDto(entity);
     }
@@ -70,7 +70,7 @@ public class CustomsUseCase {
      */
     @Transactional
     public void update(Long id, CustomsUpdateCmd cmd) {
-        CustomsExample entity = customsRepository.findByIdAndIsDeletedFalse(id)
+        CustomsExample entity = customsRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("CustomsExample", id));
         customsAssembler.copyToEntity(cmd, entity);
         customsRepository.save(entity);
@@ -82,7 +82,7 @@ public class CustomsUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        CustomsExample entity = customsRepository.findByIdAndIsDeletedFalse(id)
+        CustomsExample entity = customsRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("CustomsExample", id));
         entity.markDeleted();
         customsRepository.save(entity);

@@ -18,11 +18,11 @@ import java.util.Optional;
 @Repository
 public interface LogisticsPlanJpaRepository extends LogisticsPlanRepository, JpaRepository<LogisticsPlan, Long> {
 
-    Page<LogisticsPlan> findByStatusAndIsDeletedFalse(LogisticsStatus status, Pageable pageable);
+    Page<LogisticsPlan> findByStatusAndDeletedIsFalse(LogisticsStatus status, Pageable pageable);
 
-    Page<LogisticsPlan> findByPlanTypeAndIsDeletedFalse(PlanType planType, Pageable pageable);
+    Page<LogisticsPlan> findByPlanTypeAndDeletedIsFalse(PlanType planType, Pageable pageable);
 
-    Page<LogisticsPlan> findByProcurementIdAndIsDeletedFalse(Long procurementId, Pageable pageable);
+    Page<LogisticsPlan> findByProcurementIdAndDeletedIsFalse(Long procurementId, Pageable pageable);
 
-    Page<LogisticsPlan> findByProductCodeAndIsDeletedFalse(String productCode, Pageable pageable);
+    Page<LogisticsPlan> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
 }

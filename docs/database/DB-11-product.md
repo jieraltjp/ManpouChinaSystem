@@ -1,7 +1,7 @@
 # DB-11 — 商品目录数据库设计
 
-> **版本**: 1.2.0
-> **更新**: 2026-04-23（v1.2.0：新增7个字段+字段重排，与 SPEC-B10 v1.4.0 对齐）
+> **版本**: 1.3.0
+> **更新**: 2026-04-23（v1.3.0：补全 product.idx_product_is_deleted 索引，product_factory.uk_product_factory 已固化，DB 与文档完全对齐）
 > **创建**: 2026-04-22
 > **状态**: ✅ 已实现
 > **对应业务文档**: `docs/business/SPEC-B10-商品目录-产品管理.md`
@@ -106,7 +106,8 @@ CREATE TABLE product (
     INDEX idx_hs_code (hs_code),
     INDEX idx_hs_code_jp (hs_code_jp),
     INDEX idx_name_zh (name_zh),
-    INDEX idx_create_time (create_time)
+    INDEX idx_create_time (create_time),
+    INDEX idx_product_is_deleted (is_deleted)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品目录';
 ```
 
@@ -139,11 +140,9 @@ CREATE TABLE product_factory (
     -- 索引与约束
     UNIQUE KEY uk_product_factory (product_id, factory_id),
     INDEX idx_product_id (product_id),
-    INDEX idx_factory_id (factory_id),
+    INDEX idx_factory_id (factory_id)
 
-    -- 外键约束
-    CONSTRAINT fk_pf_product FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE,
-    CONSTRAINT fk_pf_factory FOREIGN KEY (factory_id) REFERENCES factory(id) ON DELETE RESTRICT
+    -- 注：外键约束（fk_pf_product / fk_pf_factory）在 DB 中不存在，由 JPA 逻辑外键维护
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品-工厂多对多关联';
 ```
 
@@ -389,12 +388,28 @@ SET p.package_length_cm = CAST(SUBSTRING_INDEX(g.box_desc, '*', 1) AS DECIMAL(8,
 
 | 项目 | 优先级 | 说明 |
 |------|--------|------|
-| 数据清洗 | **P0** | goods.sql 中部分 sku/box_desc 格式不一致 |
-| 工厂名称匹配 | **P0** | factory_name 不精确，需人工核准 |
 | `box_desc` 尺寸解析 | **P1** | 部分 box_desc 含尺寸（如 `193*23*28cm`）需正则提取 |
+| `sub_code` 规范 | P1 | 颜色代码标准化（re=红/bl=蓝/wt=白/...） |
 | 图片 URL | P1 | 现有数据无图片字段，需补充 |
-| `sub_code` 规范 | P1 | 颜色代码标准化（re/bl/wt 等） |
-| name_zh/en/unit/price | **P1** | 当前填充率仅19%，需重新运行 gen_migration.py 补充 |
-| origin | **P1** | 当前填充率仅14%，需从 DB.json 补充 |
 | warehouse | **P1** | 已清空，需从商品分类标签提取仓库归属 |
 | length/width/height/package_* | **P1** | 单品尺寸和外箱尺寸无数据源，待补充 |
+| `goods_master` 等已删除 | ✅ | goods_master / goods_hs_mapping / cn_factory_origin 已从 MySQL 删除，数据已迁移完毕 |
+
+## 8. 审计修复记录
+
+| 日期 | 问题 | 修复 |
+|------|------|------|
+| 2026-04-23 | `uk_master_sub` 被拆散为两个单列 UK（V25 脚本 bug） | 重置为复合唯一索引 `(master_code, sub_code)` |
+| 2026-04-23 | `product_factory` 无唯一约束，数据有 14 对重复 | 去重 15 条脏数据后添加 `uk_product_factory` |
+| 2026-04-23 | `product` 缺 `idx_product_is_deleted` 软删除索引 | 添加索引 |
+| 2026-04-23 | `product_factory` FK 约束未在 DB 创建 | 注：DB 无物理 FK，由 JPA 逻辑外键维护 |
+
+## 9. 数据源表清理状态
+
+| 表名 | 操作 | 说明 |
+|------|------|------|
+| `goods_master` | 🔴 已删除 | 数据迁移至 product（4999 条） |
+| `goods_hs_mapping` | 🔴 已删除 | 数据迁移至 product.hs_code / hs_code_jp |
+| `cn_factory_origin` | 🔴 已删除 | 数据已关联至 factory.origin |
+| `cn_hs_code` | ✅ 保留 | 独立查询用 |
+| `jp_hs_code` | ✅ 保留 | 独立查询用 |

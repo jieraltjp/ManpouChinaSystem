@@ -1,6 +1,6 @@
 package com.manpou.allinone.product.domain.repository;
 
-import com.manpou.allinone.product.domain.model.ProductExample;
+import com.manpou.allinone.product.domain.model.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,18 +10,31 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 示例实体仓库接口。
- * 定义领域层需要的查询方法（领域接口）。
- * JPA 实现在 infrastructure.persistence 包。
+ * 商品仓库接口（领域层契约）。
+ * JPA 实现在 infrastructure.persistence.jpa.ProductJpaRepository。
  */
 @Repository
-public interface ProductRepository extends JpaRepository<ProductExample, Long> {
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    Optional<ProductExample> findByNameAndIsDeletedFalse(String name);
+    Optional<Product> findByIdAndDeletedIsFalse(Long id);
 
-    Optional<ProductExample> findByIdAndIsDeletedFalse(Long id);
+    Optional<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
 
-    List<ProductExample> findAllByIsDeletedFalse();
+    Optional<Product> findByMasterCodeAndSubCodeAndDeletedIsFalse(String masterCode, String subCode);
 
-    Page<ProductExample> findAllByIsDeletedFalse(Pageable pageable);
+    Page<Product> findByMasterCodeAndDeletedIsFalse(String masterCode, Pageable pageable);
+
+    Page<Product> findByNameZhContainingAndDeletedIsFalse(String keyword, Pageable pageable);
+
+    Page<Product> findByHsCodeAndDeletedIsFalse(String hsCode, Pageable pageable);
+
+    List<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
+
+    List<String> findDistinctMasterCodeByKeyword(String keyword);
+
+    List<Object[]> findMasterCodeSuggestions(String keyword);
+
+    List<Object[]> findSubCodesByMasterCode(String masterCode);
+
+    Page<Product> findAllByDeletedIsFalse(Pageable pageable);
 }

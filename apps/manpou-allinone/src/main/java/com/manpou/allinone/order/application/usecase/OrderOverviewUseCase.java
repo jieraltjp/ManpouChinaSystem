@@ -58,59 +58,59 @@ public class OrderOverviewUseCase {
     @Transactional(readOnly = true)
     public OrderOverviewPageVO getOverview(Long procurementId) {
         Procurement procurement = procurementRepository
-                .findByIdAndIsDeletedFalse(procurementId)
+                .findByIdAndDeletedIsFalse(procurementId)
                 .orElseThrow(() -> BusinessException.notFound("Procurement", procurementId));
 
         log.info("[OrderOverview] fetch, procurementId={}", procurementId);
 
         // 锚点发注单
         String factoryName = procurement.getFactoryId() != null
-                ? factoryRepository.findByIdAndIsDeletedFalse(procurement.getFactoryId())
+                ? factoryRepository.findByIdAndDeletedIsFalse(procurement.getFactoryId())
                         .map(Factory::getFactoryName).orElse(null)
                 : null;
         ProcurementVO procurementVO = assembler.toProcurementVO(procurement, factoryName);
 
         // 步骤1：补货需求（通过 linked_procurement_id 关联）
         DemandVO demandVO = demandRepository
-                .findByLinkedProcurementIdAndIsDeletedFalse(procurementId)
+                .findByLinkedProcurementIdAndDeletedIsFalse(procurementId)
                 .map(assembler::toDemandVO).orElse(null);
 
         // 步骤3：验货记录（取最新一条）
         QcRecordVO qcVO = qcRecordRepository
-                .findByProcurementIdAndIsDeletedFalse(procurementId, Pageable.ofSize(1))
+                .findByProcurementIdAndDeletedIsFalse(procurementId, Pageable.ofSize(1))
                 .stream().findFirst()
                 .map(assembler::toQcVO).orElse(null);
 
         // 步骤4：调配计划（取最新一条）
         LogisticsPlanVO lpVO = logisticsPlanRepository
-                .findByProcurementIdAndIsDeletedFalse(procurementId, Pageable.ofSize(1))
+                .findByProcurementIdAndDeletedIsFalse(procurementId, Pageable.ofSize(1))
                 .stream().findFirst()
                 .map(assembler::toLogisticsVO).orElse(null);
 
         // 步骤5：国内报关（取最新一条）
         DomesticCustomsVO dcVO = null;
-        List<DomesticCustomsRecord> dcRecords = domesticCustomsRepository.findByProcurementIdAndIsDeletedFalse(procurementId);
+        List<DomesticCustomsRecord> dcRecords = domesticCustomsRepository.findByProcurementIdAndDeletedIsFalse(procurementId);
         if (!dcRecords.isEmpty()) {
             dcVO = assembler.toDomesticCustomsVO(dcRecords.get(0));
         }
 
         // 步骤6：日本清关（通过 procurementId 关联，取最新一条）
         JapanCustomsVO jpVO = null;
-        List<JapanCustomsRecord> jpRecords = japanCustomsRepository.findByProcurementIdAndIsDeletedFalse(procurementId);
+        List<JapanCustomsRecord> jpRecords = japanCustomsRepository.findByProcurementIdAndDeletedIsFalse(procurementId);
         if (!jpRecords.isEmpty()) {
             jpVO = assembler.toJapanCustomsVO(jpRecords.get(0));
         }
 
         // 步骤7：出口退税（通过 procurementId 关联，取最新一条）
         TaxRefundVO trVO = null;
-        List<TaxRefundRecord> trRecords = taxRefundRepository.findByProcurementIdAndIsDeletedFalse(procurementId);
+        List<TaxRefundRecord> trRecords = taxRefundRepository.findByProcurementIdAndDeletedIsFalse(procurementId);
         if (!trRecords.isEmpty()) {
             trVO = assembler.toTaxRefundVO(trRecords.get(0));
         }
 
         // 步骤8：运营销售（通过 procurementId 关联，取最新一条）
         SalesRecordVO srVO = null;
-        List<SalesRecord> srRecords = salesRecordRepository.findByProcurementIdAndIsDeletedFalse(procurementId);
+        List<SalesRecord> srRecords = salesRecordRepository.findByProcurementIdAndDeletedIsFalse(procurementId);
         if (!srRecords.isEmpty()) {
             srVO = assembler.toSalesRecordVO(srRecords.get(0));
         }
@@ -123,7 +123,7 @@ public class OrderOverviewUseCase {
                 .procurementId(procurementId)
                 .procurement(procurementVO)
                 .factory(procurement.getFactoryId() != null
-                        ? factoryRepository.findByIdAndIsDeletedFalse(procurement.getFactoryId())
+                        ? factoryRepository.findByIdAndDeletedIsFalse(procurement.getFactoryId())
                                 .map(assembler::toFactoryVO).orElse(null)
                         : null)
                 .demand(demandVO)

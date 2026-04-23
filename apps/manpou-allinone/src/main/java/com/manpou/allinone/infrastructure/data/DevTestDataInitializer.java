@@ -45,7 +45,7 @@ public class DevTestDataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        if (factoryRepository.existsByIsDeletedFalse()) {
+        if (factoryRepository.existsByDeletedIsFalse()) {
             log.info("[DevTestData] 数据已存在，跳过初始化");
             return;
         }

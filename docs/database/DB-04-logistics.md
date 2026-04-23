@@ -1,7 +1,8 @@
 # DB-04 — 调配计划数据库设计
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
+> **更新**: 2026-04-23（v1.1.0：补全缺失索引，与 DB 实际结构对齐）
 > **状态**: ✅ 已实现
 > **业务步号**: 04（调配计划）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B04-调配计划-步骤4.md`
@@ -52,10 +53,15 @@ CREATE TABLE logistics_plan (
     create_by          VARCHAR(64)  NOT NULL,
     update_by          VARCHAR(64)  NOT NULL,
     is_deleted         BOOLEAN      NOT NULL DEFAULT FALSE,
+    UNIQUE KEY uk_plan_code (plan_code),
     INDEX idx_logistics_procurement (procurement_id),
     INDEX idx_logistics_status (status),
     INDEX idx_logistics_plan_type (plan_type),
-    INDEX idx_logistics_factory (factory_id)
+    INDEX idx_logistics_factory (factory_id),
+    INDEX idx_lp_product_code (product_code),
+    INDEX idx_lp_estimated_ship_date (estimated_ship_date),
+    INDEX idx_lp_create_time (create_time),
+    INDEX idx_lp_is_deleted (is_deleted)
 );
 ```
 

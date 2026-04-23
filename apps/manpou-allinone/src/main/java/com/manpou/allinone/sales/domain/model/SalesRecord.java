@@ -28,10 +28,6 @@ public class SalesRecord extends BaseEntity {
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static long SEQ = System.currentTimeMillis() % 1000;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "record_code", length = 32)
     private String recordCode;  // 销售记录编号（SA-YYYYMMDD-NNN）
 

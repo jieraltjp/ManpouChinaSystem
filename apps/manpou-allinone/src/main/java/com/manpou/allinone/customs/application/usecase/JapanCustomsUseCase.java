@@ -24,7 +24,7 @@ public class JapanCustomsUseCase {
 
     @Transactional(readOnly = true)
     public Page<JapanCustomsPageQuery> pageQuery(JapanCustomsQuery query) {
-        List<JapanCustomsRecord> all = japanCustomsRepository.findByIsDeletedFalseOrderByCreateTimeDesc();
+        List<JapanCustomsRecord> all = japanCustomsRepository.findByDeletedFalseOrderByCreateTimeDesc();
         List<JapanCustomsPageQuery> filtered = all.stream()
                 .filter(r -> query.getProcurementId() == null || query.getProcurementId().equals(r.getProcurementId()))
                 .filter(r -> query.getDomesticCustomsId() == null || query.getDomesticCustomsId().equals(r.getDomesticCustomsId()))
@@ -43,7 +43,7 @@ public class JapanCustomsUseCase {
 
     @Transactional(readOnly = true)
     public JapanCustomsPageQuery getById(Long id) {
-        JapanCustomsRecord entity = japanCustomsRepository.findByIdAndIsDeletedFalse(id)
+        JapanCustomsRecord entity = japanCustomsRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("JapanCustoms", id));
         return assembler.toDto(entity);
     }
@@ -60,7 +60,7 @@ public class JapanCustomsUseCase {
     @Transactional
     public void update(Long id, JapanCustomsUpdateCmd cmd) {
         log.info("[JapanCustoms] update, id={}, customsBroker={}, arrivalPort={}", id, cmd.getCustomsBroker(), cmd.getArrivalPort());
-        JapanCustomsRecord entity = japanCustomsRepository.findByIdAndIsDeletedFalse(id)
+        JapanCustomsRecord entity = japanCustomsRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("JapanCustoms", id));
         if (entity.isTerminal()) {
             throw new BusinessException("japan.customs.cannot_modify_terminal", "已完成/失败的清关记录禁止修改");
@@ -72,7 +72,7 @@ public class JapanCustomsUseCase {
 
     @Transactional
     public void startClearance(Long id) {
-        JapanCustomsRecord entity = japanCustomsRepository.findByIdAndIsDeletedFalse(id)
+        JapanCustomsRecord entity = japanCustomsRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("JapanCustoms", id));
         entity.startClearance();
         japanCustomsRepository.save(entity);
@@ -82,7 +82,7 @@ public class JapanCustomsUseCase {
     @Transactional
     public void complete(Long id, JapanCustomsCompleteCmd cmd) {
         log.info("[JapanCustoms] complete, id={}, importDutyPaid={}, consumptionTaxPaid={}, clearanceDate={}", id, cmd.getImportDutyPaid(), cmd.getConsumptionTaxPaid(), cmd.getClearanceDate());
-        JapanCustomsRecord entity = japanCustomsRepository.findByIdAndIsDeletedFalse(id)
+        JapanCustomsRecord entity = japanCustomsRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("JapanCustoms", id));
         entity.complete(cmd.getImportDutyPaid(), cmd.getConsumptionTaxPaid(), cmd.getClearanceDate());
         japanCustomsRepository.save(entity);
@@ -91,7 +91,7 @@ public class JapanCustomsUseCase {
 
     @Transactional
     public void fail(Long id, JapanCustomsFailCmd cmd) {
-        JapanCustomsRecord entity = japanCustomsRepository.findByIdAndIsDeletedFalse(id)
+        JapanCustomsRecord entity = japanCustomsRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("JapanCustoms", id));
         entity.fail(cmd.getReason());
         japanCustomsRepository.save(entity);
@@ -100,7 +100,7 @@ public class JapanCustomsUseCase {
 
     @Transactional
     public void delete(Long id) {
-        JapanCustomsRecord entity = japanCustomsRepository.findByIdAndIsDeletedFalse(id)
+        JapanCustomsRecord entity = japanCustomsRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("JapanCustoms", id));
         if (entity.isTerminal()) {
             throw new BusinessException("japan.customs.cannot_delete_terminal", "已完成/失败的清关记录禁止删除");

@@ -15,19 +15,19 @@ public interface LogisticsPlanRepository {
 
     Optional<LogisticsPlan> findById(Long id);
 
-    Optional<LogisticsPlan> findByIdAndIsDeletedFalse(Long id);
+    Optional<LogisticsPlan> findByIdAndDeletedIsFalse(Long id);
 
     LogisticsPlan save(LogisticsPlan entity);
 
     void deleteById(Long id);
 
-    Page<LogisticsPlan> findAllByIsDeletedFalse(Pageable pageable);
+    Page<LogisticsPlan> findAllByDeletedIsFalse(Pageable pageable);
 
-    Page<LogisticsPlan> findByStatusAndIsDeletedFalse(LogisticsStatus status, Pageable pageable);
+    Page<LogisticsPlan> findByStatusAndDeletedIsFalse(LogisticsStatus status, Pageable pageable);
 
-    Page<LogisticsPlan> findByPlanTypeAndIsDeletedFalse(PlanType planType, Pageable pageable);
+    Page<LogisticsPlan> findByPlanTypeAndDeletedIsFalse(PlanType planType, Pageable pageable);
 
-    Page<LogisticsPlan> findByProcurementIdAndIsDeletedFalse(Long procurementId, Pageable pageable);
+    Page<LogisticsPlan> findByProcurementIdAndDeletedIsFalse(Long procurementId, Pageable pageable);
 
-    Page<LogisticsPlan> findByProductCodeAndIsDeletedFalse(String productCode, Pageable pageable);
+    Page<LogisticsPlan> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
 }

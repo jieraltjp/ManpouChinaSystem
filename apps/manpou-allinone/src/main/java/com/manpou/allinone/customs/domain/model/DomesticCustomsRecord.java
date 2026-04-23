@@ -17,12 +17,8 @@ import lombok.Setter;
  * 生命周期由 LogisticsPlan.status=IN_TRANSIT 事件自动触发创建。
  */
 @Entity
-@Table(name = "domestic_customs_record", indexes = {
-        @Index(name = "uk_domestic_customs_code", columnList = "customs_code", unique = true),
-        @Index(name = "idx_domestic_procurement", columnList = "procurement_id"),
-        @Index(name = "idx_domestic_logistics", columnList = "logistics_plan_id"),
-        @Index(name = "idx_domestic_status", columnList = "status")
-})
+@Table(name = "domestic_customs_record",
+        uniqueConstraints = @UniqueConstraint(name = "uk_domestic_customs_code", columnNames = "customs_code"))
 @Access(AccessType.FIELD)
 @Getter
 @Setter

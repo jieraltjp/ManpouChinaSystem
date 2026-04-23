@@ -20,22 +20,22 @@ import java.util.Optional;
 @Repository
 public interface ProductJpaRepository extends ProductRepository, JpaRepository<Product, Long> {
 
-    Optional<Product> findByMasterCodeAndIsDeletedFalse(String masterCode);
+    Optional<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
 
-    Optional<Product> findByMasterCodeAndSubCodeAndIsDeletedFalse(String masterCode, String subCode);
+    Optional<Product> findByMasterCodeAndSubCodeAndDeletedIsFalse(String masterCode, String subCode);
 
-    Page<Product> findByMasterCodeAndIsDeletedFalse(String masterCode, Pageable pageable);
+    Page<Product> findByMasterCodeAndDeletedIsFalse(String masterCode, Pageable pageable);
 
-    @Query("SELECT p FROM Product p WHERE p.nameZh LIKE %:keyword% AND p.isDeleted = false")
-    Page<Product> findByNameZhContainingAndIsDeletedFalse(@Param("keyword") String keyword, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.nameZh LIKE %:keyword% AND p.deleted = false")
+    Page<Product> findByNameZhContainingAndDeletedIsFalse(@Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT p FROM Product p WHERE p.hsCode = :hsCode AND p.isDeleted = false")
-    Page<Product> findByHsCodeAndIsDeletedFalse(@Param("hsCode") String hsCode, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.hsCode = :hsCode AND p.deleted = false")
+    Page<Product> findByHsCodeAndDeletedIsFalse(@Param("hsCode") String hsCode, Pageable pageable);
 
-    List<Product> findByMasterCodeAndIsDeletedFalse(String masterCode);
+    List<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
 
     /** 主货号模糊搜索（去重），用于自动补全 */
-    @Query("SELECT DISTINCT p.masterCode FROM Product p WHERE p.masterCode LIKE %:kw% AND p.isDeleted = false")
+    @Query("SELECT DISTINCT p.masterCode FROM Product p WHERE p.masterCode LIKE %:kw% AND p.deleted = false")
     List<String> findDistinctMasterCodeByKeyword(@Param("kw") String keyword);
 
     /** 主货号模糊搜索（含名称和颜色数量），限制返回条数 */
@@ -51,6 +51,6 @@ public interface ProductJpaRepository extends ProductRepository, JpaRepository<P
     List<Object[]> findMasterCodeSuggestions(@Param("kw") String keyword);
 
     /** 按主货号查询所有子货号候选项（用于多选） */
-    @Query("SELECT p.subCode, p.colorName FROM Product p WHERE p.masterCode = :masterCode AND p.isDeleted = false AND p.subCode IS NOT NULL AND p.subCode != '' ORDER BY p.subCode")
+    @Query("SELECT p.subCode, p.colorName FROM Product p WHERE p.masterCode = :masterCode AND p.deleted = false AND p.subCode IS NOT NULL AND p.subCode != '' ORDER BY p.subCode")
     List<Object[]> findSubCodesByMasterCode(@Param("masterCode") String masterCode);
 }

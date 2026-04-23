@@ -17,15 +17,15 @@ import java.util.Optional;
 @Repository
 public interface FactoryJpaAdapter extends FactoryRepository, org.springframework.data.jpa.repository.JpaRepository<Factory, Long> {
 
-    Optional<Factory> findByIdAndIsDeletedFalse(Long id);
+    Optional<Factory> findByIdAndDeletedIsFalse(Long id);
 
-    Optional<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName);
+    Optional<Factory> findByFactoryNameAndDeletedIsFalse(String factoryName);
 
-    Page<Factory> findByCooperationStatusAndIsDeletedFalse(CooperationStatus cooperationStatus, Pageable pageable);
+    Page<Factory> findByCooperationStatusAndDeletedIsFalse(CooperationStatus cooperationStatus, Pageable pageable);
 
-    Page<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName, Pageable pageable);
+    Page<Factory> findByFactoryNameAndDeletedIsFalse(String factoryName, Pageable pageable);
 
     @Override
-    @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END FROM Factory f WHERE f.isDeleted = false")
-    boolean existsByIsDeletedFalse();
+    @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END FROM Factory f WHERE f.deleted = false")
+    boolean existsByDeletedIsFalse();
 }

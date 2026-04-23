@@ -40,7 +40,7 @@ public class LogisticsUseCase {
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<LogisticsExample> page = logisticsRepository.findAllByIsDeletedFalse(pageRequest);
+        Page<LogisticsExample> page = logisticsRepository.findAllByDeletedIsFalse(pageRequest);
         return page.map(logisticsAssembler::toDto);
     }
 
@@ -49,7 +49,7 @@ public class LogisticsUseCase {
      */
     @Transactional(readOnly = true)
     public LogisticsPageQuery getById(Long id) {
-        LogisticsExample entity = logisticsRepository.findByIdAndIsDeletedFalse(id)
+        LogisticsExample entity = logisticsRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("LogisticsExample", id));
         return logisticsAssembler.toDto(entity);
     }
@@ -70,7 +70,7 @@ public class LogisticsUseCase {
      */
     @Transactional
     public void update(Long id, LogisticsUpdateCmd cmd) {
-        LogisticsExample entity = logisticsRepository.findByIdAndIsDeletedFalse(id)
+        LogisticsExample entity = logisticsRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("LogisticsExample", id));
         logisticsAssembler.copyToEntity(cmd, entity);
         logisticsRepository.save(entity);
@@ -82,7 +82,7 @@ public class LogisticsUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        LogisticsExample entity = logisticsRepository.findByIdAndIsDeletedFalse(id)
+        LogisticsExample entity = logisticsRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("LogisticsExample", id));
         entity.markDeleted();
         logisticsRepository.save(entity);

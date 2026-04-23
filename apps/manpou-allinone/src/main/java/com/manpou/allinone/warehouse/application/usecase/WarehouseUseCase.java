@@ -40,7 +40,7 @@ public class WarehouseUseCase {
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<WarehouseExample> page = warehouseRepository.findAllByIsDeletedFalse(pageRequest);
+        Page<WarehouseExample> page = warehouseRepository.findAllByDeletedIsFalse(pageRequest);
         return page.map(warehouseAssembler::toDto);
     }
 
@@ -49,7 +49,7 @@ public class WarehouseUseCase {
      */
     @Transactional(readOnly = true)
     public WarehousePageQuery getById(Long id) {
-        WarehouseExample entity = warehouseRepository.findByIdAndIsDeletedFalse(id)
+        WarehouseExample entity = warehouseRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("WarehouseExample", id));
         return warehouseAssembler.toDto(entity);
     }
@@ -70,7 +70,7 @@ public class WarehouseUseCase {
      */
     @Transactional
     public void update(Long id, WarehouseUpdateCmd cmd) {
-        WarehouseExample entity = warehouseRepository.findByIdAndIsDeletedFalse(id)
+        WarehouseExample entity = warehouseRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("WarehouseExample", id));
         warehouseAssembler.copyToEntity(cmd, entity);
         warehouseRepository.save(entity);
@@ -82,7 +82,7 @@ public class WarehouseUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        WarehouseExample entity = warehouseRepository.findByIdAndIsDeletedFalse(id)
+        WarehouseExample entity = warehouseRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("WarehouseExample", id));
         entity.markDeleted();
         warehouseRepository.save(entity);

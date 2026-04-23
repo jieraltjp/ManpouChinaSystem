@@ -10,11 +10,11 @@ import java.util.Optional;
 @Repository
 public interface DomesticCustomsRepository extends JpaRepository<DomesticCustomsRecord, Long> {
 
-    Optional<DomesticCustomsRecord> findByIdAndIsDeletedFalse(Long id);
+    Optional<DomesticCustomsRecord> findByIdAndDeletedIsFalse(Long id);
 
-    List<DomesticCustomsRecord> findByProcurementIdAndIsDeletedFalse(Long procurementId);
+    List<DomesticCustomsRecord> findByProcurementIdAndDeletedIsFalse(Long procurementId);
 
-    Optional<DomesticCustomsRecord> findByLogisticsPlanIdAndIsDeletedFalse(Long logisticsPlanId);
+    Optional<DomesticCustomsRecord> findByLogisticsPlanIdAndDeletedIsFalse(Long logisticsPlanId);
 
-    List<DomesticCustomsRecord> findByIsDeletedFalseOrderByCreateTimeDesc();
+    List<DomesticCustomsRecord> findByDeletedFalseOrderByCreateTimeDesc();
 }

@@ -50,7 +50,7 @@ public class Procurement extends BaseEntity {
     private Integer quantity;          // 订购数量
 
     // ===== 价格信息 =====
-    @Column(name = "price_rmb", nullable = false, precision = 12, scale = 2)
+    @Column(name = "price_rmb", nullable = false, precision = 12, scale = 4)
     private BigDecimal priceRmb;       // 人民币单价
 
     @Column(name = "exchange_rate", nullable = false, precision = 10, scale = 4)

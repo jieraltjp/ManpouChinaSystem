@@ -24,7 +24,7 @@ public class TaxRefundUseCase {
 
     @Transactional(readOnly = true)
     public Page<TaxRefundPageQuery> pageQuery(TaxRefundQuery query) {
-        List<TaxRefundRecord> all = taxRefundRepository.findByIsDeletedFalseOrderByCreateTimeDesc();
+        List<TaxRefundRecord> all = taxRefundRepository.findByDeletedFalseOrderByCreateTimeDesc();
         List<TaxRefundPageQuery> filtered = all.stream()
                 .filter(r -> query.getProcurementId() == null || query.getProcurementId().equals(r.getProcurementId()))
                 .filter(r -> query.getStatus() == null || query.getStatus().equals(r.getStatus().name()))
@@ -42,7 +42,7 @@ public class TaxRefundUseCase {
 
     @Transactional(readOnly = true)
     public TaxRefundPageQuery getById(Long id) {
-        TaxRefundRecord entity = taxRefundRepository.findByIdAndIsDeletedFalse(id)
+        TaxRefundRecord entity = taxRefundRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("TaxRefund", id));
         return assembler.toDto(entity);
     }
@@ -59,7 +59,7 @@ public class TaxRefundUseCase {
     @Transactional
     public void complete(Long id, TaxRefundCompleteCmd cmd) {
         log.info("[TaxRefund] complete, id={}, actualRefundRmb={}, refundDate={}, refundBank={}", id, cmd.getActualRefundRmb(), cmd.getRefundDate(), cmd.getRefundBank());
-        TaxRefundRecord entity = taxRefundRepository.findByIdAndIsDeletedFalse(id)
+        TaxRefundRecord entity = taxRefundRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("TaxRefund", id));
         entity.complete(cmd.getActualRefundRmb(), cmd.getRefundDate(), cmd.getRefundBank());
         taxRefundRepository.save(entity);
@@ -68,7 +68,7 @@ public class TaxRefundUseCase {
 
     @Transactional
     public void markNoRefund(Long id) {
-        TaxRefundRecord entity = taxRefundRepository.findByIdAndIsDeletedFalse(id)
+        TaxRefundRecord entity = taxRefundRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("TaxRefund", id));
         entity.markNoRefund();
         taxRefundRepository.save(entity);
@@ -77,7 +77,7 @@ public class TaxRefundUseCase {
 
     @Transactional
     public void delete(Long id) {
-        TaxRefundRecord entity = taxRefundRepository.findByIdAndIsDeletedFalse(id)
+        TaxRefundRecord entity = taxRefundRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("TaxRefund", id));
         if (entity.isTerminal()) {
             throw new BusinessException("tax.refund.cannot_delete_terminal", "已完成/不退税的记录禁止删除");

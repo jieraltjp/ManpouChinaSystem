@@ -17,11 +17,11 @@ import java.util.Optional;
 @Repository
 public interface WarehouseRepository extends JpaRepository<WarehouseExample, Long> {
 
-    Optional<WarehouseExample> findByNameAndIsDeletedFalse(String name);
+    Optional<WarehouseExample> findByNameAndDeletedIsFalse(String name);
 
-    Optional<WarehouseExample> findByIdAndIsDeletedFalse(Long id);
+    Optional<WarehouseExample> findByIdAndDeletedIsFalse(Long id);
 
-    List<WarehouseExample> findAllByIsDeletedFalse();
+    List<WarehouseExample> findAllByDeletedIsFalse();
 
-    Page<WarehouseExample> findAllByIsDeletedFalse(Pageable pageable);
+    Page<WarehouseExample> findAllByDeletedIsFalse(Pageable pageable);
 }

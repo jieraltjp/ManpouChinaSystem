@@ -39,7 +39,7 @@ public class LogisticsInTransitEventListener {
         try {
             // 幂等检查：同一 LogisticsPlan 只创建一条记录
             if (domesticCustomsRepository
-                    .findByLogisticsPlanIdAndIsDeletedFalse(evt.getLogisticsPlanId())
+                    .findByLogisticsPlanIdAndDeletedIsFalse(evt.getLogisticsPlanId())
                     .isPresent()) {
                 log.info("[Customs] DomesticCustomsRecord already exists for logisticsPlanId={}, skip",
                         evt.getLogisticsPlanId());

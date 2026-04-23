@@ -31,22 +31,22 @@ public class LogisticsPlanUseCase {
                 Sort.by(Sort.Direction.DESC, "createTime"));
         Page<LogisticsPlan> page;
         if (query.getStatus() != null) {
-            page = logisticsPlanRepository.findByStatusAndIsDeletedFalse(query.getStatus(), pageRequest);
+            page = logisticsPlanRepository.findByStatusAndDeletedIsFalse(query.getStatus(), pageRequest);
         } else if (query.getPlanType() != null) {
-            page = logisticsPlanRepository.findByPlanTypeAndIsDeletedFalse(query.getPlanType(), pageRequest);
+            page = logisticsPlanRepository.findByPlanTypeAndDeletedIsFalse(query.getPlanType(), pageRequest);
         } else if (query.getProcurementId() != null) {
-            page = logisticsPlanRepository.findByProcurementIdAndIsDeletedFalse(query.getProcurementId(), pageRequest);
+            page = logisticsPlanRepository.findByProcurementIdAndDeletedIsFalse(query.getProcurementId(), pageRequest);
         } else if (query.getProductCode() != null && !query.getProductCode().isBlank()) {
-            page = logisticsPlanRepository.findByProductCodeAndIsDeletedFalse(query.getProductCode(), pageRequest);
+            page = logisticsPlanRepository.findByProductCodeAndDeletedIsFalse(query.getProductCode(), pageRequest);
         } else {
-            page = logisticsPlanRepository.findAllByIsDeletedFalse(pageRequest);
+            page = logisticsPlanRepository.findAllByDeletedIsFalse(pageRequest);
         }
         return page.map(logisticsPlanAssembler::toDto);
     }
 
     @Transactional(readOnly = true)
     public LogisticsPlanPageQuery getById(Long id) {
-        LogisticsPlan entity = logisticsPlanRepository.findByIdAndIsDeletedFalse(id)
+        LogisticsPlan entity = logisticsPlanRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> new BusinessException("logistics.not_found", "调配计划不存在"));
         return logisticsPlanAssembler.toDto(entity);
     }
@@ -63,7 +63,7 @@ public class LogisticsPlanUseCase {
 
     @Transactional
     public void update(Long id, LogisticsPlanUpdateCmd cmd) {
-        LogisticsPlan entity = logisticsPlanRepository.findByIdAndIsDeletedFalse(id)
+        LogisticsPlan entity = logisticsPlanRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> new BusinessException("logistics.not_found", "调配计划不存在"));
         if (entity.isTerminal()) {
             throw new BusinessException("logistics.cannot_modify_delivered", "调配计划已完成，禁止修改");
@@ -75,7 +75,7 @@ public class LogisticsPlanUseCase {
 
     @Transactional
     public void delete(Long id) {
-        LogisticsPlan entity = logisticsPlanRepository.findByIdAndIsDeletedFalse(id)
+        LogisticsPlan entity = logisticsPlanRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> new BusinessException("logistics.not_found", "调配计划不存在"));
         if (entity.isTerminal()) {
             throw new BusinessException("logistics.cannot_delete_delivered", "已完成/运输中的调配计划禁止删除");

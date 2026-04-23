@@ -20,18 +20,18 @@ import java.util.Optional;
 @Repository
 public interface ProcurementJpaRepository extends ProcurementRepository, JpaRepository<Procurement, Long> {
 
-    Page<Procurement> findByStatusAndIsDeletedFalse(ShipmentStatus status, Pageable pageable);
+    Page<Procurement> findByStatusAndDeletedIsFalse(ShipmentStatus status, Pageable pageable);
 
-    Page<Procurement> findByProductCodeAndIsDeletedFalse(String productCode, Pageable pageable);
+    Page<Procurement> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
 
-    Page<Procurement> findByCustomerCompanyAndIsDeletedFalse(String customerCompany, Pageable pageable);
+    Page<Procurement> findByCustomerCompanyAndDeletedIsFalse(String customerCompany, Pageable pageable);
 
-    Page<Procurement> findByFactoryIdAndIsDeletedFalse(Long factoryId, Pageable pageable);
+    Page<Procurement> findByFactoryIdAndDeletedIsFalse(Long factoryId, Pageable pageable);
 
     @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END " +
            "FROM Procurement p " +
            "WHERE p.factoryId = :factoryId " +
-           "  AND p.isDeleted = false " +
+           "  AND p.deleted = false " +
            "  AND p.status NOT IN ('完了', '退货')")
     boolean existsActiveByFactoryId(@Param("factoryId") Long factoryId);
 }

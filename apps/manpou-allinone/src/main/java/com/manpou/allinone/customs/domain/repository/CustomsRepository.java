@@ -17,11 +17,11 @@ import java.util.Optional;
 @Repository
 public interface CustomsRepository extends JpaRepository<CustomsExample, Long> {
 
-    Optional<CustomsExample> findByNameAndIsDeletedFalse(String name);
+    Optional<CustomsExample> findByNameAndDeletedIsFalse(String name);
 
-    Optional<CustomsExample> findByIdAndIsDeletedFalse(Long id);
+    Optional<CustomsExample> findByIdAndDeletedIsFalse(Long id);
 
-    List<CustomsExample> findAllByIsDeletedFalse();
+    List<CustomsExample> findAllByDeletedIsFalse();
 
-    Page<CustomsExample> findAllByIsDeletedFalse(Pageable pageable);
+    Page<CustomsExample> findAllByDeletedIsFalse(Pageable pageable);
 }

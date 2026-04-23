@@ -10,13 +10,13 @@ import java.util.Optional;
 @Repository
 public interface SalesRecordRepository extends JpaRepository<SalesRecord, Long> {
 
-    Optional<SalesRecord> findByIdAndIsDeletedFalse(Long id);
+    Optional<SalesRecord> findByIdAndDeletedIsFalse(Long id);
 
-    List<SalesRecord> findByProductCodeAndIsDeletedFalse(String productCode);
+    List<SalesRecord> findByProductCodeAndDeletedIsFalse(String productCode);
 
-    List<SalesRecord> findByProcurementIdAndIsDeletedFalse(Long procurementId);
+    List<SalesRecord> findByProcurementIdAndDeletedIsFalse(Long procurementId);
 
-    List<SalesRecord> findByIsDeletedFalseOrderByCreateTimeDesc();
+    List<SalesRecord> findByDeletedFalseOrderByCreateTimeDesc();
 
-    List<SalesRecord> findByStatusInAndIsDeletedFalseOrderByCreateTimeDesc(List<String> statuses);
+    List<SalesRecord> findByStatusInAndDeletedFalseOrderByCreateTimeDesc(List<String> statuses);
 }

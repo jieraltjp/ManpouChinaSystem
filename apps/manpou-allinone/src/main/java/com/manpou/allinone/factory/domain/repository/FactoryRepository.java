@@ -15,21 +15,21 @@ public interface FactoryRepository {
 
     Optional<Factory> findById(Long id);
 
-    Optional<Factory> findByIdAndIsDeletedFalse(Long id);
+    Optional<Factory> findByIdAndDeletedIsFalse(Long id);
 
-    Optional<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName);
+    Optional<Factory> findByFactoryNameAndDeletedIsFalse(String factoryName);
 
     Factory save(Factory entity);
 
     void deleteById(Long id);
 
-    List<Factory> findAllByIsDeletedFalse();
+    List<Factory> findAllByDeletedIsFalse();
 
-    Page<Factory> findAllByIsDeletedFalse(Pageable pageable);
+    Page<Factory> findAllByDeletedIsFalse(Pageable pageable);
 
-    Page<Factory> findByCooperationStatusAndIsDeletedFalse(CooperationStatus cooperationStatus, Pageable pageable);
+    Page<Factory> findByCooperationStatusAndDeletedIsFalse(CooperationStatus cooperationStatus, Pageable pageable);
 
-    Page<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName, Pageable pageable);
+    Page<Factory> findByFactoryNameAndDeletedIsFalse(String factoryName, Pageable pageable);
 
-    boolean existsByIsDeletedFalse();
+    boolean existsByDeletedIsFalse();
 }

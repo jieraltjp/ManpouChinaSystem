@@ -12,8 +12,9 @@ import java.math.BigDecimal;
  * 对应业务流第三步。
  */
 @Entity
-@Table(name = "qc_record", indexes = {
-        @Index(name = "uk_qc_code", columnList = "qc_code", unique = true),
+@Table(name = "qc_record",
+        uniqueConstraints = @UniqueConstraint(name = "uk_qc_code", columnNames = "qc_code"),
+        indexes = {
         @Index(name = "idx_qc_procurement", columnList = "procurement_id"),
         @Index(name = "idx_qc_result", columnList = "result"),
         @Index(name = "idx_qc_date", columnList = "qc_date"),

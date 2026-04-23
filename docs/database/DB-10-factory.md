@@ -1,7 +1,8 @@
 # DB-10 — 工厂/厂家数据库设计
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
+> **更新**: 2026-04-23（v1.1.0：factory_name 加 UNIQUE KEY uk_factory_name，业务唯一标识）
 > **状态**: ✅ 已实现
 > **业务步号**: 02（工厂信息 — 发注前置基础数据）
 > **对应 UI**: `docs/ui/pages/02-procurement.md` §工厂信息
@@ -163,6 +164,7 @@ CREATE TABLE factory (
     notes          VARCHAR(500)           DEFAULT NULL  COMMENT '备注',
 
     -- ===== 索引 =====
+    UNIQUE KEY uk_factory_name (factory_name),
     INDEX idx_factory_code    (factory_code),
     INDEX idx_factory_name    (factory_name),
     INDEX idx_factory_category(category),

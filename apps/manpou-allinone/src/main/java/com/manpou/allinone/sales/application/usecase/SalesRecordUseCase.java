@@ -26,7 +26,7 @@ public class SalesRecordUseCase {
 
     @Transactional(readOnly = true)
     public Page<SalesRecordPageQuery> pageQuery(SalesRecordQuery query) {
-        List<SalesRecord> all = salesRecordRepository.findByIsDeletedFalseOrderByCreateTimeDesc();
+        List<SalesRecord> all = salesRecordRepository.findByDeletedFalseOrderByCreateTimeDesc();
         List<SalesRecordPageQuery> filtered = all.stream()
                 .filter(r -> query.getProductCode() == null || query.getProductCode().equals(r.getProductCode()))
                 .filter(r -> query.getSalesChannel() == null || query.getSalesChannel().equals(r.getSalesChannel()))
@@ -45,7 +45,7 @@ public class SalesRecordUseCase {
 
     @Transactional(readOnly = true)
     public SalesRecordPageQuery getById(Long id) {
-        SalesRecord entity = salesRecordRepository.findByIdAndIsDeletedFalse(id)
+        SalesRecord entity = salesRecordRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("SalesRecord", id));
         return assembler.toDto(entity);
     }
@@ -62,7 +62,7 @@ public class SalesRecordUseCase {
     @Transactional
     public void update(Long id, SalesRecordUpdateCmd cmd) {
         log.info("[SalesRecord] update, id={}, salesChannel={}, sellingPriceJpy={}", id, cmd.getSalesChannel(), cmd.getSellingPriceJpy());
-        SalesRecord entity = salesRecordRepository.findByIdAndIsDeletedFalse(id)
+        SalesRecord entity = salesRecordRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("SalesRecord", id));
         if (entity.isTerminal()) {
             throw new BusinessException("sales.record.cannot_update_terminal", "已下架的记录禁止修改");
@@ -75,7 +75,7 @@ public class SalesRecordUseCase {
     @Transactional
     public void updateStock(Long id, SalesRecordStockCmd cmd) {
         log.info("[SalesRecord] updateStock, id={}, sold={}, returned={}", id, cmd.getSold(), cmd.getReturned());
-        SalesRecord entity = salesRecordRepository.findByIdAndIsDeletedFalse(id)
+        SalesRecord entity = salesRecordRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("SalesRecord", id));
         if (entity.isTerminal()) {
             throw new BusinessException("sales.record.cannot_update_terminal", "已下架的记录禁止修改库存");
@@ -88,7 +88,7 @@ public class SalesRecordUseCase {
 
     @Transactional
     public void discontinue(Long id) {
-        SalesRecord entity = salesRecordRepository.findByIdAndIsDeletedFalse(id)
+        SalesRecord entity = salesRecordRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("SalesRecord", id));
         entity.discontinue();
         salesRecordRepository.save(entity);
@@ -97,7 +97,7 @@ public class SalesRecordUseCase {
 
     @Transactional
     public void relist(Long id) {
-        SalesRecord entity = salesRecordRepository.findByIdAndIsDeletedFalse(id)
+        SalesRecord entity = salesRecordRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("SalesRecord", id));
         entity.relist();
         salesRecordRepository.save(entity);
@@ -106,7 +106,7 @@ public class SalesRecordUseCase {
 
     @Transactional
     public void delete(Long id) {
-        SalesRecord entity = salesRecordRepository.findByIdAndIsDeletedFalse(id)
+        SalesRecord entity = salesRecordRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("SalesRecord", id));
         if (entity.isTerminal()) {
             throw new BusinessException("sales.record.cannot_delete_terminal", "已下架的记录禁止删除");
@@ -119,7 +119,7 @@ public class SalesRecordUseCase {
     @Transactional(readOnly = true)
     public Page<SalesRecordPageQuery> getAlerts(SalesRecordQuery query) {
         List<String> alertStatuses = List.of(SalesStatus.LOW_STOCK.name(), SalesStatus.OUT_OF_STOCK.name());
-        List<SalesRecord> all = salesRecordRepository.findByStatusInAndIsDeletedFalseOrderByCreateTimeDesc(alertStatuses);
+        List<SalesRecord> all = salesRecordRepository.findByStatusInAndDeletedFalseOrderByCreateTimeDesc(alertStatuses);
         List<SalesRecordPageQuery> filtered = all.stream()
                 .filter(r -> query.getProductCode() == null || query.getProductCode().equals(r.getProductCode()))
                 .map(assembler::toDto)

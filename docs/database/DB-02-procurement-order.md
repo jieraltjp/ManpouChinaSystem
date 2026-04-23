@@ -1,7 +1,8 @@
 # DB-02 — 发注单数据库设计
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
+> **更新**: 2026-04-23（v1.1.0：price_rmb DECIMAL(12,4)，补全 billing_method 列，与 DB 实际结构对齐）
 > **状态**: ✅ 已实现
 > **业务步号**: 02（发注单+工厂）
 > **对应业务文档**: `SPEC-B02-发注单-步骤2.md`
@@ -33,9 +34,10 @@ CREATE TABLE procurement (
     material             VARCHAR(64) COMMENT '材质',
     requires_qc         BOOLEAN COMMENT '是否需要检测',
     quantity             INT          NOT NULL COMMENT '订购数量',
-    price_rmb           DECIMAL(12,2) NOT NULL COMMENT '人民币单价',
+    price_rmb           DECIMAL(12,4) NOT NULL COMMENT '人民币单价（含税）',
     exchange_rate        DECIMAL(10,4) NOT NULL COMMENT 'CNY→JPY 汇率',
     tax_point            DECIMAL(5,4) NOT NULL COMMENT '票点（默认 1.1）',
+    billing_method       VARCHAR(32) COMMENT '开票方式（NORMAL/REBATE/VOID）',
     billing_type         VARCHAR(32) COMMENT '报关类型 ZHE_LU_KAI_PIAO / CHAO_HUI_TUI_SHUI / NO_REFUND / OTHER',
     estimated_price_jpy  DECIMAL(14,2) COMMENT '估算批发价 JPY（自动计算）',
     customs_remarks      VARCHAR(512) COMMENT '报关备注',
@@ -55,12 +57,13 @@ CREATE TABLE procurement (
     create_by           VARCHAR(64)  NOT NULL,
     update_by           VARCHAR(64)  NOT NULL,
     is_deleted          BOOLEAN      NOT NULL DEFAULT FALSE,
+    INDEX idx_procurement_factory_id (factory_id),
     INDEX idx_procurement_product_code (product_code),
     INDEX idx_procurement_status (status),
     INDEX idx_procurement_create_time (create_time),
-    INDEX idx_procurement_factory_id (factory_id),
     INDEX idx_procurement_sub_product_code (sub_product_code),
-    INDEX idx_procurement_order_date (order_date)
+    INDEX idx_procurement_order_date (order_date),
+    INDEX idx_proc_is_deleted (is_deleted)
 );
 ```
 
@@ -130,5 +133,5 @@ CREATE TABLE product (
 - [x] ✅ `FactoryUseCase` 用例服务
 - [x] ✅ `ProcurementUseCaseTest` 14个用例全部通过
 - [x] ✅ `FactoryUseCaseTest` 8个用例全部通过
-- [ ] 🔴 Product 表新增 `hs_code` 字段
-- [ ] 🔴 Product 表新增 `tax_point` 字段
+- [x] ✅ Product 表已含 `hs_code` 字段（见 DB-11）
+- [x] ✅ Product 表已含 `tax_point` 字段（见 DB-11）

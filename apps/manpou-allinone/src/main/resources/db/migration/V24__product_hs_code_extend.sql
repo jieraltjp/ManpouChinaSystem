@@ -20,3 +20,4 @@ ALTER TABLE `product`
 --       → cn_hs_code.id / jp_hs_code.id → [编码] / [税番]
 -- (Run via Python migrate_hs_code.py to handle Japanese column names)
 -- Result: 4999 updated, CN HS: 2003, JP HS: 629
+-- NOTE: goods_master / goods_hs_mapping 已于 2026-04-23 删除，数据已固化至 product 表

@@ -49,13 +49,13 @@ public class ProductUseCase {
         );
         Page<Product> page;
         if (query.getMasterCode() != null && !query.getMasterCode().isBlank()) {
-            page = productRepository.findByMasterCodeAndIsDeletedFalse(query.getMasterCode(), pageRequest);
+            page = productRepository.findByMasterCodeAndDeletedIsFalse(query.getMasterCode(), pageRequest);
         } else if (query.getHsCode() != null && !query.getHsCode().isBlank()) {
-            page = productRepository.findByHsCodeAndIsDeletedFalse(query.getHsCode(), pageRequest);
+            page = productRepository.findByHsCodeAndDeletedIsFalse(query.getHsCode(), pageRequest);
         } else if (query.getKeyword() != null && !query.getKeyword().isBlank()) {
-            page = productRepository.findByNameZhContainingAndIsDeletedFalse(query.getKeyword(), pageRequest);
+            page = productRepository.findByNameZhContainingAndDeletedIsFalse(query.getKeyword(), pageRequest);
         } else {
-            page = productRepository.findAllByIsDeletedFalse(pageRequest);
+            page = productRepository.findAllByDeletedIsFalse(pageRequest);
         }
         return page.map(productAssembler::toDto);
     }
@@ -65,7 +65,7 @@ public class ProductUseCase {
      */
     @Transactional(readOnly = true)
     public ProductPageQuery getById(Long id) {
-        Product entity = productRepository.findByIdAndIsDeletedFalse(id)
+        Product entity = productRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("Product", id));
         return productAssembler.toDto(entity);
     }
@@ -75,7 +75,7 @@ public class ProductUseCase {
      */
     @Transactional(readOnly = true)
     public ProductPageQuery getByMasterCode(String masterCode) {
-        Product entity = productRepository.findByMasterCodeAndIsDeletedFalse(masterCode)
+        Product entity = productRepository.findByMasterCodeAndDeletedIsFalse(masterCode)
                 .orElseThrow(() -> BusinessException.notFound("Product", masterCode));
         return productAssembler.toDto(entity);
     }
@@ -86,7 +86,7 @@ public class ProductUseCase {
     @Transactional
     public Long create(ProductCreateCmd cmd) {
         // 唯一性校验：masterCode + subCode
-        productRepository.findByMasterCodeAndSubCodeAndIsDeletedFalse(
+        productRepository.findByMasterCodeAndSubCodeAndDeletedIsFalse(
                 cmd.getMasterCode(), cmd.getSubCode()
         ).ifPresent(existing -> {
             throw BusinessException.conflict(
@@ -105,7 +105,7 @@ public class ProductUseCase {
      */
     @Transactional
     public void update(Long id, ProductUpdateCmd cmd) {
-        Product entity = productRepository.findByIdAndIsDeletedFalse(id)
+        Product entity = productRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("Product", id));
         productAssembler.copyToEntity(cmd, entity);
         productRepository.save(entity);
@@ -117,7 +117,7 @@ public class ProductUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        Product entity = productRepository.findByIdAndIsDeletedFalse(id)
+        Product entity = productRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("Product", id));
         entity.markDeleted();
         productRepository.save(entity);

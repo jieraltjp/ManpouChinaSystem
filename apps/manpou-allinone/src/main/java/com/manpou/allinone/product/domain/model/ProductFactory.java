@@ -4,8 +4,12 @@ import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +21,9 @@ import java.math.BigDecimal;
  * 对应 docs/business/SPEC-B10-商品目录-产品管理.md §2.2。
  */
 @Entity
-@Table(name = "product_factory", indexes = {
+@Table(name = "product_factory",
+        uniqueConstraints = @UniqueConstraint(name = "uk_product_factory", columnNames = {"product_id", "factory_id"}),
+        indexes = {
         @Index(name = "idx_product_id", columnList = "product_id"),
         @Index(name = "idx_factory_id", columnList = "factory_id")
 })
@@ -25,6 +31,10 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class ProductFactory {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "product_id", nullable = false)
     private Long productId;           // FK → product.id
@@ -46,4 +56,10 @@ public class ProductFactory {
 
     @Column(name = "is_preferred")
     private Boolean isPreferred = false; // 首选供应商
+
+    @Column(name = "create_time", nullable = false, updatable = false)
+    private java.time.LocalDateTime createTime;
+
+    @Column(name = "update_time", nullable = false)
+    private java.time.LocalDateTime updateTime;
 }

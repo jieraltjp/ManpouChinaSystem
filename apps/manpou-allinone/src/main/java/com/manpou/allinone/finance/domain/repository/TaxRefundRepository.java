@@ -10,11 +10,11 @@ import java.util.Optional;
 @Repository
 public interface TaxRefundRepository extends JpaRepository<TaxRefundRecord, Long> {
 
-    Optional<TaxRefundRecord> findByIdAndIsDeletedFalse(Long id);
+    Optional<TaxRefundRecord> findByIdAndDeletedIsFalse(Long id);
 
-    List<TaxRefundRecord> findByProcurementIdAndIsDeletedFalse(Long procurementId);
+    List<TaxRefundRecord> findByProcurementIdAndDeletedIsFalse(Long procurementId);
 
-    Optional<TaxRefundRecord> findByJapanCustomsIdAndIsDeletedFalse(Long japanCustomsId);
+    Optional<TaxRefundRecord> findByJapanCustomsIdAndDeletedIsFalse(Long japanCustomsId);
 
-    List<TaxRefundRecord> findByIsDeletedFalseOrderByCreateTimeDesc();
+    List<TaxRefundRecord> findByDeletedFalseOrderByCreateTimeDesc();
 }

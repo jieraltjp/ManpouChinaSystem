@@ -17,11 +17,11 @@ import java.util.Optional;
 @Repository
 public interface QcRecordJpaRepository extends QcRecordRepository, JpaRepository<QcRecord, Long> {
 
-    Optional<QcRecord> findByQcCodeAndIsDeletedFalse(String qcCode);
+    Optional<QcRecord> findByQcCodeAndDeletedIsFalse(String qcCode);
 
-    Page<QcRecord> findByResultAndIsDeletedFalse(QcResult result, Pageable pageable);
+    Page<QcRecord> findByResultAndDeletedIsFalse(QcResult result, Pageable pageable);
 
-    Page<QcRecord> findByProcurementIdAndIsDeletedFalse(Long procurementId, Pageable pageable);
+    Page<QcRecord> findByProcurementIdAndDeletedIsFalse(Long procurementId, Pageable pageable);
 
-    Page<QcRecord> findByProductCodeAndIsDeletedFalse(String productCode, Pageable pageable);
+    Page<QcRecord> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
 }

@@ -1,8 +1,9 @@
 # DB-06 — 日本清关数据库设计
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
-> **状态**: 🟡 部分实现（字段已定义，实体已实现）
+> **更新**: 2026-04-23（v1.1.0：customs_entry_no VARCHAR(32)，procurement_id 允许 NULL，补全索引与 DB 实际对齐）
+> **状态**: ✅ 已实现
 > **业务步号**: 06（日本清关）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B06-日本清关-步骤6.md`
 > **对应 UI 文档**: `docs/ui/pages/06-japan-customs.md`
@@ -27,11 +28,11 @@
 ```sql
 CREATE TABLE japan_customs_record (
     id                    BIGINT AUTO_INCREMENT PRIMARY KEY,
-    customs_entry_no      VARCHAR(64) COMMENT '入境报关号',
-    procurement_id        BIGINT NOT NULL COMMENT '关联采购单 FK → procurement.id',
+    customs_entry_no      VARCHAR(32) COMMENT '入境报关号（JC-YYYYMMDD-NNN）',
+    procurement_id        BIGINT COMMENT '关联采购单 FK → procurement.id（可为空）',
     domestic_customs_id  BIGINT COMMENT '关联国内报关单 FK → domestic_customs_record.id',
     logistics_plan_id     BIGINT COMMENT '关联调配计划 FK → logistics_plan.id',
-    status                VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING / IN_PROGRESS / CLEARED / FAILED',
+    status                VARCHAR(32) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING / IN_PROGRESS / CLEARED / FAILED',
     arrival_date          DATE COMMENT '到达日期',
     customs_broker        VARCHAR(128) COMMENT '清关行',
     broker_phone          VARCHAR(32) COMMENT '清关行电话',
@@ -40,29 +41,33 @@ CREATE TABLE japan_customs_record (
     consumption_tax_paid DECIMAL(14,2) COMMENT '消费税（JPY）',
     clearance_date        DATE COMMENT '清关完成日期',
     arrival_port          VARCHAR(64) COMMENT '目的港（来自 logistics_plan）',
-    declared_weight_kg   DECIMAL(10,4) COMMENT '申报重量（来自 logistics_plan）',
-    declared_volume_cbm   DECIMAL(10,6) COMMENT '申报体积（来自 logistics_plan）',
+    declared_weight_kg   DECIMAL(10,3) COMMENT '申报重量（来自 logistics_plan）',
+    declared_volume_cbm   DECIMAL(10,4) COMMENT '申报体积（来自 logistics_plan）',
     remarks               VARCHAR(512),
     create_time           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_time           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     create_by             VARCHAR(64) NOT NULL,
     update_by             VARCHAR(64) NOT NULL,
     is_deleted            BOOLEAN NOT NULL DEFAULT FALSE,
-    INDEX idx_jc_procurement (procurement_id),
-    INDEX idx_jc_status (status),
-    INDEX idx_jc_entry_no (customs_entry_no)
+    UNIQUE KEY idx_jp_customs_entry_no (customs_entry_no),
+    INDEX idx_jp_procurement_id (procurement_id),
+    INDEX idx_jp_domestic_customs_id (domestic_customs_id),
+    INDEX idx_jp_logistics_plan_id (logistics_plan_id),
+    INDEX idx_jp_status (status),
+    INDEX idx_jp_create_time (create_time),
+    INDEX idx_jp_is_deleted (is_deleted)
 );
 ```
 
 ---
 
-## 字段映射（占位）
+## 字段映射
 
 | 实体字段 | 数据库列 | 状态 |
 |---------|---------|------|
 | id | `id` | ✅ |
-| customsEntryNo | `customs_entry_no` | 🔴待确认 |
-| procurementId | `procurement_id` | ✅ |
+| customsEntryNo | `customs_entry_no` | ✅ |
+| procurementId | `procurement_id` | ✅（允许 NULL） |
 | domesticCustomsId | `domestic_customs_id` | ✅ |
 | logisticsPlanId | `logistics_plan_id` | ✅ |
 | status | `status` | ✅ |
@@ -81,13 +86,10 @@ CREATE TABLE japan_customs_record (
 
 ## 代码实现状态
 
-- [ ] 🔴 `JapanCustomsRecord` 聚合根实体
-- [ ] 🔴 `JapanCustomsStatus` 枚举（含 `isTerminal()` + `canTransitionTo()`）
-- [ ] 🔴 `JapanCustomsRepository` 领域接口
-- [ ] 🔴 `JapanCustomsJpaRepository` JPA 适配器
-- [ ] 🔴 `JapanCustomsAssembler` DTO 转换器
-- [ ] 🔴 `JapanCustomsUseCase` 用例服务
-- [ ] 🔴 `JapanCustomsController` REST 控制器
-- [ ] 🔴 `@/api/japanCustoms.ts` 前端 API 客户端
-- [ ] 🔴 `JapanCustomsPage.vue` 页面
-- [ ] 🔴 `JapanCustomsUseCaseTest` 单元测试
+- [x] ✅ `JapanCustomsRecord` 聚合根实体
+- [x] ✅ `JapanCustomsStatus` 枚举（含 `isTerminal()` + `canTransitionTo()`）
+- [x] ✅ `JapanCustomsRepository` 领域接口
+- [x] ✅ `JapanCustomsJpaRepository` JPA 适配器
+- [x] ✅ `JapanCustomsAssembler` DTO 转换器
+- [x] ✅ `JapanCustomsUseCase` 用例服务
+- [x] ✅ `JapanCustomsController` REST 控制器

@@ -1,7 +1,8 @@
 # DB-03 — 验货记录数据库设计
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
+> **更新**: 2026-04-23（v1.1.0：补全 idx_qc_is_deleted 索引，与 DB 实际对齐）
 > **状态**: ✅ 已实现
 > **业务步号**: 03（验货记录）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` §第三步
@@ -58,10 +59,12 @@ CREATE TABLE qc_record (
     create_by          VARCHAR(64)  NOT NULL,
     update_by          VARCHAR(64)  NOT NULL,
     is_deleted         BOOLEAN      NOT NULL DEFAULT FALSE,
+    UNIQUE KEY uk_qc_code (qc_code),
     INDEX idx_qc_procurement (procurement_id),
     INDEX idx_qc_result (result),
     INDEX idx_qc_date (qc_date),
-    INDEX idx_qc_status (status)
+    INDEX idx_qc_status (status),
+    INDEX idx_qc_is_deleted (is_deleted)
 );
 ```
 

@@ -33,7 +33,7 @@ public class LogisticsPlanAssembler {
         String factoryName = null;
         if (entity.getFactoryId() != null) {
             factoryName = factoryRepository
-                    .findByIdAndIsDeletedFalse(entity.getFactoryId())
+                    .findByIdAndDeletedIsFalse(entity.getFactoryId())
                     .map(Factory::getFactoryName)
                     .orElse(null);
         }

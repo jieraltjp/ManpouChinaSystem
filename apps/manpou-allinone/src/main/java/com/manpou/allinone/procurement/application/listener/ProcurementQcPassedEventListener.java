@@ -48,13 +48,13 @@ public class ProcurementQcPassedEventListener {
         }
         try {
             // 查询真实 QcRecord 获取 qcType（空运推荐的关键依据）
-            QcRecord qcRecord = qcRecordRepository.findByIdAndIsDeletedFalse(evt.getQcRecordId()).orElse(null);
+            QcRecord qcRecord = qcRecordRepository.findByIdAndDeletedIsFalse(evt.getQcRecordId()).orElse(null);
             if (qcRecord == null) {
                 log.warn("[Procurement] QC record not found for event, qcId={}", evt.getQcRecordId());
                 return;
             }
             Procurement procurement = procurementRepository
-                    .findByIdAndIsDeletedFalse(evt.getProcurementId())
+                    .findByIdAndDeletedIsFalse(evt.getProcurementId())
                     .orElse(null);
             if (procurement == null) {
                 log.info("[Procurement] QC passed but procurement not found, procurementId={}",
@@ -70,7 +70,7 @@ public class ProcurementQcPassedEventListener {
             }
             // 拉取 Product 尺寸用于空运判定
             Product product = productRepository
-                    .findByMasterCodeAndIsDeletedFalse(evt.getProductCode())
+                    .findByMasterCodeAndDeletedIsFalse(evt.getProductCode())
                     .orElse(null);
             ShipmentStatus suggested = procurement.suggestNextStatus(qcRecord, product);
             procurement.updateStatus(suggested);

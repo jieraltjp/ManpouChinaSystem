@@ -6,9 +6,10 @@
 -- This is a record of DB changes made directly. Key changes:
 --
 -- 1. Added hs_code_jp column (Japanese HS code / 税番)
---    Populated via goods_hs_mapping join:
+--    Populated via goods_hs_mapping join (BEFORE table deletion):
 --    product.id = goods_master.id = goods_hs_mapping.goods_id
 --    Result: 4999 rows, CN HS: 2003, JP HS: 629
+--    Note: goods_master / goods_hs_mapping 已于 2026-04-23 删除
 --
 -- 2. Added jan_code column (JANコード from goods_master)
 --    All 4999 rows populated

@@ -40,7 +40,7 @@ public class NotificationUseCase {
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<NotificationExample> page = notificationRepository.findAllByIsDeletedFalse(pageRequest);
+        Page<NotificationExample> page = notificationRepository.findAllByDeletedIsFalse(pageRequest);
         return page.map(notificationAssembler::toDto);
     }
 
@@ -49,7 +49,7 @@ public class NotificationUseCase {
      */
     @Transactional(readOnly = true)
     public NotificationPageQuery getById(Long id) {
-        NotificationExample entity = notificationRepository.findByIdAndIsDeletedFalse(id)
+        NotificationExample entity = notificationRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("NotificationExample", id));
         return notificationAssembler.toDto(entity);
     }
@@ -70,7 +70,7 @@ public class NotificationUseCase {
      */
     @Transactional
     public void update(Long id, NotificationUpdateCmd cmd) {
-        NotificationExample entity = notificationRepository.findByIdAndIsDeletedFalse(id)
+        NotificationExample entity = notificationRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("NotificationExample", id));
         notificationAssembler.copyToEntity(cmd, entity);
         notificationRepository.save(entity);
@@ -82,7 +82,7 @@ public class NotificationUseCase {
      */
     @Transactional
     public void delete(Long id) {
-        NotificationExample entity = notificationRepository.findByIdAndIsDeletedFalse(id)
+        NotificationExample entity = notificationRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("NotificationExample", id));
         entity.markDeleted();
         notificationRepository.save(entity);

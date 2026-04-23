@@ -17,11 +17,11 @@ import java.util.Optional;
 @Repository
 public interface NotificationRepository extends JpaRepository<NotificationExample, Long> {
 
-    Optional<NotificationExample> findByNameAndIsDeletedFalse(String name);
+    Optional<NotificationExample> findByNameAndDeletedIsFalse(String name);
 
-    Optional<NotificationExample> findByIdAndIsDeletedFalse(Long id);
+    Optional<NotificationExample> findByIdAndDeletedIsFalse(Long id);
 
-    List<NotificationExample> findAllByIsDeletedFalse();
+    List<NotificationExample> findAllByDeletedIsFalse();
 
-    Page<NotificationExample> findAllByIsDeletedFalse(Pageable pageable);
+    Page<NotificationExample> findAllByDeletedIsFalse(Pageable pageable);
 }
