@@ -1,6 +1,7 @@
 package com.manpou.allinone.procurement.application.assembler;
 
 import com.manpou.allinone.common.port.FactoryQueryPort;
+import com.manpou.allinone.order.application.dto.OrderProcurementSelectorDTO;
 import com.manpou.allinone.procurement.application.dto.ProcurementCreateCmd;
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
 import com.manpou.allinone.procurement.application.dto.ProcurementUpdateCmd;
@@ -57,6 +58,37 @@ public class ProcurementAssembler {
                 .createBy(entity.getCreateBy())
                 .createTime(entity.getCreateTime())
                 .updateTime(entity.getUpdateTime())
+                .build();
+    }
+
+    public OrderProcurementSelectorDTO toOrderProcurementSelectorDto(Procurement entity) {
+        String factoryName = null;
+        if (entity.getFactoryId() != null) {
+            factoryName = factoryQueryPort
+                    .findByIdAndDeletedIsFalse(entity.getFactoryId())
+                    .map(f -> f.getFactoryName())
+                    .orElse(null);
+        }
+        return OrderProcurementSelectorDTO.builder()
+                .id(entity.getId())
+                .factoryId(entity.getFactoryId())
+                .factoryName(factoryName)
+                .productCode(entity.getProductCode())
+                .subProductCode(entity.getSubProductCode())
+                .material(entity.getMaterial())
+                .requiresQc(entity.getRequiresQc())
+                .quantity(entity.getQuantity())
+                .priceRmb(entity.getPriceRmb())
+                .exchangeRate(entity.getExchangeRate())
+                .taxPoint(entity.getTaxPoint())
+                .billingType(entity.getBillingType() != null ? entity.getBillingType().name() : null)
+                .estimatedPriceJpy(entity.getEstimatedPriceJpy())
+                .destination(entity.getDestination())
+                .customerCompany(entity.getCustomerCompany())
+                .status(entity.getStatus() != null ? entity.getStatus().name() : null)
+                .orderDate(entity.getOrderDate())
+                .plannedShipDate(entity.getPlannedShipDate())
+                .createTime(entity.getCreateTime())
                 .build();
     }
 

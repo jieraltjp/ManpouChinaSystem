@@ -2,9 +2,9 @@ package com.manpou.allinone.order.interfaces.controller;
 
 import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.order.application.dto.OrderOverviewPageVO;
+import com.manpou.allinone.order.application.dto.OrderProcurementSelectorDTO;
 import com.manpou.allinone.order.application.usecase.OrderOverviewUseCase;
 import com.manpou.allinone.procurement.application.assembler.ProcurementAssembler;
-import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
 import com.manpou.allinone.procurement.application.dto.ProcurementQuery;
 import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
@@ -32,13 +32,13 @@ public class OrderOverviewController {
     }
 
     @GetMapping("/selector")
-    public Result<Page<ProcurementPageQuery>> selector(ProcurementQuery query) {
+    public Result<Page<OrderProcurementSelectorDTO>> selector(ProcurementQuery query) {
         PageRequest pageRequest = PageRequest.of(
                 query.getPage(),
                 Math.min(query.getPageSize(), 100),
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
         Page<Procurement> page = procurementRepository.findAllByDeletedIsFalse(pageRequest);
-        return Result.ok(page.map(procurementAssembler::toDto));
+        return Result.ok(page.map(procurementAssembler::toOrderProcurementSelectorDto));
     }
 }
