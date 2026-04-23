@@ -40,8 +40,9 @@ public class SalesRecord extends BaseEntity {
     @Column(name = "sub_product_code", length = 64)
     private String subProductCode;  // 子货号（颜色）
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "sales_channel", length = 32)
-    private String salesChannel;  // 销售渠道
+    private SalesChannel salesChannel;  // 销售渠道
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 32, nullable = false)

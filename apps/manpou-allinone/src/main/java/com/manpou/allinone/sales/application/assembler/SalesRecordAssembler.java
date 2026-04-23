@@ -1,6 +1,7 @@
 package com.manpou.allinone.sales.application.assembler;
 
 import com.manpou.allinone.sales.application.dto.*;
+import com.manpou.allinone.sales.domain.model.SalesChannel;
 import com.manpou.allinone.sales.domain.model.SalesRecord;
 import org.springframework.stereotype.Component;
 
@@ -48,7 +49,7 @@ public class SalesRecordAssembler {
                 .procurementId(entity.getProcurementId())
                 .productCode(entity.getProductCode())
                 .subProductCode(entity.getSubProductCode())
-                .salesChannel(entity.getSalesChannel())
+                .salesChannel(entity.getSalesChannel() != null ? entity.getSalesChannel().name() : null)
                 .status(entity.getStatus() != null ? entity.getStatus().name() : null)
                 .listingDate(entity.getListingDate())
                 .initialStock(entity.getInitialStock())

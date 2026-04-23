@@ -200,7 +200,7 @@ public class OrderOverviewAssembler {
                 .procurementId(entity.getProcurementId())
                 .productCode(entity.getProductCode())
                 .subProductCode(entity.getSubProductCode())
-                .salesChannel(entity.getSalesChannel())
+                .salesChannel(entity.getSalesChannel() != null ? entity.getSalesChannel().name() : null)
                 .status(entity.getStatus() != null ? entity.getStatus().name() : null)
                 .listingDate(entity.getListingDate())
                 .initialStock(entity.getInitialStock())

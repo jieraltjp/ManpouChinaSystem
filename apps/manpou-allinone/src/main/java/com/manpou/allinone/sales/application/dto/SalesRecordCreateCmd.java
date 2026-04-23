@@ -1,5 +1,6 @@
 package com.manpou.allinone.sales.application.dto;
 
+import com.manpou.allinone.sales.domain.model.SalesChannel;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -10,7 +11,7 @@ public class SalesRecordCreateCmd {
     private Long procurementId;
     private String productCode;
     private String subProductCode;
-    private String salesChannel;
+    private SalesChannel salesChannel;
     private LocalDate listingDate;
     private Integer initialStock;
     private Integer safetyStock;

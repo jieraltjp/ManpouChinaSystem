@@ -3,11 +3,13 @@ package com.manpou.allinone.sales.application.usecase;
 import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.sales.application.assembler.SalesRecordAssembler;
 import com.manpou.allinone.sales.application.dto.*;
+import com.manpou.allinone.sales.domain.event.ReplenishmentDemandNeededEvent;
 import com.manpou.allinone.sales.domain.model.SalesRecord;
 import com.manpou.allinone.sales.domain.model.SalesStatus;
 import com.manpou.allinone.sales.domain.repository.SalesRecordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.PageImpl;
@@ -23,13 +25,14 @@ public class SalesRecordUseCase {
 
     private final SalesRecordRepository salesRecordRepository;
     private final SalesRecordAssembler assembler;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<SalesRecordPageQuery> pageQuery(SalesRecordQuery query) {
         List<SalesRecord> all = salesRecordRepository.findByDeletedFalseOrderByCreateTimeDesc();
         List<SalesRecordPageQuery> filtered = all.stream()
                 .filter(r -> query.getProductCode() == null || query.getProductCode().equals(r.getProductCode()))
-                .filter(r -> query.getSalesChannel() == null || query.getSalesChannel().equals(r.getSalesChannel()))
+                .filter(r -> query.getSalesChannel() == null || query.getSalesChannel().equals(r.getSalesChannel().name()))
                 .filter(r -> query.getStatus() == null || query.getStatus().equals(r.getStatus().name()))
                 .filter(r -> query.getProcurementId() == null || query.getProcurementId().equals(r.getProcurementId()))
                 .map(assembler::toDto)
@@ -84,6 +87,8 @@ public class SalesRecordUseCase {
         entity.recalculateReturnRate();
         salesRecordRepository.save(entity);
         log.info("[SalesRecord] stock updated, id={}, sold={}, returned={}", id, cmd.getSold(), cmd.getReturned());
+        // 触发库存不足反馈循环
+        triggerReplenishmentIfNeeded(entity);
     }
 
     @Transactional
@@ -131,5 +136,32 @@ public class SalesRecordUseCase {
         int to = Math.min(from + pageSize, total);
         List<SalesRecordPageQuery> paged = from >= total ? List.of() : filtered.subList(from, to);
         return new PageImpl<>(paged, PageRequest.of(page, pageSize), total);
+    }
+
+    /**
+     * 触发补货需求生成。
+     * 当 currentStock < safetyStock 且处于正常销售状态时，发布补货事件。
+     * SPEC-B08 §4.1 反馈循环规则。
+     */
+    private void triggerReplenishmentIfNeeded(SalesRecord entity) {
+        if (entity.getSafetyStock() == null || entity.getCurrentStock() == null) {
+            return;
+        }
+        if (entity.getCurrentStock() < entity.getSafetyStock()
+                && entity.getStatus() == SalesStatus.LISTED) {
+            int requestedQty = entity.getSafetyStock() - entity.getCurrentStock();
+            eventPublisher.publishEvent(new ReplenishmentDemandNeededEvent(
+                    this,
+                    entity.getId(),
+                    entity.getProcurementId(),
+                    entity.getProductCode(),
+                    entity.getSubProductCode(),
+                    requestedQty,
+                    entity.getCurrentStock(),
+                    entity.getSafetyStock()
+            ));
+            log.info("[SalesRecord] low stock detected, id={}, currentStock={}, safetyStock={}, trigger replenishment",
+                    entity.getId(), entity.getCurrentStock(), entity.getSafetyStock());
+        }
     }
 }

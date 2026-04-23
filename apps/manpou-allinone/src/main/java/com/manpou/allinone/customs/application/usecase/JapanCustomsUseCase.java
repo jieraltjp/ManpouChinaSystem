@@ -3,10 +3,12 @@ package com.manpou.allinone.customs.application.usecase;
 import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.customs.application.assembler.JapanCustomsAssembler;
 import com.manpou.allinone.customs.application.dto.*;
+import com.manpou.allinone.customs.domain.event.JapanCustomsClearedEvent;
 import com.manpou.allinone.customs.domain.model.JapanCustomsRecord;
 import com.manpou.allinone.customs.domain.repository.JapanCustomsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ public class JapanCustomsUseCase {
 
     private final JapanCustomsRepository japanCustomsRepository;
     private final JapanCustomsAssembler assembler;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<JapanCustomsPageQuery> pageQuery(JapanCustomsQuery query) {
@@ -86,6 +89,8 @@ public class JapanCustomsUseCase {
                 .orElseThrow(() -> BusinessException.notFound("JapanCustoms", id));
         entity.complete(cmd.getImportDutyPaid(), cmd.getConsumptionTaxPaid(), cmd.getClearanceDate());
         japanCustomsRepository.save(entity);
+        // 发布清关完成事件，触发 SalesRecord 自动创建（步骤8）
+        eventPublisher.publishEvent(new JapanCustomsClearedEvent(this, id, entity.getProcurementId()));
         log.info("[JapanCustoms] completed, id={}", id);
     }
 
