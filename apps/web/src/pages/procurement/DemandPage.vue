@@ -334,13 +334,13 @@
     <!-- 查看关联采购单弹窗（v1.6.0） -->
     <el-dialog v-model="linkedDialogVisible" :title="$t('demand.dialog.linkedDialog.title')" width="600px">
       <el-table :data="linkedProcurements" border size="small" v-loading="linkedLoading">
-        <el-table-column prop="id" label="ID" width="70" />
-        <el-table-column prop="factoryName" label="工厂" min-width="120" />
-        <el-table-column prop="productCode" label="主货号" width="100" />
-        <el-table-column prop="subProductCode" label="子货号" width="90" />
-        <el-table-column prop="quantity" label="数量" width="70" align="right" />
-        <el-table-column prop="destination" label="目的地" min-width="100" show-overflow-tooltip />
-        <el-table-column prop="status" label="状态" width="90" align="center">
+        <el-table-column prop="id" :label="$t('demand.linkedDialog.column.id')" width="70" />
+        <el-table-column prop="factoryName" :label="$t('demand.linkedDialog.column.factoryName')" min-width="120" />
+        <el-table-column prop="productCode" :label="$t('demand.linkedDialog.column.productCode')" width="100" />
+        <el-table-column prop="subProductCode" :label="$t('demand.linkedDialog.column.subProductCode')" width="90" />
+        <el-table-column prop="quantity" :label="$t('demand.linkedDialog.column.quantity')" width="70" align="right" />
+        <el-table-column prop="destination" :label="$t('demand.linkedDialog.column.destination')" min-width="100" show-overflow-tooltip />
+        <el-table-column prop="status" :label="$t('demand.linkedDialog.column.status')" width="90" align="center">
           <template #default="{ row }">
             <el-tag size="small">{{ row.status }}</el-tag>
           </template>

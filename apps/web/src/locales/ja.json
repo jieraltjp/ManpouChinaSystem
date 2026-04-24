@@ -86,10 +86,11 @@
       "demandType": "タイプ",
       "productCode": "主品番",
       "subProductCode": "子品番",
-      "subProductItems": "子品番明细",
+      "subProductItems": "子品番明細",
       "quantity": "数量",
       "destination": "出荷先",
       "japanLead": "日本担当",
+      "status": "ステータス",
       "status": "ステータス",
       "createTime": "作成日時",
       "action": "操作"
@@ -116,7 +117,7 @@
       "productCodePlaceholder": "例：odn012",
       "subProductCode": "子品番（カラー）",
       "subProductCodePlaceholder": "例：re / wh / bk",
-      "subProductItems": "子品番明细",
+      "subProductItems": "子品番明細",
       "quantity": "需要数量",
       "destination": "出荷先",
       "destinationPlaceholder": "例：名古屋 / 久留米",
@@ -146,20 +147,31 @@
         "willCreate": "{n}件の発注書を生成します"
       },
       "linkedDialog": {
-        "title": "関連発注書リスト"
+        "title": "関連発注書リスト",
+        "column": {
+          "id": "ID",
+          "factoryName": "関連工場",
+          "productCode": "主品番",
+          "subProductCode": "子品番",
+          "quantity": "数量",
+          "destination": "出荷先",
+          "status": "ステータス"
+        }
       }
     },
     "validation": {
       "demandTypeRequired": "需要タイプを選択してください",
       "productCodeRequired": "主品番は必須です",
       "quantityRequired": "需要数量は必須です",
-      "subProductItemsRequired": "子品番明细を1件以上入力してください"
+      "subProductItemsRequired": "子品番明細を1件以上入力してください"
     },
     "message": {
       "createSuccess": "需要の入力が完了しました",
       "updateSuccess": "更新が完了しました",
       "deleteSuccess": "削除が完了しました",
       "deleteConfirm": "需要「{code}」を削除しますか？",
+      "loadFailed": "需要一覧の読み込みに失敗しました",
+      "convertFailed": "発注への変換に失敗しました",
       "deleteConfirmTitle": "削除確認",
       "revertConfirm": "変換取消後、需要は未確認状態に戻り、再変換が可能になります。続行しますか？",
       "revertConfirmTitle": "変換取消の確認",

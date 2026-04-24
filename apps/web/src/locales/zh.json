@@ -146,7 +146,16 @@
         "willCreate": "将生成 {n} 条发注单"
       },
       "linkedDialog": {
-        "title": "关联发注单列表"
+        "title": "关联发注单列表",
+        "column": {
+          "id": "ID",
+          "factoryName": "关联工厂",
+          "productCode": "主货号",
+          "subProductCode": "子货号",
+          "quantity": "数量",
+          "destination": "目的地",
+          "status": "状态"
+        }
       }
     },
     "validation": {
@@ -159,6 +168,8 @@
       "createSuccess": "需求录入成功",
       "updateSuccess": "更新成功",
       "deleteSuccess": "删除成功",
+      "loadFailed": "加载需求单总览失败",
+      "convertFailed": "转采购失败",
       "deleteConfirm": "确认删除需求「{code}」？",
       "deleteConfirmTitle": "删除确认",
       "revertConfirm": "撤销转换后，需求单将恢复为待确认状态，可重新转采购。是否继续？",

@@ -34,7 +34,7 @@
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.subProductItems') }}</span><span class="value highlight">{{ overview.demand.subProductItemsSummary ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.japanLead') }}</span><span class="value">{{ overview.demand.japanLead ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.status') }}</span>
-              <el-tag :type="demandStatusType(overview.demand.status)" size="small">{{ overview.demand.status }}</el-tag>
+              <el-tag :type="demandStatusType(overview.demand.status)" size="small">{{ demandStatusLabel(overview.demand.status) }}</el-tag>
             </div>
           </div>
           <!-- 转采购按钮 -->
@@ -83,7 +83,7 @@ async function fetch() {
     const res = await orderOverviewApi.getDemandOverview(demandId.value)
     overview.value = res.data.data
   } catch (e: unknown) {
-    error.value = (e as Error).message ?? '加载需求单总览失败'
+    error.value = (e as Error).message ?? t('demand.message.loadFailed')
   } finally {
     loading.value = false
   }
@@ -111,6 +111,11 @@ function demandStatusType(status?: string) {
   return 'info'
 }
 
+function demandStatusLabel(status?: string) {
+  if (!status) return t('common.format.dash')
+  return t(`demand.status.${status}`)
+}
+
 async function onConvert() {
   converting.value = true
   try {
@@ -124,7 +129,7 @@ async function onConvert() {
       router.push('/base/overview')
     }
   } catch (e: unknown) {
-    error.value = (e as Error).message ?? '转采购失败'
+    error.value = (e as Error).message ?? t('demand.message.convertFailed')
   } finally {
     converting.value = false
   }
