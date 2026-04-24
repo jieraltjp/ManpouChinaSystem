@@ -349,7 +349,28 @@
       "Bash(mvn *)",
       "Bash(\"C:/Program Files/Eclipse Adoptium/jdk-21.0.10.7-hotspot/bin/javap.exe\" -p D:/Programme/java/ManpouChinaSystem/apps/user-service/target/classes/com/manpou/user/domain/model/BaseEntity.class)",
       "Bash(mv src/main/java/com/manpou/allinone/customs src/main/java/com/manpou/allinone/customs.bak)",
-      "Bash(mv src/main/java/com/manpou/allinone/logistics src/main/java/com/manpou/allinone/logistics.bak)"
+      "Bash(mv src/main/java/com/manpou/allinone/logistics src/main/java/com/manpou/allinone/logistics.bak)",
+      "Bash(iconv -f gbk -t utf-8)",
+      "Bash(awk '{print $5}')",
+      "Bash(java *)",
+      "Bash(taskkill //F //PID 247600)",
+      "Bash(./mvnw -pl apps/manpou-allinone -am compile -q)",
+      "Bash(taskkill //F //PID 37644)",
+      "Bash(/d/Soft/maven/apache-maven-3.9.15/bin/mvn -pl apps/manpou-allinone -am compile -q)",
+      "Bash(/d/Soft/maven/apache-maven-3.9.15/bin/mvn -pl manpou-allinone -am compile -q)",
+      "Bash(/d/Soft/maven/apache-maven-3.9.15/bin/mvn -f apps/manpou-allinone/pom.xml compile -q)",
+      "Bash(env)",
+      "Bash(/d/Soft/maven/apache-maven-3.9.15/bin/mvn -f /d/Programme/java/ManpouChinaSystem/apps/manpou-allinone/pom.xml compile -q)",
+      "Bash(taskkill //F //PID 244880)",
+      "Bash(taskkill //F //PID 76440)",
+      "Bash(handle \"manpou-allinone-1.0.0-SNAPSHOT.jar\")",
+      "Bash(/d/Soft/maven/apache-maven-3.9.15/bin/mvn -f /d/Programme/java/ManpouChinaSystem/apps/manpou-allinone/pom.xml compile)",
+      "Bash(/d/Soft/maven/apache-maven-3.9.15/bin/mvn -f /d/Programme/java/ManpouChinaSystem/apps/manpou-allinone/pom.xml package -DskipTests)",
+      "Bash(taskkill //F //PID 77366)",
+      "Bash(echo \"Restarted PID: $!\")",
+      "Bash(echo \"Started PID: $!\")",
+      "WebFetch(domain:192.168.12.198)",
+      "Bash(echo \"TS_EXIT:$?\")"
     ]
   }
 }

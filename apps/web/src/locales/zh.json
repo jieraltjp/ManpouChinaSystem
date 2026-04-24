@@ -1037,6 +1037,9 @@
       "dash": "—",
       "perUnit": "/件"
     },
+    "currency": {
+      "cny": "¥"
+    },
     "locale": {
       "zh": "中文",
       "ja": "日本語"

@@ -82,7 +82,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="unitPriceRmb" :label="$t('product.column.unitPriceRmb')" width="100" align="right">
-          <template #default="{ row }">{{ row.unitPriceRmb != null ? `¥${Number(row.unitPriceRmb).toFixed(2)}` : '-' }}</template>
+          <template #default="{ row }">{{ row.unitPriceRmb != null ? $t('common.currency.cny') + Number(row.unitPriceRmb).toFixed(2) : '-' }}</template>
         </el-table-column>
         <el-table-column prop="taxPoint" :label="$t('product.column.taxPoint')" width="70" align="center">
           <template #default="{ row }">{{ row.taxPoint != null ? row.taxPoint : '-' }}</template>

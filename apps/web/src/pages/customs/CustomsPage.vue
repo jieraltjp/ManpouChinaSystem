@@ -97,7 +97,7 @@
         </el-table-column>
         <el-table-column prop="estimatedValueCny" :label="$t('customs.column.estimatedValueCny')" width="130" align="right">
           <template #default="{ row }">
-            <span v-if="row.estimatedValueCny !== null" class="money">¥{{ row.estimatedValueCny.toLocaleString('zh-CN', { minimumFractionDigits: 2 }) }}</span>
+            <span v-if="row.estimatedValueCny !== null" class="money">{{ $t('common.currency.cny') }}{{ row.estimatedValueCny.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -196,7 +196,7 @@
         <el-descriptions-item :label="$t('customs.column.subProductCode')">{{ currentRow.subProductCode ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('customs.column.quantity')">{{ currentRow.quantity ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('customs.column.estimatedValueCny')">
-          <span v-if="currentRow.estimatedValueCny !== null" class="money">¥{{ currentRow.estimatedValueCny.toLocaleString('zh-CN', { minimumFractionDigits: 2 }) }}</span>
+          <span v-if="currentRow.estimatedValueCny !== null" class="money">{{ $t('common.currency.cny') }}{{ currentRow.estimatedValueCny.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('customs.dialog.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>

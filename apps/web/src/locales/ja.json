@@ -999,6 +999,9 @@
       "dash": "—",
       "perUnit": "/個"
     },
+    "currency": {
+      "cny": "¥"
+    },
     "error": {
       "network": "ネットワークエラー、再試行してください",
       "tokenExpired": "ログイン期限切れです。再度ログインしてください",
