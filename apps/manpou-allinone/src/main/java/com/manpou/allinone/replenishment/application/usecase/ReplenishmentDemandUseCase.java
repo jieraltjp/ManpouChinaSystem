@@ -9,7 +9,6 @@ import com.manpou.allinone.procurement.application.assembler.ProcurementAssemble
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
 import com.manpou.allinone.procurement.application.usecase.ProcurementUseCase;
 import com.manpou.allinone.procurement.domain.model.Procurement;
-import com.manpou.allinone.procurement.domain.model.ShipmentStatus;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import com.manpou.allinone.replenishment.application.assembler.ReplenishmentDemandAssembler;
 import com.manpou.allinone.replenishment.application.dto.ConvertDemandCmd;
@@ -18,11 +17,8 @@ import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandCrea
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandPageQuery;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandQuery;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandUpdateCmd;
-import com.manpou.allinone.replenishment.application.dto.SubProductItemDto;
 import com.manpou.allinone.replenishment.domain.model.DemandStatus;
-import com.manpou.allinone.replenishment.domain.model.LinkedDemandItem;
 import com.manpou.allinone.replenishment.domain.model.ReplenishmentDemand;
-import com.manpou.allinone.replenishment.domain.model.SubProductItem;
 import com.manpou.allinone.replenishment.domain.repository.ReplenishmentDemandRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,12 +30,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 补货需求用例服务（v1.6.0）。
- * 批量转采购：每个 SubProductItem 生成一条 Procurement。
+ * 补货需求用例服务（v2.0.0）。
+ * 一条 Demand = 一个子货号（商品唯一标识 = 主货号+子货号）。
+ * 转采购：1 Demand → 1 Procurement（一对一）。
  */
 @Slf4j
 @Service
@@ -84,8 +80,9 @@ public class ReplenishmentDemandUseCase {
     public Long create(ReplenishmentDemandCreateCmd cmd) {
         ReplenishmentDemand entity = assembler.toEntity(cmd);
         ReplenishmentDemand saved = demandRepository.save(entity);
-        log.info("[ReplenishmentDemand] created, traceId={}, id={}, demandCode={}, type={}",
-                MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId(), saved.getDemandCode(), saved.getDemandType());
+        log.info("[ReplenishmentDemand] created, traceId={}, id={}, demandCode={}, type={}, subProductCode={}",
+                MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId(), saved.getDemandCode(),
+                saved.getDemandType(), saved.getSubProductCode());
         return saved.getId();
     }
 
@@ -100,8 +97,8 @@ public class ReplenishmentDemandUseCase {
     }
 
     /**
-     * 批量转采购（v1.6.0）。
-     * 每个 SubProductItem 生成一条 Procurement，返回所有生成的 ID 列表。
+     * 转采购（v2.0.0）。
+     * 一条 Demand → 一条 Procurement（1:1）。
      */
     @Transactional
     public ConvertDemandResponse convertToProcurement(Long demandId, ConvertDemandCmd cmd) {
@@ -112,59 +109,41 @@ public class ReplenishmentDemandUseCase {
             throw BusinessException.invalidParam("需求单已处理，无法转采购");
         }
 
-        List<SubProductItem> subItems = assembler.parseSubProductItems(entity.getSubProductItemsRaw());
-        if (subItems.isEmpty()) {
-            throw BusinessException.invalidParam("子货号明细为空，无法转采购");
+        if (entity.getQuantity() == null || entity.getQuantity() <= 0) {
+            throw BusinessException.invalidParam("需求数量无效，无法转采购");
         }
 
-        // 校验工厂
         Factory factory = factoryRepository.findByIdAndDeletedIsFalse(cmd.getFactoryId())
                 .orElseThrow(() -> BusinessException.notFound("Factory", cmd.getFactoryId()));
 
-        // 批量生成 Procurement
-        List<Long> procurementIds = new ArrayList<>();
-        List<LinkedDemandItem> linkedItems = new ArrayList<>();
-        for (int i = 0; i < subItems.size(); i++) {
-            SubProductItem item = subItems.get(i);
-            if (item.getQuantity() == null || item.getQuantity() <= 0) {
-                throw BusinessException.invalidParam(
-                        String.format("子货号 [%s] 数量无效（%s），无法转采购",
-                                item.getSubCode(), item.getQuantity()));
-            }
-            ProcurementCreateCmd pCmd = new ProcurementCreateCmd();
-            pCmd.setFactoryId(cmd.getFactoryId());
-            pCmd.setProductCode(entity.getProductCode());
-            pCmd.setSubProductCode(item.getSubCode());
-            pCmd.setQuantity(item.getQuantity());
-            pCmd.setDestination(item.getDestination());
-            pCmd.setJapanLead(entity.getJapanLead());
-            pCmd.setPriceRmb(BigDecimal.ZERO);
-            pCmd.setExchangeRate(BigDecimal.ONE);
-            pCmd.setTaxPoint(new BigDecimal("1.1"));
-            pCmd.setLinkedDemandId(demandId);
-            pCmd.setLinkedDemandItemId((long) i);
-            Long procurementId = procurementUseCase.create(pCmd);
-            procurementIds.add(procurementId);
-            linkedItems.add(new LinkedDemandItem(procurementId, item.getSubCode()));
-        }
+        ProcurementCreateCmd pCmd = new ProcurementCreateCmd();
+        pCmd.setFactoryId(cmd.getFactoryId());
+        pCmd.setProductCode(entity.getProductCode());
+        pCmd.setSubProductCode(entity.getSubProductCode());
+        pCmd.setQuantity(entity.getQuantity());
+        pCmd.setDestination(entity.getDestination());
+        pCmd.setJapanLead(entity.getJapanLead());
+        pCmd.setPriceRmb(BigDecimal.ZERO);
+        pCmd.setExchangeRate(BigDecimal.ONE);
+        pCmd.setTaxPoint(new BigDecimal("1.1"));
+        pCmd.setLinkedDemandId(demandId);
 
-        // 更新 Demand 状态
-        assembler.applyConvertedState(entity, linkedItems);
+        Long procurementId = procurementUseCase.create(pCmd);
+        entity.markAsConverted(procurementId);
         demandRepository.save(entity);
 
-        log.info("[ReplenishmentDemand] batch converted to procurement, traceId={}, demandId={}, count={}, procurementIds={}",
-                MDC.get(TraceFilter.TRACE_ID_KEY), demandId, procurementIds.size(), procurementIds);
+        log.info("[ReplenishmentDemand] converted to procurement, traceId={}, demandId={}, procurementId={}",
+                MDC.get(TraceFilter.TRACE_ID_KEY), demandId, procurementId);
 
         return ConvertDemandResponse.builder()
                 .demandStatus(DemandStatus.CONVERTED)
-                .linkedProcurementIds(procurementIds)
+                .linkedProcurementId(procurementId)
                 .build();
     }
 
     /**
-     * 批量撤销转换（v1.6.0）。
-     * 删除所有关联 Procurement，回滚 Demand → PENDING。
-     * 条件：关联 Procurement 均未推进至终态。
+     * 撤销转换（v2.0.0）。
+     * 删除关联 Procurement，回滚 Demand → PENDING。
      */
     @Transactional
     public void revertConversion(Long demandId) {
@@ -175,44 +154,53 @@ public class ReplenishmentDemandUseCase {
             throw BusinessException.invalidParam("需求单未转采购，无需撤销");
         }
 
-        List<LinkedDemandItem> linkedItems = assembler.parseLinkedDemandItems(entity.getLinkedDemandItemsRaw());
-        if (linkedItems.isEmpty()) {
-            entity.revertConversion();
-            demandRepository.save(entity);
-            return;
-        }
-
-        List<Long> procurementIds = linkedItems.stream()
-                .map(LinkedDemandItem::getLinkedProcurementId)
-                .toList();
-
-        // 批量检查状态
-        List<Procurement> procurements = procurementRepository.findAllByIdInAndDeletedIsFalse(procurementIds);
-        for (Procurement p : procurements) {
-            if (p.getStatus().isTerminal()) {
+        Long procurementId = entity.getLinkedProcurementId();
+        if (procurementId != null) {
+            Procurement procurement = procurementRepository.findByIdAndDeletedIsFalse(procurementId)
+                    .orElse(null);
+            if (procurement != null && procurement.getStatus().isTerminal()) {
                 throw BusinessException.invalidParam(
-                        "关联发注单 [" + p.getId() + "] 已推进至终态，禁止撤销");
+                        "关联发注单 [" + procurementId + "] 已推进至终态，禁止撤销");
             }
-        }
-
-        // 批量删除
-        for (Long pid : procurementIds) {
-            procurementRepository.deleteById(pid);
+            procurementRepository.deleteById(procurementId);
         }
 
         entity.revertConversion();
         demandRepository.save(entity);
 
-        log.info("[ReplenishmentDemand] conversion reverted, traceId={}, demandId={}, deletedProcurementIds={}",
-                MDC.get(TraceFilter.TRACE_ID_KEY), demandId, procurementIds);
+        log.info("[ReplenishmentDemand] conversion reverted, traceId={}, demandId={}, deletedProcurementId={}",
+                MDC.get(TraceFilter.TRACE_ID_KEY), demandId, procurementId);
     }
 
     /**
-     * 查看关联的采购单列表（v1.6.0）。
+     * 查看关联的采购单（v2.0.0）。
      */
     @Transactional(readOnly = true)
-    public List<ProcurementPageQuery> getLinkedProcurements(Long demandId) {
-        return procurementRepository.findByLinkedDemandIdAndDeletedIsFalse(demandId)
+    public ProcurementPageQuery getLinkedProcurement(Long demandId) {
+        ReplenishmentDemand entity = demandRepository.findByIdAndDeletedIsFalse(demandId)
+                .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", demandId));
+        if (entity.getLinkedProcurementId() == null) {
+            return null;
+        }
+        return procurementRepository.findByIdAndDeletedIsFalse(entity.getLinkedProcurementId())
+                .map(procurementAssembler::toDto)
+                .orElse(null);
+    }
+
+    /**
+     * 批量查询关联的采购单列表（用于多选 Demand 的场景）。
+     */
+    @Transactional(readOnly = true)
+    public List<ProcurementPageQuery> getLinkedProcurements(List<Long> demandIds) {
+        List<ReplenishmentDemand> demands = demandRepository.findAllByIdInAndDeletedIsFalse(demandIds);
+        List<Long> procurementIds = demands.stream()
+                .map(ReplenishmentDemand::getLinkedProcurementId)
+                .filter(id -> id != null)
+                .toList();
+        if (procurementIds.isEmpty()) {
+            return List.of();
+        }
+        return procurementRepository.findAllByIdInAndDeletedIsFalse(procurementIds)
                 .stream()
                 .map(procurementAssembler::toDto)
                 .toList();

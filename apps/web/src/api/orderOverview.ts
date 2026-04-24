@@ -93,7 +93,12 @@ export interface DemandVO {
   demandCode: string
   demandType?: string
   productCode: string
-  subProductItemsSummary?: string  // v1.6.0: "be:100久留米, bu:50名古屋"
+  /** 子货号全码（v2.0.0，如 ad009-be） */
+  subProductCode?: string
+  /** 需求数量（v2.0.0） */
+  quantity?: number
+  /** 目的地（v2.0.0） */
+  destination?: string
   japanLead?: string
   status?: string
   createTime?: string
@@ -104,13 +109,19 @@ export interface DemandSelectorVO {
   demandCode: string
   demandType?: string
   productCode: string
-  subProductItemsSummary?: string
+  /** 子货号全码（v2.0.0） */
+  subProductCode?: string
+  /** 需求数量（v2.0.0） */
+  quantity?: number
+  /** 目的地（v2.0.0） */
+  destination?: string
   japanLead?: string
   status?: string
   createTime?: string
 }
 
 export interface DemandOverviewVO {
+  demandId: number
   demand: DemandVO
   stepStatuses: StepStatus[]
 }

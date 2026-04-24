@@ -26,4 +26,6 @@ public interface ReplenishmentDemandRepository extends JpaRepository<Replenishme
 
 
     Page<ReplenishmentDemand> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
+
+    List<ReplenishmentDemand> findAllByIdInAndDeletedIsFalse(List<Long> ids);
 }

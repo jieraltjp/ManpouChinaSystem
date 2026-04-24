@@ -1,8 +1,8 @@
 # SPEC-B09 — 订单总览 · 实现设计
 
-> **版本**: 1.3.0
+> **版本**: 1.4.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-24（v1.3.0：双入口架构 — Demand 中心化，新建需求单立即出现在 Overview）
+> **更新**: 2026-04-24（v1.4.0：v2.0.0 数据模型迁移 — Demand subProductItems JSON → 直接字段；新增 DemandOverviewVO 独立 DTO；前端所有枚举值 i18n 本地化）
 > **状态**: 🟢 已完成
 > **前置**: SPEC-B09-API设计 · DB-09 · docs/ui/pages/09-order-overview.md · SPEC-B09-全链路子货号追踪分析.md
 > **INTJ 编号**: DOC-B09-IMPL-001
@@ -95,25 +95,39 @@ public class OrderOverviewPageVO {
 }
 ```
 
-### 3.2 DemandVO（v1.6.0 适配）
+### 3.2 DemandVO（v2.0.0 适配）
 
 ```java
-// DemandVO — v1.6.0 不再返回 quantity/destination
-// 改为 subProductItemsSummary: "be:100久留米, bu:50名古屋"
+// DemandVO — v2.0.0 使用直接字段（不再是 JSON 数组）
 public static class DemandVO {
     private Long id;
     private String demandCode;
     private String demandType;           // REPLENISHMENT / NEW_PURCHASE
     private String productCode;
-    private String subProductItemsSummary; // v1.6.0: "be:100久留米, bu:50名古屋" 或 null
+    private String subProductCode;        // v2.0.0: 子货号全码（如 ad009-be）
+    private Integer quantity;             // v2.0.0: 需求数量
+    private String destination;           // v2.0.0: 目的地
     private String japanLead;
     private String status;
     private LocalDateTime createTime;
 }
 ```
 
-> **v1.6.0 背景**：ReplenishmentDemand.subProductItemsRaw 从单字段改为 JSON 数组，
-> 前端 Step1 卡片通过 `subProductItemsSummary` 展示（而非单独 quantity/destination）。
+> **v2.0.0 背景**：ReplenishmentDemand 从 JSON 数组 `subProductItems[]` 改为直接字段
+> `subProductCode / quantity / destination`，前端 Step1 卡片直接渲染这些字段。
+> `subProductItemsSummary` 仍保留（在 `OrderOverviewPageVO.DemandVO` 中），由 Assembler 计算。
+
+### 3.2.1 DemandOverviewVO（独立 DTO）
+
+```java
+// 专用于 /api/v1/orders/demands/{demandId}/overview
+// Demand 锚点专用：Step1 有数据，Step2-8 = NOT_STARTED
+public class DemandOverviewVO {
+    private Long demandId;
+    private DemandVO demand;
+    private StepStatus[] stepStatuses; // 长度8：[COMPLETED, NOT_STARTED...]
+}
+```
 
 ### 3.3 StepStatus 枚举（前端用）
 
@@ -179,13 +193,73 @@ GET /api/v1/orders/{procurementId}/overview
 
 **响应 404**：`Procurement` 不存在或已删除
 
-### 4.2 采购单选择器（列表）
+### 4.2 Demand 选择器（列表）
+
+```
+GET /api/v1/orders/demands?page=0&pageSize=20&status=PENDING&keyword=
+```
+
+**响应 200**：
+```json
+{
+  "code": "0",
+  "data": {
+    "content": [
+      {
+        "id": 1,
+        "demandCode": "D-20260424-001",
+        "demandType": "REPLENISHMENT",
+        "productCode": "ad009",
+        "subProductCode": "ad009-be",
+        "quantity": 100,
+        "destination": "久留米",
+        "japanLead": "田中",
+        "status": "PENDING",
+        "createTime": "2026-04-24T10:00:00"
+      }
+    ],
+    "totalElements": 1
+  }
+}
+```
+
+### 4.3 Demand 详情总览
+
+```
+GET /api/v1/orders/demands/{demandId}/overview
+```
+
+**响应 200**：
+```json
+{
+  "code": "0",
+  "data": {
+    "demandId": 1,
+    "demand": {
+      "id": 1,
+      "demandCode": "D-20260424-001",
+      "demandType": "REPLENISHMENT",
+      "productCode": "ad009",
+      "subProductCode": "ad009-be",
+      "quantity": 100,
+      "destination": "久留米",
+      "japanLead": "田中",
+      "status": "PENDING",
+      "createTime": "2026-04-24T10:00:00"
+    },
+    "stepStatuses": [
+      "COMPLETED",
+      "NOT_STARTED", "NOT_STARTED", "NOT_STARTED",
+      "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED"
+    ]
+  }
+}
+```
+
+### 4.4 采购单选择器（列表）
 
 ```
 GET /api/v1/orders/selector?page=0&pageSize=20&keyword=
-```
-
-> 复用已有 `ProcurementUseCase.pageQuery()`，Controller 独立出口
 
 ---
 
@@ -445,6 +519,9 @@ export function useOrderOverview(procurementId: Ref<number>) {
 | v1.6.0 前端 Step1 卡片修复 | P0 | DemandVO.subProductItemsSummary | 🟢 已完成 |
 | Phase 5 Demand 中心化 | P0 | 双入口架构 | 🟢 已完成 |
 | JapanCustomsRecord 补充 subProductCode | P2 | DB 迁移 + 实体 + Assembler | ✅ 已完成（v1.6.1） |
+| v2.0.0 前端类型同步 | P0 | OrderPage/DemandPage subProductItems → 直接字段 | ✅ 已完成（v1.6.0） |
+| DemandOverviewVO 独立 DTO | P0 | Demand 锚点专用 VO，与 OrderOverviewPageVO 解耦 | ✅ 已完成（v1.6.0） |
+| 前端 i18n 枚举本地化 | P0 | 8步所有 status/enum 值通过 t() 渲染，非原始字符串 | ✅ 已完成（v1.6.0） |
 
 ---
 
@@ -476,7 +553,7 @@ v1.3.0：Overview 从 Procurement 中心 → Demand 中心，支持双入口。
            → 发注单 Tab 中出现新的 Procurement 记录
 ```
 
-### v1.6.0 子货号追踪（保留）
+### v2.0.0 子货号追踪
 
 ```
 Demand → N×Procurement → N×DomesticCustoms → LogisticsPlan → JapanCustoms → SalesRecord
@@ -486,7 +563,7 @@ Demand → N×Procurement → N×DomesticCustoms → LogisticsPlan → JapanCust
 
 | 步骤 | 实体 | 子货号精确 | 备注 |
 |------|------|:---:|------|
-| 需求单 | ReplenishmentDemand | ✅ | JSON 数组 |
+| 需求单 | ReplenishmentDemand | ✅ | v2.0.0 直接字段（非 JSON） |
 | 发注单 | Procurement | ✅ | 每条 SubProductItem 一个 |
 | 国内报关 | DomesticCustomsRecord | ✅ | 事件驱动自动 |
 | 调配计划 | LogisticsPlan | ✅ | 可按批次合并 |
@@ -509,4 +586,4 @@ Demand → N×Procurement → N×DomesticCustoms → LogisticsPlan → JapanCust
 
 ---
 
-*文档版本: 1.3.0 · 状态: 已完成 · 2026-04-24*
+*文档版本: 1.4.0 · 状态: 已完成 · 2026-04-24*

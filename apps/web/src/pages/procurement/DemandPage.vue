@@ -72,7 +72,7 @@
       </el-form>
     </el-card>
 
-    <!-- 表格 -->
+    <!-- 表格（v2.0.0：一行 = 一个子货号） -->
     <el-card class="table-card" shadow="never">
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
         <el-table-column prop="demandCode" :label="$t('demand.column.demandCode')" width="160" />
@@ -83,21 +83,19 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="productCode" :label="$t('demand.column.productCode')" width="120">
+        <el-table-column prop="subProductCode" :label="$t('demand.column.subProductCode')" width="140">
           <template #default="{ row }">
-            <span class="product-code">{{ row.productCode }}</span>
+            <span class="product-code">{{ row.subProductCode }}</span>
           </template>
         </el-table-column>
-        <!-- v1.6.0: 子货号明细列 -->
-        <el-table-column :label="$t('demand.column.subProductItems')" min-width="220">
+        <el-table-column prop="quantity" :label="$t('demand.column.quantity')" width="90" align="right">
           <template #default="{ row }">
-            <span v-if="!row.subProductItems || row.subProductItems.length === 0">—</span>
-            <span v-else v-for="(item, idx) in row.subProductItems" :key="idx" class="sub-item-chip">
-              <el-tag size="small" type="info" style="margin-right:4px">{{ item.subCode }}</el-tag>
-              <span class="sub-item-detail">{{ item.quantity }}{{ $t('demand.dialog.unitTai') }}</span>
-              <span v-if="item.destination" class="sub-item-dest"> → {{ item.destination }}</span>
-              <span v-if="idx < row.subProductItems.length - 1" style="margin-right:6px">,</span>
-            </span>
+            <span class="qty-value">{{ row.quantity }}{{ $t('demand.dialog.unitTai') }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="destination" :label="$t('demand.column.destination')" width="110">
+          <template #default="{ row }">
+            <span class="dest-value">{{ row.destination || '—' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="japanLead" :label="$t('demand.column.japanLead')" width="100" />
@@ -148,14 +146,14 @@
       </div>
     </el-card>
 
-    <!-- 新建/编辑弹窗（v1.6.0：子货号明细 2列卡片网格） -->
+    <!-- 新建/编辑弹窗（v2.0.0：简化为直接字段） -->
     <el-dialog
       v-model="dialogVisible"
       :title="dialogMode === 'create' ? $t('demand.newDialogTitle') : $t('demand.editDialogTitle')"
-      width="660px"
+      width="580px"
     >
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="110px" :class="'demand-form'">
-        <!-- 第一行：类型 + 主货号 -->
+      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="110px" class="demand-form">
+        <!-- 需求类型 + 主货号 -->
         <div class="form-row form-row--2col">
           <el-form-item :label="$t('demand.dialog.demandType')" prop="demandType" class="form-item--shrink">
             <el-radio-group v-model="formData.demandType">
@@ -189,90 +187,45 @@
           </el-form-item>
         </div>
 
-        <!-- 子货号明细区 -->
-        <div class="sic-section">
-          <div class="sic-header">
-            <span class="sic-title">{{ $t('demand.dialog.subProductItems') }}</span>
-            <span class="sic-count" v-if="formData.subProductItems.length > 0">
-              {{ $t('demand.dialog.subProductItemCount', { count: formData.subProductItems.length }) }}
-            </span>
-          </div>
-
-          <!-- 2列卡片网格 -->
-          <div class="sic-grid" v-if="formData.subProductItems.length > 0">
-            <div
-              v-for="(item, $index) in formData.subProductItems"
-              :key="$index"
-              class="sic-card"
+        <!-- 子货号 + 数量 + 目的地（v2.0.0：直接字段） -->
+        <div class="form-row form-row--3col">
+          <el-form-item :label="$t('demand.dialog.subProductCode')" prop="subProductCode" class="form-item--fill">
+            <el-select
+              v-model="formData.subProductCode"
+              filterable
+              allow-create
+              default-first-option
+              :disabled="!formData.productCode && dialogMode === 'create'"
+              :placeholder="$t('demand.dialog.selectSubCode')"
+              style="width:100%"
+              @focus="loadSubCodeOptions"
             >
-              <!-- 卡片头部：子货号选择 + 删除 -->
-              <div class="sic-card-head">
-                <el-select
-                  v-model="item.subCode"
-                  filterable
-                  allow-create
-                  default-first-option
-                  :disabled="!formData.productCode && dialogMode === 'create'"
-                  :placeholder="$t('demand.dialog.selectColorVariant')"
-                  size="small"
-                  style="width:100%;flex:1"
-                  @focus="loadSubCodeOptions($index)"
-                >
-                  <el-option
-                    v-for="opt in subCodeOptions[$index] || []"
-                    :key="opt.subCode"
-                    :label="(opt.colorName || opt.subCode) + ' (' + opt.subCode + ')'"
-                    :value="opt.subCode"
-                  />
-                </el-select>
-                <el-button
-                  link
-                  type="danger"
-                  size="small"
-                  :disabled="formData.subProductItems.length <= 1"
-                  @click="removeSubProductItem($index)"
-                  style="flex-shrink:0;padding:2px 4px;margin-left:4px"
-                >
-                  <el-icon><Delete /></el-icon>
-                </el-button>
-              </div>
-
-              <!-- 卡片体：数量 + 目的地 -->
-              <div class="sic-card-body">
-                <div class="sic-field">
-                  <label class="sic-field__label">{{ $t('demand.dialog.col.quantity') }}</label>
-                  <el-input-number
-                    v-model="item.quantity"
-                    :min="0"
-                    :max="99999"
-                    size="small"
-                    controls-position="right"
-                    style="width:100%"
-                  />
-                </div>
-                <div class="sic-field">
-                  <label class="sic-field__label">{{ $t('demand.dialog.col.destination') }}</label>
-                  <el-input
-                    v-model="item.destination"
-                    :placeholder="$t('demand.dialog.destinationPlaceholder')"
-                    size="small"
-                    style="width:100%"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="formData.subProductItems.length === 0" class="sic-empty">
-            {{ $t('demand.validation.subProductItemsRequired') }}
-          </div>
-
-          <el-button size="small" class="sic-add-btn" @click="addSubProductItem">
-            <el-icon><Plus /></el-icon> {{ $t('demand.dialog.addSubItem') }}
-          </el-button>
+              <el-option
+                v-for="opt in subCodeOptions"
+                :key="opt.subCode"
+                :label="(opt.colorName || opt.subCode) + ' (' + opt.subCode + ')'"
+                :value="opt.subCode"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="$t('demand.dialog.quantity')" prop="quantity" class="form-item--qty">
+            <el-input-number
+              v-model="formData.quantity"
+              :min="1"
+              :max="999999"
+              controls-position="right"
+              style="width:100%"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('demand.dialog.destination')" prop="destination" class="form-item--fill">
+            <el-input
+              v-model="formData.destination"
+              :placeholder="$t('demand.dialog.destinationPlaceholder')"
+            />
+          </el-form-item>
         </div>
 
-        <!-- 第二行：日本担当 + 备注 -->
+        <!-- 日本担当 + 备注 -->
         <div class="form-row form-row--2col">
           <el-form-item :label="$t('demand.dialog.japanLead')" class="form-item--fill">
             <el-input v-model="formData.japanLead" :placeholder="$t('demand.dialog.japanLeadPlaceholder')" />
@@ -288,7 +241,7 @@
       </template>
     </el-dialog>
 
-    <!-- 转采购弹窗（v1.6.0：选择工厂） -->
+    <!-- 转采购弹窗（v2.0.0：1:1 预览） -->
     <el-dialog v-model="convertDialogVisible" :title="$t('demand.dialog.convertDialog.title')" width="500px">
       <el-form label-width="100px">
         <el-form-item :label="$t('demand.dialog.convertDialog.factory')" required>
@@ -312,13 +265,11 @@
         </el-form-item>
         <el-form-item :label="$t('demand.dialog.convertDialog.preview')">
           <div v-if="convertForm.demand" style="font-size:13px;color:#666">
-            <div><b>{{ convertForm.demand.productCode }}</b></div>
-            <div v-for="(item, i) in (convertForm.demand.subProductItems || [])" :key="i" style="margin-top:2px">
-              {{ item.subCode }} × {{ item.quantity }}
-              <span v-if="item.destination"> → {{ item.destination }}</span>
+            <div><b>{{ convertForm.demand.subProductCode }}</b> × {{ convertForm.demand.quantity }}{{ $t('demand.dialog.unitTai') }}
+              <span v-if="convertForm.demand.destination"> → {{ convertForm.demand.destination }}</span>
             </div>
             <div style="margin-top:4px;color:#D97706">
-              {{ $t('demand.dialog.convertDialog.willCreate', { n: (convertForm.demand.subProductItems || []).length }) }}
+              {{ $t('demand.dialog.convertDialog.willCreateOne') }}
             </div>
           </div>
         </el-form-item>
@@ -331,13 +282,13 @@
       </template>
     </el-dialog>
 
-    <!-- 查看关联采购单弹窗（v1.6.0） -->
+    <!-- 查看关联采购单弹窗（v2.0.0：单条） -->
     <el-dialog v-model="linkedDialogVisible" :title="$t('demand.dialog.linkedDialog.title')" width="600px">
-      <el-table :data="linkedProcurements" border size="small" v-loading="linkedLoading">
+      <el-table :data="linkedProcurement ? [linkedProcurement] : []" border size="small" v-loading="linkedLoading">
         <el-table-column prop="id" :label="$t('demand.linkedDialog.column.id')" width="70" />
         <el-table-column prop="factoryName" :label="$t('demand.linkedDialog.column.factoryName')" min-width="120" />
         <el-table-column prop="productCode" :label="$t('demand.linkedDialog.column.productCode')" width="100" />
-        <el-table-column prop="subProductCode" :label="$t('demand.linkedDialog.column.subProductCode')" width="90" />
+        <el-table-column prop="subProductCode" :label="$t('demand.linkedDialog.column.subProductCode')" width="110" />
         <el-table-column prop="quantity" :label="$t('demand.linkedDialog.column.quantity')" width="70" align="right" />
         <el-table-column prop="destination" :label="$t('demand.linkedDialog.column.destination')" min-width="100" show-overflow-tooltip />
         <el-table-column prop="status" :label="$t('demand.linkedDialog.column.status')" width="90" align="center">
@@ -346,6 +297,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <div v-if="!linkedLoading && !linkedProcurement" style="text-align:center;color:#999;padding:20px">
+        {{ $t('demand.linkedDialog.noData') }}
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -353,14 +307,8 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
-import { Plus, Clock, Warning, CircleCheck, Delete } from '@element-plus/icons-vue'
-import {
-  demandApi,
-  type DemandPageVO,
-  type CreateDemandRequest,
-  type UpdateDemandRequest,
-  type SubProductItem,
-} from '@/api/demand'
+import { Plus, Clock, Warning, CircleCheck } from '@element-plus/icons-vue'
+import { demandApi, type DemandPageVO, type DemandType } from '@/api/demand'
 import { productApi, type MasterCodeSuggestVO, type SubCodeSuggestVO } from '@/api/product'
 import { factoryApi, type FactoryPageVO } from '@/api/factory'
 import { useI18n } from 'vue-i18n'
@@ -373,9 +321,9 @@ const factoryLoading = ref(false)
 const converting = ref(false)
 const linkedLoading = ref(false)
 const masterCodeOptions = ref<MasterCodeSuggestVO[]>([])
-const subCodeOptions = ref<SubCodeSuggestVO[][]>([[]])
+const subCodeOptions = ref<SubCodeSuggestVO[]>([])
 const factoryOptions = ref<FactoryPageVO[]>([])
-const linkedProcurements = ref<unknown[]>([])
+const linkedProcurement = ref<unknown | null>(null)
 const loadedSubCodesFor = ref<string>('')
 const dialogVisible = ref(false)
 const convertDialogVisible = ref(false)
@@ -394,34 +342,35 @@ const tableData = ref<DemandPageVO[]>([])
 const pendingCount = computed(() => tableData.value.filter(r => r.status === 'PENDING').length)
 const convertedCount = computed(() => tableData.value.filter(r => r.status === 'CONVERTED').length)
 
-// 转采购弹窗数据
+// 转采购弹窗
 const convertForm = reactive<{ factoryId: number | null; demand: DemandPageVO | null }>({
   factoryId: null,
   demand: null,
 })
 
-function emptyItem(): SubProductItem {
-  return { subCode: '', quantity: 0, destination: '' }
-}
-
-function defaultFormData(): CreateDemandRequest & { subProductItems: SubProductItem[] } {
-  return {
-    demandType: 'REPLENISHMENT',
-    productCode: '',
-    subProductItems: [emptyItem()],
-    japanLead: '',
-    remarks: '',
-  }
-}
-
-// 强类型化 formData
-const formData = reactive<{ demandType: string; productCode: string; subProductItems: SubProductItem[]; japanLead: string; remarks: string }>(
-  defaultFormData() as { demandType: string; productCode: string; subProductItems: SubProductItem[]; japanLead: string; remarks: string }
-)
+const formData = reactive<{
+  demandType: DemandType
+  productCode: string
+  subProductCode: string
+  quantity: number | undefined
+  destination: string
+  japanLead: string
+  remarks: string
+}>({
+  demandType: 'REPLENISHMENT',
+  productCode: '',
+  subProductCode: '',
+  quantity: 1,
+  destination: '',
+  japanLead: '',
+  remarks: '',
+})
 
 const formRules = {
   demandType: [{ required: true, message: () => t('demand.validation.demandTypeRequired'), trigger: 'change' }],
   productCode: [{ required: true, message: () => t('demand.validation.productCodeRequired'), trigger: 'blur' }],
+  subProductCode: [{ required: true, message: () => t('demand.validation.subProductCodeRequired'), trigger: 'blur' }],
+  quantity: [{ required: true, message: () => t('demand.validation.quantityRequired'), trigger: 'blur' }],
 }
 
 async function loadData() {
@@ -452,9 +401,16 @@ function onReset() {
 
 function onNew() {
   dialogMode.value = 'create'
-  const d = defaultFormData()
-  Object.assign(formData, d)
-  subCodeOptions.value = [[]]
+  Object.assign(formData, {
+    demandType: 'REPLENISHMENT',
+    productCode: '',
+    subProductCode: '',
+    quantity: 1,
+    destination: '',
+    japanLead: '',
+    remarks: '',
+  })
+  subCodeOptions.value = []
   loadedSubCodesFor.value = ''
   dialogVisible.value = true
 }
@@ -465,29 +421,18 @@ function onEdit(row: DemandPageVO) {
   Object.assign(formData, {
     demandType: row.demandType,
     productCode: row.productCode,
-    subProductItems: (row.subProductItems && row.subProductItems.length > 0)
-      ? row.subProductItems.map(i => ({ subCode: i.subCode, quantity: i.quantity, destination: i.destination || '' }))
-      : [emptyItem()],
+    subProductCode: row.subProductCode || '',
+    quantity: row.quantity ?? 1,
+    destination: row.destination || '',
     japanLead: row.japanLead || '',
     remarks: row.remarks || '',
   })
   loadedSubCodesFor.value = row.productCode
-  subCodeOptions.value = [[]]
+  subCodeOptions.value = []
   dialogVisible.value = true
 }
 
-function addSubProductItem() {
-  formData.subProductItems.push(emptyItem())
-  subCodeOptions.value.push([])
-}
-
-function removeSubProductItem(index: number) {
-  formData.subProductItems.splice(index, 1)
-  subCodeOptions.value.splice(index, 1)
-}
-
-
-// 转采购（v1.6.0：弹窗选工厂）
+// 转采购（v2.0.0）
 function onConvert(row: DemandPageVO) {
   convertForm.demand = row
   convertForm.factoryId = null
@@ -496,115 +441,71 @@ function onConvert(row: DemandPageVO) {
 }
 
 async function searchFactory(query: string) {
-  if (!query || query.length < 1) {
-    factoryOptions.value = []
-    return
-  }
+  if (!query || query.length < 1) { factoryOptions.value = []; return }
   factoryLoading.value = true
   try {
     const res = await factoryApi.list({ factoryName: query, pageSize: 20 })
     factoryOptions.value = res.data.data?.content || []
-  } catch {
-    factoryOptions.value = []
-  } finally {
-    factoryLoading.value = false
-  }
+  } catch { factoryOptions.value = [] } finally { factoryLoading.value = false }
 }
 
 async function doConvert() {
-  if (!convertForm.factoryId) {
-    ElMessage.warning(t('demand.dialog.convertDialog.factoryRequired'))
-    return
-  }
+  if (!convertForm.factoryId) { ElMessage.warning(t('demand.dialog.convertDialog.factoryRequired')); return }
   if (!convertForm.demand) return
   converting.value = true
   try {
     const res = await demandApi.convertToProcurement(convertForm.demand.id, { factoryId: convertForm.factoryId! })
     const data = res.data.data!
     convertDialogVisible.value = false
-    ElMessage.success(
-      t('demand.message.convertSuccess', {
-        n: data.linkedProcurementIds.length,
-        ids: data.linkedProcurementIds.join(', '),
-      })
-    )
+    ElMessage.success(t('demand.message.convertSuccess', { id: data.linkedProcurementId }))
     loadData()
-  } catch { /* interceptor */ } finally {
-    converting.value = false
-  }
+  } catch { /* interceptor */ } finally { converting.value = false }
 }
 
 async function onViewLinked(row: DemandPageVO) {
   linkedDialogVisible.value = true
-  linkedProcurements.value = []
+  linkedProcurement.value = null
   linkedLoading.value = true
   try {
-    const res = await demandApi.getLinkedProcurements(row.id)
-    linkedProcurements.value = res.data.data || []
-  } catch {
-    ElMessage.error(t('demand.message.loadLinkedFailed'))
-  } finally {
-    linkedLoading.value = false
-  }
+    const res = await demandApi.getLinkedProcurement(row.id)
+    linkedProcurement.value = res.data.data || null
+  } catch { ElMessage.error(t('demand.message.loadLinkedFailed')) } finally { linkedLoading.value = false }
 }
 
 let masterCodeTimer: ReturnType<typeof setTimeout>
 async function searchMasterCode(query: string) {
   clearTimeout(masterCodeTimer)
-  if (!query || query.length < 1) {
-    masterCodeOptions.value = []
-    return
-  }
+  if (!query || query.length < 1) { masterCodeOptions.value = []; return }
   masterCodeTimer = setTimeout(async () => {
     masterCodeLoading.value = true
     try {
       const res = await productApi.suggestMasterCodes(query)
       masterCodeOptions.value = res.data.data || []
-    } catch (e) {
-      console.error('[DemandPage] searchMasterCode failed', e)
-      masterCodeOptions.value = []
-    } finally {
-      masterCodeLoading.value = false
-    }
+    } catch (e) { masterCodeOptions.value = [] } finally { masterCodeLoading.value = false }
   }, 300)
 }
 
 function onMasterCodeChange(val: string) {
   formData.productCode = val
-  formData.subProductItems = [emptyItem()]
-  subCodeOptions.value = [[]]
+  formData.subProductCode = ''
+  subCodeOptions.value = []
   loadedSubCodesFor.value = ''
-  if (val) {
-    loadSubCodeOptions(0)
-  }
+  if (val) loadSubCodeOptions()
 }
 
-async function loadSubCodeOptions(_index: number) {
+async function loadSubCodeOptions() {
   const masterCode = formData.productCode
   if (!masterCode || loadedSubCodesFor.value === masterCode) return
   loadedSubCodesFor.value = masterCode
   subCodeLoading.value = true
   try {
     const res = await productApi.suggestSubCodes(masterCode)
-    const opts = res.data.data || []
-    // 填充所有空槽位
-    for (let i = 0; i < subCodeOptions.value.length; i++) {
-      subCodeOptions.value[i] = opts
+    subCodeOptions.value = res.data.data || []
+    // 自动代入第一个子货号
+    if (!formData.subProductCode && subCodeOptions.value.length > 0) {
+      formData.subProductCode = subCodeOptions.value[0].subCode
     }
-    // 如果只有一行，自动代入全部子货号
-    if (formData.subProductItems.length === 1 && !formData.subProductItems[0].subCode && opts.length > 0) {
-      formData.subProductItems = opts.map(o => ({
-        subCode: o.subCode,
-        quantity: 0,
-        destination: '',
-      }))
-      subCodeOptions.value = opts.map(() => opts)
-    }
-  } catch (e) {
-    console.error('[DemandPage] loadSubCodeOptions failed', e)
-  } finally {
-    subCodeLoading.value = false
-  }
+  } catch (e) { subCodeOptions.value = [] } finally { subCodeLoading.value = false }
 }
 
 async function onRevertConversion(row: DemandPageVO) {
@@ -641,33 +542,27 @@ async function onSubmit() {
   if (!formRef.value) return
   await formRef.value.validate(async (valid: boolean) => {
     if (!valid) return
-    // 过滤空行
-    const items = formData.subProductItems.filter(i => i.subCode.trim())
-    if (items.length === 0) {
-      ElMessage.warning(t('demand.validation.subProductItemsRequired'))
-      return
-    }
     submitting.value = true
     try {
       const payload = {
         demandType: formData.demandType,
         productCode: formData.productCode,
-        subProductItems: items,
+        subProductCode: formData.subProductCode,
+        quantity: formData.quantity ?? 1,
+        destination: formData.destination || undefined,
         japanLead: formData.japanLead || undefined,
         remarks: formData.remarks || undefined,
       }
       if (dialogMode.value === 'create') {
-        await demandApi.create(payload as CreateDemandRequest)
+        await demandApi.create(payload)
         ElMessage.success(t('demand.message.createSuccess'))
       } else if (currentRow.value) {
-        await demandApi.update(currentRow.value.id, payload as UpdateDemandRequest)
+        await demandApi.update(currentRow.value.id, payload)
         ElMessage.success(t('demand.message.updateSuccess'))
       }
       dialogVisible.value = false
       loadData()
-    } finally {
-      submitting.value = false
-    }
+    } finally { submitting.value = false }
   })
 }
 
@@ -698,96 +593,16 @@ onMounted(() => loadData())
 .stat-value { font-size: 26px; font-weight: 800; color: var(--text-primary); line-height: 1; font-variant-numeric: tabular-nums; }
 .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
 .product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
+.qty-value { color: #D97706; font-weight: 600; }
+.dest-value { color: #6B7280; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
-.sub-item-chip { font-size: 12px; }
-.sub-item-detail { color: #D97706; font-weight: 600; }
-.sub-item-dest { color: #6B7280; }
 
-/* v1.6.0: 弹窗表单布局 */
+/* v2.0.0 表单布局 */
 :deep(.demand-form .el-form-item) { margin-bottom: 16px; }
 :deep(.demand-form .el-form-item:last-child) { margin-bottom: 0; }
-.form-row--2col {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 16px;
-  align-items: flex-start;
-}
+.form-row--2col { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: flex-start; }
+.form-row--3col { display: grid; grid-template-columns: 1fr 120px 1fr; gap: 12px; align-items: flex-start; }
 .form-item--shrink { flex-shrink: 0; }
 .form-item--fill { flex: 1; }
-
-/* 子货号明细区 — 2列卡片网格 */
-.sic-section {
-  background: var(--el-fill-color-light);
-  border: 1px solid var(--el-border-color-lighter);
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-bottom: 16px;
-}
-.sic-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-.sic-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--el-text-color-regular);
-}
-.sic-count {
-  font-size: 11px;
-  color: var(--el-color-primary);
-  background: color-mix(in srgb, var(--el-color-primary) 10%, transparent);
-  border-radius: 20px;
-  padding: 2px 10px;
-  font-weight: 500;
-}
-.sic-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.sic-card {
-  background: var(--el-bg-color);
-  border: 1px solid var(--el-border-color-lighter);
-  border-radius: 8px;
-  padding: 10px 12px;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-.sic-card:hover {
-  border-color: var(--el-border-color);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-.sic-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.sic-card-body {
-  display: grid;
-  grid-template-columns: 90px 1fr;
-  gap: 8px;
-  align-items: center;
-}
-.sic-field__label {
-  font-size: 11px;
-  color: var(--el-text-color-secondary);
-  display: block;
-  margin-bottom: 2px;
-}
-.sic-empty {
-  text-align: center;
-  color: var(--el-text-color-placeholder);
-  font-size: 13px;
-  padding: 8px 0 4px;
-}
-.sic-add-btn {
-  width: 100%;
-  border-style: dashed !important;
-  color: var(--el-color-primary);
-  font-size: 13px;
-  margin-top: 4px;
-}
+.form-item--qty { flex-shrink: 0; }
 </style>

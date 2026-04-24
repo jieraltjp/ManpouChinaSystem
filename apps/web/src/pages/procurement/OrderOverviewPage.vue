@@ -33,11 +33,25 @@
             <el-table-column prop="demandCode" :label="$t('orderOverview.column.demandCode')" width="160" />
             <el-table-column prop="demandType" :label="$t('orderOverview.column.demandType')" width="120" />
             <el-table-column prop="productCode" :label="$t('orderOverview.column.productCode')" width="120" />
-            <el-table-column prop="subProductItemsSummary" :label="$t('orderOverview.column.subProductItems')" min-width="180" show-overflow-tooltip />
+            <el-table-column prop="subProductCode" :label="$t('orderOverview.column.subProductCode')" width="140">
+              <template #default="{ row }">
+                <span class="product-code">{{ row.subProductCode }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="quantity" :label="$t('orderOverview.column.quantity')" width="80" align="right">
+              <template #default="{ row }">
+                <span class="qty-value">{{ row.quantity || 0 }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="destination" :label="$t('orderOverview.column.destination')" width="110">
+              <template #default="{ row }">
+                {{ row.destination || '—' }}
+              </template>
+            </el-table-column>
             <el-table-column prop="japanLead" :label="$t('orderOverview.column.japanLead')" width="100" />
             <el-table-column prop="status" :label="$t('orderOverview.column.status')" width="120">
               <template #default="{ row }">
-                <el-tag :type="demandStatusType(row.status)" size="small">{{ row.status }}</el-tag>
+                <el-tag :type="demandStatusType(row.status)" size="small">{{ demandStatusLabel(row.status) }}</el-tag>
               </template>
             </el-table-column>
             <el-table-column :label="$t('orderOverview.column.action')" width="100" align="center">
@@ -109,9 +123,11 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { orderOverviewApi, type DemandSelectorVO, type ProcurementPageVO } from '@/api/orderOverview'
 
 const router = useRouter()
+const { t } = useI18n()
 
 // ===== Tab 状态 =====
 const activeTab = ref<'demands' | 'procurements'>('demands')
@@ -161,6 +177,11 @@ function demandStatusType(status?: string) {
   if (status === 'CONVERTED') return 'success'
   if (status === 'CANCELLED') return 'info'
   return 'info'
+}
+
+function demandStatusLabel(status?: string) {
+  if (!status) return t('common.format.dash')
+  return t(`demand.status.${status}`)
 }
 
 // ===== Procurement 列表 =====
@@ -216,4 +237,6 @@ onMounted(() => {
 .table-card { margin-top: 0; }
 .filter-card { margin-bottom: 12px; }
 .pagination-wrap { display: flex; justify-content: flex-end; margin-top: 12px; }
+.product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
+.qty-value { color: #D97706; font-weight: 600; }
 </style>

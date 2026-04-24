@@ -1,11 +1,11 @@
 # 订单总览 — API 设计
 
-> **版本**: 1.3.0
+> **版本**: 2.0.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-24（v1.3.0：补充 Phase 5 Demand 中心化端点；统一 VO 命名为 OrderOverviewPageVO）
+> **更新**: 2026-04-24（v2.0.0：Demand 每行 = 一个子货号；DemandVO/OrderDemandSelectorDTO 改为直接字段）
 > **状态**: ✅ 已实现（Phase 1 + Phase 5）
 > **对应前端**: `OrderOverviewPage.vue` · `docs/ui/pages/09-order-overview.md`
-> **核心**: 双入口架构 — Demand 锚点（新建需求单立即可见）+ Procurement 锚点（8步全链路聚合）
+> **核心**: 双入口架构 — Demand 锚点（每行 = 一个子货号，从步骤1到步骤8的完整链路）+ Procurement 锚点（8步全链路聚合）
 
 ---
 
@@ -108,7 +108,10 @@ Query 参数：`page`, `pageSize`, `keyword`
 }
 ```
 
-### 3.2 步骤1 — ReplenishmentDemand（可选，v1.6.0）
+### 3.2 步骤1 — ReplenishmentDemand（可选，v2.0.0）
+
+> **v2.0.0 变更**：每条 Demand = 一个子货号（商品唯一标识 = 主货号+子货号）。
+> `subProductCode`（子货号全码，如 ad009-be）直接存储，不再用 JSON 摘要。
 
 ```json
 {
@@ -116,16 +119,31 @@ Query 参数：`page`, `pageSize`, `keyword`
   "demandCode": "D-20260401-001",
   "demandType": "NEW_PURCHASE",
   "productCode": "odn012",
-  "subProductItemsSummary": "be:100久留米, bu:50名古屋, re:75大阪",
+  "subProductCode": "odn012-be",
+  "quantity": 100,
+  "destination": "久留米",
   "japanLead": "田中",
   "status": "CONVERTED",
   "createTime": "2026-04-01T09:00:00Z"
 }
 ```
 
-> **v1.6.0 变更**：原 `quantity`/`destination`/`subProductCode` 合并为 `subProductItemsSummary` 字符串，
-> 由后端 `OrderOverviewAssembler.buildSubProductItemsSummary()` 从 `subProductItemsRaw` JSON 数组生成。
-> 旧数据（v1.5.x）`sub_product_code` 格式为 `["be","bu"]` 时，兼容解析为 `be, bu`。
+### OrderDemandSelectorDTO（v2.0.0，需求单 Tab 列表用）
+
+```json
+{
+  "id": 5,
+  "demandCode": "D-20260401-001",
+  "demandType": "NEW_PURCHASE",
+  "productCode": "odn012",
+  "subProductCode": "odn012-be",
+  "quantity": 100,
+  "destination": "久留米",
+  "japanLead": "田中",
+  "status": "CONVERTED",
+  "createTime": "2026-04-01T09:00:00Z"
+}
+```
 
 ### 3.3 步骤2 — Factory（可选）
 

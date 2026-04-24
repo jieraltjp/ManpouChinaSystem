@@ -22,12 +22,8 @@ import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.model.ShipmentStatus;
 import com.manpou.allinone.qc.domain.model.QcRecord;
 import com.manpou.allinone.qc.domain.model.QcStatus;
-import com.manpou.allinone.replenishment.application.assembler.ReplenishmentDemandAssembler;
 import com.manpou.allinone.replenishment.domain.model.ReplenishmentDemand;
-import com.manpou.allinone.replenishment.domain.model.SubProductItem;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * 订单总览 DTO 转换器。
@@ -35,12 +31,6 @@ import java.util.List;
  */
 @Component
 public class OrderOverviewAssembler {
-
-    private final ReplenishmentDemandAssembler demandAssembler;
-
-    public OrderOverviewAssembler(ReplenishmentDemandAssembler demandAssembler) {
-        this.demandAssembler = demandAssembler;
-    }
 
     public ProcurementVO toProcurementVO(Procurement entity, String factoryName) {
         return ProcurementVO.builder()
@@ -89,35 +79,18 @@ public class OrderOverviewAssembler {
     }
 
     public DemandVO toDemandVO(ReplenishmentDemand entity) {
-        String summary = buildSubProductItemsSummary(entity.getSubProductItemsRaw());
         return DemandVO.builder()
                 .id(entity.getId())
                 .demandCode(entity.getDemandCode())
                 .demandType(entity.getDemandType() != null ? entity.getDemandType().name() : null)
                 .productCode(entity.getProductCode())
-                .subProductItemsSummary(summary)
+                .subProductCode(entity.getSubProductCode())
+                .quantity(entity.getQuantity())
+                .destination(entity.getDestination())
                 .japanLead(entity.getJapanLead())
                 .status(entity.getStatus() != null ? entity.getStatus().name() : null)
                 .createTime(entity.getCreateTime())
                 .build();
-    }
-
-    private String buildSubProductItemsSummary(String raw) {
-        if (raw == null || raw.isBlank()) return null;
-        try {
-            var items = demandAssembler.parseSubProductItems(raw);
-            if (items == null || items.isEmpty()) return null;
-            return items.stream()
-                    .map(item -> {
-                        String qty = item.getQuantity() != null ? String.valueOf(item.getQuantity()) : "?";
-                        String dest = item.getDestination() != null ? item.getDestination() : "";
-                        return item.getSubCode() + ":" + qty + dest;
-                    })
-                    .reduce((a, b) -> a + ", " + b)
-                    .orElse(null);
-        } catch (Exception e) {
-            return raw;
-        }
     }
 
     public QcRecordVO toQcVO(QcRecord entity) {
@@ -242,11 +215,6 @@ public class OrderOverviewAssembler {
     }
 
     /**
-     * 解析子货号明细（委托 DemandAssembler）。
-     */
-    public List<SubProductItem> parseSubProductItemsForDemand(String raw) {
-        return demandAssembler.parseSubProductItems(raw);
-    }
 
     /**
      * Demand 锚点专用状态数组。

@@ -110,7 +110,12 @@ public class OrderOverviewPageVO {
         private String demandCode;
         private String demandType;
         private String productCode;
-        private String subProductItemsSummary;  // v1.6.0: "be:100久留米, bu:50名古屋"
+        /** 子货号全码（v2.0.0，如 ad009-be） */
+        private String subProductCode;
+        /** 需求数量（v2.0.0） */
+        private Integer quantity;
+        /** 目的地（v2.0.0） */
+        private String destination;
         private String japanLead;
         private String status;
         private java.time.LocalDateTime createTime;

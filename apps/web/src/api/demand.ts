@@ -1,36 +1,29 @@
 /**
  * 补货需求单 API 客户端。
- * 与 docs/business/SPEC-B01-补货需求-步骤1.md §API设计 完全对齐。
+ * 与 docs/business/SPEC-B01-补货需求-步骤1.md v2.0.0 完全对齐。
+ * 一行 = 一个子货号（商品唯一标识 = 主货号+子货号）。
  */
 import client from './client'
 
 export type DemandType = 'REPLENISHMENT' | 'NEW_PURCHASE'
 export type DemandStatus = 'PENDING' | 'CONVERTED' | 'CANCELLED'
 
-/** 子货号明细（v1.6.0：每个子货号独立数量+目的地） */
-export interface SubProductItem {
-  subCode: string
-  quantity: number
-  destination?: string
-}
-
-/** 关联发注表明细（v1.6.0） */
-export interface LinkedDemandItem {
-  linkedProcurementId: number
-  subCode: string
-}
-
 export interface DemandPageVO {
   id: number
   demandCode: string
   demandType: DemandType
+  /** 主货号 */
   productCode: string
-  /** 子货号明细列表（v1.6.0） */
-  subProductItems?: SubProductItem[]
+  /** 子货号（全码，如 ad009-be） */
+  subProductCode: string
+  /** 需求数量 */
+  quantity: number
+  /** 目的地 */
+  destination?: string
   japanLead?: string
   status: DemandStatus
-  /** 关联发注表明细（v1.6.0，CONVERTED 时有值） */
-  linkedDemandItems?: LinkedDemandItem[]
+  /** 关联的 Procurement ID（CONVERTED 时有值） */
+  linkedProcurementId?: number
   remarks?: string
   createBy?: string
   createTime?: string
@@ -44,17 +37,18 @@ export interface DemandPageResponse {
   pageNumber: number
 }
 
-/** 转采购响应（v1.6.0） */
+/** 转采购响应（v2.0.0：1:1） */
 export interface ConvertDemandResponse {
   demandStatus: DemandStatus
-  linkedProcurementIds: number[]
+  linkedProcurementId: number
 }
 
 export interface CreateDemandRequest {
   demandType: DemandType
   productCode: string
-  /** 子货号明细列表（v1.6.0） */
-  subProductItems: SubProductItem[]
+  subProductCode: string
+  quantity: number
+  destination?: string
   japanLead?: string
   remarks?: string
 }
@@ -62,14 +56,15 @@ export interface CreateDemandRequest {
 export interface UpdateDemandRequest {
   demandType?: DemandType
   productCode?: string
-  /** 子货号明细列表（v1.6.0） */
-  subProductItems?: SubProductItem[]
+  subProductCode?: string
+  quantity?: number
+  destination?: string
   japanLead?: string
   remarks?: string
   status?: DemandStatus
 }
 
-/** 转采购请求（v1.6.0） */
+/** 转采购请求（v2.0.0） */
 export interface ConvertDemandCmd {
   factoryId: number
 }
@@ -90,16 +85,16 @@ export const demandApi = {
   delete(id: number) {
     return client.delete<{ code: string }>(`/demands/${id}`)
   },
-  /** 批量转采购（v1.6.0）：POST /demands/{id}/convert body={factoryId} */
+  /** 转采购（v2.0.0）：POST /demands/{id}/convert body={factoryId} */
   convertToProcurement(id: number, cmd: ConvertDemandCmd) {
     return client.post<{ code: string; data: ConvertDemandResponse }>(`/demands/${id}/convert`, cmd)
   },
-  /** 撤销转换（v1.6.0）：批量删除关联 Procurement，回滚状态 */
+  /** 撤销转换（v2.0.0） */
   revertConversion(id: number) {
     return client.post<{ code: string }>(`/demands/${id}/revert`)
   },
-  /** 查看关联的采购单列表（v1.6.0） */
-  getLinkedProcurements(id: number) {
-    return client.get<{ code: string; data: unknown[] }>(`/demands/${id}/procurements`)
+  /** 查看关联的采购单（v2.0.0） */
+  getLinkedProcurement(id: number) {
+    return client.get<{ code: string; data: unknown }>(`/demands/${id}/procurement`)
   },
 }

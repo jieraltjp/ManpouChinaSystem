@@ -30,8 +30,14 @@ public class OrderDemandSelectorDTO {
     /** 主货号 */
     private String productCode;
 
-    /** 子货号明细摘要（v1.6.0）："be:100久留米, bu:50名古屋" */
-    private String subProductItemsSummary;
+    /** 子货号全码（v2.0.0，如 ad009-be） */
+    private String subProductCode;
+
+    /** 需求数量（v2.0.0） */
+    private Integer quantity;
+
+    /** 目的地（v2.0.0） */
+    private String destination;
 
     /** 日本担当 */
     private String japanLead;

@@ -494,10 +494,10 @@ function onDemandChange(demandId: number | null) {
   const d = demandOptions.value.find(x => x.id === demandId)
   if (!d) return
   formData.productCode = d.productCode
-  formData.subProductCode = d.subProductItems?.[0]?.subCode || ''
-  formData.destination = d.subProductItems?.[0]?.destination || ''
+  formData.subProductCode = d.subProductCode || ''
+  formData.destination = d.destination || ''
   formData.japanLead = d.japanLead || ''
-  formData.quantity = d.subProductItems?.[0]?.quantity ?? 0
+  formData.quantity = d.quantity ?? 0
 }
 
 /**
@@ -509,10 +509,10 @@ function prefillFromDemand(demand: DemandPageVO) {
   dialogMode.value = 'create'
   Object.assign(formData, defaultFormData())
   formData.productCode = demand.productCode
-  formData.subProductCode = demand.subProductItems?.[0]?.subCode || ''
-  formData.destination = demand.subProductItems?.[0]?.destination || ''
+  formData.subProductCode = demand.subProductCode || ''
+  formData.destination = demand.destination || ''
   formData.japanLead = demand.japanLead || ''
-  formData.quantity = demand.subProductItems?.[0]?.quantity ?? 0
+  formData.quantity = demand.quantity ?? 0
   dialogVisible.value = true
 }
 

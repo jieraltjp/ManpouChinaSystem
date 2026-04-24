@@ -32,7 +32,7 @@
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.demandCode') }}</span><span class="value">{{ overview.demand.demandCode }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.demandType') }}</span><span class="value">{{ overview.demand.demandType }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.productCode') }}</span><span class="value">{{ overview.demand.productCode }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step1.subProductItems') }}</span><span class="value">{{ overview.demand.subProductItemsSummary ?? $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step1.subProductItems') }}</span><span class="value highlight">{{ subProductSummary(overview.demand) }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.japanLead') }}</span><span class="value">{{ overview.demand.japanLead ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.status') }}</span><span class="value">{{ overview.demand.status }}</span></div>
           </div>
@@ -49,14 +49,14 @@
           <div class="step-item"><span class="label">{{ $t('orderOverview.step2.factoryName') }}</span><span class="value">{{ overview.procurement.factoryName ?? $t('common.format.dash') }}</span></div>
           <div class="step-item"><span class="label">{{ $t('orderOverview.step2.productCode') }}</span><span class="value">{{ overview.procurement.productCode }}</span></div>
           <div class="step-item"><span class="label">{{ $t('orderOverview.step2.quantity') }}</span><span class="value">{{ overview.procurement.quantity ?? $t('common.format.dash') }}</span></div>
-          <div class="step-item"><span class="label">{{ $t('orderOverview.step2.priceRmb') }}</span><span class="value">{{ overview.procurement.priceRmb != null ? `¥${Number(overview.procurement.priceRmb).toFixed(2)}` : $t('common.format.dash') }}</span></div>
+          <div class="step-item"><span class="label">{{ $t('orderOverview.step2.priceRmb') }}</span><span class="value">{{ overview.procurement.priceRmb != null ? $t('common.currency.cny') + Number(overview.procurement.priceRmb).toFixed(2) : $t('common.format.dash') }}</span></div>
           <div class="step-item"><span class="label">{{ $t('orderOverview.step2.taxPoint') }}</span><span class="value">{{ overview.procurement.taxPoint ?? $t('common.format.dash') }}</span></div>
-          <div class="step-item"><span class="label">{{ $t('orderOverview.step2.billingType') }}</span><span class="value">{{ overview.procurement.billingType ?? $t('common.format.dash') }}</span></div>
-          <div class="step-item"><span class="label">{{ $t('orderOverview.step2.estimatedPriceJpy') }}</span><span class="value">{{ overview.procurement.estimatedPriceJpy != null ? `${Number(overview.procurement.estimatedPriceJpy).toFixed(0)} JPY` : $t('common.format.dash') }}</span></div>
+          <div class="step-item"><span class="label">{{ $t('orderOverview.step2.billingType') }}</span><span class="value">{{ billingTypeLabel(overview.procurement.billingType) }}</span></div>
+          <div class="step-item"><span class="label">{{ $t('orderOverview.step2.estimatedPriceJpy') }}</span><span class="value">{{ overview.procurement.estimatedPriceJpy != null ? `${Number(overview.procurement.estimatedPriceJpy).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ${$t('common.units.jpy')}` : $t('common.format.dash') }}</span></div>
           <div class="step-item"><span class="label">{{ $t('orderOverview.step2.orderDate') }}</span><span class="value">{{ overview.procurement.orderDate ?? $t('common.format.dash') }}</span></div>
           <div class="step-item"><span class="label">{{ $t('orderOverview.step2.plannedShipDate') }}</span><span class="value">{{ overview.procurement.plannedShipDate ?? $t('common.format.dash') }}</span></div>
           <div class="step-item"><span class="label">{{ $t('orderOverview.step2.actualShipDate') }}</span><span class="value">{{ overview.procurement.actualShipDate ?? $t('common.format.dash') }}</span></div>
-          <div class="step-item"><span class="label">{{ $t('orderOverview.step2.status') }}</span><span class="value">{{ overview.procurement.status ?? $t('common.format.dash') }}</span></div>
+          <div class="step-item"><span class="label">{{ $t('orderOverview.step2.status') }}</span><span class="value">{{ procurementStatusLabel(overview.procurement.status) }}</span></div>
         </div>
       </StepCard>
 
@@ -84,12 +84,12 @@
         <template v-if="overview.logisticsPlan">
           <div class="step-grid">
             <div class="step-item"><span class="label">{{ $t('orderOverview.step4.planCode') }}</span><span class="value">{{ overview.logisticsPlan.planCode }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step4.planType') }}</span><span class="value">{{ overview.logisticsPlan.planType ?? $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step4.planType') }}</span><span class="value">{{ logisticsPlanTypeLabel(overview.logisticsPlan.planType) }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step4.cargoVolume') }}</span><span class="value">{{ overview.logisticsPlan.cargoVolumeCbm != null ? `${Number(overview.logisticsPlan.cargoVolumeCbm).toFixed(4)} CBM` : $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step4.cargoWeight') }}</span><span class="value">{{ overview.logisticsPlan.cargoWeightKg != null ? `${Number(overview.logisticsPlan.cargoWeightKg).toFixed(2)} kg` : $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step4.estimatedShipDate') }}</span><span class="value">{{ overview.logisticsPlan.estimatedShipDate ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step4.actualShipDate') }}</span><span class="value">{{ overview.logisticsPlan.actualShipDate ?? $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step4.status') }}</span><span class="value">{{ overview.logisticsPlan.status ?? $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step4.status') }}</span><span class="value">{{ logisticsStatusLabel(overview.logisticsPlan.status) }}</span></div>
           </div>
         </template>
         <template v-else>
@@ -103,8 +103,8 @@
           <div class="step-grid">
             <div class="step-item"><span class="label">{{ $t('orderOverview.step5.customsCode') }}</span><span class="value">{{ overview.domesticCustoms.customsCode }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step5.productCode') }}</span><span class="value">{{ overview.domesticCustoms.productCode }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step5.status') }}</span><span class="value">{{ overview.domesticCustoms.status ?? $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step5.estimatedValue') }}</span><span class="value">{{ overview.domesticCustoms.estimatedValueCny != null ? `¥${Number(overview.domesticCustoms.estimatedValueCny).toFixed(2)}` : $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step5.status') }}</span><span class="value">{{ domesticCustomsStatusLabel(overview.domesticCustoms.status) }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step5.estimatedValue') }}</span><span class="value">{{ overview.domesticCustoms.estimatedValueCny != null ? $t('common.currency.cny') + Number(overview.domesticCustoms.estimatedValueCny).toFixed(2) : $t('common.format.dash') }}</span></div>
           </div>
         </template>
         <template v-else>
@@ -120,10 +120,10 @@
             <div class="step-item"><span class="label">{{ $t('orderOverview.step6.arrivalDate') }}</span><span class="value">{{ overview.japanCustoms.arrivalDate ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step6.clearanceDate') }}</span><span class="value">{{ overview.japanCustoms.clearanceDate ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step6.customsBroker') }}</span><span class="value">{{ overview.japanCustoms.customsBroker ?? $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step6.importDutyPaid') }}</span><span class="value">{{ overview.japanCustoms.importDutyPaid != null ? `${Number(overview.japanCustoms.importDutyPaid).toFixed(2)} JPY` : $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step6.consumptionTaxPaid') }}</span><span class="value">{{ overview.japanCustoms.consumptionTaxPaid != null ? `${Number(overview.japanCustoms.consumptionTaxPaid).toFixed(2)} JPY` : $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step6.importDutyPaid') }}</span><span class="value">{{ overview.japanCustoms.importDutyPaid != null ? `${Number(overview.japanCustoms.importDutyPaid).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${$t('common.units.jpy')}` : $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step6.consumptionTaxPaid') }}</span><span class="value">{{ overview.japanCustoms.consumptionTaxPaid != null ? `${Number(overview.japanCustoms.consumptionTaxPaid).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${$t('common.units.jpy')}` : $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step6.arrivalPort') }}</span><span class="value">{{ overview.japanCustoms.arrivalPort ?? $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step6.status') }}</span><span class="value">{{ overview.japanCustoms.status ?? $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step6.status') }}</span><span class="value">{{ japanCustomsStatusLabel(overview.japanCustoms.status) }}</span></div>
           </div>
         </template>
         <template v-else>
@@ -136,10 +136,10 @@
         <template v-if="overview.taxRefund">
           <div class="step-grid">
             <div class="step-item"><span class="label">{{ $t('orderOverview.step7.refundCode') }}</span><span class="value">{{ overview.taxRefund.refundCode ?? $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step7.estimatedRefundRmb') }}</span><span class="value">{{ overview.taxRefund.estimatedRefundRmb != null ? `¥${Number(overview.taxRefund.estimatedRefundRmb).toFixed(2)}` : $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step7.actualRefundRmb') }}</span><span class="value">{{ overview.taxRefund.actualRefundRmb != null ? `¥${Number(overview.taxRefund.actualRefundRmb).toFixed(2)}` : $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step7.estimatedRefundRmb') }}</span><span class="value">{{ overview.taxRefund.estimatedRefundRmb != null ? $t('common.currency.cny') + Number(overview.taxRefund.estimatedRefundRmb).toFixed(2) : $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step7.actualRefundRmb') }}</span><span class="value">{{ overview.taxRefund.actualRefundRmb != null ? $t('common.currency.cny') + Number(overview.taxRefund.actualRefundRmb).toFixed(2) : $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step7.refundDate') }}</span><span class="value">{{ overview.taxRefund.refundDate ?? $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step7.status') }}</span><span class="value">{{ overview.taxRefund.status ?? $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step7.status') }}</span><span class="value">{{ taxRefundStatusLabel(overview.taxRefund.status) }}</span></div>
           </div>
         </template>
         <template v-else>
@@ -152,13 +152,13 @@
         <template v-if="overview.salesRecord">
           <div class="step-grid">
             <div class="step-item"><span class="label">{{ $t('orderOverview.step8.recordCode') }}</span><span class="value">{{ overview.salesRecord.recordCode ?? $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step8.salesChannel') }}</span><span class="value">{{ overview.salesRecord.salesChannel ?? $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step8.salesChannel') }}</span><span class="value">{{ salesChannelLabel(overview.salesRecord.salesChannel) }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step8.listingDate') }}</span><span class="value">{{ overview.salesRecord.listingDate ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step8.currentStock') }}</span><span class="value">{{ overview.salesRecord.currentStock ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step8.salesQuantity') }}</span><span class="value">{{ overview.salesRecord.salesQuantity ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step8.returnRate') }}</span><span class="value">{{ overview.salesRecord.returnRate != null ? `${(Number(overview.salesRecord.returnRate) * 100).toFixed(2)}%` : $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step8.sellingPriceJpy') }}</span><span class="value">{{ overview.salesRecord.sellingPriceJpy != null ? `${Number(overview.salesRecord.sellingPriceJpy).toFixed(0)} JPY` : $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step8.status') }}</span><span class="value">{{ overview.salesRecord.status ?? $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step8.sellingPriceJpy') }}</span><span class="value">{{ overview.salesRecord.sellingPriceJpy != null ? `${Number(overview.salesRecord.sellingPriceJpy).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ${$t('common.units.jpy')}` : $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step8.status') }}</span><span class="value">{{ salesStatusLabel(overview.salesRecord.status) }}</span></div>
           </div>
         </template>
         <template v-else>
@@ -172,10 +172,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ArrowLeft, Loading } from '@element-plus/icons-vue'
 import { orderOverviewApi, type OrderOverviewVO } from '@/api/orderOverview'
 import StatusProgressBar from './components/StatusProgressBar.vue'
 import StepCard from './components/StepCard.vue'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
@@ -205,6 +208,50 @@ function qcResultType(result?: string) {
   if (result === 'PASS') return 'success'
   if (result === 'FAIL') return 'danger'
   return 'info'
+}
+
+function procurementStatusLabel(s?: string) {
+  return s ? t('orderOverview.enum.procurement.' + s, s) : t('common.format.dash')
+}
+
+function logisticsStatusLabel(s?: string) {
+  return s ? t('orderOverview.enum.logistics.' + s, s) : t('common.format.dash')
+}
+
+function logisticsPlanTypeLabel(s?: string) {
+  return s ? t('orderOverview.enum.planType.' + s, s) : t('common.format.dash')
+}
+
+function domesticCustomsStatusLabel(s?: string) {
+  return s ? t('orderOverview.enum.domesticCustoms.' + s, s) : t('common.format.dash')
+}
+
+function japanCustomsStatusLabel(s?: string) {
+  return s ? t('orderOverview.enum.japanCustoms.' + s, s) : t('common.format.dash')
+}
+
+function taxRefundStatusLabel(s?: string) {
+  return s ? t('orderOverview.enum.taxRefund.' + s, s) : t('common.format.dash')
+}
+
+function billingTypeLabel(s?: string) {
+  return s ? t('orderOverview.enum.billingType.' + s, s) : t('common.format.dash')
+}
+
+function salesStatusLabel(s?: string) {
+  return s ? t('orderOverview.enum.sales.' + s, s) : t('common.format.dash')
+}
+
+function salesChannelLabel(s?: string) {
+  return s ? t('orderOverview.enum.salesChannel.' + s, s) : t('common.format.dash')
+}
+
+function subProductSummary(demand: { subProductCode?: string; quantity?: number; destination?: string }): string {
+  if (!demand.subProductCode) return t('common.format.dash')
+  const parts = [demand.subProductCode]
+  if (demand.quantity != null) parts.push(demand.quantity + t('demand.dialog.unitTai'))
+  if (demand.destination) parts.push(demand.destination)
+  return parts.join(' ')
 }
 </script>
 

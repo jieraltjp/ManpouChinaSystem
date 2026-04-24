@@ -14,9 +14,10 @@ import lombok.Setter;
 
 
 /**
- * 补货需求单实体（v1.6.0）。
+ * 补货需求单实体（v2.0.0）。
+ * 一条记录 = 一个子货号（主货号+子货号 = 商品唯一标识）。
  * 对应业务流第一步入口：非新品补货 or 新品采购。
- * 与 docs/business/SPEC-B01-补货需求-步骤1.md §2 聚合根 完全对齐。
+ * 与 docs/business/SPEC-B01-补货需求-步骤1.md v2.0.0 完全对齐。
  */
 @Entity
 @Table(name = "replenishment_demand", indexes = {
@@ -36,18 +37,31 @@ public class ReplenishmentDemand extends BaseEntity {
     @Column(name = "demand_type", nullable = false, length = 32)
     private DemandType demandType;
 
+    /** 主货号 */
     @Column(name = "product_code", nullable = false, length = 32)
     private String productCode;
 
     /**
-     * 子货号明细（v1.6.0，JSON 数组）。
-     * 存储格式：[{"subCode":"be","quantity":100,"destination":"久留米"},...]
-     * 旧数据（v1.5.x）：["be","bu","re"] → 反序列化时兼容转成 [{subCode:"be"},{subCode:"bu"},...]
-     * 内部字段，get/set 通过 Assembler 操作 JSON 序列化。
-     * 注意：使用 TEXT 而非 VARCHAR，避免中文多字节字符超出字节限制。
+     * 子货号（v2.0.0）。
+     * 格式：主货号-子货号，如 "ad009-be"。
+     * 与主货号联合构成商品唯一标识。
      */
-    @Column(name = "sub_product_code", columnDefinition = "TEXT")
-    private String subProductItemsRaw;
+    @Column(name = "sub_product_code", length = 64)
+    private String subProductCode;
+
+    /**
+     * 需求数量（v2.0.0）。
+     * 该子货号的需求数量。
+     */
+    @Column(name = "quantity")
+    private Integer quantity;
+
+    /**
+     * 目的地（v2.0.0）。
+     * 该子货号的出货目的地，如久留米/名古屋/大阪。
+     */
+    @Column(name = "destination", length = 128)
+    private String destination;
 
     @Column(name = "japan_lead", length = 64)
     private String japanLead;
@@ -57,28 +71,28 @@ public class ReplenishmentDemand extends BaseEntity {
     private DemandStatus status = DemandStatus.PENDING;
 
     /**
-     * 关联发注表明细（v1.6.0，JSON 数组）。
-     * 存储格式：[{"linkedProcurementId":101,"subCode":"be"},...]
+     * 关联的 Procurement ID（v2.0.0）。
+     * CONVERTED 时记录对应的 Procurement.id。
+     * 撤销转换时删除该 Procurement 并清空此字段。
      */
-    @Column(name = "linked_demand_items", columnDefinition = "TEXT")
-    private String linkedDemandItemsRaw;
+    @Column(name = "linked_procurement_id")
+    private Long linkedProcurementId;
 
     @Column(name = "remarks", length = 512)
     private String remarks;
 
     // ===== 领域方法 =====
 
-    /** 标记为已转采购（v1.6.0，实际赋值由 UseCase 通过 Assembler 操作） */
-    public void markAsConverted() {
+    public void markAsConverted(Long procurementId) {
         if (this.status != DemandStatus.PENDING) {
             throw new com.manpou.allinone.common.exception.BusinessException(
                     "demand.already_processed",
                     "需求单已处理，无法转为采购单");
         }
         this.status = DemandStatus.CONVERTED;
+        this.linkedProcurementId = procurementId;
     }
 
-    /** 撤销转换（v1.6.0） */
     public void revertConversion() {
         if (this.status != DemandStatus.CONVERTED) {
             throw new com.manpou.allinone.common.exception.BusinessException(
@@ -86,10 +100,9 @@ public class ReplenishmentDemand extends BaseEntity {
                     "需求单未转换，无需撤销");
         }
         this.status = DemandStatus.PENDING;
-        this.linkedDemandItemsRaw = null;
+        this.linkedProcurementId = null;
     }
 
-    /** 取消需求 */
     public void cancel() {
         if (this.status != DemandStatus.PENDING) {
             throw new com.manpou.allinone.common.exception.BusinessException(

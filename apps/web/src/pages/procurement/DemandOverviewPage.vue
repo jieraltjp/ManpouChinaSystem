@@ -31,7 +31,7 @@
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.demandCode') }}</span><span class="value">{{ overview.demand.demandCode }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.demandType') }}</span><span class="value">{{ overview.demand.demandType }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.productCode') }}</span><span class="value">{{ overview.demand.productCode }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step1.subProductItems') }}</span><span class="value highlight">{{ overview.demand.subProductItemsSummary ?? $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step1.subProductItems') }}</span><span class="value highlight">{{ subProductSummary(overview.demand) }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.japanLead') }}</span><span class="value">{{ overview.demand.japanLead ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.status') }}</span>
               <el-tag :type="demandStatusType(overview.demand.status)" size="small">{{ demandStatusLabel(overview.demand.status) }}</el-tag>
@@ -39,7 +39,7 @@
           </div>
           <!-- 转采购按钮 -->
           <div v-if="overview.demand.status === 'PENDING'" class="action-bar">
-            <el-button type="primary" @click="onConvert">{{ $t('demand.action.convertToProcurement') }}</el-button>
+            <el-button type="primary" @click="openConvertDialog">{{ $t('demand.action.convertToProcurement') }}</el-button>
           </div>
         </template>
         <template v-else>
@@ -52,6 +52,33 @@
         <div class="step-empty">{{ $t('orderOverview.step.notStarted') }}</div>
       </StepCard>
     </div>
+
+    <!-- 转采购弹窗（工厂选择） -->
+    <el-dialog v-model="convertDialogVisible" :title="$t('demand.dialog.convertDialog.title')" width="500px">
+      <el-form label-width="100px">
+        <el-form-item :label="$t('demand.dialog.convertDialog.factory')" required>
+          <el-select
+            v-model="convertFactoryId"
+            filterable remote reserve-keyword
+            :remote-method="searchFactory"
+            :loading="factoryLoading"
+            :placeholder="$t('demand.dialog.convertDialog.factoryPlaceholder')"
+            style="width:100%"
+          >
+            <el-option
+              v-for="f in factoryOptions"
+              :key="f.id"
+              :label="f.factoryName + ' (' + f.factoryCode + ')'"
+              :value="f.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="convertDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="converting" @click="doConvert">{{ $t('demand.dialog.convertDialog.confirm') }}</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -59,9 +86,11 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { ElMessage } from 'element-plus'
 import { ArrowLeft, Loading } from '@element-plus/icons-vue'
 import { orderOverviewApi, type DemandOverviewVO } from '@/api/orderOverview'
 import { demandApi } from '@/api/demand'
+import { factoryApi, type FactoryPageVO } from '@/api/factory'
 import StatusProgressBar from './components/StatusProgressBar.vue'
 import StepCard from './components/StepCard.vue'
 
@@ -75,6 +104,50 @@ const overview = ref<DemandOverviewVO | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const converting = ref(false)
+const convertDialogVisible = ref(false)
+const convertFactoryId = ref<number | null>(null)
+const factoryOptions = ref<FactoryPageVO[]>([])
+const factoryLoading = ref(false)
+
+// 转采购弹窗 — 工厂搜索
+async function searchFactory(query: string) {
+  if (!query || query.length < 1) { factoryOptions.value = []; return }
+  factoryLoading.value = true
+  try {
+    const res = await factoryApi.list({ factoryName: query, pageSize: 20 })
+    factoryOptions.value = res.data.data?.content || []
+  } catch { factoryOptions.value = [] }
+  finally { factoryLoading.value = false }
+}
+
+function openConvertDialog() {
+  convertFactoryId.value = null
+  factoryOptions.value = []
+  convertDialogVisible.value = true
+}
+
+async function doConvert() {
+  if (!convertFactoryId.value) {
+    ElMessage.warning(t('demand.dialog.convertDialog.factoryRequired'))
+    return
+  }
+  converting.value = true
+  try {
+    const res = await demandApi.convertToProcurement(demandId.value, { factoryId: convertFactoryId.value })
+    const procurementId = res.data.data?.linkedProcurementId
+    convertDialogVisible.value = false
+    if (procurementId) {
+      ElMessage.success(t('demand.message.convertSuccess', { n: 1 }))
+      router.push(`/base/overview/procurement/${procurementId}`)
+    } else {
+      router.push('/base/overview')
+    }
+  } catch (e: unknown) {
+    error.value = (e as Error).message ?? t('demand.message.convertFailed')
+  } finally {
+    converting.value = false
+  }
+}
 
 async function fetch() {
   loading.value = true
@@ -116,23 +189,12 @@ function demandStatusLabel(status?: string) {
   return t(`demand.status.${status}`)
 }
 
-async function onConvert() {
-  converting.value = true
-  try {
-    // TODO: 后续应弹出工厂选择对话框（类似 DemandPage 的 ConvertDialog）
-    // 当前使用占位 factoryId=1，实际应由用户选择
-    const res = await demandApi.convertToProcurement(demandId.value, { factoryId: 1 })
-    const firstProcurementId = res.data.data?.linkedProcurementIds?.[0]
-    if (firstProcurementId) {
-      router.push(`/base/overview/procurement/${firstProcurementId}`)
-    } else {
-      router.push('/base/overview')
-    }
-  } catch (e: unknown) {
-    error.value = (e as Error).message ?? t('demand.message.convertFailed')
-  } finally {
-    converting.value = false
-  }
+function subProductSummary(demand: { subProductCode?: string; quantity?: number; destination?: string }): string {
+  if (!demand.subProductCode) return t('common.format.dash')
+  const parts = [demand.subProductCode]
+  if (demand.quantity != null) parts.push(demand.quantity + t('demand.dialog.unitTai'))
+  if (demand.destination) parts.push(demand.destination)
+  return parts.join(' ')
 }
 </script>
 

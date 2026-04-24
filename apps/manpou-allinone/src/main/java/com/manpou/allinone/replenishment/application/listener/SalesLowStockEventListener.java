@@ -1,15 +1,11 @@
 package com.manpou.allinone.replenishment.application.listener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manpou.allinone.common.filter.TraceFilter;
 import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import com.manpou.allinone.replenishment.application.assembler.ReplenishmentDemandAssembler;
-import com.manpou.allinone.replenishment.application.dto.SubProductItemDto;
 import com.manpou.allinone.replenishment.domain.model.DemandType;
 import com.manpou.allinone.replenishment.domain.model.ReplenishmentDemand;
-import com.manpou.allinone.replenishment.domain.model.SubProductItem;
 import com.manpou.allinone.replenishment.domain.repository.ReplenishmentDemandRepository;
 import com.manpou.allinone.sales.domain.event.ReplenishmentDemandNeededEvent;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +17,6 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -29,7 +24,6 @@ import java.util.List;
 public class SalesLowStockEventListener {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
-    private static final ObjectMapper MAPPER = new ObjectMapper();
     private static int SEQ = (int) (System.currentTimeMillis() % 1000);
 
     private final ReplenishmentDemandRepository demandRepository;
@@ -56,19 +50,13 @@ public class SalesLowStockEventListener {
                 }
             }
 
-            String demandCode = generateDemandCode();
-
             ReplenishmentDemand demand = new ReplenishmentDemand();
-            demand.setDemandCode(demandCode);
+            demand.setDemandCode(assembler.generateDemandCode());
             demand.setDemandType(DemandType.REPLENISHMENT);
             demand.setProductCode(evt.getProductCode());
-            SubProductItem item = new SubProductItem(
-                    evt.getSubProductCode(),
-                    evt.getRequestedQuantity(),
-                    destination
-            );
-            demand.setSubProductItemsRaw(assembler.serializeSubProductItems(
-                    List.of(new SubProductItemDto(evt.getSubProductCode(), evt.getRequestedQuantity(), destination))));
+            demand.setSubProductCode(evt.getSubProductCode());
+            demand.setQuantity(evt.getRequestedQuantity());
+            demand.setDestination(destination);
             demand.setJapanLead(japanLead);
             demand.setRemarks(String.format(
                     "【自动生成】库存不足，当前库存 %d，安全库存 %d，补货数量 %d。关联销售记录 ID: %d",
@@ -82,10 +70,5 @@ public class SalesLowStockEventListener {
             log.error("[ReplenishmentDemand] failed to auto-create from low stock, salesRecordId={}: {}",
                     evt.getSalesRecordId(), e.getMessage(), e);
         }
-    }
-
-    private String generateDemandCode() {
-        String date = LocalDate.now().format(DATE_FMT);
-        return String.format("DM-%s-%03d", date, (++SEQ) % 1000);
     }
 }

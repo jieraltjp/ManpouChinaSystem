@@ -918,6 +918,8 @@
       "action": "操作",
       "demandCode": "需求编号",
       "demandType": "需求类型",
+      "subProductCode": "子货号",
+      "quantity": "数量",
       "subProductItems": "子货号明细",
       "japanLead": "担当"
     },
@@ -1010,6 +1012,39 @@
       "status": {
         "completed": "已完成",
         "inProgress": "进行中"
+      }
+    },
+    "enum": {
+      "procurement": {
+        "未定": "未定", "予定": "予定", "OEM": "OEM", "発注待": "発注待",
+        "永康": "永康", "直送": "直送", "倉庫着": "倉庫着", "現地検品": "現地検品",
+        "検品": "検品", "エア便": "エア便", "メーカー直送": "メーカー直送",
+        "輸出": "輸出", "国内通関": "国内通関", "通関": "通関", "日本着": "日本着",
+        "日本通関完了": "日本通関完了", "会計": "会計", "完了": "完了", "退货": "退货"
+      },
+      "logistics": {
+        "PLANNED": "已创建", "BOOKED": "已订舱", "IN_TRANSIT": "运输中", "DELIVERED": "已送达"
+      },
+      "domesticCustoms": {
+        "PENDING": "待提交", "SUBMITTED": "已提交", "CLEARED": "已清关", "REJECTED": "已驳回"
+      },
+      "japanCustoms": {
+        "PENDING": "待清关", "IN_PROGRESS": "清关中", "CLEARED": "已清关", "FAILED": "清关失败"
+      },
+      "taxRefund": {
+        "APPLYING": "申请中", "COMPLETED": "已完成", "NO_REFUND": "不退税"
+      },
+      "sales": {
+        "LISTED": "上架中", "LOW_STOCK": "库存预警", "OUT_OF_STOCK": "已售罄", "DISCONTINUED": "已下架"
+      },
+      "planType": {
+        "SEA": "海运", "AIR": "空运"
+      },
+      "billingType": {
+        "ZHE_LU_KAI_PIAO": "浙鲁开票", "CHAO_HUI_TUI_SHUI": "超慧退税", "NO_REFUND": "不退税", "OTHER": "其他"
+      },
+      "salesChannel": {
+        "AMAZON": "Amazon", "MERCALI": "メルカリ", "SELF_SITE": "自有网站", "OTHER": "其他"
       }
     }
   },

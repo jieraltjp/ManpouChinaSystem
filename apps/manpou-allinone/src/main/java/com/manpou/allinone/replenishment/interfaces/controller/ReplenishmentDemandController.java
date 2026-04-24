@@ -14,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/demands")
 @RequiredArgsConstructor
@@ -53,20 +51,20 @@ public class ReplenishmentDemandController {
     }
 
     /**
-     * 批量转采购（v1.6.0）。
+     * 转采购（v2.0.0）。
      * POST /api/v1/demands/{id}/convert
-     * 每个子货号明细生成一条 Procurement。
+     * 一条 Demand → 一条 Procurement（1:1）。
      */
     @PostMapping("/{id}/convert")
     public Result<ConvertDemandResponse> convertToProcurement(
             @PathVariable("id") Long id,
             @Valid @RequestBody ConvertDemandCmd cmd) {
         ConvertDemandResponse response = demandUseCase.convertToProcurement(id, cmd);
-        return Result.ok("已转采购，共生成 " + response.getLinkedProcurementIds().size() + " 条发注单", response);
+        return Result.ok("已转采购，生成发注单 #" + response.getLinkedProcurementId(), response);
     }
 
     /**
-     * 批量撤销转换（v1.6.0）。
+     * 撤销转换（v2.0.0）。
      * POST /api/v1/demands/{id}/revert
      */
     @PostMapping("/{id}/revert")
@@ -76,11 +74,11 @@ public class ReplenishmentDemandController {
     }
 
     /**
-     * 查看关联的采购单列表（v1.6.0）。
-     * GET /api/v1/demands/{id}/procurements
+     * 查看关联的采购单（v2.0.0）。
+     * GET /api/v1/demands/{id}/procurement
      */
-    @GetMapping("/{id}/procurements")
-    public Result<List<ProcurementPageQuery>> getLinkedProcurements(@PathVariable("id") Long id) {
-        return Result.ok(demandUseCase.getLinkedProcurements(id));
+    @GetMapping("/{id}/procurement")
+    public Result<ProcurementPageQuery> getLinkedProcurement(@PathVariable("id") Long id) {
+        return Result.ok(demandUseCase.getLinkedProcurement(id));
     }
 }

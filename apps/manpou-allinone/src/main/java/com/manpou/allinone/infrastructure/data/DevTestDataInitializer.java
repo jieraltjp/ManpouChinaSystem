@@ -1,7 +1,5 @@
 package com.manpou.allinone.infrastructure.data;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manpou.allinone.factory.domain.model.CooperationStatus;
 import com.manpou.allinone.factory.domain.model.Factory;
 import com.manpou.allinone.factory.domain.model.PaymentTerms;
@@ -10,12 +8,9 @@ import com.manpou.allinone.procurement.domain.model.BillingType;
 import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.model.ShipmentStatus;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
-import com.manpou.allinone.replenishment.application.dto.SubProductItemDto;
 import com.manpou.allinone.replenishment.domain.model.DemandStatus;
 import com.manpou.allinone.replenishment.domain.model.DemandType;
-import com.manpou.allinone.replenishment.domain.model.LinkedDemandItem;
 import com.manpou.allinone.replenishment.domain.model.ReplenishmentDemand;
-import com.manpou.allinone.replenishment.domain.model.SubProductItem;
 import com.manpou.allinone.replenishment.domain.repository.ReplenishmentDemandRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,15 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 @Slf4j
 @Component
 @Profile({"dev", "test"})
 @RequiredArgsConstructor
 public class DevTestDataInitializer implements CommandLineRunner {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final FactoryRepository factoryRepository;
     private final ReplenishmentDemandRepository demandRepository;
@@ -63,22 +55,22 @@ public class DevTestDataInitializer implements CommandLineRunner {
         factoryRepository.save(f2);
         factoryRepository.save(f3);
 
-        // ===== Step 2: 补货需求数据（v1.6.0） =====
+        // ===== Step 2: 补货需求数据（v2.0.0：一行 = 一个子货号） =====
+        // 每条 Demand = 一个子货号，商品唯一标识 = 主货号 + 子货号
         ReplenishmentDemand d1 = demandOf("DM-20260421-001", DemandType.REPLENISHMENT,
-                "odn012", List.of(new SubProductItemDto("odn012-re", 120, "名古屋")),
+                "odn012", "odn012-re", 120, "名古屋",
                 "田中太郎", DemandStatus.PENDING, null, "常规补货，本月第三批次");
         ReplenishmentDemand d2 = demandOf("DM-20260421-002", DemandType.REPLENISHMENT,
-                "odn012", List.of(new SubProductItemDto("odn012-wh", 80, "久留米")),
+                "odn012", "odn012-wh", 80, "久留米",
                 "田中太郎", DemandStatus.PENDING, null, "白色款库存告急");
         ReplenishmentDemand d3 = demandOf("DM-20260421-003", DemandType.NEW_PURCHASE,
-                "odn045", List.of(new SubProductItemDto(null, 200, "东京")),
-                "山本健一", DemandStatus.CONVERTED,
-                List.of(new LinkedDemandItem(1L, null)), "新品试单");
+                "odn045", "odn045", 200, "东京",
+                "山本健一", DemandStatus.PENDING, null, "新品试单");  // 未转采购，改为 PENDING
         ReplenishmentDemand d4 = demandOf("DM-20260421-004", DemandType.REPLENISHMENT,
-                "cpn101", List.of(new SubProductItemDto(null, 300, "大阪")),
+                "cpn101", "cpn101", 300, "大阪",
                 "佐藤花子", DemandStatus.PENDING, null, "cpn101 大货补货");
         ReplenishmentDemand d5 = demandOf("DM-20260421-005", DemandType.NEW_PURCHASE,
-                "odn088", List.of(new SubProductItemDto("odn088-bk", 50, "福冈")),
+                "odn088", "odn088-bk", 50, "福冈",
                 "山本健一", DemandStatus.CANCELLED, null, "需求取消，无需采购");
 
         demandRepository.save(d1);
@@ -87,76 +79,57 @@ public class DevTestDataInitializer implements CommandLineRunner {
         demandRepository.save(d4);
         demandRepository.save(d5);
 
-        // ===== Step 3: 发注单数据 =====
+        // ===== Step 3: 发注单数据（v2.0.0：1 Demand → 1 Procurement） =====
+        // d1 → p1（odn012-re，120台，久留米）
         procurementOf(f1, "odn012", "odn012-re", "PU面料", true,
                 120, new BigDecimal("28.50"), new BigDecimal("21.5"),
                 new BigDecimal("1.1000"), BillingType.ZHE_LU_KAI_PIAO,
                 LocalDate.of(2026, 4, 10), LocalDate.of(2026, 4, 20),
                 LocalDate.of(2026, 4, 25), "商品担当-张伟", "田中太郎", "李明",
-                "久留米", "久留米贸易株式会社", ShipmentStatus.未定, null);
+                "久留米", "久留米贸易株式会社", ShipmentStatus.完了, d1.getId());
 
+        // d2 → p2（odn012-wh，80台，久留米）
         procurementOf(f1, "odn012", "odn012-wh", "PU面料", true,
                 80, new BigDecimal("28.50"), new BigDecimal("21.5"),
                 new BigDecimal("1.1000"), BillingType.ZHE_LU_KAI_PIAO,
                 LocalDate.of(2026, 4, 12), LocalDate.of(2026, 4, 22),
                 LocalDate.of(2026, 4, 26), "商品担当-张伟", "田中太郎", "李明",
-                "久留米", "久留米贸易株式会社", ShipmentStatus.未定, null);
+                "久留米", "久留米贸易株式会社", ShipmentStatus.完了, d2.getId());
 
-        procurementOf(f2, "odn045", null, "金属配件+PU", false,
-                200, new BigDecimal("45.00"), new BigDecimal("21.5"),
-                new BigDecimal("1.1000"), BillingType.CHAO_HUI_TUI_SHUI,
-                LocalDate.of(2026, 4, 5), LocalDate.of(2026, 4, 15),
-                LocalDate.of(2026, 4, 20), "商品担当-张伟", "山本健一", "李明",
-                "东京", "东京贸易株式会社", ShipmentStatus.完了, null);
-
-        procurementOf(f2, "cpn101", null, "尼龙布+金属扣", false,
+        // d4 → p4（cpn101，300台，大阪）
+        procurementOf(f2, "cpn101", "cpn101", "尼龙布+金属扣", false,
                 300, new BigDecimal("35.00"), new BigDecimal("21.5"),
                 new BigDecimal("1.1000"), BillingType.ZHE_LU_KAI_PIAO,
                 LocalDate.of(2026, 4, 8), LocalDate.of(2026, 4, 18),
                 LocalDate.of(2026, 4, 25), "商品担当-张伟", "佐藤花子", "李明",
-                "大阪", "大阪商会", ShipmentStatus.発注待, null);
+                "大阪", "大阪商会", ShipmentStatus.発注待, d4.getId());
 
+        // d5 → p5（odn088-bk，50台，福冈）
         procurementOf(f3, "odn088", "odn088-bk", "真皮", false,
                 50, new BigDecimal("55.00"), new BigDecimal("21.5"),
                 new BigDecimal("1.1000"), BillingType.NO_REFUND,
                 LocalDate.of(2026, 4, 15), LocalDate.of(2026, 4, 25),
                 LocalDate.of(2026, 5, 5), "商品担当-张伟", "山本健一", "李明",
-                "福冈", "福冈商店", ShipmentStatus.未定, null);
+                "福冈", "福冈商店", ShipmentStatus.未定, d5.getId());
     }
 
     private ReplenishmentDemand demandOf(String code, DemandType type, String productCode,
-                                         List<SubProductItemDto> subItems,
+                                         String subProductCode, Integer quantity, String destination,
                                          String lead, DemandStatus status,
-                                         List<LinkedDemandItem> linkedItems,
+                                         Long linkedProcurementId,
                                          String remarks) {
         ReplenishmentDemand d = new ReplenishmentDemand();
         d.setDemandCode(code);
         d.setDemandType(type);
         d.setProductCode(productCode);
-        d.setSubProductItemsRaw(serializeSubProductItems(subItems));
+        d.setSubProductCode(subProductCode);
+        d.setQuantity(quantity);
+        d.setDestination(destination);
         d.setJapanLead(lead);
         d.setStatus(status);
-        d.setLinkedDemandItemsRaw(serializeLinkedDemandItems(linkedItems));
+        d.setLinkedProcurementId(linkedProcurementId);
         d.setRemarks(remarks);
         return d;
-    }
-
-    private String serializeSubProductItems(List<SubProductItemDto> items) {
-        if (items == null || items.isEmpty()) return null;
-        try {
-            return MAPPER.writeValueAsString(items);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
-    }
-
-    private String serializeLinkedDemandItems(List<LinkedDemandItem> items) {
-        if (items == null || items.isEmpty()) return null;
-        try {
-            return MAPPER.writeValueAsString(items);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
     }
 
     private Factory factoryOf(String code, String name, String province, String city,

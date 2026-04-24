@@ -1,6 +1,7 @@
 package com.manpou.allinone.order.interfaces.controller;
 
 import com.manpou.allinone.common.result.Result;
+import com.manpou.allinone.order.application.dto.DemandOverviewVO;
 import com.manpou.allinone.order.application.dto.OrderDemandSelectorDTO;
 import com.manpou.allinone.order.application.dto.OrderOverviewPageVO;
 import com.manpou.allinone.order.application.dto.OrderProcurementSelectorDTO;
@@ -74,7 +75,7 @@ public class OrderOverviewController {
     }
 
     @GetMapping("/demands/{demandId}/overview")
-    public Result<OrderOverviewPageVO> getDemandOverview(@PathVariable Long demandId) {
+    public Result<DemandOverviewVO> getDemandOverview(@PathVariable Long demandId) {
         return Result.ok(orderOverviewUseCase.getDemandOverview(demandId));
     }
 }
