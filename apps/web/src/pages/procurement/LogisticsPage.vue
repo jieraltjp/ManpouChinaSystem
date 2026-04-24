@@ -61,44 +61,44 @@
     </el-card>
 
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
-        <el-table-column prop="planCode" :label="$t('logistics.column.planCode')" width="160" />
+      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+        <el-table-column prop="planCode" :label="$t('logistics.column.planCode')" min-width="160" />
         <el-table-column prop="factoryName" :label="$t('logistics.column.factoryName')" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="productCode" :label="$t('logistics.column.productCode')" width="120">
+        <el-table-column prop="productCode" :label="$t('logistics.column.productCode')" min-width="120">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="planType" :label="$t('logistics.column.planType')" width="100" align="center">
+        <el-table-column prop="planType" :label="$t('logistics.column.planType')" min-width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="planTypeTag(row.planType)" size="small">{{ planTypeLabel(row.planType) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="cargoWeightKg" :label="$t('logistics.column.cargoWeightKg')" width="100" align="right">
+        <el-table-column prop="cargoWeightKg" :label="$t('logistics.column.cargoWeightKg')" min-width="100" align="right">
           <template #default="{ row }">
             {{ row.cargoWeightKg ? row.cargoWeightKg + $t('common.units.kg') : '' }}
           </template>
         </el-table-column>
-        <el-table-column prop="cargoVolumeCbm" :label="$t('logistics.column.cargoVolumeCbm')" width="90" align="right">
+        <el-table-column prop="cargoVolumeCbm" :label="$t('logistics.column.cargoVolumeCbm')" min-width="90" align="right">
           <template #default="{ row }">
             {{ row.cargoVolumeCbm ? row.cargoVolumeCbm.toFixed(4) + $t('common.units.m3') : '' }}
           </template>
         </el-table-column>
-        <el-table-column prop="requiresQc" :label="$t('logistics.column.requiresQc')" width="90" align="center">
+        <el-table-column prop="requiresQc" :label="$t('logistics.column.requiresQc')" min-width="90" align="center">
           <template #default="{ row }">
             <el-tag :type="row.requiresQc ? 'warning' : 'success'" size="small">
               {{ row.requiresQc ? $t('logistics.requiresQc.yes') : $t('logistics.requiresQc.no') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="status" :label="$t('logistics.column.status')" width="100" align="center">
+        <el-table-column prop="status" :label="$t('logistics.column.status')" min-width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="logisticsStatusType(row.status)" size="small">
               {{ logisticsStatusLabel(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('logistics.column.action')" width="160" fixed="right" align="center">
+        <el-table-column :label="$t('logistics.column.action')" min-width="160" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('logistics.action.detail') }}</el-button>
             <el-button v-if="row.procurementId" link type="warning" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
@@ -330,8 +330,8 @@ async function loadData() {
       status: filterForm.status || undefined,
     })
     const data = res.data.data
-    tableData.value = data.content
-    pagination.total = data.totalElements
+    tableData.value = data?.content ?? []
+    pagination.total = data?.totalElements ?? 0
   } catch (e) {
     console.error('[LogisticsPage] loadData failed', e)
     ElMessage.error(t('logistics.message.loadFailed'))
@@ -361,7 +361,7 @@ async function searchProcurement(query: string) {
   procurementLoading.value = true
   try {
     const res = await procurementApi.list({ page: 0, pageSize: 20, productCode: query })
-    procurementList.value = res.data.data.content
+    procurementList.value = res.data.data?.content ?? []
   } catch (e) { console.error('[LogisticsPage] searchProcurement failed', e); procurementList.value = [] }
   finally { procurementLoading.value = false }
 }

@@ -55,36 +55,36 @@
     </el-card>
 
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
-        <el-table-column prop="qcCode" :label="$t('inspection.column.qcCode')" width="160" />
-        <el-table-column prop="productCode" :label="$t('inspection.column.productCode')" width="120">
+      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+        <el-table-column prop="qcCode" :label="$t('inspection.column.qcCode')" min-width="160" />
+        <el-table-column prop="productCode" :label="$t('inspection.column.productCode')" min-width="120">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="sellerName" :label="$t('inspection.column.sellerName')" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="inspectionCount" :label="$t('inspection.column.inspectionCount')" width="90" align="right" />
-        <el-table-column prop="passedCount" :label="$t('inspection.column.passedCount')" width="90" align="right">
+        <el-table-column prop="inspectionCount" :label="$t('inspection.column.inspectionCount')" min-width="90" align="right" />
+        <el-table-column prop="passedCount" :label="$t('inspection.column.passedCount')" min-width="90" align="right">
           <template #default="{ row }">
             <span style="color:#16A34A;font-weight:600">{{ row.passedCount ?? '-' }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="defectiveCount" :label="$t('inspection.column.defectiveCount')" width="90" align="right">
+        <el-table-column prop="defectiveCount" :label="$t('inspection.column.defectiveCount')" min-width="90" align="right">
           <template #default="{ row }">
             <span v-if="row.defectiveCount" style="color:#DC2626;font-weight:600">{{ row.defectiveCount }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="boxCount" :label="$t('inspection.column.boxCount')" width="70" align="right" />
-        <el-table-column prop="qcDate" :label="$t('inspection.column.qcDate')" width="120" />
-        <el-table-column prop="result" :label="$t('inspection.column.result')" width="90" align="center">
+        <el-table-column prop="boxCount" :label="$t('inspection.column.boxCount')" min-width="70" align="right" />
+        <el-table-column prop="qcDate" :label="$t('inspection.column.qcDate')" min-width="120" />
+        <el-table-column prop="result" :label="$t('inspection.column.result')" min-width="90" align="center">
           <template #default="{ row }">
             <el-tag :type="row.result === 'PASS' ? 'success' : 'danger'" size="small">
               {{ row.result === 'PASS' ? $t('inspection.result.pass') : $t('inspection.result.fail') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('inspection.column.action')" width="160" fixed="right" align="center">
+        <el-table-column :label="$t('inspection.column.action')" min-width="160" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('inspection.action.detail') }}</el-button>
             <el-button v-if="row.procurementId" link type="warning" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
@@ -402,8 +402,8 @@ async function loadData() {
       result: filterForm.result || undefined,
     })
     const data = res.data.data
-    tableData.value = data.content
-    pagination.total = data.totalElements
+    tableData.value = data?.content ?? []
+    pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {
     console.error('[InspectionPage] loadData failed', e)
     ElMessage.error(t('inspection.message.loadFailed'))
@@ -433,7 +433,7 @@ async function searchProcurement(query: string) {
   procurementLoading.value = true
   try {
     const res = await procurementApi.list({ page: 0, pageSize: 20, productCode: query })
-    procurementList.value = res.data.data.content
+    procurementList.value = res.data.data?.content ?? []
   } catch (e) { console.error('[InspectionPage] searchProcurement failed', e); procurementList.value = [] }
   finally { procurementLoading.value = false }
 }

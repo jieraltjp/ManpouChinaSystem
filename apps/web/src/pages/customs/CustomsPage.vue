@@ -71,43 +71,43 @@
 
     <!-- 数据表 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
-        <el-table-column prop="customsCode" :label="$t('customs.column.customsCode')" width="180">
+      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+        <el-table-column prop="customsCode" :label="$t('customs.column.customsCode')" min-width="180">
           <template #default="{ row }">
             <span class="code-badge">{{ row.customsCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="procurementId" :label="$t('customs.column.procurementId')" width="110" align="center">
+        <el-table-column prop="procurementId" :label="$t('customs.column.procurementId')" min-width="110" align="center">
           <template #default="{ row }">
             <span v-if="row.procurementId">{{ row.procurementId }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="productCode" :label="$t('customs.column.productCode')" width="140">
+        <el-table-column prop="productCode" :label="$t('customs.column.productCode')" min-width="140">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="subProductCode" :label="$t('customs.column.subProductCode')" width="100" />
-        <el-table-column prop="quantity" :label="$t('customs.column.quantity')" width="80" align="right">
+        <el-table-column prop="subProductCode" :label="$t('customs.column.subProductCode')" min-width="100" />
+        <el-table-column prop="quantity" :label="$t('customs.column.quantity')" min-width="80" align="right">
           <template #default="{ row }">
             <span v-if="row.quantity !== null">{{ row.quantity }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="estimatedValueCny" :label="$t('customs.column.estimatedValueCny')" width="130" align="right">
+        <el-table-column prop="estimatedValueCny" :label="$t('customs.column.estimatedValueCny')" min-width="130" align="right">
           <template #default="{ row }">
             <span v-if="row.estimatedValueCny !== null" class="money">{{ $t('common.currency.cny') }}{{ row.estimatedValueCny.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="status" :label="$t('customs.column.status')" width="100" align="center">
+        <el-table-column prop="status" :label="$t('customs.column.status')" min-width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" :label="$t('customs.column.createTime')" width="160" />
-        <el-table-column :label="$t('customs.column.action')" width="200" fixed="right" align="center">
+        <el-table-column prop="createTime" :label="$t('customs.column.createTime')" min-width="160" />
+        <el-table-column :label="$t('customs.column.action')" min-width="200" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
             <template v-if="row.status === 'PENDING'">
@@ -300,8 +300,8 @@ async function loadData() {
       status: filterForm.status || undefined,
     })
     const data = res.data.data
-    tableData.value = data.content
-    pagination.total = data.totalElements
+    tableData.value = data?.content ?? []
+    pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {
     console.error('[CustomsPage] loadData failed', e)
     ElMessage.error(t('customs.message.loadFailed'))

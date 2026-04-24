@@ -62,45 +62,45 @@
 
     <!-- 数据表 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
-        <el-table-column prop="refundCode" :label="$t('taxRefund.column.refundCode')" width="180">
+      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+        <el-table-column prop="refundCode" :label="$t('taxRefund.column.refundCode')" min-width="180">
           <template #default="{ row }">
             <span class="code-badge">{{ row.refundCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="procurementId" :label="$t('taxRefund.column.procurementId')" width="100" align="center">
+        <el-table-column prop="procurementId" :label="$t('taxRefund.column.procurementId')" min-width="100" align="center">
           <template #default="{ row }">
             <span v-if="row.procurementId">{{ row.procurementId }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="billingType" :label="$t('taxRefund.column.billingType')" width="130" align="center" />
-        <el-table-column prop="taxPoint" :label="$t('taxRefund.column.taxPoint')" width="90" align="right">
+        <el-table-column prop="billingType" :label="$t('taxRefund.column.billingType')" min-width="130" align="center" />
+        <el-table-column prop="taxPoint" :label="$t('taxRefund.column.taxPoint')" min-width="90" align="right">
           <template #default="{ row }">
             <span v-if="row.taxPoint !== null">{{ (Number(row.taxPoint) * 100).toFixed(1) }}%</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="estimatedRefundRmb" :label="$t('taxRefund.column.estimatedRefundRmb')" width="140" align="right">
+        <el-table-column prop="estimatedRefundRmb" :label="$t('taxRefund.column.estimatedRefundRmb')" min-width="140" align="right">
           <template #default="{ row }">
             <span v-if="row.estimatedRefundRmb !== null" class="money">{{ Number(row.estimatedRefundRmb).toLocaleString() }} RMB</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="actualRefundRmb" :label="$t('taxRefund.column.actualRefundRmb')" width="140" align="right">
+        <el-table-column prop="actualRefundRmb" :label="$t('taxRefund.column.actualRefundRmb')" min-width="140" align="right">
           <template #default="{ row }">
             <span v-if="row.actualRefundRmb !== null" class="money-success">{{ Number(row.actualRefundRmb).toLocaleString() }} RMB</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="refundDate" :label="$t('taxRefund.column.refundDate')" width="120" />
-        <el-table-column prop="refundBank" :label="$t('taxRefund.column.refundBank')" width="140" show-overflow-tooltip />
-        <el-table-column prop="status" :label="$t('taxRefund.column.status')" width="110" align="center">
+        <el-table-column prop="refundDate" :label="$t('taxRefund.column.refundDate')" min-width="120" />
+        <el-table-column prop="refundBank" :label="$t('taxRefund.column.refundBank')" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="status" :label="$t('taxRefund.column.status')" min-width="110" align="center">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('taxRefund.column.action')" width="180" fixed="right" align="center">
+        <el-table-column :label="$t('taxRefund.column.action')" min-width="180" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('taxRefund.action.detail') }}</el-button>
             <template v-if="row.status === 'APPLYING'">
@@ -245,8 +245,8 @@ async function loadData() {
       procurementId: filterForm.procurementId,
     })
     const data = res.data.data
-    tableData.value = data.content
-    pagination.total = data.totalElements
+    tableData.value = data?.content ?? []
+    pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {
     console.error('[TaxRefundPage] loadData failed', e)
     ElMessage.error(t('taxRefund.message.loadFailed'))

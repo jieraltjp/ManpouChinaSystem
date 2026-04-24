@@ -66,46 +66,46 @@
 
     <!-- 数据表 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
-        <el-table-column prop="customsEntryNo" :label="$t('japanCustoms.column.entryNo')" width="180">
+      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+        <el-table-column prop="customsEntryNo" :label="$t('japanCustoms.column.entryNo')" min-width="180">
           <template #default="{ row }">
             <span class="code-badge">{{ row.customsEntryNo }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="procurementId" :label="$t('japanCustoms.column.procurementId')" width="80" align="center">
+        <el-table-column prop="procurementId" :label="$t('japanCustoms.column.procurementId')" min-width="80" align="center">
           <template #default="{ row }">
             <span v-if="row.procurementId">{{ row.procurementId }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="subProductCode" :label="$t('japanCustoms.column.subProductCode')" width="80" align="center">
+        <el-table-column prop="subProductCode" :label="$t('japanCustoms.column.subProductCode')" min-width="80" align="center">
           <template #default="{ row }">
             <span v-if="row.subProductCode">{{ row.subProductCode }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="arrivalPort" :label="$t('japanCustoms.column.arrivalPort')" width="90" />
-        <el-table-column prop="arrivalDate" :label="$t('japanCustoms.column.arrivalDate')" width="120" />
-        <el-table-column prop="customsBroker" :label="$t('japanCustoms.column.broker')" width="140" show-overflow-tooltip />
-        <el-table-column prop="importDutyPaid" :label="$t('japanCustoms.column.importDuty')" width="120" align="right">
+        <el-table-column prop="arrivalPort" :label="$t('japanCustoms.column.arrivalPort')" min-width="90" />
+        <el-table-column prop="arrivalDate" :label="$t('japanCustoms.column.arrivalDate')" min-width="120" />
+        <el-table-column prop="customsBroker" :label="$t('japanCustoms.column.broker')" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="importDutyPaid" :label="$t('japanCustoms.column.importDuty')" min-width="120" align="right">
           <template #default="{ row }">
             <span v-if="row.importDutyPaid !== null" class="money">{{ row.importDutyPaid.toLocaleString('ja-JP') }} JPY</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="consumptionTaxPaid" :label="$t('japanCustoms.column.consumptionTax')" width="120" align="right">
+        <el-table-column prop="consumptionTaxPaid" :label="$t('japanCustoms.column.consumptionTax')" min-width="120" align="right">
           <template #default="{ row }">
             <span v-if="row.consumptionTaxPaid !== null" class="money">{{ row.consumptionTaxPaid.toLocaleString('ja-JP') }} JPY</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="clearanceDate" :label="$t('japanCustoms.column.clearanceDate')" width="120" />
-        <el-table-column prop="status" :label="$t('japanCustoms.column.status')" width="110" align="center">
+        <el-table-column prop="clearanceDate" :label="$t('japanCustoms.column.clearanceDate')" min-width="120" />
+        <el-table-column prop="status" :label="$t('japanCustoms.column.status')" min-width="110" align="center">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('japanCustoms.column.action')" width="200" fixed="right" align="center">
+        <el-table-column :label="$t('japanCustoms.column.action')" min-width="200" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('japanCustoms.action.detail') }}</el-button>
             <template v-if="row.status === 'PENDING'">
@@ -209,7 +209,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Document, Clock, Loading, CircleCheck } from '@element-plus/icons-vue'
 import { japanCustomsApi, type JapanCustomsVO, type JapanCustomsStatus } from '@/api/japanCustoms'
@@ -275,9 +275,12 @@ async function loadData() {
       status: filterForm.status || undefined,
       procurementId: filterForm.procurementId,
     })
+    console.log('[JapanCustomsPage] full res:', res)
+    console.log('[JapanCustomsPage] res.data:', res.data)
+    console.log('[JapanCustomsPage] res.data.data:', res.data.data)
     const data = res.data.data
-    tableData.value = data.content
-    pagination.total = data.totalElements
+    tableData.value = data?.content ?? []
+    pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {
     console.error('[JapanCustomsPage] loadData failed', e)
     ElMessage.error(t('japanCustoms.message.loadFailed'))
@@ -390,6 +393,21 @@ async function onDelete(row: JapanCustomsVO) {
 }
 
 onMounted(() => loadData())
+
+// DEBUG: 修正空状态时 empty-block 宽度溢出
+watch(tableData, () => {
+  nextTick(() => {
+    const headerTable = document.querySelector('.el-table__header') as HTMLElement
+    const scrollView = document.querySelector('.el-scrollbar__view') as HTMLElement
+    const emptyBlock = document.querySelector('.el-table__empty-block') as HTMLElement
+    if (headerTable) {
+      const headerW = headerTable.offsetWidth
+      console.log('[JapanCustomsPage] fixing widths to headerW:', headerW)
+      if (scrollView) scrollView.style.width = headerW + 'px'
+      if (emptyBlock) emptyBlock.style.width = headerW + 'px'
+    }
+  })
+})
 </script>
 
 <style scoped>

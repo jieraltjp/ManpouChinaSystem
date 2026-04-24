@@ -51,10 +51,10 @@
 
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
-        <el-table-column prop="masterCode" :label="$t('product.column.masterCode')" width="110" />
-        <el-table-column prop="subCode" :label="$t('product.column.subCode')" width="120" />
-        <el-table-column :label="$t('product.column.image')" width="70" align="center">
+      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+        <el-table-column prop="masterCode" :label="$t('product.column.masterCode')" min-width="110" />
+        <el-table-column prop="subCode" :label="$t('product.column.subCode')" min-width="120" />
+        <el-table-column :label="$t('product.column.image')" min-width="70" align="center">
           <template #default="{ row }">
             <a v-if="row.imageUrl" :href="row.imageUrl" target="_blank" title="查看大图">
               <img :src="row.imageUrl" style="width:36px;height:36px;object-fit:cover;border-radius:4px;border:1px solid #eee;" loading="lazy" />
@@ -62,18 +62,18 @@
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="janCode" :label="$t('product.column.janCode')" width="100" show-overflow-tooltip />
+        <el-table-column prop="janCode" :label="$t('product.column.janCode')" min-width="100" show-overflow-tooltip />
         <el-table-column prop="nameZh" :label="$t('product.column.nameZh')" min-width="150" show-overflow-tooltip />
         <el-table-column prop="nameJa" :label="$t('product.column.nameJa')" min-width="110" show-overflow-tooltip />
         <el-table-column prop="nameEn" :label="$t('product.column.nameEn')" min-width="130" show-overflow-tooltip />
-        <el-table-column prop="origin" :label="$t('product.column.origin')" width="80" />
-        <el-table-column prop="category" :label="$t('product.column.category')" width="90">
+        <el-table-column prop="origin" :label="$t('product.column.origin')" min-width="80" />
+        <el-table-column prop="category" :label="$t('product.column.category')" min-width="90">
           <template #default="{ row }">
             <span v-if="row.category">{{ $t('product.category.' + row.category) }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('product.column.linkedFactories')" width="130" align="center">
+        <el-table-column :label="$t('product.column.linkedFactories')" min-width="130" align="center">
           <template #default="{ row }">
             <el-tooltip v-if="row.factoryNames" :content="row.factoryNames" placement="top" :disabled="!row.factoryNames">
               <span class="factory-names-text">{{ row.factoryNames }}</span>
@@ -81,20 +81,20 @@
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="unitPriceRmb" :label="$t('product.column.unitPriceRmb')" width="100" align="right">
+        <el-table-column prop="unitPriceRmb" :label="$t('product.column.unitPriceRmb')" min-width="100" align="right">
           <template #default="{ row }">{{ row.unitPriceRmb != null ? $t('common.currency.cny') + Number(row.unitPriceRmb).toFixed(2) : '-' }}</template>
         </el-table-column>
-        <el-table-column prop="taxPoint" :label="$t('product.column.taxPoint')" width="70" align="center">
+        <el-table-column prop="taxPoint" :label="$t('product.column.taxPoint')" min-width="70" align="center">
           <template #default="{ row }">{{ row.taxPoint != null ? row.taxPoint : '-' }}</template>
         </el-table-column>
-        <el-table-column prop="material" :label="$t('product.column.material')" width="90" show-overflow-tooltip />
-        <el-table-column prop="requiresQc" :label="$t('product.column.requiresQc')" width="70" align="center">
+        <el-table-column prop="material" :label="$t('product.column.material')" min-width="90" show-overflow-tooltip />
+        <el-table-column prop="requiresQc" :label="$t('product.column.requiresQc')" min-width="70" align="center">
           <template #default="{ row }">
             <el-tag v-if="row.requiresQc" type="warning" size="small">{{ $t('product.column.requiresQc') }}</el-tag>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('product.column.action')" width="150" fixed="right" align="center">
+        <el-table-column :label="$t('product.column.action')" min-width="150" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('product.action.detail') }}</el-button>
             <el-button link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('product.action.edit') }}</el-button>
@@ -506,8 +506,8 @@ async function loadData() {
       factoryName: filterForm.factoryName || undefined,
     })
     const data = res.data.data
-    tableData.value = data.content
-    pagination.total = data.totalElements
+    tableData.value = data?.content ?? []
+    pagination.total = data?.totalElements ?? 0
   } finally {
     loading.value = false
   }

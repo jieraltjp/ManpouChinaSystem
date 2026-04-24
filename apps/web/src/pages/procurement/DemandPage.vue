@@ -74,44 +74,44 @@
 
     <!-- 表格（v2.0.0：一行 = 一个子货号） -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" table-layout="fixed" min-height="200">
-        <el-table-column prop="demandCode" :label="$t('demand.column.demandCode')" width="160" />
-        <el-table-column prop="demandType" :label="$t('demand.column.demandType')" width="130" align="center">
+      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+        <el-table-column prop="demandCode" :label="$t('demand.column.demandCode')" min-width="160" />
+        <el-table-column prop="demandType" :label="$t('demand.column.demandType')" min-width="130" align="center">
           <template #default="{ row }">
             <el-tag :type="row.demandType === 'NEW_PURCHASE' ? 'warning' : 'primary'" size="small">
               {{ row.demandType === 'NEW_PURCHASE' ? $t('demand.type.newPurchase') : $t('demand.type.replenishment') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="subProductCode" :label="$t('demand.column.subProductCode')" width="140">
+        <el-table-column prop="subProductCode" :label="$t('demand.column.subProductCode')" min-width="140">
           <template #default="{ row }">
             <span class="product-code">{{ row.subProductCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="quantity" :label="$t('demand.column.quantity')" width="90" align="right">
+        <el-table-column prop="quantity" :label="$t('demand.column.quantity')" min-width="90" align="right">
           <template #default="{ row }">
             <span class="qty-value">{{ row.quantity }}{{ $t('demand.dialog.unitTai') }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="destination" :label="$t('demand.column.destination')" width="110">
+        <el-table-column prop="destination" :label="$t('demand.column.destination')" min-width="110">
           <template #default="{ row }">
             <span class="dest-value">{{ row.destination || '—' }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="japanLead" :label="$t('demand.column.japanLead')" width="100" />
-        <el-table-column prop="status" :label="$t('demand.column.status')" width="100" align="center">
+        <el-table-column prop="japanLead" :label="$t('demand.column.japanLead')" min-width="100" />
+        <el-table-column prop="status" :label="$t('demand.column.status')" min-width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="demandStatusType(row.status)" size="small">
               {{ demandStatusLabel(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" :label="$t('demand.column.createTime')" width="160">
+        <el-table-column prop="createTime" :label="$t('demand.column.createTime')" min-width="160">
           <template #default="{ row }">
             {{ row.createTime ? new Date(row.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN') : '-' }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('demand.column.action')" width="260" align="center">
+        <el-table-column :label="$t('demand.column.action')" min-width="260" align="center">
           <template #default="{ row }">
             <el-button v-if="row.status === 'PENDING'" link type="primary" size="small" @click.stop="onConvert(row)">
               {{ $t('demand.action.convert') }}

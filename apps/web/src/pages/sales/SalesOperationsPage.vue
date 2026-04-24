@@ -89,56 +89,56 @@
 
     <!-- 数据表 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
-        <el-table-column prop="recordCode" :label="$t('sales.column.recordCode')" width="170">
+      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+        <el-table-column prop="recordCode" :label="$t('sales.column.recordCode')" min-width="170">
           <template #default="{ row }">
             <span class="code-badge">{{ row.recordCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="productCode" :label="$t('sales.column.productCode')" width="110">
+        <el-table-column prop="productCode" :label="$t('sales.column.productCode')" min-width="110">
           <template #default="{ row }">
             <span v-if="row.productCode">{{ row.productCode }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="subProductCode" :label="$t('sales.column.subProductCode')" width="100" />
-        <el-table-column prop="salesChannel" :label="$t('sales.column.salesChannel')" width="110" align="center">
+        <el-table-column prop="subProductCode" :label="$t('sales.column.subProductCode')" min-width="100" />
+        <el-table-column prop="salesChannel" :label="$t('sales.column.salesChannel')" min-width="110" align="center">
           <template #default="{ row }">
             <span>{{ channelLabel(row.salesChannel) }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="currentStock" :label="$t('sales.column.currentStock')" width="90" align="center">
+        <el-table-column prop="currentStock" :label="$t('sales.column.currentStock')" min-width="90" align="center">
           <template #default="{ row }">
             <span v-if="row.currentStock !== null" :class="stockClass(row)">{{ row.currentStock }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="salesQuantity" :label="$t('sales.column.salesQuantity')" width="90" align="center" />
-        <el-table-column prop="returnedQuantity" :label="$t('sales.column.returnedQuantity')" width="90" align="center">
+        <el-table-column prop="salesQuantity" :label="$t('sales.column.salesQuantity')" min-width="90" align="center" />
+        <el-table-column prop="returnedQuantity" :label="$t('sales.column.returnedQuantity')" min-width="90" align="center">
           <template #default="{ row }">
             <span v-if="row.returnedQuantity !== null" :class="row.returnedQuantity > 0 ? 'text-danger' : ''">{{ row.returnedQuantity }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="returnRate" :label="$t('sales.column.returnRate')" width="80" align="right">
+        <el-table-column prop="returnRate" :label="$t('sales.column.returnRate')" min-width="80" align="right">
           <template #default="{ row }">
             <span v-if="row.returnRate !== null">{{ (Number(row.returnRate) * 100).toFixed(1) }}%</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="sellingPriceJpy" :label="$t('sales.column.sellingPriceJpy')" width="120" align="right">
+        <el-table-column prop="sellingPriceJpy" :label="$t('sales.column.sellingPriceJpy')" min-width="120" align="right">
           <template #default="{ row }">
             <span v-if="row.sellingPriceJpy !== null" class="money">{{ Number(row.sellingPriceJpy).toLocaleString('ja-JP') }} JPY</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="listingDate" :label="$t('sales.column.listingDate')" width="110" />
-        <el-table-column prop="status" :label="$t('sales.column.status')" width="110" align="center">
+        <el-table-column prop="listingDate" :label="$t('sales.column.listingDate')" min-width="110" />
+        <el-table-column prop="status" :label="$t('sales.column.status')" min-width="110" align="center">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('sales.column.action')" width="220" fixed="right" align="center">
+        <el-table-column :label="$t('sales.column.action')" min-width="220" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('sales.action.detail') }}</el-button>
             <template v-if="row.status !== 'DISCONTINUED'">
@@ -263,18 +263,18 @@
     <!-- 库存预警弹窗 -->
     <el-dialog v-model="alertDialogVisible" :title="$t('sales.alertDialogTitle')" width="700px">
       <el-table :data="alertData" stripe>
-        <el-table-column prop="productCode" :label="$t('sales.column.productCode')" width="130" />
-        <el-table-column prop="subProductCode" :label="$t('sales.column.subProductCode')" width="100" />
-        <el-table-column prop="salesChannel" :label="$t('sales.column.salesChannel')" width="110" align="center">
+        <el-table-column prop="productCode" :label="$t('sales.column.productCode')" min-width="130" />
+        <el-table-column prop="subProductCode" :label="$t('sales.column.subProductCode')" min-width="100" />
+        <el-table-column prop="salesChannel" :label="$t('sales.column.salesChannel')" min-width="110" align="center">
           <template #default="{ row }">{{ channelLabel(row.salesChannel) }}</template>
         </el-table-column>
-        <el-table-column prop="currentStock" :label="$t('sales.column.currentStock')" width="90" align="center">
+        <el-table-column prop="currentStock" :label="$t('sales.column.currentStock')" min-width="90" align="center">
           <template #default="{ row }">
             <span :class="stockClass(row)">{{ row.currentStock }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="safetyStock" :label="$t('sales.column.safetyStock')" width="90" align="center" />
-        <el-table-column prop="status" :label="$t('sales.column.status')" width="110" align="center">
+        <el-table-column prop="safetyStock" :label="$t('sales.column.safetyStock')" min-width="90" align="center" />
+        <el-table-column prop="status" :label="$t('sales.column.status')" min-width="110" align="center">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
           </template>
@@ -386,8 +386,8 @@ async function loadData() {
       status: filterForm.status || undefined,
     })
     const data = res.data.data
-    tableData.value = data.content
-    pagination.total = data.totalElements
+    tableData.value = data?.content ?? []
+    pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {
     console.error('[SalesOperationsPage] loadData failed', e)
     ElMessage.error(t('sales.message.loadFailed'))
@@ -548,7 +548,7 @@ async function onShowAlerts() {
   alertDialogVisible.value = true
   try {
     const res = await salesOperationsApi.alerts({ page: 0, pageSize: 100 })
-    alertData.value = res.data.data.content
+    alertData.value = res.data.data?.content ?? []
   } catch (e) {
     console.error('[SalesOperationsPage] load alerts failed', e)
   }

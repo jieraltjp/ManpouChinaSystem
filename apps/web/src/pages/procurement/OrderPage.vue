@@ -87,34 +87,34 @@
         stripe
         style="width: 100%"
       >
-        <el-table-column prop="productCode" :label="$t('order.column.productCode')" width="120">
+        <el-table-column prop="productCode" :label="$t('order.column.productCode')" min-width="120">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="factoryName" :label="$t('order.column.factoryName')" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="quantity" :label="$t('order.column.quantity')" width="80" align="right" />
-        <el-table-column prop="estimatedPriceJpy" :label="$t('order.column.estimatedPriceJpy')" width="150" align="right">
+        <el-table-column prop="quantity" :label="$t('order.column.quantity')" min-width="80" align="right" />
+        <el-table-column prop="estimatedPriceJpy" :label="$t('order.column.estimatedPriceJpy')" min-width="150" align="right">
           <template #default="{ row }">
             {{ row.estimatedPriceJpy ? row.estimatedPriceJpy.toLocaleString() : '-' }}
           </template>
         </el-table-column>
         <el-table-column prop="customerCompany" :label="$t('order.column.customerCompany')" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="productLead" :label="$t('order.column.productLead')" width="100" />
-        <el-table-column prop="plannedShipDate" :label="$t('order.column.plannedShipDate')" width="130" />
-        <el-table-column prop="status" :label="$t('order.column.status')" width="110" align="center">
+        <el-table-column prop="productLead" :label="$t('order.column.productLead')" min-width="100" />
+        <el-table-column prop="plannedShipDate" :label="$t('order.column.plannedShipDate')" min-width="130" />
+        <el-table-column prop="status" :label="$t('order.column.status')" min-width="110" align="center">
           <template #default="{ row }">
             <el-tag :type="statusType(row.status)" size="small">
               {{ statusLabel(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" :label="$t('order.column.createTime')" width="160">
+        <el-table-column prop="createTime" :label="$t('order.column.createTime')" min-width="160">
           <template #default="{ row }">
             {{ row.createTime ? new Date(row.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('order.column.action')" width="220" fixed="right" align="center">
+        <el-table-column :label="$t('order.column.action')" min-width="220" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('order.message.detail') }}</el-button>
             <el-button link type="warning" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>

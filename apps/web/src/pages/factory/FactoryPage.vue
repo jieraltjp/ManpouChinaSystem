@@ -78,23 +78,23 @@
 
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
-        <el-table-column prop="factoryCode" :label="$t('factory.column.factoryCode')" width="140" />
+      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+        <el-table-column prop="factoryCode" :label="$t('factory.column.factoryCode')" min-width="140" />
         <el-table-column prop="factoryName" :label="$t('factory.column.factoryName')" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="province" :label="$t('factory.column.province')" width="100" />
-        <el-table-column prop="city" :label="$t('factory.column.city')" width="100" />
-        <el-table-column prop="county" :label="$t('factory.column.county')" width="100" />
+        <el-table-column prop="province" :label="$t('factory.column.province')" min-width="100" />
+        <el-table-column prop="city" :label="$t('factory.column.city')" min-width="100" />
+        <el-table-column prop="county" :label="$t('factory.column.county')" min-width="100" />
         <el-table-column prop="roughLocation" :label="$t('factory.column.roughLocation')" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="contactName" :label="$t('factory.column.contactName')" width="100" />
-        <el-table-column prop="contactPhone" :label="$t('factory.column.contactPhone')" width="130" />
-        <el-table-column prop="cooperationStatus" :label="$t('factory.column.cooperationStatus')" width="110">
+        <el-table-column prop="contactName" :label="$t('factory.column.contactName')" min-width="100" />
+        <el-table-column prop="contactPhone" :label="$t('factory.column.contactPhone')" min-width="130" />
+        <el-table-column prop="cooperationStatus" :label="$t('factory.column.cooperationStatus')" min-width="110">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.cooperationStatus)" size="small">
               {{ statusLabel(row.cooperationStatus) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('factory.column.action')" width="150" fixed="right" align="center">
+        <el-table-column :label="$t('factory.column.action')" min-width="150" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('factory.action.detail') }}</el-button>
             <el-button link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('factory.action.edit') }}</el-button>

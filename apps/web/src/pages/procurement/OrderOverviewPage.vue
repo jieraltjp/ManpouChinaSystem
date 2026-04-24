@@ -28,33 +28,33 @@
           </el-form>
         </el-card>
         <el-card class="table-card" shadow="never">
-          <el-table v-loading="demandLoading" :data="demandSelectorData" stripe @row-click="onSelectDemand">
-            <el-table-column prop="id" label="ID" width="80" />
-            <el-table-column prop="demandCode" :label="$t('orderOverview.column.demandCode')" width="160" />
-            <el-table-column prop="demandType" :label="$t('orderOverview.column.demandType')" width="120" />
-            <el-table-column prop="productCode" :label="$t('orderOverview.column.productCode')" width="120" />
-            <el-table-column prop="subProductCode" :label="$t('orderOverview.column.subProductCode')" width="140">
+          <el-table v-loading="demandLoading" :data="demandSelectorData" stripe @row-click="onSelectDemand" min-height="200">
+            <el-table-column prop="id" :label="$t('orderOverview.column.id')" min-width="80" />
+            <el-table-column prop="demandCode" :label="$t('orderOverview.column.demandCode')" min-width="160" />
+            <el-table-column prop="demandType" :label="$t('orderOverview.column.demandType')" min-width="120" />
+            <el-table-column prop="productCode" :label="$t('orderOverview.column.productCode')" min-width="120" />
+            <el-table-column prop="subProductCode" :label="$t('orderOverview.column.subProductCode')" min-width="140">
               <template #default="{ row }">
                 <span class="product-code">{{ row.subProductCode }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="quantity" :label="$t('orderOverview.column.quantity')" width="80" align="right">
+            <el-table-column prop="quantity" :label="$t('orderOverview.column.quantity')" min-width="80" align="right">
               <template #default="{ row }">
                 <span class="qty-value">{{ row.quantity || 0 }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="destination" :label="$t('orderOverview.column.destination')" width="110">
+            <el-table-column prop="destination" :label="$t('orderOverview.column.destination')" min-width="110">
               <template #default="{ row }">
                 {{ row.destination || '—' }}
               </template>
             </el-table-column>
-            <el-table-column prop="japanLead" :label="$t('orderOverview.column.japanLead')" width="100" />
-            <el-table-column prop="status" :label="$t('orderOverview.column.status')" width="120">
+            <el-table-column prop="japanLead" :label="$t('orderOverview.column.japanLead')" min-width="100" />
+            <el-table-column prop="status" :label="$t('orderOverview.column.status')" min-width="120">
               <template #default="{ row }">
                 <el-tag :type="demandStatusType(row.status)" size="small">{{ demandStatusLabel(row.status) }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('orderOverview.column.action')" width="100" align="center">
+            <el-table-column :label="$t('orderOverview.column.action')" min-width="100" align="center">
               <template #default="{ row }">
                 <el-button link type="primary" size="small" @click.stop="router.push('/base/overview/demand/' + row.id)">
                   {{ $t('orderOverview.action.view') }}
@@ -89,14 +89,14 @@
           </el-form>
         </el-card>
         <el-card class="table-card" shadow="never">
-          <el-table v-loading="procurementLoading" :data="procurementSelectorData" stripe @row-click="onSelectProcurement">
-            <el-table-column prop="id" label="ID" width="80" />
-            <el-table-column prop="productCode" :label="$t('orderOverview.column.productCode')" width="120" />
-            <el-table-column prop="factoryName" :label="$t('orderOverview.column.factoryName')" width="160" show-overflow-tooltip />
-            <el-table-column prop="status" :label="$t('orderOverview.column.status')" width="140" />
-            <el-table-column prop="orderDate" :label="$t('orderOverview.column.orderDate')" width="120" />
+          <el-table v-loading="procurementLoading" :data="procurementSelectorData" stripe @row-click="onSelectProcurement" min-height="200">
+            <el-table-column prop="id" :label="$t('orderOverview.column.id')" min-width="80" />
+            <el-table-column prop="productCode" :label="$t('orderOverview.column.productCode')" min-width="120" />
+            <el-table-column prop="factoryName" :label="$t('orderOverview.column.factoryName')" min-width="160" show-overflow-tooltip />
+            <el-table-column prop="status" :label="$t('orderOverview.column.status')" min-width="140" />
+            <el-table-column prop="orderDate" :label="$t('orderOverview.column.orderDate')" min-width="120" />
             <el-table-column prop="destination" :label="$t('orderOverview.column.destination')" min-width="120" show-overflow-tooltip />
-            <el-table-column :label="$t('orderOverview.column.action')" width="100" align="center">
+            <el-table-column :label="$t('orderOverview.column.action')" min-width="100" align="center">
               <template #default="{ row }">
                 <el-button link type="primary" size="small" @click.stop="router.push('/base/overview/procurement/' + row.id)">
                   {{ $t('orderOverview.action.view') }}
@@ -149,8 +149,8 @@ async function loadDemandSelector() {
       status: demandFilter.status || undefined,
       keyword: demandFilter.keyword || undefined,
     })
-    demandSelectorData.value = res.data.data.content
-    demandTotal.value = res.data.data.totalElements
+    demandSelectorData.value = res.data.data?.content ?? []
+    demandTotal.value = res.data.data?.totalElements ?? 0
   } finally {
     demandLoading.value = false
   }
@@ -200,8 +200,8 @@ async function loadProcurementSelector() {
       pageSize: procurementPageSize.value,
       keyword: procurementFilter.keyword || undefined,
     })
-    procurementSelectorData.value = res.data.data.content
-    procurementTotal.value = res.data.data.totalElements
+    procurementSelectorData.value = res.data.data?.content ?? []
+    procurementTotal.value = res.data.data?.totalElements ?? 0
   } finally {
     procurementLoading.value = false
   }
