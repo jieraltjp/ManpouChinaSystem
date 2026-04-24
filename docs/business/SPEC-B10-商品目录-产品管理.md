@@ -1,6 +1,6 @@
 # SPEC-B10 — 商品目录业务规格（商品类）
 
-> **版本**: 2.0.0
+> **版本**: 2.1.0
 > **更新**: 2026-04-24（v2.0.0：关联工厂显示名称 factoryNames；新增日本HS编码/工厂名称筛选）
 > **更新**: 2026-04-24（v1.9.0：关联工厂数量 factoryCount（修复：JPQL from 放错 repository））
 > **更新**: 2026-04-24（v1.6.0：表格列重组；移除库存/箱数；新增含税单价/票点；UI文档同步更新）
@@ -385,6 +385,6 @@ throw BusinessException.conflict(
 | 图片存储方案 | P1 | OSS / MinIO / 数据库 BLOB |
 | 各工厂单价差异 | P2 | `product_factory.unit_price_rmb` 是否支持不同工厂不同价 |
 | ✅ `goods_master` 等已删除 | — | 原始数据表已从 MySQL 删除，数据已迁移完毕 |
-| ✅ hs_code / hs_code_jp | — | 已通过 V24 直接 MySQL 迁移完成（CN HS: 2003 条，JP HS: 629 条） |
+| ✅ hs_code / hs_code_jp | — | 已通过 V30 直接 MySQL 迁移完成（CN HS: 2003 条，JP HS: 629 条） |
 | ✅ warehouse / remarks 污染 | — | V24 已修复：warehouse 已清空，remarks 已清除 通常/予約 |
 | ✅ category 未映射 | — | V24 已通过 status → category CASE WHEN 映射（通常→ORDINARY，予約→FACTORY_DIRECT） |

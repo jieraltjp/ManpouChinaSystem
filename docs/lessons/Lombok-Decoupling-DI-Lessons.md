@@ -26,6 +26,7 @@
 - [Lesson 42: Vue template v-for 的 index 参数未使用时必须加 `_` 前缀](#lesson-42-vue-template-v-for-的-index-参数未使用时必须加--前缀)
 - [Lesson 43: 前端组件 Props 必须与所有调用方对齐——optional 字段不得隐式 required](#lesson-43-前端组件-props-必须与所有调用方对齐——optional-字段不得隐式-required)
 - [Lesson 44: 前端对话框表格列标签必须提取为 i18n key——禁止硬编码](#lesson-44-前端对话框表格列标签必须提取为-i18n-key——禁止硬编码)
+- [Lesson 45: Flyway 迁移文件版本号不得重复——冲突时立即修正](#lesson-45-flyway-迁移文件版本号不得重复——冲突时立即修正)
 
 ---
 
@@ -1731,6 +1732,51 @@ defineProps<{
 
 ---
 
+## Lesson 45: Flyway 迁移文件版本号不得重复，冲突时立即修正
+
+### 问题
+
+两个迁移文件同名 V24：
+
+```
+V24__product_field_extend.sql     — 添加 warehouse/remarks 修复
+V24__product_hs_code_extend.sql  — 添加 hs_code_jp 字段
+```
+
+Flyway 按版本号排序执行，V24 冲突导致执行顺序不确定，或其中一个被忽略。
+
+### 根因
+
+- 多人同时开发时未协调版本号空间
+- 没有统一的 Flyway 版本路线图文档
+- `V10/V20/V30` 留空原则未被遵守
+
+### 本次修复
+
+```bash
+# 重命名冲突文件至下一个可用版本
+mv V24__product_hs_code_extend.sql V30__product_hs_code_extend.sql
+
+# 更新文件内注释
+-- Migration: V30__product_hs_code_extend.sql
+-- Note: 原 V24 与 V24__product_field_extend.sql 重复，升至 V30
+```
+
+同步更新 SPEC-B10 中 "通过 V24 迁移完成" → "通过 V30 迁移完成"。
+
+### 预防
+
+| 场景 | 操作 |
+|------|------|
+| 新增迁移前 | `ls db/migration/` 查看已用版本号，避免重复 |
+| 大版本功能前 | 预留空间：`V10__`, `V20__`, `V30__`（每个模块 10 个版本） |
+| 紧急热修复 | 用 `V10_1__fix_xxx.sql` 或 `V10_hotfix__xxx.sql` |
+| 发现版本冲突 | 立即修正，不要遗留（Flyway 执行后修复更复杂） |
+
+> **Flyway 版本路线图应记录在 `docs/database/README.md` 中，每次开发前确认下一个可用版本。**
+
+---
+
 ## 总结：二十七条铁律（最终版）
 
 ### 工程实践（代码层）
@@ -1801,8 +1847,9 @@ defineProps<{
 | 42 | v-for 的 index 参数未使用加 `_` 前缀 | TS6133 |
 | 43 | 组件 Props 必须与所有调用方对齐——optional 字段不加 `?` 会导致 TS2345 | 编译失败 |
 | 44 | 对话框/表格列标签必须提取为 i18n key，禁止硬编码 | 日语用户无法理解 |
+| 45 | Flyway 迁移版本号不得重复，冲突时立即修正 | 迁移执行顺序不确定 |
 
 ---
 
-*来源：2026-04-24 全量审计会话 · docs/business 审计（SPEC-B01/B03/B07/B08/B09）· docs/database 审计（DB-01/DB-06/DB-08/DB-09/废弃旧文档）· 后端代码审计 · 前端代码审计 · lessons 文档更新（Lesson 35-44，铁律表更新至27条规则）*
+*来源：2026-04-24 全量审计会话 · docs/business 审计（SPEC-B01/B03/B07/B08/B09/B10）· docs/database 审计（DB-01/DB-06/DB-08/DB-09/废弃旧文档）· 后端代码审计 · 前端代码审计 · lessons 文档更新（Lesson 35-45，铁律表更新至27条规则）*
 
