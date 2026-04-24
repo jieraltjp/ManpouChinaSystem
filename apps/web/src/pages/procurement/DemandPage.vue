@@ -74,7 +74,7 @@
 
     <!-- 表格（v2.0.0：一行 = 一个子货号） -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
+      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" table-layout="fixed" min-height="200">
         <el-table-column prop="demandCode" :label="$t('demand.column.demandCode')" width="160" />
         <el-table-column prop="demandType" :label="$t('demand.column.demandType')" width="130" align="center">
           <template #default="{ row }">
@@ -202,7 +202,7 @@
               <el-option
                 v-for="item in masterCodeOptions"
                 :key="item.masterCode"
-                :label="item.masterCode + (item.nameZh ? ' — ' + item.nameZh : '')"
+                 :label="item.masterCode"
                 :value="item.masterCode"
               >
                 <span style="font-weight:600">{{ item.masterCode }}</span>
@@ -256,10 +256,26 @@
               prop="destination"
               class="detail-row__dest"
             >
-              <el-input
+              <el-select
                 v-model="formData.destination"
+                filterable
+                remote
+                reserve-keyword
+                :remote-method="searchDestination"
+                :loading="destLoading"
                 :placeholder="$t('demand.dialog.destinationPlaceholder')"
-              />
+                allow-create
+                default-first-option
+                style="width:100%"
+                clearable
+              >
+                <el-option
+                  v-for="d in destOptions"
+                  :key="d"
+                  :label="d"
+                  :value="d"
+                />
+              </el-select>
             </el-form-item>
           </div>
         </div>
@@ -269,7 +285,26 @@
           <div class="form-section__title">{{ $t('demand.dialog.section.extra') }}</div>
           <div class="extra-row">
             <el-form-item :label="$t('demand.dialog.japanLead')" class="extra-row__lead">
-              <el-input v-model="formData.japanLead" :placeholder="$t('demand.dialog.japanLeadPlaceholder')" />
+              <el-select
+                v-model="formData.japanLead"
+                filterable
+                remote
+                reserve-keyword
+                :remote-method="searchJapanLead"
+                :loading="leadLoading"
+                :placeholder="$t('demand.dialog.japanLeadPlaceholder')"
+                allow-create
+                default-first-option
+                style="width:100%"
+                clearable
+              >
+                <el-option
+                  v-for="l in leadOptions"
+                  :key="l"
+                  :label="l"
+                  :value="l"
+                />
+              </el-select>
             </el-form-item>
             <el-form-item :label="$t('demand.dialog.remarks')" class="extra-row__remarks">
               <el-input v-model="formData.remarks" :placeholder="$t('demand.dialog.remarksPlaceholder')" />
@@ -369,8 +404,15 @@ const subCodeLoading = ref(false)
 const factoryLoading = ref(false)
 const converting = ref(false)
 const linkedLoading = ref(false)
-const masterCodeOptions = ref<MasterCodeSuggestVO[]>([])
+const masterCodeRaw = ref<MasterCodeSuggestVO[]>([])
+const masterCodeOptions = computed<MasterCodeSuggestVO[]>(() =>
+  Array.from(new Map(masterCodeRaw.value.map(i => [i.masterCode, i])).values())
+)
 const subCodeOptions = ref<SubCodeSuggestVO[]>([])
+const destOptions = ref<string[]>([])
+const destLoading = ref(false)
+const leadOptions = ref<string[]>([])
+const leadLoading = ref(false)
 const factoryOptions = ref<FactoryPageVO[]>([])
 const linkedProcurement = ref<unknown | null>(null)
 const loadedSubCodesFor = ref<string>('')
@@ -410,7 +452,7 @@ const formData = reactive<{
   demandType: 'REPLENISHMENT',
   productCode: '',
   subProductCode: '',
-  quantity: 1,
+  quantity: 100,
   destination: '',
   japanLead: '',
   remarks: '',
@@ -456,7 +498,7 @@ function onNew() {
     demandType: 'REPLENISHMENT',
     productCode: '',
     subProductCode: '',
-    quantity: 1,
+    quantity: 100,
     destination: '',
     japanLead: '',
     remarks: '',
@@ -526,13 +568,13 @@ async function onViewLinked(row: DemandPageVO) {
 let masterCodeTimer: ReturnType<typeof setTimeout>
 async function searchMasterCode(query: string) {
   clearTimeout(masterCodeTimer)
-  if (!query || query.length < 1) { masterCodeOptions.value = []; return }
+  if (!query || query.length < 1) { masterCodeRaw.value = []; return }
   masterCodeTimer = setTimeout(async () => {
     masterCodeLoading.value = true
     try {
       const res = await productApi.suggestMasterCodes(query)
-      masterCodeOptions.value = res.data.data || []
-    } catch (e) { masterCodeOptions.value = [] } finally { masterCodeLoading.value = false }
+      masterCodeRaw.value = res.data.data || []
+    } catch (e) { masterCodeRaw.value = [] } finally { masterCodeLoading.value = false }
   }, 300)
 }
 
@@ -557,6 +599,30 @@ async function loadSubCodeOptions() {
       formData.subProductCode = subCodeOptions.value[0].subCode
     }
   } catch (e) { subCodeOptions.value = [] } finally { subCodeLoading.value = false }
+}
+
+async function searchDestination(query: string) {
+  destLoading.value = true
+  try {
+    const res = await demandApi.suggestDestinations()
+    const all = res.data.data || []
+    destOptions.value = query
+      ? all.filter((d: string) => d.toLowerCase().includes(query.toLowerCase()))
+      : all
+  } catch { destOptions.value = [] }
+  finally { destLoading.value = false }
+}
+
+async function searchJapanLead(query: string) {
+  leadLoading.value = true
+  try {
+    const res = await demandApi.suggestJapanLeads()
+    const all = res.data.data || []
+    leadOptions.value = query
+      ? all.filter((l: string) => l.toLowerCase().includes(query.toLowerCase()))
+      : all
+  } catch { leadOptions.value = [] }
+  finally { leadLoading.value = false }
 }
 
 async function onRevertConversion(row: DemandPageVO) {
@@ -647,6 +713,8 @@ onMounted(() => loadData())
 .qty-value { color: #D97706; font-weight: 600; }
 .dest-value { color: #6B7280; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
+:deep(.el-table) { width: 100% !important; min-width: 100%; }
+:deep(.el-table__header) { width: 100% !important; }
 
 /* v2.1.0 表单布局 */
 :deep(.demand-dialog .el-dialog__body) { padding-top: 16px; }
@@ -695,22 +763,27 @@ onMounted(() => loadData())
   border-bottom: 1px solid #f0f0f0;
 }
 
-/* 需求明细行 */
+/* 需求明细行：flex + min-width:0 防止 form-item 撑破列宽 */
 .detail-row {
-  display: grid;
-  grid-template-columns: 2fr 140px 1.6fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: flex-start;
 }
+.detail-row__sub  { flex: 2 1 0; min-width: 0; }
+.detail-row__qty  { flex: 0 0 140px; min-width: 0; }
+.detail-row__dest { flex: 1.6 1 0; min-width: 0; }
 .detail-row__qty :deep(.el-input-number) { width: 100%; }
 
 /* 补充信息行 */
 .extra-row {
-  display: grid;
-  grid-template-columns: 200px 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: flex-start;
 }
+.extra-row__lead   { flex: 0 0 200px; min-width: 0; }
+.extra-row__remarks { flex: 1 1 0; min-width: 0; }
 
 /* 批量模式提示 */
 .batch-mode { padding: 24px 0; text-align: center; }

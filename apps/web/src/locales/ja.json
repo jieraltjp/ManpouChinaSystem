@@ -115,7 +115,7 @@
       "productCode": "主品番",
       "productCodePlaceholder": "例：odn012",
       "subProductCode": "子品番（カラー）",
-      "selectSubCode": "先に子品番を選択してください",
+      "selectSubCode": "先に主品番を選択してください",
       "subProductCodePlaceholder": "例：re / wh / bk",
       "subProductItems": "子品番明細",
       "quantity": "需要数量",

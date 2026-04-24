@@ -115,7 +115,7 @@
       "productCode": "主货号",
       "productCodePlaceholder": "如 odn012",
       "subProductCode": "子货号（颜色）",
-      "selectSubCode": "请先选择子货号",
+      "selectSubCode": "请先选择主货号",
       "subProductCodePlaceholder": "如 re / wh / bk",
       "subProductItems": "子货号明细",
       "quantity": "需求量",
