@@ -93,3 +93,6 @@ CREATE TABLE japan_customs_record (
 - [x] ✅ `JapanCustomsAssembler` DTO 转换器
 - [x] ✅ `JapanCustomsUseCase` 用例服务
 - [x] ✅ `JapanCustomsController` REST 控制器
+
+> ⚠️ **P2 缺口**：`japan_customs_record` 表缺少 `sub_product_code` 列，全链路子货号追踪在步骤6断裂。
+> 建议：新增 DB migration 添加 `sub_product_code VARCHAR(64)` 列，并在 Assembler 层补全映射。

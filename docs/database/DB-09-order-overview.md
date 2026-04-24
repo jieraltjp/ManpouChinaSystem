@@ -1,9 +1,9 @@
 # DB-09 — 订单总览数据库设计
 
-> **版本**: 1.1.0
-> **更新**: 2026-04-23（v1.1.0：版本号同步）
+> **版本**: 1.2.0
+> **更新**: 2026-04-24（v1.2.0：同步 v1.6.0 Demand 锚点关联；更新代码实现状态为已完成）
 > **创建**: 2026-04-22
-> **状态**: 🟡 设计中
+> **状态**: ✅ 已实现（步骤1-4 + Demand 锚点；步骤5-8 待填充）
 > **业务步号**: 09（订单总览 — 核心视图）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B09-订单总览-API设计.md`
 > **对应 UI 文档**: `docs/ui/pages/09-order-overview.md`
@@ -15,7 +15,7 @@
 
 ```
 Procurement (锚点)
-  ├── ReplenishmentDemand   (步骤1)  → procurement.replenishment_demand_id
+  ├── ReplenishmentDemand   (步骤1)  → procurement.linked_demand_id → replenishment_demand.id
   ├── Factory              (步骤2)  → procurement.factory_id
   ├── QcRecord             (步骤3)  → qc_record.procurement_id
   ├── LogisticsPlan         (步骤4)  → logistics_plan.procurement_id
@@ -26,6 +26,9 @@ Procurement (锚点)
   ├── TaxRefundRecord       (步骤7)  → tax_refund_record.procurement_id
   └── SalesRecord           (步骤8)  → sales_record.procurement_id
 ```
+
+> ⚠️ v1.6.0 关联关系已反转：`Procurement.linked_demand_id` 指向 `ReplenishmentDemand.id`，
+> 不再使用旧版的 `replenishment_demand.linked_procurement_id`。
 
 ---
 
@@ -58,9 +61,10 @@ SELECT
 FROM procurement p
 WHERE p.id = :procurementId AND p.is_deleted = FALSE;
 
--- 步骤1：ReplenishmentDemand（JOIN via linked_procurement_id）
+-- 步骤1：ReplenishmentDemand（v1.6.0: procurement.linked_demand_id → replenishment_demand.id）
 SELECT d.* FROM replenishment_demand d
-WHERE d.linked_procurement_id = :procurementId AND d.is_deleted = FALSE
+WHERE d.id = (SELECT linked_demand_id FROM procurement WHERE id = :procurementId)
+  AND d.is_deleted = FALSE
 LIMIT 1;
 
 -- 步骤2：Factory
@@ -111,9 +115,11 @@ public interface OrderOverviewRepository {
 
 ## 代码实现状态
 
-- [x] 🟡 `OrderOverviewUseCase` 用例服务（骨架，待填充步骤5-8）
-- [x] 🟡 `OrderOverviewController` REST 控制器（GET /api/v1/orders/{id}/overview）
-- [x] 🟡 `OrderOverviewVO` 聚合响应对象
-- [ ] 🔴 前端 `OrderOverviewPage.vue`
-- [ ] 🔴 前端 `@/api/orderOverview.ts`
-- [ ] 🔴 前端 `useOrderOverview.ts` composable
+- [x] ✅ `OrderOverviewUseCase` 用例服务（含 Demand 锚点 + Procurement 锚点）
+- [x] ✅ `OrderOverviewController` REST 控制器（GET /api/v1/orders/{id}/overview + /demands 端点）
+- [x] ✅ `OrderOverviewPageVO` 聚合响应对象（含 StepStatus 数组）
+- [x] ✅ 前端 `OrderOverviewPage.vue`（双入口架构）
+- [x] ✅ 前端 `DemandOverviewPage.vue`（Demand 锚点详情页）
+- [x] ✅ 前端 `ProcurementOverviewPage.vue`（Procurement 锚点详情页）
+- [x] ✅ 前端 `@/api/orderOverview.ts` + `@/api/demand.ts`
+- [ ] 🟡 步骤5-8 聚合数据填充（DomesticCustoms/JapanCustoms/TaxRefund/SalesRecord）

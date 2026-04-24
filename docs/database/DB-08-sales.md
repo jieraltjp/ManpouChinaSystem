@@ -76,6 +76,14 @@ CREATE TABLE sales_record (
 
 ---
 
+> **域模型与数据库差异说明**：以下 SPEC-B08 域模型字段不直接存储于 `sales_record` 表，需通过 `procurementId` 关联 Procurement 获取：
+> - `destination` → `Procurement.destination`
+> - `japanLead` → `Procurement.japan_lead`
+> - `estimatedPriceJpy` → `Procurement.estimated_price_jpy`
+> - `safetyThreshold` → `sales_record.safety_stock`（列名不同，域模型统一为驼峰）
+
+---
+
 ## 代码实现状态
 
 - [x] ✅ `SalesRecord` 聚合根实体
