@@ -1,5 +1,7 @@
 package com.manpou.allinone.replenishment.interfaces.controller;
 
+import java.util.List;
+
 import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
 import com.manpou.allinone.replenishment.application.dto.ConvertDemandCmd;
@@ -80,5 +82,21 @@ public class ReplenishmentDemandController {
     @GetMapping("/{id}/procurement")
     public Result<ProcurementPageQuery> getLinkedProcurement(@PathVariable("id") Long id) {
         return Result.ok(demandUseCase.getLinkedProcurement(id));
+    }
+
+    /**
+     * 目的地建议（去重，已录入的目的地列表）。
+     */
+    @GetMapping("/suggest/destinations")
+    public Result<List<String>> suggestDestinations() {
+        return Result.ok(demandUseCase.findDistinctDestinations());
+    }
+
+    /**
+     * 日本担当建议（去重，已录入的担当列表）。
+     */
+    @GetMapping("/suggest/japan-leads")
+    public Result<List<String>> suggestJapanLeads() {
+        return Result.ok(demandUseCase.findDistinctJapanLeads());
     }
 }

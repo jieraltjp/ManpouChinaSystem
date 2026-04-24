@@ -27,13 +27,13 @@ GET /api/v1/orders/demands                      # Demand 列表（selector）
 GET /api/v1/orders/demands/{demandId}/overview   # Demand 详情总览（Step1 有数据，Step2-8 NOT_STARTED）
 
 # 入口B：Procurement 锚点（8步全链路聚合）
-GET /api/v1/orders/{procurementId}/overview      # Procurement 详情总览
-GET /api/v1/orders/selector                      # Procurement 列表（selector）
+GET /api/v1/orders/procurement/{procurementId}/overview  # Procurement 详情总览
+GET /api/v1/orders/procurement/selector                  # Procurement 列表（selector）
 ```
 
 **入口A — GET `/api/v1/orders/demands`**
 
-Query 参数：`page`, `pageSize`, `keyword`
+Query 参数：`page`, `pageSize`, `status`（可选）, `keyword`（可选）
 
 响应 200：`Page<OrderDemandSelectorDTO>`（Demand 选择器分页列表）
 
@@ -50,7 +50,7 @@ Query 参数：`page`, `pageSize`, `keyword`
 }
 ```
 
-**入口B — GET `/api/v1/orders/{procurementId}/overview`**
+**入口B — GET `/api/v1/orders/procurement/{procurementId}/overview`**
 
 **响应 200**：
 

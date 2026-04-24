@@ -217,4 +217,16 @@ public class ReplenishmentDemandUseCase {
         demandRepository.save(entity);
         log.info("[ReplenishmentDemand] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
+
+    /** 去重目的地列表 */
+    @Transactional(readOnly = true)
+    public List<String> findDistinctDestinations() {
+        return demandRepository.findDistinctDestinations();
+    }
+
+    /** 去重日本担当列表 */
+    @Transactional(readOnly = true)
+    public List<String> findDistinctJapanLeads() {
+        return demandRepository.findDistinctJapanLeads();
+    }
 }

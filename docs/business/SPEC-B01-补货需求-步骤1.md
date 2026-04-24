@@ -29,7 +29,7 @@
 ```
 ReplenishmentDemand（聚合根）
 ├── id: Long
-├── demandCode: String           # D-YYYYMMDD-NNN
+├── demandCode: String           # DM-YYYYMMDD-NNN
 ├── demandType: DemandType        # REPLENISHMENT(补货) / NEW_PURCHASE(新品采购)
 ├── productCode: String           # 主货号（如 ad009）
 ├── subProductCode: String        # 子货号全码（如 ad009-be，商品唯一标识）
@@ -147,5 +147,5 @@ GET    /api/v1/demands/{id}/procurement # 查看关联的采购单
 - [x] ✅ `OrderOverviewPage.vue`（v2.0.0：列表含 subProductCode/quantity/destination）
 - [x] ✅ `OrderOverviewAssembler` / `OrderOverviewUseCase`
 - [x] ✅ `ReplenishmentDemandUseCaseTest` 单元测试（v2.0.0）
-- [ ] 🔲 `DevTestDataInitializer` 初始化数据（v2.0.0）
+- [x] ✅ `DevTestDataInitializer` 初始化数据（v2.0.0：subProductCode/quantity/destination/linkedProcurementId）
 - [x] ✅ 数据库迁移脚本（V31：删除 JSON 列，新增 quantity/destination/sub_product_code）

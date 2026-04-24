@@ -3,9 +3,10 @@ package com.manpou.allinone.replenishment.domain.repository;
 import com.manpou.allinone.replenishment.domain.model.DemandStatus;
 import com.manpou.allinone.replenishment.domain.model.DemandType;
 import com.manpou.allinone.replenishment.domain.model.ReplenishmentDemand;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,4 +29,10 @@ public interface ReplenishmentDemandRepository extends JpaRepository<Replenishme
     Page<ReplenishmentDemand> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
 
     List<ReplenishmentDemand> findAllByIdInAndDeletedIsFalse(List<Long> ids);
+
+    @Query("SELECT DISTINCT d.destination FROM ReplenishmentDemand d WHERE d.deleted = false AND d.destination IS NOT NULL AND d.destination <> '' ORDER BY d.destination")
+    List<String> findDistinctDestinations();
+
+    @Query("SELECT DISTINCT d.japanLead FROM ReplenishmentDemand d WHERE d.deleted = false AND d.japanLead IS NOT NULL AND d.japanLead <> '' ORDER BY d.japanLead")
+    List<String> findDistinctJapanLeads();
 }

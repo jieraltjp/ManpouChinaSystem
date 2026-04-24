@@ -23,7 +23,11 @@ import lombok.Setter;
 @Table(name = "replenishment_demand", indexes = {
         @Index(name = "idx_demand_status", columnList = "status"),
         @Index(name = "idx_demand_type", columnList = "demand_type"),
-        @Index(name = "idx_demand_product_code", columnList = "product_code")
+        @Index(name = "idx_demand_product_code", columnList = "product_code"),
+        @Index(name = "idx_demand_is_deleted", columnList = "is_deleted"),
+        @Index(name = "idx_demand_sub_product_code", columnList = "sub_product_code"),
+        @Index(name = "idx_demand_quantity", columnList = "quantity"),
+        @Index(name = "idx_demand_destination", columnList = "destination")
 })
 @Access(AccessType.FIELD)
 @Getter

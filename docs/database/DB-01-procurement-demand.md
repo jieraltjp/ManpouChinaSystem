@@ -15,7 +15,7 @@
 
 | 序号 | 表名 | 聚合根 | 状态 |
 |------|------|--------|------|
-| 1 | `replenishment_demand` | ReplenishmentDemand | 🔲 待迁移 |
+| 1 | `replenishment_demand` | ReplenishmentDemand | ✅ 已实现（V31） |
 
 ---
 
@@ -26,7 +26,7 @@
 ```sql
 CREATE TABLE replenishment_demand (
     id                    BIGINT AUTO_INCREMENT PRIMARY KEY,
-    demand_code           VARCHAR(32)  NOT NULL UNIQUE COMMENT '需求编号 D-YYYYMMDD-NNN',
+    demand_code           VARCHAR(32)  NOT NULL UNIQUE COMMENT '需求编号 DM-YYYYMMDD-NNN',
     demand_type           VARCHAR(32)  NOT NULL COMMENT 'REPLENISHMENT(补货) / NEW_PURCHASE(新品采购)',
     product_code          VARCHAR(32)  NOT NULL COMMENT '主货号',
     sub_product_code      VARCHAR(64)  COMMENT '子货号全码（v2.0.0，如 ad009-be，商品唯一标识）',
@@ -45,7 +45,10 @@ CREATE TABLE replenishment_demand (
     INDEX idx_demand_product_code (product_code),
     INDEX idx_demand_status (status),
     INDEX idx_demand_type (demand_type),
-    INDEX idx_demand_is_deleted (is_deleted)
+    INDEX idx_demand_is_deleted (is_deleted),
+    INDEX idx_demand_sub_product_code (sub_product_code),   -- v2.0.0
+    INDEX idx_demand_quantity (quantity),                   -- v2.0.0
+    INDEX idx_demand_destination (destination)             -- v2.0.0
 );
 ```
 
