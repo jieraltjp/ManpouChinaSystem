@@ -697,6 +697,7 @@ onMounted(() => loadData())
 .page-title { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
 .page-title::before { content: ''; display: inline-block; width: 4px; height: 20px; background: var(--color-primary); border-radius: 2px; margin-right: 10px; vertical-align: middle; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
+.table-card :deep(.el-card__body) { padding: 16px; }
 .stats-row { margin-bottom: 4px; }
 .stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }
 .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light)); border-radius: var(--radius-md) var(--radius-md) 0 0; }

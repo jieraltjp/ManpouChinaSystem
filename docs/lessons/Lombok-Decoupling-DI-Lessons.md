@@ -1848,8 +1848,74 @@ mv V24__product_hs_code_extend.sql V30__product_hs_code_extend.sql
 | 43 | 组件 Props 必须与所有调用方对齐——optional 字段不加 `?` 会导致 TS2345 | 编译失败 |
 | 44 | 对话框/表格列标签必须提取为 i18n key，禁止硬编码 | 日语用户无法理解 |
 | 45 | Flyway 迁移版本号不得重复，冲突时立即修正 | 迁移执行顺序不确定 |
+| 46 | ::deep 禁止覆盖 el-table 内部 width/fixed，固定列仅限列少场景 | 表头/表体错位 |
 
 ---
 
-*来源：2026-04-24 全量审计会话 · docs/business 审计（SPEC-B01/B03/B07/B08/B09/B10）· docs/database 审计（DB-01/DB-06/DB-08/DB-09/废弃旧文档）· 后端代码审计 · 前端代码审计 · lessons 文档更新（Lesson 35-45，铁律表更新至27条规则）*
+## Lesson 46: Element Plus `el-card` + `el-table` 布局须防 ::deep 污染，禁止覆盖内部结构宽度
+
+### 问题
+
+`DemandPage.vue` 的表格出现两个症状：
+
+1. **表头/表体列错位**（header 与 body 上下不对齐）
+2. **表格撑满卡片无边距**（表内容紧贴卡面）
+
+### 根因
+
+**错位根因 — 两处 CSS 污染了 Element Plus 内部同步机制：**
+
+```css
+/* ❌ 错误1：fixed="right" 在等宽列场景下破坏 header/body 同步 */
+<el-table-column width="260" fixed="right" align="center">
+
+/* ❌ 错误2：::deep 强制覆盖 el-table 内部 width 计算 */
+:deep(.el-table) { width: 100% !important; min-width: 100%; }
+:deep(.el-table__header) { width: 100% !important; }
+```
+
+Element Plus 的表头/表体通过 JS 同步列宽。`fixed="right"` 在列数多（9列）且总宽接近容器宽时，会创建独立 fixed 表格实例，与主表分离，导致 header/body 错位。`::deep(.el-table)` 的 `width: 100% !important` 覆盖了 Element Plus 的动态计算，破坏同步。
+
+**无边距根因 — `.table-card` 未显式设置 `el-card__body` padding：**
+
+```css
+/* ✅ filter-card 有 padding-bottom: 0 */
+/* ❌ table-card 没有 → 默认 padding 被某处样式覆盖或缺失 */
+```
+
+### 本次修复
+
+| 问题 | 修复 |
+|------|------|
+| 表头/表体错位 | 移除 `fixed="right"` + 移除 `::deep(.el-table) { width: 100% !important }` |
+| 表格撑满无边距 | `.table-card :deep(.el-card__body) { padding: 16px; }` |
+
+### 正确写法
+
+```html
+<!-- 固定列在列少（≤5）时可用；9列等宽场景下禁用 -->
+<el-table-column width="260" align="center">
+```
+
+```css
+/* ✅ 只控制外层容器，不动 Element Plus 内部结构 */
+.table-card :deep(.el-card__body) { padding: 16px; }
+
+/* ❌ 禁止覆盖 el-table/el-table__header 内部 width */
+:deep(.el-table) { width: 100% !important; }  /* ← 删除此行 */
+:deep(.el-table__header) { width: 100% !important; }  /* ← 删除此行 */
+
+/* ✅ 如需控制 el-table 宽度，在 el-card__body 层面控制 */
+.table-card :deep(.el-table) { width: 100%; }  /* 不加 !important */
+```
+
+### 预防
+
+- `::deep` 只穿透到子组件根节点，不应覆盖框架内部计算逻辑（如 `width`、`flex` 布局同步）
+- 固定列 `fixed` 只在列少、有横向滚动场景下使用；全部列等宽时禁用
+- Element Plus 组件的布局问题 → 先查官方 issues，再搜 `::deep` 是否有污染
+
+---
+
+*来源：2026-04-24 全量审计会话 · docs/business 审计（SPEC-B01/B03/B07/B08/B09/B10）· docs/database 审计（DB-01/DB-06/DB-08/DB-09/废弃旧文档）· 后端代码审计 · 前端代码审计 · lessons 文档更新（Lesson 35-46，铁律表更新至27条规则）*
 
