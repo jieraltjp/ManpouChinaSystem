@@ -243,6 +243,7 @@
                 v-model="formData.quantity"
                 :min="1"
                 :max="999999"
+                :step="1"
                 controls-position="right"
                 style="width:100%"
               />
