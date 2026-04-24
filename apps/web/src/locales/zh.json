@@ -115,6 +115,7 @@
       "productCode": "主货号",
       "productCodePlaceholder": "如 odn012",
       "subProductCode": "子货号（颜色）",
+      "selectSubCode": "请先选择子货号",
       "subProductCodePlaceholder": "如 re / wh / bk",
       "subProductItems": "子货号明细",
       "quantity": "需求量",
@@ -145,7 +146,8 @@
         "factoryRequired": "请选择工厂",
         "preview": "预览",
         "confirm": "确认转采购",
-        "willCreate": "将生成 {n} 条发注单"
+        "willCreate": "将生成 {n} 条发注单",
+        "willCreateOne": "将生成 1 条发注单"
       },
       "linkedDialog": {
         "title": "关联发注单列表",
@@ -157,7 +159,8 @@
           "quantity": "数量",
           "destination": "目的地",
           "status": "状态"
-        }
+        },
+        "noData": "暂无数据"
       }
     },
     "validation": {

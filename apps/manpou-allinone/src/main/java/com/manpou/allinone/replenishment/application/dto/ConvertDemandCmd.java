@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * 转采购请求 DTO（v1.6.0）。
+ * 转采购请求 DTO（v2.0.0）。
  * POST /api/v1/demands/{id}/convert
  */
 @Data

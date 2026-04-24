@@ -116,6 +116,7 @@
       "productCode": "主品番",
       "productCodePlaceholder": "例：odn012",
       "subProductCode": "子品番（カラー）",
+      "selectSubCode": "先に子品番を選択してください",
       "subProductCodePlaceholder": "例：re / wh / bk",
       "subProductItems": "子品番明細",
       "quantity": "需要数量",
@@ -146,7 +147,8 @@
         "factoryRequired": "工場を選択してください",
         "preview": "プレビュー",
         "confirm": "発注へ変換",
-        "willCreate": "{n}件の発注書を生成します"
+        "willCreate": "{n}件の発注書を生成します",
+        "willCreateOne": "1件の発注書を生成します"
       },
       "linkedDialog": {
         "title": "関連発注書リスト",
@@ -158,7 +160,8 @@
           "quantity": "数量",
           "destination": "出荷先",
           "status": "ステータス"
-        }
+        },
+        "noData": "データがありません"
       }
     },
     "validation": {
