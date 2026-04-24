@@ -15,7 +15,7 @@ import type { StepStatus } from '@/api/orderOverview'
 
 const props = defineProps<{
   stepStatuses: StepStatus[]
-  currentStep: number
+  currentStep?: number
 }>()
 
 const STEP_NAMES = ['补货', '发注', '验货', '调配', '国报', '日报', '退税', '运营']

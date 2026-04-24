@@ -494,10 +494,10 @@ function onDemandChange(demandId: number | null) {
   const d = demandOptions.value.find(x => x.id === demandId)
   if (!d) return
   formData.productCode = d.productCode
-  formData.subProductCode = d.subProductCodes?.[0] || ''
-  formData.destination = d.destination || ''
+  formData.subProductCode = d.subProductItems?.[0]?.subCode || ''
+  formData.destination = d.subProductItems?.[0]?.destination || ''
   formData.japanLead = d.japanLead || ''
-  formData.quantity = d.quantity
+  formData.quantity = d.subProductItems?.[0]?.quantity ?? 0
 }
 
 /**
@@ -509,10 +509,10 @@ function prefillFromDemand(demand: DemandPageVO) {
   dialogMode.value = 'create'
   Object.assign(formData, defaultFormData())
   formData.productCode = demand.productCode
-  formData.subProductCode = demand.subProductCodes?.[0] || ''
-  formData.destination = demand.destination || ''
+  formData.subProductCode = demand.subProductItems?.[0]?.subCode || ''
+  formData.destination = demand.subProductItems?.[0]?.destination || ''
   formData.japanLead = demand.japanLead || ''
-  formData.quantity = demand.quantity
+  formData.quantity = demand.subProductItems?.[0]?.quantity ?? 0
   dialogVisible.value = true
 }
 
@@ -810,7 +810,7 @@ async function onSubmit() {
         ElMessage.success(savedMsg)
         // 若为转采购模式，则关联需求单
         if (convertingDemandId.value !== null) {
-          await demandApi.convertToProcurement(convertingDemandId.value, req.factoryId as number)
+          await demandApi.convertToProcurement(convertingDemandId.value, { factoryId: req.factoryId as number })
           ElMessage.success(t('order.message.demandConverted'))
           convertingDemandId.value = null
         }

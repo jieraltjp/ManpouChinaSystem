@@ -17,6 +17,7 @@ export interface JapanCustomsVO {
   procurementId: number | null
   domesticCustomsId: number | null
   logisticsPlanId: number | null
+  subProductCode: string | null  // 子货号/颜色（v1.6.1 全链路追踪）
   status: JapanCustomsStatus
   arrivalDate: string | null
   customsBroker: string | null
@@ -53,6 +54,7 @@ export interface JapanCustomsCreateRequest {
   procurementId?: number
   domesticCustomsId?: number
   logisticsPlanId?: number
+  subProductCode?: string  // 子货号/颜色（v1.6.1 全链路追踪）
   arrivalDate?: string
   customsBroker?: string
   brokerPhone?: string
@@ -64,6 +66,7 @@ export interface JapanCustomsCreateRequest {
 }
 
 export interface JapanCustomsUpdateRequest {
+  subProductCode?: string  // 子货号/颜色
   arrivalDate?: string
   customsBroker?: string
   brokerPhone?: string

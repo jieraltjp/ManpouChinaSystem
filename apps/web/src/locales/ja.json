@@ -1107,6 +1107,7 @@
     "column": {
       "entryNo": "入境通関番号",
       "procurementId": "仕入書類番号",
+      "subProductCode": "子品番",
       "domesticCustomsId": "国内通関番号",
       "arrivalPort": "到着港",
       "arrivalDate": "到着日",

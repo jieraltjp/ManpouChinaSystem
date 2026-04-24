@@ -72,13 +72,19 @@
             <span class="code-badge">{{ row.customsEntryNo }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="procurementId" :label="$t('japanCustoms.column.procurementId')" width="100" align="center">
+        <el-table-column prop="procurementId" :label="$t('japanCustoms.column.procurementId')" width="80" align="center">
           <template #default="{ row }">
             <span v-if="row.procurementId">{{ row.procurementId }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="arrivalPort" :label="$t('japanCustoms.column.arrivalPort')" width="100" />
+        <el-table-column prop="subProductCode" :label="$t('japanCustoms.column.subProductCode')" width="80" align="center">
+          <template #default="{ row }">
+            <span v-if="row.subProductCode">{{ row.subProductCode }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="arrivalPort" :label="$t('japanCustoms.column.arrivalPort')" width="90" />
         <el-table-column prop="arrivalDate" :label="$t('japanCustoms.column.arrivalDate')" width="120" />
         <el-table-column prop="customsBroker" :label="$t('japanCustoms.column.broker')" width="140" show-overflow-tooltip />
         <el-table-column prop="importDutyPaid" :label="$t('japanCustoms.column.importDuty')" width="120" align="right">
@@ -138,6 +144,7 @@
           <el-tag :type="statusTagType(currentRow.status)" size="small">{{ statusLabel(currentRow.status) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.procurementId')">{{ currentRow.procurementId ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('japanCustoms.column.subProductCode')">{{ currentRow.subProductCode ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.domesticCustomsId')">{{ currentRow.domesticCustomsId ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.arrivalPort')">{{ currentRow.arrivalPort ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.arrivalDate')">{{ currentRow.arrivalDate ?? '-' }}</el-descriptions-item>
