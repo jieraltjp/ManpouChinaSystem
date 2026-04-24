@@ -93,3 +93,4 @@ CREATE TABLE sales_record (
 - [x] ✅ `SalesRecordAssembler` DTO 转换器
 - [x] ✅ `SalesRecordUseCase` 用例服务（含库存管理）
 - [x] ✅ `SalesRecordController` REST 控制器
+- [x] ✅ `isLowStock()` 领域方法（`currentStock < safetyStock`，低于安全库存）
