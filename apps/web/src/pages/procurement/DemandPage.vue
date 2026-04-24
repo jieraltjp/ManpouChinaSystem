@@ -763,17 +763,19 @@ onMounted(() => loadData())
   border-bottom: 1px solid #f0f0f0;
 }
 
-/* 需求明细行：flex + min-width:0 防止 form-item 撑破列宽 */
+/* 需求明细行：让三个 el-form-item 像普通 div 一样并排 */
 .detail-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 12px;
   align-items: flex-start;
 }
-.detail-row__sub  { flex: 2 1 0; min-width: 0; }
-.detail-row__qty  { flex: 0 0 140px; min-width: 0; }
-.detail-row__dest { flex: 1.6 1 0; min-width: 0; }
-.detail-row__qty :deep(.el-input-number) { width: 100%; }
+/* el-form-item 默认 display:block，强制改为 block 并参与 flex 布局 */
+.detail-row > .el-form-item { display: block; width: 100%; box-sizing: border-box; }
+.detail-row__sub  { flex: 2 1 0% !important; min-width: 0; }
+.detail-row__qty  { flex: 0 0 140px !important; min-width: 0; }
+.detail-row__dest { flex: 1.6 1 0% !important; min-width: 0; }
+.detail-row__qty :deep(.el-form-item__content) { width: 100%; }
 
 /* 补充信息行 */
 .extra-row {
