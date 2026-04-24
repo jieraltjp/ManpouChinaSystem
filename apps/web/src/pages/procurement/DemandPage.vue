@@ -146,22 +146,48 @@
       </div>
     </el-card>
 
-    <!-- 新建/编辑弹窗（v2.0.0：简化为直接字段） -->
+    <!-- 新建/编辑弹窗（v2.1.0：单个录入 + 批量录入 两种模式） -->
     <el-dialog
       v-model="dialogVisible"
       :title="dialogMode === 'create' ? $t('demand.newDialogTitle') : $t('demand.editDialogTitle')"
-      width="580px"
+      width="680px"
+      class="demand-dialog"
     >
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="110px" class="demand-form">
-        <!-- 需求类型 + 主货号 -->
-        <div class="form-row form-row--2col">
-          <el-form-item :label="$t('demand.dialog.demandType')" prop="demandType" class="form-item--shrink">
+      <!-- 模式切换（批量功能开发中） -->
+      <div class="dialog-mode-tabs">
+        <button
+          class="mode-tab"
+          :class="{ 'mode-tab--active': entryMode === 'single' }"
+          @click="entryMode = 'single'"
+          type="button"
+        >{{ $t('demand.dialog.entryMode.single') }}</button>
+        <button
+          class="mode-tab"
+          :class="{ 'mode-tab--active': entryMode === 'batch' }"
+          @click="entryMode = 'batch'"
+          type="button"
+        >{{ $t('demand.dialog.entryMode.batch') }}</button>
+      </div>
+
+      <!-- ========== 单个录入模式 ========== -->
+      <el-form
+        v-if="entryMode === 'single'"
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-width="100px"
+        class="demand-form"
+      >
+        <!-- 【基本信息】 -->
+        <div class="form-section">
+          <div class="form-section__title">{{ $t('demand.dialog.section.basic') }}</div>
+          <el-form-item :label="$t('demand.dialog.demandType')" prop="demandType">
             <el-radio-group v-model="formData.demandType">
               <el-radio value="REPLENISHMENT">{{ $t('demand.type.replenishment') }}</el-radio>
               <el-radio value="NEW_PURCHASE">{{ $t('demand.type.newPurchase') }}</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item :label="$t('demand.dialog.productCode')" prop="productCode" class="form-item--fill">
+          <el-form-item :label="$t('demand.dialog.productCode')" prop="productCode">
             <el-select
               v-model="formData.productCode"
               filterable
@@ -187,54 +213,77 @@
           </el-form-item>
         </div>
 
-        <!-- 子货号 + 数量 + 目的地（v2.0.0：直接字段） -->
-        <div class="form-row form-row--3col">
-          <el-form-item :label="$t('demand.dialog.subProductCode')" prop="subProductCode" class="form-item--fill">
-            <el-select
-              v-model="formData.subProductCode"
-              filterable
-              allow-create
-              default-first-option
-              :disabled="!formData.productCode && dialogMode === 'create'"
-              :placeholder="$t('demand.dialog.selectSubCode')"
-              style="width:100%"
-              @focus="loadSubCodeOptions"
+        <!-- 【需求明细】 -->
+        <div class="form-section">
+          <div class="form-section__title">{{ $t('demand.dialog.section.detail') }}</div>
+          <div class="detail-row">
+            <el-form-item
+              :label="$t('demand.dialog.subProductCode')"
+              prop="subProductCode"
+              class="detail-row__sub"
             >
-              <el-option
-                v-for="opt in subCodeOptions"
-                :key="opt.subCode"
-                :label="(opt.colorName || opt.subCode) + ' (' + opt.subCode + ')'"
-                :value="opt.subCode"
+              <el-select
+                v-model="formData.subProductCode"
+                filterable
+                :disabled="!formData.productCode"
+                :placeholder="$t('demand.dialog.selectSubCode')"
+                style="width:100%"
+                @focus="loadSubCodeOptions"
+              >
+                <el-option
+                  v-for="opt in subCodeOptions"
+                  :key="opt.subCode"
+                  :label="(opt.colorName || opt.subCode) + ' (' + opt.subCode + ')'"
+                  :value="opt.subCode"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item
+              :label="$t('demand.dialog.quantity')"
+              prop="quantity"
+              class="detail-row__qty"
+            >
+              <el-input-number
+                v-model="formData.quantity"
+                :min="1"
+                :max="999999"
+                controls-position="right"
+                style="width:100%"
               />
-            </el-select>
-          </el-form-item>
-          <el-form-item :label="$t('demand.dialog.quantity')" prop="quantity" class="form-item--qty">
-            <el-input-number
-              v-model="formData.quantity"
-              :min="1"
-              :max="999999"
-              controls-position="right"
-              style="width:100%"
-            />
-          </el-form-item>
-          <el-form-item :label="$t('demand.dialog.destination')" prop="destination" class="form-item--fill">
-            <el-input
-              v-model="formData.destination"
-              :placeholder="$t('demand.dialog.destinationPlaceholder')"
-            />
-          </el-form-item>
+            </el-form-item>
+            <el-form-item
+              :label="$t('demand.dialog.destination')"
+              prop="destination"
+              class="detail-row__dest"
+            >
+              <el-input
+                v-model="formData.destination"
+                :placeholder="$t('demand.dialog.destinationPlaceholder')"
+              />
+            </el-form-item>
+          </div>
         </div>
 
-        <!-- 日本担当 + 备注 -->
-        <div class="form-row form-row--2col">
-          <el-form-item :label="$t('demand.dialog.japanLead')" class="form-item--fill">
-            <el-input v-model="formData.japanLead" :placeholder="$t('demand.dialog.japanLeadPlaceholder')" />
-          </el-form-item>
-          <el-form-item :label="$t('demand.dialog.remarks')" class="form-item--fill">
-            <el-input v-model="formData.remarks" :placeholder="$t('demand.dialog.remarksPlaceholder')" />
-          </el-form-item>
+        <!-- 【补充信息】 -->
+        <div class="form-section">
+          <div class="form-section__title">{{ $t('demand.dialog.section.extra') }}</div>
+          <div class="extra-row">
+            <el-form-item :label="$t('demand.dialog.japanLead')" class="extra-row__lead">
+              <el-input v-model="formData.japanLead" :placeholder="$t('demand.dialog.japanLeadPlaceholder')" />
+            </el-form-item>
+            <el-form-item :label="$t('demand.dialog.remarks')" class="extra-row__remarks">
+              <el-input v-model="formData.remarks" :placeholder="$t('demand.dialog.remarksPlaceholder')" />
+            </el-form-item>
+          </div>
         </div>
       </el-form>
+
+      <!-- ========== 批量录入模式 ========== -->
+      <div v-else class="batch-mode">
+        <p class="batch-hint">{{ $t('demand.dialog.batchHint') }}</p>
+        <p class="batch-hint batch-hint--muted">（批量录入功能开发中）</p>
+      </div>
+
       <template #footer>
         <el-button @click="dialogVisible = false">{{ $t('demand.dialog.cancel') }}</el-button>
         <el-button type="primary" :loading="submitting" @click="onSubmit">{{ $t('demand.dialog.save') }}</el-button>
@@ -329,6 +378,7 @@ const dialogVisible = ref(false)
 const convertDialogVisible = ref(false)
 const linkedDialogVisible = ref(false)
 const dialogMode = ref<'create' | 'update'>('create')
+const entryMode = ref<'single' | 'batch'>('single')
 const currentRow = ref<DemandPageVO | null>(null)
 const formRef = ref<FormInstance>()
 
@@ -401,6 +451,7 @@ function onReset() {
 
 function onNew() {
   dialogMode.value = 'create'
+  entryMode.value = 'single'
   Object.assign(formData, {
     demandType: 'REPLENISHMENT',
     productCode: '',
@@ -597,12 +648,72 @@ onMounted(() => loadData())
 .dest-value { color: #6B7280; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
 
-/* v2.0.0 表单布局 */
-:deep(.demand-form .el-form-item) { margin-bottom: 16px; }
+/* v2.1.0 表单布局 */
+:deep(.demand-dialog .el-dialog__body) { padding-top: 16px; }
+:deep(.demand-form .el-form-item) { margin-bottom: 14px; }
 :deep(.demand-form .el-form-item:last-child) { margin-bottom: 0; }
-.form-row--2col { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: flex-start; }
-.form-row--3col { display: grid; grid-template-columns: 1fr 120px 1fr; gap: 12px; align-items: flex-start; }
-.form-item--shrink { flex-shrink: 0; }
-.form-item--fill { flex: 1; }
-.form-item--qty { flex-shrink: 0; }
+
+/* 模式切换标签 */
+.dialog-mode-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: #f5f7fa;
+  border-radius: 8px;
+  padding: 4px;
+  width: fit-content;
+}
+.mode-tab {
+  padding: 6px 20px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #606266;
+  transition: all 0.2s;
+}
+.mode-tab:hover { color: #409eff; }
+.mode-tab--active {
+  background: #fff;
+  color: #409eff;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* 分组 */
+.form-section { margin-bottom: 18px; }
+.form-section:last-child { margin-bottom: 0; }
+.form-section__title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #909399;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* 需求明细行 */
+.detail-row {
+  display: grid;
+  grid-template-columns: 2fr 140px 1.6fr;
+  gap: 12px;
+  align-items: flex-start;
+}
+.detail-row__qty :deep(.el-input-number) { width: 100%; }
+
+/* 补充信息行 */
+.extra-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* 批量模式提示 */
+.batch-mode { padding: 24px 0; text-align: center; }
+.batch-hint { color: #606266; font-size: 14px; margin: 0 0 4px; }
+.batch-hint--muted { color: #c0c4cc; font-size: 12px; }
 </style>

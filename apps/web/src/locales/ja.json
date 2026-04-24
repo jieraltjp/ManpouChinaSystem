@@ -91,7 +91,6 @@
       "destination": "出荷先",
       "japanLead": "日本担当",
       "status": "ステータス",
-      "status": "ステータス",
       "createTime": "作成日時",
       "action": "操作"
     },
@@ -130,6 +129,9 @@
       "save": "保存",
       "colorCount": "{count}色展開",
       "selectColorVariant": "カラーを選択",
+      "entryMode": { "single": "単一入力", "batch": "一括入力" },
+      "section": { "basic": "基本情報", "detail": "需要明细", "extra": "補充情報" },
+      "batchHint": "同一主品番の複数子品番を各自的数量・出荷先で一度に作成する場合に使用",
       "selectMasterCodeFirst": "先に主品番を選択してください",
       "addSubItem": "子品番を追加",
       "subProductItemCount": "{count}件のサブ品番",
@@ -1009,6 +1011,7 @@
     }
   },
   "common": {
+    "all": "すべて",
     "search": "検索",
     "reset": "リセット",
     "cancel": "キャンセル",
