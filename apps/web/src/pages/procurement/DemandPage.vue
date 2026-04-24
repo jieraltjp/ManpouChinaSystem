@@ -175,7 +175,7 @@
         ref="formRef"
         :model="formData"
         :rules="formRules"
-        label-width="100px"
+        label-width="120px"
         class="demand-form"
       >
         <!-- 【基本信息】 -->
@@ -213,15 +213,13 @@
           </el-form-item>
         </div>
 
-        <!-- 【需求明细】 -->
+        <!-- 【需求明细】：Grid 布局，每个单元格 = label + control -->
         <div class="form-section">
           <div class="form-section__title">{{ $t('demand.dialog.section.detail') }}</div>
-          <div class="detail-row">
-            <el-form-item
-              :label="$t('demand.dialog.subProductCode')"
-              prop="subProductCode"
-              class="detail-row__sub"
-            >
+          <div class="detail-grid">
+            <!-- 子货号（颜色） -->
+            <div class="detail-cell">
+              <label class="detail-label">{{ $t('demand.dialog.subProductCode') }}</label>
               <el-select
                 v-model="formData.subProductCode"
                 filterable
@@ -237,12 +235,10 @@
                   :value="opt.subCode"
                 />
               </el-select>
-            </el-form-item>
-            <el-form-item
-              :label="$t('demand.dialog.quantity')"
-              prop="quantity"
-              class="detail-row__qty"
-            >
+            </div>
+            <!-- 需求量 -->
+            <div class="detail-cell detail-cell--qty">
+              <label class="detail-label">{{ $t('demand.dialog.quantity') }}</label>
               <el-input-number
                 v-model="formData.quantity"
                 :min="1"
@@ -250,12 +246,10 @@
                 controls-position="right"
                 style="width:100%"
               />
-            </el-form-item>
-            <el-form-item
-              :label="$t('demand.dialog.destination')"
-              prop="destination"
-              class="detail-row__dest"
-            >
+            </div>
+            <!-- 目的地 -->
+            <div class="detail-cell">
+              <label class="detail-label">{{ $t('demand.dialog.destination') }}</label>
               <el-select
                 v-model="formData.destination"
                 filterable
@@ -276,15 +270,16 @@
                   :value="d"
                 />
               </el-select>
-            </el-form-item>
+            </div>
           </div>
         </div>
 
         <!-- 【补充信息】 -->
         <div class="form-section">
           <div class="form-section__title">{{ $t('demand.dialog.section.extra') }}</div>
-          <div class="extra-row">
-            <el-form-item :label="$t('demand.dialog.japanLead')" class="extra-row__lead">
+          <div class="extra-grid">
+            <div class="extra-cell">
+              <label class="detail-label">{{ $t('demand.dialog.japanLead') }}</label>
               <el-select
                 v-model="formData.japanLead"
                 filterable
@@ -305,10 +300,11 @@
                   :value="l"
                 />
               </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('demand.dialog.remarks')" class="extra-row__remarks">
+            </div>
+            <div class="extra-cell extra-cell--remarks">
+              <label class="detail-label">{{ $t('demand.dialog.remarks') }}</label>
               <el-input v-model="formData.remarks" :placeholder="$t('demand.dialog.remarksPlaceholder')" />
-            </el-form-item>
+            </div>
           </div>
         </div>
       </el-form>
@@ -763,29 +759,30 @@ onMounted(() => loadData())
   border-bottom: 1px solid #f0f0f0;
 }
 
-/* 需求明细行：让三个 el-form-item 像普通 div 一样并排 */
-.detail-row {
-  display: flex;
-  flex-wrap: nowrap;
+/* 需求明细：Grid 布局，不依赖 el-form-item 的 block/flex 行为 */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 2fr 140px 1.6fr;
   gap: 12px;
-  align-items: flex-start;
+  align-items: start;
 }
-/* el-form-item 默认 display:block，强制改为 block 并参与 flex 布局 */
-.detail-row > .el-form-item { display: block; width: 100%; box-sizing: border-box; }
-.detail-row__sub  { flex: 2 1 0% !important; min-width: 0; }
-.detail-row__qty  { flex: 0 0 140px !important; min-width: 0; }
-.detail-row__dest { flex: 1.6 1 0% !important; min-width: 0; }
-.detail-row__qty :deep(.el-form-item__content) { width: 100%; }
+.detail-cell { display: flex; flex-direction: column; gap: 4px; }
+.detail-cell--qty .el-input-number { width: 100%; }
+.detail-label {
+  font-size: 13px;
+  color: #606266;
+  line-height: 1.4;
+  white-space: nowrap;
+}
 
-/* 补充信息行 */
-.extra-row {
-  display: flex;
-  flex-wrap: wrap;
+/* 补充信息：Grid 布局 */
+.extra-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
   gap: 12px;
-  align-items: flex-start;
+  align-items: start;
 }
-.extra-row__lead   { flex: 0 0 200px; min-width: 0; }
-.extra-row__remarks { flex: 1 1 0; min-width: 0; }
+.extra-cell { display: flex; flex-direction: column; gap: 4px; }
 
 /* 批量模式提示 */
 .batch-mode { padding: 24px 0; text-align: center; }
