@@ -94,7 +94,7 @@
             <span v-if="!row.subProductItems || row.subProductItems.length === 0">—</span>
             <span v-else v-for="(item, idx) in row.subProductItems" :key="idx" class="sub-item-chip">
               <el-tag size="small" type="info" style="margin-right:4px">{{ item.subCode }}</el-tag>
-              <span class="sub-item-detail">{{ item.quantity }}台</span>
+              <span class="sub-item-detail">{{ item.quantity }}{{ $t('demand.dialog.unitTai') }}</span>
               <span v-if="item.destination" class="sub-item-dest"> → {{ item.destination }}</span>
               <span v-if="idx < row.subProductItems.length - 1" style="margin-right:6px">,</span>
             </span>
@@ -194,7 +194,7 @@
           <div class="sic-header">
             <span class="sic-title">{{ $t('demand.dialog.subProductItems') }}</span>
             <span class="sic-count" v-if="formData.subProductItems.length > 0">
-              {{ formData.subProductItems.length }} 个子货号
+              {{ $t('demand.dialog.subProductItemCount', { count: formData.subProductItems.length }) }}
             </span>
           </div>
 

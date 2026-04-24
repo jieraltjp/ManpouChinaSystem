@@ -131,6 +131,8 @@
       "selectColorVariant": "カラーを選択",
       "selectMasterCodeFirst": "先に主品番を選択してください",
       "addSubItem": "子品番を追加",
+      "subProductItemCount": "{count}件のサブ品番",
+      "unitTai": "台",
       "col": {
         "subCode": "子品番",
         "quantity": "数量",

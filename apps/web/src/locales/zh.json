@@ -130,6 +130,8 @@
       "selectColorVariant": "选择颜色变体",
       "selectMasterCodeFirst": "请先选择主货号",
       "addSubItem": "添加子货号",
+      "subProductItemCount": "{count}个子货号",
+      "unitTai": "台",
       "col": {
         "subCode": "子货号",
         "quantity": "数量",

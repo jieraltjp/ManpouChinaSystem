@@ -108,10 +108,10 @@ scripts\start-all.bat status    # 查询运行状态
 
 ```bash
 cd apps/manpou-allinone
-mvn package -DskipTests -q -Drevision=1.0.0
+mvn package -DskipTests -Drevision=1.0.0
 
 cd apps/user-service
-mvn package -DskipTests -q -Drevision=1.0.0
+mvn package -DskipTests -Drevision=1.0.0
 ```
 
 ## 团队成员
