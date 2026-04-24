@@ -40,7 +40,7 @@ graph TB
     %% 基础设施层
     subgraph Infrastructure["基础设施 (docker/compose.yaml)"]
         REDIS["Redis\n:6379"]
-        MYSQL["MySQL / TiDB\n:3306"]
+        MYSQL["MySQL\n:3306"]
         KAFKA["Kafka\n:9092"]
         NACOS["Nacos\n:8848"]
         MINIO["MinIO\n:9000"]
@@ -249,7 +249,7 @@ graph TB
 
 | 组件 | 端口 | 用途 | 当前状态 |
 |------|------|------|---------|
-| MySQL / TiDB | 3306 | 业务数据持久化 | Docker 可用 |
+| MySQL | 3306 | 业务数据持久化 | Docker 可用 |
 | Redis | 6379 | 缓存 + 会话（health 检查依赖） | Docker 可用 |
 | Kafka | 9092 | 领域事件消息队列 | Docker 可用 |
 | Nacos | 8848 | 配置中心 + 注册中心 | Docker 可用 |

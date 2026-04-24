@@ -60,7 +60,7 @@ ManpouChinaSystem/
 | Java 框架 | Spring Boot | 3.2.5 |
 | Java 微服务生态 | Spring Cloud Alibaba | 2023.0.1.2 |
 | ORM | Spring Data JPA + Hibernate | - |
-| 数据库 | MySQL 8.x（开发）/ TiDB v8（生产） | 8.0 |
+| 数据库 | MySQL 8.x（开发/生产） | 8.0 |
 | 数据库迁移 | Flyway | 10.10.0 |
 | 前端框架 | Vue | 3.4+ |
 | 前端构建 | Vite | 5.3+ |

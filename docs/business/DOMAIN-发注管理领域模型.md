@@ -593,15 +593,15 @@ public interface ReplenishmentDemandRepository extends JpaRepository<Replenishme
 ```java
 public interface FactoryRepository {
     Optional<Factory> findById(Long id);
-    Optional<Factory> findByIdAndIsDeletedFalse(Long id);
-    Optional<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName);
+    Optional<Factory> findByIdAndDeletedIsFalse(Long id);
+    Optional<Factory> findByFactoryNameAndDeletedIsFalse(String factoryName);
     Factory save(Factory entity);
     void deleteById(Long id);
-    List<Factory> findAllByIsDeletedFalse();
-    Page<Factory> findAllByIsDeletedFalse(Pageable pageable);
-    Page<Factory> findByCooperationStatusAndIsDeletedFalse(CooperationStatus status, Pageable pageable);
-    Page<Factory> findByFactoryNameAndIsDeletedFalse(String factoryName, Pageable pageable);
-    boolean existsByIsDeletedFalse();
+    List<Factory> findAllByDeletedIsFalse();
+    Page<Factory> findAllByDeletedIsFalse(Pageable pageable);
+    Page<Factory> findByCooperationStatusAndDeletedIsFalse(CooperationStatus status, Pageable pageable);
+    Page<Factory> findByFactoryNameAndDeletedIsFalse(String factoryName, Pageable pageable);
+    boolean existsByDeletedIsFalse();
 }
 ```
 
@@ -621,16 +621,16 @@ public interface ProcurementRepository extends JpaRepository<Procurement, Long> 
 ```java
 public interface ProductRepository {
     Optional<Product> findById(Long id);
-    Optional<Product> findByIdAndIsDeletedFalse(Long id);
-    Optional<Product> findByMasterCodeAndIsDeletedFalse(String masterCode);
-    Optional<Product> findByMasterCodeAndSubCodeAndIsDeletedFalse(String masterCode, String subCode);
+    Optional<Product> findByIdAndDeletedIsFalse(Long id);
+    Optional<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
+    Optional<Product> findByMasterCodeAndSubCodeAndDeletedIsFalse(String masterCode, String subCode);
     Product save(Product entity);
     void deleteById(Long id);
-    List<Product> findAllByIsDeletedFalse();
-    Page<Product> findAllByIsDeletedFalse(Pageable pageable);
-    Page<Product> findByMasterCodeAndIsDeletedFalse(String masterCode, Pageable pageable);
-    Page<Product> findByNameZhContainingAndIsDeletedFalse(String keyword, Pageable pageable);
-    Page<Product> findByHsCodeAndIsDeletedFalse(String hsCode, Pageable pageable);
+    List<Product> findAllByDeletedIsFalse();
+    Page<Product> findAllByDeletedIsFalse(Pageable pageable);
+    Page<Product> findByMasterCodeAndDeletedIsFalse(String masterCode, Pageable pageable);
+    Page<Product> findByNameZhContainingAndDeletedIsFalse(String keyword, Pageable pageable);
+    Page<Product> findByHsCodeAndDeletedIsFalse(String hsCode, Pageable pageable);
 }
 
 > **实现**: `ProductJpaRepository`（`infrastructure/persistence/jpa/`）同时继承本接口和 `JpaRepository<Product, Long>`。
@@ -639,8 +639,8 @@ public interface ProductRepository {
 
 ```java
 public interface ProductFactoryRepository {
-    List<ProductFactory> findByProductIdAndIsDeletedFalse(Long productId);
-    List<ProductFactory> findByFactoryIdAndIsDeletedFalse(Long factoryId);
+    List<ProductFactory> findByProductIdAndDeletedIsFalse(Long productId);
+    List<ProductFactory> findByFactoryIdAndDeletedIsFalse(Long factoryId);
     Optional<ProductFactory> findByProductIdAndFactoryId(Long productId, Long factoryId);
 }
 
@@ -648,8 +648,8 @@ public interface ProductFactoryRepository {
 
 ```java
 public interface ProductFactoryRepository {
-    List<ProductFactory> findByProductIdAndIsDeletedFalse(Long productId);
-    List<ProductFactory> findByFactoryIdAndIsDeletedFalse(Long factoryId);
+    List<ProductFactory> findByProductIdAndDeletedIsFalse(Long productId);
+    List<ProductFactory> findByFactoryIdAndDeletedIsFalse(Long factoryId);
     Optional<ProductFactory> findByProductIdAndFactoryId(Long productId, Long factoryId);
 }
 ```

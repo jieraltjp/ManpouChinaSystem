@@ -139,7 +139,7 @@ public Long create(ProcurementCreateCmd cmd) {
     if (cmd.getFactoryId() == null) {
         throw BusinessException.invalidParam("关联工厂不能为空");
     }
-    factoryRepository.findByIdAndIsDeletedFalse(cmd.getFactoryId())
+    factoryRepository.findByIdAndDeletedIsFalse(cmd.getFactoryId())
             .orElseThrow(() -> BusinessException.invalidParam("关联工厂不存在或已删除"));
 
     Procurement entity = assembler.toEntity(cmd);
@@ -153,7 +153,7 @@ public Long create(ProcurementCreateCmd cmd) {
 ```java
 @Transactional
 public void update(Long id, ProcurementUpdateCmd cmd) {
-    Procurement entity = procurementRepository.findByIdAndIsDeletedFalse(id)
+    Procurement entity = procurementRepository.findByIdAndDeletedIsFalse(id)
             .orElseThrow(() -> BusinessException.notFound("Procurement", id));
 
     // factoryId 不允许修改
@@ -201,13 +201,13 @@ private Long factoryId;  // 按工厂筛选
 
 `ProcurementRepository` 新增：
 ```java
-Page<Procurement> findByFactoryIdAndIsDeletedFalse(Long factoryId, Pageable pageable);
+Page<Procurement> findByFactoryIdAndDeletedIsFalse(Long factoryId, Pageable pageable);
 ```
 
 `ProcurementUseCase.pageQuery` 新增分支：
 ```java
 if (query.getFactoryId() != null) {
-    page = procurementRepository.findByFactoryIdAndIsDeletedFalse(
+    page = procurementRepository.findByFactoryIdAndDeletedIsFalse(
             query.getFactoryId(), pageRequest);
 }
 ```

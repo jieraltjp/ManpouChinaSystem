@@ -18,7 +18,7 @@
 | `DemandPage.vue` 主货号输入 | `el-input` 纯文本，无提示 | 无法复用 Product 表数据，用户须记忆货号 |
 | `DemandPage.vue` 子货号输入 | `el-input` 纯文本，单个值 | 无法选择多个颜色变体 |
 | `ProductController` | 有 `/code/{masterCode}` 按主货号精确查询 | **无模糊搜索/自动补全接口** |
-| `ProductJpaRepository` | 有 `findByMasterCodeAndIsDeletedFalse` | 无按关键词返回候选列表 |
+| `ProductJpaRepository` | 有 `findByMasterCodeAndDeletedIsFalse` | 无按关键词返回候选列表 |
 | `ReplenishmentDemand` | `subProductCode` 为普通 String | 字段语义为"单个"，多选需扩展 |
 
 ### 1.2 数据模型对应关系
@@ -222,7 +222,7 @@ public Result<List<SubCodeSuggestVO>> suggestSubCodes(@RequestParam String maste
 List<String> findDistinctMasterCodeByKeyword(@Param("kw") String keyword);
 
 // 子货号候选项（按 masterCode 过滤）
-List<Product> findByMasterCodeAndIsDeletedFalse(String masterCode);
+List<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
 ```
 
 ---
