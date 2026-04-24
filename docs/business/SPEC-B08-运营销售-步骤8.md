@@ -118,7 +118,7 @@ SalesRecord.isLowStock() = true
             productCode = this.productCode
             subProductCode = this.subProductCode
             quantity = safetyThreshold - currentStock
-            destination = this.destination（来自 Procurement）
+            destination = Procurement.destination（通过 procurementId 查询 Procurement 获取）
             japanLead = this.japanLead（来自 Procurement）
 ```
 

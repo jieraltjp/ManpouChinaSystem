@@ -37,7 +37,7 @@ TaxRefundRecord（聚合根）
 ├── taxPoint: BigDecimal                # 票点（来自 Procurement）
 ├── estimatedRefundRmb: BigDecimal       # 理论退税额（自动计算）
 ├── actualRefundRmb: BigDecimal         # 实际退税额（用户填入）
-├── exchangeRate: BigDecimal             # 汇率（来自 Procurement）
+├── exchangeRate: BigDecimal             # 汇率（来自 Procurement；注：当前退税公式不涉及此字段，保留用于未来扩展）
 ├── refundDate: LocalDate               # 实际退税日期
 ├── refundBank: String                  # 退税银行账户
 ├── remarks: String                     # 备注

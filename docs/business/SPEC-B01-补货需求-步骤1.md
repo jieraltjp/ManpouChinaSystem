@@ -97,7 +97,7 @@ public class LinkedDemandItem {
 
 ### 转采购：批量生成逻辑（v1.6.0）
 
-`convertToProcurement(factoryId, procurementIds)` 的语义升级：
+`convertToProcurement(factoryId)` 的语义（v1.6.0）：
 
 - **每个 SubProductItem 生成一条 Procurement 记录**（数量、目的地各自独立）
 - **一条 ReplenishmentDemand 对应多条 Procurement**（通过 `linkedDemandItems` 追踪）

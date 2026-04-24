@@ -1,11 +1,11 @@
 # 订单总览 — API 设计
 
-> **版本**: 1.2.0
+> **版本**: 1.3.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-24（v1.2.0：DemandVO 适配 v1.6.0；subProductItemsSummary 替代 quantity/destination）
-> **状态**: ✅ 已实现（Phase 1）
+> **更新**: 2026-04-24（v1.3.0：补充 Phase 5 Demand 中心化端点；统一 VO 命名为 OrderOverviewPageVO）
+> **状态**: ✅ 已实现（Phase 1 + Phase 5）
 > **对应前端**: `OrderOverviewPage.vue` · `docs/ui/pages/09-order-overview.md`
-> **核心**: 以 Procurement.id 为锚点，聚合全链路 8 步数据
+> **核心**: 双入口架构 — Demand 锚点（新建需求单立即可见）+ Procurement 锚点（8步全链路聚合）
 
 ---
 
@@ -19,11 +19,38 @@
 
 ## 2. 接口契约
 
-### 2.1 聚合查询（核心）
+### 2.1 双入口端点
 
 ```
-GET /api/v1/orders/{procurementId}/overview
+# 入口A：Demand 锚点（新建需求单立即可见）
+GET /api/v1/orders/demands                      # Demand 列表（selector）
+GET /api/v1/orders/demands/{demandId}/overview   # Demand 详情总览（Step1 有数据，Step2-8 NOT_STARTED）
+
+# 入口B：Procurement 锚点（8步全链路聚合）
+GET /api/v1/orders/{procurementId}/overview      # Procurement 详情总览
+GET /api/v1/orders/selector                      # Procurement 列表（selector）
 ```
+
+**入口A — GET `/api/v1/orders/demands`**
+
+Query 参数：`page`, `pageSize`, `keyword`
+
+响应 200：`Page<OrderDemandSelectorDTO>`（Demand 选择器分页列表）
+
+**入口A — GET `/api/v1/orders/demands/{demandId}/overview`**
+
+> Demand 锚点详情：step1=COMPLETED（数据来自 Demand 自身），step2-8=NOT_STARTED
+
+响应 200：
+
+```json
+{
+  "demand": { ... },
+  "stepStatuses": ["COMPLETED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED"]
+}
+```
+
+**入口B — GET `/api/v1/orders/{procurementId}/overview`**
 
 **响应 200**：
 
@@ -45,7 +72,7 @@ GET /api/v1/orders/{procurementId}/overview
 
 > ⚠️ 响应体各步骤字段为占位，待对应聚合根实现后填充完整。
 
-**响应 404**：`Procurement` 不存在或已删除
+**响应 404**：`Procurement` / `ReplenishmentDemand` 不存在或已删除
 
 ---
 
@@ -266,7 +293,7 @@ public class OrderOverviewController {
     private final OrderOverviewUseCase orderOverviewUseCase;
 
     @GetMapping("/{procurementId}/overview")
-    public OrderOverviewVO getOverview(@PathVariable Long procurementId) {
+    public OrderOverviewPageVO getOverview(@PathVariable Long procurementId) {
         return orderOverviewUseCase.getOverview(procurementId);
     }
 }
@@ -287,12 +314,12 @@ public class OrderOverviewUseCase {
     // 步骤5-8 Repository（待实现）
 
     @Transactional(readOnly = true)
-    public OrderOverviewVO getOverview(Long procurementId) {
+    public OrderOverviewPageVO getOverview(Long procurementId) {
         Procurement procurement = procurementRepository
-                .findByIdAndIsDeletedFalse(procurementId)
+                .findByIdAndDeletedIsFalse(procurementId)
                 .orElseThrow(() -> BusinessException.notFound("Procurement", procurementId));
 
-        return OrderOverviewVO.builder()
+        return OrderOverviewPageVO.builder()
                 .procurementId(procurement.getId())
                 .procurement(mapProcurement(procurement))
                 .demand(findDemand(procurement))
@@ -313,7 +340,7 @@ public class OrderOverviewUseCase {
 ```java
 @Data
 @Builder
-public class OrderOverviewVO {
+public class OrderOverviewPageVO {
     private Long procurementId;
     private ProcurementVO procurement;          // 必定非空
     private ReplenishmentDemandVO demand;       // 可能为空
@@ -337,7 +364,7 @@ public class OrderOverviewVO {
 // apps/web/src/api/orderOverview.ts
 import { client } from './client'
 
-export interface OrderOverviewVO {
+export interface OrderOverviewPageVO {
   procurementId: number
   procurement: ProcurementVO
   demand?: ReplenishmentDemandVO
@@ -352,7 +379,7 @@ export interface OrderOverviewVO {
 
 export const orderOverviewApi = {
   getOverview(procurementId: number) {
-    return client.get<OrderOverviewVO>(`/orders/${procurementId}/overview`)
+    return client.get<OrderOverviewPageVO>(`/orders/${procurementId}/overview`)
   }
 }
 ```
@@ -362,10 +389,10 @@ export const orderOverviewApi = {
 ```typescript
 // apps/web/src/pages/procurement/useOrderOverview.ts
 import { ref, computed } from 'vue'
-import { orderOverviewApi, type OrderOverviewVO } from '@/api/orderOverview'
+import { orderOverviewApi, type OrderOverviewPageVO } from '@/api/orderOverview'
 
 export function useOrderOverview(procurementId: Ref<number>) {
-  const overview = ref<OrderOverviewVO | null>(null)
+  const overview = ref<OrderOverviewPageVO | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -394,10 +421,11 @@ export function useOrderOverview(procurementId: Ref<number>) {
 
 ## 6. 缺口与TODO
 
-| 项目 | 优先级 | 说明 |
-|------|--------|------|
-| 聚合接口实现 | P0 | GET `/api/v1/orders/{id}/overview` 后端实现 |
-| 步骤5-8 填充 | P1 | DomesticCustoms/JapanCustoms/TaxRefund/SalesRecord 实现后填充 |
-| 前端页面实现 | P1 | `OrderOverviewPage.vue` + 各步骤卡片组件 |
-| 路由注册 | P1 | `/procurement/overview/:id` 注册到 router |
+| 项目 | 优先级 | 状态 | 说明 |
+|------|--------|------|------|
+| 聚合接口实现 | P0 | ✅ 已完成 | GET `/api/v1/orders/{id}/overview` 后端实现 |
+| Phase 5 Demand 中心化 | P0 | ✅ 已完成 | GET `/api/v1/orders/demands` + `/demands/{id}/overview` |
+| 步骤5-8 填充 | P1 | 🟡 进行中 | DomesticCustoms/JapanCustoms/TaxRefund/SalesRecord 实现后填充 |
+| 前端页面实现 | P1 | ✅ 已完成 | `OrderOverviewPage.vue` + `DemandOverviewPage.vue` |
+| 路由注册 | P1 | ✅ 已完成 | `/procurement/overview/:id` 及 `/demand-overview/:id` |
 | 列表页入口 | P2 | Procurement/Inspection/Logistics 列表页「总览」按钮 |

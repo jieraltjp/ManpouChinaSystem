@@ -55,7 +55,7 @@
     ├── DomesticCustomsRepository
     ├── JapanCustomsRepository
     ├── TaxRefundRepository
-    └── SalesRepository
+    └── SalesRecordRepository
 
 前端
 ├── api/
@@ -231,7 +231,7 @@ public class OrderOverviewUseCase {
     private final DomesticCustomsRepository domesticCustomsRepository;
     private final JapanCustomsRepository japanCustomsRepository;
     private final TaxRefundRepository taxRefundRepository;
-    private final SalesRepository salesRepository;
+    private final SalesRecordRepository salesRecordRepository;
     private final OrderOverviewAssembler assembler;
 
     @Transactional(readOnly = true)
