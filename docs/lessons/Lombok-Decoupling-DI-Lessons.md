@@ -21,6 +21,11 @@
 - [Lesson 32: 重构实体移除字段后必须同步清理数据库旧列](#lesson-32-重构实体移除字段后必须同步清理数据库旧列)
 - [Lesson 33: 锚点设计决定 Overview 可见性——Procurement 中心导致 Demand 新建后不可见](#lesson-33-锚点设计决定-overview-可见性procurement-中心导致-demand-新建后不可见)
 - [Lesson 34: 前端类型定义必须与后端 VO 同步——接口变更后旧字段残留导致-undefined](#lesson-34-前端类型定义必须与后端-vo-同步接口变更后旧字段残留导致-undefined)
+- [Lesson 40: TypeScript strict 编译必须通过——TS6133/TS2345 是代码腐烂信号](#lesson-40-typescript-strict-编译必须通过ts6133ts2345-是代码腐烂信号)
+- [Lesson 41: 前端 API 签名变更后所有调用方必须同步——v1.6 破坏性变更教训](#lesson-41-前端-api-签名变更后所有调用方必须同步——v16-破坏性变更教训)
+- [Lesson 42: Vue template v-for 的 index 参数未使用时必须加 `_` 前缀](#lesson-42-vue-template-v-for-的-index-参数未使用时必须加--前缀)
+- [Lesson 43: 前端组件 Props 必须与所有调用方对齐——optional 字段不得隐式 required](#lesson-43-前端组件-props-必须与所有调用方对齐——optional-字段不得隐式-required)
+- [Lesson 44: 前端对话框表格列标签必须提取为 i18n key——禁止硬编码](#lesson-44-前端对话框表格列标签必须提取为-i18n-key——禁止硬编码)
 
 ---
 
@@ -819,9 +824,9 @@ mvn package -DskipTests
 
 ---
 
-## 总结：十八条铁律（→ 已有 32 条，详见文末）
+## 总结：二十七条铁律（→ 已有 44 条，详见文末）
 
-> 以下为历史版本（Lesson 1-27），当前最新版本（含 Lesson 28-32）见文末「总结：十八条铁律（更新版）」。
+> 以下为历史版本（Lesson 1-17），当前最新版本（含 Lesson 25-44）见文末「总结：二十七条铁律（最终版）」。
 
 ### 工程实践（代码层）
 
@@ -1204,7 +1209,7 @@ ALTER TABLE replenishment_demand DROP COLUMN linked_procurement_id;
 
 ---
 
-## 总结：十八条铁律（更新版）
+## 总结：二十七条铁律（更新版）
 
 ### 工程实践（代码层）
 
@@ -1493,7 +1498,240 @@ if (item.getQuantity() == null || item.getQuantity() <= 0) {
 
 ---
 
-## 总结：十八条铁律（最终版）
+## Lesson 40: TypeScript strict 编译必须通过，TS6133/TS2345 是代码腐烂信号
+
+### 问题
+
+`vue-tsc --noEmit` 编译失败，大量 TS 错误：
+
+```
+TS6133: 'onSubCodeChange' is declared but never used        // DemandPage.vue
+TS6133: 'index' is declared but never used                 // OrderPage.vue (2处)
+TS2345: Argument of type '{ currentStep: number }' is not assignable
+        to parameter of type 'StepStatus[]'                   // StatusProgressBar.vue
+```
+
+### 根因
+
+- 前端组件参数与调用方不一致（如 `StatusProgressBar` 的 `currentStep` 应为 optional）
+- 旧函数被重构后遗留（`onSubCodeChange`）
+- Vue `v-for` 的 `index` 参数未使用
+
+### 本次修复
+
+| 错误类型 | 修复方式 |
+|---------|---------|
+| TS6133 未使用变量 | 移除声明，或用 `_` 前缀（`v-for` 的 index）|
+| TS2345 类型不匹配 | 检查组件 `defineProps` 定义与调用方是否对齐 |
+
+```typescript
+// ✅ 正确：currentStep 声明为可选
+defineProps<{
+  stepStatuses: StepStatus[]
+  currentStep?: number  // ← optional，与3处调用方匹配
+}>()
+
+// ❌ 错误：currentStep 声明为必需
+defineProps<{
+  stepStatuses: StepStatus[]
+  currentStep: number  // ← 3个页面调用时未传参 → TS2345
+}>()
+```
+
+### 预防
+
+- `vue-tsc --noEmit` 必须加入 CI，检查 `tsconfig.json` 中 `strict: true`
+- `tsconfig.json` 包含以下规则：
+  ```json
+  {
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  }
+  ```
+- PR 合入前 `npm run build` 必须成功
+
+---
+
+## Lesson 41: 前端 API 签名变更后所有调用方必须同步，v1.6 破坏性变更教训
+
+### 问题
+
+v1.6.0 后端 `convertToProcurement` API 签名从：
+```
+convertToProcurement(id: number, factoryId: number)
+```
+改为：
+```
+convertToProcurement(id: number, cmd: ConvertDemandCmd)
+```
+
+前端 `OrderPage.vue` 仍用旧签名调用：
+```typescript
+// ❌ 旧调用（编译通过但语义错误）
+demandApi.convertToProcurement(id, factoryId as number)
+
+// ✅ 新调用
+demandApi.convertToProcurement(id, { factoryId: factoryId as number })
+```
+
+### 根因
+
+- 后端 API 签名变更未同步更新前端 API 客户端类型
+- 前端 API 层（`api/demand.ts`）的请求类型定义与实际不匹配
+- 没有前端覆盖测试（TypeScript 编译通过但运行时有误）
+
+### 本次修复
+
+| 旧 API（v1.5） | 新 API（v1.6） |
+|---|---|
+| `convertToProcurement(id, factoryId)` | `convertToProcurement(id, { factoryId })` |
+| `d.subProductCodes[0]` | `d.subProductItems?.[0]?.subCode` |
+| `d.destination` | `d.subProductItems?.[0]?.destination` |
+| `d.quantity` | `d.subProductItems?.[0]?.quantity` |
+
+### 预防
+
+> **后端 API 破坏性变更 = 前端 API 类型 + 所有调用方 + 单元测试 三处同步。**
+
+- OpenAPI schema 变更必须触发前端 codegen 重新生成
+- 无 codegen 时：变更后端 API → 立即 grep 全前端 `api/*.ts` 找调用方
+
+---
+
+## Lesson 42: Vue template `v-for` 的 `index` 参数未使用时必须加 `_` 前缀
+
+### 问题
+
+```typescript
+// ❌ TS6133: index is declared but never used
+tableData.forEach((item, index) => {
+  console.log(item)  // index 未使用
+})
+```
+
+### 根因
+
+TypeScript `noUnusedParameters: true` 规则。
+
+### 解决方案
+
+```typescript
+// ✅ 正确：index 不需要时加 _ 前缀
+tableData.forEach((item, _index) => {
+  console.log(item)
+})
+
+// ✅ 或解构忽略
+tableData.forEach((item) => {
+  console.log(item)
+})
+```
+
+### 预防
+
+- `tsconfig.json` 开启 `noUnusedParameters: true`
+- IDE 配置实时提示未使用变量（WebStorm/VSCode TypeScript 插件）
+
+---
+
+## Lesson 43: 前端组件 Props 必须与所有调用方对齐——optional 字段不得隐式 required
+
+### 问题
+
+`StatusProgressBar.vue` 组件的 `currentStep` 声明为必需，但 3 个调用页面（`DemandPage.vue`、`OrderPage.vue`、`OrderOverviewPage.vue`）均未传此参数：
+
+```
+TS2345: Argument of type '{ stepStatuses: StepStatus[] }'
+is not assignable to parameter of type
+'{ stepStatuses: StepStatus[]; currentStep: number }'
+```
+
+### 根因
+
+- 组件设计时认为 `currentStep` 必需，但实际业务场景中页面不需要显示"当前步骤高亮"
+- `defineProps` 定义与调用方数量不匹配时，TypeScript 无法自动推导
+
+### 解决方案
+
+```typescript
+// ✅ 正确：非必需字段加 ?
+defineProps<{
+  stepStatuses: StepStatus[]
+  currentStep?: number  // ← optional，调用方可以不传
+}>()
+```
+
+### 预防
+
+- 设计组件时，默认所有 props 均为 optional（`?`）
+- 必须为 required 的字段才不加 `?`（如列表数据的 `items`）
+- 组件添加新 prop 前，grep 所有调用方确认使用场景
+
+---
+
+## Lesson 44: 前端对话框表格列标签必须提取为 i18n key，禁止硬编码
+
+### 问题
+
+`DemandPage.vue` 中"关联采购单"对话框的表格列标签硬编码：
+
+```vue
+<!-- ❌ 硬编码中文字符串 -->
+<el-table-column prop="id" label="采购单号" />
+<el-table-column prop="factoryName" label="工厂名称" />
+<el-table-column prop="productCode" label="货号" />
+```
+
+日语用户看到中文标签，无法理解。
+
+### 根因
+
+- 对话框 UI 后加，漏掉了 i18n 集成
+- 硬编码比写 `{{ $t('...') }}` 更快，养成坏习惯
+
+### 解决方案
+
+```vue
+<!-- ✅ i18n 化 -->
+<el-table-column prop="id" :label="t('demand.linkedDialog.column.id')" />
+<el-table-column prop="factoryName" :label="t('demand.linkedDialog.column.factoryName')" />
+```
+
+```json
+// zh.json
+"demand": {
+  "linkedDialog": {
+    "title": "关联采购单",
+    "column": {
+      "id": "采购单号",
+      "factoryName": "工厂名称",
+      "productCode": "货号"
+    }
+  }
+}
+
+// ja.json
+"demand": {
+  "linkedDialog": {
+    "title": "関連発注書",
+    "column": {
+      "id": "発注番号",
+      "factoryName": "工場名",
+      "productCode": "商品番号"
+    }
+  }
+}
+```
+
+### 预防
+
+- ESLint rule `vue/i18n` 或 `vue/no-v-text-v-skeleton` 检查硬编码文本
+- 新增组件时，所有文本显示默认用 `$t()`，不提供文本默认值
+
+---
+
+## 总结：二十七条铁律（最终版）
 
 ### 工程实践（代码层）
 
@@ -1558,8 +1796,13 @@ if (item.getQuantity() == null || item.getQuantity() <= 0) {
 | 33 | 业务链起点 = Overview 入口锚点 | Demand 新建后不可见 |
 | 34 | 接口变更 = 后端 VO + 前端类型 + 模板 + i18n 同步 | undefined 显示 |
 | 37 | 前端状态标签必须本地化，禁止直接显示枚举值 | 日语用户看到乱码 |
+| 40 | vue-tsc --noEmit 必须通过（strict + noUnusedLocals） | TS6133/TS2345 累积 |
+| 41 | 后端 API 破坏性变更 = 前端 API 类型 + 所有调用方 + 单元测试 三处同步 | 运行时错误 |
+| 42 | v-for 的 index 参数未使用加 `_` 前缀 | TS6133 |
+| 43 | 组件 Props 必须与所有调用方对齐——optional 字段不加 `?` 会导致 TS2345 | 编译失败 |
+| 44 | 对话框/表格列标签必须提取为 i18n key，禁止硬编码 | 日语用户无法理解 |
 
 ---
 
-*来源：2026-04-24 全量审计会话 · docs/business 审计（SPEC-B01/B03/B07/B08/B09）· docs/database 审计（DB-01/DB-06/DB-08/DB-09）· 后端代码审计 · 前端代码审计 · lessons 文档更新（Lesson 35-39，铁律表更新至39条）*
+*来源：2026-04-24 全量审计会话 · docs/business 审计（SPEC-B01/B03/B07/B08/B09）· docs/database 审计（DB-01/DB-06/DB-08/DB-09/废弃旧文档）· 后端代码审计 · 前端代码审计 · lessons 文档更新（Lesson 35-44，铁律表更新至27条规则）*
 
