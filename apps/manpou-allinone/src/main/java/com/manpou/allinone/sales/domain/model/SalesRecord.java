@@ -114,4 +114,15 @@ public class SalesRecord extends BaseEntity {
     public boolean isTerminal() {
         return status != null && status.isTerminal();
     }
+
+    /**
+     * 判断是否低于安全库存。
+     * 触发条件：currentStock < safetyStock
+     */
+    public boolean isLowStock() {
+        if (currentStock == null || safetyStock == null) {
+            return false;
+        }
+        return currentStock < safetyStock;
+    }
 }

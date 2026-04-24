@@ -220,7 +220,7 @@ public class OrderOverviewPageVO {
         private java.math.BigDecimal taxPoint;
         private java.math.BigDecimal estimatedRefundRmb;
         private java.math.BigDecimal actualRefundRmb;
-        private java.math.BigDecimal exchangeRate;
+        private java.math.BigDecimal exchangeRate; // 参考值：来自 Procurement；理论退税公式不使用此字段
         private java.time.LocalDate refundDate;
         private String refundBank;
         private String remarks;

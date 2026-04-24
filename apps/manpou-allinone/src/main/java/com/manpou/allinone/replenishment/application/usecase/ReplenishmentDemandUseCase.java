@@ -126,6 +126,11 @@ public class ReplenishmentDemandUseCase {
         List<LinkedDemandItem> linkedItems = new ArrayList<>();
         for (int i = 0; i < subItems.size(); i++) {
             SubProductItem item = subItems.get(i);
+            if (item.getQuantity() == null || item.getQuantity() <= 0) {
+                throw BusinessException.invalidParam(
+                        String.format("子货号 [%s] 数量无效（%s），无法转采购",
+                                item.getSubCode(), item.getQuantity()));
+            }
             ProcurementCreateCmd pCmd = new ProcurementCreateCmd();
             pCmd.setFactoryId(cmd.getFactoryId());
             pCmd.setProductCode(entity.getProductCode());
