@@ -111,7 +111,7 @@
             {{ row.createTime ? new Date(row.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN') : '-' }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('demand.column.action')" width="260" fixed="right" align="center">
+        <el-table-column :label="$t('demand.column.action')" width="260" align="center">
           <template #default="{ row }">
             <el-button v-if="row.status === 'PENDING'" link type="primary" size="small" @click.stop="onConvert(row)">
               {{ $t('demand.action.convert') }}
@@ -710,8 +710,6 @@ onMounted(() => loadData())
 .qty-value { color: #D97706; font-weight: 600; }
 .dest-value { color: #6B7280; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
-:deep(.el-table) { width: 100% !important; min-width: 100%; }
-:deep(.el-table__header) { width: 100% !important; }
 
 /* v2.1.0 表单布局 */
 :deep(.demand-dialog .el-dialog__body) { padding-top: 16px; }
