@@ -37,15 +37,15 @@
 
 | 步号 | 业务文档 | UI文档 | 数据库文档 |
 |------|---------|--------|-----------|
-| 01 | B-01 补货需求 | UI-06 01-demand | DB-01 procurement-demand |
-| 02 | B-02 发注单+工厂 | UI-04 02-procurement | DB-02 procurement-order |
-| 03 | B-03 验货记录 | UI-07 03-inspection | DB-03 inspection |
-| 04 | B-04 调配计划 | UI-05 04-logistics | DB-04 logistics |
-| 05 | B-05 国内报关 | UI-08 05-domestic-customs | DB-05 domestic-customs |
-| 06 | B-06 日本清关 | UI-09 06-japan-customs | DB-06 japan-customs |
-| 07 | B-07 退税 | UI-10 07-tax-refund | DB-07 tax-refund |
-| 08 | B-08 运营销售 | UI-11 08-sales | DB-08 sales |
-| 09 | B-09 订单总览 | UI-12 09-order-overview | DB-09 order-overview |
+| 01 | B-01 补货需求 | `01-demand.md` | DB-01 procurement-demand |
+| 02 | B-02 发注单+工厂 | `02-procurement.md` | DB-02 procurement-order |
+| 03 | B-03 验货记录 | `03-inspection.md` | DB-03 inspection |
+| 04 | B-04 调配计划 | `04-logistics.md` | DB-04 logistics |
+| 05 | B-05 国内报关 | `05-domestic-customs.md` | DB-05 domestic-customs |
+| 06 | B-06 日本清关 | `06-japan-customs.md` | DB-06 japan-customs |
+| 07 | B-07 退税 | `07-tax-refund.md` | DB-07 tax-refund |
+| 08 | B-08 运营销售 | `08-sales.md` | DB-08 sales |
+| 09 | B-09 订单总览 | `09-order-overview.md` | DB-09 order-overview |
 
 ---
 
@@ -90,29 +90,29 @@
 | `consolidation_pool` | ConsolidationPool | ⚡占位 |
 | `consolidation_pool_item` | ConsolidationPoolItem | ⚡占位 |
 
-### DB-05 国内报关 ⚡
+### DB-05 国内报关 ✅
 
 | 表名 | 聚合根 | 状态 |
 |------|--------|------|
-| `domestic_customs_record` | DomesticCustomsRecord | ⚡占位 |
+| `domestic_customs_record` | DomesticCustomsRecord | ✅ 已实现 |
 
-### DB-06 日本清关 ⚡
-
-| 表名 | 聚合根 | 状态 |
-|------|--------|------|
-| `japan_customs_record` | JapanCustomsRecord | ⚡占位 |
-
-### DB-07 退税 ⚡
+### DB-06 日本清关 ✅
 
 | 表名 | 聚合根 | 状态 |
 |------|--------|------|
-| `tax_refund_record` | TaxRefundRecord | ⚡占位 |
+| `japan_customs_record` | JapanCustomsRecord | ✅ 已实现 |
 
-### DB-08 运营销售 ⚡
+### DB-07 退税 ✅
 
 | 表名 | 聚合根 | 状态 |
 |------|--------|------|
-| `sales_record` | SalesRecord | ⚡占位 |
+| `tax_refund_record` | TaxRefundRecord | ✅ 已实现 |
+
+### DB-08 运营销售 ✅
+
+| 表名 | 聚合根 | 状态 |
+|------|--------|------|
+| `sales_record` | SalesRecord | ✅ 已实现 |
 
 ### DB-09 订单总览 🟡
 

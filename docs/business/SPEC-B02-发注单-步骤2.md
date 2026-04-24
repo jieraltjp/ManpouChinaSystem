@@ -1,6 +1,8 @@
 # SPEC-B02 — 发注单业务规格（步骤2）
 
-> **版本**: 1.0.0
+> **版本**: 1.7.0
+> **更新**: 2026-04-24（v1.7.0：Factory 合作状态渲染规则 — product_factory 有关联则强制渲染为 ACTIVE）
+> **更新**: 2026-04-24（v1.6.0：补货需求转采购改为批量模式；一个 ReplenishmentDemand 批量生成多条 Procurement）
 > **更新**: 2026-04-23（补充元数据字段）
 > **创建**: 2026-04-22
 > **状态**: ✅ 已实现
@@ -22,7 +24,7 @@
 
 ### 2.1 ReplenishmentDemand（补货需求单）
 
-> **入口**：步骤1已创建，此处引用。
+> **入口**：步骤1已创建，此处引用。（v1.6.0：支持批量转采购）
 
 ```
 ReplenishmentDemand（聚合根）
@@ -30,20 +32,22 @@ ReplenishmentDemand（聚合根）
 ├── demandCode: String           # D-YYYYMMDD-NNN
 ├── demandType: DemandType        # REPLENISHMENT / NEW_PURCHASE
 ├── productCode: String           # 主货号
-├── subProductCodes: List<String> # 子货号列表（JSON存储；转采购时取首元素）
-├── quantity: Integer            # 需求量
-├── destination: String          # 目的地
-├── japanLead: String            # 日本担当
+├── subProductItems: List<SubProductItem> # 子货号明细（JSON；含数量+目的地）
+├── japanLead: String            # 日本担当（整单共用）
 ├── status: DemandStatus        # PENDING → CONVERTED → CANCELLED
-├── linkedProcurementId: Long    # 关联采购单（CONVERTED后赋值）
+├── linkedDemandItems: List<LinkedDemandItem> # 关联的 Procurement 明细（CONVERTED时填充）
 └── 领域方法
-    ├── convertToProcurement()   # 转为发注单
-    └── cancel()                 # 取消需求
+    ├── convertToProcurement(factoryId)  # 转为发注单，批量生成 Procurement（v1.6.0）
+    └── cancel()                        # 取消需求
 ```
 
 ### 2.2 Factory（工厂）
 
 > **内嵌**：无独立页面，工厂选择器内嵌于发注单表单，支持新建/编辑。
+>
+> **合作状态渲染规则**：API 返回时，若 `product_factory` 表中存在 `factory_id` 关联记录，
+> 强制将 `cooperationStatus` 渲染为 `ACTIVE`（合作中），不修改数据库值。
+> 实现：`FactoryAssembler.toDto()` → `FactorySynergyPort.hasAssociatedProducts()`。
 
 ```
 Factory（聚合根）
@@ -61,7 +65,7 @@ Factory（聚合根）
 ├── contactPhone: String        # 手机号
 ├── contactWechat: String       # 微信号
 ├── contactQq: String          # QQ号
-├── cooperationStatus: CooperationStatus  # 合作状态
+├── cooperationStatus: CooperationStatus  # 合作状态（渲染时：有关联商品 → ACTIVE）
 ├── paymentTerms: PaymentTerms  # 账期
 ├── notes: String              # 备注
 └── 领域方法
@@ -95,8 +99,10 @@ Procurement（聚合根）
 ├── productLead: String        # 商品担当
 ├── japanLead: String          # 日本担当
 ├── chinaLead: String          # 中国担当
-├── destination: String        # 发送目的地
+├── destination: String        # 发送目的地（转采购时从 SubProductItem 代入）
 ├── customerCompany: String    # 客户公司
+├── linkedDemandId: Long     # 关联的需求单 ID（v1.6.0 新增）
+├── linkedDemandItemId: Long  # 关联的需求单子货号明细 ID（v1.6.0 新增）
 ├── status: ShipmentStatus     # 19态（含完了终态）
 └── 领域方法
     ├── calculateEstimatedPriceJpy()  # 估算批发价
@@ -191,7 +197,7 @@ GET    /api/v1/demands?page=&pageSize=&demandType=&productCode=&status=
 GET    /api/v1/demands/{id}
 POST   /api/v1/demands
 PATCH  /api/v1/demands/{id}
-POST   /api/v1/demands/{id}/convert    # 转采购 → 创建 Procurement
+POST   /api/v1/demands/{id}/convert    # 转采购 → 批量创建 N 条 Procurement（v1.6.0）
 DELETE /api/v1/demands/{id}
 ```
 
@@ -238,6 +244,7 @@ DELETE /api/v1/procurements/{id}
 - [x] ✅ `ProcurementController` REST 控制器
 - [x] ✅ `ProcurementUseCaseTest` 单元测试（14个用例，全部通过）
 - [x] ✅ `FactoryUseCaseTest` 单元测试（8个用例，全部通过）
+- [x] ✅ `FactorySynergyPort` 跨模块防腐口（检查 product_factory 关联）
 - [x] ✅ `@/api/order.ts` 前端 API 客户端
 - [x] ✅ `OrderPage.vue` 页面（已对接真实 API）
 - [x] ✅ 工厂内嵌选择器（新建/编辑）

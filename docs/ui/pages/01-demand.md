@@ -1,7 +1,8 @@
 # 页面规格 — 步骤1：补货需求
 
-> **版本**: 1.0.0
+> **版本**: 1.6.0
 > **创建**: 2026-04-22
+> **更新**: 2026-04-24（v1.6.0：子货号明细表单 — 每行子货号+数量+目的地各自独立）
 > **路由**: `/procurement/demand`
 > **组件**: `DemandPage.vue`
 > **对应后端**: `ReplenishmentDemand` 聚合根
@@ -44,24 +45,22 @@
 
 ---
 
-## 3. 表格列定义
+## 3. 表格列定义（v1.6.0）
 
 | 列名 | 字段 | 说明 |
 |------|------|------|
 | 编号 | `demandCode` | 格式 `D-YYYYMMDD-NNN` |
 | 类型 | `demandType` | `REPLENISHMENT`(补货) / `NEW_PURCHASE`(新品采购) |
 | 主货号 | `productCode` | 主货号 |
-| 子货号 | `subProductCode` | 子货号/颜色（可为空） |
-| 数量 | `quantity` | 需求量 |
-| 目的地 | `destination` | 发送目的地 |
+| 子货号明细 | `subProductItems` | 汇总显示：例 `be:100久留米, bu:50名古屋`（转采购后显示） |
 | 日本担当 | `japanLead` | 日本担当 |
 | 状态 | `status` | PENDING / CONVERTED / CANCELLED |
 | 创建时间 | `createTime` | — |
-| 操作 | — | 转采购 / 取消 / 详情 |
+| 操作 | — | 转采购 / 查看采购单 / 编辑 / 删除 |
 
 ---
 
-## 4. 新规录入弹窗
+## 4. 新规录入弹窗（v1.6.0）
 
 ### 4.1 触发
 
@@ -72,26 +71,49 @@
 | 字段 | 控件 | 必填 | 说明 |
 |------|------|------|------|
 | 需求类型 | `el-radio-group` | ✅ | `REPLENISHMENT`(补货) / `NEW_PURCHASE`(新品采购) |
-| 主货号 | `el-input` + 商品选择器 | ✅ | 来自 Product.masterCode |
-| 子货号 | `el-select`（可选子货号列表） | | 根据主货号过滤颜色变体；新品采购可为空 |
-| 需求量 | `el-input-number` | ✅ | 正整数 |
-| 目的地 | `el-input` | | 发送给哪个日本客户 |
+| 主货号 | `el-select`（商品选择器） | ✅ | 来自 Product.masterCode，支持搜索 |
 | 日本担当 | `el-select`（担当者列表） | | 来自系统用户表 |
+| 子货号明细 | `el-table`（动态行） | ✅ | 核心变更：每行含子货号+数量+目的地 |
+| + 添加行 | `el-button` | | 追加子货号明细行 |
+| 备注 | `el-input` | | 整单备注 |
+
+**子货号明细表结构（v1.6.0 新增）：**
+
+| 列 | 控件 | 必填 | 说明 |
+|----|------|------|------|
+| 子货号 | `el-select`（可选子货号列表） | ✅ | 根据主货号过滤颜色变体 |
+| 数量 | `el-input-number` | ✅ | 该子货号的需求数量 |
+| 目的地 | `el-input` | ✅ | 发送给哪个日本客户（久留米/名古屋/大阪等） |
+| 操作 | `el-button` | | 删除该行 |
 
 ### 4.3 业务规则
 
-- 选择主货号后，若该货号有子货号（颜色变体），子货号选择器自动加载
-- 新品采购：subProductCode 可为空（新品只有主货号）
-- 非新品补货：subProductCode 建议填入（补货通常是已有颜色）
+- 选择主货号后，若该货号有子货号（颜色变体），第一行自动代入全部子货号
+- 用户可调整每行的数量和目的地
+- 新品采购：至少填一行子货号（子货号可手动输入，不必须来自下拉）
+- 非新品补货：子货号优先从下拉选择（颜色标准化）
 
 ### 4.4 提交
 
 - POST `/api/v1/demands`
+- 请求体示例：
+```json
+{
+  "demandType": "REPLENISHMENT",
+  "productCode": "ad009",
+  "subProductItems": [
+    { "subCode": "be", "quantity": 100, "destination": "久留米" },
+    { "subCode": "bu", "quantity": 50,  "destination": "名古屋" }
+  ],
+  "japanLead": "田中",
+  "remarks": ""
+}
+```
 - 成功后刷新列表；弹窗关闭
 
 ---
 
-## 5. 转采购（关键操作）
+## 5. 转采购（v1.6.0 — 批量模式）
 
 ### 5.1 触发条件
 
@@ -99,20 +121,26 @@
 
 ### 5.2 行为
 
-1. 弹出确认框，显示需求基本信息
-2. 点击确认 → 跳转至 `/procurement/order?fromDemand={id}`
-3. 发注单页面预填充以下字段（来自需求单）：
-   - `productCode`
-   - `subProductCode`
-   - `quantity`
-   - `destination`
-   - `japanLead`
-4. 用户补充其余字段后提交
+1. 跳转至 `/procurement/order`（带 query 参数 `demandId`）
+2. 发注单页面预填充：主货号 + 工厂选择器（空白待填）
+3. **每个子货号明细行生成一条 Procurement 草稿**（数量/目的地已代入）
+4. 用户选择工厂后提交（工厂 ID 传给 `/demands/{id}/convert`）
 
-### 5.3 后端联动
+### 5.3 API 调用
 
-- 调用 `POST /api/v1/demands/{id}/convert`
-- 后端创建 Procurement 实体，状态推进为 `CONVERTED`
+```
+POST /api/v1/demands/{id}/convert
+请求体：{ "factoryId": 123 }
+响应：{ "code": "ok", "data": { "demandStatus": "CONVERTED", "linkedProcurementIds": [101, 102] } }
+```
+
+### 5.4 查看采购单（CONVERTED）
+
+操作列 `[查看采购单]` → 跳转 `/procurement/order?demandId={id}` → 列出该需求单生成的所有 Procurement
+
+### 5.5 撤销转换
+
+操作列 `[撤销转换]` → 批量删除关联的 Procurement，回滚需求状态 → PENDING
 
 ---
 
@@ -126,15 +154,13 @@
 
 | 状态 | 颜色 | 可用操作 |
 |------|------|---------|
-| PENDING | `#FEF3C7` 黄色 | 转采购 / 取消 / 详情 |
-| CONVERTED | `#DBEAFE` 蓝色 | 详情 |
+| PENDING | `#FEF3C7` 黄色 | 转采购 / 撤销 / 编辑 / 删除 |
+| CONVERTED | `#DBEAFE` 蓝色 | 查看采购单 / 撤销转换 / 详情 |
 | CANCELLED | `#F3F4F6` 灰色 | 详情 |
 
 ---
 
 ## 7. API 集成
-
-> ⚠️ API 路径已更正（2026-04-22）：后端 Controller 为 `@RequestMapping("/api/v1/demands")`，非 `replenishment-demands`。
 
 | 操作 | Method | Endpoint |
 |------|--------|----------|
@@ -142,7 +168,8 @@
 | 详情 | GET | `/api/v1/demands/{id}` |
 | 创建 | POST | `/api/v1/demands` |
 | 更新 | PATCH | `/api/v1/demands/{id}` |
-| 转采购 | POST | `/api/v1/demands/{id}/convert` |
+| 转采购 | POST | `/api/v1/demands/{id}/convert` → 返回 `linkedProcurementIds[]` |
+| 撤销转换 | POST | `/api/v1/demands/{id}/revert` |
 | 删除 | DELETE | `/api/v1/demands/{id}` |
 
 ---
@@ -151,10 +178,11 @@
 
 | 项目 | 优先级 | 说明 |
 |------|--------|------|
-| 商品选择器 | P1 | 需对接 Product 列表 API；按 masterCode 搜索 |
-| 担当者选择器 | P1 | 需系统用户管理表；目前 hardcode 列表 |
-| 转采购预填充 | P1 | OrderPage.vue 需解析 URL query 参数 `fromDemand` |
-| 取消操作 | P2 | 确认框 + DELETE API |
+| 子货号明细表单 | **P0** | v1.6.0 核心：el-table 动态行，子货号+数量+目的地 |
+| 转采购批量 API | **P0** | 后端 convert 改为批量返回 procurementIds |
+| 查看采购单列表 | P1 | CONVERTED 状态显示该需求生成的 N 条 Procurement |
+| 撤销转换批量 | P1 | 遍历 linkedDemandItems 批量删除 Procurement |
+| 担当者选择器 | P2 | 需系统用户管理表；目前 hardcode 列表 |
 
 ---
 

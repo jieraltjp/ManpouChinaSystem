@@ -1,17 +1,17 @@
 package com.manpou.allinone.customs.application.dto;
 
-import com.manpou.allinone.customs.domain.model.CustomsStatus;
+import com.manpou.allinone.customs.domain.model.DomesticCustomsStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 分页查询响应 DTO。
- * 仅包含业务数据字段，不包含查询参数。
+ * 国内报关记录分页查询响应。
  */
 @Data
 @Builder
@@ -21,8 +21,16 @@ import java.time.LocalDateTime;
 public class CustomsPageQuery {
 
     private Long id;
-    private String name;
-    private CustomsStatus status;
+    private String customsCode;
+    private Long procurementId;
+    private Long logisticsPlanId;
+    private Long factoryId;
+    private String productCode;
+    private String subProductCode;
+    private Integer quantity;
+    private BigDecimal estimatedValueCny;
+    private DomesticCustomsStatus status;
+    private String remarks;
     private String createBy;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

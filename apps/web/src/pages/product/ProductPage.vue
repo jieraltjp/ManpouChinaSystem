@@ -34,7 +34,13 @@
           <el-input v-model="filterForm.keyword" :placeholder="$t('product.filter.keywordPlaceholder')" clearable style="width:160px" />
         </el-form-item>
         <el-form-item :label="$t('product.filter.hsCode')">
-          <el-input v-model="filterForm.hsCode" :placeholder="$t('product.filter.hsCode')" clearable style="width:140px" />
+          <el-input v-model="filterForm.hsCode" :placeholder="$t('product.filter.hsCode')" clearable style="width:120px" />
+        </el-form-item>
+        <el-form-item :label="$t('product.filter.hsCodeJp')">
+          <el-input v-model="filterForm.hsCodeJp" :placeholder="$t('product.filter.hsCodeJp')" clearable style="width:120px" />
+        </el-form-item>
+        <el-form-item :label="$t('product.filter.factoryName')">
+          <el-input v-model="filterForm.factoryName" :placeholder="$t('product.filter.factoryNamePlaceholder')" clearable style="width:120px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="loadData">{{ $t('product.filter.search') }}</el-button>
@@ -46,17 +52,48 @@
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
-        <el-table-column prop="masterCode" :label="$t('product.column.masterCode')" width="120" />
-        <el-table-column prop="subCode" :label="$t('product.column.subCode')" width="100" />
-        <el-table-column prop="nameZh" :label="$t('product.column.nameZh')" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="nameEn" :label="$t('product.column.nameEn')" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="hsCode" :label="$t('product.column.hsCode')" width="120" />
-        <el-table-column prop="unitPriceRmb" :label="$t('product.column.unitPriceRmb')" width="120" align="right">
-          <template #default="{ row }">{{ row.unitPriceRmb != null ? `¥${Number(row.unitPriceRmb).toFixed(2)}` : $t('common.format.dash') }}</template>
+        <el-table-column prop="masterCode" :label="$t('product.column.masterCode')" width="110" />
+        <el-table-column prop="subCode" :label="$t('product.column.subCode')" width="120" />
+        <el-table-column :label="$t('product.column.image')" width="70" align="center">
+          <template #default="{ row }">
+            <a v-if="row.imageUrl" :href="row.imageUrl" target="_blank" title="查看大图">
+              <img :src="row.imageUrl" style="width:36px;height:36px;object-fit:cover;border-radius:4px;border:1px solid #eee;" loading="lazy" />
+            </a>
+            <span v-else>-</span>
+          </template>
         </el-table-column>
-        <el-table-column prop="origin" :label="$t('product.column.origin')" width="90" />
-        <el-table-column prop="material" :label="$t('product.column.material')" width="100" show-overflow-tooltip />
-        <el-table-column prop="unit" :label="$t('product.column.unit')" width="70" align="center" />
+        <el-table-column prop="janCode" :label="$t('product.column.janCode')" width="100" show-overflow-tooltip />
+        <el-table-column prop="nameZh" :label="$t('product.column.nameZh')" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="nameJa" :label="$t('product.column.nameJa')" min-width="110" show-overflow-tooltip />
+        <el-table-column prop="nameEn" :label="$t('product.column.nameEn')" min-width="130" show-overflow-tooltip />
+        <el-table-column prop="origin" :label="$t('product.column.origin')" width="80" />
+        <el-table-column prop="category" :label="$t('product.column.category')" width="90">
+          <template #default="{ row }">
+            <span v-if="row.category">{{ $t('product.category.' + row.category) }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('product.column.linkedFactories')" width="130" align="center">
+          <template #default="{ row }">
+            <el-tooltip v-if="row.factoryNames" :content="row.factoryNames" placement="top" :disabled="!row.factoryNames">
+              <span class="factory-names-text">{{ row.factoryNames }}</span>
+            </el-tooltip>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="unitPriceRmb" :label="$t('product.column.unitPriceRmb')" width="100" align="right">
+          <template #default="{ row }">{{ row.unitPriceRmb != null ? `¥${Number(row.unitPriceRmb).toFixed(2)}` : '-' }}</template>
+        </el-table-column>
+        <el-table-column prop="taxPoint" :label="$t('product.column.taxPoint')" width="70" align="center">
+          <template #default="{ row }">{{ row.taxPoint != null ? row.taxPoint : '-' }}</template>
+        </el-table-column>
+        <el-table-column prop="material" :label="$t('product.column.material')" width="90" show-overflow-tooltip />
+        <el-table-column prop="requiresQc" :label="$t('product.column.requiresQc')" width="70" align="center">
+          <template #default="{ row }">
+            <el-tag v-if="row.requiresQc" type="warning" size="small">{{ $t('product.column.requiresQc') }}</el-tag>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('product.column.action')" width="150" fixed="right" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('product.action.detail') }}</el-button>
@@ -80,31 +117,73 @@
     </el-card>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="detailVisible" :title="$t('product.drawer.title')" size="600px" direction="rtl">
+    <el-drawer v-model="detailVisible" :title="$t('product.drawer.title')" size="680px" direction="rtl">
       <div v-if="currentRow" class="drawer-content">
-        <!-- 基本信息区 -->
+
+        <!-- 基本信息 -->
         <div class="drawer-section-title">{{ $t('product.drawer.section.basicInfo') }}</div>
         <div class="detail-grid">
           <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.masterCode') }}</span><span class="detail-value">{{ currentRow.masterCode }}</span></div>
-          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.subCode') }}</span><span class="detail-value">{{ currentRow.subCode || $t('common.format.dash') }}</span></div>
-          <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.nameZh') }}</span><span class="detail-value">{{ currentRow.nameZh || $t('common.format.dash') }}</span></div>
-          <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.nameEn') }}</span><span class="detail-value">{{ currentRow.nameEn || $t('common.format.dash') }}</span></div>
-          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.hsCode') }}</span><span class="detail-value">{{ currentRow.hsCode || $t('common.format.dash') }}</span></div>
-          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.nameJa') }}</span><span class="detail-value">{{ currentRow.nameJa || $t('common.format.dash') }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.subCode') }}</span><span class="detail-value">{{ currentRow.subCode || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.janCode') }}</span><span class="detail-value">{{ currentRow.janCode || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.category') }}</span>
+            <span class="detail-value">
+              <el-tag v-if="currentRow.category" size="small">{{ $t('product.category.' + currentRow.category) }}</el-tag>
+              <span v-else>-</span>
+            </span>
+          </div>
+          <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.nameZh') }}</span><span class="detail-value">{{ currentRow.nameZh || '-' }}</span></div>
+          <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.nameEn') }}</span><span class="detail-value">{{ currentRow.nameEn || '-' }}</span></div>
+          <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.nameJa') }}</span><span class="detail-value">{{ currentRow.nameJa || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.material') }}</span><span class="detail-value">{{ currentRow.material || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.materialJa') }}</span><span class="detail-value">{{ currentRow.materialJa || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.colorName') }}</span><span class="detail-value">{{ currentRow.colorName || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.origin') }}</span><span class="detail-value">{{ currentRow.origin || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.status') }}</span><span class="detail-value">{{ currentRow.status || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.unit') }}</span><span class="detail-value">{{ currentRow.unit || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.quantities') }}</span><span class="detail-value">{{ currentRow.quantities ?? '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.cartonQty') }}</span><span class="detail-value">{{ currentRow.cartonQty ?? '-' }}</span></div>
+          <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.imageUrl') }}</span>
+            <span class="detail-value">
+              <a v-if="currentRow.imageUrl" :href="currentRow.imageUrl" target="_blank" style="color:#409EFF">{{ currentRow.imageUrl }}</a>
+              <span v-else>-</span>
+            </span>
+          </div>
         </div>
 
-        <!-- 规格信息区 -->
+        <!-- 规格信息 -->
         <div class="drawer-section-title">{{ $t('product.drawer.section.specInfo') }}</div>
         <div class="detail-grid">
-          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.origin') }}</span><span class="detail-value">{{ currentRow.origin || $t('common.format.dash') }}</span></div>
-          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.material') }}</span><span class="detail-value">{{ currentRow.material || $t('common.format.dash') }}</span></div>
-          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.unit') }}</span><span class="detail-value">{{ currentRow.unit || $t('common.format.dash') }}</span></div>
-          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.unitPriceRmb') }}</span><span class="detail-value">{{ currentRow.unitPriceRmb != null ? `¥${Number(currentRow.unitPriceRmb).toFixed(2)}` : $t('common.format.dash') }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.unitPriceRmb') }}</span><span class="detail-value">{{ currentRow.unitPriceRmb != null ? `¥${Number(currentRow.unitPriceRmb).toFixed(2)}` : '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.taxPoint') }}</span><span class="detail-value">{{ currentRow.taxPoint ?? '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.taxRate') }}</span><span class="detail-value">{{ currentRow.taxRate != null ? `${(Number(currentRow.taxRate) * 100).toFixed(1)}%` : '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.amountRmb') }}</span><span class="detail-value">{{ currentRow.amountRmb != null ? `¥${Number(currentRow.amountRmb).toFixed(2)}` : '-' }}</span></div>
+          <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.hsCode') }} / {{ $t('product.drawer.hsCodeJp') }}</span><span class="detail-value">{{ currentRow.hsCode || '-' }} / {{ currentRow.hsCodeJp || '-' }}</span></div>
+          <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.declarationElements') }}</span><span class="detail-value">{{ currentRow.declarationElements || '-' }}</span></div>
           <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.lengthCm') }} × {{ $t('product.drawer.widthCm') }} × {{ $t('product.drawer.heightCm') }}</span><span class="detail-value">{{ dims(currentRow) }}</span></div>
-          <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.netWeight') }} / {{ $t('product.drawer.grossWeight') }}</span><span class="detail-value">{{ weightStr(currentRow) }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.volumeCbm') }}</span><span class="detail-value">{{ currentRow.volumeCbm != null ? Number(currentRow.volumeCbm).toFixed(6) : '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.netWeight') }}</span><span class="detail-value">{{ currentRow.netWeightKg != null ? `${currentRow.netWeightKg}kg` : '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.grossWeight') }}</span><span class="detail-value">{{ currentRow.grossWeightKg != null ? `${currentRow.grossWeightKg}kg` : '-' }}</span></div>
         </div>
 
-        <!-- 关联工厂区 -->
+        <!-- 外箱信息 -->
+        <div class="drawer-section-title">{{ $t('product.drawer.section.packageInfo') }}</div>
+        <div class="detail-grid">
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.unitsPerPackage') }}</span><span class="detail-value">{{ currentRow.unitsPerPackage ?? '-' }}</span></div>
+          <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.packageLengthCm') }} × {{ $t('product.drawer.packageWidthCm') }} × {{ $t('product.drawer.packageHeightCm') }}</span><span class="detail-value">{{ pkgDims(currentRow) }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.packageVolumeCbm') }}</span><span class="detail-value">{{ currentRow.packageVolumeCbm != null ? Number(currentRow.packageVolumeCbm).toFixed(6) : '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.packageWeightKg') }}</span><span class="detail-value">{{ currentRow.packageWeightKg != null ? `${currentRow.packageWeightKg}kg` : '-' }}</span></div>
+        </div>
+
+        <!-- 仓储信息 -->
+        <div class="drawer-section-title">{{ $t('product.drawer.section.warehouseInfo') }}</div>
+        <div class="detail-grid">
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.warehouse') }}</span><span class="detail-value">{{ currentRow.warehouse || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.requiresQc') }}</span><span class="detail-value">{{ currentRow.requiresQc ? $t('common.format.yes') : '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.lastUsedDate') }}</span><span class="detail-value">{{ currentRow.lastUsedDate || '-' }}</span></div>
+        </div>
+
+        <!-- 关联工厂 -->
         <div class="drawer-section-title">
           {{ $t('product.drawer.section.factories') }}
           <span class="factory-count-badge" v-if="productFactories.length > 0">{{ productFactories.length }}</span>
@@ -118,7 +197,7 @@
         <div v-else class="factories-list">
           <div v-for="factory in productFactories" :key="factory.factoryId" class="factory-card">
             <div class="factory-header">
-              <span class="factory-name">{{ factory.factoryName || $t('common.format.dash') }}</span>
+              <span class="factory-name">{{ factory.factoryName || '-' }}</span>
               <el-tag v-if="factory.isPreferred" type="warning" size="small">{{ $t('product.drawer.preferred') }}</el-tag>
               <el-tag v-if="factory.cooperationStatus" size="small">{{ factory.cooperationStatus }}</el-tag>
             </div>
@@ -135,8 +214,13 @@
 
         <!-- 备注 -->
         <div class="drawer-section-title">{{ $t('product.drawer.remarks') }}</div>
-        <div class="detail-remarks">
-          {{ currentRow.remarks || $t('common.format.dash') }}
+        <div class="detail-remarks">{{ currentRow.remarks || '-' }}</div>
+
+        <!-- 审计信息 -->
+        <div class="drawer-section-title" style="margin-top:8px">{{ $t('product.drawer.createTime') }} / {{ $t('product.drawer.updateTime') }}</div>
+        <div class="detail-grid" style="margin-bottom:0">
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.createTime') }}</span><span class="detail-value">{{ currentRow.createTime || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.updateTime') }}</span><span class="detail-value">{{ currentRow.updateTime || '-' }}</span></div>
         </div>
       </div>
       <template #footer>
@@ -146,17 +230,24 @@
     </el-drawer>
 
     <!-- 新规/编辑弹窗 -->
-    <el-dialog v-model="formVisible" :title="formTitle" width="720px" :close-on-click-modal="false">
+    <el-dialog v-model="formVisible" :title="formTitle" width="840px" :close-on-click-modal="false">
       <el-form ref="formRef" :model="form" :rules="formRules" label-width="110px">
+        <!-- 基本信息 -->
+        <div class="dialog-section-title">{{ $t('product.drawer.section.basicInfo') }}</div>
         <el-row :gutter="16">
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item :label="$t('product.dialog.masterCode')" prop="masterCode">
               <el-input v-model="form.masterCode" :placeholder="$t('product.dialog.masterCodePlaceholder')" maxlength="32" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item :label="$t('product.dialog.subCode')">
               <el-input v-model="form.subCode" :placeholder="$t('product.dialog.subCodePlaceholder')" maxlength="64" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('product.dialog.janCode')">
+              <el-input v-model="form.janCode" :placeholder="$t('product.dialog.janCodePlaceholder')" maxlength="64" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -180,13 +271,65 @@
               <el-input v-model="form.nameJa" :placeholder="$t('product.dialog.nameJaPlaceholder')" maxlength="128" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('product.dialog.hsCode')">
-              <el-input v-model="form.hsCode" :placeholder="$t('product.dialog.hsCodePlaceholder')" maxlength="20" />
+          <el-col :span="6">
+            <el-form-item :label="$t('product.dialog.category')">
+              <el-select v-model="form.category" clearable style="width:100%">
+                <el-option value="OEM" :label="$t('product.category.OEM')" />
+                <el-option value="ORDINARY" :label="$t('product.category.ORDINARY')" />
+                <el-option value="FACTORY_DIRECT" :label="$t('product.category.FACTORY_DIRECT')" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item :label="$t('product.dialog.status')">
+              <el-input v-model="form.status" maxlength="32" />
             </el-form-item>
           </el-col>
         </el-row>
 
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item :label="$t('product.dialog.material')">
+              <el-input v-model="form.material" :placeholder="$t('product.dialog.materialPlaceholder')" maxlength="64" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('product.dialog.materialJa')">
+              <el-input v-model="form.materialJa" :placeholder="$t('product.dialog.materialJaPlaceholder')" maxlength="255" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('product.dialog.origin')">
+              <el-input v-model="form.origin" :placeholder="$t('product.dialog.originPlaceholder')" maxlength="100" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('product.dialog.colorName')">
+              <el-input v-model="form.colorName" maxlength="64" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item :label="$t('product.dialog.unit')">
+              <el-input v-model="form.unit" :placeholder="$t('product.dialog.unitPlaceholder')" maxlength="50" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('product.dialog.quantities')">
+              <el-input-number v-model="form.quantities" :min="0" style="width:100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('product.dialog.cartonQty')">
+              <el-input-number v-model="form.cartonQty" :min="0" style="width:100%" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <!-- 规格信息 -->
+        <div class="dialog-section-title">{{ $t('product.drawer.section.specInfo') }}</div>
         <el-row :gutter="16">
           <el-col :span="8">
             <el-form-item :label="$t('product.dialog.unitPriceRmb')">
@@ -195,12 +338,25 @@
           </el-col>
           <el-col :span="8">
             <el-form-item :label="$t('product.dialog.taxPoint')">
-              <el-input-number v-model="form.taxPoint" :min="0" :max="10" :precision="4" style="width:100%" :placeholder="$t('product.dialog.taxPointPlaceholder')" />
+              <el-input-number v-model="form.taxPoint" :min="0" :precision="4" style="width:100%" :placeholder="$t('product.dialog.taxPointPlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item :label="$t('product.dialog.taxRate')">
               <el-input-number v-model="form.taxRate" :min="0" :max="1" :precision="4" style="width:100%" :placeholder="$t('product.dialog.taxRatePlaceholder')" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item :label="$t('product.dialog.hsCode')">
+              <el-input v-model="form.hsCode" :placeholder="$t('product.dialog.hsCodePlaceholder')" maxlength="20" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('product.dialog.hsCodeJp')">
+              <el-input v-model="form.hsCodeJp" :placeholder="$t('product.dialog.hsCodeJpPlaceholder')" maxlength="20" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -226,28 +382,38 @@
         <el-row :gutter="16">
           <el-col :span="8">
             <el-form-item :label="$t('product.dialog.netWeight')">
-              <el-input-number v-model="form.netWeightKg" :min="0" :precision="4" style="width:100%" />
+              <el-input-number v-model="form.netWeightKg" :min="0" :precision="4" style="width:100%" :placeholder="$t('product.dialog.netWeightPlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item :label="$t('product.dialog.grossWeight')">
-              <el-input-number v-model="form.grossWeightKg" :min="0" :precision="4" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item :label="$t('product.dialog.unit')">
-              <el-input v-model="form.unit" :placeholder="$t('product.dialog.unitPlaceholder')" maxlength="50" />
+              <el-input-number v-model="form.grossWeightKg" :min="0" :precision="4" style="width:100%" :placeholder="$t('product.dialog.grossWeightPlaceholder')" />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-form-item :label="$t('product.dialog.origin')">
-          <el-input v-model="form.origin" :placeholder="$t('product.dialog.originPlaceholder')" maxlength="100" />
-        </el-form-item>
-
         <el-form-item :label="$t('product.dialog.declarationElements')">
           <el-input v-model="form.declarationElements" type="textarea" :rows="2" :placeholder="$t('product.dialog.declarationElementsPlaceholder')" />
         </el-form-item>
+
+        <el-form-item :label="$t('product.drawer.imageUrl')">
+          <el-input v-model="form.imageUrl" :placeholder="$t('product.drawer.imageUrl')" maxlength="512" />
+        </el-form-item>
+
+        <!-- 仓储信息 -->
+        <div class="dialog-section-title">{{ $t('product.drawer.section.warehouseInfo') }}</div>
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item :label="$t('product.dialog.warehouse')">
+              <el-input v-model="form.warehouse" :placeholder="$t('product.dialog.warehousePlaceholder')" maxlength="64" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('product.dialog.requiresQc')">
+              <el-switch v-model="form.requiresQc" />
+            </el-form-item>
+          </el-col>
+        </el-row>
 
         <el-form-item :label="$t('product.dialog.remarks')">
           <el-input v-model="form.remarks" type="textarea" :rows="2" maxlength="512" show-word-limit />
@@ -283,27 +449,38 @@ const isEdit = ref(false)
 const formRef = ref()
 
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
-
-const filterForm = reactive({ masterCode: '', keyword: '', hsCode: '' })
+const filterForm = reactive({ masterCode: '', keyword: '', hsCode: '', hsCodeJp: '', factoryName: '' })
 
 const defaultForm = (): CreateProductRequest => ({
   masterCode: '',
   subCode: '',
-  nameJa: '',
-  nameEn: '',
+  janCode: '',
   nameZh: '',
+  nameEn: '',
+  nameJa: '',
+  material: '',
+  materialJa: '',
   origin: '',
-  hsCode: '',
-  unitPriceRmb: undefined,
-  taxPoint: 1.1,
-  taxRate: 0.1,
+  colorName: '',
+  imageUrl: '',
+  category: undefined,
+  status: '',
+  unit: '',
+  quantities: undefined,
+  cartonQty: undefined,
   lengthCm: undefined,
   widthCm: undefined,
   heightCm: undefined,
   netWeightKg: undefined,
   grossWeightKg: undefined,
-  unit: '',
+  unitPriceRmb: undefined,
+  taxPoint: 1.1,
+  taxRate: 0.1,
+  hsCode: '',
+  hsCodeJp: '',
   declarationElements: '',
+  warehouse: '',
+  requiresQc: false,
   remarks: '',
 })
 
@@ -325,6 +502,8 @@ async function loadData() {
       masterCode: filterForm.masterCode || undefined,
       keyword: filterForm.keyword || undefined,
       hsCode: filterForm.hsCode || undefined,
+      hsCodeJp: filterForm.hsCodeJp || undefined,
+      factoryName: filterForm.factoryName || undefined,
     })
     const data = res.data.data
     tableData.value = data.content
@@ -338,6 +517,8 @@ function onReset() {
   filterForm.masterCode = ''
   filterForm.keyword = ''
   filterForm.hsCode = ''
+  filterForm.hsCodeJp = ''
+  filterForm.factoryName = ''
   pagination.page = 1
   loadData()
 }
@@ -370,21 +551,33 @@ function onEdit(row: ProductPageVO) {
   Object.assign(form, {
     masterCode: row.masterCode,
     subCode: row.subCode || '',
-    nameJa: row.nameJa || '',
-    nameEn: row.nameEn || '',
+    janCode: row.janCode || '',
     nameZh: row.nameZh || '',
+    nameEn: row.nameEn || '',
+    nameJa: row.nameJa || '',
+    material: row.material || '',
+    materialJa: row.materialJa || '',
     origin: row.origin || '',
-    hsCode: row.hsCode || '',
-    unitPriceRmb: row.unitPriceRmb,
-    taxPoint: row.taxPoint ?? 1.1,
-    taxRate: row.taxRate ?? 0.1,
+    colorName: row.colorName || '',
+    imageUrl: row.imageUrl || '',
+    category: row.category,
+    status: row.status || '',
+    unit: row.unit || '',
+    quantities: row.quantities,
+    cartonQty: row.cartonQty,
     lengthCm: row.lengthCm,
     widthCm: row.widthCm,
     heightCm: row.heightCm,
     netWeightKg: row.netWeightKg,
     grossWeightKg: row.grossWeightKg,
-    unit: row.unit || '',
+    unitPriceRmb: row.unitPriceRmb,
+    taxPoint: row.taxPoint ?? 1.1,
+    taxRate: row.taxRate ?? 0.1,
+    hsCode: row.hsCode || '',
+    hsCodeJp: row.hsCodeJp || '',
     declarationElements: row.declarationElements || '',
+    warehouse: row.warehouse || '',
+    requiresQc: row.requiresQc ?? false,
     remarks: row.remarks || '',
   })
   formVisible.value = true
@@ -430,14 +623,14 @@ function onPageChange(page: number) {
 
 function dims(row: ProductPageVO) {
   const l = row.lengthCm, w = row.widthCm, h = row.heightCm
-  if (l || w || h) return `${l ?? t('common.format.dash')} × ${w ?? t('common.format.dash')} × ${h ?? t('common.format.dash')} cm`
-  return t('common.format.dash')
+  if (l || w || h) return `${l ?? '-'} × ${w ?? '-'} × ${h ?? '-'} cm`
+  return '-'
 }
 
-function weightStr(row: ProductPageVO) {
-  const n = row.netWeightKg, g = row.grossWeightKg
-  if (n || g) return `${n ?? t('common.format.dash')}kg / ${g ?? t('common.format.dash')}kg`
-  return t('common.format.dash')
+function pkgDims(row: ProductPageVO) {
+  const l = row.packageLengthCm, w = row.packageWidthCm, h = row.packageHeightCm
+  if (l || w || h) return `${l ?? '-'} × ${w ?? '-'} × ${h ?? '-'} cm`
+  return '-'
 }
 
 loadData()
@@ -463,6 +656,14 @@ loadData()
   align-items: center;
   gap: 8px;
 }
+.dialog-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #409EFF;
+  margin: 12px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed #d0d7de;
+}
 .factory-count-badge {
   background: var(--color-primary);
   color: #fff;
@@ -472,10 +673,20 @@ loadData()
   font-weight: 600;
   line-height: 18px;
 }
+.factory-names-text {
+  display: inline-block;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #409EFF;
+  cursor: pointer;
+}
 .detail-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 14px 20px;
   padding: 0;
 }
 .detail-item {
@@ -493,6 +704,7 @@ loadData()
 .detail-value {
   font-size: 14px;
   color: #303133;
+  word-break: break-all;
 }
 .factories-loading,
 .factories-empty {

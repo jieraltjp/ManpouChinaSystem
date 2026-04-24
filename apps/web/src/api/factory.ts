@@ -6,6 +6,8 @@ import client from './client'
 
 export type CooperationStatus = 'ACTIVE' | 'SUSPENDED' | 'ELIMINATED' | 'POTENTIAL'
 
+export type PaymentTerms = 'CASH' | 'NET_30' | 'NET_60' | 'NET_90' | 'CREDIT'
+
 export interface FactoryStatsDTO {
   total: number
   active: number
@@ -29,6 +31,7 @@ export interface FactoryPageVO {
   contactWechat?: string
   contactQq?: string
   cooperationStatus?: CooperationStatus
+  paymentTerms?: PaymentTerms
   notes?: string
   createBy?: string
   createTime?: string
@@ -55,6 +58,7 @@ export interface CreateFactoryRequest {
   contactWechat?: string
   contactQq?: string
   cooperationStatus?: CooperationStatus
+  paymentTerms?: PaymentTerms
   notes?: string
 }
 
@@ -71,6 +75,7 @@ export interface UpdateFactoryRequest {
   contactWechat?: string
   contactQq?: string
   cooperationStatus?: CooperationStatus
+  paymentTerms?: PaymentTerms
   notes?: string
 }
 

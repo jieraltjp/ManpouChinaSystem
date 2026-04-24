@@ -367,7 +367,7 @@ function cooperationStatusTag(s?: string): string {
   return { ACTIVE: 'success', SUSPENDED: 'warning', ELIMINATED: 'danger', POTENTIAL: 'info' }[s ?? ''] ?? 'info'
 }
 
-function paymentTermsLabel(p?: string): string {
+function paymentTermsLabel(p?: PaymentTerms): string {
   return t(`factory.paymentTerms.${p}` as any, { default: p ?? '-' })
 }
 

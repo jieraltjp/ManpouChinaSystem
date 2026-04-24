@@ -293,7 +293,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, CircleCheck, Warning, CloseBold, Remove, Goods } from '@element-plus/icons-vue'
-import { salesOperationsApi, type SalesRecordVO, type SalesStatus } from '@/api/salesOperations'
+import { salesOperationsApi, type SalesRecordVO, type SalesStatus, type SalesChannel } from '@/api/salesOperations'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -313,7 +313,7 @@ const stockRowId = ref<number | null>(null)
 
 const filterForm = reactive({
   productCode: '',
-  salesChannel: '' as string | '',
+  salesChannel: '' as SalesChannel | '',
   status: '' as SalesStatus | '',
 })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
@@ -323,7 +323,7 @@ const createForm = reactive({
   procurementId: undefined as number | undefined,
   productCode: '',
   subProductCode: '',
-  salesChannel: '',
+  salesChannel: '' as SalesChannel | '',
   listingDate: '',
   initialStock: 0,
   safetyStock: 0,

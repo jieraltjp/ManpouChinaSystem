@@ -10,15 +10,20 @@ export interface ProductPageVO {
   id: number
   masterCode: string
   subCode?: string
-  nameJa?: string
-  nameEn?: string
+  janCode?: string
   nameZh?: string
-  imageUrl?: string
-  colorName?: string
+  nameEn?: string
+  nameJa?: string
   material?: string
-  category?: ProductCategory
+  materialJa?: string
   origin?: string
+  colorName?: string
+  imageUrl?: string
+  category?: ProductCategory
+  status?: string
   unit?: string
+  quantities?: number
+  cartonQty?: number
   lengthCm?: number
   widthCm?: number
   heightCm?: number
@@ -28,7 +33,9 @@ export interface ProductPageVO {
   unitPriceRmb?: number
   taxPoint?: number
   taxRate?: number
+  amountRmb?: number
   hsCode?: string
+  hsCodeJp?: string
   declarationElements?: string
   unitsPerPackage?: number
   packageLengthCm?: number
@@ -43,6 +50,8 @@ export interface ProductPageVO {
   createBy?: string
   createTime?: string
   updateTime?: string
+  factoryCount?: number
+  factoryNames?: string
 }
 
 export interface ProductPageResponse {
@@ -55,15 +64,20 @@ export interface ProductPageResponse {
 export interface CreateProductRequest {
   masterCode: string
   subCode?: string
-  nameJa?: string
-  nameEn?: string
+  janCode?: string
   nameZh?: string
-  imageUrl?: string
-  colorName?: string
+  nameEn?: string
+  nameJa?: string
   material?: string
-  category?: ProductCategory
+  materialJa?: string
   origin?: string
+  colorName?: string
+  imageUrl?: string
+  category?: ProductCategory
+  status?: string
   unit?: string
+  quantities?: number
+  cartonQty?: number
   lengthCm?: number
   widthCm?: number
   heightCm?: number
@@ -72,7 +86,9 @@ export interface CreateProductRequest {
   unitPriceRmb?: number
   taxPoint?: number
   taxRate?: number
+  amountRmb?: number
   hsCode?: string
+  hsCodeJp?: string
   declarationElements?: string
   unitsPerPackage?: number
   packageLengthCm?: number
@@ -86,15 +102,20 @@ export interface CreateProductRequest {
 export interface UpdateProductRequest {
   masterCode?: string
   subCode?: string
-  nameJa?: string
-  nameEn?: string
+  janCode?: string
   nameZh?: string
-  imageUrl?: string
-  colorName?: string
+  nameEn?: string
+  nameJa?: string
   material?: string
-  category?: ProductCategory
+  materialJa?: string
   origin?: string
+  colorName?: string
+  imageUrl?: string
+  category?: ProductCategory
+  status?: string
   unit?: string
+  quantities?: number
+  cartonQty?: number
   lengthCm?: number
   widthCm?: number
   heightCm?: number
@@ -103,7 +124,9 @@ export interface UpdateProductRequest {
   unitPriceRmb?: number
   taxPoint?: number
   taxRate?: number
+  amountRmb?: number
   hsCode?: string
+  hsCodeJp?: string
   declarationElements?: string
   unitsPerPackage?: number
   packageLengthCm?: number
@@ -143,7 +166,7 @@ export interface ProductFactoryVO {
 }
 
 export const productApi = {
-  list(params: { page?: number; pageSize?: number; masterCode?: string; keyword?: string; hsCode?: string }) {
+  list(params: { page?: number; pageSize?: number; masterCode?: string; keyword?: string; hsCode?: string; hsCodeJp?: string; factoryName?: string }) {
     return client.get<{ code: string; data: ProductPageResponse }>('/products', { params })
   },
   get(id: number) {

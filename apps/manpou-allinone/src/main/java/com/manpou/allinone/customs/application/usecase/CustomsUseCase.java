@@ -7,8 +7,8 @@ import com.manpou.allinone.customs.application.dto.CustomsUpdateCmd;
 import com.manpou.allinone.customs.application.assembler.CustomsAssembler;
 import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.common.filter.TraceFilter;
-import com.manpou.allinone.customs.domain.model.CustomsExample;
-import com.manpou.allinone.customs.domain.repository.CustomsRepository;
+import com.manpou.allinone.customs.domain.model.DomesticCustomsRecord;
+import com.manpou.allinone.customs.domain.repository.DomesticCustomsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -19,73 +19,87 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 示例用例服务。
- * 负责编排业务操作，不含领域逻辑。
+ * 国内报关用例服务。
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomsUseCase {
 
-    private final CustomsRepository customsRepository;
+    private final DomesticCustomsRepository customsRepository;
     private final CustomsAssembler customsAssembler;
 
-    /**
-     * 分页查询。
-     */
     @Transactional(readOnly = true)
     public Page<CustomsPageQuery> pageQuery(CustomsQuery query) {
+        int pageIndex = query.getPage() == null ? 0 : Math.max(0, query.getPage() - 1);
         PageRequest pageRequest = PageRequest.of(
-                (query.getPage() - 1),
-                Math.min(query.getPageSize(), 100), // 上限 100
+                pageIndex,
+                Math.min(query.getPageSize(), 100),
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<CustomsExample> page = customsRepository.findAllByDeletedIsFalse(pageRequest);
+        Page<DomesticCustomsRecord> page = customsRepository.findAllByDeletedIsFalse(pageRequest);
         return page.map(customsAssembler::toDto);
     }
 
-    /**
-     * 根据 ID 查询。
-     */
     @Transactional(readOnly = true)
     public CustomsPageQuery getById(Long id) {
-        CustomsExample entity = customsRepository.findByIdAndDeletedIsFalse(id)
-                .orElseThrow(() -> BusinessException.notFound("CustomsExample", id));
+        DomesticCustomsRecord entity = customsRepository.findByIdAndDeletedIsFalse(id)
+                .orElseThrow(() -> BusinessException.notFound("DomesticCustomsRecord", id));
         return customsAssembler.toDto(entity);
     }
 
-    /**
-     * 创建。
-     */
     @Transactional
     public Long create(CustomsCreateCmd cmd) {
-        CustomsExample entity = customsAssembler.toEntity(cmd);
-        CustomsExample saved = customsRepository.save(entity);
-        log.info("[CustomsExample] created, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId());
+        DomesticCustomsRecord entity = customsAssembler.toEntity(cmd);
+        DomesticCustomsRecord saved = customsRepository.save(entity);
+        log.info("[DomesticCustomsRecord] created, traceId={}, id={}, customsCode={}",
+                MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId(), saved.getCustomsCode());
         return saved.getId();
     }
 
-    /**
-     * 更新。
-     */
     @Transactional
     public void update(Long id, CustomsUpdateCmd cmd) {
-        CustomsExample entity = customsRepository.findByIdAndDeletedIsFalse(id)
-                .orElseThrow(() -> BusinessException.notFound("CustomsExample", id));
+        DomesticCustomsRecord entity = customsRepository.findByIdAndDeletedIsFalse(id)
+                .orElseThrow(() -> BusinessException.notFound("DomesticCustomsRecord", id));
         customsAssembler.copyToEntity(cmd, entity);
         customsRepository.save(entity);
-        log.info("[CustomsExample] updated, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
+        log.info("[DomesticCustomsRecord] updated, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 
-    /**
-     * 逻辑删除。
-     */
+    @Transactional
+    public void submit(Long id) {
+        DomesticCustomsRecord entity = customsRepository.findByIdAndDeletedIsFalse(id)
+                .orElseThrow(() -> BusinessException.notFound("DomesticCustomsRecord", id));
+        entity.submit();
+        customsRepository.save(entity);
+        log.info("[DomesticCustomsRecord] submitted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
+    }
+
+    @Transactional
+    public void clear(Long id) {
+        DomesticCustomsRecord entity = customsRepository.findByIdAndDeletedIsFalse(id)
+                .orElseThrow(() -> BusinessException.notFound("DomesticCustomsRecord", id));
+        entity.clear();
+        customsRepository.save(entity);
+        log.info("[DomesticCustomsRecord] cleared, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
+    }
+
+    @Transactional
+    public void reject(Long id, String reason) {
+        DomesticCustomsRecord entity = customsRepository.findByIdAndDeletedIsFalse(id)
+                .orElseThrow(() -> BusinessException.notFound("DomesticCustomsRecord", id));
+        entity.reject(reason);
+        customsRepository.save(entity);
+        log.info("[DomesticCustomsRecord] rejected, traceId={}, id={}, reason={}",
+                MDC.get(TraceFilter.TRACE_ID_KEY), id, reason);
+    }
+
     @Transactional
     public void delete(Long id) {
-        CustomsExample entity = customsRepository.findByIdAndDeletedIsFalse(id)
-                .orElseThrow(() -> BusinessException.notFound("CustomsExample", id));
+        DomesticCustomsRecord entity = customsRepository.findByIdAndDeletedIsFalse(id)
+                .orElseThrow(() -> BusinessException.notFound("DomesticCustomsRecord", id));
         entity.markDeleted();
         customsRepository.save(entity);
-        log.info("[CustomsExample] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
+        log.info("[DomesticCustomsRecord] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
 }

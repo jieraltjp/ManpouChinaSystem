@@ -4,6 +4,7 @@ import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.factory.application.dto.FactoryCreateCmd;
 import com.manpou.allinone.factory.application.dto.FactoryPageQuery;
 import com.manpou.allinone.factory.application.dto.FactoryQuery;
+import com.manpou.allinone.factory.application.dto.FactoryStatsDTO;
 import com.manpou.allinone.factory.application.dto.FactoryUpdateCmd;
 import com.manpou.allinone.factory.application.usecase.FactoryUseCase;
 import jakarta.validation.Valid;
@@ -21,6 +22,11 @@ public class FactoryController {
     @GetMapping
     public Result<Page<FactoryPageQuery>> list(FactoryQuery query) {
         return Result.ok(factoryUseCase.pageQuery(query));
+    }
+
+    @GetMapping("/stats")
+    public Result<FactoryStatsDTO> stats() {
+        return Result.ok(factoryUseCase.stats());
     }
 
     @GetMapping("/{id}")

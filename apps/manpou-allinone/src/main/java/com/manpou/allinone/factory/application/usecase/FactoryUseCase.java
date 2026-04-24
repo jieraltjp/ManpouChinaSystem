@@ -7,7 +7,10 @@ import com.manpou.allinone.factory.application.assembler.FactoryAssembler;
 import com.manpou.allinone.factory.application.dto.FactoryCreateCmd;
 import com.manpou.allinone.factory.application.dto.FactoryPageQuery;
 import com.manpou.allinone.factory.application.dto.FactoryQuery;
+import com.manpou.allinone.factory.application.dto.FactoryStatsDTO;
 import com.manpou.allinone.factory.application.dto.FactoryUpdateCmd;
+import com.manpou.allinone.common.port.FactoryQueryPort;
+import com.manpou.allinone.factory.domain.model.CooperationStatus;
 import com.manpou.allinone.factory.domain.model.Factory;
 import com.manpou.allinone.factory.domain.repository.FactoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ public class FactoryUseCase {
     private final FactoryRepository factoryRepository;
     private final ProcurementPort procurementPort;
     private final FactoryAssembler assembler;
+    private final FactoryQueryPort factoryQueryPort;
 
     @Transactional(readOnly = true)
     public Page<FactoryPageQuery> pageQuery(FactoryQuery query) {
@@ -89,5 +93,16 @@ public class FactoryUseCase {
         entity.markDeleted();
         factoryRepository.save(entity);
         log.info("[Factory] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
+    }
+
+    @Transactional(readOnly = true)
+    public FactoryStatsDTO stats() {
+        return FactoryStatsDTO.builder()
+                .total(factoryRepository.countByDeletedIsFalse())
+                .active(factoryQueryPort.countFactoriesWithLinkedProducts())
+                .potential(factoryRepository.countByCooperationStatusAndDeletedIsFalse(CooperationStatus.POTENTIAL))
+                .suspended(factoryRepository.countByCooperationStatusAndDeletedIsFalse(CooperationStatus.SUSPENDED))
+                .eliminated(factoryRepository.countByCooperationStatusAndDeletedIsFalse(CooperationStatus.ELIMINATED))
+                .build();
     }
 }

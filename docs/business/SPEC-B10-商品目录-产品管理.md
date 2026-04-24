@@ -1,6 +1,10 @@
 # SPEC-B10 — 商品目录业务规格（商品类）
 
-> **版本**: 1.4.0
+> **版本**: 2.0.0
+> **更新**: 2026-04-24（v2.0.0：关联工厂显示名称 factoryNames；新增日本HS编码/工厂名称筛选）
+> **更新**: 2026-04-24（v1.9.0：关联工厂数量 factoryCount（修复：JPQL from 放错 repository））
+> **更新**: 2026-04-24（v1.6.0：表格列重组；移除库存/箱数；新增含税单价/票点；UI文档同步更新）
+> **更新**: 2026-04-24（v1.5.0：image_url 全量填充 + 前端表格图片列）
 > **更新**: 2026-04-23（v1.4.0：新增7个字段 hs_code_jp/jan_code/status/quantities/carton_qty/amount_rmb/material_ja）
 > **创建**: 2026-04-22
 > **状态**: ✅ 已实现
@@ -37,7 +41,7 @@ Product（聚合根）
 ├── nameZh: String                  # 中文名称（中国用）
 ├── nameEn: String                  # 英文名称（报关用）
 ├── nameJa: String                  # 日文名称（日本用）
-├── imageUrl: String                # 商品图片 URL
+├── imageUrl: String                # 商品图片 URL（格式：https://shopping.c.yimg.jp/lib/fkstyle/{subCode}.jpg）
 │
 ├── 分类
 ├── category: ProductCategory       # OEM / ORDINARY / FACTORY_DIRECT
@@ -119,10 +123,17 @@ ProductFactory（关联实体，非聚合根）
 ```java
 public enum ProductCategory {
     OEM,              // OEM定制产品
-    ORDINARY,         // 普通商品
+    ORDINARY,         // 普通商品（默认）
     FACTORY_DIRECT    // 工厂直供
 }
+
+public enum ProductStatus {
+    ACTIVE,           // 在售/可用
+    INACTIVE          // 停售/禁用
+}
 ```
+
+> **ProductStatus 与 category 的区别**：category 是商品类型（商业模式），status 是上下架状态（运营状态）。两者独立，含义不同。
 
 ---
 
@@ -311,7 +322,28 @@ List<SubCodeSuggestVO> suggestSubCodes(String masterCode);
 
 ---
 
-## 8. 代码实现状态
+## 8. 错误码
+
+所有商品域业务异常均通过 `BusinessException` 抛出，错误码定义如下：
+
+| 错误码 | 触发场景 | HTTP 状态 |
+|--------|----------|-----------|
+| `product.not_found` | 按 ID 或 masterCode 查找商品不存在 | 404 |
+| `product.master_code_conflict` | 创建时 masterCode + subCode 组合已存在 | 409 |
+
+```java
+// 示例：查找不存在
+throw BusinessException.notFound("Product", id);
+throw BusinessException.notFound("Product", masterCode);
+
+// 示例：唯一性冲突
+throw BusinessException.conflict(
+    String.format("货号 %s 已存在", cmd.getMasterCode()));
+```
+
+---
+
+## 9. 代码实现状态
 
 - [x] ✅ `Product` 聚合根实体（`manpou-allinone/.../product/domain/model/Product.java`）
 - [x] ✅ `ProductFactory` 关联实体（`manpou-allinone/.../product/domain/model/ProductFactory.java`）
@@ -343,7 +375,7 @@ List<SubCodeSuggestVO> suggestSubCodes(String masterCode);
 
 ---
 
-## 9. 缺口阻塞
+## 10. 缺口阻塞
 
 | 项目 | 优先级 | 说明 |
 |------|--------|------|

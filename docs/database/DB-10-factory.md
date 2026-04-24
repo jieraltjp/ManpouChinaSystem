@@ -1,7 +1,8 @@
 # DB-10 — 工厂/厂家数据库设计
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **创建**: 2026-04-22
+> **更新**: 2026-04-24（v1.2.0：§2.2 新增 cooperationStatus 渲染规则 — product_factory 有关联则强制渲染为 ACTIVE）
 > **更新**: 2026-04-23（v1.1.0：factory_name 加 UNIQUE KEY uk_factory_name，业务唯一标识）
 > **状态**: ✅ 已实现
 > **业务步号**: 02（工厂信息 — 发注前置基础数据）
@@ -45,9 +46,13 @@
 
 ### 2.2 合作状态（cooperation_status）
 
+> **渲染规则**：工厂详情/列表返回时，若在 `product_factory` 表中存在 `factory_id` 关联记录，
+> 强制将 `cooperationStatus` 渲染为 `ACTIVE`（合作中），不修改数据库值。
+> 实现：`FactoryAssembler.toDto()` 通过 `FactorySynergyPort.hasAssociatedProducts()` 查询。
+
 | 状态 | 值 | 说明 |
 |------|---|------|
-| 合作中 | `ACTIVE` | 正常下单 |
+| 合作中 | `ACTIVE` | 正常下单；**或有商品关联时强制渲染** |
 | 已暂停 | `SUSPENDED` | 暂停合作，待评估 |
 | 已淘汰 | `ELIMINATED` | 淘汰厂家，不再合作 |
 | 潜在合作 | `POTENTIAL` | 潜在供应商，尚未合作 |
@@ -300,7 +305,8 @@ factory (厂家)
     │
     ├── procurement (发注单)   ── factory_id FK
     ├── qc_record (验货记录)   ── factory_id FK（来源方）
-    └── product (商品)         ── factory_id FK（生产方）
+    └── product (商品)         ── factory_id FK（product_factory 中间表）
+        ↕ 有商品关联时，cooperationStatus 强制渲染为 ACTIVE（见 §2.2）
 ```
 
 > 工厂删除前必须校验无关联发注单、验货记录和商品，否则拒绝删除。

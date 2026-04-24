@@ -7,13 +7,17 @@ import com.manpou.allinone.common.filter.TraceFilter;
 import com.manpou.allinone.product.application.assembler.ProductAssembler;
 import com.manpou.allinone.product.application.dto.MasterCodeSuggestVO;
 import com.manpou.allinone.product.application.dto.ProductCreateCmd;
+import com.manpou.allinone.product.application.dto.ProductFactoryVO;
 import com.manpou.allinone.product.application.dto.ProductPageQuery;
 import com.manpou.allinone.product.application.dto.ProductQuery;
 import com.manpou.allinone.product.application.dto.ProductUpdateCmd;
 import com.manpou.allinone.product.application.dto.SubCodeSuggestVO;
 import com.manpou.allinone.product.domain.model.Product;
+import com.manpou.allinone.product.domain.model.ProductFactory;
+import com.manpou.allinone.product.infrastructure.persistence.jpa.ProductFactoryJpaRepository;
 import com.manpou.allinone.product.domain.repository.ProductRepository;
 import com.manpou.allinone.product.infrastructure.persistence.jpa.ProductJpaRepository;
+import com.manpou.allinone.factory.domain.repository.FactoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -35,20 +39,26 @@ public class ProductUseCase {
 
     private final ProductRepository productRepository;
     private final ProductJpaRepository productJpaRepository;
+    private final ProductFactoryJpaRepository productFactoryJpaRepository;
+    private final FactoryRepository factoryRepository;
     private final ProductAssembler productAssembler;
 
     public ProductUseCase(
             @Qualifier("productJpaRepository") ProductRepository productRepository,
             ProductJpaRepository productJpaRepository,
+            ProductFactoryJpaRepository productFactoryJpaRepository,
+            FactoryRepository factoryRepository,
             ProductAssembler productAssembler) {
         this.productRepository = productRepository;
         this.productJpaRepository = productJpaRepository;
+        this.productFactoryJpaRepository = productFactoryJpaRepository;
+        this.factoryRepository = factoryRepository;
         this.productAssembler = productAssembler;
     }
 
     /**
      * 分页查询。
-     * 支持：按主货号精确、按关键词模糊、按 HS编码精确。
+     * 支持：按主货号精确、按关键词模糊、按中国HS编码精确、按日本HS编码精确、按工厂名称模糊。
      */
     @Transactional(readOnly = true)
     public Page<ProductPageQuery> pageQuery(ProductQuery query) {
@@ -56,19 +66,42 @@ public class ProductUseCase {
         PageRequest pageRequest = PageRequest.of(
                 pageIndex,
                 Math.min(query.getPageSize(), 100),
-                Sort.by(Sort.Direction.DESC, "createTime")
+                Sort.by(Sort.Direction.ASC, "createTime")
         );
         Page<Product> page;
         if (query.getMasterCode() != null && !query.getMasterCode().isBlank()) {
             page = productRepository.findByMasterCodeAndDeletedIsFalse(query.getMasterCode(), pageRequest);
         } else if (query.getHsCode() != null && !query.getHsCode().isBlank()) {
             page = productRepository.findByHsCodeAndDeletedIsFalse(query.getHsCode(), pageRequest);
+        } else if (query.getHsCodeJp() != null && !query.getHsCodeJp().isBlank()) {
+            page = productRepository.findByHsCodeJpAndDeletedIsFalse(query.getHsCodeJp(), pageRequest);
+        } else if (query.getFactoryName() != null && !query.getFactoryName().isBlank()) {
+            page = productJpaRepository.findByFactoryNameContaining(query.getFactoryName(), pageRequest);
         } else if (query.getKeyword() != null && !query.getKeyword().isBlank()) {
             page = productRepository.findByNameZhContainingAndDeletedIsFalse(query.getKeyword(), pageRequest);
         } else {
             page = productRepository.findAllByDeletedIsFalse(pageRequest);
         }
-        return page.map(productAssembler::toDto);
+        // 批量查询关联工厂数量和名称，避免 N+1
+        var productIds = page.getContent().stream().map(Product::getId).toList();
+        var factoryCountMap = productFactoryJpaRepository.countFactoriesByProductIds(productIds)
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> ((Number) row[1]).intValue()
+                ));
+        var factoryNamesMap = productFactoryJpaRepository.findFactoryNamesByProductIds(productIds)
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        row -> ((Number) row[0]).longValue(),
+                        row -> (String) row[1]
+                ));
+        return page.map(product -> {
+            ProductPageQuery dto = productAssembler.toDto(product);
+            dto.setFactoryCount(factoryCountMap.getOrDefault(product.getId(), 0));
+            dto.setFactoryNames(factoryNamesMap.get(product.getId()));
+            return dto;
+        });
     }
 
     /**
@@ -165,5 +198,33 @@ public class ProductUseCase {
                         .colorName((String) row[1])
                         .build())
                 .toList();
+    }
+
+    /**
+     * 获取商品关联的工厂列表（含工厂详情）。
+     */
+    @Transactional(readOnly = true)
+    public List<ProductFactoryVO> getProductFactories(Long productId) {
+        List<ProductFactory> links = productFactoryJpaRepository.findByProductId(productId);
+        return links.stream().map(link -> {
+            var factory = factoryRepository.findByIdAndDeletedIsFalse(link.getFactoryId()).orElse(null);
+            return ProductFactoryVO.builder()
+                    .productId(link.getProductId())
+                    .factoryId(link.getFactoryId())
+                    .supplierSku(link.getSupplierSku())
+                    .moq(link.getMoq())
+                    .leadTimeDays(link.getLeadTimeDays())
+                    .unitPriceRmb(link.getUnitPriceRmb())
+                    .isPreferred(link.getIsPreferred())
+                    .factoryCode(factory != null ? factory.getFactoryCode() : null)
+                    .factoryName(factory != null ? factory.getFactoryName() : null)
+                    .province(factory != null ? factory.getProvince() : null)
+                    .city(factory != null ? factory.getCity() : null)
+                    .contactName(factory != null ? factory.getContactName() : null)
+                    .contactPhone(factory != null ? factory.getContactPhone() : null)
+                    .cooperationStatus(factory != null && factory.getCooperationStatus() != null
+                            ? factory.getCooperationStatus().name() : null)
+                    .build();
+        }).toList();
     }
 }

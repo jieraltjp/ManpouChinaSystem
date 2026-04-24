@@ -1,8 +1,9 @@
 # 订单总览 — API 设计
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
-> **状态**: 设计中
+> **更新**: 2026-04-24（v1.1.0：Phase 1 已实现，与 SPEC-B09-IMPLEMENTATION.md 对齐）
+> **状态**: ✅ 已实现（Phase 1）
 > **对应前端**: `OrderOverviewPage.vue` · `docs/ui/pages/09-order-overview.md`
 > **核心**: 以 Procurement.id 为锚点，聚合全链路 8 步数据
 

@@ -1,6 +1,9 @@
 package com.manpou.allinone.replenishment.interfaces.controller;
 
 import com.manpou.allinone.common.result.Result;
+import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
+import com.manpou.allinone.replenishment.application.dto.ConvertDemandCmd;
+import com.manpou.allinone.replenishment.application.dto.ConvertDemandResponse;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandCreateCmd;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandPageQuery;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandQuery;
@@ -10,6 +13,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/demands")
@@ -48,25 +53,34 @@ public class ReplenishmentDemandController {
     }
 
     /**
-     * 需求单转为采购单。
+     * 批量转采购（v1.6.0）。
      * POST /api/v1/demands/{id}/convert
+     * 每个子货号明细生成一条 Procurement。
      */
     @PostMapping("/{id}/convert")
-    public Result<Void> convertToProcurement(
+    public Result<ConvertDemandResponse> convertToProcurement(
             @PathVariable("id") Long id,
-            @RequestParam("procurementId") Long procurementId) {
-        demandUseCase.convertToProcurement(id, procurementId);
-        return Result.ok("需求单已转为采购单", null);
+            @Valid @RequestBody ConvertDemandCmd cmd) {
+        ConvertDemandResponse response = demandUseCase.convertToProcurement(id, cmd);
+        return Result.ok("已转采购，共生成 " + response.getLinkedProcurementIds().size() + " 条发注单", response);
     }
 
     /**
-     * 撤销转换。
-     * 将需求单状态回退为 PENDING，清除 linkedProcurementId。
+     * 批量撤销转换（v1.6.0）。
      * POST /api/v1/demands/{id}/revert
      */
     @PostMapping("/{id}/revert")
     public Result<Void> revertConversion(@PathVariable("id") Long id) {
         demandUseCase.revertConversion(id);
         return Result.ok("已撤销转换，需求单可重新转采购", null);
+    }
+
+    /**
+     * 查看关联的采购单列表（v1.6.0）。
+     * GET /api/v1/demands/{id}/procurements
+     */
+    @GetMapping("/{id}/procurements")
+    public Result<List<ProcurementPageQuery>> getLinkedProcurements(@PathVariable("id") Long id) {
+        return Result.ok(demandUseCase.getLinkedProcurements(id));
     }
 }

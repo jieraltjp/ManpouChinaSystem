@@ -32,4 +32,8 @@ public interface FactoryRepository {
     Page<Factory> findByFactoryNameAndDeletedIsFalse(String factoryName, Pageable pageable);
 
     boolean existsByDeletedIsFalse();
+
+    long countByCooperationStatusAndDeletedIsFalse(CooperationStatus status);
+
+    long countByDeletedIsFalse();
 }

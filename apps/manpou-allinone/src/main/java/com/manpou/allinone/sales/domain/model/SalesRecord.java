@@ -88,13 +88,6 @@ public class SalesRecord extends BaseEntity {
         int s = (sold != null ? sold : 0);
         int r = (returned != null ? returned : 0);
         this.currentStock = Math.max(0, this.currentStock + r - s);
-        if (this.currentStock == 0) {
-            this.status = SalesStatus.OUT_OF_STOCK;
-        } else if (this.safetyStock != null && this.currentStock < this.safetyStock) {
-            this.status = SalesStatus.LOW_STOCK;
-        } else {
-            this.status = SalesStatus.LISTED;
-        }
     }
 
     public void recalculateReturnRate() {

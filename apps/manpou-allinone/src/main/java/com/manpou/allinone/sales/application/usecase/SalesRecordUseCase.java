@@ -83,12 +83,14 @@ public class SalesRecordUseCase {
         if (entity.isTerminal()) {
             throw new BusinessException("sales.record.cannot_update_terminal", "已下架的记录禁止修改库存");
         }
+        int prevStock = entity.getCurrentStock() != null ? entity.getCurrentStock() : 0;
         entity.updateStock(cmd.getSold(), cmd.getReturned());
         entity.recalculateReturnRate();
+        // 先触发补货事件（基于旧库存状态判断），再同步状态
+        triggerReplenishmentIfNeeded(entity, prevStock);
+        syncStatus(entity);
         salesRecordRepository.save(entity);
         log.info("[SalesRecord] stock updated, id={}, sold={}, returned={}", id, cmd.getSold(), cmd.getReturned());
-        // 触发库存不足反馈循环
-        triggerReplenishmentIfNeeded(entity);
     }
 
     @Transactional
@@ -140,16 +142,19 @@ public class SalesRecordUseCase {
 
     /**
      * 触发补货需求生成。
-     * 当 currentStock < safetyStock 且处于正常销售状态时，发布补货事件。
+     * 当旧库存 >= safetyStock 且新库存 < safetyStock 时，发布补货事件。
      * SPEC-B08 §4.1 反馈循环规则。
      */
-    private void triggerReplenishmentIfNeeded(SalesRecord entity) {
+    private void triggerReplenishmentIfNeeded(SalesRecord entity, int prevStock) {
+        log.info("[triggerCheck] id={}, prevStock={}, currentStock={}, safetyStock={}",
+                entity.getId(), prevStock, entity.getCurrentStock(), entity.getSafetyStock());
         if (entity.getSafetyStock() == null || entity.getCurrentStock() == null) {
             return;
         }
-        if (entity.getCurrentStock() < entity.getSafetyStock()
-                && entity.getStatus() == SalesStatus.LISTED) {
-            int requestedQty = entity.getSafetyStock() - entity.getCurrentStock();
+        int safetyStock = entity.getSafetyStock();
+        int currentStock = entity.getCurrentStock();
+        if (prevStock >= safetyStock && currentStock < safetyStock) {
+            int requestedQty = safetyStock - currentStock;
             eventPublisher.publishEvent(new ReplenishmentDemandNeededEvent(
                     this,
                     entity.getId(),
@@ -157,11 +162,22 @@ public class SalesRecordUseCase {
                     entity.getProductCode(),
                     entity.getSubProductCode(),
                     requestedQty,
-                    entity.getCurrentStock(),
-                    entity.getSafetyStock()
+                    currentStock,
+                    safetyStock
             ));
-            log.info("[SalesRecord] low stock detected, id={}, currentStock={}, safetyStock={}, trigger replenishment",
-                    entity.getId(), entity.getCurrentStock(), entity.getSafetyStock());
+            log.info("[SalesRecord] low stock detected, id={}, prevStock={}, currentStock={}, safetyStock={}, trigger replenishment",
+                    entity.getId(), prevStock, currentStock, safetyStock);
+        }
+    }
+
+    private void syncStatus(SalesRecord entity) {
+        if (entity.getCurrentStock() == null) return;
+        if (entity.getCurrentStock() == 0) {
+            entity.setStatus(SalesStatus.OUT_OF_STOCK);
+        } else if (entity.getSafetyStock() != null && entity.getCurrentStock() < entity.getSafetyStock()) {
+            entity.setStatus(SalesStatus.LOW_STOCK);
+        } else {
+            entity.setStatus(SalesStatus.LISTED);
         }
     }
 }

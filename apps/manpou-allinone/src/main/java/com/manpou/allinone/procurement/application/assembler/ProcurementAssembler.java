@@ -55,6 +55,8 @@ public class ProcurementAssembler {
                 .destination(entity.getDestination())
                 .customerCompany(entity.getCustomerCompany())
                 .status(entity.getStatus())
+                .linkedDemandId(entity.getLinkedDemandId())
+                .linkedDemandItemId(entity.getLinkedDemandItemId())
                 .createBy(entity.getCreateBy())
                 .createTime(entity.getCreateTime())
                 .updateTime(entity.getUpdateTime())
@@ -121,6 +123,8 @@ public class ProcurementAssembler {
         if (cmd.getDestination() != null) entity.setDestination(cmd.getDestination());
         if (cmd.getCustomerCompany() != null) entity.setCustomerCompany(cmd.getCustomerCompany());
         if (cmd.getStatus() != null) entity.setStatus(cmd.getStatus());
+        if (cmd.getLinkedDemandId() != null) entity.setLinkedDemandId(cmd.getLinkedDemandId());
+        if (cmd.getLinkedDemandItemId() != null) entity.setLinkedDemandItemId(cmd.getLinkedDemandItemId());
     }
 
     public void copyToEntity(ProcurementUpdateCmd cmd, Procurement entity) {

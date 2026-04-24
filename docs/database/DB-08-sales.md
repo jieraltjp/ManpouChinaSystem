@@ -11,13 +11,11 @@
 
 | 序号 | 表名 | 聚合根 | 状态 |
 |------|------|--------|------|
-| 1 | `sales_record` | SalesRecord | 🔴 占位 |
+| 1 | `sales_record` | SalesRecord | ✅ 已实现 |
 
 ---
 
-## 1. sales_record（运营销售）🔴占位
-
-> ⚠️ 字段为占位，触发时机和库存管理规则待运营方确认。
+## 1. sales_record（运营销售）
 
 **对应**: `SalesRecord` 聚合根
 
@@ -28,7 +26,7 @@ CREATE TABLE sales_record (
     procurement_id       BIGINT COMMENT '关联采购单 FK → procurement.id',
     product_code        VARCHAR(64) COMMENT '主货号',
     sub_product_code    VARCHAR(64) COMMENT '子货号（颜色）',
-    sales_channel       VARCHAR(32) COMMENT '销售渠道',
+    sales_channel       VARCHAR(32) COMMENT '销售渠道 AMAZON / MERCALI / SELF_SITE / OTHER',
     status              VARCHAR(32) NOT NULL DEFAULT 'LISTED' COMMENT 'LISTED / LOW_STOCK / OUT_OF_STOCK / DISCONTINUED',
     listing_date         DATE COMMENT '上架日期',
     initial_stock       INT COMMENT '初始上架库存',

@@ -5,6 +5,7 @@ import com.manpou.allinone.product.application.dto.ProductCreateCmd;
 import com.manpou.allinone.product.application.dto.ProductPageQuery;
 import com.manpou.allinone.product.application.dto.ProductQuery;
 import com.manpou.allinone.product.application.dto.ProductUpdateCmd;
+import com.manpou.allinone.product.application.dto.ProductFactoryVO;
 import com.manpou.allinone.product.application.dto.SubCodeSuggestVO;
 import com.manpou.allinone.product.application.usecase.ProductUseCase;
 import com.manpou.allinone.common.annotation.Idempotent;
@@ -70,6 +71,15 @@ public class ProductController {
     @GetMapping("/suggest/sub-codes")
     public Result<List<SubCodeSuggestVO>> suggestSubCodes(@RequestParam String masterCode) {
         return Result.ok(productUseCase.suggestSubCodes(masterCode));
+    }
+
+    /**
+     * 获取商品关联的工厂列表（含工厂详情）。
+     * GET /api/v1/products/{id}/factories
+     */
+    @GetMapping("/{id}/factories")
+    public Result<List<ProductFactoryVO>> getProductFactories(@PathVariable Long id) {
+        return Result.ok(productUseCase.getProductFactories(id));
     }
 
     /**

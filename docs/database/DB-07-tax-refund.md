@@ -15,7 +15,7 @@
 
 | 序号 | 表名 | 聚合根 | 状态 |
 |------|------|--------|------|
-| 1 | `tax_refund_record` | TaxRefundRecord | 🔴 占位 |
+| 1 | `tax_refund_record` | TaxRefundRecord | ✅ 已实现 |
 
 ---
 
@@ -37,7 +37,7 @@ CREATE TABLE tax_refund_record (
     procurement_id       BIGINT COMMENT '关联采购单 FK → procurement.id',
     japan_customs_id    BIGINT COMMENT '关联日本清关单 FK → japan_customs_record.id',
     status               VARCHAR(32)  NOT NULL DEFAULT 'APPLYING' COMMENT 'APPLYING / COMPLETED / NO_REFUND',
-    billing_type         VARCHAR(32) COMMENT '报关类型 NORMAL / REBATE / VOID',
+    billing_type         VARCHAR(32) COMMENT '报关类型 ZHE_LU_KAI_PIAO / CHAO_HUI_TUI_SHUI / NO_REFUND',
     price_rmb            DECIMAL(14,2) COMMENT '含税人民币单价（来自 procurement）',
     quantity             INT COMMENT '采购数量（来自 procurement）',
     tax_point            DECIMAL(5,4) COMMENT '票点（来自 procurement）',

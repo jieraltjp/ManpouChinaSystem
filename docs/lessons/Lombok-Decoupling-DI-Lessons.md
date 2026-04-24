@@ -734,6 +734,82 @@ public interface ProductJpaRepository extends ProductRepository, JpaRepository<P
 
 ---
 
+## Lesson 26: Maven `-q` 静默模式会吞掉 spring-boot:repackage 失败，导致 JAR 无法启动
+
+### 问题
+
+后端 `mvn package -DskipTests -q` 报告 BUILD SUCCESS，但 `java -jar target/xxx.jar` 启动失败：
+
+```
+Error: Unable to access jarfile target/manpou-allinone-1.0.0-SNAPSHOT.jar
+# 或启动后立即退出，无日志
+```
+
+检查 MANIFEST.MF 发现缺失：
+```
+Main-Class: org.springframework.boot.loader.launch.JarLauncher   ← 缺失
+Start-Class: com.manpou.allinone.ManpouAllInOneApplication       ← 缺失
+```
+
+### 根因
+
+**两条错误叠加：**
+
+1. **JAR 文件被进程锁住**
+   前一个 Spring Boot 进程（`java -jar` 启动的）仍持有 `manpou-allinone-1.0.0-SNAPSHOT.jar` 的文件锁。`mvn package` 的 `spring-boot:repackage` 尝试覆盖该文件时失败（Windows 文件锁），但使用了 `-q`（quiet）标志，**所有输出被吞掉**。
+
+2. **Maven 静默模式掩盖了 repackage 失败**
+   `-q` 标志让 Maven 不输出任何 INFO/WARNING，repackage 失败时只返回非零退出码（脚本未检查），最终产物是没有 Spring Boot Loader 的普通 JAR。
+
+```
+mvn package -DskipTests -q
+  → spring-boot:repackage 失败（文件锁）
+  → 错误被 -q 吞掉
+  → BUILD SUCCESS（因为 compile 成功了）
+  → 产物：无 Main-Class 的普通 JAR → java -jar 失败
+```
+
+### 诊断方法
+
+检查 JAR 是否可执行：
+```bash
+# 方法1：检查 MANIFEST.MF
+unzip -p target/manpou-allinone-1.0.0-SNAPSHOT.jar META-INF/MANIFEST.MF | grep "Main-Class"
+
+# 方法2：检查 Spring Boot 特有的文件
+unzip -l target/xxx.jar | grep "BOOT-INF"
+
+# 方法3：不用 -q，跑完整日志
+mvn package -DskipTests 2>&1 | grep -E "repackage|ERROR|SUCCESS"
+```
+
+### 解决方案
+
+**立即修复（本次）：**
+```bash
+# 1. 杀掉持有 JAR 锁的 Java 进程
+taskkill //F //IM java.exe
+
+# 2. 不带 -q 重新打包，让错误可见
+mvn package -DskipTests
+```
+
+**预防：**
+
+| 规范 | 说明 |
+|------|------|
+| CI/CD 和本地打包**禁止**使用 `-q` | 掩盖 WARNING 和错误 |
+| 打包后立即检查 MANIFEST.MF | `unzip -p target/xxx.jar META-INF/MANIFEST.MF \| grep Main-Class` |
+| 打包前确保无旧进程锁 JAR | `taskkill //F //IM java.exe` 或等效命令 |
+| 构建脚本检查 exit code | `mvn package ... && echo "OK" \|\| echo "FAILED"` |
+
+### 相关文件
+
+- `apps/manpou-allinone/pom.xml` — spring-boot-maven-plugin 配置
+- `apps/manpou-allinone/target/manpou-allinone-1.0.0-SNAPSHOT.jar`
+
+---
+
 ## 总结：十八条铁律
 
 ### 工程实践（代码层）
@@ -785,6 +861,59 @@ public interface ProductJpaRepository extends ProductRepository, JpaRepository<P
 | 21 | BaseEntity 用 @MappedSuperclass，所有实体继承 | 审计字段不一致 |
 | 24 | 测试数据提取禁止用字符串解析（grep），用专业 API 库 | 测试脆弱 |
 | 25 | 领域层 Repository 禁止加 @Repository，避免与 JPA Adapter 重复 Bean | Spring 启动失败（bean 歧义） |
+| 26 | 打包禁止使用 `-q` + 确保无旧进程锁 JAR | repackage 失败被吞掉，JAR 无 Main-Class |
+| 27 | 运行时依赖不能是 test scope；datasource 必须与实际环境一致 | `Cannot load driver class: org.h2.Driver` |
+
+---
+
+## Lesson 27: 依赖 scope 必须与实际运行环境匹配（H2 test scope vs runtime）
+
+### 问题
+
+JAR 打包成功，`java -jar` 启动时报错：
+```
+Caused by: java.lang.IllegalStateException: Cannot load driver class: org.h2.Driver
+```
+
+### 根因
+
+`pom.xml` 中 H2 为 `test` scope，但 `application.yml` 默认 datasource 使用 H2：
+```xml
+<!-- pom.xml -->
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>test</scope>   ← 不打包到 JAR
+</dependency>
+
+<!-- application.yml -->
+driver-class-name: org.h2.Driver  ← 运行时需要，找不到
+```
+
+`spring-boot:repackage` 只打包 `compile` + `runtime` scope，不打包 test scope。
+
+### 解决方案
+
+**移除 H2，激活 MySQL local profile：**
+```yaml
+# application.yml
+spring:
+  profiles:
+    active: local   # ← 激活 application-local.yml（MySQL 配置）
+
+# application-local.yml（已在 .gitignore）
+# 包含完整的 MySQL datasource + JPA 配置
+```
+
+同时从 `pom.xml` 中删除 H2 依赖。
+
+### 预防
+
+| 规范 | 说明 |
+|------|------|
+| 运行时依赖不能用 `test` scope | test scope 不参与 JAR 打包 |
+| datasource profile 与实际环境匹配 | 本地开发用 MySQL → 激活 local profile |
+| profile 合并后 YAML 不能有重复 key | `spring:` 只能出现一次，合并为单一块 |
 
 ---
 

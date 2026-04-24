@@ -1,11 +1,12 @@
 # DB-11 — 商品目录数据库设计
 
-> **版本**: 1.3.0
-> **更新**: 2026-04-23（v1.3.0：补全 product.idx_product_is_deleted 索引，product_factory.uk_product_factory 已固化，DB 与文档完全对齐）
+> **版本**: 1.5.0
+> **更新**: 2026-04-24（v1.5.0：移除重复 §5 历史迁移章节；修正 UI 文档引用（10-product.md 已存在）；）
+> **更新**: 2026-04-23（v1.4.0：补全 idx_master_code 索引，修正 category 为 enum 类型，补充 product 表实际字段类型说明）
 > **创建**: 2026-04-22
 > **状态**: ✅ 已实现
 > **对应业务文档**: `docs/business/SPEC-B10-商品目录-产品管理.md`
-> **对应 UI 文档**: `docs/ui/pages/10-product.md`（待创建）
+> **对应 UI 文档**: `docs/ui/pages/10-product.md`
 > **历史参考**: `docs/database/sql/goods.sql`（782条原始数据）
 
 ---
@@ -38,8 +39,8 @@ CREATE TABLE product (
     name_en               VARCHAR(255) COMMENT '英文名称（报关用）',
     name_ja               VARCHAR(128) COMMENT '日文名称（日本用）',
 
-    -- 分类
-    category               VARCHAR(20)  COMMENT 'OEM / ORDINARY / FACTORY_DIRECT',
+    -- 分类（实际 DB 为 enum，与 JPA entity 枚举一致）
+    category               ENUM('OEM','ORDINARY','FACTORY_DIRECT') COMMENT 'OEM / 常规 / 工厂直供',
     status                 VARCHAR(32)  COMMENT '商品区分（通常/予約，来自 goods_master.商品区分）',
     color_name            VARCHAR(64)  COMMENT '颜色名称',
 
@@ -58,9 +59,9 @@ CREATE TABLE product (
     unit_price_rmb         DECIMAL(12,4) COMMENT '含税单价(CNY)',
     amount_rmb             DECIMAL(14,4) COMMENT '金额(RMB) = 单价 × 数量（来自 DB.json）',
 
-    -- 税率
-    tax_rate               DECIMAL(5,4) DEFAULT 0.1000 COMMENT '增值税率（默认10%）',
-    tax_point              DECIMAL(5,4) DEFAULT 1.1    COMMENT '票点（默认1.1=含税）',
+    -- 税率（实际 DB 无默认值，由 Java entity 默认值注入）
+    tax_rate               DECIMAL(5,4) COMMENT '增值税率（实际 DB 无默认值，entity 层默认 0.1）',
+    tax_point              DECIMAL(5,4) COMMENT '票点（实际 DB 无默认值，entity 层默认 1.1）',
 
     -- 单品尺寸
     length_cm              DECIMAL(8,2) COMMENT '单品长(cm)',
@@ -85,8 +86,8 @@ CREATE TABLE product (
     package_volume_cbm    DECIMAL(10,6) COMMENT '外箱体积(m³)',
     package_weight_kg      DECIMAL(10,4) COMMENT '外箱毛重(kg)',
 
-    -- 质检
-    requires_qc            TINYINT(1)   COMMENT '是否需要检测（0/1）',
+    -- 质检（实际 DB 为 bit(1)，JPA 映射为 Boolean）
+    requires_qc            BIT(1)       COMMENT '是否需要检测（0/1）',
 
     -- 其他
     image_url              VARCHAR(512) COMMENT '商品图片 URL',
@@ -96,7 +97,7 @@ CREATE TABLE product (
     -- 审计
     create_by             VARCHAR(64)  NOT NULL DEFAULT '',
     create_time           DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    is_deleted            TINYINT(1)   NOT NULL DEFAULT 0,
+    is_deleted            BIT(1)       NOT NULL DEFAULT b'0' COMMENT '逻辑删除',
     update_by             VARCHAR(64)  NOT NULL,
     update_time           DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
 
@@ -110,6 +111,19 @@ CREATE TABLE product (
     INDEX idx_product_is_deleted (is_deleted)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品目录';
 ```
+
+---
+
+## 1.1 实际 DB 与文档差异说明
+
+| 差异项 | 文档描述 | 实际 DB | 说明 |
+|--------|---------|---------|------|
+| `category` 类型 | `VARCHAR(20)` | `ENUM('OEM','ORDINARY','FACTORY_DIRECT')` | 实际 DB 更严格，与 entity `@Enumerated(EnumType.STRING)` 一致 |
+| `tax_rate` 默认值 | `DEFAULT 0.1000` | 无默认值（NULL） | Java entity 层注入默认值，DB 层无需默认值 |
+| `tax_point` 默认值 | `DEFAULT 1.1` | 无默认值（NULL） | 同上 |
+| `requires_qc` 类型 | `TINYINT(1)` | `BIT(1)` | JPA 均映射为 `Boolean`，功能等价 |
+| `is_deleted` 类型 | `TINYINT(1)` | `BIT(1)` | 同上 |
+| `product_factory` FK | 文档注明有 FK 约束 | 实际无物理 FK | JPA 逻辑外键，由应用层维护完整性 |
 
 ---
 
@@ -249,90 +263,6 @@ SET p.package_length_cm = CAST(SUBSTRING_INDEX(g.box_desc, '*', 1) AS DECIMAL(8,
 - `DB.json` → `product.quantities` / `carton_qty` / `amount_rmb` / `material_ja` / `origin`
 
 
-| 差异 | 旧表（DB-02） | 新表（DB-10） |
-|------|--------------|--------------|
-| 货号结构 | `master_code` + `sub_code`（已对齐） | 同左 |
-| 名称字段 | `name`（日文） | `name_ja` + `name_en` + `name_zh` |
-| 重量字段 | `weight_kg`（净重） | `net_weight_kg` + `gross_weight_kg` |
-| 价格字段 | 无 | `unit_price_rmb` + `tax_point` + `tax_rate` |
-| HS编码 | 待新增 | `hs_code` |
-| 报关要素 | 无 | `declaration_elements` |
-| 外箱字段 | `package_height/width/depth` | + `package_volume_cbm` + `package_weight_kg` |
-| 图片 | 无 | `image_url` |
-| 原产国 | 无 | `origin` |
-| 多工厂关联 | 无 | `product_factory` 关联表 |
-| 系统字段 | 无 | `is_deleted` 软删除 |
-
----
-
-## 5. 数据迁移说明（历史）
-
-### 3.1 goods_master → product
-
-```sql
--- 货号拆分规则：sku='in041-a' → master_code='in041', sub_code='in041-a'（存完整SKU）
--- sub_code 直接存完整SKU，不拆分
-
-INSERT INTO product (
-    master_code, sub_code,
-    name_en, name_zh,
-    unit_price_rmb, tax_rate,
-    gross_weight_kg, net_weight_kg,
-    hs_code, declaration_elements,
-    units_per_package,
-    origin, remarks, last_used_date,
-    unit
-)
-SELECT
-    CASE
-        WHEN LOCATE('-', sku) > 0 THEN SUBSTRING_INDEX(sku, '-', 1)
-        ELSE sku
-    END AS master_code,
-    sku AS sub_code,
-    name_en, name_zh,
-    unit_price, tax_rate / 100,
-    weight_gross / 1000, weight_net / 1000,
-    hs_code, declaration_elements,
-    CAST(box_qty AS UNSIGNED),
-    origin, remark, last_used,
-    unit
-FROM esagf_oem.goods
-WHERE sku IS NOT NULL AND sku != '';
-```
-
-### 3.2 factory_name → product_factory 关联
-
-> ⚠️ 需要先完成 `factory.name` 标准化，然后通过名称匹配关联。
-
-```sql
--- 临时：按工厂名称模糊匹配（不精确，仅作迁移参考）
-INSERT INTO product_factory (product_id, factory_id, is_preferred)
-SELECT
-    p.id,
-    f.id,
-    TRUE
-FROM esagf_oem.goods g
-JOIN product p ON p.master_code = (
-    CASE WHEN LOCATE('-', g.sku) > 0 THEN SUBSTRING_INDEX(g.sku, '-', 1) ELSE g.sku END
-)
-JOIN factory f ON f.factory_name LIKE CONCAT('%', g.factory_name, '%')
-LIMIT 100;
-```
-
-### 3.3 box_desc 解析外箱尺寸
-
-```sql
--- 从 box_desc 中提取外箱尺寸
--- 格式示例：'一个一箱', '5个装一箱', '20个装一箱'
--- 尺寸示例：'193*23*28cm'（解析为长宽高）
-
-UPDATE product p
-JOIN esagf_oem.goods g ON (
-    CASE WHEN LOCATE('-', g.sku) > 0 THEN SUBSTRING_INDEX(g.sku, '-', 1) ELSE g.sku END
-) = p.master_code
-SET p.package_length_cm = CAST(SUBSTRING_INDEX(g.box_desc, '*', 1) AS DECIMAL(8,2));
-```
-
 ---
 
 ## 6. E-R 图
@@ -403,6 +333,7 @@ SET p.package_length_cm = CAST(SUBSTRING_INDEX(g.box_desc, '*', 1) AS DECIMAL(8,
 | 2026-04-23 | `product_factory` 无唯一约束，数据有 14 对重复 | 去重 15 条脏数据后添加 `uk_product_factory` |
 | 2026-04-23 | `product` 缺 `idx_product_is_deleted` 软删除索引 | 添加索引 |
 | 2026-04-23 | `product_factory` FK 约束未在 DB 创建 | 注：DB 无物理 FK，由 JPA 逻辑外键维护 |
+| 2026-04-23 | DB-11 文档与实际 DB 不一致 | v1.4.0：修正 category 为 enum、`is_deleted`/`requires_qc` 为 `bit(1)`，补充 `idx_master_code` 索引，补充差异说明章节 |
 
 ## 9. 数据源表清理状态
 

@@ -108,6 +108,14 @@ public class Procurement extends BaseEntity {
     @Column(name = "status", nullable = false, length = 32)
     private ShipmentStatus status = ShipmentStatus.未定;
 
+    // ===== 关联需求单（v1.6.0：转采购时填充） =====
+    @Column(name = "linked_demand_id")
+    private Long linkedDemandId;
+
+    /** 关联的需求单子货号明细索引（对应 ReplenishmentDemand.subProductItems 数组下标，v1.6.0） */
+    @Column(name = "linked_demand_item_id")
+    private Long linkedDemandItemId;
+
     // ===== 领域方法 =====
 
     /**

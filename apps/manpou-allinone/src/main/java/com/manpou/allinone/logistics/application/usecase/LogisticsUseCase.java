@@ -36,7 +36,7 @@ public class LogisticsUseCase {
     @Transactional(readOnly = true)
     public Page<LogisticsPageQuery> pageQuery(LogisticsQuery query) {
         PageRequest pageRequest = PageRequest.of(
-                (query.getPage() - 1),
+                query.getPage(),
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );

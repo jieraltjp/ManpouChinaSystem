@@ -89,4 +89,10 @@ public class ProductPageQuery {
     private String createBy;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+
+    // ===== 关联工厂数量（表格列展示用）=====
+    private Integer factoryCount;
+
+    // ===== 关联工厂名称（逗号分隔，表格列展示用）=====
+    private String factoryNames;
 }

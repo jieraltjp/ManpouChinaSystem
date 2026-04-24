@@ -15,7 +15,7 @@
 
 | 序号 | 表名 | 聚合根 | 状态 |
 |------|------|--------|------|
-| 1 | `japan_customs_record` | JapanCustomsRecord | 🔴 占位 |
+| 1 | `japan_customs_record` | JapanCustomsRecord | ✅ 已实现 |
 
 ---
 

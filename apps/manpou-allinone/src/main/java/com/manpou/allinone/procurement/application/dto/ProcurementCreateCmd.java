@@ -82,4 +82,8 @@ public class ProcurementCreateCmd {
     private String customerCompany;  // 客户公司
 
     private ShipmentStatus status;   // 状态（默认未定）
+
+    // ===== 关联需求单（v1.6.0：转采购时由 UseCase 填充） =====
+    private Long linkedDemandId;
+    private Long linkedDemandItemId;
 }

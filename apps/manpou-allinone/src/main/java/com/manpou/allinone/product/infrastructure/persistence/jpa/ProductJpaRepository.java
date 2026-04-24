@@ -20,17 +20,26 @@ import java.util.Optional;
 @Repository
 public interface ProductJpaRepository extends ProductRepository, JpaRepository<Product, Long> {
 
-    Optional<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
-
     Optional<Product> findByMasterCodeAndSubCodeAndDeletedIsFalse(String masterCode, String subCode);
-
-    Page<Product> findByMasterCodeAndDeletedIsFalse(String masterCode, Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE p.nameZh LIKE %:keyword% AND p.deleted = false")
     Page<Product> findByNameZhContainingAndDeletedIsFalse(@Param("keyword") String keyword, Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE p.hsCode = :hsCode AND p.deleted = false")
     Page<Product> findByHsCodeAndDeletedIsFalse(@Param("hsCode") String hsCode, Pageable pageable);
+
+    @Query("SELECT p FROM Product p WHERE p.hsCodeJp = :hsCodeJp AND p.deleted = false")
+    Page<Product> findByHsCodeJpAndDeletedIsFalse(@Param("hsCodeJp") String hsCodeJp, Pageable pageable);
+
+    /** 按工厂名称模糊搜索商品（JOIN product_factory + factory） */
+    @Query(value = """
+        SELECT DISTINCT p.* FROM product p
+        JOIN product_factory pf ON pf.product_id = p.id AND pf.product_id IS NOT NULL
+        JOIN factory f ON f.id = pf.factory_id AND f.is_deleted = FALSE
+        WHERE f.factory_name LIKE CONCAT('%', :factoryName, '%')
+          AND p.is_deleted = FALSE
+        """, nativeQuery = true)
+    Page<Product> findByFactoryNameContaining(@Param("factoryName") String factoryName, Pageable pageable);
 
     /** 主货号模糊搜索（去重），用于自动补全 */
     @Query("SELECT DISTINCT p.masterCode FROM Product p WHERE p.masterCode LIKE %:kw% AND p.deleted = false")

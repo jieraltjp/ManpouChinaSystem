@@ -23,4 +23,10 @@ public class ProductQuery {
 
     /** HS编码（精确匹配） */
     private String hsCode;
+
+    /** 日本HS编码（精确匹配） */
+    private String hsCodeJp;
+
+    /** 工厂名称（模糊匹配） */
+    private String factoryName;
 }

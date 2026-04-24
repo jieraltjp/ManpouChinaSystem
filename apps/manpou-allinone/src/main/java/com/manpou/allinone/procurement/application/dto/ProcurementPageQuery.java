@@ -64,6 +64,10 @@ public class ProcurementPageQuery {
     // ===== 状态 =====
     private ShipmentStatus status;    // 状态
 
+    // ===== 关联需求单（v1.6.0） =====
+    private Long linkedDemandId;
+    private Long linkedDemandItemId;
+
     // ===== 审计 =====
     private String createBy;
     private LocalDateTime createTime;

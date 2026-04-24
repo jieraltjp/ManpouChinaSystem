@@ -4,6 +4,7 @@ import com.manpou.allinone.product.application.dto.ProductCreateCmd;
 import com.manpou.allinone.product.application.dto.ProductPageQuery;
 import com.manpou.allinone.product.application.dto.ProductUpdateCmd;
 import com.manpou.allinone.product.domain.model.Product;
+import com.manpou.allinone.product.domain.model.ProductCategory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -104,6 +105,17 @@ public class ProductAssembler {
         if (cmd.getRequiresQc() != null) entity.setRequiresQc(cmd.getRequiresQc());
         if (cmd.getRemarks() != null) entity.setRemarks(cmd.getRemarks());
         if (cmd.getLastUsedDate() != null) entity.setLastUsedDate(cmd.getLastUsedDate());
+        // 自动分类：子货号含 oem → OEM，否则 → ORDINARY（用户可手动覆盖）
+        if (cmd.getCategory() != null) {
+            entity.setCategory(cmd.getCategory());
+        } else {
+            String sub = cmd.getSubCode();
+            entity.setCategory(
+                    sub != null && sub.toLowerCase().contains("oem")
+                            ? ProductCategory.OEM
+                            : ProductCategory.ORDINARY
+            );
+        }
         // 自动计算体积
         entity.calculateVolume();
         entity.calculatePackageVolume();
@@ -146,6 +158,17 @@ public class ProductAssembler {
         if (cmd.getRequiresQc() != null) entity.setRequiresQc(cmd.getRequiresQc());
         if (cmd.getRemarks() != null) entity.setRemarks(cmd.getRemarks());
         if (cmd.getLastUsedDate() != null) entity.setLastUsedDate(cmd.getLastUsedDate());
+        // 自动分类：子货号含 oem → OEM，否则 → ORDINARY（用户可手动覆盖）
+        if (cmd.getCategory() != null) {
+            entity.setCategory(cmd.getCategory());
+        } else {
+            String sub = cmd.getSubCode();
+            entity.setCategory(
+                    sub != null && sub.toLowerCase().contains("oem")
+                            ? ProductCategory.OEM
+                            : ProductCategory.ORDINARY
+            );
+        }
         entity.calculateVolume();
         entity.calculatePackageVolume();
     }

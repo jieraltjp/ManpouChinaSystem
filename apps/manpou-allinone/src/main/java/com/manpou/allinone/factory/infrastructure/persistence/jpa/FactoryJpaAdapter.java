@@ -28,4 +28,10 @@ public interface FactoryJpaAdapter extends FactoryRepository, org.springframewor
     @Override
     @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END FROM Factory f WHERE f.deleted = false")
     boolean existsByDeletedIsFalse();
+
+    @Override
+    long countByCooperationStatusAndDeletedIsFalse(CooperationStatus status);
+
+    @Override
+    long countByDeletedIsFalse();
 }

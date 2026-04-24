@@ -34,4 +34,8 @@ public interface ProcurementJpaRepository extends ProcurementRepository, JpaRepo
            "  AND p.deleted = false " +
            "  AND p.status NOT IN ('完了', '退货')")
     boolean existsActiveByFactoryId(@Param("factoryId") Long factoryId);
+
+    List<Procurement> findAllByIdInAndDeletedIsFalse(List<Long> ids);
+
+    List<Procurement> findByLinkedDemandIdAndDeletedIsFalse(Long linkedDemandId);
 }

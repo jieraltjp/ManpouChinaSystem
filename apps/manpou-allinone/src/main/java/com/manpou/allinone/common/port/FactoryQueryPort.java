@@ -12,4 +12,10 @@ public interface FactoryQueryPort {
     Optional<Factory> findById(Long id);
 
     Optional<Factory> findByIdAndDeletedIsFalse(Long id);
+
+    /**
+     * 统计关联了商品（product_factory）的工厂数量。
+     * 用于 FactoryStatsDTO.active 计数（ACTIVE = 有商品关联）。
+     */
+    long countFactoriesWithLinkedProducts();
 }
