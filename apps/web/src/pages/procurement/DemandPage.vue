@@ -486,9 +486,6 @@ function removeSubProductItem(index: number) {
   subCodeOptions.value.splice(index, 1)
 }
 
-async function onSubCodeChange(index: number) {
-  // nothing extra needed for now
-}
 
 // 转采购（v1.6.0：弹窗选工厂）
 function onConvert(row: DemandPageVO) {
@@ -582,7 +579,7 @@ function onMasterCodeChange(val: string) {
   }
 }
 
-async function loadSubCodeOptions(index: number) {
+async function loadSubCodeOptions(_index: number) {
   const masterCode = formData.productCode
   if (!masterCode || loadedSubCodesFor.value === masterCode) return
   loadedSubCodesFor.value = masterCode

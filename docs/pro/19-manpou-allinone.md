@@ -2,7 +2,7 @@
 
 > **视角**：INTJ 战略 — 极简先行，演进无价
 > **原则**：最好的架构不是设计出来的，是业务长出来的
-> **最后更新**：2026-04-22
+> **最后更新**：2026-04-24
 
 ---
 
@@ -24,10 +24,10 @@
 | factory | `/api/v1/factories` | factory-service | ✅ domain层+FSM |
 | qc | `/api/v1/qc-records` | qc-service | ✅ domain层+FSM |
 | logistics | `/api/v1/logistics-plans` | logistics-service（Kafka topic: logistics-events） | ✅ domain层+FSM |
-| replenishment | `/api/v1/demands` | replenishment-service | ✅ CRUD+转采购 |
-| product | `/api/v1/products` | product-service（Kafka topic: product-events） | 🔴 骨架 |
-| customs | `/api/v1/customs` | customs-service（Kafka topic: customs-events） | 🔴 骨架 |
-| finance | `/api/v1/finance` | finance-service（Kafka topic: finance-events） | 🔴 骨架 |
+| replenishment | `/api/v1/demands` | replenishment-service | ✅ CRUD+v1.6.0批量转采购 |
+| product | `/api/v1/products` | product-service（Kafka topic: product-events） | 🟡 骨架（业务开发中） |
+| customs | `/api/v1/customs` | customs-service（Kafka topic: customs-events） | 🟡 骨架（业务开发中） |
+| finance | `/api/v1/finance` | finance-service（Kafka topic: finance-events） | 🟡 骨架（业务开发中） |
 
 **保留独立**：
 
