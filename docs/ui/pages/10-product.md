@@ -70,6 +70,8 @@
 | 关联工厂 | `factoryCount` | 关联工厂数量（家），显示在抽屉中查看详情 |
 | 操作 | — | 详情 / 编辑 / 删除 |
 
+> **前端表格布局**：列宽用 `min-width`，不写 `table-layout="fixed"`，操作列不写 `fixed="right"`。详见 [docs/ui/ARCHITECTURE.md §8](../ARCHITECTURE.md#8-element-plus-表格布局规范)。
+
 ---
 
 ## 4. 新规录入 / 编辑弹窗

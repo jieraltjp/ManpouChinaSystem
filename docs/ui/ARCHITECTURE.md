@@ -261,4 +261,57 @@ graph TB
 
 ---
 
-*相关文档：[docs/ui/README.md](README.md)*
+## 8. Element Plus 表格布局规范
+
+> 版本: 1.0.0 · 更新: 2026-04-24
+> 来源: Lesson 46 — `el-card` + `el-table` 布局防 ::deep 污染
+
+### 8.1 正确写法
+
+```html
+<!-- ✅ 不写 table-layout（默认 auto）-->
+<!-- ✅ 不写 fixed="right"（无横向滚动时禁用）-->
+<!-- ✅ 列宽用 min-width，允许表格按内容扩展 -->
+<el-table ...>
+  <el-table-column prop="xxx" label="XXX" min-width="120" />
+  <el-table-column prop="xxx" label="XXX" min-width="140" show-overflow-tooltip />
+</el-table>
+```
+
+```css
+/* ✅ el-card 内边距由外层控制，不覆盖 el-table 内部结构 */
+.table-card :deep(.el-card__body) { padding: 16px; }
+
+/* ❌ 禁止：覆盖 el-table 内部 width/flex 计算，破坏 header/body 对齐 */
+:deep(.el-table) { width: 100% !important; }           /* ← 删除 */
+:deep(.el-table__header) { width: 100% !important; }  /* ← 删除 */
+```
+
+### 8.2 规则总结
+
+| 规则 | 说明 |
+|------|------|
+| 不写 `table-layout="fixed"` | 保持默认 auto，内容决定列宽 |
+| 列宽用 `min-width` | 可扩展；`table-layout: fixed` 下 min-width 不生效 |
+| 操作列不写 `fixed="right"` | 无横向滚动需求时，fixed 列会破坏 header/body 对齐 |
+| `::deep` 不覆盖内部 width/flex | 只穿透到子组件根节点，不干预框架内部布局计算 |
+| `el-card__body` padding 外层控制 | 通过 `:deep(.el-card__body)` 设置，不影响子组件 |
+
+### 8.3 固定列的正确用法
+
+仅在**横向滚动存在时**才使用 `fixed`：
+
+```html
+<!-- ✅ 场景：表格列数 > 15，且容器宽度不足以展示全部列时 -->
+<el-table ...>
+  <el-table-column ... width="80" />
+  <!-- ... 很多列 ... -->
+  <el-table-column :label="$t('action')" width="160" fixed="right" />
+</el-table>
+```
+
+本项目所有列表页列数 ≤ 12，无横向滚动，**禁止使用 `fixed`**。
+
+---
+
+*相关文档：[docs/ui/README.md](README.md) · [docs/lessons/Lombok-Decoupling-DI-Lessons.md#Lesson-46]*

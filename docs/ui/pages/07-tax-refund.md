@@ -60,6 +60,8 @@
 | 状态 | `status` | 系统 | APPLYING / COMPLETED / NO_REFUND |
 | 操作 | — | — | 详情 / 编辑 |
 
+> **前端表格布局**：列宽用 `min-width`，不写 `table-layout="fixed"`，操作列不写 `fixed="right"`。详见 [docs/ui/ARCHITECTURE.md §8](../ARCHITECTURE.md#8-element-plus-表格布局规范)。
+
 ---
 
 ## 4. 新规退税记录弹窗（骨架）
