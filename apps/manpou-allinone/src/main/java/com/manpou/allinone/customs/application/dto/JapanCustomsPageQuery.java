@@ -15,6 +15,7 @@ public class JapanCustomsPageQuery {
     private Long procurementId;
     private Long domesticCustomsId;
     private Long logisticsPlanId;
+    private String subProductCode;  // 子货号/颜色（v1.6.1 全链路追踪）
     private String status;
     private LocalDate arrivalDate;
     private String customsBroker;

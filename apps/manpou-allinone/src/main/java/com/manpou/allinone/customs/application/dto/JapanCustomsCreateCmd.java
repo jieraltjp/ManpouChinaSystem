@@ -13,6 +13,7 @@ public class JapanCustomsCreateCmd {
     private Long procurementId;
     private Long domesticCustomsId;
     private Long logisticsPlanId;
+    private String subProductCode;  // 子货号/颜色（来自 Procurement，全链路追踪）
 
     private LocalDate arrivalDate;
 

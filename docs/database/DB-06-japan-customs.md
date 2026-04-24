@@ -1,8 +1,8 @@
 # DB-06 — 日本清关数据库设计
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-23（v1.1.0：customs_entry_no VARCHAR(32)，procurement_id 允许 NULL，补全索引与 DB 实际对齐）
+> **更新**: 2026-04-24（v1.2.0：补充 sub_product_code 列，全链路子货号追踪完整）
 > **状态**: ✅ 已实现
 > **业务步号**: 06（日本清关）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B06-日本清关-步骤6.md`
@@ -32,6 +32,7 @@ CREATE TABLE japan_customs_record (
     procurement_id        BIGINT COMMENT '关联采购单 FK → procurement.id（可为空）',
     domestic_customs_id  BIGINT COMMENT '关联国内报关单 FK → domestic_customs_record.id',
     logistics_plan_id     BIGINT COMMENT '关联调配计划 FK → logistics_plan.id',
+    sub_product_code     VARCHAR(64) COMMENT '子货号/颜色（来自 Procurement，v1.6.1 全链路追踪）',
     status                VARCHAR(32) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING / IN_PROGRESS / CLEARED / FAILED',
     arrival_date          DATE COMMENT '到达日期',
     customs_broker        VARCHAR(128) COMMENT '清关行',
@@ -70,6 +71,7 @@ CREATE TABLE japan_customs_record (
 | procurementId | `procurement_id` | ✅（允许 NULL） |
 | domesticCustomsId | `domestic_customs_id` | ✅ |
 | logisticsPlanId | `logistics_plan_id` | ✅ |
+| subProductCode | `sub_product_code` | ✅（v1.6.1 新增） |
 | status | `status` | ✅ |
 | arrivalDate | `arrival_date` | ✅ |
 | customsBroker | `customs_broker` | ✅ |
@@ -93,6 +95,4 @@ CREATE TABLE japan_customs_record (
 - [x] ✅ `JapanCustomsAssembler` DTO 转换器
 - [x] ✅ `JapanCustomsUseCase` 用例服务
 - [x] ✅ `JapanCustomsController` REST 控制器
-
-> ⚠️ **P2 缺口**：`japan_customs_record` 表缺少 `sub_product_code` 列，全链路子货号追踪在步骤6断裂。
-> 建议：新增 DB migration 添加 `sub_product_code VARCHAR(64)` 列，并在 Assembler 层补全映射。
+- [x] ✅ `V29__japan_customs_sub_product_code.sql`（v1.6.1 新增 sub_product_code 列，全链路追踪完整）

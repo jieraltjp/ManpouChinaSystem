@@ -1,8 +1,8 @@
 # SPEC-B09-EX — 全链路子货号追踪分析
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-24
-> **状态**: 🟡 建设中
+> **状态**: ✅ 已完成（v1.6.1 JapanCustoms subProductCode 已补全）
 > **背景**: v1.6.0 批量子货号改造完成后，系统需要确认：全链路（需求单→发注单→国内报关→日本清关→调配计划→销售记录）是否按子货号分开追踪；Overview 页面锚点设计是否满足 v1.6.0 需求。
 
 ---
@@ -36,7 +36,7 @@ Procurement × N（每个 SubProductItem 一个 Procurement）
   │         ▼
   │     LogisticsPlan × N（手动创建，有 subProductCode）✓
   │         ▼
-  │     JapanCustomsRecord × N（手动创建，无 subProductCode）✗ 缺口
+  │     JapanCustomsRecord × N（有 subProductCode，来自 Procurement）✅
   │         ▼
   │     [事件驱动] JapanCustomsClearedEvent
   │         ▼
@@ -54,7 +54,7 @@ Procurement × N（每个 SubProductItem 一个 Procurement）
 | 3 验货 | QcRecord | ✅ | 手动创建 | ✅ | `procurementId` 精确追溯到单条 Procurement |
 | 4 调配计划 | LogisticsPlan | ✅ | 手动创建 | ✅ | 单独创建，procurementId 精确关联 |
 | 5 国内报关 | DomesticCustomsRecord | ✅ | 物流在途事件自动创建 | ✅ | `LogisticsInTransitEventListener` 逐条创建 |
-| **6 日本清关** | **JapanCustomsRecord** | **✗** | **手动创建** | **⚠️** | **缺少 subProductCode，通过 procurementId 间接可查** |
+| **6 日本清关** | **JapanCustomsRecord** | **✅** | **手动创建** | **✅** | **v1.6.1 新增 subProductCode 字段，全链路完整** |
 | 7 退税 | TaxRefundRecord | — | 手动创建 | ✅ | 财务维度，按采购单总额退税，不区分子货号 |
 | 8 销售记录 | SalesRecord | ✅ | 日本清关完成事件自动创建 | ✅ | `JapanCustomsClearedEventListener` 从 Procurement 取 subProductCode |
 
@@ -104,17 +104,18 @@ public void onLogisticsInTransit(LogisticsPlanInTransitEvent evt) {
 **触发**：手动创建（`LogisticsPlanUseCase.create()`）
 **设计合理性**：物流计划按出货批次，可以多件商品合一个 LogisticsPlan，但表本身有 subProductCode，下游仍可追溯。
 
-#### 步骤6：日本清关 ⚠️ 缺口
+#### 步骤6：日本清关 ✅（v1.6.1 已补全）
 
-**实体**：`JapanCustomsRecord`，**无** `subProductCode` 字段
+**实体**：`JapanCustomsRecord`，**有** `subProductCode` 字段（v1.6.1 新增）
 **触发**：手动创建（`JapanCustomsController` → `JapanCustomsUseCase.create()`）
-**当前链路**：`JapanCustomsRecord.procurementId` → `Procurement.subProductCode`（间接追溯）
+**来源**：清关员从 Procurement 复制 subProductCode 填入，或由前端自动预填
 
-**业务合理性**：日本清关行按提单/货件维度处理，不按商品 SKU 区分——这一层确实可以不分。但下游 `SalesRecord` 需要精确的 subProductCode。
-
-**缺口后果**：
-- `JapanCustomsClearedEvent` 只传 `procurementId`，`JapanCustomsClearedEventListener` 从 Procurement 查 subProductCode，绕过了缺口
-- 但 `JapanCustomsRecord` 表本身不记录子货号，清关员页面无法显示
+**实现**：
+- `JapanCustomsCreateCmd.subProductCode`（v1.6.1 新增）
+- `JapanCustomsUpdateCmd.subProductCode`（v1.6.1 新增）
+- `JapanCustomsRecord.subProductCode`（v1.6.1 新增）
+- `JapanCustomsAssembler` 映射（v1.6.1 新增）
+- `V29__japan_customs_sub_product_code.sql`（DB migration）
 
 #### 步骤8：销售记录 ✅
 
@@ -166,30 +167,16 @@ ReplenishmentDemand
 
 ## 4. 缺口修复方案
 
-### 4.1 缺口：日本清关补充 subProductCode
+### 4.1 ✅ JapanCustomsRecord subProductCode（v1.6.1 已修复）
 
-**优先级**：P2（业务链路实际通过 Procurement 可查，仅展示层缺失）
-**理由**：
-1. 日本清关行的业务操作确实按货件/提单维度，不需要精确到 SKU
-2. 财务（退税）和运营（销售）都通过 `procurementId` 精确追溯
+**优先级**：P2 → ✅ 已实现（2026-04-24）
 
-**如需修复**：
-
-```sql
--- DB migration
-ALTER TABLE japan_customs_record ADD COLUMN sub_product_code VARCHAR(64);
-```
-
-```java
-// JapanCustomsRecord.java 新增字段
-@Column(name = "sub_product_code", length = 64)
-private String subProductCode;
-
-// JapanCustomsUseCase.create() 传入
-// JapanCustomsAssembler.toJapanCustomsVO() 填充
-```
-
-**不修复的影响**：极小——`JapanCustomsClearedEventListener` 直接从 Procurement 查 subProductCode，销售记录数据完全正确。缺口仅在清关员查看日本清关页面时看不到子货号字段。
+**实现内容**：
+- `JapanCustomsRecord.java`：`subProductCode` 字段
+- `JapanCustomsCreateCmd.java` / `JapanCustomsUpdateCmd.java`：新增 `subProductCode`
+- `JapanCustomsAssembler.java`：copyCreate / copyUpdate / toDto 映射
+- `JapanCustomsPageQuery.java`：新增 `subProductCode`
+- `V29__japan_customs_sub_product_code.sql`：DB migration
 
 ### 4.2 体验优化：Overview 列表页展示关联子货号（待定）
 
@@ -304,7 +291,7 @@ return parseCommaSeparated(raw);
 
 | 评估维度 | 结论 |
 |---------|------|
-| 子货号分开追踪 | ✅ 除日本清关外的所有步骤均精确到子货号 |
+| 子货号分开追踪 | ✅ 全链路所有步骤均精确到子货号（v1.6.1 JapanCustoms 已补全）|
 | 批量 UX | ✅ 用户批量录入，系统内部逐条分开 |
 | Overview 锚点正确性 | ✅ 双入口：Demand 详情（Step1） + Procurement 详情（8步） |
 | v1.6.0 兼容性 | ✅ 修复了前端 Step1 卡片显示 bug |
@@ -314,10 +301,10 @@ return parseCommaSeparated(raw);
 ### 立即可修复项
 
 1. **前端 Bug**（已修复）：Step1 卡片 `quantity`/`destination` → `subProductItemsSummary`
-2. **JapanCustomsRecord 补充 subProductCode**（P2，可选）：需 ALTER TABLE + 后端字段 + Assembler 填充
+2. **JapanCustomsRecord 补充 subProductCode**（✅ v1.6.1 已实现）：V29 migration + entity + assembler
 
 ### 文档更新
 
 - SPEC-B09-IMPLEMENTATION.md：v1.3.0 双入口架构，Phase 5 已完成
-- SPEC-B09-全链路子货号追踪分析.md：本文件，新增 v1.3.0 架构变更章节
+- SPEC-B09-全链路子货号追踪分析.md：本文件，v1.6.1 JapanCustoms subProductCode 缺口已修复
 - SPEC-B01：补充转换链路说明（转采购循环 + linkedDemandItemsRaw 双向关联）

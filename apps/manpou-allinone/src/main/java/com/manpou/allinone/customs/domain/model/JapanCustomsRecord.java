@@ -43,6 +43,9 @@ public class JapanCustomsRecord extends BaseEntity {
     @Column(name = "logistics_plan_id")
     private Long logisticsPlanId;   // 关联调配计划
 
+    @Column(name = "sub_product_code", length = 64)
+    private String subProductCode;  // 子货号/颜色（来自 Procurement，全链路追踪）
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 32, nullable = false)
     private JapanCustomsStatus status = JapanCustomsStatus.PENDING;

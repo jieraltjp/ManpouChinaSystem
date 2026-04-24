@@ -1,9 +1,9 @@
 # 日本清关 — 业务规格（步骤6）
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-22 — DB迁移 + 前端页面已完善
-> **状态**: ✅ 已实现（B06 日本清关核心 CRUD + 生命周期流转）
+> **更新**: 2026-04-24（v1.2.0：补充 subProductCode 字段，全链路子货号追踪完整）
+> **状态**: ✅ 已实现（B06 日本清关核心 CRUD + 生命周期流转 + subProductCode）
 > **对应前端**: `JapanCustomsPage.vue`（`apps/web/src/pages/customs/JapanCustomsPage.vue`）· `docs/ui/pages/06-japan-customs.md`
 > **前置**: DomesticCustomsRecord.status = CLEARED
 > **后续**: TaxRefundRecord（步骤7）— ✅ 已实现
@@ -40,6 +40,7 @@ JapanCustomsRecord（聚合根）
 ├── procurementId: Long                  # 关联采购单
 ├── domesticCustomsId: Long              # 关联国内报关单
 ├── logisticsPlanId: Long                # 关联调配计划
+├── subProductCode: String               # 子货号/颜色（来自 Procurement，v1.6.1 全链路追踪）
 ├── status: JapanCustomsStatus           # PENDING / IN_PROGRESS / CLEARED / FAILED
 ├── customsEntryNo: String               # 入境报关号
 ├── arrivalDate: LocalDate               # 到达日期

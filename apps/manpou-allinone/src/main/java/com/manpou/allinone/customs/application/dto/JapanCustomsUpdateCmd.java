@@ -11,6 +11,9 @@ public class JapanCustomsUpdateCmd {
 
     private LocalDate arrivalDate;
 
+    @Size(max = 64)
+    private String subProductCode;  // 子货号/颜色
+
     @Size(max = 128)
     private String customsBroker;
 

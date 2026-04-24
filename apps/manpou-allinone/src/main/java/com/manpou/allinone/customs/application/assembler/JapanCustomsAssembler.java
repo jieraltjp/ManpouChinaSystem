@@ -23,6 +23,7 @@ public class JapanCustomsAssembler {
         if (cmd.getProcurementId() != null) entity.setProcurementId(cmd.getProcurementId());
         if (cmd.getDomesticCustomsId() != null) entity.setDomesticCustomsId(cmd.getDomesticCustomsId());
         if (cmd.getLogisticsPlanId() != null) entity.setLogisticsPlanId(cmd.getLogisticsPlanId());
+        if (cmd.getSubProductCode() != null) entity.setSubProductCode(cmd.getSubProductCode());
         if (cmd.getArrivalDate() != null) entity.setArrivalDate(cmd.getArrivalDate());
         if (cmd.getCustomsBroker() != null) entity.setCustomsBroker(cmd.getCustomsBroker());
         if (cmd.getBrokerPhone() != null) entity.setBrokerPhone(cmd.getBrokerPhone());
@@ -35,6 +36,7 @@ public class JapanCustomsAssembler {
 
     public void copyUpdate(JapanCustomsUpdateCmd cmd, JapanCustomsRecord entity) {
         if (cmd.getArrivalDate() != null) entity.setArrivalDate(cmd.getArrivalDate());
+        if (cmd.getSubProductCode() != null) entity.setSubProductCode(cmd.getSubProductCode());
         if (cmd.getCustomsBroker() != null) entity.setCustomsBroker(cmd.getCustomsBroker());
         if (cmd.getBrokerPhone() != null) entity.setBrokerPhone(cmd.getBrokerPhone());
         if (cmd.getBrokerContact() != null) entity.setBrokerContact(cmd.getBrokerContact());
@@ -51,6 +53,7 @@ public class JapanCustomsAssembler {
                 .procurementId(entity.getProcurementId())
                 .domesticCustomsId(entity.getDomesticCustomsId())
                 .logisticsPlanId(entity.getLogisticsPlanId())
+                .subProductCode(entity.getSubProductCode())
                 .status(entity.getStatus() != null ? entity.getStatus().name() : null)
                 .arrivalDate(entity.getArrivalDate())
                 .customsBroker(entity.getCustomsBroker())
