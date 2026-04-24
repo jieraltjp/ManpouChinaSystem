@@ -1326,4 +1326,240 @@ Overview 以 `Procurement.id` 为锚点：
 ---
 
 *来源：2026-04-24 sub_product_code VARCHAR 超限修复 · V27 migration · V28 schema 记录 · 旧列 DROP 修复 · 铁律表更新（18→32条）*
-*新增：Lesson 33（锚点设计）· Lesson 34（前后端类型同步）*
+*新增：Lesson 33（锚点设计）· Lesson 34（前后端类型同步）· Lesson 35（文档引用必须与实现对齐）· Lesson 36（跨实体字段来源必须明确）· Lesson 37（前端状态标签必须本地化）· Lesson 38（业务逻辑校验必须在入口）*
+
+---
+
+## Lesson 35: 文档引用必须与实现严格对齐，禁止引用不存在的命名
+
+### 问题
+
+审计发现 `SPEC-B09-IMPLEMENTATION.md` 两处引用 `SalesRepository`，但全系统其他位置均为 `SalesRecordRepository`。这是 typo，文档与实现不一致。
+
+### 根因
+
+- 文档编写时根据上下文推断命名，未与实际代码核对
+- 跨文档引用时未做 grep 验证
+
+### 本次修复
+
+```java
+// ❌ SPEC-B09-IMPLEMENTATION.md（旧，错误）
+private final SalesRepository salesRepository;
+
+// ✅ 修正后
+private final SalesRecordRepository salesRecordRepository;
+```
+
+### 预防
+
+- 文档中引用类名/方法名时，先 `grep` 确认该名称在代码中存在
+- 代码中的命名变更 → 同步更新所有引用该名称的文档
+- 建议：文档中的代码片段应该可以直接复制编译
+
+---
+
+## Lesson 36: 聚合根引用其他实体字段时，必须在文档中注明来源
+
+### 问题
+
+`SPEC-B08-运营销售-步骤8.md` 中描述反馈循环时：
+
+```
+destination = this.destination（来自 Procurement）
+```
+
+但 `SalesRecord` 聚合根中根本没有 `destination` 字段，`destination` 必须通过 `procurementId` 查询 `Procurement` 获取。
+
+### 根因
+
+文档描述领域方法时，想当然地认为聚合根包含所有字段，没有区分"自身字段"和"引用字段"。
+
+### 正确描述
+
+```
+destination = Procurement.destination（通过 procurementId 查询 Procurement 获取）
+```
+
+### 预防
+
+- 聚合根字段表 + 引用字段表分开列示
+- 跨实体数据访问在文档中明确标注"来自 XxxEntity"
+
+---
+
+## Lesson 37: 前端状态标签必须本地化，禁止直接显示枚举值
+
+### 问题
+
+`DemandOverviewPage.vue` 中：
+
+```vue
+<!-- ❌ 直接显示枚举值 -->
+<el-tag>{{ overview.demand.status }}</el-tag>
+<!-- 日语用户看到: PENDING / CONVERTED / CANCELLED -->
+
+<!-- ✅ 显示本地化文本 -->
+<el-tag>{{ demandStatusLabel(overview.demand.status) }}</el-tag>
+<!-- 日语用户看到: 確認待ち / 発注済み / キャンセル済み -->
+```
+
+### 根因
+
+- 状态枚举值在中文环境下可读，但日语环境下是乱码
+- 同一字段在 `DemandPage.vue` 中已做了本地化，但在 `DemandOverviewPage.vue` 中遗漏
+
+### 本次修复
+
+```typescript
+// DemandOverviewPage.vue
+function demandStatusLabel(status?: string) {
+  if (!status) return t('common.format.dash')
+  return t(`demand.status.${status}`)  // PENDING → 待确认 / 確認待ち
+}
+```
+
+### 预防
+
+- 前端组件中所有 `{{ someStatus }}` 文本显示必须经过 i18n 转换
+- ESLint rule: `no-hardcoded-strings` 扩展到枚举值
+- 新增页面时，状态字段必须使用 label 函数，不允许直接插值
+
+---
+
+## Lesson 38: 业务逻辑校验必须在入口处，零值/空值校验是防御性编程底线
+
+### 问题
+
+`ReplenishmentDemandUseCase.convertToProcurement()` 遍历 SubProductItem 列表生成 Procurement 时，未校验 `quantity` 是否为 0 或 null。
+
+若 JSON 中有 `{subCode:"be", quantity:0}` 的异常数据，会生成数量为 0 的 Procurement。
+
+### 根因
+
+- 认为"前端已校验"就不在后端重复校验
+- JSON 解析路径（旧数据兼容）可能产生零值
+
+### 本次修复
+
+```java
+// ✅ 入口校验
+if (item.getQuantity() == null || item.getQuantity() <= 0) {
+    throw BusinessException.invalidParam(
+            String.format("子货号 [%s] 数量无效（%s），无法转采购",
+                    item.getSubCode(), item.getQuantity()));
+}
+```
+
+### 防御性校验清单
+
+| 场景 | 校验规则 |
+|------|---------|
+| 数量字段 | `> 0` |
+| ID 字段 | `> 0`（不为 null） |
+| 枚举字段 | `!= null` |
+| 金额字段 | `>= 0` |
+| 日期字段 | `!= null` 且 `>= 今天`（若业务要求）|
+
+### 预防
+
+- UseCase 入口处必须有完整的参数校验
+- `@Valid` 注解只校验格式，不校验业务语义（如 > 0）
+- 校验异常统一抛出 `BusinessException.invalidParam()`
+
+---
+
+## Lesson 39: 数据库 schema 文档必须与实现同步，版本号体现同步状态
+
+### 问题
+
+`DB-01-procurement-demand.md` 中 `replenishment_demand` 表结构为 v1.5.x 格式（含 `quantity`、`destination`、`linked_procurement_id` 列），但 v1.6.0 实体已移除这些列，改为 JSON 字段。
+
+### 根因
+
+- 文档和代码分属不同提交/分支，版本演进时未同步
+- 文档版本号（v1.2.0）与代码版本号（v1.6.0）脱节
+
+### 预防
+
+| 变更类型 | 文档要求 |
+|----------|---------|
+| 表字段变更 | DB 文档版本 + changelog + migration 脚本三方同步 |
+| 新增字段 | DB 文档 + entity + migration 同 commit |
+| 删除字段 | DB migration DROP 列 + 文档同步删除 |
+| 关联关系反转 | 所有引用该关系的文档全部更新 |
+
+> **文档版本号 ≥ 代码版本号。代码到哪个版本，文档必须跟到哪个版本。**
+
+---
+
+## 总结：十八条铁律（最终版）
+
+### 工程实践（代码层）
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 1 | 跨模块走 Port 接口 | Lombok 失效 |
+| 2 | Domain model 禁止引用其他模块 Entity | 编译耦合 |
+| 3 | JPA Repository 继承链 → @Qualifier | Spring 启动失败 |
+| 4 | BusinessException API 添加前搜索全项目 | 编译失败 |
+| 5 | Model 重构后测试必须同步 | 测试编译失败 |
+| 6 | Repository 方法不依赖返回类型区分同名方法 | 编译失败 |
+| 22 | JPA 持久化字段必须显式标注 @Column | 列映射错误 |
+| 23 | 枚举注释必须与业务语义严格对齐 | 理解歧义 |
+| 29 | 删除旧注解时必须同步删除所有引用 | 编译失败 |
+| 31 | JSON 存储列必须用 TEXT，不用 VARCHAR | 数据截断 |
+| 32 | 实体删除字段后必须同步 DROP DB 列 | 插入失败 |
+| 38 | 业务逻辑校验在入口处，零值/空值必须防御 | 脏数据 |
+
+### 工程实践（环境/部署）
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 7 | Windows 用 Git Bash 执行 .sh 脚本 | 脚本报错 |
+| 8 | Flyway 禁用时数据初始化走 DevTestDataInitializer | 数据不导入 |
+| 9 | 密钥资源走 classpath + 文件系统双路径 | 启动失败 |
+| 17 | 开发环境配置走 .env.local/proxy | 环境差异 |
+| 18 | private.pem 仅存于签发中心服务 | 安全漏洞 |
+| 20 | 分页约定 page=0 vs page=1 开发前锁定 | 前后端不对齐 |
+| 26 | 打包禁止 `-q` + 确保无旧进程锁 JAR | JAR 不可用 |
+| 27 | 运行时依赖不能是 test scope | 启动失败 |
+| 28 | 编译与启动必须分离，错误必须可见 | 错误被掩盖 |
+
+### 架构/模块化
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 10 | Controller 返回类型必须属于自己模块 | 模块边界模糊 |
+| 15 | 单体内部分层清晰，提前规划拆分边界 | 未来拆分成本高 |
+| 19 | 共享代码抽取到 common 模块 | 代码冗余 |
+
+### 文档/命名
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 11 | 文档和代码同 commit，持续审计不积累 | 多轮返工 |
+| 12 | i18n 从第一天规划 | 4轮返工 |
+| 13 | Flyway 版本号提前规划，禁止重编号 | checksum 不一致 |
+| 14 | 命名在开发前锁定，禁止中途改名 | 大量迁移返工 |
+| 35 | 文档引用类名/方法名必须与代码 grep 对齐 | 文档失效 |
+| 36 | 跨实体字段引用在文档中注明来源 | 误解数据流 |
+| 39 | DB schema 文档版本号 ≥ 代码版本号 | 文档失效 |
+
+### 前端/契约/测试
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 16 | 前端类型从 OpenAPI schema 生成 | 字段不匹配 |
+| 21 | BaseEntity 用 @MappedSuperclass | 审计字段不一致 |
+| 24 | 测试数据提取禁止用字符串解析 | 测试脆弱 |
+| 25 | 领域层 Repository 禁止加 @Repository | Spring Bean 歧义 |
+| 30 | Test 代码必须与 Model/API 同步更新 | 编译失败 |
+| 33 | 业务链起点 = Overview 入口锚点 | Demand 新建后不可见 |
+| 34 | 接口变更 = 后端 VO + 前端类型 + 模板 + i18n 同步 | undefined 显示 |
+| 37 | 前端状态标签必须本地化，禁止直接显示枚举值 | 日语用户看到乱码 |
+
+---
+
+*来源：2026-04-24 全量审计会话 · docs/business 审计（SPEC-B01/B03/B07/B08/B09）· docs/database 审计（DB-01/DB-06/DB-08/DB-09）· 后端代码审计 · 前端代码审计 · lessons 文档更新（Lesson 35-39，铁律表更新至39条）*
+
