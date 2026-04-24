@@ -7,18 +7,30 @@ import client from './client'
 export type DemandType = 'REPLENISHMENT' | 'NEW_PURCHASE'
 export type DemandStatus = 'PENDING' | 'CONVERTED' | 'CANCELLED'
 
+/** 子货号明细（v1.6.0：每个子货号独立数量+目的地） */
+export interface SubProductItem {
+  subCode: string
+  quantity: number
+  destination?: string
+}
+
+/** 关联发注表明细（v1.6.0） */
+export interface LinkedDemandItem {
+  linkedProcurementId: number
+  subCode: string
+}
+
 export interface DemandPageVO {
   id: number
   demandCode: string
   demandType: DemandType
   productCode: string
-  /** 子货号数组；单个时为单元素列表（JSON 数组格式） */
-  subProductCodes?: string[]
-  quantity: number
-  destination?: string
+  /** 子货号明细列表（v1.6.0） */
+  subProductItems?: SubProductItem[]
   japanLead?: string
   status: DemandStatus
-  linkedProcurementId?: number
+  /** 关联发注表明细（v1.6.0，CONVERTED 时有值） */
+  linkedDemandItems?: LinkedDemandItem[]
   remarks?: string
   createBy?: string
   createTime?: string
@@ -32,13 +44,17 @@ export interface DemandPageResponse {
   pageNumber: number
 }
 
+/** 转采购响应（v1.6.0） */
+export interface ConvertDemandResponse {
+  demandStatus: DemandStatus
+  linkedProcurementIds: number[]
+}
+
 export interface CreateDemandRequest {
   demandType: DemandType
   productCode: string
-  /** 子货号数组 */
-  subProductCodes?: string[]
-  quantity: number
-  destination?: string
+  /** 子货号明细列表（v1.6.0） */
+  subProductItems: SubProductItem[]
   japanLead?: string
   remarks?: string
 }
@@ -46,13 +62,16 @@ export interface CreateDemandRequest {
 export interface UpdateDemandRequest {
   demandType?: DemandType
   productCode?: string
-  /** 子货号数组 */
-  subProductCodes?: string[]
-  quantity?: number
-  destination?: string
+  /** 子货号明细列表（v1.6.0） */
+  subProductItems?: SubProductItem[]
   japanLead?: string
   remarks?: string
   status?: DemandStatus
+}
+
+/** 转采购请求（v1.6.0） */
+export interface ConvertDemandCmd {
+  factoryId: number
 }
 
 export const demandApi = {
@@ -71,11 +90,16 @@ export const demandApi = {
   delete(id: number) {
     return client.delete<{ code: string }>(`/demands/${id}`)
   },
-  convertToProcurement(id: number, procurementId: number) {
-    return client.post<{ code: string }>(`/demands/${id}/convert?procurementId=${procurementId}`)
+  /** 批量转采购（v1.6.0）：POST /demands/{id}/convert body={factoryId} */
+  convertToProcurement(id: number, cmd: ConvertDemandCmd) {
+    return client.post<{ code: string; data: ConvertDemandResponse }>(`/demands/${id}/convert`, cmd)
   },
-  /** 撤销转换：将状态回退为 PENDING，清除 linkedProcurementId */
+  /** 撤销转换（v1.6.0）：批量删除关联 Procurement，回滚状态 */
   revertConversion(id: number) {
     return client.post<{ code: string }>(`/demands/${id}/revert`)
+  },
+  /** 查看关联的采购单列表（v1.6.0） */
+  getLinkedProcurements(id: number) {
+    return client.get<{ code: string; data: unknown[] }>(`/demands/${id}/procurements`)
   },
 }

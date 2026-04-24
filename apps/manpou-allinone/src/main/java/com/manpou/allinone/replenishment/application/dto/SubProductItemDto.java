@@ -1,8 +1,8 @@
 package com.manpou.allinone.replenishment.application.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,10 +24,9 @@ public class SubProductItemDto {
     private String subCode;
 
     @NotNull(message = "数量不能为空")
-    @Positive(message = "数量必须为正数")
+    @Min(value = 0, message = "数量不能为负数")
     private Integer quantity;
 
-    @NotBlank(message = "目的地不能为空")
     @Length(max = 128)
     private String destination;
 }

@@ -86,6 +86,7 @@
       "demandType": "タイプ",
       "productCode": "主品番",
       "subProductCode": "子品番",
+      "subProductItems": "子品番明细",
       "quantity": "数量",
       "destination": "出荷先",
       "japanLead": "日本担当",
@@ -115,22 +116,44 @@
       "productCodePlaceholder": "例：odn012",
       "subProductCode": "子品番（カラー）",
       "subProductCodePlaceholder": "例：re / wh / bk",
+      "subProductItems": "子品番明细",
       "quantity": "需要数量",
       "destination": "出荷先",
       "destinationPlaceholder": "例：名古屋 / 久留米",
       "japanLead": "日本担当",
       "japanLeadPlaceholder": "日本担当氏名",
       "remarks": "備考",
+      "remarksPlaceholder": "備考を入力",
       "cancel": "キャンセル",
       "save": "保存",
       "colorCount": "{count}色展開",
-      "selectColorVariant": "カラーVariantを選択（または手動入力）",
-      "selectMasterCodeFirst": "先に主品番を選択してください"
+      "selectColorVariant": "カラーを選択",
+      "selectMasterCodeFirst": "先に主品番を選択してください",
+      "addSubItem": "子品番を追加",
+      "col": {
+        "subCode": "子品番",
+        "quantity": "数量",
+        "destination": "出荷先",
+        "action": "操作"
+      },
+      "convertDialog": {
+        "title": "発注へ変換 — 工場選択",
+        "factory": "対象工場",
+        "factoryPlaceholder": "工場名を検索",
+        "factoryRequired": "工場を選択してください",
+        "preview": "プレビュー",
+        "confirm": "発注へ変換",
+        "willCreate": "{n}件の発注書を生成します"
+      },
+      "linkedDialog": {
+        "title": "関連発注書リスト"
+      }
     },
     "validation": {
       "demandTypeRequired": "需要タイプを選択してください",
       "productCodeRequired": "主品番は必須です",
-      "quantityRequired": "需要数量は必須です"
+      "quantityRequired": "需要数量は必須です",
+      "subProductItemsRequired": "子品番明细を1件以上入力してください"
     },
     "message": {
       "createSuccess": "需要の入力が完了しました",
@@ -140,7 +163,9 @@
       "deleteConfirmTitle": "削除確認",
       "revertConfirm": "変換取消後、需要は未確認状態に戻り、再変換が可能になります。続行しますか？",
       "revertConfirmTitle": "変換取消の確認",
-      "revertSuccess": "変換取消が完了しました。需要は未確認状態に戻りました"
+      "revertSuccess": "変換取消が完了しました。需要は未確認状態に戻りました",
+      "convertSuccess": "発注への変換が完了しました。{n}件の発注書を生成しました（ID: {ids}）",
+      "loadLinkedFailed": "関連発注書の読み込みに失敗しました"
     }
   },
   "order": {
@@ -810,11 +835,22 @@
     "print": "印刷",
     "loadFailed": "読み込み失敗",
     "retry": "再試行",
+    "tab": {
+      "demands": "需要一覧",
+      "procurements": "発注一覧"
+    },
     "filter": {
       "keyword": "キーワード",
       "keywordPlaceholder": "品番/工場名",
       "search": "検索",
-      "reset": "リセット"
+      "reset": "リセット",
+      "status": "ステータス"
+    },
+    "status": {
+      "all": "すべて",
+      "pending": "未処理",
+      "converted": "変換済み",
+      "cancelled": "キャンセル済み"
     },
     "column": {
       "productCode": "品番",
@@ -822,7 +858,11 @@
       "status": "ステータス",
       "orderDate": "発注日",
       "destination": "送り先",
-      "action": "操作"
+      "action": "操作",
+      "demandCode": "需要番号",
+      "demandType": "需要タイプ",
+      "subProductItems": "サブ品番明細",
+      "japanLead": "担当者"
     },
     "action": {
       "view": "一覧"
@@ -832,8 +872,7 @@
       "demandCode": "需要番号",
       "demandType": "需要タイプ",
       "productCode": "品番",
-      "quantity": "需要数量",
-      "destination": "送り先",
+      "subProductItems": "サブ品番明細",
       "japanLead": "担当者",
       "status": "ステータス"
     },

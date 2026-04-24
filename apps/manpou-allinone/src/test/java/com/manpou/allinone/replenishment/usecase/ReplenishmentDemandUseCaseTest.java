@@ -1,14 +1,22 @@
 package com.manpou.allinone.replenishment.usecase;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manpou.allinone.common.exception.BusinessException;
+import com.manpou.allinone.factory.domain.model.CooperationStatus;
+import com.manpou.allinone.factory.domain.model.Factory;
+import com.manpou.allinone.replenishment.application.dto.ConvertDemandCmd;
+import com.manpou.allinone.replenishment.application.dto.ConvertDemandResponse;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandCreateCmd;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandPageQuery;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandQuery;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandUpdateCmd;
+import com.manpou.allinone.replenishment.application.dto.SubProductItemDto;
 import com.manpou.allinone.replenishment.application.usecase.ReplenishmentDemandUseCase;
 import com.manpou.allinone.replenishment.domain.model.DemandStatus;
 import com.manpou.allinone.replenishment.domain.model.DemandType;
 import com.manpou.allinone.replenishment.domain.model.ReplenishmentDemand;
+import com.manpou.allinone.replenishment.domain.model.SubProductItem;
 import com.manpou.allinone.replenishment.domain.repository.ReplenishmentDemandRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -39,18 +48,37 @@ class ReplenishmentDemandUseCaseTest {
     @Autowired
     private ReplenishmentDemandRepository demandRepository;
 
+    @Autowired
+    private com.manpou.allinone.factory.domain.repository.FactoryRepository factoryRepository;
+
     private ReplenishmentDemand savedDemand;
+    private Factory savedFactory;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws JsonProcessingException {
+        // 创建测试工厂
+        Factory factory = new Factory();
+        factory.setFactoryCode("FAC-TEST-001");
+        factory.setFactoryName("测试工厂");
+        factory.setCooperationStatus(CooperationStatus.ACTIVE);
+        savedFactory = factoryRepository.save(factory);
+
+        // 创建测试需求单（v1.6.0）
         ReplenishmentDemand d = new ReplenishmentDemand();
-        d.setDemandCode("DM-20260421-T001");
+        d.setDemandCode("DM-20260424-T001");
         d.setDemandType(DemandType.REPLENISHMENT);
         d.setProductCode("odn999");
-        d.setQuantity(50);
-        d.setDestination("东京");
         d.setJapanLead("测试担当");
         d.setStatus(DemandStatus.PENDING);
+
+        // v1.6.0: JSON 格式存储子货号明细
+        List<SubProductItem> items = List.of(
+                new SubProductItem("be", 50, "东京"),
+                new SubProductItem("bk", 30, "大阪")
+        );
+        d.setSubProductItemsRaw(objectMapper.writeValueAsString(items));
+
         savedDemand = demandRepository.save(d);
     }
 
@@ -58,7 +86,7 @@ class ReplenishmentDemandUseCaseTest {
     void getById_returnsDto() {
         ReplenishmentDemandPageQuery result = demandUseCase.getById(savedDemand.getId());
         assertThat(result.getId()).isEqualTo(savedDemand.getId());
-        assertThat(result.getDemandCode()).isEqualTo("DM-20260421-T001");
+        assertThat(result.getDemandCode()).isEqualTo("DM-20260424-T001");
         assertThat(result.getStatus()).isEqualTo(DemandStatus.PENDING);
     }
 
@@ -74,9 +102,10 @@ class ReplenishmentDemandUseCaseTest {
         ReplenishmentDemandCreateCmd cmd = new ReplenishmentDemandCreateCmd();
         cmd.setDemandType(DemandType.NEW_PURCHASE);
         cmd.setProductCode("odn888");
-        cmd.setQuantity(100);
-        cmd.setDestination("大阪");
         cmd.setJapanLead("新担当");
+        cmd.setSubProductItems(List.of(
+                SubProductItemDto.builder().subCode("wh").quantity(20).destination("久留米").build()
+        ));
 
         Long id = demandUseCase.create(cmd);
 
@@ -89,32 +118,37 @@ class ReplenishmentDemandUseCaseTest {
     @Test
     void update_modifiesEntity() {
         ReplenishmentDemandUpdateCmd cmd = new ReplenishmentDemandUpdateCmd();
-        cmd.setQuantity(200);
-        cmd.setDestination("福冈");
+        cmd.setJapanLead("修改后担当");
 
         demandUseCase.update(savedDemand.getId(), cmd);
 
         ReplenishmentDemand updated = demandRepository.findById(savedDemand.getId()).orElseThrow();
-        assertThat(updated.getQuantity()).isEqualTo(200);
-        assertThat(updated.getDestination()).isEqualTo("福冈");
+        assertThat(updated.getJapanLead()).isEqualTo("修改后担当");
     }
 
     @Test
-    void convertToProcurement_updatesStatus() {
-        demandUseCase.convertToProcurement(savedDemand.getId(), 1L);
+    void convertToProcurement_updatesStatus_v1_6_0() {
+        ConvertDemandCmd cmd = new ConvertDemandCmd();
+        cmd.setFactoryId(savedFactory.getId());
+
+        ConvertDemandResponse resp = demandUseCase.convertToProcurement(savedDemand.getId(), cmd);
+
+        assertThat(resp.getDemandStatus()).isEqualTo(DemandStatus.CONVERTED);
+        assertThat(resp.getLinkedProcurementIds()).hasSize(2);
 
         ReplenishmentDemand updated = demandRepository.findById(savedDemand.getId()).orElseThrow();
         assertThat(updated.getStatus()).isEqualTo(DemandStatus.CONVERTED);
-        assertThat(updated.getLinkedProcurementId()).isEqualTo(1L);
+        assertThat(updated.getLinkedDemandItemsRaw()).isNotNull();
     }
 
     @Test
     void convertToProcurement_alreadyProcessed_throws() {
-        // 先转为采购
-        demandUseCase.convertToProcurement(savedDemand.getId(), 1L);
+        ConvertDemandCmd cmd = new ConvertDemandCmd();
+        cmd.setFactoryId(savedFactory.getId());
 
-        // 再次转换应抛出异常
-        assertThatThrownBy(() -> demandUseCase.convertToProcurement(savedDemand.getId(), 2L))
+        demandUseCase.convertToProcurement(savedDemand.getId(), cmd);
+
+        assertThatThrownBy(() -> demandUseCase.convertToProcurement(savedDemand.getId(), cmd))
                 .isInstanceOf(BusinessException.class);
     }
 
@@ -128,7 +162,9 @@ class ReplenishmentDemandUseCaseTest {
 
     @Test
     void delete_convertedDemand_throws() {
-        demandUseCase.convertToProcurement(savedDemand.getId(), 1L);
+        ConvertDemandCmd cmd = new ConvertDemandCmd();
+        cmd.setFactoryId(savedFactory.getId());
+        demandUseCase.convertToProcurement(savedDemand.getId(), cmd);
 
         assertThatThrownBy(() -> demandUseCase.delete(savedDemand.getId()))
                 .isInstanceOf(BusinessException.class);
@@ -155,6 +191,20 @@ class ReplenishmentDemandUseCaseTest {
 
         var result = demandUseCase.pageQuery(query);
 
-        assertThat(result.getContent()).allMatch(d -> d.getProductCode().equals("odn999"));
+        assertThat(result.getContent())
+                .allMatch(d -> d.getProductCode().equals("odn999"));
+    }
+
+    @Test
+    void revertConversion_restoresPendingStatus() {
+        ConvertDemandCmd cmd = new ConvertDemandCmd();
+        cmd.setFactoryId(savedFactory.getId());
+        demandUseCase.convertToProcurement(savedDemand.getId(), cmd);
+
+        demandUseCase.revertConversion(savedDemand.getId());
+
+        ReplenishmentDemand reverted = demandRepository.findById(savedDemand.getId()).orElseThrow();
+        assertThat(reverted.getStatus()).isEqualTo(DemandStatus.PENDING);
+        assertThat(reverted.getLinkedDemandItemsRaw()).isNull();
     }
 }

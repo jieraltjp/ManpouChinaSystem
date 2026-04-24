@@ -86,6 +86,7 @@
       "demandType": "类型",
       "productCode": "主货号",
       "subProductCode": "子货号",
+      "subProductItems": "子货号明细",
       "quantity": "数量",
       "destination": "目的地",
       "japanLead": "日本担当",
@@ -115,22 +116,44 @@
       "productCodePlaceholder": "如 odn012",
       "subProductCode": "子货号（颜色）",
       "subProductCodePlaceholder": "如 re / wh / bk",
+      "subProductItems": "子货号明细",
       "quantity": "需求量",
       "destination": "目的地",
       "destinationPlaceholder": "如 名古屋 / 久留米",
       "japanLead": "日本担当",
       "japanLeadPlaceholder": "日本担当姓名",
       "remarks": "备注",
+      "remarksPlaceholder": "备注信息",
       "cancel": "取消",
       "save": "保存",
       "colorCount": "{count}个颜色",
-      "selectColorVariant": "选择颜色变体（或手动输入）",
-      "selectMasterCodeFirst": "请先选择主货号"
+      "selectColorVariant": "选择颜色变体",
+      "selectMasterCodeFirst": "请先选择主货号",
+      "addSubItem": "添加子货号",
+      "col": {
+        "subCode": "子货号",
+        "quantity": "数量",
+        "destination": "目的地",
+        "action": "操作"
+      },
+      "convertDialog": {
+        "title": "转采购 — 选择工厂",
+        "factory": "目标工厂",
+        "factoryPlaceholder": "搜索工厂名称",
+        "factoryRequired": "请选择工厂",
+        "preview": "预览",
+        "confirm": "确认转采购",
+        "willCreate": "将生成 {n} 条发注单"
+      },
+      "linkedDialog": {
+        "title": "关联发注单列表"
+      }
     },
     "validation": {
       "demandTypeRequired": "请选择需求类型",
       "productCodeRequired": "主货号不能为空",
-      "quantityRequired": "需求量不能为空"
+      "quantityRequired": "需求量不能为空",
+      "subProductItemsRequired": "请至少填入一条子货号明细"
     },
     "message": {
       "createSuccess": "需求录入成功",
@@ -140,7 +163,9 @@
       "deleteConfirmTitle": "删除确认",
       "revertConfirm": "撤销转换后，需求单将恢复为待确认状态，可重新转采购。是否继续？",
       "revertConfirmTitle": "撤销转换确认",
-      "revertSuccess": "撤销成功，需求单已恢复为待确认状态"
+      "revertSuccess": "撤销成功，需求单已恢复为待确认状态",
+      "convertSuccess": "转采购成功，生成 {n} 条发注单（ID: {ids}）",
+      "loadLinkedFailed": "加载关联发注单失败"
     }
   },
   "order": {
@@ -854,11 +879,22 @@
     "print": "打印",
     "loadFailed": "加载失败",
     "retry": "重试",
+    "tab": {
+      "demands": "需求单",
+      "procurements": "发注单"
+    },
     "filter": {
       "keyword": "关键词",
       "keywordPlaceholder": "货号/工厂名",
       "search": "查询",
-      "reset": "重置"
+      "reset": "重置",
+      "status": "状态"
+    },
+    "status": {
+      "all": "全部",
+      "pending": "待处理",
+      "converted": "已转采购",
+      "cancelled": "已取消"
     },
     "column": {
       "productCode": "货号",
@@ -866,7 +902,11 @@
       "status": "状态",
       "orderDate": "下单日",
       "destination": "目的地",
-      "action": "操作"
+      "action": "操作",
+      "demandCode": "需求编号",
+      "demandType": "需求类型",
+      "subProductItems": "子货号明细",
+      "japanLead": "担当"
     },
     "action": {
       "view": "总览"
@@ -876,8 +916,7 @@
       "demandCode": "需求编号",
       "demandType": "需求类型",
       "productCode": "货号",
-      "quantity": "需求量",
-      "destination": "目的地",
+      "subProductItems": "子货号明细",
       "japanLead": "担当",
       "status": "状态"
     },

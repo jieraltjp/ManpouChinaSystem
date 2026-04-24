@@ -122,6 +122,18 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/pages/procurement/OrderOverviewPage.vue'),
             meta: { titleKey: 'menu.orderOverview', requiresAuth: true },
           },
+          {
+            path: 'overview/demand/:demandId',
+            name: 'DemandOverview',
+            component: () => import('@/pages/procurement/DemandOverviewPage.vue'),
+            meta: { titleKey: 'menu.orderOverview', requiresAuth: true },
+          },
+          {
+            path: 'overview/procurement/:procurementId',
+            name: 'ProcurementOverview',
+            component: () => import('@/pages/procurement/ProcurementOverviewPage.vue'),
+            meta: { titleKey: 'menu.orderOverview', requiresAuth: true },
+          },
         ],
       },
     ],

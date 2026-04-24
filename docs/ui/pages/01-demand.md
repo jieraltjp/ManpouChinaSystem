@@ -176,13 +176,13 @@ POST /api/v1/demands/{id}/convert
 
 ## 8. 缺口与 TODO
 
-| 项目 | 优先级 | 说明 |
-|------|--------|------|
-| 子货号明细表单 | **P0** | v1.6.0 核心：el-table 动态行，子货号+数量+目的地 |
-| 转采购批量 API | **P0** | 后端 convert 改为批量返回 procurementIds |
-| 查看采购单列表 | P1 | CONVERTED 状态显示该需求生成的 N 条 Procurement |
-| 撤销转换批量 | P1 | 遍历 linkedDemandItems 批量删除 Procurement |
-| 担当者选择器 | P2 | 需系统用户管理表；目前 hardcode 列表 |
+| 项目 | 优先级 | 状态 | 说明 |
+|------|--------|------|------|
+| 子货号明细表单 | **P0** | 🔲 进行中 | v1.6.0 核心：el-table 动态行，子货号+数量+目的地 |
+| 转采购弹窗批量 | **P0** | 🔲 进行中 | POST /demands/{id}/convert + factoryId 弹窗选择工厂 |
+| 表格列显示明细 | **P0** | 🔲 进行中 | 显示 be:100久留米, bu:50名古屋 格式 |
+| 查看采购单列表 | P1 | ✅ | GET /demands/{id}/procurements |
+| 担当者选择器 | P2 | 🔲 | 需系统用户管理表；目前自由输入 |
 
 ---
 

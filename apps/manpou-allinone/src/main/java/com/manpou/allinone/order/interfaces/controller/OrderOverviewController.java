@@ -1,6 +1,7 @@
 package com.manpou.allinone.order.interfaces.controller;
 
 import com.manpou.allinone.common.result.Result;
+import com.manpou.allinone.order.application.dto.OrderDemandSelectorDTO;
 import com.manpou.allinone.order.application.dto.OrderOverviewPageVO;
 import com.manpou.allinone.order.application.dto.OrderProcurementSelectorDTO;
 import com.manpou.allinone.order.application.usecase.OrderOverviewUseCase;
@@ -8,6 +9,8 @@ import com.manpou.allinone.procurement.application.assembler.ProcurementAssemble
 import com.manpou.allinone.procurement.application.dto.ProcurementQuery;
 import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
+import com.manpou.allinone.replenishment.domain.model.DemandStatus;
+import com.manpou.allinone.replenishment.domain.repository.ReplenishmentDemandRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,7 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 订单总览控制器。
+ * 订单总览控制器（Demand + Procurement 双入口）。
  */
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -24,14 +27,17 @@ public class OrderOverviewController {
 
     private final OrderOverviewUseCase orderOverviewUseCase;
     private final ProcurementRepository procurementRepository;
+    private final ReplenishmentDemandRepository demandRepository;
     private final ProcurementAssembler procurementAssembler;
 
-    @GetMapping("/{procurementId}/overview")
+    // ===== Procurement 锚点（已有）=====
+
+    @GetMapping("/procurement/{procurementId}/overview")
     public Result<OrderOverviewPageVO> getOverview(@PathVariable("procurementId") Long procurementId) {
         return Result.ok(orderOverviewUseCase.getOverview(procurementId));
     }
 
-    @GetMapping("/selector")
+    @GetMapping("/procurement/selector")
     public Result<Page<OrderProcurementSelectorDTO>> selector(ProcurementQuery query) {
         PageRequest pageRequest = PageRequest.of(
                 query.getPage(),
@@ -40,5 +46,35 @@ public class OrderOverviewController {
         );
         Page<Procurement> page = procurementRepository.findAllByDeletedIsFalse(pageRequest);
         return Result.ok(page.map(procurementAssembler::toOrderProcurementSelectorDto));
+    }
+
+    // ===== Demand 锚点（新增）=====
+
+    @GetMapping("/demands")
+    public Result<Page<OrderDemandSelectorDTO>> listDemands(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int pageSize,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword) {
+        PageRequest pageRequest = PageRequest.of(
+                page,
+                Math.min(pageSize, 100),
+                Sort.by(Sort.Direction.DESC, "createTime")
+        );
+
+        Page<com.manpou.allinone.replenishment.domain.model.ReplenishmentDemand> demandPage;
+        if (status != null && !status.isBlank()) {
+            DemandStatus demandStatus = DemandStatus.valueOf(status.toUpperCase());
+            demandPage = demandRepository.findByStatusAndDeletedIsFalse(demandStatus, pageRequest);
+        } else {
+            demandPage = demandRepository.findAllByDeletedIsFalse(pageRequest);
+        }
+
+        return Result.ok(demandPage.map(orderOverviewUseCase::toDemandSelectorDto));
+    }
+
+    @GetMapping("/demands/{demandId}/overview")
+    public Result<OrderOverviewPageVO> getDemandOverview(@PathVariable Long demandId) {
+        return Result.ok(orderOverviewUseCase.getDemandOverview(demandId));
     }
 }

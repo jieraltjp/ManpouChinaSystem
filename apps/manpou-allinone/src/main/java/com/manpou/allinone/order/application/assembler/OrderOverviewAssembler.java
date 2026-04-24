@@ -27,6 +27,8 @@ import com.manpou.allinone.replenishment.domain.model.ReplenishmentDemand;
 import com.manpou.allinone.replenishment.domain.model.SubProductItem;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * 订单总览 DTO 转换器。
  * 只做类型映射，不含业务判断。
@@ -237,6 +239,26 @@ public class OrderOverviewAssembler {
                 .sellingPriceJpy(entity.getSellingPriceJpy())
                 .remarks(entity.getRemarks())
                 .build();
+    }
+
+    /**
+     * 解析子货号明细（委托 DemandAssembler）。
+     */
+    public List<SubProductItem> parseSubProductItemsForDemand(String raw) {
+        return demandAssembler.parseSubProductItems(raw);
+    }
+
+    /**
+     * Demand 锚点专用状态数组。
+     * 规则：step1=COMPLETED（需求单存在），step2-8=NOT_STARTED
+     */
+    public StepStatus[] computeDemandStepStatuses() {
+        StepStatus[] result = new StepStatus[8];
+        result[0] = StepStatus.COMPLETED;
+        for (int i = 1; i < 8; i++) {
+            result[i] = StepStatus.NOT_STARTED;
+        }
+        return result;
     }
 
     /**

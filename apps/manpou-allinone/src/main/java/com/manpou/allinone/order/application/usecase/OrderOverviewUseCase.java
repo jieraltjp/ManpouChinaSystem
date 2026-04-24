@@ -13,6 +13,7 @@ import com.manpou.allinone.logistics.domain.repository.LogisticsPlanRepository;
 import com.manpou.allinone.sales.domain.model.SalesRecord;
 import com.manpou.allinone.sales.domain.repository.SalesRecordRepository;
 import com.manpou.allinone.order.application.assembler.OrderOverviewAssembler;
+import com.manpou.allinone.order.application.dto.OrderDemandSelectorDTO;
 import com.manpou.allinone.order.application.dto.OrderOverviewPageVO;
 import com.manpou.allinone.order.application.dto.OrderOverviewPageVO.DemandVO;
 import com.manpou.allinone.order.application.dto.OrderOverviewPageVO.DomesticCustomsVO;
@@ -26,6 +27,8 @@ import com.manpou.allinone.order.application.dto.OrderOverviewPageVO.TaxRefundVO
 import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import com.manpou.allinone.qc.domain.repository.QcRecordRepository;
+import com.manpou.allinone.replenishment.domain.model.ReplenishmentDemand;
+import com.manpou.allinone.replenishment.domain.model.SubProductItem;
 import com.manpou.allinone.replenishment.domain.repository.ReplenishmentDemandRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -137,5 +140,64 @@ public class OrderOverviewUseCase {
                 .salesRecord(srVO)
                 .stepStatuses(stepStatuses)
                 .build();
+    }
+
+    // ===== Demand 锚点方法（新增）=====
+
+    /**
+     * Demand 选择器 DTO 转换（供 Controller 直接调用）。
+     */
+    public OrderDemandSelectorDTO toDemandSelectorDto(ReplenishmentDemand entity) {
+        String summary = buildSubProductItemsSummary(entity.getSubProductItemsRaw());
+        return OrderDemandSelectorDTO.builder()
+                .id(entity.getId())
+                .demandCode(entity.getDemandCode())
+                .demandType(entity.getDemandType() != null ? entity.getDemandType().name() : null)
+                .productCode(entity.getProductCode())
+                .subProductItemsSummary(summary)
+                .japanLead(entity.getJapanLead())
+                .status(entity.getStatus() != null ? entity.getStatus().name() : null)
+                .createTime(entity.getCreateTime())
+                .build();
+    }
+
+    /**
+     * 以 Demand 为锚点的订单总览。
+     * 用于 /api/v1/orders/demands/{demandId}/overview
+     */
+    @Transactional(readOnly = true)
+    public OrderOverviewPageVO getDemandOverview(Long demandId) {
+        ReplenishmentDemand demand = demandRepository.findByIdAndDeletedIsFalse(demandId)
+                .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", demandId));
+
+        log.info("[OrderOverview] getDemandOverview, demandId={}", demandId);
+
+        DemandVO demandVO = assembler.toDemandVO(demand);
+
+        // Demand 锚点：step1=COMPLETED，step2-8=NOT_STARTED
+        StepStatus[] stepStatuses = assembler.computeDemandStepStatuses();
+
+        return OrderOverviewPageVO.builder()
+                .demand(demandVO)
+                .stepStatuses(stepStatuses)
+                .build();
+    }
+
+    private String buildSubProductItemsSummary(String raw) {
+        if (raw == null || raw.isBlank()) return null;
+        try {
+            var items = assembler.parseSubProductItemsForDemand(raw);
+            if (items == null || items.isEmpty()) return null;
+            return items.stream()
+                    .map(item -> {
+                        String qty = item.getQuantity() != null ? String.valueOf(item.getQuantity()) : "?";
+                        String dest = item.getDestination() != null ? item.getDestination() : "";
+                        return item.getSubCode() + ":" + qty + (dest.isEmpty() ? "" : dest);
+                    })
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse(null);
+        } catch (Exception e) {
+            return raw;
+        }
     }
 }

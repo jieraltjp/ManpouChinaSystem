@@ -44,8 +44,9 @@ public class ReplenishmentDemand extends BaseEntity {
      * 存储格式：[{"subCode":"be","quantity":100,"destination":"久留米"},...]
      * 旧数据（v1.5.x）：["be","bu","re"] → 反序列化时兼容转成 [{subCode:"be"},{subCode:"bu"},...]
      * 内部字段，get/set 通过 Assembler 操作 JSON 序列化。
+     * 注意：使用 TEXT 而非 VARCHAR，避免中文多字节字符超出字节限制。
      */
-    @Column(name = "sub_product_code", length = 2048)
+    @Column(name = "sub_product_code", columnDefinition = "TEXT")
     private String subProductItemsRaw;
 
     @Column(name = "japan_lead", length = 64)
@@ -59,7 +60,7 @@ public class ReplenishmentDemand extends BaseEntity {
      * 关联发注表明细（v1.6.0，JSON 数组）。
      * 存储格式：[{"linkedProcurementId":101,"subCode":"be"},...]
      */
-    @Column(name = "linked_demand_items", length = 2048)
+    @Column(name = "linked_demand_items", columnDefinition = "TEXT")
     private String linkedDemandItemsRaw;
 
     @Column(name = "remarks", length = 512)

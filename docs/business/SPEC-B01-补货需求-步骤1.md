@@ -163,7 +163,10 @@ GET    /api/v1/products/suggest/sub-codes?masterCode={code}    # 子货号候选
 - [x] ✅ 主货号自动补全（el-select remote + 300ms 防抖）
 - [x] ✅ 子货号多选（el-select multiple + filterable + allow-create）
 - [x] ✅ `ProductController` suggest 端点（/suggest/master-codes + /suggest/sub-codes）
-- [ ] 🔲 `DemandPage.vue` 子货号明细表单（v1.6.0：每行子货号+数量+目的地）
-- [ ] 🔲 `ReplenishmentDemand` 领域方法升级（v1.6.0：convertToProcurement 批量）
-- [ ] 🔲 `ReplenishmentDemandAssembler` JSON 序列化/反序列化（v1.6.0）
-- [ ] 🔲 转采购 revert 批量删除（v1.6.0）
+- [x] ✅ `ReplenishmentDemandAssembler` JSON 序列化/反序列化（v1.6.0，含旧数据兼容升格式）
+- [x] ✅ `ReplenishmentDemandUseCase.convertToProcurement()` 批量生成 N 条 Procurement（v1.6.0）
+- [x] ✅ `ReplenishmentDemandUseCase.revertConversion()` 批量撤销（v1.6.0）
+- [ ] 🔲 `DemandPage.vue` 子货号明细表单（v1.6.0：el-table 动态行，每行子货号+数量+目的地各自独立）
+- [ ] 🔲 `DemandPage.vue` 转采购改为弹窗选择工厂（v1.6.0：POST /demands/{id}/convert + factoryId）
+- [ ] 🔲 `DemandPage.vue` 表格列显示 subProductItems 含数量/目的地（v1.6.0）
+- [ ] 🔲 `demand.ts` API 类型对齐 v1.6.0（CreateDemandRequest.subProductItems[]）

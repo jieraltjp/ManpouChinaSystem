@@ -4,6 +4,7 @@ import com.manpou.allinone.replenishment.domain.model.DemandType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @Data
 public class ReplenishmentDemandCreateCmd {
 
-    @NotBlank(message = "需求类型不能为空")
+    @NotNull(message = "需求类型不能为空")
     private DemandType demandType;
 
     @NotBlank(message = "主货号不能为空")

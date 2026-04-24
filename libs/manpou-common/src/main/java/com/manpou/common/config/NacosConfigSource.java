@@ -150,7 +150,7 @@ public class NacosConfigSource implements ConfigSource {
             current = current.path(part);
         }
         if (current.isMissingNode() || current.isNull()) return null;
-        return current.isScalar() ? current.asText() : current.toString();
+        return !current.isContainerNode() ? current.asText() : current.toString();
     }
 
     private String extractFlatValue(String content, String key) {

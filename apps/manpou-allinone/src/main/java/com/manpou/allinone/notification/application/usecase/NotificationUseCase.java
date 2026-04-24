@@ -36,7 +36,7 @@ public class NotificationUseCase {
     @Transactional(readOnly = true)
     public Page<NotificationPageQuery> pageQuery(NotificationQuery query) {
         PageRequest pageRequest = PageRequest.of(
-                (query.getPage() - 1),
+                query.getPage(),
                 Math.min(query.getPageSize(), 100), // 上限 100
                 Sort.by(Sort.Direction.DESC, "createTime")
         );

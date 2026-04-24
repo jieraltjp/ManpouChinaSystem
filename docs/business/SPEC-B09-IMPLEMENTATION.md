@@ -1,22 +1,26 @@
 # SPEC-B09 — 订单总览 · 实现设计
 
-> **版本**: 1.1.0
+> **版本**: 1.3.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-22
+> **更新**: 2026-04-24（v1.3.0：双入口架构 — Demand 中心化，新建需求单立即出现在 Overview）
 > **状态**: 🟢 已完成
-> **前置**: SPEC-B09-API设计 · DB-09 · docs/ui/pages/09-order-overview.md
+> **前置**: SPEC-B09-API设计 · DB-09 · docs/ui/pages/09-order-overview.md · SPEC-B09-全链路子货号追踪分析.md
 > **INTJ 编号**: DOC-B09-IMPL-001
 
 ---
 
 ## 1. INTJ 干跑
 
-**本质（一句话）：** 以 `Procurement.id` 为锚点，垂直聚合全链路 8 步，横向对比当前卡点。
+**本质（一句话）：** Overview 页面以 Demand 为入口，新建需求单立即可见；Procurement 为业务链锚点，聚合全链路 8 步数据。
+
+**双入口设计**：
+- 入口 A：需求单（`/demands`）→ Demand 锚点 → Step1 有数据，Step2-8 待填 → 支持转采购
+- 入口 B：发注单（`/procurement/selector`）→ Procurement 锚点 → 8 步全链路聚合
 
 **三行推演：**
-1. 后端一次聚合查询返回 8 步数据，前端按序渲染展开卡片
-2. 状态进度条映射各步聚合根 status，计算当前步骤（0-8）
-3. 每步卡片含跳转编辑入口，形成单向操作流
+1. 用户在 DemandPage 创建需求单 → 立即出现在 Overview 需求单 Tab
+2. 用户点进 Demand 详情 → 看到 Step1 数据，支持转采购
+3. 转采购后 → Procurement 出现在发注单 Tab，对应 Procurement 详情有完整 8 步
 
 **禁止项：**
 - 禁止前端独立查 8 个接口凑数据（网络次数 × 8 = 灾难）
@@ -55,10 +59,12 @@
 
 前端
 ├── api/
-│   └── orderOverview.ts              # API 客户端 + 类型
+│   └── orderOverview.ts              # API 客户端 + 类型（含 DemandSelectorVO / ProcurementSelectorVO）
 └── pages/
     └── procurement/
-        └── OrderOverviewPage.vue     # 容器（选择器 + 进度条 + 卡片组，内联逻辑，无独立 composable）
+        ├── OrderOverviewPage.vue     # 列表页（Demands Tab + Procurements Tab）
+        ├── DemandOverviewPage.vue     # Demand 详情（Step1 有数据，Step2-8 未开始，支持转采购）
+        └── ProcurementOverviewPage.vue # Procurement 详情（8 步全链路聚合）
 ```
 
 ---
@@ -89,7 +95,27 @@ public class OrderOverviewPageVO {
 }
 ```
 
-### 3.2 StepStatus 枚举（前端用）
+### 3.2 DemandVO（v1.6.0 适配）
+
+```java
+// DemandVO — v1.6.0 不再返回 quantity/destination
+// 改为 subProductItemsSummary: "be:100久留米, bu:50名古屋"
+public static class DemandVO {
+    private Long id;
+    private String demandCode;
+    private String demandType;           // REPLENISHMENT / NEW_PURCHASE
+    private String productCode;
+    private String subProductItemsSummary; // v1.6.0: "be:100久留米, bu:50名古屋" 或 null
+    private String japanLead;
+    private String status;
+    private LocalDateTime createTime;
+}
+```
+
+> **v1.6.0 背景**：ReplenishmentDemand.subProductItemsRaw 从单字段改为 JSON 数组，
+> 前端 Step1 卡片通过 `subProductItemsSummary` 展示（而非单独 quantity/destination）。
+
+### 3.3 StepStatus 枚举（前端用）
 
 ```typescript
 // 前端用，不与后端共享
@@ -394,6 +420,17 @@ export function useOrderOverview(procurementId: Ref<number>) {
 ### Phase 4 — 体验优化（P2）✅ 已完成
 1. 列表页「总览」按钮（ProcurementPage / InspectionPage / LogisticsPage）
 
+### Phase 5 — Demand 中心化（P0）✅ v1.3.0 已完成
+1. `OrderDemandSelectorDTO.java`（新建 Demand 选择器 DTO）
+2. Controller 新增 `/demands` selector + `/demands/{id}/overview` 端点
+3. `OrderOverviewUseCase.getDemandOverview()`（Demand 锚点，step1=COMPLETED，step2-8=NOT_STARTED）
+4. `OrderOverviewAssembler.computeDemandStepStatuses()`（Demand 专用状态数组）
+5. 前端 `api/orderOverview.ts` 新增 `listDemandSelector` + `getDemandOverview` API
+6. 路由改造：`/overview/demand/:demandId` + `/overview/procurement/:procurementId`
+7. `OrderOverviewPage.vue` 改为双 Tab 列表（需求单 / 发注单）
+8. 新建 `DemandOverviewPage.vue`（Step1 数据，支持转采购）
+9. 新建 `ProcurementOverviewPage.vue`（8步全链路，迁自原 OrderOverviewPage 详情部分）
+
 ---
 
 ## 8. 缺口与依赖
@@ -405,10 +442,61 @@ export function useOrderOverview(procurementId: Ref<number>) {
 | 步骤6 JapanCustoms 字段 | P1 | DB-06 · SPEC-B06 | 🟢 已完成 |
 | 步骤7 TaxRefund 字段 | P1 | DB-07 · SPEC-B07 | 🟢 已完成 |
 | 步骤8 SalesRecord 字段 | P1 | DB-08 · SPEC-B08 | 🟢 已完成 |
+| v1.6.0 前端 Step1 卡片修复 | P0 | DemandVO.subProductItemsSummary | 🟢 已完成 |
+| Phase 5 Demand 中心化 | P0 | 双入口架构 | 🟢 已完成 |
+| JapanCustomsRecord 补充 subProductCode | P2 | DB 迁移 + 实体 + Assembler | 🟡 可选 |
 
 ---
 
-## 9. INTJ 审计
+## 9. v1.3.0 双入口架构说明
+
+> 详细分析见：`SPEC-B09-全链路子货号追踪分析.md`
+
+### 核心变更
+
+v1.3.0：Overview 从 Procurement 中心 → Demand 中心，支持双入口。
+
+```
+/base/overview                          → 双 Tab 列表（需求单 / 发注单）
+/base/overview/demand/:demandId           → Demand 详情（Step1 有数据，Step2-8 未开始）
+/base/overview/procurement/:procurementId → Procurement 详情（8 步全链路）
+```
+
+### 双入口数据流
+
+```
+新建需求单
+    ↓
+出现在 Overview → 需求单 Tab（立即可见）
+    ↓
+点击进入 Demand 详情 → Step1 有数据，支持"转采购"
+    ↓
+转采购成功 → 自动跳转到 Procurement 详情
+           → 需求单 Tab 中该条变为 CONVERTED 状态
+           → 发注单 Tab 中出现新的 Procurement 记录
+```
+
+### v1.6.0 子货号追踪（保留）
+
+```
+Demand → N×Procurement → N×DomesticCustoms → LogisticsPlan → JapanCustoms → SalesRecord
+                  ↓
+              N×SalesRecord（从 Procurement 直接触发）
+```
+
+| 步骤 | 实体 | 子货号精确 | 备注 |
+|------|------|:---:|------|
+| 需求单 | ReplenishmentDemand | ✅ | JSON 数组 |
+| 发注单 | Procurement | ✅ | 每条 SubProductItem 一个 |
+| 国内报关 | DomesticCustomsRecord | ✅ | 事件驱动自动 |
+| 调配计划 | LogisticsPlan | ✅ | 可按批次合并 |
+| 日本清关 | JapanCustomsRecord | ⚠️ | 无 subProductCode（可延后补充） |
+| 退税 | TaxRefundRecord | — | 按采购单总额，维度不同 |
+| 销售记录 | SalesRecord | ✅ | 事件驱动自动 |
+
+---
+
+## 10. INTJ 审计
 
 | 判定 | 说明 |
 |------|------|
@@ -421,4 +509,4 @@ export function useOrderOverview(procurementId: Ref<number>) {
 
 ---
 
-*文档版本: 1.1.0 · 状态: 已完成*
+*文档版本: 1.3.0 · 状态: 已完成 · 2026-04-24*

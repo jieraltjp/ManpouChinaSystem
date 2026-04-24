@@ -1,6 +1,6 @@
 # Lombok + Cross-Module Compilation + Spring DI — Lessons Learned
 
-> Date: 2026-04-23
+> Date: 2026-04-24
 > Project: manpou-allinone
 
 ---
@@ -12,6 +12,15 @@
 - [Lesson 3: JPA Repository 继承链会产生多个同名 Bean](#lesson-3-jpa-repository-继承链会产生多个同名-bean)
 - [Lesson 4: BusinessException API 必须与调用方严格对齐](#lesson-4-businessexception-api-必须与调用方严格对齐)
 - [Lesson 5: Test 代码必须与 Model API 同步](#lesson-5-test-代码必须与-model-api-同步)
+- [Lesson 26: Maven `-q` 静默模式掩盖 repackage 失败](#lesson-26-maven--q-静默模式会吞掉-spring-bootrepackage-失败导致-jar-无法启动)
+- [Lesson 27: 依赖 scope 必须与实际运行环境匹配](#lesson-27-依赖-scope-必须与实际运行环境匹配h2-test-scope-vs-runtime)
+- [Lesson 28: 编译与启动必须分离，禁止在脚本中隐蔽失败](#lesson-28-编译与启动必须分离禁止在脚本中隐蔽失败)
+- [Lesson 29: 删除旧注解时必须同步删除所有引用，禁止只删 import](#lesson-29-删除旧注解时必须同步删除所有引用禁止只删-import)
+- [Lesson 30: Test 代码必须与 Model/API 同步更新（v1.5→v1.6 重构教训）](#lesson-30-test-代码必须与-modelapi-同步更新v15v16-重构教训)
+- [Lesson 31: JSON 存储列必须用 TEXT，不能用 VARCHAR](#lesson-31-json-存储列必须用-text不能用-varchar)
+- [Lesson 32: 重构实体移除字段后必须同步清理数据库旧列](#lesson-32-重构实体移除字段后必须同步清理数据库旧列)
+- [Lesson 33: 锚点设计决定 Overview 可见性——Procurement 中心导致 Demand 新建后不可见](#lesson-33-锚点设计决定-overview-可见性procurement-中心导致-demand-新建后不可见)
+- [Lesson 34: 前端类型定义必须与后端 VO 同步——接口变更后旧字段残留导致-undefined](#lesson-34-前端类型定义必须与后端-vo-同步接口变更后旧字段残留导致-undefined)
 
 ---
 
@@ -810,7 +819,9 @@ mvn package -DskipTests
 
 ---
 
-## 总结：十八条铁律
+## 总结：十八条铁律（→ 已有 32 条，详见文末）
+
+> 以下为历史版本（Lesson 1-27），当前最新版本（含 Lesson 28-32）见文末「总结：十八条铁律（更新版）」。
 
 ### 工程实践（代码层）
 
@@ -824,6 +835,9 @@ mvn package -DskipTests
 | 6 | Repository 方法不依赖返回类型区分同名方法 | 编译失败 |
 | 22 | JPA 持久化字段必须显式标注 @Column | 列映射错误 |
 | 23 | 枚举注释必须与业务语义严格对齐 | 理解歧义 |
+| 29 | 删除旧注解时必须同步删除所有引用 | 编译失败 |
+| 31 | JSON 存储列必须用 TEXT，不用 VARCHAR | 数据截断 |
+| 32 | 实体删除字段后必须同步 DROP DB 列 | 插入失败 |
 
 ### 工程实践（环境/部署）
 
@@ -835,6 +849,9 @@ mvn package -DskipTests
 | 17 | 开发环境配置走 .env.local/proxy，本地必须可运行 | 环境差异 |
 | 18 | private.pem 仅存于签发中心服务，禁止全量分发 | 安全漏洞 |
 | 20 | 分页约定 page=0 vs page=1 必须在开发前锁定 | 前后端不对齐 |
+| 26 | 打包禁止使用 `-q` + 确保无旧进程锁 JAR | repackage 失败被吞掉 |
+| 27 | 运行时依赖不能是 test scope | `Cannot load driver class` |
+| 28 | 编译与启动必须分离，错误必须可见 | 错误被掩盖 |
 
 ### 架构/模块化
 
@@ -842,15 +859,15 @@ mvn package -DskipTests
 |---|------|---------|
 | 10 | Controller 返回类型必须属于自己模块 | 模块边界模糊 |
 | 15 | 单体内部分层清晰，提前规划拆分边界 | 未来拆分成本高 |
-| 19 | 共享代码抽取到 common 模块，禁止服务内联重复 | 代码冗余 |
+| 19 | 共享代码抽取到 common 模块 | 代码冗余 |
 
 ### 文档/命名
 
 | # | 铁律 | 违反后果 |
 |---|------|---------|
-| 11 | 文档和代码同 commit，持续审计不积累 | 多轮返工，版本 drift |
-| 12 | i18n 从第一天规划，禁止后期打补丁 | 4轮返工，key 遗漏 |
-| 13 | Flyway 版本号提前规划，留足空间禁止重编号 | checksum 不一致 |
+| 11 | 文档和代码同 commit，持续审计不积累 | 多轮返工 |
+| 12 | i18n 从第一天规划，禁止后期打补丁 | 4轮返工 |
+| 13 | Flyway 版本号提前规划，禁止重编号 | checksum 不一致 |
 | 14 | 命名在开发前锁定，禁止中途改名 | 大量迁移返工 |
 
 ### 前端/契约/测试
@@ -859,10 +876,9 @@ mvn package -DskipTests
 |---|------|---------|
 | 16 | 前端类型从 OpenAPI schema 生成，禁止手动对齐 | 字段不匹配 |
 | 21 | BaseEntity 用 @MappedSuperclass，所有实体继承 | 审计字段不一致 |
-| 24 | 测试数据提取禁止用字符串解析（grep），用专业 API 库 | 测试脆弱 |
-| 25 | 领域层 Repository 禁止加 @Repository，避免与 JPA Adapter 重复 Bean | Spring 启动失败（bean 歧义） |
-| 26 | 打包禁止使用 `-q` + 确保无旧进程锁 JAR | repackage 失败被吞掉，JAR 无 Main-Class |
-| 27 | 运行时依赖不能是 test scope；datasource 必须与实际环境一致 | `Cannot load driver class: org.h2.Driver` |
+| 24 | 测试数据提取禁止用字符串解析（grep） | 测试脆弱 |
+| 25 | 领域层 Repository 禁止加 @Repository | Spring Bean 歧义 |
+| 30 | Test 代码必须与 Model/API 同步更新 | 编译失败 |
 
 ---
 
@@ -917,4 +933,397 @@ spring:
 
 ---
 
-*来源：git log（2026-04-10 ~ 04-23，104 commits）· docs/check/99-全面审计报告.md · docs/check/101~105 · docs/role/02-架构师视角.md · docs/pro/17-服务间认证.md · 2026-04-23 全量解耦重构会话 · 2026-04-23 运行时 Bean 歧义修复会话*
+---
+
+## Lesson 28: 编译与启动必须分离，禁止在脚本中隐蔽失败
+
+### 问题
+
+`mvn clean package` 编译失败（`isScalar()` 方法找不到），但未被发现，JAR 打包表面成功，实际不可用。
+
+### 根因
+
+两条错误叠加：
+1. Spring Cloud Alibaba Nacos 带来了旧版 Jackson，与 `manpou-common` 中声明的 Jackson 2.17.0 不兼容
+2. `manpou-common` 源码调用了 Jackson 2.10+ 才有的 `JsonNode.isScalar()` 方法，编译时 classpath 有旧版 Jackson，`isScalar()` 不可见
+
+### 本次修复
+
+```java
+// libs/manpou-common/.../NacosConfigSource.java line 153
+// ❌ 旧代码（Jackson 2.10+，classpath 有旧版时报错）
+return current.isScalar() ? current.asText() : current.toString();
+
+// ✅ 新代码（兼容所有 Jackson 版本）
+return !current.isContainerNode() ? current.asText() : current.toString();
+```
+
+### 正确启动流程
+
+```bash
+# 1. 确保无旧进程锁 JAR
+powershell -Command "Stop-Process -Name java -Force -ErrorAction SilentlyContinue"
+
+# 2. 全量编译（禁止 -q，让错误可见）
+cd apps/manpou-allinone
+mvn clean package -DskipTests
+
+# 3. 检查 MANIFEST.MF
+unzip -p target/manpou-allinone-*.jar META-INF/MANIFEST.MF | grep "Main-Class"
+# 预期输出: Main-Class: org.springframework.boot.loader.launch.JarLauncher
+
+# 4. 启动后端
+java -Xms512m -Xmx1024m \
+  -jar apps/manpou-allinone/target/manpou-allinone-1.0.0-SNAPSHOT.jar \
+  --spring.profiles.active=local \
+  --server.port=18090
+
+# 5. 启动前端
+cd apps/web && npm run dev
+```
+
+或使用脚本（Git Bash）：
+
+```bash
+# 仅启动后端
+./scripts/start-all.sh manpou
+
+# 启动全部
+./scripts/start-all.sh
+
+# 查看状态
+./scripts/start-all.sh status
+```
+
+### 端口约定
+
+| 服务 | 端口 |
+|------|------|
+| manpou-allinone | 18090 |
+| user-service | 18081 |
+| web 前端 | 13000 |
+| Gateway（生产） | 18080 |
+
+### 预防
+
+- 编译错误必须在本对话内修复，不遗留到打包
+- 禁止静默编译：`mvn package` 不带任何 `-q` / `--quiet`
+- 打包后立即检查 MANIFEST.MF
+- 脚本中的 `mvn ... -q` 必须替换为 `mvn ... 2>&1 | tee build.log`
+
+---
+
+*来源：git log（2026-04-10 ~ 04-23，104 commits）· docs/check/99-全面审计报告.md · docs/check/101~105 · docs/role/02-架构师视角.md · docs/pro/17-服务间认证.md · 2026-04-23 全量解耦重构会话 · 2026-04-23 运行时 Bean 歧义修复会话 · 2026-04-24 Jackson isScalar() 编译失败修复*
+
+---
+
+## Lesson 29: 删除旧注解时必须同步删除所有引用，禁止只删 import
+
+### 问题
+
+`ReplenishmentDemandCreateCmd.java` 中的 `@NotBlank` 注解已改为 `@NotNull`（因 `DemandType` 是枚举），但 Edit 工具误删了 `NotBlank` 的 import，导致编译失败：
+
+```java
+// ❌ 错误：使用了 @NotBlank 但没有 import
+@NotBlank(message = "主货号不能为空")  // ← 编译失败，找不到符号
+private DemandType demandType;
+
+// 实际意图：DemandType 是枚举，@NotBlank 不适用，应改为 @NotNull
+// 但删注解时遗漏了 import
+```
+
+### 根因
+
+编辑时同时修改了注解和 import，但未确认两者是否匹配：
+- `@NotBlank` → `@NotNull` 的修改本身正确（`DemandType` 是枚举）
+- 但删除旧注解时，import 被同步删除
+- 新注解 `@NotNull` 保留了 import
+
+### 正确修复流程
+
+1. 先确认注解是否正确（枚举用 `@NotNull`，字符串用 `@NotBlank`）
+2. 修改注解后，单独检查 import 块是否仍然完整
+3. 禁止在同一个 Edit 中同时删除旧注解和导入新注解——分两步做
+
+```java
+// 第1步：修改注解（不碰 import）
+- @NotBlank(message = "需求类型不能为空")
++ @NotNull(message = "需求类型不能为空")
+
+// 第2步：单独检查 import
+// import jakarta.validation.constraints.NotBlank;  ← 保留（若其他字段还用）
+// import jakarta.validation.constraints.NotNull;  ← 添加
+```
+
+### 预防
+
+- 搜索所有使用该注解的文件：`grep -r "@NotBlank\|@NotNull" src/main/java`
+- 删除注解前：`grep` 确认无其他引用
+
+---
+
+## Lesson 30: Test 代码必须与 Model/API 同步更新（v1.5→v1.6 重构教训）
+
+### 问题
+
+v1.5→v1.6 重构后，`ReplenishmentDemandUseCaseTest` 仍用旧 API：
+
+```java
+// 旧 API（v1.5）
+d.setQuantity(50);
+d.setDestination("东京");
+demandUseCase.convertToProcurement(savedDemand.getId(), 1L);
+
+// 新 API（v1.6）
+// ReplenishmentDemand 不再有 quantity/destination → 用 subProductItemsRaw (JSON)
+// convertToProcurement 接受 ConvertDemandCmd 而非 long
+```
+
+→ 编译失败，报 `cannot find symbol: method setQuantity(int)`
+
+### 根因
+
+重构时只更新了主代码，未同步更新测试代码。Test 编译未参与 CI 检查时会被漏掉。
+
+### 本次修复
+
+| 旧 API（v1.5） | 新 API（v1.6） |
+|---|---|
+| `d.setQuantity(50)` | `d.setSubProductItemsRaw(json)` |
+| `d.setDestination("东京")` | 同上，用 JSON |
+| `convertToProcurement(id, 1L)` | `convertToProcurement(id, ConvertDemandCmd)` |
+| `getLinkedProcurementId()` | `getLinkedDemandItemsRaw()` |
+| `ReplenishmentDemandUpdateCmd.setQuantity()` | 已移除该字段 |
+| `CooperationStatus.ACTIVE` | `FactoryStatus.ACTIVE` → `CooperationStatus.ACTIVE` |
+
+### 预防
+
+- Model 重构后立即更新测试（Lesson 5 的延伸）
+- `mvn test-compile` 必须在 PR 中通过
+- CI 必须运行 `test-compile`，不仅 `compile`
+
+---
+
+## Lesson 31: JSON 存储列必须用 TEXT，不能用 VARCHAR
+
+### 问题
+
+`ReplenishmentDemand.subProductItemsRaw` 字段（存储 JSON 数组）定义为 `VARCHAR(2048)`：
+
+```java
+@Column(name = "sub_product_code", length = 2048)
+private String subProductItemsRaw;
+```
+
+提交 8 个子货号明细时报错：
+
+```
+Data truncation: Data too long for column 'sub_product_code' at row 1
+```
+
+### 根因
+
+JPA `length = 2048` 映射为 `VARCHAR(2048)`，限制的是**字节数**，而非字符数。
+
+MySQL `utf8mb4` 编码下，中文字符每个占 3 字节：2048 / 3 ≈ 682 字符。
+实际 JSON（8 个子货号，含中文目的地）超过此限制。
+
+### 修复
+
+```java
+// ❌ VARCHAR(2048) — 字节限制，中文超限
+@Column(name = "sub_product_code", length = 2048)
+
+// ✅ TEXT — 无字符/字节限制
+@Column(name = "sub_product_code", columnDefinition = "TEXT")
+```
+
+同时执行 DB 迁移：
+
+```sql
+ALTER TABLE replenishment_demand MODIFY COLUMN sub_product_code TEXT;
+ALTER TABLE replenishment_demand MODIFY COLUMN linked_demand_items TEXT;
+```
+
+### 预防
+
+| 字段类型 | 判定 |
+|----------|------|
+| 有明确上限的短字段 | `VARCHAR(n)` — 如 code、name |
+| JSON / 自由文本 | `TEXT` — 无上限保证 |
+| 大字段（文章/HTML） | `LONGTEXT` |
+
+> 同理：`linkedDemandItemsRaw`（v1.6.0 JSON）也改为 TEXT
+
+---
+
+*来源：2026-04-24 sub_product_code VARCHAR 超限修复 · V27 migration*
+
+---
+
+## Lesson 32: 重构实体移除字段后必须同步清理数据库旧列
+
+### 问题
+
+v1.6.0 重构 `ReplenishmentDemand` 实体，移除了 `quantity`、`destination`、`linked_procurementId` 三个字段，改用 JSON 数组存储。
+
+但数据库 `replenishment_demand` 表中旧列仍存在，且 `quantity` 定义为 `INT NOT NULL`（无默认值）。
+
+INSERT 时 Hibernate 不填旧列，MySQL 报错：
+
+```
+SQLException: Field 'quantity' doesn't have a default value
+```
+
+### 根因
+
+Hibernate `ddl-auto: update` **只添加新列**，不会删除已存在但实体中不再引用的列。重构时删了字段但漏了 DB 旧列。
+
+### 本次修复
+
+```sql
+ALTER TABLE replenishment_demand DROP COLUMN quantity;
+ALTER TABLE replenishment_demand DROP COLUMN destination;
+ALTER TABLE replenishment_demand DROP COLUMN linked_procurement_id;
+```
+
+同步创建 `V27__demand_json_columns_text.sql` 和 `V28__demand_v1_6_schema.sql` 记录变更。
+
+### 预防
+
+| 重构场景 | 必做事项 |
+|----------|----------|
+| 新增字段 | DB migration + entity 同步 |
+| 删除字段 | **DB migration 删除旧列 + entity 移除字段** |
+| 重命名字段 | DB rename + entity 改名，禁止先删后加（丢数据） |
+| 改列类型 | DB ALTER + entity `@Column` 更新 |
+
+- `ddl-auto: update` 不是银弹——它只处理**新增**，不处理**删除**
+- 重构前查 `DESCRIBE table_name` 确认当前 DB 结构
+- Flyway 禁用时，所有表结构变更必须手动执行 ALTER
+
+---
+
+## 总结：十八条铁律（更新版）
+
+### 工程实践（代码层）
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 1 | 跨模块走 Port 接口 | Lombok 失效 |
+| 2 | Domain model 禁止引用其他模块 Entity | 编译耦合 |
+| 3 | JPA Repository 继承链 → @Qualifier | Spring 启动失败 |
+| 4 | BusinessException API 添加前搜索全项目 | 编译失败 |
+| 5 | Model 重构后测试必须同步 | 测试编译失败 |
+| 6 | Repository 方法不依赖返回类型区分同名方法 | 编译失败 |
+| 22 | JPA 持久化字段必须显式标注 @Column | 列映射错误 |
+| 23 | 枚举注释必须与业务语义严格对齐 | 理解歧义 |
+| 29 | 删除旧注解时必须同步删除所有引用 | 编译失败 |
+| 31 | JSON 存储列必须用 TEXT，不用 VARCHAR | 数据截断 |
+| 32 | 实体删除字段后必须同步 DROP DB 列 | 插入失败 |
+
+### 工程实践（环境/部署）
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 7 | Windows 用 Git Bash 执行 .sh 脚本 | 脚本报错 |
+| 8 | Flyway 禁用时数据初始化走 DevTestDataInitializer | 数据不导入 |
+| 9 | 密钥资源走 classpath + 文件系统双路径 | 启动失败 |
+| 17 | 开发环境配置走 .env.local/proxy | 环境差异 |
+| 18 | private.pem 仅存于签发中心服务 | 安全漏洞 |
+| 20 | 分页约定 page=0 vs page=1 开发前锁定 | 前后端不对齐 |
+| 26 | 打包禁止 `-q` + 确保无旧进程锁 JAR | JAR 不可用 |
+| 27 | 运行时依赖不能是 test scope | 启动失败 |
+| 28 | 编译与启动必须分离，错误必须可见 | 错误被掩盖 |
+
+### 架构/模块化
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 10 | Controller 返回类型必须属于自己模块 | 模块边界模糊 |
+| 15 | 单体内部分层清晰，提前规划拆分边界 | 未来拆分成本高 |
+| 19 | 共享代码抽取到 common 模块 | 代码冗余 |
+
+### 文档/命名
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 11 | 文档和代码同 commit，持续审计不积累 | 多轮返工 |
+| 12 | i18n 从第一天规划 | 4轮返工 |
+| 13 | Flyway 版本号提前规划，禁止重编号 | checksum 不一致 |
+| 14 | 命名在开发前锁定，禁止中途改名 | 大量迁移返工 |
+
+### 前端/契约/测试
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 16 | 前端类型从 OpenAPI schema 生成 | 字段不匹配 |
+| 21 | BaseEntity 用 @MappedSuperclass | 审计字段不一致 |
+| 24 | 测试数据提取禁止用字符串解析 | 测试脆弱 |
+| 25 | 领域层 Repository 禁止加 @Repository | Spring Bean 歧义 |
+| 30 | Test 代码必须与 Model/API 同步更新 | 编译失败 |
+| 33 | 业务链起点 = Overview 入口锚点 | Demand 新建后不可见 |
+| 34 | 接口变更 = 后端 VO + 前端类型 + 模板 + i18n 同步 | undefined 显示 |
+
+---
+
+## Lesson 33: 锚点设计决定 Overview 可见性——Procurement 中心导致 Demand 新建后不可见
+
+### 问题
+
+`/base/overview` 列表只展示 Procurements。用户新建 Demand 后，Demand 不会出现在 Overview 中，必须先转采购才能看到。
+
+### 根因
+
+Overview 以 `Procurement.id` 为锚点：
+- 列表 API：`GET /orders/selector` 只查 Procurement 表
+- 详情 API：`GET /orders/{procurementId}/overview` 锚点是 Procurement
+- Step1 卡片只在 `procurement.linkedDemandId != null` 时显示
+
+### 设计原则
+
+**业务链路的起点必须是 Overview 的入口**。如果业务从 Demand 开始，Overview 必须支持 Demand 锚点。
+
+### 修复方案
+
+双入口架构：
+```
+/base/overview                          → 双 Tab（需求单 / 发注单）
+/base/overview/demand/:demandId         → Demand 锚点（Step1 有数据）
+/base/overview/procurement/:procurementId → Procurement 锚点（8 步全链路）
+```
+
+### 教训
+
+> **业务链起点 = Overview 入口锚点。禁止以中间环节（如 Procurement）作为唯一的入口锚点。**
+
+---
+
+## Lesson 34: 前端类型定义必须与后端 VO 同步——接口变更后旧字段残留导致 undefined
+
+### 问题
+
+后端 `DemandVO` 从 `quantity/destination` 改为 `subProductItemsSummary`（v1.6.0），但前端 `OrderOverviewPage.vue` Step1 卡片仍引用 `overview.demand.quantity`，导致页面显示 `undefined`。
+
+### 根因
+
+前端 API 类型定义与后端 VO 不同步：
+- 后端改了 `DemandVO`，删除了 `quantity`/`destination`
+- 前端 `DemandVO` 类型定义未同步更新
+- 前端模板仍用旧字段名
+
+### 修复
+
+变更接口时同步更新前后端类型定义：
+1. 后端修改 VO → 同步更新前端 API 类型定义
+2. 前端模板字段引用 → 对应更新
+3. i18n key → 同步调整
+
+### 教训
+
+> **接口变更 = 后端 VO + 前端类型 + 前端模板 + i18n 四处同步。缺一不可。**
+
+---
+
+*来源：2026-04-24 sub_product_code VARCHAR 超限修复 · V27 migration · V28 schema 记录 · 旧列 DROP 修复 · 铁律表更新（18→32条）*
+*新增：Lesson 33（锚点设计）· Lesson 34（前后端类型同步）*

@@ -1,8 +1,8 @@
 # 订单总览 — API 设计
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-24（v1.1.0：Phase 1 已实现，与 SPEC-B09-IMPLEMENTATION.md 对齐）
+> **更新**: 2026-04-24（v1.2.0：DemandVO 适配 v1.6.0；subProductItemsSummary 替代 quantity/destination）
 > **状态**: ✅ 已实现（Phase 1）
 > **对应前端**: `OrderOverviewPage.vue` · `docs/ui/pages/09-order-overview.md`
 > **核心**: 以 Procurement.id 为锚点，聚合全链路 8 步数据
@@ -81,7 +81,7 @@ GET /api/v1/orders/{procurementId}/overview
 }
 ```
 
-### 3.2 步骤1 — ReplenishmentDemand（可选）
+### 3.2 步骤1 — ReplenishmentDemand（可选，v1.6.0）
 
 ```json
 {
@@ -89,14 +89,16 @@ GET /api/v1/orders/{procurementId}/overview
   "demandCode": "D-20260401-001",
   "demandType": "NEW_PURCHASE",
   "productCode": "odn012",
-  "subProductCode": "re",
-  "quantity": 200,
-  "destination": "久留米",
+  "subProductItemsSummary": "be:100久留米, bu:50名古屋, re:75大阪",
   "japanLead": "田中",
   "status": "CONVERTED",
   "createTime": "2026-04-01T09:00:00Z"
 }
 ```
+
+> **v1.6.0 变更**：原 `quantity`/`destination`/`subProductCode` 合并为 `subProductItemsSummary` 字符串，
+> 由后端 `OrderOverviewAssembler.buildSubProductItemsSummary()` 从 `subProductItemsRaw` JSON 数组生成。
+> 旧数据（v1.5.x）`sub_product_code` 格式为 `["be","bu"]` 时，兼容解析为 `be, bu`。
 
 ### 3.3 步骤2 — Factory（可选）
 

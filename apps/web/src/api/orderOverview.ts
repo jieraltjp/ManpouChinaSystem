@@ -93,12 +93,26 @@ export interface DemandVO {
   demandCode: string
   demandType?: string
   productCode: string
-  subProductCode?: string
-  quantity?: number
-  destination?: string
+  subProductItemsSummary?: string  // v1.6.0: "be:100久留米, bu:50名古屋"
   japanLead?: string
   status?: string
   createTime?: string
+}
+
+export interface DemandSelectorVO {
+  id: number
+  demandCode: string
+  demandType?: string
+  productCode: string
+  subProductItemsSummary?: string
+  japanLead?: string
+  status?: string
+  createTime?: string
+}
+
+export interface DemandOverviewVO {
+  demand: DemandVO
+  stepStatuses: StepStatus[]
 }
 
 export interface QcRecordVO {
@@ -211,8 +225,8 @@ export interface SalesRecordVO {
 }
 
 export interface OrderOverviewVO {
-  procurementId: number
-  procurement: ProcurementVO
+  procurementId?: number
+  procurement?: ProcurementVO
   factory?: FactoryVO
   demand?: DemandVO
   qcRecord?: QcRecordVO
@@ -224,11 +238,29 @@ export interface OrderOverviewVO {
   stepStatuses: StepStatus[]
 }
 
+export interface DemandPageResponse {
+  content: DemandSelectorVO[]
+  totalElements: number
+  totalPages: number
+  pageNumber: number
+  size: number
+  number: number
+  first: boolean
+  last: boolean
+  empty: boolean
+}
+
 export const orderOverviewApi = {
   getOverview(procurementId: number) {
-    return client.get<{ code: string; data: OrderOverviewVO }>(`/orders/${procurementId}/overview`)
+    return client.get<{ code: string; data: OrderOverviewVO }>(`/orders/procurement/${procurementId}/overview`)
   },
-  listSelector(params: { page?: number; pageSize?: number; keyword?: string }) {
-    return client.get<{ code: string; data: ProcurementPageResponse }>('/orders/selector', { params })
+  listProcurementSelector(params: { page?: number; pageSize?: number; keyword?: string }) {
+    return client.get<{ code: string; data: ProcurementPageResponse }>('/orders/procurement/selector', { params })
+  },
+  listDemandSelector(params: { page?: number; pageSize?: number; status?: string; keyword?: string }) {
+    return client.get<{ code: string; data: DemandPageResponse }>('/orders/demands', { params })
+  },
+  getDemandOverview(demandId: number) {
+    return client.get<{ code: string; data: DemandOverviewVO }>(`/orders/demands/${demandId}/overview`)
   },
 }
