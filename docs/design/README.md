@@ -14,6 +14,7 @@
 | [04-前端项目生成](04-前端项目生成.md) | Vue 3 前端项目配置 | ✅ |
 | [05-领域模块开发](05-领域模块开发.md) | 业务模块详细开发 | ✅ |
 | [06-配置与部署](06-配置与部署.md) | Docker Compose、CI/CD 配置 | ✅ |
+| [07-Element Plus 表格布局规范](07-Element-Plus-表格布局规范.md) | el-table min-width / ::deep 禁区 / fixed=right 禁用 | ✅ |
 
 ---
 
