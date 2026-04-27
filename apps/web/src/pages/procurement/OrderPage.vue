@@ -87,14 +87,14 @@
         stripe
         style="width: 100%"
       >
-        <el-table-column prop="productCode" :label="$t('order.column.productCode')" min-width="120">
+        <el-table-column :label="$t('order.column.productCode')" min-width="120">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="factoryName" :label="$t('order.column.factoryName')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="quantity" :label="$t('order.column.quantity')" min-width="80" align="right" />
-        <el-table-column prop="estimatedPriceJpy" :label="$t('order.column.estimatedPriceJpy')" min-width="150" align="right">
+        <el-table-column :label="$t('order.column.estimatedPriceJpy')" min-width="150" align="right">
           <template #default="{ row }">
             {{ row.estimatedPriceJpy ? row.estimatedPriceJpy.toLocaleString() : '-' }}
           </template>
