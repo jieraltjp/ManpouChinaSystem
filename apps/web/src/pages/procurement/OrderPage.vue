@@ -118,16 +118,6 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('order.column.updateBy')" min-width="100" align="center">
-          <template #default="{ row }">
-            {{ row.updateBy || '-' }}
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('order.column.updateTime')" min-width="160">
-          <template #default="{ row }">
-            {{ row.updateTime ? new Date(row.updateTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
-          </template>
-        </el-table-column>
         <el-table-column :label="$t('order.column.action')" min-width="220" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('order.message.detail') }}</el-button>
@@ -187,7 +177,8 @@
         <el-descriptions-item :label="$t('order.drawer.chinaLead')">{{ currentRow.chinaLead || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.destination')" :span="2">{{ currentRow.destination || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.createTime')" :span="2">{{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('order.drawer.updateTime')" :span="2">{{ currentRow.updateTime ? new Date(currentRow.updateTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.updateBy')">{{ currentRow.updateBy || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.updateTime')">{{ currentRow.updateTime ? new Date(currentRow.updateTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
       </el-descriptions>
 
       <div class="drawer-actions">

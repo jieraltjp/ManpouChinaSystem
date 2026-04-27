@@ -66,9 +66,14 @@
         <el-table-column prop="containerNo" :label="$t('logistics.column.containerNo')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="qcCode" :label="$t('logistics.column.qcCode')" min-width="130" show-overflow-tooltip />
         <el-table-column prop="factoryName" :label="$t('logistics.column.factoryName')" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="productCode" :label="$t('logistics.column.productCode')" min-width="120">
+        <el-table-column :label="$t('logistics.column.productCode')" min-width="130" show-overflow-tooltip>
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('logistics.column.subProductCode')" min-width="130" show-overflow-tooltip>
+          <template #default="{ row }">
+            <span class="product-code">{{ row.subProductCode || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="planType" :label="$t('logistics.column.planType')" min-width="100" align="center">
@@ -252,6 +257,9 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.column.productCode')">
           <span class="product-code">{{ currentRow.productCode }}</span>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.subProductCode')">
+          <span class="product-code">{{ currentRow.subProductCode || '-' }}</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.column.factoryName')">{{ currentRow.factoryName || (currentRow.factoryId ? `ID:${currentRow.factoryId}` : '-') }}</el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.column.status')">
