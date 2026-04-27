@@ -64,6 +64,7 @@ export interface CreateLogisticsPlanRequest {
 }
 
 export interface UpdateLogisticsPlanRequest {
+  qcRecordId?: number     // 关联验货记录（v1.2.0）
   planType?: PlanType
   status?: LogisticsStatus
   containerNo?: string    // 货柜号（v1.3.0）

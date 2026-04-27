@@ -371,7 +371,10 @@ async function loadQcRecordOptions() {
   try {
     // 只过滤 result=PASS，status 不限制（DB 里 status=PENDING 也是合法验货记录）
     const res = await inspectionApi.list({ page: 0, pageSize: 100, result: 'PASS' })
+    console.log('[LogisticsPage] loadQcRecordOptions raw:', JSON.stringify(res.data))
     qcRecordOptions.value = res.data.data?.content ?? []
+    console.log('[LogisticsPage] qcRecordOptions set, count:', qcRecordOptions.value.length, 'ids:', qcRecordOptions.value.map((r: QcRecordVO) => r.id))
+    console.log('[LogisticsPage] form.qcRecordId =', form.qcRecordId)
   } catch (e) {
     console.error('[LogisticsPage] loadQcRecordOptions failed', e)
     qcRecordOptions.value = []
@@ -381,7 +384,7 @@ async function loadQcRecordOptions() {
 }
 
 watch(dialogVisible, (val) => {
-  if (val && qcRecordOptions.value.length === 0) loadQcRecordOptions()
+  if (val) loadQcRecordOptions()
 })
 
 function onQcRecordSelected(id: number) {
@@ -420,7 +423,8 @@ async function onSubmit() {
   submitting.value = true
   try {
     if (editId.value) {
-      await logisticsApi.update(editId.value, {
+      const payload = {
+        qcRecordId: form.qcRecordId,
         containerNo: form.containerNo || undefined,
         planType: form.planType!,
         cargoLengthCm: form.cargoLengthCm,
@@ -432,7 +436,9 @@ async function onSubmit() {
         estimatedShipDate: form.estimatedShipDate || undefined,
         actualShipDate: form.actualShipDate || undefined,
         remarks: form.remarks || undefined,
-      })
+      }
+      console.log('[LogisticsPage] update payload:', JSON.stringify(payload))
+      await logisticsApi.update(editId.value, payload)
       ElMessage.success(t('logistics.message.updateSuccess'))
     } else {
       await logisticsApi.create({
@@ -472,6 +478,10 @@ function onView(row: LogisticsPlanVO) {
 }
 
 async function onEdit(row: LogisticsPlanVO) {
+  console.log('[LogisticsPage] onEdit called, qcRecordId:', row.qcRecordId, 'planCode:', row.planCode)
+  // 调试：确认 tableData 里这条记录的 qcRecordId
+  const fresh = tableData.value.find(r => r.id === row.id)
+  console.log('[LogisticsPage] fresh from tableData, qcRecordId:', fresh?.qcRecordId, 'planCode:', fresh?.planCode)
   editId.value = row.id
   formRef.value?.resetFields()
   Object.assign(form, {
@@ -493,18 +503,12 @@ async function onEdit(row: LogisticsPlanVO) {
     remarks: row.remarks || '',
   })
   drawerVisible.value = false
-  // 先加载验货记录选项（确保 el-select 绑定的值在列表中），再打开对话框
-  if (row.qcRecordId) {
-    try {
-      const res = await inspectionApi.get(row.qcRecordId)
-      const qc = res.data.data
-      if (qc) qcRecordOptions.value = [qc]
-    } catch {
-      qcRecordOptions.value = []
-    }
-  }
+  // 直接设置 qcRecordId，列表加载后 el-select 即可正确显示（列表已包含该记录）
+  form.qcRecordId = row.qcRecordId
+  console.log('[LogisticsPage] after assign form.qcRecordId:', form.qcRecordId)
   await loadQcRecordOptions()
   dialogVisible.value = true
+  console.log('[LogisticsPage] dialog opened, qcRecordOptions count:', qcRecordOptions.value.length, 'form.qcRecordId:', form.qcRecordId)
 }
 
 function onEditFromDrawer() {

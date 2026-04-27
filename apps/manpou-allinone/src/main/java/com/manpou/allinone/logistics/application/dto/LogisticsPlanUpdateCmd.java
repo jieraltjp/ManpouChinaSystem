@@ -32,6 +32,8 @@ public class LogisticsPlanUpdateCmd {
     @Length(max = 32)
     private String containerNo;          // 货柜号（v1.3.0）
 
+    private Long qcRecordId;               // 关联验货记录（v1.2.0）
+
     private Long poolId;                  // 拼柜池ID
 
     private LocalDate estimatedShipDate;

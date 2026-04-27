@@ -550,7 +550,8 @@
       "action": "操作"
     },
     "action": {
-      "detail": "詳細"
+      "detail": "詳細",
+      "edit": "編集"
     },
     "requiresQc": {
       "yes": "検品要",
@@ -558,6 +559,7 @@
     },
     "dialog": {
       "newTitle": "新規追加",
+      "editTitle": "編集",
       "qcRecord": "関連検査記録",
       "qcRecordPlaceholder": "検査番号または品番を検索",
       "containerNo": "コンテナ番号",
@@ -599,7 +601,9 @@
     "message": {
       "loadFailed": "配送計画の読み込みに失敗しました",
       "createSuccess": "配送計画の作成が完了しました",
-      "createFailed": "配送計画の作成に失敗しました"
+      "createFailed": "配送計画の作成に失敗しました",
+      "updateSuccess": "配送計画の更新が完了しました",
+      "updateFailed": "配送計画の更新に失敗しました"
     }
   },
   "factory": {

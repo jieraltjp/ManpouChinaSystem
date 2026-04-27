@@ -550,7 +550,8 @@
       "action": "操作"
     },
     "action": {
-      "detail": "详情"
+      "detail": "详情",
+      "edit": "编辑"
     },
     "requiresQc": {
       "yes": "需检测",
@@ -558,6 +559,7 @@
     },
     "dialog": {
       "newTitle": "新增调配",
+      "editTitle": "编辑调配",
       "qcRecord": "关联验货记录",
       "qcRecordPlaceholder": "搜索验货编号或货号",
       "containerNo": "货柜号",
@@ -599,7 +601,9 @@
     "message": {
       "loadFailed": "加载调配计划失败",
       "createSuccess": "调配计划创建成功",
-      "createFailed": "创建调配计划失败"
+      "createFailed": "创建调配计划失败",
+      "updateSuccess": "调配计划更新成功",
+      "updateFailed": "更新调配计划失败"
     }
   },
   "factory": {
