@@ -13,11 +13,11 @@
 | [LESSONS-BACKEND.md](./LESSONS-BACKEND.md) | 后端 Java / Spring / JPA / DDD | 1–6, 10, 25, 29–34, 38 |
 | [LESSONS-OPS.md](./LESSONS-OPS.md) | 构建 / 部署 / 环境 / 运维 | 7–9, 17–18, 20, 26–28 |
 | [LESSONS-DATABASE.md](./LESSONS-DATABASE.md) | 数据库 / Flyway / Schema | 8, 13, 31–32, 39, 45, 51 |
-| [LESSONS-FRONTEND.md](./LESSONS-FRONTEND.md) | 前端 Vue / TS / i18n / Element Plus | 11–12, 14, 16, 33–34, 37, 40–44, 46–50, 52–58 |
+| [LESSONS-FRONTEND.md](./LESSONS-FRONTEND.md) | 前端 Vue / TS / i18n / Element Plus | 11–12, 14, 16, 33–34, 37, 40–44, 46–50, 52–59 |
 
 ---
 
-## 铁律总表（56 条）
+## 铁律总表（57 条）
 
 ### 后端（17 条）
 

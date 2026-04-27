@@ -57,6 +57,7 @@ public class QcRecordUseCase {
 
     @Transactional
     public Long create(QcRecordCreateCmd cmd) {
+        log.info("[QcRecord] create called, procurementId={}, productCode={}", cmd.getProcurementId(), cmd.getProductCode());
         if (cmd.getInspectionCount() != null && cmd.getPassedCount() != null) {
             if (cmd.getInspectionCount() < cmd.getPassedCount()) {
                 throw new BusinessException("qc.invalid_count", "合格数量不能大于检品数");
@@ -76,7 +77,11 @@ public class QcRecordUseCase {
         }
         QcRecord entity = qcRecordAssembler.toEntity(cmd);
         entity.calculateDefectiveCount();
+        log.info("[QcRecord] about to save entity, qcCode={}, result={}", entity.getQcCode(), entity.getResult());
         QcRecord saved = qcRecordRepository.save(entity);
+        log.info("[QcRecord] after save, id={}, qcCode={}", saved.getId(), saved.getQcCode());
+        qcRecordRepository.flush();
+        log.info("[QcRecord] after flush, id={}", saved.getId());
         log.info("[QcRecord] created, traceId={}, id={}, qcCode={}, result={}",
                 null, saved.getId(), saved.getQcCode(), saved.getResult());
         return saved.getId();

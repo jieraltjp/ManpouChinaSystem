@@ -2,7 +2,7 @@
 
 > 项目：ManpouChinaSystem
 > 覆盖范围：Vue 组件 / TypeScript / vue-i18n / Element Plus / 构建产物
-> Lesson 编号：11–12, 14, 16, 21, 24, 33–34, 37, 40–44, 46–50, 52–58（共 27 条）
+> Lesson 编号：11–12, 14, 16, 21, 24, 33–34, 37, 40–44, 46–50, 52–59（共 28 条）
 
 ---
 
@@ -771,6 +771,7 @@ cat /tmp/fixed-tables.txt | wc -l
 | 56 | 表单 diviser 仅在跨语义区大区块时使用，紧凑表单禁止加分隔线 | 视觉噪音 |
 | 57 | 业务关联变更须从 SPEC → DB → 后端 → 前端八层同步 | 锚点选错导致无实际 cargo 尺寸 |
 | 58 | el-input-number 列宽 = content - 60px(按钮×2) - 16px(el-col padding)，content < 150px 时按钮截断 | 按钮文字被遮挡 |
+| 59 | onNew() 必须重置 currentRow；后端 @Positive 改为 @PositiveOrZero | 新建变编辑/保存静默失败 |
 
 ---
 
@@ -945,3 +946,57 @@ LogisticsPage.vue：弹窗宽度 640px → 820px，货物尺寸行 span 8 → sp
 ### 溯源
 
 - **EV-058**: LogisticsPage el-input-number 按钮截断 → Lesson 58
+
+---
+
+## Lesson 59: `onNew()` 必须重置 `currentRow`，否则 `onSubmit()` 误入编辑分支 + 后端 `@Positive` 拦截 0 值
+
+### 问题 1：新建变编辑（currentRow 未重置）
+
+InspectionPage.vue，点"新建"后，`currentRow.value` 仍持有可能的旧记录引用，`onSubmit()` 第 531 行 `if (currentRow.value)` 判断为 `true`，走入 `update()` 分支，`currentRow.value.id` 可能为 `undefined` → 后端 400 或静默失败。
+
+### 根因
+
+```typescript
+// ❌ 错误：resetFields() 只重置表单，不重置 currentRow
+function onNew() {
+  formRef.value?.resetFields()
+  // currentRow.value 仍为旧引用！
+  dialogVisible.value = true
+}
+
+// ✅ 正确：必须显式重置 currentRow
+function onNew() {
+  formRef.value?.resetFields()
+  currentRow.value = null  // ← 关键！否则 onSubmit 误判为编辑模式
+  dialogVisible.value = true
+}
+```
+
+### 问题 2：后端 `@Positive` 拦截 inspectionCount=0
+
+`QcRecordCreateCmd` 上 `inspectionCount` 有 `@Positive`（值必须 > 0），但前端 `onNew()` 初始化 `inspectionCount: 0`，保存时后端 Hibernate Validator 返回 400。
+
+错误日志：
+```
+[参数校验失败] code=validation.inspectionCount.invalid, fields=必须是正数
+```
+
+### 修复
+
+1. `onNew()` 中加 `currentRow.value = null`
+2. `QcRecordCreateCmd`：`@Positive` → `@PositiveOrZero`（允许 0，验货数量可以为 0）
+
+```java
+// ❌ @Positive 要求 > 0
+@Positive
+private Integer inspectionCount;
+
+// ✅ @PositiveOrZero 允许 0
+@PositiveOrZero
+private Integer inspectionCount;
+```
+
+### 溯源
+
+- **EV-059**: InspectionPage 新建保存静默失败 → Lesson 59

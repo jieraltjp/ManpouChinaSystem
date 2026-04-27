@@ -3,7 +3,7 @@ package com.manpou.allinone.qc.application.dto;
 import com.manpou.allinone.qc.domain.model.QcResult;
 import com.manpou.allinone.qc.domain.model.QcType;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
@@ -34,10 +34,10 @@ public class QcRecordCreateCmd {
 
     private QcResult result;               // 验货结果
 
-    @Positive
+    @PositiveOrZero
     private Integer inspectionCount;       // 检品数
 
-    @Positive
+    @PositiveOrZero
     private Integer passedCount;           // 合格数量
 
     private Integer boxCount;              // 箱数

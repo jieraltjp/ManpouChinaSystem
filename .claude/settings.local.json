@@ -238,7 +238,17 @@
       "Read(//c//**)",
       "Read(//d//**)",
       "Bash(git *)",
-      "Bash(echo \"Backend PID: $!\")"
+      "Bash(echo \"Backend PID: $!\")",
+      "Bash(where docker *)",
+      "Bash(docker.exe --version)",
+      "Bash(ssh -o StrictHostKeyChecking=no jieraltjp@192.168.12.198 \"hostname && whoami\")",
+      "Bash(wmic process *)",
+      "Bash(ssh *)",
+      "Read(//d/Programme/java/ManpouChinaSystem/apps/manpou-allinone/**)",
+      "Bash(taskkill //F //PID 185132)",
+      "Bash(echo \"Started PID=$!\")",
+      "Bash(tasklist /FI \"PID eq 258700\")",
+      "Bash(taskkill *)"
     ]
   }
 }

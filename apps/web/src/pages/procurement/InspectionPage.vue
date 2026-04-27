@@ -505,6 +505,7 @@ function onProcurementSelected(id: number) {
 
 function onNew() {
   formRef.value?.resetFields()
+  currentRow.value = null  // 必须重置，否则 onSubmit 会误入编辑分支
   const today = new Date().toISOString().slice(0, 10)
   Object.assign(form, {
     procurementId: undefined, productCode: '', subProductCode: '', qcUserId: undefined,
@@ -523,6 +524,8 @@ async function onSubmit() {
   if (!valid) return
   submitting.value = true
   try {
+    console.log('[InspectionPage] currentRow:', currentRow.value)
+    console.log('[InspectionPage] form:', JSON.stringify(form))
     if (form.inspectionCount !== undefined && form.passedCount !== undefined && form.passedCount > form.inspectionCount) {
       ElMessage.warning(t('inspection.validation.passedCountExceeds'))
       submitting.value = false
@@ -530,6 +533,7 @@ async function onSubmit() {
     }
     if (currentRow.value) {
       // 编辑模式
+      console.log('[InspectionPage] UPDATE mode, id:', currentRow.value.id)
       await inspectionApi.update(currentRow.value.id, {
         sellerName: form.sellerName || undefined,
         qcUserId: form.qcUserId,
@@ -554,6 +558,7 @@ async function onSubmit() {
       ElMessage.success(t('inspection.message.updateSuccess'))
     } else {
       // 创建模式
+      console.log('[InspectionPage] CREATE mode')
       await inspectionApi.create({
         procurementId: form.procurementId!,
         productCode: form.productCode,
@@ -580,13 +585,16 @@ async function onSubmit() {
         orderDate: form.orderDate || undefined,
         sellerName: form.sellerName || undefined,
       })
+      console.log('[InspectionPage] create SUCCESS')
       ElMessage.success(t('inspection.message.createSuccess'))
     }
     dialogVisible.value = false
     loadData()
-  } catch (e) {
+  } catch (e: unknown) {
     console.error('[InspectionPage] onSubmit failed', e)
-    ElMessage.error(t('inspection.message.createFailed'))
+    console.log('[InspectionPage] create FAILED, error:', e)
+    const msg = e instanceof Error ? e.message : String(e)
+    ElMessage.error(t('inspection.message.createFailed') + ': ' + msg)
   } finally {
     submitting.value = false
   }

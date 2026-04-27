@@ -20,6 +20,8 @@ public interface QcRecordRepository {
 
     QcRecord save(QcRecord entity);
 
+    void flush();
+
     void deleteById(Long id);
 
     Page<QcRecord> findAllByDeletedIsFalse(Pageable pageable);
