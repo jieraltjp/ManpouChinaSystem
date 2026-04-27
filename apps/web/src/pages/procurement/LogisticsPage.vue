@@ -435,29 +435,31 @@ async function onSubmit() {
       ElMessage.success(t('logistics.message.updateSuccess'))
     } else {
       await logisticsApi.create({
-      qcRecordId: form.qcRecordId,
-      procurementId: form.procurementId,
-      factoryId: form.factoryId,
-      productCode: form.productCode,
-      subProductCode: form.subProductCode || undefined,
-      containerNo: form.containerNo || undefined,
-      planType: form.planType!,
-      cargoLengthCm: form.cargoLengthCm,
-      cargoWidthCm: form.cargoWidthCm,
-      cargoHeightCm: form.cargoHeightCm,
-      cargoWeightKg: form.cargoWeightKg,
-      quantity: form.quantity,
-      requiresQc: form.requiresQc,
-      estimatedShipDate: form.estimatedShipDate || undefined,
-      actualShipDate: form.actualShipDate || undefined,
-      remarks: form.remarks || undefined,
-    })
-    ElMessage.success(t('logistics.message.createSuccess'))
+        qcRecordId: form.qcRecordId,
+        procurementId: form.procurementId,
+        factoryId: form.factoryId,
+        productCode: form.productCode,
+        subProductCode: form.subProductCode || undefined,
+        containerNo: form.containerNo || undefined,
+        planType: form.planType!,
+        cargoLengthCm: form.cargoLengthCm,
+        cargoWidthCm: form.cargoWidthCm,
+        cargoHeightCm: form.cargoHeightCm,
+        cargoWeightKg: form.cargoWeightKg,
+        quantity: form.quantity,
+        requiresQc: form.requiresQc,
+        estimatedShipDate: form.estimatedShipDate || undefined,
+        actualShipDate: form.actualShipDate || undefined,
+        remarks: form.remarks || undefined,
+      })
+      ElMessage.success(t('logistics.message.createSuccess'))
+    }
     dialogVisible.value = false
+    editId.value = null
     loadData()
   } catch (e) {
     console.error('[LogisticsPage] onSubmit failed', e)
-    ElMessage.error(t('logistics.message.createFailed'))
+    ElMessage.error(t(editId.value ? 'logistics.message.updateFailed' : 'logistics.message.createFailed'))
   } finally {
     submitting.value = false
   }
@@ -466,6 +468,36 @@ async function onSubmit() {
 function onView(row: LogisticsPlanVO) {
   currentRow.value = row
   drawerVisible.value = true
+}
+
+function onEdit(row: LogisticsPlanVO) {
+  editId.value = row.id
+  formRef.value?.resetFields()
+  Object.assign(form, {
+    qcRecordId: row.qcRecordId,
+    procurementId: row.procurementId,
+    factoryId: row.factoryId,
+    containerNo: row.containerNo || '',
+    productCode: row.productCode,
+    subProductCode: row.subProductCode || '',
+    planType: row.planType,
+    cargoLengthCm: row.cargoLengthCm,
+    cargoWidthCm: row.cargoWidthCm,
+    cargoHeightCm: row.cargoHeightCm,
+    cargoWeightKg: row.cargoWeightKg ?? 0,
+    quantity: row.quantity ?? 0,
+    requiresQc: row.requiresQc ?? false,
+    estimatedShipDate: row.estimatedShipDate || '',
+    actualShipDate: row.actualShipDate || '',
+    remarks: row.remarks || '',
+  })
+  drawerVisible.value = false
+  dialogVisible.value = true
+}
+
+function onEditFromDrawer() {
+  if (!currentRow.value) return
+  onEdit(currentRow.value)
 }
 
 function onOverview(row: LogisticsPlanVO) {
