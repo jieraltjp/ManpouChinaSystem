@@ -369,8 +369,7 @@ function onReset() {
 async function loadQcRecordOptions() {
   qcRecordLoading.value = true
   try {
-    // 不限制 result/status，确保编辑时原有关联验货记录也能显示
-    const res = await inspectionApi.list({ page: 0, pageSize: 500 })
+    const res = await inspectionApi.list({ page: 0, pageSize: 100, result: 'PASS', status: 'COMPLETED' })
     qcRecordOptions.value = res.data.data?.content ?? []
   } catch (e) {
     console.error('[LogisticsPage] loadQcRecordOptions failed', e)
@@ -471,7 +470,7 @@ function onView(row: LogisticsPlanVO) {
   drawerVisible.value = true
 }
 
-function onEdit(row: LogisticsPlanVO) {
+async function onEdit(row: LogisticsPlanVO) {
   editId.value = row.id
   formRef.value?.resetFields()
   Object.assign(form, {
@@ -494,6 +493,17 @@ function onEdit(row: LogisticsPlanVO) {
   })
   drawerVisible.value = false
   dialogVisible.value = true
+  // 编辑时：先加载已选验货记录（确保下拉里能显示），再加载可选列表
+  if (row.qcRecordId) {
+    try {
+      const res = await inspectionApi.get(row.qcRecordId)
+      const qc = res.data.data
+      if (qc) qcRecordOptions.value = [qc]
+    } catch {
+      qcRecordOptions.value = []
+    }
+  }
+  loadQcRecordOptions()
 }
 
 function onEditFromDrawer() {
