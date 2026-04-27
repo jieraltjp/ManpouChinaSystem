@@ -115,13 +115,25 @@ public class ProductUseCase {
     }
 
     /**
-     * 根据主货号查询（用于步骤1商品选择器自动代入）。
+     * 根据主货号查询商品。
+     * 优先返回 master-level（sub_code IS NULL），如果没有则返回第一条子货号记录。
+     * 用于步骤1商品选择器和需求页商品分类查询。
      */
     @Transactional(readOnly = true)
     public ProductPageQuery getByMasterCode(String masterCode) {
-        Product entity = productRepository.findByMasterCodeAndDeletedIsFalse(masterCode)
-                .orElseThrow(() -> BusinessException.notFound("Product", masterCode));
-        return productAssembler.toDto(entity);
+        // 优先查 master-level
+        var master = productRepository.findByMasterCodeAndSubCodeIsNullAndDeletedIsFalse(masterCode);
+        if (master.isPresent()) {
+            return productAssembler.toDto(master.get());
+        }
+        // fallback：查所有子货号，返回第一条
+        var all = productRepository.findAllByMasterCodeAndDeletedIsFalse(masterCode);
+        if (!all.isEmpty()) {
+            log.info("[ProductUseCase] getByMasterCode masterCode={}, no master, fallback to first subProduct subCode={}",
+                    masterCode, all.get(0).getSubCode());
+            return productAssembler.toDto(all.get(0));
+        }
+        throw BusinessException.notFound("Product", masterCode);
     }
 
     /**
