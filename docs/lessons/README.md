@@ -12,12 +12,12 @@
 |------|---------|------------|
 | [LESSONS-BACKEND.md](./LESSONS-BACKEND.md) | 后端 Java / Spring / JPA / DDD | 1–6, 10, 25, 29–34, 38 |
 | [LESSONS-OPS.md](./LESSONS-OPS.md) | 构建 / 部署 / 环境 / 运维 | 7–9, 17–18, 20, 26–28 |
-| [LESSONS-DATABASE.md](./LESSONS-DATABASE.md) | 数据库 / Flyway / Schema | 8, 13, 31–32, 39, 45, 51 |
+| [LESSONS-DATABASE.md](./LESSONS-DATABASE.md) | 数据库 / Flyway / Schema | 8, 13, 31–32, 39, 45, 51, 59 |
 | [LESSONS-FRONTEND.md](./LESSONS-FRONTEND.md) | 前端 Vue / TS / i18n / Element Plus | 11–12, 14, 16, 33–34, 37, 40–44, 46–50, 52–59 |
 
 ---
 
-## 铁律总表（57 条）
+## 铁律总表（59 条）
 
 ### 后端（17 条）
 
@@ -93,6 +93,7 @@
 | 55 | el-input-number 所在列 span≥4（dialog 宽 800+），按钮才不被截断 | 按钮显示异常 |
 | 56 | 表单 diviser 仅在跨语义区大区块时使用，紧凑表单禁止加分隔线 | 视觉噪音 |
 | 57 | 业务关联变更须从 SPEC → DB → 后端 → 前端八层同步，锚点选择决定数据质量 | 调配计划用采购单锚点导致无实际 cargo 尺寸 |
+| 59 | Flyway 禁用项目新增枚举值须同步 ALTER DB 列类型，V38 类迁移组件幂等设计 | Data truncated 500 错误 |
 | 58 | el-input-number 列宽 = content - 60px(按钮) - 16px(el-col padding)，content < 150px 时按钮截断 | 按钮文字被遮挡 |
 
 ---
@@ -124,3 +125,4 @@
 | 56 | 2026-04-27 InspectionPage dialog 无必要 divider 移除 |
 | 57 | 2026-04-27 LogisticsPlan procurementId → qcRecordId 业务锚点修正 |
 | 58 | 2026-04-27 LogisticsPage el-input-number 按钮截断宽度计算修正 |
+| 59 | 2026-04-28 DemandStatus CONFIRMED 新增 + Flyway 禁用项目 @PostConstruct 幂等迁移组件 |

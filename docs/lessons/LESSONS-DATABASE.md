@@ -2,7 +2,7 @@
 
 > 项目：ManpouChinaSystem
 > 覆盖范围：MySQL Schema / Flyway 迁移 / DB 文档
-> Lesson 编号：8, 13, 31, 32, 39, 45, 51（共 7 条）
+> Lesson 编号：8, 13, 31, 32, 39, 45, 51, 59（共 8 条）
 
 > 注：Lesson 8（Flyway 禁用数据不导入）和 Lesson 31（JSON TEXT）在 [LESSONS-OPS.md](./LESSONS-OPS.md) 和 [LESSONS-BACKEND.md](./LESSONS-BACKEND.md) 中也有详细描述，此处专注 DB 层。
 
@@ -16,6 +16,7 @@
 - [Lesson 39: 数据库 schema 文档必须与实现同步，版本号体现同步状态](#lesson-39-数据库-schema-文档必须与实现同步版本号体现同步状态)
 - [Lesson 45: Flyway 迁移文件版本号不得重复，冲突时立即修正](#lesson-45-flyway-迁移文件版本号不得重复冲突时立即修正)
 - [Lesson 51: JPQL 查询字段名 = 实体字段名，非数据库列名](#lesson-51-jpql-查询字段名-实体字段名非数据库列名)
+- [Lesson 59: Flyway 禁用项目新增 DB 列类型变更——@PostConstruct 幂等迁移组件](#lesson-59-flyway-禁用项目新增-db-列类型变更postconstruct-幂等迁移组件)
 
 ---
 
@@ -248,6 +249,83 @@ private Boolean deleted = false;
 
 ---
 
+## Lesson 59: Flyway 禁用项目新增 DB 列类型变更——@PostConstruct 幂等迁移组件
+
+### 问题
+
+后端 `DemandStatus` 枚举新增 `CONFIRMED` 值，前端 toggle-confirm 接口调用时 500：
+
+```
+Data truncated for column 'status' at row 1
+[update replenishment_demand set ... status=? where id=?]
+```
+
+### 根因
+
+项目使用 Hibernate `ddl-auto: update` 管理表结构，**Flyway 被禁用**：
+
+```yaml
+# application-local.yml
+flyway:
+  enabled: false
+```
+
+V38 迁移文件存在但从未执行。数据库 `status` 列仍是旧 ENUM 类型：
+
+```sql
+status ENUM('PENDING','CONVERTED','CANCELLED') NOT NULL DEFAULT 'PENDING'
+```
+
+代码中写入 `'CONFIRMED'` 超出 ENUM 范围，MySQL 拒绝。
+
+### 修复方案
+
+创建 `@PostConstruct` 幂等迁移组件，在启动时检测并 ALTER：
+
+```java
+@Component
+public class DemandStatusMigrationConfig {
+
+    @Autowired
+    private JdbcTemplate jdbc;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void migrate() {
+        // 幂等检测：已是 VARCHAR 则跳过
+        String colType = jdbc.queryForObject(
+            "SELECT COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS " +
+            "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'replenishment_demand' AND COLUMN_NAME = 'status'",
+            String.class);
+
+        if ("varchar(32)".equalsIgnoreCase(colType)) {
+            System.out.println("[DemandStatusMigration] status 已是 VARCHAR(32)，跳过");
+            return;
+        }
+
+        System.out.println("[DemandStatusMigration] 将 status 从 " + colType + " 改为 VARCHAR(32)");
+        jdbc.execute("ALTER TABLE replenishment_demand " +
+            "MODIFY COLUMN status VARCHAR(32) NOT NULL DEFAULT 'PENDING' " +
+            "COMMENT '状态：PENDING=待确认，CONFIRMED=已确认，CONVERTED=已转采购，CANCELLED=已取消'");
+    }
+}
+```
+
+### 关键设计原则
+
+| 原则 | 说明 |
+|------|------|
+| 幂等 | 启动时检测列类型，已变更则跳过 |
+| 单一职责 | 仅做一件事：修复 ENUM → VARCHAR |
+| 可移除 | Flyway 正式启用后，删除此组件 |
+
+### 预防
+
+- 新增枚举值前先查 DB 列类型：`SHOW COLUMNS FROM table WHERE Field = 'column'`
+- 迁移文件配合 JPA 实体变更一起提交，不能假设 Flyway 会自动执行
+- Flyway 禁用项目建议统一用 @PostConstruct 迁移模式，防止人工遗漏
+
+---
+
 ## 铁律总结表（数据库）
 
 | # | 铁律 | 违反后果 |
@@ -258,3 +336,4 @@ private Boolean deleted = false;
 | 39 | DB schema 文档版本号 ≥ 代码版本号 | 文档失效 |
 | 45 | Flyway 迁移版本号不得重复，冲突时立即修正 | 迁移执行顺序不确定 |
 | 51 | JPQL 查询字段名 = 实体字段名，非数据库列名 | 查询报错 |
+| 59 | Flyway 禁用项目新增枚举值须同步 ALTER DB 列类型，V38 类迁移组件幂等设计 | Data truncated 500 错误 |
