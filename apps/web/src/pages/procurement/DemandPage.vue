@@ -115,16 +115,12 @@
           </template>
         </el-table-column>
         <el-table-column prop="japanLead" :label="$t('demand.column.japanLead')" min-width="100" />
+        <el-table-column prop="remarks" :label="$t('demand.column.remarks')" min-width="120" show-overflow-tooltip />
         <el-table-column prop="status" :label="$t('demand.column.status')" min-width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="demandStatusType(row.status)" size="small">
               {{ demandStatusLabel(row.status) }}
             </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" :label="$t('demand.column.createTime')" min-width="160">
-          <template #default="{ row }">
-            {{ row.createTime ? new Date(row.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN') : '-' }}
           </template>
         </el-table-column>
         <el-table-column :label="$t('demand.column.action')" min-width="260" align="center">

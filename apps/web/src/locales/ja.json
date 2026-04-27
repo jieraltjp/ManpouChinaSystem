@@ -93,6 +93,7 @@
       "quantity": "数量",
       "destination": "出荷先",
       "japanLead": "日本担当",
+      "remarks": "備考",
       "status": "ステータス",
       "createTime": "作成日時",
       "createBy": "作成者",

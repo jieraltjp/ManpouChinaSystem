@@ -524,8 +524,6 @@ async function onSubmit() {
   if (!valid) return
   submitting.value = true
   try {
-    console.log('[InspectionPage] currentRow:', currentRow.value)
-    console.log('[InspectionPage] form:', JSON.stringify(form))
     if (form.inspectionCount !== undefined && form.passedCount !== undefined && form.passedCount > form.inspectionCount) {
       ElMessage.warning(t('inspection.validation.passedCountExceeds'))
       submitting.value = false
@@ -533,7 +531,6 @@ async function onSubmit() {
     }
     if (currentRow.value) {
       // 编辑模式
-      console.log('[InspectionPage] UPDATE mode, id:', currentRow.value.id)
       await inspectionApi.update(currentRow.value.id, {
         sellerName: form.sellerName || undefined,
         qcUserId: form.qcUserId,
@@ -585,14 +582,11 @@ async function onSubmit() {
         orderDate: form.orderDate || undefined,
         sellerName: form.sellerName || undefined,
       })
-      console.log('[InspectionPage] create SUCCESS')
       ElMessage.success(t('inspection.message.createSuccess'))
     }
     dialogVisible.value = false
     loadData()
   } catch (e: unknown) {
-    console.error('[InspectionPage] onSubmit failed', e)
-    console.log('[InspectionPage] create FAILED, error:', e)
     const msg = e instanceof Error ? e.message : String(e)
     ElMessage.error(t('inspection.message.createFailed') + ': ' + msg)
   } finally {

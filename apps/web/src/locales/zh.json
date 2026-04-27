@@ -93,6 +93,7 @@
       "quantity": "数量",
       "destination": "目的地",
       "japanLead": "日本担当",
+      "remarks": "备注",
       "status": "状态",
       "createTime": "录入时间",
       "createBy": "创建人",
