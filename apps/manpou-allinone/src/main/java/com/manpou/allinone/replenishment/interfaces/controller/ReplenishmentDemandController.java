@@ -76,6 +76,16 @@ public class ReplenishmentDemandController {
     }
 
     /**
+     * 切换确认状态（PENDING ↔ CONFIRMED）。
+     * POST /api/v1/demands/{id}/toggle-confirm
+     */
+    @PostMapping("/{id}/toggle-confirm")
+    public Result<Void> toggleConfirm(@PathVariable("id") Long id) {
+        demandUseCase.toggleConfirm(id);
+        return Result.ok("状态已更新", null);
+    }
+
+    /**
      * 查看关联的采购单（v2.0.0）。
      * GET /api/v1/demands/{id}/procurement
      */

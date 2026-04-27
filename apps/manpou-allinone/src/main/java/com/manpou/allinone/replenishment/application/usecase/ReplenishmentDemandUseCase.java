@@ -254,4 +254,23 @@ public class ReplenishmentDemandUseCase {
     public List<String> findDistinctJapanLeads() {
         return demandRepository.findDistinctJapanLeads();
     }
+
+    /**
+     * 切换确认状态（PENDING → CONFIRMED，或 CONFIRMED → PENDING）。
+     */
+    @Transactional
+    public void toggleConfirm(Long id) {
+        ReplenishmentDemand entity = demandRepository.findByIdAndDeletedIsFalse(id)
+                .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", id));
+        if (entity.getStatus() == DemandStatus.PENDING) {
+            entity.setStatus(DemandStatus.CONFIRMED);
+        } else if (entity.getStatus() == DemandStatus.CONFIRMED) {
+            entity.setStatus(DemandStatus.PENDING);
+        } else {
+            throw BusinessException.invalidParam("当前状态不允许切换确认状态");
+        }
+        demandRepository.save(entity);
+        log.info("[ReplenishmentDemand] toggleConfirm, traceId={}, id={}, newStatus={}",
+                MDC.get(TraceFilter.TRACE_ID_KEY), id, entity.getStatus());
+    }
 }

@@ -6,7 +6,7 @@
 import client from './client'
 
 export type DemandType = 'REPLENISHMENT' | 'NEW_PURCHASE'
-export type DemandStatus = 'PENDING' | 'CONVERTED' | 'CANCELLED'
+export type DemandStatus = 'PENDING' | 'CONFIRMED' | 'CONVERTED' | 'CANCELLED'
 
 export interface DemandPageVO {
   id: number
@@ -106,5 +106,9 @@ export const demandApi = {
   /** 日本担当建议（下拉去重列表） */
   suggestJapanLeads() {
     return client.get<{ code: string; data: string[] }>('/demands/suggest/japan-leads')
+  },
+  /** 切换确认状态（PENDING ↔ CONFIRMED） */
+  toggleConfirm(id: number) {
+    return client.post<{ code: string }>(`/demands/${id}/toggle-confirm`)
   },
 }

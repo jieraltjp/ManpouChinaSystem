@@ -118,7 +118,13 @@
         <el-table-column prop="remarks" :label="$t('demand.column.remarks')" min-width="120" show-overflow-tooltip />
         <el-table-column prop="status" :label="$t('demand.column.status')" min-width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="demandStatusType(row.status)" size="small">
+            <el-tag
+              :type="demandStatusType(row.status)"
+              size="small"
+              :disable-transitions="false"
+              :class="{ 'status-toggle': row.status === 'PENDING' || row.status === 'CONFIRMED' }"
+              @click.stop="onToggleStatus(row)"
+            >
               {{ demandStatusLabel(row.status) }}
             </el-tag>
           </template>
@@ -719,7 +725,7 @@ async function onSubmit() {
 }
 
 function demandStatusLabel(status: string): string {
-  return { PENDING: t('demand.status.PENDING'), CONVERTED: t('demand.status.CONVERTED'), CANCELLED: t('demand.status.CANCELLED') }[status] ?? status
+  return { PENDING: t('demand.status.PENDING'), CONFIRMED: t('demand.status.CONFIRMED'), CONVERTED: t('demand.status.CONVERTED'), CANCELLED: t('demand.status.CANCELLED') }[status] ?? status
 }
 
 function demandTypeLabel(type: string): string {
@@ -727,7 +733,15 @@ function demandTypeLabel(type: string): string {
 }
 
 function demandStatusType(status: string): string {
-  return { PENDING: 'warning', CONVERTED: 'success', CANCELLED: 'info' }[status] ?? 'info'
+  return { PENDING: 'warning', CONFIRMED: 'success', CONVERTED: 'success', CANCELLED: 'info' }[status] ?? 'info'
+}
+
+async function onToggleStatus(row: DemandPageVO) {
+  if (row.status !== 'PENDING' && row.status !== 'CONFIRMED') return
+  try {
+    await demandApi.toggleConfirm(row.id)
+    loadData()
+  } catch { /* interceptor handles error */ }
 }
 
 onMounted(() => loadData())
@@ -753,6 +767,8 @@ onMounted(() => loadData())
 .btn-blue { color: #409EFF !important; }
 .qty-value { color: #D97706; font-weight: 600; }
 .dest-value { color: #6B7280; }
+.status-toggle { cursor: pointer; }
+.status-toggle:hover { opacity: 0.8; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
 .drawer-footer { padding: 16px 0 0; border-top: 1px solid var(--border-color); margin-top: 16px; display: flex; gap: 8px; }
 
