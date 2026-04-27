@@ -87,12 +87,12 @@
         stripe
         style="width: 100%"
       >
-        <el-table-column :label="$t('order.column.productCode')" min-width="120">
+        <el-table-column :label="$t('order.column.productCode')" min-width="150" show-overflow-tooltip>
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('order.column.subProductCode')" min-width="100">
+        <el-table-column :label="$t('order.column.subProductCode')" min-width="120" show-overflow-tooltip>
           <template #default="{ row }">
             <span class="product-code">{{ row.subProductCode || '—' }}</span>
           </template>
