@@ -96,7 +96,9 @@
     },
     "type": {
       "replenishment": "补货（非新品）",
-      "newPurchase": "新品采购"
+      "newPurchase": "新品采购",
+      "REPLENISHMENT": "补货（非新品）",
+      "NEW_PURCHASE": "新品采购"
     },
     "status": {
       "PENDING": "待确认",
@@ -398,14 +400,19 @@
     "filter": {
       "qcCode": "验货编号",
       "qcCodePlaceholder": "如 Q-20260421-001",
+      "procurementId": "采购单号",
+      "procurementIdPlaceholder": "输入采购单号搜索",
       "result": "验货结果",
+      "status": "状态",
       "all": "全部",
       "search": "查询",
       "reset": "重置"
     },
     "column": {
       "qcCode": "验货编号",
+      "procurementId": "采购单号",
       "productCode": "货号",
+      "subProductCode": "子货号",
       "sellerName": "卖家名称",
       "inspectionCount": "检品数",
       "passedCount": "合格数",
@@ -413,6 +420,8 @@
       "boxCount": "箱数",
       "qcDate": "验货日期",
       "result": "结果",
+      "status": "状态",
+      "taxRefund": "退税",
       "action": "操作"
     },
     "result": {
@@ -429,7 +438,9 @@
       "returnRequested": "退货"
     },
     "action": {
-      "detail": "详情"
+      "detail": "详情",
+      "edit": "编辑",
+      "delete": "删除"
     },
     "dialog": {
       "procurement": "关联采购单",
@@ -482,7 +493,11 @@
     "message": {
       "loadFailed": "加载验货记录失败",
       "createSuccess": "验货记录创建成功",
-      "createFailed": "创建验货记录失败"
+      "createFailed": "创建验货记录失败",
+      "updateSuccess": "验货记录更新成功",
+      "deleteSuccess": "删除验货记录成功",
+      "deleteConfirm": "确定删除该验货记录吗？",
+      "deleteConfirmTitle": "确认删除"
     }
   },
   "logistics": {
@@ -896,7 +911,7 @@
     "title": "订单总览",
     "back": "返回列表",
     "print": "打印",
-    "loadFailed": "加载失败",
+    "loadFailed": "加载订单总览失败",
     "retry": "重试",
     "tab": {
       "demands": "需求单",
@@ -916,6 +931,7 @@
       "cancelled": "已取消"
     },
     "column": {
+      "id": "ID",
       "productCode": "货号",
       "factoryName": "工厂",
       "status": "状态",
@@ -960,6 +976,10 @@
       "title": "步骤3：验货记录",
       "qcCode": "验货编号",
       "result": "结果",
+      "qcResult": {
+        "PASS": "合格",
+        "FAIL": "不合格"
+      },
       "inspectionCount": "检品数",
       "passedCount": "合格数",
       "defectiveCount": "不良数",
@@ -1247,6 +1267,9 @@
   },
   "taxRefund": {
     "title": "出口退税",
+    "newButton": "新规退税记录",
+    "newDialogTitle": "新规退税记录",
+    "editDialogTitle": "编辑退税记录",
     "drawerTitle": "退税详情",
     "completeDialogTitle": "完成退税",
     "stat": {
@@ -1285,7 +1308,24 @@
     "action": {
       "detail": "详情",
       "complete": "完成",
-      "noRefund": "不退税"
+      "noRefund": "不退税",
+      "edit": "编辑",
+      "delete": "删除"
+    },
+    "dialog": {
+      "procurement": "关联采购单",
+      "procurementPlaceholder": "搜索采购单（输入货号或编号）",
+      "japanCustomsId": "日本清关记录",
+      "japanCustomsIdPlaceholder": "输入日本清关记录ID（选填）",
+      "billingType": "开票类型",
+      "priceRmb": "采购单价(RMB)",
+      "taxPoint": "税点",
+      "quantity": "采购数量",
+      "exchangeRate": "汇率",
+      "estimatedRefundPreview": "理论退税额",
+      "estimatedRefundHint": "= 单价 × 数量 × (税点 - 1)",
+      "remarks": "备注",
+      "remarksPlaceholder": "选填，备注信息"
     },
     "completeDialog": {
       "actualRefundRmb": "实际退税金额（RMB）",
@@ -1294,10 +1334,18 @@
       "refundBank": "退税银行",
       "refundBankPlaceholder": "请输入退税银行（选填）"
     },
+    "validation": {
+      "procurementRequired": "请选择关联采购单"
+    },
     "message": {
       "loadFailed": "加载退税列表失败",
+      "createSuccess": "退税记录创建成功",
+      "updateSuccess": "退税记录更新成功",
+      "deleteSuccess": "退税记录删除成功",
       "completeSuccess": "退税完成",
       "noRefundSuccess": "已标记为不退税",
+      "deleteConfirm": "确定删除该退税记录吗？",
+      "deleteConfirmTitle": "确认删除",
       "actionFailed": "操作失败，请重试"
     }
   },

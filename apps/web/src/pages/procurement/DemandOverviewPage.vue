@@ -29,7 +29,7 @@
         <template v-if="overview.demand">
           <div class="step-grid">
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.demandCode') }}</span><span class="value">{{ overview.demand.demandCode }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step1.demandType') }}</span><span class="value">{{ overview.demand.demandType }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step1.demandType') }}</span><span class="value">{{ demandTypeLabel(overview.demand.demandType) }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.productCode') }}</span><span class="value">{{ overview.demand.productCode }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.subProductItems') }}</span><span class="value highlight">{{ subProductSummary(overview.demand) }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.japanLead') }}</span><span class="value">{{ overview.demand.japanLead ?? $t('common.format.dash') }}</span></div>
@@ -187,6 +187,11 @@ function demandStatusType(status?: string) {
 function demandStatusLabel(status?: string) {
   if (!status) return t('common.format.dash')
   return t(`demand.status.${status}`)
+}
+
+function demandTypeLabel(type?: string) {
+  if (!type) return t('common.format.dash')
+  return t(`demand.type.${type}`)
 }
 
 function subProductSummary(demand: { subProductCode?: string; quantity?: number; destination?: string }): string {

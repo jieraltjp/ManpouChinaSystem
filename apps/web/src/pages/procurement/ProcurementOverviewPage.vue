@@ -30,11 +30,13 @@
         <template v-if="overview.demand">
           <div class="step-grid">
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.demandCode') }}</span><span class="value">{{ overview.demand.demandCode }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step1.demandType') }}</span><span class="value">{{ overview.demand.demandType }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step1.demandType') }}</span><span class="value">{{ demandTypeLabel(overview.demand.demandType) }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.productCode') }}</span><span class="value">{{ overview.demand.productCode }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.subProductItems') }}</span><span class="value highlight">{{ subProductSummary(overview.demand) }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step1.japanLead') }}</span><span class="value">{{ overview.demand.japanLead ?? $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step1.status') }}</span><span class="value">{{ overview.demand.status }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step1.status') }}</span>
+              <el-tag :type="demandStatusType(overview.demand.status)" size="small">{{ demandStatusLabel(overview.demand.status) }}</el-tag>
+            </div>
           </div>
         </template>
         <template v-else>
@@ -66,7 +68,7 @@
           <div class="step-grid">
             <div class="step-item"><span class="label">{{ $t('orderOverview.step3.qcCode') }}</span><span class="value">{{ overview.qcRecord.qcCode }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step3.result') }}</span><span class="value">
-              <el-tag :type="qcResultType(overview.qcRecord.result)" size="small">{{ overview.qcRecord.result }}</el-tag>
+              <el-tag :type="qcResultType(overview.qcRecord.result)" size="small">{{ qcResultLabel(overview.qcRecord.result) }}</el-tag>
             </span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step3.inspectionCount') }}</span><span class="value">{{ overview.qcRecord.inspectionCount ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step3.passedCount') }}</span><span class="value">{{ overview.qcRecord.passedCount ?? $t('common.format.dash') }}</span></div>
@@ -85,8 +87,8 @@
           <div class="step-grid">
             <div class="step-item"><span class="label">{{ $t('orderOverview.step4.planCode') }}</span><span class="value">{{ overview.logisticsPlan.planCode }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step4.planType') }}</span><span class="value">{{ logisticsPlanTypeLabel(overview.logisticsPlan.planType) }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step4.cargoVolume') }}</span><span class="value">{{ overview.logisticsPlan.cargoVolumeCbm != null ? `${Number(overview.logisticsPlan.cargoVolumeCbm).toFixed(4)} CBM` : $t('common.format.dash') }}</span></div>
-            <div class="step-item"><span class="label">{{ $t('orderOverview.step4.cargoWeight') }}</span><span class="value">{{ overview.logisticsPlan.cargoWeightKg != null ? `${Number(overview.logisticsPlan.cargoWeightKg).toFixed(2)} kg` : $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step4.cargoVolume') }}</span><span class="value">{{ overview.logisticsPlan.cargoVolumeCbm != null ? `${Number(overview.logisticsPlan.cargoVolumeCbm).toFixed(4)} ${$t('common.units.m3')}` : $t('common.format.dash') }}</span></div>
+            <div class="step-item"><span class="label">{{ $t('orderOverview.step4.cargoWeight') }}</span><span class="value">{{ overview.logisticsPlan.cargoWeightKg != null ? `${Number(overview.logisticsPlan.cargoWeightKg).toFixed(2)} ${$t('common.units.kg')}` : $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step4.estimatedShipDate') }}</span><span class="value">{{ overview.logisticsPlan.estimatedShipDate ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step4.actualShipDate') }}</span><span class="value">{{ overview.logisticsPlan.actualShipDate ?? $t('common.format.dash') }}</span></div>
             <div class="step-item"><span class="label">{{ $t('orderOverview.step4.status') }}</span><span class="value">{{ logisticsStatusLabel(overview.logisticsPlan.status) }}</span></div>
@@ -196,7 +198,7 @@ async function fetch() {
     const res = await orderOverviewApi.getOverview(procurementId.value)
     overview.value = res.data.data
   } catch (e: unknown) {
-    error.value = (e as Error).message ?? '加载订单总览失败'
+    error.value = (e as Error).message ?? t('orderOverview.loadFailed')
   } finally {
     loading.value = false
   }
@@ -208,6 +210,28 @@ function qcResultType(result?: string) {
   if (result === 'PASS') return 'success'
   if (result === 'FAIL') return 'danger'
   return 'info'
+}
+
+function qcResultLabel(result?: string) {
+  if (!result) return t('common.format.dash')
+  return t(`orderOverview.step3.qcResult.${result}`)
+}
+
+function demandTypeLabel(type?: string) {
+  if (!type) return t('common.format.dash')
+  return t(`demand.type.${type}`)
+}
+
+function demandStatusType(status?: string) {
+  if (status === 'PENDING') return 'warning'
+  if (status === 'CONVERTED') return 'success'
+  if (status === 'CANCELLED') return 'info'
+  return 'info'
+}
+
+function demandStatusLabel(status?: string) {
+  if (!status) return t('common.format.dash')
+  return t(`demand.status.${status}`)
 }
 
 function procurementStatusLabel(s?: string) {

@@ -162,8 +162,8 @@
           <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.declarationElements') }}</span><span class="detail-value">{{ currentRow.declarationElements || '-' }}</span></div>
           <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.lengthCm') }} × {{ $t('product.drawer.widthCm') }} × {{ $t('product.drawer.heightCm') }}</span><span class="detail-value">{{ dims(currentRow) }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.volumeCbm') }}</span><span class="detail-value">{{ currentRow.volumeCbm != null ? Number(currentRow.volumeCbm).toFixed(6) : '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.netWeight') }}</span><span class="detail-value">{{ currentRow.netWeightKg != null ? `${currentRow.netWeightKg}kg` : '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.grossWeight') }}</span><span class="detail-value">{{ currentRow.grossWeightKg != null ? `${currentRow.grossWeightKg}kg` : '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.netWeight') }}</span><span class="detail-value">{{ currentRow.netWeightKg != null ? `${currentRow.netWeightKg} ${$t('common.units.kg')}` : '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.grossWeight') }}</span><span class="detail-value">{{ currentRow.grossWeightKg != null ? `${currentRow.grossWeightKg} ${$t('common.units.kg')}` : '-' }}</span></div>
         </div>
 
         <!-- 外箱信息 -->
@@ -172,7 +172,7 @@
           <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.unitsPerPackage') }}</span><span class="detail-value">{{ currentRow.unitsPerPackage ?? '-' }}</span></div>
           <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.packageLengthCm') }} × {{ $t('product.drawer.packageWidthCm') }} × {{ $t('product.drawer.packageHeightCm') }}</span><span class="detail-value">{{ pkgDims(currentRow) }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.packageVolumeCbm') }}</span><span class="detail-value">{{ currentRow.packageVolumeCbm != null ? Number(currentRow.packageVolumeCbm).toFixed(6) : '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.packageWeightKg') }}</span><span class="detail-value">{{ currentRow.packageWeightKg != null ? `${currentRow.packageWeightKg}kg` : '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.packageWeightKg') }}</span><span class="detail-value">{{ currentRow.packageWeightKg != null ? `${currentRow.packageWeightKg} ${$t('common.units.kg')}` : '-' }}</span></div>
         </div>
 
         <!-- 仓储信息 -->

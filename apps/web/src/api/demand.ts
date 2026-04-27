@@ -97,4 +97,12 @@ export const demandApi = {
   getLinkedProcurement(id: number) {
     return client.get<{ code: string; data: unknown }>(`/demands/${id}/procurement`)
   },
+  /** 目的地建议（下拉去重列表） */
+  suggestDestinations() {
+    return client.get<{ code: string; data: string[] }>('/demands/suggest/destinations')
+  },
+  /** 日本担当建议（下拉去重列表） */
+  suggestJapanLeads() {
+    return client.get<{ code: string; data: string[] }>('/demands/suggest/japan-leads')
+  },
 }

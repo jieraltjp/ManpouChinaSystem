@@ -128,7 +128,7 @@
         </el-table-column>
         <el-table-column prop="sellingPriceJpy" :label="$t('sales.column.sellingPriceJpy')" min-width="120" align="right">
           <template #default="{ row }">
-            <span v-if="row.sellingPriceJpy !== null" class="money">{{ Number(row.sellingPriceJpy).toLocaleString('ja-JP') }} JPY</span>
+            <span v-if="row.sellingPriceJpy !== null" class="money">{{ Number(row.sellingPriceJpy).toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -182,7 +182,7 @@
         <el-descriptions-item :label="$t('sales.column.salesChannel')">{{ channelLabel(currentRow.salesChannel) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('sales.column.listingDate')">{{ currentRow.listingDate ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('sales.column.sellingPriceJpy')">
-          <span v-if="currentRow.sellingPriceJpy !== null" class="money">{{ Number(currentRow.sellingPriceJpy).toLocaleString('ja-JP') }} JPY</span>
+          <span v-if="currentRow.sellingPriceJpy !== null" class="money">{{ Number(currentRow.sellingPriceJpy).toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('sales.column.initialStock')">{{ currentRow.initialStock ?? '-' }}</el-descriptions-item>
@@ -270,7 +270,8 @@
         </el-table-column>
         <el-table-column prop="currentStock" :label="$t('sales.column.currentStock')" min-width="90" align="center">
           <template #default="{ row }">
-            <span :class="stockClass(row)">{{ row.currentStock }}</span>
+            <span v-if="row.currentStock !== null" :class="stockClass(row)">{{ row.currentStock }}</span>
+            <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column prop="safetyStock" :label="$t('sales.column.safetyStock')" min-width="90" align="center" />
@@ -290,7 +291,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, CircleCheck, Warning, CloseBold, Remove, Goods } from '@element-plus/icons-vue'
 import { salesOperationsApi, type SalesRecordVO, type SalesStatus, type SalesChannel } from '@/api/salesOperations'
@@ -555,6 +556,20 @@ async function onShowAlerts() {
 }
 
 onMounted(() => { loadData(); loadAlertCount() })
+
+// 修正 el-table 空状态时 empty-block 宽度超出列宽
+watch(tableData, () => {
+  nextTick(() => {
+    const headerTable = document.querySelector('.el-table__header') as HTMLElement
+    const scrollView = document.querySelector('.el-scrollbar__view') as HTMLElement
+    const emptyBlock = document.querySelector('.el-table__empty-block') as HTMLElement
+    if (headerTable) {
+      const headerW = headerTable.offsetWidth
+      if (scrollView) scrollView.style.width = headerW + 'px'
+      if (emptyBlock) emptyBlock.style.width = headerW + 'px'
+    }
+  })
+})
 </script>
 
 <style scoped>

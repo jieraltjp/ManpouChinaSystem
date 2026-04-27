@@ -258,7 +258,7 @@
         <el-form-item :label="$t('order.dialog.estimatedPricePreview')">
           <div class="price-preview">
             <span class="price-value">{{ previewPriceJpy }}</span>
-            <span class="price-unit">JPY</span>
+            <span class="price-unit">{{ $t('common.units.jpy') }}</span>
             <span class="price-formula">= (RMB ÷ {{ formData.taxPoint }} × 1.02 × 1.2) × {{ formData.exchangeRate }} × 1.05</span>
           </div>
         </el-form-item>

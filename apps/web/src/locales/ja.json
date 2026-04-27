@@ -96,7 +96,9 @@
     },
     "type": {
       "replenishment": "補充（非新品）",
-      "newPurchase": "新品発注"
+      "newPurchase": "新品発注",
+      "REPLENISHMENT": "補充（非新品）",
+      "NEW_PURCHASE": "新品発注"
     },
     "status": {
       "PENDING": "確認待ち",
@@ -398,14 +400,19 @@
     "filter": {
       "qcCode": "検品番号",
       "qcCodePlaceholder": "例：Q-20260421-001",
+      "procurementId": "発注番号",
+      "procurementIdPlaceholder": "発注番号で検索",
       "result": "検品結果",
+      "status": "ステータス",
       "all": "すべて",
       "search": "検索",
       "reset": "リセット"
     },
     "column": {
       "qcCode": "検品番号",
+      "procurementId": "発注番号",
       "productCode": "品番",
+      "subProductCode": "子品番",
       "sellerName": "出荷元名",
       "inspectionCount": "検査数",
       "passedCount": "合格数",
@@ -413,6 +420,8 @@
       "boxCount": "カートン数",
       "qcDate": "検品日",
       "result": "結果",
+      "status": "ステータス",
+      "taxRefund": "退税",
       "action": "操作"
     },
     "result": {
@@ -429,7 +438,9 @@
       "returnRequested": "退货"
     },
     "action": {
-      "detail": "詳細"
+      "detail": "詳細",
+      "edit": "編集",
+      "delete": "削除"
     },
     "dialog": {
       "procurement": "関連発注書",
@@ -482,7 +493,11 @@
     "message": {
       "loadFailed": "検品記録の読み込みに失敗しました",
       "createSuccess": "検品記録の作成が完了しました",
-      "createFailed": "検品記録の作成に失敗しました"
+      "createFailed": "検品記録の作成に失敗しました",
+      "updateSuccess": "検品記録の更新が完了しました",
+      "deleteSuccess": "検品記録の削除が完了しました",
+      "deleteConfirm": "この検品記録を削除してもよろしいですか？",
+      "deleteConfirmTitle": "削除確認"
     }
   },
   "logistics": {
@@ -852,7 +867,7 @@
     "title": "注文一覧",
     "back": "一覧に戻る",
     "print": "印刷",
-    "loadFailed": "読み込み失敗",
+    "loadFailed": "注文概要の読み込みに失敗しました",
     "retry": "再試行",
     "tab": {
       "demands": "需要一覧",
@@ -872,6 +887,7 @@
       "cancelled": "キャンセル済み"
     },
     "column": {
+      "id": "ID",
       "productCode": "品番",
       "factoryName": "工場",
       "status": "ステータス",
@@ -916,6 +932,10 @@
       "title": "ステップ3：検品記録",
       "qcCode": "検品番号",
       "result": "結果",
+      "qcResult": {
+        "PASS": "合格",
+        "FAIL": "不合格"
+      },
       "inspectionCount": "検品数",
       "passedCount": "合格数",
       "defectiveCount": "不良数",
@@ -1204,6 +1224,9 @@
   },
   "taxRefund": {
     "title": "輸出退税",
+    "newButton": "新規退税記録",
+    "newDialogTitle": "新規退税記録",
+    "editDialogTitle": "退税記録を編集",
     "drawerTitle": "退税詳細",
     "completeDialogTitle": "退税完了",
     "stat": {
@@ -1242,7 +1265,24 @@
     "action": {
       "detail": "詳細",
       "complete": "完了",
-      "noRefund": "退税なし"
+      "noRefund": "退税なし",
+      "edit": "編集",
+      "delete": "削除"
+    },
+    "dialog": {
+      "procurement": "関連発注書",
+      "procurementPlaceholder": "発注書を検索（品番または番号を入力）",
+      "japanCustomsId": "日本通関記録",
+      "japanCustomsIdPlaceholder": "日本通関記録IDを入力（任意）",
+      "billingType": "請求タイプ",
+      "priceRmb": "仕入単価(RMB)",
+      "taxPoint": "税率",
+      "quantity": "仕入数量",
+      "exchangeRate": "為替レート",
+      "estimatedRefundPreview": "理論退税額",
+      "estimatedRefundHint": "= 単価 × 数量 × (税率 - 1)",
+      "remarks": "備考",
+      "remarksPlaceholder": "任意、備考情報"
     },
     "completeDialog": {
       "actualRefundRmb": "実際退税金額（RMB）",
@@ -1251,10 +1291,18 @@
       "refundBank": "退税銀行",
       "refundBankPlaceholder": "退税銀行を入力（任意）"
     },
+    "validation": {
+      "procurementRequired": "関連発注書を選択してください"
+    },
     "message": {
       "loadFailed": "退税申請一覧の読み込みに失敗しました",
+      "createSuccess": "退税記録の作成が完了しました",
+      "updateSuccess": "退税記録の更新が完了しました",
+      "deleteSuccess": "退税記録の削除が完了しました",
       "completeSuccess": "退税が完了しました",
       "noRefundSuccess": "退税なしとマークしました",
+      "deleteConfirm": "この退税記録を削除してもよろしいですか？",
+      "deleteConfirmTitle": "削除確認",
       "actionFailed": "操作に失敗しました"
     }
   },

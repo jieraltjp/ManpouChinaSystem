@@ -69,7 +69,9 @@
 | 日本担当 | `japanLead` | 日本担当 |
 | 状态 | `status` | PENDING / CONVERTED / CANCELLED |
 | 创建时间 | `createTime` | — |
-| 操作 | — | 转采购 / 查看采购单 / 编辑 / 删除 |
+| 操作 | — | 转采购 / 查看采购单 / **撤销转换** / 编辑 / 删除 |
+
+> **前端表格布局**：列宽用 `min-width`，不写 `table-layout="fixed"`，操作列不写 `fixed="right"`。详见 [docs/ui/ARCHITECTURE.md §8](../ARCHITECTURE.md#8-element-plus-表格布局规范)。
 
 ---
 

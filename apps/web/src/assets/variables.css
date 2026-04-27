@@ -128,6 +128,20 @@
   background: var(--color-primary-pale) !important;
 }
 
+/* 表格空状态列宽不塌陷 */
+.el-table__empty-block {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+.el-scrollbar__view {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+.el-scrollbar__wrap {
+  overflow-x: hidden !important;
+}
+
 /* 表格选中行 */
 .el-table__body .current-row > td.el-table__cell {
   background: #FDE9D4 !important;

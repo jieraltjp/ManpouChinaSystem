@@ -222,7 +222,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Document, Clock, Top, CircleCheck } from '@element-plus/icons-vue'
 import { customsApi, type CustomsVO, type DomesticCustomsStatus, type CustomsCreateRequest } from '@/api/customs'
@@ -430,6 +430,20 @@ async function onDelete(row: CustomsVO) {
 }
 
 onMounted(() => loadData())
+
+// 修正 el-table 空状态时 empty-block 宽度超出列宽
+watch(tableData, () => {
+  nextTick(() => {
+    const headerTable = document.querySelector('.el-table__header') as HTMLElement
+    const scrollView = document.querySelector('.el-scrollbar__view') as HTMLElement
+    const emptyBlock = document.querySelector('.el-table__empty-block') as HTMLElement
+    if (headerTable) {
+      const headerW = headerTable.offsetWidth
+      if (scrollView) scrollView.style.width = headerW + 'px'
+      if (emptyBlock) emptyBlock.style.width = headerW + 'px'
+    }
+  })
+})
 </script>
 
 <style scoped>

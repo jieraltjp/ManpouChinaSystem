@@ -2,6 +2,11 @@
   <div class="page">
     <div class="page-header">
       <h2 class="page-title">{{ $t('taxRefund.title') }}</h2>
+      <div class="header-actions">
+        <el-button type="primary" @click="onNew">
+          <el-icon><Plus /></el-icon> {{ $t('taxRefund.newButton') }}
+        </el-button>
+      </div>
     </div>
 
     <!-- 统计卡片 -->
@@ -83,13 +88,13 @@
         </el-table-column>
         <el-table-column prop="estimatedRefundRmb" :label="$t('taxRefund.column.estimatedRefundRmb')" min-width="140" align="right">
           <template #default="{ row }">
-            <span v-if="row.estimatedRefundRmb !== null" class="money">{{ Number(row.estimatedRefundRmb).toLocaleString() }} RMB</span>
+            <span v-if="row.estimatedRefundRmb !== null" class="money">{{ Number(row.estimatedRefundRmb).toLocaleString() }} {{ $t('common.currency.cny') }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column prop="actualRefundRmb" :label="$t('taxRefund.column.actualRefundRmb')" min-width="140" align="right">
           <template #default="{ row }">
-            <span v-if="row.actualRefundRmb !== null" class="money-success">{{ Number(row.actualRefundRmb).toLocaleString() }} RMB</span>
+            <span v-if="row.actualRefundRmb !== null" class="money-success">{{ Number(row.actualRefundRmb).toLocaleString() }} {{ $t('common.currency.cny') }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -100,9 +105,11 @@
             <el-tag :type="statusTagType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('taxRefund.column.action')" min-width="180" align="center">
+        <el-table-column :label="$t('taxRefund.column.action')" min-width="240" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('taxRefund.action.detail') }}</el-button>
+            <el-button link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('taxRefund.action.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('taxRefund.action.delete') }}</el-button>
             <template v-if="row.status === 'APPLYING'">
               <el-button link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('taxRefund.action.complete') }}</el-button>
               <el-button link type="warning" size="small" :loading="actionLoading === row.id + '-no-refund'" @click.stop="onNoRefund(row)">{{ $t('taxRefund.action.noRefund') }}</el-button>
@@ -142,16 +149,16 @@
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.priceRmb')">
-          <span v-if="currentRow.priceRmb !== null">{{ Number(currentRow.priceRmb).toLocaleString() }} RMB</span>
+          <span v-if="currentRow.priceRmb !== null">{{ Number(currentRow.priceRmb).toLocaleString() }} {{ $t('common.currency.cny') }}</span>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.quantity')">{{ currentRow.quantity ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.estimatedRefundRmb')">
-          <span v-if="currentRow.estimatedRefundRmb !== null" class="money">{{ Number(currentRow.estimatedRefundRmb).toLocaleString() }} RMB</span>
+          <span v-if="currentRow.estimatedRefundRmb !== null" class="money">{{ Number(currentRow.estimatedRefundRmb).toLocaleString() }} {{ $t('common.currency.cny') }}</span>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.actualRefundRmb')">
-          <span v-if="currentRow.actualRefundRmb !== null" class="money-success">{{ Number(currentRow.actualRefundRmb).toLocaleString() }} RMB</span>
+          <span v-if="currentRow.actualRefundRmb !== null" class="money-success">{{ Number(currentRow.actualRefundRmb).toLocaleString() }} {{ $t('common.currency.cny') }}</span>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.refundDate')">{{ currentRow.refundDate ?? '-' }}</el-descriptions-item>
@@ -161,6 +168,105 @@
         <el-descriptions-item :label="$t('taxRefund.column.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
       </el-descriptions>
     </el-drawer>
+
+    <!-- 新建/编辑弹窗 -->
+    <el-dialog
+      v-model="formDialogVisible"
+      :title="dialogMode === 'create' ? $t('taxRefund.newDialogTitle') : $t('taxRefund.editDialogTitle')"
+      width="600px"
+      destroy-on-close
+    >
+      <el-form ref="formRef" :model="dialogForm" :rules="dialogRules" label-width="130px">
+        <!-- 关联采购单 -->
+        <el-form-item :label="$t('taxRefund.dialog.procurement')" prop="procurementId">
+          <el-select
+            v-model="dialogForm.procurementId"
+            filterable
+            remote
+            reserve-keyword
+            :remote-method="searchProcurement"
+            :loading="procurementLoading"
+            :placeholder="$t('taxRefund.dialog.procurementPlaceholder')"
+            style="width:100%"
+            @change="onProcurementSelected"
+          >
+            <el-option
+              v-for="p in procurementOptions"
+              :key="p.id"
+              :label="`${p.productCode}${p.subProductCode ? '-' + p.subProductCode : ''} / ${p.factoryName || ''} / ${p.orderDate || ''}`"
+              :value="p.id"
+            />
+          </el-select>
+        </el-form-item>
+
+        <!-- 日本清关记录（选填） -->
+        <el-form-item :label="$t('taxRefund.dialog.japanCustomsId')">
+          <el-input-number
+            v-model="dialogForm.japanCustomsId"
+            :min="1"
+            :placeholder="$t('taxRefund.dialog.japanCustomsIdPlaceholder')"
+            style="width:100%"
+            clearable
+          />
+        </el-form-item>
+
+        <el-divider />
+
+        <!-- 采购信息（自动代入，只读展示） -->
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item :label="$t('taxRefund.dialog.billingType')">
+              <el-input :model-value="billingTypeLabel(dialogForm.billingType)" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('taxRefund.dialog.priceRmb')">
+              <el-input :model-value="dialogForm.priceRmb != null ? dialogForm.priceRmb : '-'" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('taxRefund.dialog.taxPoint')">
+              <el-input :model-value="dialogForm.taxPoint != null ? (Number(dialogForm.taxPoint) * 100).toFixed(1) + '%' : '-'" disabled />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item :label="$t('taxRefund.dialog.quantity')">
+              <el-input :model-value="dialogForm.quantity != null ? dialogForm.quantity : '-'" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('taxRefund.dialog.exchangeRate')">
+              <el-input :model-value="dialogForm.exchangeRate != null ? dialogForm.exchangeRate : '-'" disabled />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <!-- 理论退税额预览 -->
+        <el-form-item :label="$t('taxRefund.dialog.estimatedRefundPreview')">
+          <div class="refund-preview">
+            <span class="refund-value">{{ estimatedRefundPreview }}</span>
+            <span class="refund-unit">{{ $t('common.currency.cny') }}</span>
+            <span class="refund-formula">{{ $t('taxRefund.dialog.estimatedRefundHint') }}</span>
+          </div>
+        </el-form-item>
+
+        <!-- 备注 -->
+        <el-form-item :label="$t('taxRefund.dialog.remarks')">
+          <el-input
+            v-model="dialogForm.remarks"
+            type="textarea"
+            :rows="2"
+            :placeholder="$t('taxRefund.dialog.remarksPlaceholder')"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="formDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="formSubmitting" @click="onFormSubmit">{{ $t('common.save') }}</el-button>
+      </template>
+    </el-dialog>
 
     <!-- 完成退税弹窗 -->
     <el-dialog v-model="completeDialogVisible" :title="$t('taxRefund.completeDialogTitle')" width="480px">
@@ -184,10 +290,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { Document, Clock, CircleCheck, Close } from '@element-plus/icons-vue'
-import { taxRefundApi, type TaxRefundVO, type TaxRefundStatus } from '@/api/taxRefund'
+import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
+import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
+import { Document, Clock, CircleCheck, Close, Plus } from '@element-plus/icons-vue'
+import { taxRefundApi, type TaxRefundVO, type TaxRefundStatus, type TaxRefundCreateRequest } from '@/api/taxRefund'
+import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
@@ -208,6 +315,162 @@ const completeForm = reactive({
   refundBank: '',
 })
 const completingRowId = ref<number | null>(null)
+
+// 新建/编辑弹窗
+const formDialogVisible = ref(false)
+const dialogMode = ref<'create' | 'update'>('create')
+const formRef = ref<FormInstance>()
+const formSubmitting = ref(false)
+const currentFormRow = ref<TaxRefundVO | null>(null)
+
+const dialogForm = reactive({
+  procurementId: undefined as number | undefined,
+  japanCustomsId: undefined as number | undefined,
+  billingType: undefined as string | undefined,
+  priceRmb: undefined as number | undefined,
+  quantity: undefined as number | undefined,
+  taxPoint: undefined as number | undefined,
+  exchangeRate: undefined as number | undefined,
+  remarks: '',
+})
+
+const dialogRules = {
+  procurementId: [{ required: true, message: () => t('taxRefund.validation.procurementRequired'), trigger: 'change' }],
+}
+
+const procurementOptions = ref<ProcurementPageVO[]>([])
+const procurementLoading = ref(false)
+
+const estimatedRefundPreview = computed(() => {
+  const { priceRmb, quantity, taxPoint } = dialogForm
+  if (priceRmb == null || quantity == null || taxPoint == null) return '—'
+  const refund = priceRmb * quantity * (taxPoint - 1)
+  return isNaN(refund) || !isFinite(refund) ? '—' : Math.round(refund * 100) / 100
+})
+
+async function searchProcurement(query: string) {
+  if (!query) { procurementOptions.value = []; return }
+  procurementLoading.value = true
+  try {
+    const res = await procurementApi.list({ page: 0, pageSize: 20, productCode: query.trim() || undefined })
+    procurementOptions.value = res.data.data?.content ?? []
+  } catch { procurementOptions.value = [] }
+  finally { procurementLoading.value = false }
+}
+
+function onProcurementSelected(id: number) {
+  const p = procurementOptions.value.find(p => p.id === id)
+  if (!p) return
+  dialogForm.billingType = p.billingType ?? undefined
+  dialogForm.priceRmb = p.priceRmb ?? undefined
+  dialogForm.quantity = p.quantity ?? undefined
+  dialogForm.taxPoint = p.taxPoint ?? undefined
+  dialogForm.exchangeRate = p.exchangeRate ?? undefined
+}
+
+function onNew() {
+  dialogMode.value = 'create'
+  currentFormRow.value = null
+  Object.assign(dialogForm, {
+    procurementId: undefined,
+    japanCustomsId: undefined,
+    billingType: undefined,
+    priceRmb: undefined,
+    quantity: undefined,
+    taxPoint: undefined,
+    exchangeRate: undefined,
+    remarks: '',
+  })
+  procurementOptions.value = []
+  formDialogVisible.value = true
+}
+
+function onEdit(row: TaxRefundVO) {
+  dialogMode.value = 'update'
+  currentFormRow.value = row
+  Object.assign(dialogForm, {
+    procurementId: row.procurementId ?? undefined,
+    japanCustomsId: row.japanCustomsId ?? undefined,
+    billingType: row.billingType ?? undefined,
+    priceRmb: row.priceRmb ?? undefined,
+    quantity: row.quantity ?? undefined,
+    taxPoint: row.taxPoint ?? undefined,
+    exchangeRate: row.exchangeRate ?? undefined,
+    remarks: row.remarks || '',
+  })
+  // 如果有 procurementId，加载其信息用于显示
+  if (row.procurementId) {
+    procurementOptions.value = [{
+      id: row.procurementId,
+      productCode: '',
+      subProductCode: '',
+      factoryName: '',
+      orderDate: '',
+      billingType: row.billingType ?? undefined,
+      priceRmb: row.priceRmb ?? undefined,
+      quantity: row.quantity ?? undefined,
+      taxPoint: row.taxPoint ?? undefined,
+      exchangeRate: row.exchangeRate ?? undefined,
+    }] as ProcurementPageVO[]
+  }
+  formDialogVisible.value = true
+}
+
+async function onFormSubmit() {
+  if (!formRef.value) return
+  const valid = await formRef.value.validate().catch(() => false)
+  if (!valid) return
+  formSubmitting.value = true
+  try {
+    const payload: TaxRefundCreateRequest = {
+      procurementId: dialogForm.procurementId,
+      japanCustomsId: dialogForm.japanCustomsId,
+      billingType: dialogForm.billingType,
+      priceRmb: dialogForm.priceRmb,
+      quantity: dialogForm.quantity,
+      taxPoint: dialogForm.taxPoint,
+      exchangeRate: dialogForm.exchangeRate,
+      remarks: dialogForm.remarks || undefined,
+    }
+    if (dialogMode.value === 'create') {
+      await taxRefundApi.create(payload)
+      ElMessage.success(t('taxRefund.message.createSuccess'))
+    } else if (currentFormRow.value) {
+      // 使用 update 接口（或复用 create 逻辑，视后端实现而定）
+      await taxRefundApi.create({ ...payload, procurementId: currentFormRow.value.procurementId })
+      ElMessage.success(t('taxRefund.message.updateSuccess'))
+    }
+    formDialogVisible.value = false
+    loadData()
+  } catch (e) {
+    console.error('[TaxRefundPage] submit failed', e)
+    ElMessage.error(t('taxRefund.message.actionFailed'))
+  } finally {
+    formSubmitting.value = false
+  }
+}
+
+async function onDelete(row: TaxRefundVO) {
+  try {
+    await ElMessageBox.confirm(
+      t('taxRefund.message.deleteConfirm', { code: row.refundCode }),
+      t('taxRefund.message.deleteConfirmTitle'),
+      { confirmButtonText: t('common.delete'), cancelButtonText: t('common.cancel'), type: 'warning' },
+    )
+  } catch { return }
+  try {
+    await taxRefundApi.delete(row.id)
+    ElMessage.success(t('taxRefund.message.deleteSuccess'))
+    loadData()
+  } catch {
+    ElMessage.error(t('taxRefund.message.actionFailed'))
+  }
+}
+
+function billingTypeLabel(val?: string | null): string {
+  if (!val) return '-'
+  return val
+}
 
 const { t } = useI18n()
 
@@ -318,6 +581,20 @@ async function onNoRefund(row: TaxRefundVO) {
 }
 
 onMounted(() => loadData())
+
+// 修正 el-table 空状态时 empty-block 宽度超出列宽
+watch(tableData, () => {
+  nextTick(() => {
+    const headerTable = document.querySelector('.el-table__header') as HTMLElement
+    const scrollView = document.querySelector('.el-scrollbar__view') as HTMLElement
+    const emptyBlock = document.querySelector('.el-table__empty-block') as HTMLElement
+    if (headerTable) {
+      const headerW = headerTable.offsetWidth
+      if (scrollView) scrollView.style.width = headerW + 'px'
+      if (emptyBlock) emptyBlock.style.width = headerW + 'px'
+    }
+  })
+})
 </script>
 
 <style scoped>
@@ -325,6 +602,7 @@ onMounted(() => loadData())
 .page-header { display: flex; align-items: center; justify-content: space-between; }
 .page-title { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
 .page-title::before { content: ''; display: inline-block; width: 4px; height: 20px; background: var(--color-primary); border-radius: 2px; margin-right: 10px; vertical-align: middle; }
+.header-actions { display: flex; gap: 8px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
 .stats-row { margin-bottom: 4px; }
 .stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }
@@ -339,4 +617,16 @@ onMounted(() => loadData())
 .money { color: #F59E0B; font-weight: 600; }
 .money-success { color: #16A34A; font-weight: 600; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
+.refund-preview {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  background: #fef3c7;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(245,158,11,0.2);
+}
+.refund-value { font-size: 22px; font-weight: 800; color: #D97706; font-variant-numeric: tabular-nums; }
+.refund-unit { font-size: 13px; color: #92400e; font-weight: 600; }
+.refund-formula { font-size: 11px; color: #92400e; margin-left: 4px; }
 </style>

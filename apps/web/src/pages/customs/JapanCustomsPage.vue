@@ -89,13 +89,13 @@
         <el-table-column prop="customsBroker" :label="$t('japanCustoms.column.broker')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="importDutyPaid" :label="$t('japanCustoms.column.importDuty')" min-width="120" align="right">
           <template #default="{ row }">
-            <span v-if="row.importDutyPaid !== null" class="money">{{ row.importDutyPaid.toLocaleString('ja-JP') }} JPY</span>
+            <span v-if="row.importDutyPaid !== null" class="money">{{ row.importDutyPaid.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column prop="consumptionTaxPaid" :label="$t('japanCustoms.column.consumptionTax')" min-width="120" align="right">
           <template #default="{ row }">
-            <span v-if="row.consumptionTaxPaid !== null" class="money">{{ row.consumptionTaxPaid.toLocaleString('ja-JP') }} JPY</span>
+            <span v-if="row.consumptionTaxPaid !== null" class="money">{{ row.consumptionTaxPaid.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -152,19 +152,19 @@
         <el-descriptions-item :label="$t('japanCustoms.column.brokerPhone')">{{ currentRow.brokerPhone ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.brokerContact')">{{ currentRow.brokerContact ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.weight')">
-          <span v-if="currentRow.declaredWeightKg !== null">{{ currentRow.declaredWeightKg }} kg</span>
+          <span v-if="currentRow.declaredWeightKg !== null">{{ currentRow.declaredWeightKg }} {{ $t('common.units.kg') }}</span>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.volume')">
-          <span v-if="currentRow.declaredVolumeCbm !== null">{{ currentRow.declaredVolumeCbm }} m³</span>
+          <span v-if="currentRow.declaredVolumeCbm !== null">{{ currentRow.declaredVolumeCbm }} {{ $t('common.units.m3') }}</span>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.importDuty')">
-          <span v-if="currentRow.importDutyPaid !== null" class="money">{{ currentRow.importDutyPaid.toLocaleString('ja-JP') }} JPY</span>
+          <span v-if="currentRow.importDutyPaid !== null" class="money">{{ currentRow.importDutyPaid.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.consumptionTax')">
-          <span v-if="currentRow.consumptionTaxPaid !== null" class="money">{{ currentRow.consumptionTaxPaid.toLocaleString('ja-JP') }} JPY</span>
+          <span v-if="currentRow.consumptionTaxPaid !== null" class="money">{{ currentRow.consumptionTaxPaid.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.clearanceDate')">{{ currentRow.clearanceDate ?? '-' }}</el-descriptions-item>
@@ -275,9 +275,6 @@ async function loadData() {
       status: filterForm.status || undefined,
       procurementId: filterForm.procurementId,
     })
-    console.log('[JapanCustomsPage] full res:', res)
-    console.log('[JapanCustomsPage] res.data:', res.data)
-    console.log('[JapanCustomsPage] res.data.data:', res.data.data)
     const data = res.data.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
@@ -394,7 +391,7 @@ async function onDelete(row: JapanCustomsVO) {
 
 onMounted(() => loadData())
 
-// DEBUG: 修正空状态时 empty-block 宽度溢出
+// 修正 el-table 空状态时 empty-block 宽度超出列宽
 watch(tableData, () => {
   nextTick(() => {
     const headerTable = document.querySelector('.el-table__header') as HTMLElement
@@ -402,7 +399,6 @@ watch(tableData, () => {
     const emptyBlock = document.querySelector('.el-table__empty-block') as HTMLElement
     if (headerTable) {
       const headerW = headerTable.offsetWidth
-      console.log('[JapanCustomsPage] fixing widths to headerW:', headerW)
       if (scrollView) scrollView.style.width = headerW + 'px'
       if (emptyBlock) emptyBlock.style.width = headerW + 'px'
     }

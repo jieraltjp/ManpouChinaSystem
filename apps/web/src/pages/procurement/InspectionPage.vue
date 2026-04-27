@@ -41,10 +41,20 @@
         <el-form-item :label="$t('inspection.filter.qcCode')">
           <el-input v-model="filterForm.qcCode" :placeholder="$t('inspection.filter.qcCodePlaceholder')" clearable style="width:180px" />
         </el-form-item>
+        <el-form-item :label="$t('inspection.filter.procurementId')">
+          <el-input-number v-model="filterForm.procurementId" :min="1" :placeholder="$t('inspection.filter.procurementIdPlaceholder')" style="width:140px" clearable />
+        </el-form-item>
         <el-form-item :label="$t('inspection.filter.result')">
           <el-select v-model="filterForm.result" :placeholder="$t('inspection.filter.all')" clearable style="width:120px">
             <el-option value="PASS" :label="$t('inspection.result.pass')" />
             <el-option value="FAIL" :label="$t('inspection.result.fail')" />
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('inspection.filter.status')">
+          <el-select v-model="filterForm.status" :placeholder="$t('inspection.filter.all')" clearable style="width:130px">
+            <el-option value="PENDING" :label="$t('inspection.qcStatus.pending')" />
+            <el-option value="COMPLETED" :label="$t('inspection.qcStatus.completed')" />
+            <el-option value="RETURN_REQUESTED" :label="$t('inspection.qcStatus.returnRequested')" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -57,9 +67,20 @@
     <el-card class="table-card" shadow="never">
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="qcCode" :label="$t('inspection.column.qcCode')" min-width="160" />
+        <el-table-column prop="procurementId" :label="$t('inspection.column.procurementId')" min-width="90" align="center">
+          <template #default="{ row }">
+            <span v-if="row.procurementId">{{ row.procurementId }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="productCode" :label="$t('inspection.column.productCode')" min-width="120">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="subProductCode" :label="$t('inspection.column.subProductCode')" min-width="110">
+          <template #default="{ row }">
+            {{ row.subProductCode || '-' }}
           </template>
         </el-table-column>
         <el-table-column prop="sellerName" :label="$t('inspection.column.sellerName')" min-width="120" show-overflow-tooltip />
@@ -84,9 +105,24 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('inspection.column.action')" min-width="160" align="center">
+        <el-table-column prop="status" :label="$t('inspection.column.status')" min-width="110" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.status === 'COMPLETED' ? 'success' : row.status === 'RETURN_REQUESTED' ? 'danger' : 'info'" size="small">
+              {{ qcStatusLabel(row.status) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="taxRefund" :label="$t('inspection.column.taxRefund')" min-width="70" align="center">
+          <template #default="{ row }">
+            <span v-if="row.taxRefund">{{ $t('inspection.yes') }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('inspection.column.action')" min-width="220" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('inspection.action.detail') }}</el-button>
+            <el-button link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('inspection.action.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('inspection.action.delete') }}</el-button>
             <el-button v-if="row.procurementId" link type="warning" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
           </template>
         </el-table-column>
@@ -128,16 +164,20 @@
             />
           </el-select>
         </el-form-item>
+        <!-- 卖家名称（自动代入） -->
+        <el-form-item :label="$t('inspection.column.sellerName')">
+          <el-input v-model="form.sellerName" disabled />
+        </el-form-item>
         <el-divider content-position="left"><span class="divider-label">{{ $t('inspection.dialog.inspectionInfo') }}</span></el-divider>
         <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item :label="$t('inspection.dialog.productCode')" prop="productCode">
-              <el-input v-model="form.productCode" :placeholder="$t('inspection.dialog.productCodePlaceholder')" />
+              <el-input v-model="form.productCode" :placeholder="$t('inspection.dialog.productCodePlaceholder')" disabled />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item :label="$t('inspection.dialog.subProductCode')">
-              <el-input v-model="form.subProductCode" :placeholder="$t('inspection.dialog.subProductCodePlaceholder')" />
+              <el-input v-model="form.subProductCode" :placeholder="$t('inspection.dialog.subProductCodePlaceholder')" disabled />
             </el-form-item>
           </el-col>
         </el-row>
@@ -321,7 +361,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules, ElMessageBox } from 'element-plus'
 import { Plus, Document, CircleCheck, Warning } from '@element-plus/icons-vue'
 import { inspectionApi, type QcRecordVO, type QcResult, type QcStatus, type QcType } from '@/api/inspection'
 import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
@@ -335,7 +375,7 @@ const drawerVisible = ref(false)
 const procurementLoading = ref(false)
 
 const currentRow = ref<QcRecordVO | null>(null)
-const filterForm = reactive({ qcCode: '', result: '' as QcResult | '' })
+const filterForm = reactive({ qcCode: '', result: '' as QcResult | '', status: '' as string | '', procurementId: undefined as number | undefined })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const tableData = ref<QcRecordVO[]>([])
 const procurementList = ref<ProcurementPageVO[]>([])
@@ -400,6 +440,8 @@ async function loadData() {
       pageSize: pagination.pageSize,
       qcCode: filterForm.qcCode || undefined,
       result: filterForm.result || undefined,
+      status: filterForm.status || undefined,
+      procurementId: filterForm.procurementId,
     })
     const data = res.data.data
     tableData.value = data?.content ?? []
@@ -424,6 +466,8 @@ function onSearchFromButton() {
 function onReset() {
   filterForm.qcCode = ''
   filterForm.result = ''
+  filterForm.status = ''
+  filterForm.procurementId = undefined
   pagination.page = 1
   loadData()
 }
@@ -446,6 +490,7 @@ function onProcurementSelected(id: number) {
   form.quantity = p.quantity
   form.material = p.material || ''
   form.destination = p.destination || ''
+  form.sellerName = p.factoryName || ''
 }
 
 function onNew() {
@@ -473,34 +518,62 @@ async function onSubmit() {
       submitting.value = false
       return
     }
-    await inspectionApi.create({
-      procurementId: form.procurementId!,
-      productCode: form.productCode,
-      subProductCode: form.subProductCode || undefined,
-      qcUserId: form.qcUserId,
-      qcType: form.qcType,
-      qcDate: form.qcDate || undefined,
-      result: form.result,
-      inspectionCount: form.inspectionCount,
-      passedCount: form.passedCount,
-      boxCount: form.boxCount,
-      boxLengthCm: form.boxLengthCm,
-      boxWidthCm: form.boxWidthCm,
-      boxHeightCm: form.boxHeightCm,
-      netWeightPerUnit: form.netWeightPerUnit,
-      grossWeight: form.grossWeight,
-      taxInclusivePrice: form.taxInclusivePrice,
-      material: form.material || undefined,
-      taxRefund: form.taxRefund,
-      qcStandard: form.qcStandard || undefined,
-      remarks: form.remarks || undefined,
-      images: form.images || undefined,
-      destination: form.destination || undefined,
-      quantity: form.quantity,
-      orderDate: form.orderDate || undefined,
-      sellerName: form.sellerName || undefined,
-    })
-    ElMessage.success(t('inspection.message.createSuccess'))
+    if (currentRow.value) {
+      // 编辑模式
+      await inspectionApi.update(currentRow.value.id, {
+        sellerName: form.sellerName || undefined,
+        qcUserId: form.qcUserId,
+        qcType: form.qcType,
+        qcDate: form.qcDate || undefined,
+        result: form.result,
+        status: form.status,
+        inspectionCount: form.inspectionCount,
+        passedCount: form.passedCount,
+        boxCount: form.boxCount,
+        boxLengthCm: form.boxLengthCm,
+        boxWidthCm: form.boxWidthCm,
+        boxHeightCm: form.boxHeightCm,
+        netWeightPerUnit: form.netWeightPerUnit,
+        grossWeight: form.grossWeight,
+        taxInclusivePrice: form.taxInclusivePrice,
+        material: form.material || undefined,
+        taxRefund: form.taxRefund,
+        qcStandard: form.qcStandard || undefined,
+        remarks: form.remarks || undefined,
+        images: form.images || undefined,
+      })
+      ElMessage.success(t('inspection.message.updateSuccess'))
+    } else {
+      // 创建模式
+      await inspectionApi.create({
+        procurementId: form.procurementId!,
+        productCode: form.productCode,
+        subProductCode: form.subProductCode || undefined,
+        qcUserId: form.qcUserId,
+        qcType: form.qcType,
+        qcDate: form.qcDate || undefined,
+        result: form.result,
+        inspectionCount: form.inspectionCount,
+        passedCount: form.passedCount,
+        boxCount: form.boxCount,
+        boxLengthCm: form.boxLengthCm,
+        boxWidthCm: form.boxWidthCm,
+        boxHeightCm: form.boxHeightCm,
+        netWeightPerUnit: form.netWeightPerUnit,
+        grossWeight: form.grossWeight,
+        taxInclusivePrice: form.taxInclusivePrice,
+        material: form.material || undefined,
+        taxRefund: form.taxRefund,
+        qcStandard: form.qcStandard || undefined,
+        remarks: form.remarks || undefined,
+        images: form.images || undefined,
+        destination: form.destination || undefined,
+        quantity: form.quantity,
+        orderDate: form.orderDate || undefined,
+        sellerName: form.sellerName || undefined,
+      })
+      ElMessage.success(t('inspection.message.createSuccess'))
+    }
     dialogVisible.value = false
     loadData()
   } catch (e) {
@@ -514,6 +587,71 @@ async function onSubmit() {
 function onView(row: QcRecordVO) {
   currentRow.value = row
   drawerVisible.value = true
+}
+
+function onEdit(row: QcRecordVO) {
+  formRef.value?.resetFields()
+  Object.assign(form, {
+    procurementId: row.procurementId ?? undefined,
+    productCode: row.productCode || '',
+    subProductCode: row.subProductCode || '',
+    qcUserId: row.qcUserId ?? undefined,
+    qcType: row.qcType as QcType || undefined,
+    qcDate: row.qcDate || '',
+    result: row.result as QcResult || undefined,
+    status: row.status as QcStatus || 'PENDING',
+    inspectionCount: row.inspectionCount ?? undefined,
+    passedCount: row.passedCount ?? undefined,
+    defectiveCount: row.defectiveCount ?? undefined,
+    boxCount: row.boxCount ?? undefined,
+    boxLengthCm: row.boxLengthCm ?? undefined,
+    boxWidthCm: row.boxWidthCm ?? undefined,
+    boxHeightCm: row.boxHeightCm ?? undefined,
+    netWeightPerUnit: row.netWeightPerUnit ?? undefined,
+    grossWeight: row.grossWeight ?? undefined,
+    taxInclusivePrice: row.taxInclusivePrice ?? undefined,
+    material: row.material || '',
+    taxRefund: row.taxRefund ?? false,
+    qcStandard: row.qcStandard || '',
+    remarks: row.remarks || '',
+    images: row.images || '',
+    destination: row.destination || '',
+    quantity: row.quantity ?? undefined,
+    orderDate: row.orderDate || '',
+    sellerName: row.sellerName || '',
+  })
+  // 加载采购单下拉（用于变更关联采购单）
+  if (row.procurementId) {
+    procurementList.value = [{
+      id: row.procurementId,
+      productCode: row.productCode,
+      subProductCode: row.subProductCode || '',
+      factoryName: row.sellerName || '',
+      quantity: row.quantity ?? 0,
+      material: row.material || '',
+      destination: row.destination || '',
+    } as unknown as ProcurementPageVO]
+  }
+  currentRow.value = row
+  dialogVisible.value = true
+}
+
+async function onDelete(row: QcRecordVO) {
+  try {
+    await ElMessageBox.confirm(
+      t('inspection.message.deleteConfirm', { code: row.qcCode }),
+      t('inspection.message.deleteConfirmTitle'),
+      { confirmButtonText: t('common.delete'), cancelButtonText: t('common.cancel'), type: 'warning' },
+    )
+  } catch { return }
+  try {
+    await inspectionApi.delete(row.id)
+    ElMessage.success(t('inspection.message.deleteSuccess'))
+    loadData()
+  } catch (e) {
+    console.error('[InspectionPage] delete failed', e)
+    ElMessage.error(t('inspection.message.deleteFailed') || t('inspection.message.actionFailed'))
+  }
 }
 
 function onOverview(row: QcRecordVO) {

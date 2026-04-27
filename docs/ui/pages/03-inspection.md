@@ -1,7 +1,8 @@
 # 页面规格 — 步骤3：验货记录
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-22
+> **更新**: 2026-04-27（v1.1.0：补充分页查询参数/编辑删除功能/sellerName disabled代入，修正统计卡描述）
 > **路由**: `/procurement/inspection`
 > **组件**: `InspectionPage.vue`
 > **对应后端**: `QcRecord` 聚合根
@@ -24,14 +25,13 @@
 │ 页面标题：验货记录                                   [+ 新规验货]   │
 ├────────────────────────────────────────────────────────────────────┤
 │ 统计卡                                                               │
-│ ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐       │
-│ │ PENDING    │ │ COMPLETED  │ │ RETURN_    │ │   合计    │       │
-│ │ 待验货     │ │ 已完成     │ │ REQUESTED  │ │            │       │
-│ │            │ │            │ │ 退货待处理 │ │            │       │
-│ └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
+│ ┌────────────┐ ┌────────────┐ ┌────────────┐                       │
+│ │   合计     │ │   PASS     │ │   FAIL     │                       │
+│ │     N      │ │     N      │ │     N      │                       │
+│ └────────────┘ └────────────┘ └────────────┘                       │
 ├────────────────────────────────────────────────────────────────────┤
 │ 筛选栏                                                               │
-│ 关联采购单 [________]  货号 [________]  结果 [全部▼]  状态 [全部▼] │
+│ 验货号 [________]  采购单号 [____]  结果 [全部▼]  状态 [全部▼]    │
 │                                                [搜索]  [重置]       │
 ├────────────────────────────────────────────────────────────────────┤
 │ 表格                                                               │
@@ -50,8 +50,9 @@
 | 列名 | 字段 | 说明 |
 |------|------|------|
 | 验货号 | `qcCode` | 格式 `Q-YYYYMMDD-NNN` |
-| 采购单号 | `procurementId` | 关联采购单（显示 procurementId） |
-| 货号 | `productCode` + `subProductCode` | 主货号 + 子货号 |
+| 采购单号 | `procurementId` | 关联采购单（显示数字 ID） |
+| 货号 | `productCode` | 主货号 |
+| 子货号 | `subProductCode` | 子货号 |
 | 卖家名称 | `sellerName` | 来自 Factory.factoryName |
 | 检品数 | `inspectionCount` | 检品总数 |
 | 合格数 | `passedCount` | 合格数量 |
@@ -60,7 +61,7 @@
 | 状态 | `status` | PENDING / COMPLETED / RETURN_REQUESTED |
 | 是否退税 | `taxRefund` | 开关，显示 ✓/✗ |
 | 验货日期 | `qcDate` | — |
-| 操作 | — | 详情 / 编辑 / 删除 |
+| 操作 | — | 详情 / **总览** / 编辑 / 删除 |
 
 > **前端表格布局**：列宽用 `min-width`，不写 `table-layout="fixed"`，操作列不写 `fixed="right"`。详见 [docs/ui/ARCHITECTURE.md §8](../ARCHITECTURE.md#8-element-plus-表格布局规范)。
 
@@ -79,9 +80,9 @@
 | 字段 | 控件 | 必填 | 来源 |
 |------|------|------|------|
 | 关联采购单 | `el-select` + 搜索框 | ✅ | 调用 `GET /api/v1/procurements?page=0&pageSize=20` |
-| 卖家名称 | `el-input` | | 选采购单后代入 Factory.factoryName |
-| 货号 | `el-input`（只读） | ✅ | 选采购单后代入 |
-| 子货号 | `el-input`（只读） | | 选采购单后代入 |
+| 卖家名称 | `el-input`（disabled） | | 选采购单后代入 Factory.factoryName |
+| 货号 | `el-input`（disabled） | ✅ | 选采购单后代入（不可编辑） |
+| 子货号 | `el-input`（disabled） | | 选采购单后代入（不可编辑） |
 | 开单人 | `el-select` | | 担当者列表 |
 | 验货日期 | `el-date-picker` | | 默认今天 |
 | 是否退税 | `el-switch` | | 根据采购单 billingType 推断 |
@@ -112,8 +113,8 @@
 ### 4.4 业务规则
 
 - 选择采购单后，以下字段自动代入（disabled）：
-  - `sellerName` → Factory.factoryName
-  - `productCode` / `subProductCode` → Procurement
+  - `sellerName` → Factory.factoryName（disabled，不可编辑）
+  - `productCode` / `subProductCode` → Procurement（disabled，不可编辑）
   - `quantity` → Procurement
   - `destination` → Procurement
   - `material` → Procurement
@@ -165,10 +166,10 @@
 
 | 操作 | Method | Endpoint |
 |------|--------|----------|
-| 分页查询 | GET | `/api/v1/qc-records?page=&pageSize=&procurementId=&productCode=&result=&status=` |
+| 分页查询 | GET | `/api/v1/qc-records?page=&pageSize=&qcCode=&procurementId=&result=&status=` |
 | 详情 | GET | `/api/v1/qc-records/{id}` |
 | 创建 | POST | `/api/v1/qc-records` |
-| 更新 | PATCH | `/api/v1/qc-records/{id}` |
+| 更新（编辑） | PATCH | `/api/v1/qc-records/{id}` |
 | 删除 | DELETE | `/api/v1/qc-records/{id}` |
 | 验货完成 | PATCH | `/api/v1/qc-records/{id}`（body: `{status: "COMPLETED"}`）|
 | 关联采购单搜索 | GET | `/api/v1/procurements?page=&pageSize=&productCode=` |
@@ -179,9 +180,12 @@
 
 | 项目 | 优先级 | 说明 |
 |------|--------|------|
-| 采购单搜索选择器 | P1 | InspectionPage.vue 已有（fromDemand 逻辑可复用） |
-| sellerName 自动代入 | ✅ P1 | ✅ `QcRecordUseCase.create()` 已实现 |
-| 验货完成按钮 | ✅ P1 | ✅ 已实现：`PATCH /api/v1/qc-records/{id}` + body `{status: "COMPLETED"}` |
+| 统计卡 | P1 | 当前为 PASS/FAIL/合计 3个，应改为 PENDING/COMPLETED/RETURN_REQUESTED/合计 4个 |
+| sellerName 自动代入 | ✅ | ✅ 已实现（disabled 代入） |
+| 货号自动代入 | ✅ | ✅ 已实现（disabled 代入） |
+| 编辑/删除功能 | ✅ | ✅ 已实现：PATCH / DELETE |
+| 验货完成按钮 | ✅ | ✅ 已实现：`PATCH /api/v1/qc-records/{id}` + body `{status: "COMPLETED"}` |
+| 统计卡增加状态筛选 | ✅ | ✅ 已实现 |
 | 序列号输入 | P2 | 暂不规划；QcRecord 无此字段 |
 | 缺陷照片上传 | P2 | MinIO 文件上传，显示缩略图 |
 | 创建调配预填充 | P1 | LogisticsPage.vue 解析 `fromQc` query 参数 |
