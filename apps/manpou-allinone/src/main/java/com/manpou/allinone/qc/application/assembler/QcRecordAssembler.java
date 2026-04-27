@@ -1,10 +1,11 @@
 package com.manpou.allinone.qc.application.assembler;
 
+import com.manpou.allinone.common.port.FactoryQueryPort;
+import com.manpou.allinone.common.port.ProcurementPort;
 import com.manpou.allinone.qc.application.dto.QcRecordCreateCmd;
 import com.manpou.allinone.qc.application.dto.QcRecordPageQuery;
 import com.manpou.allinone.qc.application.dto.QcRecordUpdateCmd;
 import com.manpou.allinone.qc.domain.model.QcRecord;
-import com.manpou.allinone.qc.domain.model.QcStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -17,6 +18,14 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public class QcRecordAssembler {
 
+    private final ProcurementPort procurementPort;
+    private final FactoryQueryPort factoryQueryPort;
+
+    public QcRecordAssembler(ProcurementPort procurementPort, FactoryQueryPort factoryQueryPort) {
+        this.procurementPort = procurementPort;
+        this.factoryQueryPort = factoryQueryPort;
+    }
+
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final AtomicLong SEQ = new AtomicLong(System.currentTimeMillis() % 1000);
 
@@ -26,11 +35,24 @@ public class QcRecordAssembler {
     }
 
     public QcRecordPageQuery toDto(QcRecord entity) {
+        // v1.3.0：通过 procurementId 查 factoryId/factoryName
+        String factoryName = null;
+        Long factoryId = null;
+        if (entity.getProcurementId() != null) {
+            factoryId = procurementPort.findFactoryIdById(entity.getProcurementId()).orElse(null);
+            if (factoryId != null) {
+                factoryName = factoryQueryPort.findByIdAndDeletedIsFalse(factoryId)
+                        .map(f -> f.getFactoryName())
+                        .orElse(null);
+            }
+        }
         return QcRecordPageQuery.builder()
                 .id(entity.getId())
                 .qcCode(entity.getQcCode())
                 .procurementId(entity.getProcurementId())
                 .sellerName(entity.getSellerName())
+                .factoryId(factoryId)
+                .factoryName(factoryName)
                 .productCode(entity.getProductCode())
                 .subProductCode(entity.getSubProductCode())
                 .qcUserId(entity.getQcUserId())

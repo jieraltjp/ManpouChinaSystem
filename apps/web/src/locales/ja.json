@@ -562,6 +562,8 @@
       "editTitle": "編集",
       "qcRecord": "関連検査記録",
       "qcRecordPlaceholder": "検査番号または品番を検索",
+      "factory": "関連工場",
+      "factoryPlaceholder": "工場を選択（検査記録から自動代入）",
       "containerNo": "コンテナ番号",
       "containerNoPlaceholder": "同じバッチの貨物には同じコンテナ番号を入力",
       "procurement": "関連発注書",

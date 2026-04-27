@@ -18,6 +18,8 @@ public class QcRecordPageQuery {
     private String qcCode;
     private Long procurementId;
     private String sellerName;
+    private Long factoryId;              // 关联工厂ID（来自 procurement.factoryId，v1.3.0）
+    private String factoryName;         // 关联工厂名称（来自 factory 表，v1.3.0）
     private String productCode;
     private String subProductCode;
     private Long qcUserId;

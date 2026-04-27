@@ -34,6 +34,8 @@ public class LogisticsPlanUpdateCmd {
 
     private Long qcRecordId;               // 关联验货记录（v1.2.0）
 
+    private Long factoryId;                // 关联工厂（v1.3.0）
+
     private Long poolId;                  // 拼柜池ID
 
     private LocalDate estimatedShipDate;

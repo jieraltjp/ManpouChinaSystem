@@ -106,6 +106,7 @@ public class LogisticsPlanAssembler {
         if (cmd.getPlanType() != null) entity.setPlanType(cmd.getPlanType());
         if (cmd.getStatus() != null) entity.updateStatus(cmd.getStatus());
         if (cmd.getQcRecordId() != null) entity.setQcRecordId(cmd.getQcRecordId());
+        if (cmd.getFactoryId() != null) entity.setFactoryId(cmd.getFactoryId());
         if (cmd.getCargoLengthCm() != null) entity.setCargoLengthCm(cmd.getCargoLengthCm());
         if (cmd.getCargoWidthCm() != null) entity.setCargoWidthCm(cmd.getCargoWidthCm());
         if (cmd.getCargoHeightCm() != null) entity.setCargoHeightCm(cmd.getCargoHeightCm());

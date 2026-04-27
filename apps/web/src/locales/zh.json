@@ -562,6 +562,8 @@
       "editTitle": "编辑调配",
       "qcRecord": "关联验货记录",
       "qcRecordPlaceholder": "搜索验货编号或货号",
+      "factory": "关联工厂",
+      "factoryPlaceholder": "选择工厂（从验货记录自动代入）",
       "containerNo": "货柜号",
       "containerNoPlaceholder": "同批次货物填入相同货柜号",
       "procurement": "关联采购单",

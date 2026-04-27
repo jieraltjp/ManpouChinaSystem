@@ -142,6 +142,22 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item :label="$t('logistics.dialog.factory')">
+          <el-select
+            v-model="form.factoryId"
+            :placeholder="$t('logistics.dialog.factoryPlaceholder')"
+            filterable
+            disabled
+            style="width:100%"
+          >
+            <el-option
+              v-for="f in factoryOptions"
+              :key="f.id"
+              :label="f.factoryName"
+              :value="f.id"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item :label="$t('logistics.dialog.containerNo')">
           <el-input v-model="form.containerNo" :placeholder="$t('logistics.dialog.containerNoPlaceholder')" style="width:100%;max-width:400px" />
         </el-form-item>
@@ -270,6 +286,7 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Van, Top, Loading } from '@element-plus/icons-vue'
 import { logisticsApi, type LogisticsPlanVO, type LogisticsStatus, type PlanType } from '@/api/logistics'
 import { inspectionApi, type QcRecordVO } from '@/api/inspection'
+import { factoryApi, type FactoryPageVO } from '@/api/factory'
 import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
@@ -282,6 +299,7 @@ const editId = ref<number | null>(null)
 
 const currentRow = ref<LogisticsPlanVO | null>(null)
 const qcRecordOptions = ref<QcRecordVO[]>([])
+const factoryOptions = ref<FactoryPageVO[]>([])
 const filterForm = reactive({
   planType: '' as PlanType | '',
   status: '' as LogisticsStatus | '',
@@ -371,10 +389,7 @@ async function loadQcRecordOptions() {
   try {
     // 只过滤 result=PASS，status 不限制（DB 里 status=PENDING 也是合法验货记录）
     const res = await inspectionApi.list({ page: 0, pageSize: 100, result: 'PASS' })
-    console.log('[LogisticsPage] loadQcRecordOptions raw:', JSON.stringify(res.data))
     qcRecordOptions.value = res.data.data?.content ?? []
-    console.log('[LogisticsPage] qcRecordOptions set, count:', qcRecordOptions.value.length, 'ids:', qcRecordOptions.value.map((r: QcRecordVO) => r.id))
-    console.log('[LogisticsPage] form.qcRecordId =', form.qcRecordId)
   } catch (e) {
     console.error('[LogisticsPage] loadQcRecordOptions failed', e)
     qcRecordOptions.value = []
@@ -384,8 +399,21 @@ async function loadQcRecordOptions() {
 }
 
 watch(dialogVisible, (val) => {
-  if (val) loadQcRecordOptions()
+  if (val) {
+    loadQcRecordOptions()
+    loadFactoryOptions()
+  }
 })
+
+async function loadFactoryOptions() {
+  try {
+    const res = await factoryApi.list({ page: 0, pageSize: 200 })
+    factoryOptions.value = res.data.data?.content ?? []
+  } catch (e) {
+    console.error('[LogisticsPage] loadFactoryOptions failed', e)
+    factoryOptions.value = []
+  }
+}
 
 function onQcRecordSelected(id: number) {
   const r = qcRecordOptions.value.find(r => r.id === id)
@@ -394,6 +422,10 @@ function onQcRecordSelected(id: number) {
   form.productCode = r.productCode
   form.subProductCode = r.subProductCode || ''
   form.quantity = r.quantity
+  // 工厂 auto-fill（来自 QC record.procurement.factoryId，v1.3.0）
+  if (r.factoryId) {
+    form.factoryId = r.factoryId
+  }
   // 实际装箱尺寸 auto-fill（用户可手动覆盖）
   if (!form.cargoLengthCm && r.boxLengthCm) form.cargoLengthCm = r.boxLengthCm
   if (!form.cargoWidthCm && r.boxWidthCm) form.cargoWidthCm = r.boxWidthCm
@@ -425,6 +457,7 @@ async function onSubmit() {
     if (editId.value) {
       const payload = {
         qcRecordId: form.qcRecordId,
+        factoryId: form.factoryId,
         containerNo: form.containerNo || undefined,
         planType: form.planType!,
         cargoLengthCm: form.cargoLengthCm,
@@ -478,16 +511,26 @@ function onView(row: LogisticsPlanVO) {
 }
 
 async function onEdit(row: LogisticsPlanVO) {
-  console.log('[LogisticsPage] onEdit called, qcRecordId:', row.qcRecordId, 'planCode:', row.planCode)
-  // 调试：确认 tableData 里这条记录的 qcRecordId
-  const fresh = tableData.value.find(r => r.id === row.id)
-  console.log('[LogisticsPage] fresh from tableData, qcRecordId:', fresh?.qcRecordId, 'planCode:', fresh?.planCode)
   editId.value = row.id
   formRef.value?.resetFields()
+
+  // 工厂从 QC 记录代入（不能依赖 tableData 里旧的 factoryId）
+  let factoryId = row.factoryId
+  if (row.qcRecordId) {
+    try {
+      const res = await inspectionApi.get(row.qcRecordId)
+      if (res.data.data?.factoryId) {
+        factoryId = res.data.data.factoryId
+      }
+    } catch {
+      // ignore
+    }
+  }
+
   Object.assign(form, {
     qcRecordId: row.qcRecordId,
     procurementId: row.procurementId,
-    factoryId: row.factoryId,
+    factoryId: factoryId,
     containerNo: row.containerNo || '',
     productCode: row.productCode,
     subProductCode: row.subProductCode || '',
@@ -505,10 +548,8 @@ async function onEdit(row: LogisticsPlanVO) {
   drawerVisible.value = false
   // 直接设置 qcRecordId，列表加载后 el-select 即可正确显示（列表已包含该记录）
   form.qcRecordId = row.qcRecordId
-  console.log('[LogisticsPage] after assign form.qcRecordId:', form.qcRecordId)
   await loadQcRecordOptions()
   dialogVisible.value = true
-  console.log('[LogisticsPage] dialog opened, qcRecordOptions count:', qcRecordOptions.value.length, 'form.qcRecordId:', form.qcRecordId)
 }
 
 function onEditFromDrawer() {

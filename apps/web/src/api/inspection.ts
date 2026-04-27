@@ -13,6 +13,8 @@ export interface QcRecordVO {
   qcCode: string
   procurementId: number
   sellerName?: string
+  factoryId?: number    // 关联工厂ID（来自 procurement.factoryId，v1.3.0）
+  factoryName?: string  // 关联工厂名称（来自 factory 表，v1.3.0）
   productCode: string
   subProductCode?: string
   qcUserId?: number
