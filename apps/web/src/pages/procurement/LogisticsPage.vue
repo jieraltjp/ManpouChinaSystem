@@ -380,7 +380,7 @@ async function loadQcRecordOptions() {
 }
 
 watch(dialogVisible, (val) => {
-  if (val) loadQcRecordOptions()
+  if (val && qcRecordOptions.value.length === 0) loadQcRecordOptions()
 })
 
 function onQcRecordSelected(id: number) {
@@ -492,8 +492,7 @@ async function onEdit(row: LogisticsPlanVO) {
     remarks: row.remarks || '',
   })
   drawerVisible.value = false
-  dialogVisible.value = true
-  // 编辑时：先加载已选验货记录（确保下拉里能显示），再加载可选列表
+  // 先加载验货记录选项（确保 el-select 绑定的值在列表中），再打开对话框
   if (row.qcRecordId) {
     try {
       const res = await inspectionApi.get(row.qcRecordId)
@@ -503,7 +502,8 @@ async function onEdit(row: LogisticsPlanVO) {
       qcRecordOptions.value = []
     }
   }
-  loadQcRecordOptions()
+  await loadQcRecordOptions()
+  dialogVisible.value = true
 }
 
 function onEditFromDrawer() {
