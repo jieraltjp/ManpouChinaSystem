@@ -107,6 +107,7 @@
     },
     "status": {
       "PENDING": "確認待ち",
+      "CONFIRMED": "確認済み",
       "CONVERTED": "発注済み",
       "CANCELLED": "キャンセル済み"
     },
@@ -223,7 +224,8 @@
       "reset": "リセット"
     },
     "column": {
-      "productCode": "商品コード",
+      "productCode": "主品番",
+      "subProductCode": "子品番",
       "factoryName": "関連工場",
       "quantity": "数量",
       "estimatedPriceJpy": "見積もり卸値(JPY)",

@@ -107,6 +107,7 @@
     },
     "status": {
       "PENDING": "待确认",
+      "CONFIRMED": "已确认",
       "CONVERTED": "已转采购",
       "CANCELLED": "已取消"
     },
@@ -223,7 +224,8 @@
       "reset": "重置"
     },
     "column": {
-      "productCode": "商品代码",
+      "productCode": "主货号",
+      "subProductCode": "子货号",
       "factoryName": "关联工厂",
       "quantity": "数量",
       "estimatedPriceJpy": "估算批发价(JPY)",

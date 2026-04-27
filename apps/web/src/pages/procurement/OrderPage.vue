@@ -87,10 +87,14 @@
         stripe
         style="width: 100%"
       >
-        <el-table-column :label="$t('order.column.productCode')" min-width="160">
+        <el-table-column :label="$t('order.column.productCode')" min-width="120">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
-            <span v-if="row.subProductCode" style="color:#999;font-size:11px"> / {{ row.subProductCode }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('order.column.subProductCode')" min-width="100">
+          <template #default="{ row }">
+            <span class="product-code">{{ row.subProductCode || '—' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="factoryName" :label="$t('order.column.factoryName')" min-width="140" show-overflow-tooltip />
