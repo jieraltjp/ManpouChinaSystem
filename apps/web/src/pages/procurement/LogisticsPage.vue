@@ -369,7 +369,8 @@ function onReset() {
 async function loadQcRecordOptions() {
   qcRecordLoading.value = true
   try {
-    const res = await inspectionApi.list({ page: 0, pageSize: 100, result: 'PASS', status: 'COMPLETED' })
+    // 只过滤 result=PASS，status 不限制（DB 里 status=PENDING 也是合法验货记录）
+    const res = await inspectionApi.list({ page: 0, pageSize: 100, result: 'PASS' })
     qcRecordOptions.value = res.data.data?.content ?? []
   } catch (e) {
     console.error('[LogisticsPage] loadQcRecordOptions failed', e)
