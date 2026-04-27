@@ -19,6 +19,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
 
+    /** 查询 master-level 商品（sub_code IS NULL），用于 /code/{masterCode} 接口 */
+    Optional<Product> findByMasterCodeAndSubCodeIsNullAndDeletedIsFalse(String masterCode);
+
     Optional<Product> findByMasterCodeAndSubCodeAndDeletedIsFalse(String masterCode, String subCode);
 
     Page<Product> findByMasterCodeAndDeletedIsFalse(String masterCode, Pageable pageable);
@@ -30,6 +33,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByHsCodeJpAndDeletedIsFalse(String hsCodeJp, Pageable pageable);
 
     List<Product> findAllByMasterCodeAndDeletedIsFalse(String masterCode);
+
+    List<Product> findAllByMasterCodeInAndDeletedIsFalse(List<String> masterCodes);
 
     Page<Product> findAllByDeletedIsFalse(Pageable pageable);
 }

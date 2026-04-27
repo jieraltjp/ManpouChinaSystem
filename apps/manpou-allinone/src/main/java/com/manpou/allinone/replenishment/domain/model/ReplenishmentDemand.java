@@ -85,6 +85,14 @@ public class ReplenishmentDemand extends BaseEntity {
     @Column(name = "remarks", length = 512)
     private String remarks;
 
+    /**
+     * 商品图片URL（v2.1.0）。
+     * 反规范化自 product.image_url，查询零成本。
+     * Demand 创建时由 UseCase 从 Product 表同步填充。
+     */
+    @Column(name = "image_url", length = 512)
+    private String imageUrl;
+
     // ===== 领域方法 =====
 
     public void markAsConverted(Long procurementId) {

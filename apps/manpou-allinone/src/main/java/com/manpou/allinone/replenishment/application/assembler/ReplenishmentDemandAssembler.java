@@ -38,6 +38,7 @@ public class ReplenishmentDemandAssembler {
                 .status(entity.getStatus())
                 .linkedProcurementId(entity.getLinkedProcurementId())
                 .remarks(entity.getRemarks())
+                .imageUrl(entity.getImageUrl())
                 .createBy(entity.getCreateBy())
                 .createTime(entity.getCreateTime())
                 .updateTime(entity.getUpdateTime())

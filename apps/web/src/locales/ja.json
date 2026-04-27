@@ -87,6 +87,7 @@
       "demandType": "タイプ",
       "productCode": "主品番",
       "subProductCode": "子品番",
+      "imageUrl": "商品画像",
       "category": "商品分類",
       "subProductItems": "子品番明細",
       "quantity": "数量",

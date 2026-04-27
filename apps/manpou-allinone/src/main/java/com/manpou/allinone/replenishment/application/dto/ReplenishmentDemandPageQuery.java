@@ -37,6 +37,8 @@ public class ReplenishmentDemandPageQuery {
     /** 关联的 Procurement ID（CONVERTED 时有值） */
     private Long linkedProcurementId;
     private String remarks;
+    /** 商品图片URL（v2.1.0） */
+    private String imageUrl;
     private String createBy;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

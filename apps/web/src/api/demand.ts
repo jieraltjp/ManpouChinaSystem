@@ -25,6 +25,8 @@ export interface DemandPageVO {
   /** 关联的 Procurement ID（CONVERTED 时有值） */
   linkedProcurementId?: number
   remarks?: string
+  /** 商品图片URL（v2.1.0） */
+  imageUrl?: string
   createBy?: string
   createTime?: string
   updateTime?: string

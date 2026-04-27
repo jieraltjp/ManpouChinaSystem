@@ -34,6 +34,11 @@ public class ProductQueryPortImpl implements ProductQueryPort {
     }
 
     @Override
+    public List<Product> findByMasterCodeIn(List<String> masterCodes) {
+        return productRepository.findAllByMasterCodeInAndDeletedIsFalse(masterCodes);
+    }
+
+    @Override
     public List<Object[]> findMasterCodeSuggestions(String keyword) {
         return productJpaRepository.findMasterCodeSuggestions(keyword);
     }

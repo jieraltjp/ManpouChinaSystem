@@ -423,7 +423,7 @@ async function onFormSubmit() {
   formSubmitting.value = true
   try {
     const payload: TaxRefundCreateRequest = {
-      procurementId: dialogForm.procurementId,
+      procurementId: dialogForm.procurementId ?? undefined,
       japanCustomsId: dialogForm.japanCustomsId,
       billingType: dialogForm.billingType,
       priceRmb: dialogForm.priceRmb,
@@ -437,7 +437,7 @@ async function onFormSubmit() {
       ElMessage.success(t('taxRefund.message.createSuccess'))
     } else if (currentFormRow.value) {
       // 使用 update 接口（或复用 create 逻辑，视后端实现而定）
-      await taxRefundApi.create({ ...payload, procurementId: currentFormRow.value.procurementId })
+      await taxRefundApi.create({ ...payload, procurementId: currentFormRow.value.procurementId ?? undefined })
       ElMessage.success(t('taxRefund.message.updateSuccess'))
     }
     formDialogVisible.value = false

@@ -14,6 +14,8 @@ public interface ProductQueryPort {
 
     List<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
 
+    List<Product> findByMasterCodeIn(List<String> masterCodes);
+
     List<Object[]> findMasterCodeSuggestions(String keyword);
 
     List<Object[]> findSubCodesByMasterCode(String masterCode);

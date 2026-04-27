@@ -2,6 +2,7 @@ package com.manpou.allinone.replenishment.application.usecase;
 
 import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.common.filter.TraceFilter;
+import com.manpou.allinone.common.port.ProductQueryPort;
 import com.manpou.allinone.factory.domain.model.Factory;
 import com.manpou.allinone.factory.domain.repository.FactoryRepository;
 import com.manpou.allinone.procurement.application.dto.ProcurementCreateCmd;
@@ -46,6 +47,7 @@ public class ReplenishmentDemandUseCase {
     private final ReplenishmentDemandAssembler assembler;
     private final ProcurementRepository procurementRepository;
     private final FactoryRepository factoryRepository;
+    private final ProductQueryPort productQueryPort;
     private final ProcurementUseCase procurementUseCase;
     private final ProcurementAssembler procurementAssembler;
 
@@ -66,19 +68,43 @@ public class ReplenishmentDemandUseCase {
         } else {
             page = demandRepository.findAllByDeletedIsFalse(pageRequest);
         }
-        return page.map(assembler::toDto);
+        // 批量补充 imageUrl（v2.1.0）
+        var productCodes = page.getContent().stream()
+                .map(ReplenishmentDemand::getProductCode)
+                .distinct()
+                .toList();
+        java.util.Map<String, String> imageUrlMap = productQueryPort.findByMasterCodeIn(productCodes).stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        p -> p.getMasterCode(),
+                        p -> p.getImageUrl() != null ? p.getImageUrl() : "",
+                        (a, b) -> a
+                ));
+        return page.map(d -> {
+            ReplenishmentDemandPageQuery dto = assembler.toDto(d);
+            dto.setImageUrl(imageUrlMap.getOrDefault(d.getProductCode(), d.getImageUrl()));
+            return dto;
+        });
     }
 
     @Transactional(readOnly = true)
     public ReplenishmentDemandPageQuery getById(Long id) {
         ReplenishmentDemand entity = demandRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", id));
-        return assembler.toDto(entity);
+        ReplenishmentDemandPageQuery dto = assembler.toDto(entity);
+        // 补充 imageUrl（v2.1.0）
+        if (dto.getImageUrl() == null) {
+            productQueryPort.findByMasterCode(entity.getProductCode())
+                    .ifPresent(p -> dto.setImageUrl(p.getImageUrl()));
+        }
+        return dto;
     }
 
     @Transactional
     public Long create(ReplenishmentDemandCreateCmd cmd) {
         ReplenishmentDemand entity = assembler.toEntity(cmd);
+        // 创建时同步商品图片（v2.1.0）
+        productQueryPort.findByMasterCode(cmd.getProductCode())
+                .ifPresent(p -> entity.setImageUrl(p.getImageUrl()));
         ReplenishmentDemand saved = demandRepository.save(entity);
         log.info("[ReplenishmentDemand] created, traceId={}, id={}, demandCode={}, type={}, subProductCode={}",
                 MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId(), saved.getDemandCode(),
