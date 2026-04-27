@@ -1,8 +1,8 @@
 # DB-04 — 调配计划数据库设计
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-23（v1.1.0：补全缺失索引，与 DB 实际结构对齐）
+> **更新**: 2026-04-27（v1.2.0：新增 qc_record_id 列，关联验货记录；保留 procurement_id 用于拼柜场景兼容）
 > **状态**: ✅ 已实现
 > **业务步号**: 04（调配计划）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B04-调配计划-步骤4.md`
@@ -30,7 +30,8 @@
 CREATE TABLE logistics_plan (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
     plan_code          VARCHAR(32)  NOT NULL UNIQUE COMMENT '调配编号 L-YYYYMMDD-NNN',
-    procurement_id      BIGINT COMMENT '关联采购单 FK → procurement.id（拼柜时可为空）',
+    qc_record_id       BIGINT COMMENT '关联验货记录 FK → qc_record.id（调配锚点，v1.2.0新增）',
+    procurement_id      BIGINT COMMENT '关联采购单 FK → procurement.id（拼柜时可为空，保留兼容）',
     factory_id         BIGINT COMMENT '关联工厂 FK → factory.id',
     product_code       VARCHAR(32)  NOT NULL COMMENT '货号',
     sub_product_code   VARCHAR(64) COMMENT '子货号/颜色',
@@ -54,6 +55,7 @@ CREATE TABLE logistics_plan (
     update_by          VARCHAR(64)  NOT NULL,
     is_deleted         BOOLEAN      NOT NULL DEFAULT FALSE,
     UNIQUE KEY uk_plan_code (plan_code),
+    INDEX idx_logistics_qc_record (qc_record_id),
     INDEX idx_logistics_procurement (procurement_id),
     INDEX idx_logistics_status (status),
     INDEX idx_logistics_plan_type (plan_type),
@@ -130,17 +132,17 @@ CREATE TABLE consolidation_pool (
 
 ## 代码实现状态
 
-- [x] ✅ `LogisticsPlan` 聚合根实体（含 `calculateVolume()`）
+- [x] ✅ `LogisticsPlan` 聚合根实体（含 `calculateVolume()`，v1.2.0 新增 `qcRecordId`）
 - [x] ✅ `LogisticsStatus` 枚举（含 `isTerminal()` + `canTransitionTo()` + FSM map）
 - [x] ✅ `PlanType` 枚举
-- [x] ✅ `LogisticsPlanRepository` 领域接口
+- [x] ✅ `LogisticsPlanRepository` 领域接口（v1.2.0 新增 `findByQcRecordIdAndDeletedIsFalse`）
 - [x] ✅ `LogisticsPlanJpaRepository` JPA 适配器
-- [x] ✅ `LogisticsPlanUseCase` 用例服务
+- [x] ✅ `LogisticsPlanUseCase` 用例服务（v1.2.0 校验 qcRecord 存在且 result=PASS）
 - [x] ✅ `LogisticsPlanController` REST 控制器
-- [x] ✅ `LogisticsPlanAssembler` DTO 转换器
+- [x] ✅ `LogisticsPlanAssembler` DTO 转换器（v1.2.0 新增 qcRecordId 映射）
 - [x] ✅ `LogisticsPlanUseCaseTest` 单元测试（12 个用例，全部通过）
-- [x] ✅ `@/api/logistics.ts` 前端 API 客户端
-- [x] ✅ `LogisticsPage.vue` 页面（已对接真实 API）
+- [x] ✅ `@/api/logistics.ts` 前端 API 客户端（v1.2.0 qcRecordId 类型）
+- [x] ✅ `LogisticsPage.vue` 页面（v1.2.0 验货记录下拉替代采购单下拉）
 - [ ] 🔴 `Container` 聚合根实体
 - [ ] 🔴 `ConsolidationPool` 聚合根实体
 - [ ] 🔴 `ConsolidationPoolItem` 聚合根实体

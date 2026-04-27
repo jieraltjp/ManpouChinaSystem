@@ -78,6 +78,9 @@ public class ProcurementUseCase {
         procurementAssembler.toEntity(cmd); // 触发 assembler 中 factoryId 校验
 
         Procurement entity = procurementAssembler.toEntity(cmd);
+        if (entity.getLeadTimeDays() == null) {
+            entity.setLeadTimeDays(30);
+        }
         entity.calculateEstimatedPriceJpy();
         Procurement saved = procurementRepository.save(entity);
         log.info("[Procurement] created, traceId={}, id={}, productCode={}, factoryId={}, factoryName={}",

@@ -45,6 +45,8 @@ CREATE TABLE procurement (
     factory_ship_date   DATE COMMENT '厂家出货日',
     planned_ship_date   DATE COMMENT '预计出货日（交货期）',
     actual_ship_date    DATE COMMENT '实际出货日',
+    lead_time_days      INT COMMENT '交货期天数（30/45/60），默认30',
+    carton_notes        VARCHAR(512) COMMENT '纸箱备注',
     product_lead        VARCHAR(64) COMMENT '商品担当',
     japan_lead          VARCHAR(64) COMMENT '日本担当',
     china_lead          VARCHAR(64) COMMENT '中国担当',

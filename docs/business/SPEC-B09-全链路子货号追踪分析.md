@@ -1,34 +1,37 @@
 # SPEC-B09-EX — 全链路子货号追踪分析
 
-> **版本**: 1.1.0
+> **版本**: 2.0.0
 > **创建**: 2026-04-24
-> **状态**: ✅ 已完成（v1.6.1 JapanCustoms subProductCode 已补全）
-> **背景**: v1.6.0 批量子货号改造完成后，系统需要确认：全链路（需求单→发注单→国内报关→日本清关→调配计划→销售记录）是否按子货号分开追踪；Overview 页面锚点设计是否满足 v1.6.0 需求。
+> **更新**: 2026-04-27（v2.0.0：整篇重构 — JSON 批量模型废除，改为 1 Demand = 1 Procurement 直接字段模型）
+> **状态**: ✅ 已同步（v2.0.0 架构）
+> **背景**: v2.0.0 完成 Demand subProductItems JSON → 直接字段改造，每条 Demand 对应一个子货号和一条 Procurement。全链路子货号精确追踪。
 
 ---
 
-## 1. 业务背景
+## 1. 业务背景（v2.0.0）
 
-v1.6.0 核心变更：需求单（ReplenishmentDemand）从单 quantity/destination 改为 JSON 数组存储多个子货号明细（SubProductItem），每个 SubProductItem 独立数量和目的地。转采购时循环生成多个 Procurement。
+v2.0.0 核心变更：需求单（ReplenishmentDemand）从 JSON 数组 `subProductItems[]` 改为**直接字段**：
+- `subProductCode` — 子货号全码（如 `ad009-be`）
+- `quantity` — 需求数量
+- `destination` — 目的地
 
-**用户意图**：批量录入多个子货号 → 系统内部每条子货号独立流转 → 全链路可追溯
+转采购时 **1:1 映射**：每条 Demand 创建一个 Procurement，不再循环生成多条。
+
+**用户意图**：逐条录入子货号需求 → 系统内部逐条独立流转 → 全链路精确到子货号
 
 ---
 
-## 2. 全链路追踪分析
+## 2. 全链路追踪分析（v2.0.0）
 
 ### 链路总图
 
 ```
-ReplenishmentDemand
-  subProductItemsRaw: JSON数组 [{"subCode":"be","quantity":100,"destination":"久留米"},{"subCode":"bu","quantity":50,"destination":"名古屋"}]
+ReplenishmentDemand（1条，含 subProductCode / quantity / destination）
   │
-  │  [转采购循环 — ReplenishmentDemandUseCase.convertToProcurement()]
-  │  for each SubProductItem → new Procurement()
+  │  [转采购 — ReplenishmentDemandUseCase.convertToProcurement()]
+  │  1 Demand → 1 Procurement，直接字段传递
   ▼
-Procurement × N（每个 SubProductItem 一个 Procurement）
-  subProductCode ✓
-  linkedDemandId ✓
+Procurement（1条，subProductCode 直接继承自 Demand）
   │
   ├─→ [事件驱动] LogisticsInTransitEvent
   │         ▼
@@ -36,86 +39,68 @@ Procurement × N（每个 SubProductItem 一个 Procurement）
   │         ▼
   │     LogisticsPlan × N（手动创建，有 subProductCode）✓
   │         ▼
-  │     JapanCustomsRecord × N（有 subProductCode，来自 Procurement）✅
+  │     JapanCustomsRecord × N（有 subProductCode）✓
   │         ▼
   │     [事件驱动] JapanCustomsClearedEvent
   │         ▼
-  │     SalesRecord × N（有 subProductCode，从 Procurement 继承）✓
-  │
-  └─→ SalesRecord × N（从 Procurement 取 subProductCode）✓
+  │     SalesRecord × N（有 subProductCode）✓
 ```
 
 ### 每步详情
 
-| 步骤 | 实体 | subProductCode | 触发方式 | 链路完整 | 缺口说明 |
-|------|------|:---:|-----------|:---:|---------|
-| 1 需求单 | ReplenishmentDemand | JSON数组 | 手动批量录入 | ✅ | v1.6.0 核心：JSON 存多条子货号明细 |
-| 2 发注单 | Procurement | ✅ | 转采购循环（逐条创建） | ✅ | 循环中 `linkedDemandId` 建立双向关联 |
-| 3 验货 | QcRecord | ✅ | 手动创建 | ✅ | `procurementId` 精确追溯到单条 Procurement |
-| 4 调配计划 | LogisticsPlan | ✅ | 手动创建 | ✅ | 单独创建，procurementId 精确关联 |
+| 步骤 | 实体 | subProductCode | 触发方式 | 链路完整 | 说明 |
+|------|------|:---:|-----------|:---:|------|
+| 1 需求单 | ReplenishmentDemand | ✅ 直接字段 | 手动录入 | ✅ | v2.0.0：直接字段，非 JSON |
+| 2 发注单 | Procurement | ✅ 直接字段 | 转采购（1:1） | ✅ | `linkedProcurementId` 建立 Demand → Procurement 关联 |
+| 3 验货 | QcRecord | ✅ | 手动创建 | ✅ | `procurementId` 精确追溯 |
+| 4 调配计划 | LogisticsPlan | ✅ | 手动创建 | ✅ | `procurementId` 精确关联 |
 | 5 国内报关 | DomesticCustomsRecord | ✅ | 物流在途事件自动创建 | ✅ | `LogisticsInTransitEventListener` 逐条创建 |
-| **6 日本清关** | **JapanCustomsRecord** | **✅** | **手动创建** | **✅** | **v1.6.1 新增 subProductCode 字段，全链路完整** |
-| 7 退税 | TaxRefundRecord | — | 手动创建 | ✅ | 财务维度，按采购单总额退税，不区分子货号 |
-| 8 销售记录 | SalesRecord | ✅ | 日本清关完成事件自动创建 | ✅ | `JapanCustomsClearedEventListener` 从 Procurement 取 subProductCode |
+| 6 日本清关 | JapanCustomsRecord | ✅ | 手动创建 | ✅ | v1.6.1 已补全 subProductCode |
+| 7 退税 | TaxRefundRecord | — | 手动创建 | ✅ | 财务维度，按采购单总额退税 |
+| 8 销售记录 | SalesRecord | ✅ | 日本清关完成事件自动创建 | ✅ | 从 Procurement 继承 subProductCode |
 
 ### 步骤详解
 
 #### 步骤2：发注单 ✅
 
 **实体**：`Procurement`，`subProductCode` 字段
-**触发**：转采购时循环创建
+**触发**：转采购时 1:1 创建
 
 ```java
 // ReplenishmentDemandUseCase.convertToProcurement()
-for (int i = 0; i < subItems.size(); i++) {
-    SubProductItem item = subItems.get(i);
-    ProcurementCreateCmd pCmd = new ProcurementCreateCmd();
-    pCmd.setSubProductCode(item.getSubCode());
-    pCmd.setQuantity(item.getQuantity());
-    pCmd.setDestination(item.getDestination());
-    pCmd.setLinkedDemandId(demandId);
-    pCmd.setLinkedDemandItemId((long) i);  // 关联到具体 SubProductItem
-    procurementUseCase.create(pCmd);
-}
+ProcurementCreateCmd pCmd = new ProcurementCreateCmd();
+pCmd.setSubProductCode(demand.getSubProductCode());   // ✓ 直接传递
+pCmd.setQuantity(demand.getQuantity());
+pCmd.setDestination(demand.getDestination());
+procurementUseCase.create(pCmd);
 ```
 
-同时 `linkedDemandItemsRaw`（Demand）填充 JSON：`[{"linkedProcurementId":101,"subCode":"be"},...]`，建立双向可查。
+`ReplenishmentDemand.linkedProcurementId` 在创建后填充，建立 Demand → Procurement 反向关联。
 
 #### 步骤5：国内报关 ✅
 
 **实体**：`DomesticCustomsRecord`，`subProductCode` 字段
-**触发**：`LogisticsInTransitEventListener`（TransactionalEventListener AFTER_COMMIT）
+**触发**：`LogisticsPlanInTransitEventListener`（TransactionalEventListener AFTER_COMMIT）
 
 ```java
 public void onLogisticsInTransit(LogisticsPlanInTransitEvent evt) {
     DomesticCustomsRecord record = new DomesticCustomsRecord();
     record.setProcurementId(evt.getProcurementId());
-    record.setSubProductCode(evt.getSubProductCode());  // ✓ 子货号精确传递
+    record.setSubProductCode(evt.getSubProductCode());  // ✓ 精确传递
     record.setProductCode(evt.getProductCode());
-    // ...
 }
 ```
-
-每条 LogisticsPlanInTransitEvent 对应一条 DomesticCustomsRecord，subProductCode 精确传递。
 
 #### 步骤4：调配计划 ✅
 
 **实体**：`LogisticsPlan`，`subProductCode` 字段
 **触发**：手动创建（`LogisticsPlanUseCase.create()`）
-**设计合理性**：物流计划按出货批次，可以多件商品合一个 LogisticsPlan，但表本身有 subProductCode，下游仍可追溯。
 
 #### 步骤6：日本清关 ✅（v1.6.1 已补全）
 
-**实体**：`JapanCustomsRecord`，**有** `subProductCode` 字段（v1.6.1 新增）
+**实体**：`JapanCustomsRecord`，有 `subProductCode` 字段（v1.6.1 新增）
 **触发**：手动创建（`JapanCustomsController` → `JapanCustomsUseCase.create()`）
-**来源**：清关员从 Procurement 复制 subProductCode 填入，或由前端自动预填
-
-**实现**：
-- `JapanCustomsCreateCmd.subProductCode`（v1.6.1 新增）
-- `JapanCustomsUpdateCmd.subProductCode`（v1.6.1 新增）
-- `JapanCustomsRecord.subProductCode`（v1.6.1 新增）
-- `JapanCustomsAssembler` 映射（v1.6.1 新增）
-- `V29__japan_customs_sub_product_code.sql`（DB migration）
+**来源**：清关员从 Procurement 复制 subProductCode 填入
 
 #### 步骤8：销售记录 ✅
 
@@ -123,7 +108,6 @@ public void onLogisticsInTransit(LogisticsPlanInTransitEvent evt) {
 **触发**：`JapanCustomsClearedEventListener`（TransactionalEventListener AFTER_COMMIT）
 
 ```java
-// JapanCustomsClearedEventListener.createSalesRecordFromProcurement()
 record.setProcurementId(procurement.getId());
 record.setProductCode(procurement.getProductCode());
 record.setSubProductCode(procurement.getSubProductCode());  // ✓ 从 Procurement 继承
@@ -138,87 +122,68 @@ record.setStatus(SalesStatus.LISTED);
 
 ```
 Overview 锚点 = Procurement.id
-URL: /base/overview/{procurementId}
+URL: /base/overview/procurement/{procurementId}
 ```
 
-`OrderOverviewUseCase.getOverview(procurementId)` 以单条 Procurement 为锚点，聚合该 Procurement 的完整下游链路。
+`OrderOverviewUseCase.getOverview(procurementId)` 以单条 Procurement 为锚点，聚合完整下游链路。
 
-### 3.2 v1.6.0 影响：一个 Demand → 多个 Procurement
+### 3.2 v2.0.0 影响：1 Demand = 1 Procurement
+
+每个 Demand 转化后对应一条 Procurement，每个 Procurement 有独立 Overview 页面：
 
 ```
-ReplenishmentDemand
-  └── Procurement(be, 100件, 久留米)     → /base/overview/101
-  └── Procurement(bu, 50件, 名古屋)     → /base/overview/102
-  └── Procurement(re, 75件, 大阪)       → /base/overview/103
+ReplenishmentDemand(ad009-be, 100件, 久留米)
+  └── Procurement(ad009-be)  → /base/overview/procurement/101
 ```
 
-**结论**：每个 Procurement 的 Overview 页面独立、完整；但 Overview 列表页无法一眼看到"同需求单下的所有子货号"。
+**结论**：Overview 列表页每行自然对应一条子货号，无需额外聚合逻辑。
 
-### 3.3 现状：前端 Bug 已修复
+### 3.3 现状：前端 Step1 卡片适配
 
-**Bug**：Step1 卡片前端模板引用旧字段 `overview.demand.quantity` 和 `overview.demand.destination`（v1.5 字段），后端 `DemandVO` 早已改为 `subProductItemsSummary`（格式 `"be:100久留米, bu:50名古屋"`）。
+**字段映射**（v2.0.0）：`DemandVO` 直接暴露 `subProductCode` / `quantity` / `destination` 字段，前端 Step1 卡片直接渲染：
 
-**修复**：
-- `api/orderOverview.ts`：前端 `DemandVO` 类型 `quantity`/`destination` → `subProductItemsSummary`
-- `OrderOverviewPage.vue`：Step1 卡片模板对应更新
-- `locales/zh.json` + `locales/ja.json`：`quantity`/`destination` → `subProductItems`
+```
+subProductCode: ad009-be
+quantity: 100
+destination: 久留米
+```
 
 ---
 
 ## 4. 缺口修复方案
 
-### 4.1 ✅ JapanCustomsRecord subProductCode（v1.6.1 已修复）
+### 4.1 ✅ JapanCustomsRecord subProductCode（v1.6.1 已实现）
 
-**优先级**：P2 → ✅ 已实现（2026-04-24）
-
-**实现内容**：
 - `JapanCustomsRecord.java`：`subProductCode` 字段
 - `JapanCustomsCreateCmd.java` / `JapanCustomsUpdateCmd.java`：新增 `subProductCode`
 - `JapanCustomsAssembler.java`：copyCreate / copyUpdate / toDto 映射
-- `JapanCustomsPageQuery.java`：新增 `subProductCode`
 - `V29__japan_customs_sub_product_code.sql`：DB migration
 
-### 4.2 体验优化：Overview 列表页展示关联子货号（待定）
+### 4.2 体验优化：Demand 详情页展示同需求单关联（已归档）
 
-**需求**：在 Overview 列表页（`/base/overview` 选择器模式），将同 Demand 的多个 Procurement 关联展示。
-
-**方案 A**：在列表页增加"关联需求单"列，显示 Demand 编号 + 子货号摘要
-
-```
-需求单编号        子货号明细           状态
-D-20260424-001   be:100, bu:50, re:75   进行中
-  └─ P-101 (be) — 久留米 — 步骤3
-  └─ P-102 (bu) — 名古屋 — 步骤5
-  └─ P-103 (re) — 大阪   — 步骤2
-```
-
-**方案 B**：保持现状（每个 Procurement 单独一行），在详情页顶部显示"同需求单的其他子货号"折叠区
+> 方案 A/B 均因 v2.0.0 1:1 映射而不再需要，改为 Demand 列表自然对应子货号。
 
 ---
 
-## 5. 批量 UX 验证
+## 5. 批量 UX 验证（v2.0.0）
 
 | 用户操作 | 系统内部行为 | 用户感知 |
 |---------|------------|---------|
-| 需求单录入3个子货号 | 存1条 Demand，subProductItemsRaw=JSON数组 | 一次录入 ✓ |
-| 点"转采购" | 循环创建3条 Procurement | 一次操作 ✓ |
-| 查看 Overview | 每个 Procurement 单独一条 Overview | 自然分开 ✓ |
-| 调配计划发货 | 可选：3条 LogisticsPlan 或1条含3件的批次 | 操作灵活 ✓ |
-| 国内报关 | 自动创建3条 DomesticCustomsRecord | 无感知 ✓ |
-| 日本清关 | 手动创建3条 JapanCustomsRecord（或按发货批次合并）| 操作可选 ✓ |
-| 销售记录 | 自动创建3条 SalesRecord | 无感知 ✓ |
+| 需求单录入1个子货号 | 存1条 Demand + 1条 Procurement | 一次录入 ✓ |
+| 点"转采购" | 创建1条 Procurement | 一次操作 ✓ |
+| 查看 Overview | 每条 Procurement 单独一条 Overview | 自然分开 ✓ |
+| 调配计划发货 | 手动创建 LogisticsPlan | 操作可选 ✓ |
+| 国内报关 | 自动创建 DomesticCustomsRecord | 无感知 ✓ |
+| 日本清关 | 手动创建 JapanCustomsRecord | 操作可选 ✓ |
+| 销售记录 | 自动创建 SalesRecord | 无感知 ✓ |
 
-**结论**：批量 UX 设计合理——用户批量操作，系统内部每条子货号独立流转，互不干扰。
+**结论**：v2.0.0 UX 更清晰——每条子货号独立流转，无批量循环逻辑。
 
 ---
 
-## 6. v1.3.0 架构变更：Overview Demand 中心化
+## 6. v1.3.0 架构：Overview Demand 中心化
 
-### 变更原因
-
-**问题**：原 Overview 是 Procurement 中心——列表只展示 Procurements，新建 Demand 不会出现在 Overview 中。
-
-**设计**：Overview 从 Procurement 中心 → Demand 中心，支持双入口。
+### 双入口设计
 
 ```
 /base/overview                          → 双 Tab 列表（需求单 / 发注单）
@@ -235,13 +200,13 @@ D-20260424-001   be:100, bu:50, re:75   进行中
       ↓
 3. 用户点击"总览" → 跳转到 /base/overview/demand/:id
       ↓ 详情页
-4. Step1 有数据（demandCode、productCode、subProductItemsSummary）
+4. Step1 有数据（demandCode、subProductCode、quantity、destination）
    Step2-8 全部"未开始"
    进度条：步骤1=绿色，步骤2-8=灰色
       ↓
 5. 用户点击"转采购"（需选工厂）
       ↓
-6. 创建 N 条 Procurement（N = 子货号数量）
+6. 创建 1 条 Procurement（v2.0.0 1:1）
    Demand 状态 → CONVERTED
    自动跳转到 /base/overview/procurement/:firstId
       ↓ 详情页
@@ -251,60 +216,18 @@ D-20260424-001   be:100, bu:50, re:75   进行中
 
 ---
 
-## 7. 数据修复：历史旧数据兼容
-
-v1.5 历史数据的 `sub_product_code` 格式为 `["be","bu","re"]`（JSON 字符串数组），v1.6.0 的 `ReplenishmentDemandAssembler.parseSubProductItems()` 需要兼容：
-
-```java
-// ReplenishmentDemandAssembler.parseSubProductItems(raw)
-if (raw == null) return Collections.emptyList();
-raw = raw.trim();
-
-// 旧格式：["be","bu"] → JSON数组，非对象数组
-if (raw.startsWith("[")) {
-    try {
-        var node = objectMapper.readTree(raw);
-        if (node.isArray()) {
-            List<SubProductItem> items = new ArrayList<>();
-            for (var elem : node) {
-                if (elem.isTextual()) {
-                    // 旧格式元素：字符串 "be" → 转为 SubProductItem(subCode="be")
-                    items.add(new SubProductItem(elem.asText(), null, null));
-                } else if (elem.isObject()) {
-                    // 新格式元素：对象 {"subCode":"be","quantity":100,"destination":"久留米"}
-                    items.add(parseObjectElement(elem));
-                }
-            }
-            return items;
-        }
-    } catch (JsonProcessingException e) { /* fall through */ }
-}
-// 纯字符串旧格式：be,bu,re
-return parseCommaSeparated(raw);
-```
-
----
-
 ## 7. 结论
 
-### 链路完整性
+### 链路完整性（v2.0.0）
 
 | 评估维度 | 结论 |
 |---------|------|
 | 子货号分开追踪 | ✅ 全链路所有步骤均精确到子货号（v1.6.1 JapanCustoms 已补全）|
-| 批量 UX | ✅ 用户批量录入，系统内部逐条分开 |
+| 1:1 UX | ✅ 每条 Demand → Procurement 自然独立，无批量循环 |
 | Overview 锚点正确性 | ✅ 双入口：Demand 详情（Step1） + Procurement 详情（8步） |
-| v1.6.0 兼容性 | ✅ 修复了前端 Step1 卡片显示 bug |
-| v1.3.0 Demand 中心化 | ✅ 新建需求单立即出现在 Overview |
-| 缺口可接受性 | ⚠️ JapanCustomsRecord 缺少 subProductCode（影响小，可延后修复）|
-
-### 立即可修复项
-
-1. **前端 Bug**（已修复）：Step1 卡片 `quantity`/`destination` → `subProductItemsSummary`
-2. **JapanCustomsRecord 补充 subProductCode**（✅ v1.6.1 已实现）：V29 migration + entity + assembler
+| Demand 中心化 | ✅ 新建需求单立即出现在 Overview |
 
 ### 文档更新
 
-- SPEC-B09-IMPLEMENTATION.md：v1.3.0 双入口架构，Phase 5 已完成
-- SPEC-B09-全链路子货号追踪分析.md：本文件，v1.6.1 JapanCustoms subProductCode 缺口已修复
-- SPEC-B01：补充转换链路说明（转采购循环 + linkedDemandItemsRaw 双向关联）
+- SPEC-B09-IMPLEMENTATION.md：v2.0.0 数据模型，API 路径已同步
+- SPEC-B09-全链路子货号追踪分析.md：本文件，v2.0.0 架构已同步

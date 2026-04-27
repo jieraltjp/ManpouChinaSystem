@@ -2,7 +2,7 @@
 
 > 项目：ManpouChinaSystem
 > 覆盖范围：Vue 组件 / TypeScript / vue-i18n / Element Plus / 构建产物
-> Lesson 编号：11–12, 14, 16, 21, 24, 33–34, 37, 40–44, 46–50, 52–54（共 23 条）
+> Lesson 编号：11–12, 14, 16, 21, 24, 33–34, 37, 40–44, 46–50, 52–58（共 27 条）
 
 ---
 
@@ -30,7 +30,8 @@
 - [Lesson 52: dist 构建产物与源文件 commit 历史脱节——CSS working copy 未提交导致样式修复无效](#lesson-52-dist-构建产物与源文件-commit-历史脱节css-working-copy-未提交导致样式修复无效)
 - [Lesson 53: i18n JSON 中 key 不得重复——后值覆盖前值（JSON 规范未定义合并行为）](#lesson-53-i18n-json-中-key-不得重复后值覆盖前值json-规范未定义合并行为)
 - [Lesson 54: 多文件样式修复必须用 grep 全局扫描——防止"改了 A 漏了 B"](#lesson-54-多文件样式修复必须用-grep-全局扫描防止改了-a-漏了-b)
-
+- [Lesson 57: 业务关联变更须从 SPEC → DB → 后端 → 前端八层同步——LogisticsPlan 锚点从 procurementId 改为 qcRecordId](#lesson-57-业务关联变更须从-spec--db--后端--前端八层同步logisticsplan-锚点从-procurementid-改为-qcrecordid)
+- [Lesson 58: el-input-number 列宽计算须扣 button×2 + el-col padding，内容 < 150px 时按钮截断](#lesson-58-el-input-number-列宽计算须扣-button×2--el-col-padding内容--150px-时按钮截断)
 ---
 
 ## Lesson 11: 文档与代码同步必须持续进行，不能积累
@@ -766,3 +767,181 @@ cat /tmp/fixed-tables.txt | wc -l
 | 52 | dist 构建产物与源文件 commit 历史脱节 | 样式修复无效 |
 | 53 | i18n JSON 中 key 不得重复 | 文案错误 |
 | 54 | 多文件样式修复必须用 grep 全局扫描 | 修复不完整 |
+| 55 | el-input-number 所在列 span≥4（dialog 宽 800+），按钮才不被截断 | 按钮显示异常 |
+| 56 | 表单 diviser 仅在跨语义区大区块时使用，紧凑表单禁止加分隔线 | 视觉噪音 |
+| 57 | 业务关联变更须从 SPEC → DB → 后端 → 前端八层同步 | 锚点选错导致无实际 cargo 尺寸 |
+| 58 | el-input-number 列宽 = content - 60px(按钮×2) - 16px(el-col padding)，content < 150px 时按钮截断 | 按钮文字被遮挡 |
+
+---
+
+## Lesson 55: el-input-number 最小可用列宽
+
+### 问题
+
+InspectionPage.vue 新规验货弹窗中，`el-input-number`（span 4）在 680px 弹窗内，加减按钮被截断：
+
+```
+内容宽度 ≈ (680 - 100 - 16×2) / 4 ≈ 112px  ← 不足以容纳按钮
+```
+
+### 判定
+
+`el-input-number` 含左右两个按钮（各 30px），最小可用 content 宽度 ≈ **150px**。
+
+### 公式
+
+```
+el-input-number span 最小值 ≈ 4（当 dialog width=800, gutter=10, label-width=86）
+  content = (800 - 86 - 10×2) / 4 ≈ 173px ✅ 可用
+  span 3 时 content ≈ 115px ❌ 太窄
+```
+
+### 正确配置
+
+| 每行字段数 | span | dialog 宽度 | 适用控件 |
+|-----------|------|------------|---------|
+| 3 列 | span 6 | 800px+ | el-input-number（推荐） |
+| 3 列 | span 8 | 800px | el-input-number（宽松） |
+| 4 列 | span 6 | 900px | el-select / el-date-picker |
+| 6 列 | span 4 | 800px+ | 仅 el-input-number（紧张） |
+
+> **弹窗宽度 ≥ 800px，含数字输入的表单推荐 820-900px。**
+
+---
+
+## Lesson 56: 表单 divider 是视觉噪音
+
+### 问题
+
+InspectionPage.vue 验货弹窗中，两条 `el-divider` 分隔线把连续的验货字段切成孤立区块，破坏表单的整体感。
+
+### 判定
+
+**同一业务语义区的字段应自然分组，不需要显式分隔线。** divider 仅在跨语义区大区块（如"基本信息"vs"财务信息"）时使用。
+
+### 手术
+
+移除 InspectionPage.vue 新规弹窗中的两条 `el-divider`：
+- ❌ 删除 `验货信息` 分隔线
+- ❌ 删除 `货物信息` 分隔线
+
+### 替代方案
+
+用 `el-row` 自然分行即可。不同语义区之间留 `margin-bottom: 12px` 或空白行。
+
+---
+
+## Lesson 57: 业务关联变更须从 SPEC → DB → 后端 → 前端八层同步
+
+### 问题
+
+`LogisticsPlan`（调配计划）原关联 `procurementId`（采购单），但调配订舱需要**实际装箱尺寸**和**毛重**，这些数据只有在验货完成（步骤3）后才能确定，采购单（步骤2）仅有计划数量。
+
+### 业务链路分析
+
+| 步骤 | 实体 | 实际装箱尺寸 | 毛重 |
+|------|------|------------|------|
+| 步骤2 | Procurement（采购单） | ❌ 无数据 | ❌ 无数据 |
+| 步骤3 | QcRecord（验货记录） | ✅ boxLengthCm × boxWidthCm × boxHeightCm | ✅ grossWeight |
+| 步骤4 | LogisticsPlan（调配计划） | 锚点选步骤3才正确 | 锚点选步骤3才正确 |
+
+### 正确变更顺序
+
+```
+SPEC 文档     → 定义 qcRecordId 关联，注明业务原因
+DB migration → V34 ADD COLUMN qc_record_id
+Entity       → LogisticsPlan.java 新增 qcRecordId 字段 + @Index
+DTOs         → CreateCmd / UpdateCmd / PageQuery / Query 全部加字段
+Assembler    → toDto/toEntity/copyCreate 全部映射 qcRecordId
+Repository   → 新增 findByQcRecordIdAndDeletedIsFalse 方法
+UseCase      → 校验 qcRecordId 存在且 result=PASS，auto-fill cargo 尺寸
+Controller   → Query 参数自动绑定（无需修改）
+前端 API     → logistics.ts 类型加 qcRecordId
+前端 Vue     → 采购单下拉 → 验货记录下拉，auto-fill cargo 尺寸
+i18n        → 新增 qcRecord/qcRecordRequired 等 key
+Lesson       → 记录本次教训
+```
+
+### 本次变更文件清单
+
+| 层级 | 文件 | 变更 |
+|------|------|------|
+| SPEC | `SPEC-B04-调配计划-步骤4.md` | v1.2.0，新增 qcRecordId 聚合根 |
+| DB | `DB-04-logistics.md` | v1.2.0，新增 qc_record_id 列定义 |
+| DB | `V34__logistics_plan_qc_record_id.sql` | 新建，ADD COLUMN qc_record_id |
+| Entity | `LogisticsPlan.java` | 新增 qcRecordId 字段 + idx |
+| DTOs | `LogisticsPlanCreateCmd.java` | 新增 qcRecordId |
+| DTOs | `LogisticsPlanUpdateCmd.java` | 新增 qcRecordId |
+| DTOs | `LogisticsPlanPageQuery.java` | 新增 qcRecordId + qcCode |
+| DTOs | `LogisticsPlanQuery.java` | 新增 qcRecordId |
+| Assembler | `LogisticsPlanAssembler.java` | 新增 qcRecordId 映射 + QcQueryPort 获取 qcCode |
+| Repository | `LogisticsPlanRepository.java` | 新增 findByQcRecordIdAndDeletedIsFalse |
+| JPA | `LogisticsPlanJpaRepository.java` | 新增 findByQcRecordIdAndDeletedIsFalse |
+| UseCase | `LogisticsPlanUseCase.java` | 校验 qcRecord 存在且 result=PASS，auto-fill cargo |
+| 前端 API | `logistics.ts` | LogisticsPlanVO + CreateRequest 新增 qcRecordId/qcCode |
+| 前端 Vue | `LogisticsPage.vue` | 采购单下拉 → 验货记录下拉 |
+| i18n | `zh.json` / `ja.json` | 新增 qcRecord/qcRecordRequired 等 key |
+
+### 溯源
+
+- **EV-057**: LogisticsPlan 锚点错误 → Lesson 57
+
+---
+
+## Lesson 58: el-input-number 列宽计算须扣 button×2 + el-col padding，内容 < 150px 时按钮截断
+
+### 问题
+
+LogisticsPage.vue 新规调配弹窗，货物长/宽/高三列，`el-input-number` 按钮文字被遮挡。显示"货物长"时部分文字不可见。
+
+### 根因分析
+
+**Element Plus `el-input-number` 内部结构**：
+
+```
+┌────────────────────────────────────────┐
+│ [− 30px] │    input content (数字)    │ [+ 30px] │
+└────────────────────────────────────────┘
+  按钮         content = 列宽 - 60px        按钮
+```
+
+**漏扣项（多层 padding 消耗）**：
+
+| 层 | padding 消耗 |
+|----|------------|
+| `el-input-number` 按钮 | 30px × 2 = 60px |
+| `el-input__wrapper` 内边距 | 11px × 2 = 22px（文字不贴边） |
+| `el-col` gutter padding | 8px × 2 = 16px |
+| `el-form-item__content` | 0（无额外 padding） |
+
+### 正确公式
+
+```
+el-input-number 最小可用 content 宽度 = 150px
+最小列宽 = content + 60px（按钮×2）+ 16px（el-col padding）
+         = 150 + 60 + 16
+         = 226px
+
+820px 弹窗 + label-width=100 + gutter=16 + span 6:
+  content ≈ (820 - 100 - 16) / 3 ≈ 234px ✅（实际扣 padding 后 ≈ 213px，够用）
+
+640px 弹窗 + label-width=100 + gutter=16 + span 4:
+  content ≈ (640 - 100 - 16) / 4 ≈ 131px ❌（实际 ≈ 113px < 150px → 截断）
+```
+
+### 判定速查表
+
+| 弹窗 | gutter | label | 列数 | span | 估算 content | 可用? |
+|------|--------|-------|------|------|-------------|--------|
+| 640px | 16 | 100 | 3 | span 6 | ≈ 153px | ✅ |
+| 680px | 10 | 86 | 3 | span 6 | ≈ 193px | ✅ |
+| 820px | 16 | 100 | 3 | span 6 | ≈ 213px | ✅ |
+| 640px | 16 | 100 | 4 | span 4 | ≈ 113px | ❌ 截断 |
+
+### 手术（本次）
+
+LogisticsPage.vue：弹窗宽度 640px → 820px，货物尺寸行 span 8 → span 6。
+
+### 溯源
+
+- **EV-058**: LogisticsPage el-input-number 按钮截断 → Lesson 58

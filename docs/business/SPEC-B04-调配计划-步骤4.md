@@ -1,8 +1,8 @@
 # SPEC-B04 — 调配计划业务规格（步骤4）
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-22 — 同步状态（无代码变更）
+> **更新**: 2026-04-27 — v1.2.0：LogisticsPlan 关联从 procurementId 改为 qcRecordId（验完货才知道实际装箱尺寸，用于调配订舱）
 > **状态**: ✅ 已实现（LogisticsPlan）；⚡占位（Container/ConsolidationPool）
 > **业务步号**: 04（调配计划）
 > **对应 UI 文档**: `docs/ui/pages/04-logistics.md`
@@ -15,6 +15,9 @@
 ## 1. 业务背景
 
 验货通过后，安排货物的运输方式（海运/空运/拼柜），生成调配记录。调配类型决定了后续报关和运输的流程差异。
+
+**业务锚点变更（v1.2.0）**：
+> 调配计划关联 **验货记录（QcRecord）**，而非采购单（Procurement）。原因：验完货才知道实际装箱尺寸（长×宽×高）和毛重，用于判断 SEA/AIR 路径和订舱计算。采购单仅有计划数量，无实际测量数据。
 
 **三种调配路径**：
 - `SEA`：体积/重量超标，优先海运
@@ -31,8 +34,9 @@
 LogisticsPlan（聚合根）
 ├── id: Long
 ├── planCode: String             # L-YYYYMMDD-NNN
-├── procurementId: Long           # 关联采购单（拼柜时可为空）
-├── factoryId: Long              # 关联工厂
+├── qcRecordId: Long              # 关联验货记录（QC通过后才知道实际装箱尺寸，用于订舱）
+├── procurementId: Long           # 关联采购单（拼柜场景可空；正常流程由 qcRecordId 反查）
+├── factoryId: Long              # 关联工厂（由 qcRecord.procurement.factoryId 代入）
 ├── productCode: String          # 货号
 ├── subProductCode: String       # 子货号/颜色
 ├── planType: PlanType           # SEA / AIR / CONSOLIDATION
@@ -82,8 +86,8 @@ ConsolidationPool（聚合根）
 ├── containerId: Long          # 实际货柜（装柜后赋值）
 ├── status: PoolStatus         # POOL_PENDING → POOL_READY → LOADED
 └── 领域方法
-    ├── add(procurementId)      # 加入拼柜
-    ├── remove(procurementId)   # 移出
+    ├── add(qcRecordId)         # 加入拼柜（关联验货记录）
+    ├── remove(qcRecordId)     # 移出
     └── consolidate(containerId) # 触发装柜
 ```
 
@@ -151,7 +155,7 @@ public enum LogisticsStatus {
 
 ```
 # LogisticsPlan
-GET    /api/v1/logistics-plans?page=&pageSize=&planType=&productCode=&status=
+GET    /api/v1/logistics-plans?page=&pageSize=&planType=&productCode=&status=&qcRecordId=
 GET    /api/v1/logistics-plans/{id}
 POST   /api/v1/logistics-plans
 PATCH  /api/v1/logistics-plans/{id}
@@ -173,16 +177,16 @@ DELETE /api/v1/consolidation-pools/{poolId}/items/{itemId}
 
 ## 7. 代码实现状态
 
-- [x] ✅ `LogisticsPlan` 聚合根实体（含 `calculateVolume()`）
+- [x] ✅ `LogisticsPlan` 聚合根实体（含 `calculateVolume()`，v1.2.0 新增 `qcRecordId`）
 - [x] ✅ `LogisticsStatus` 枚举（含 `isTerminal()` + `canTransitionTo()` + FSM map）
 - [x] ✅ `PlanType` 枚举
-- [x] ✅ `LogisticsPlanRepository` 领域接口 + JPA 适配器
-- [x] ✅ `LogisticsPlanUseCase` 用例服务
-- [x] ✅ `LogisticsPlanAssembler` DTO 转换器
+- [x] ✅ `LogisticsPlanRepository` 领域接口 + JPA 适配器（v1.2.0 新增 `findByQcRecordId`）
+- [x] ✅ `LogisticsPlanUseCase` 用例服务（v1.2.0 校验 qcRecord 存在且 result=PASS）
+- [x] ✅ `LogisticsPlanAssembler` DTO 转换器（v1.2.0 新增 qcRecordId 映射）
 - [x] ✅ `LogisticsPlanController` REST 控制器
 - [x] ✅ `LogisticsPlanUseCaseTest` 单元测试（12个用例，全部通过）
-- [x] ✅ `@/api/logistics.ts` 前端 API 客户端
-- [x] ✅ `LogisticsPage.vue` 页面（已对接真实 API）
+- [x] ✅ `@/api/logistics.ts` 前端 API 客户端（v1.2.0 qcRecordId 类型）
+- [x] ✅ `LogisticsPage.vue` 页面（v1.2.0 验货记录下拉替代采购单下拉）
 - [ ] 🔴 `Container` 聚合根实体
 - [ ] 🔴 `ConsolidationPool` 聚合根实体
 - [ ] 🔴 `ConsolidationPoolItem` 聚合根实体

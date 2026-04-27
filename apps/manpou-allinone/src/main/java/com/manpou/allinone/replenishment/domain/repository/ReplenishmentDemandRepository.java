@@ -35,4 +35,7 @@ public interface ReplenishmentDemandRepository extends JpaRepository<Replenishme
 
     @Query("SELECT DISTINCT d.japanLead FROM ReplenishmentDemand d WHERE d.deleted = false AND d.japanLead IS NOT NULL AND d.japanLead <> '' ORDER BY d.japanLead")
     List<String> findDistinctJapanLeads();
+
+    /** 按关联发注单 ID 查询（v2.0.0：Procurement → ReplenishmentDemand 反向关联） */
+    List<ReplenishmentDemand> findByLinkedProcurementIdAndDeletedIsFalse(Long linkedProcurementId);
 }

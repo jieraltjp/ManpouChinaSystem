@@ -15,6 +15,8 @@ public class LogisticsPlanPageQuery {
 
     private Long id;
     private String planCode;
+    private Long qcRecordId;
+    private String qcCode;          // 验货编号（来自 QC record，v1.2.0）
     private Long procurementId;
     private Long factoryId;
     private String factoryName;       // 关联工厂名称（来自 factory 表 JOIN）

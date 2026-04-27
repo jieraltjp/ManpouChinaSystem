@@ -1,6 +1,5 @@
 package com.manpou.allinone.factory.application.assembler;
 
-import com.manpou.allinone.common.port.FactorySynergyPort;
 import com.manpou.allinone.factory.application.dto.FactoryCreateCmd;
 import com.manpou.allinone.factory.application.dto.FactoryPageQuery;
 import com.manpou.allinone.factory.application.dto.FactoryUpdateCmd;
@@ -19,12 +18,6 @@ public class FactoryAssembler {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final AtomicLong SEQ = new AtomicLong(System.currentTimeMillis() % 1000);
-
-    private final FactorySynergyPort synergyPort;
-
-    public FactoryAssembler(FactorySynergyPort synergyPort) {
-        this.synergyPort = synergyPort;
-    }
 
     public String generateFactoryCode() {
         String date = LocalDate.now().format(DATE_FMT);
@@ -54,11 +47,6 @@ public class FactoryAssembler {
                 .createTime(entity.getCreateTime())
                 .updateTime(entity.getUpdateTime())
                 .build();
-
-        // 跨聚合根领域规则：有商品关联 → 强制合作中
-        if (entity.getId() != null && synergyPort.hasAssociatedProducts(entity.getId())) {
-            dto.setCooperationStatus(CooperationStatus.ACTIVE);
-        }
         return dto;
     }
 

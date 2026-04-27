@@ -1,7 +1,7 @@
 # SPEC-B02 — 发注单业务规格（步骤2）
 
-> **版本**: 1.7.0
-> **更新**: 2026-04-24（v1.7.0：Factory 合作状态渲染规则 — product_factory 有关联则强制渲染为 ACTIVE）
+> **版本**: 1.9.0
+> **更新**: 2026-04-27（v1.9.0：新增交货期 leadTimeDays 和纸箱备注 cartonNotes 两字段）
 > **更新**: 2026-04-24（v1.6.0：补货需求转采购改为批量模式；一个 ReplenishmentDemand 批量生成多条 Procurement）
 > **更新**: 2026-04-23（补充元数据字段）
 > **创建**: 2026-04-22
@@ -45,9 +45,8 @@ ReplenishmentDemand（聚合根）
 
 > **内嵌**：无独立页面，工厂选择器内嵌于发注单表单，支持新建/编辑。
 >
-> **合作状态渲染规则**：API 返回时，若 `product_factory` 表中存在 `factory_id` 关联记录，
-> 强制将 `cooperationStatus` 渲染为 `ACTIVE`（合作中），不修改数据库值。
-> 实现：`FactoryAssembler.toDto()` → `FactorySynergyPort.hasAssociatedProducts()`。
+> **v1.8.0 变更**：移除了 `FactorySynergyPort`（跨模块强耦合），`cooperation_status` 以 DB 值为准，
+> 由管理员在工厂管理页面手动维护 ACTIVE/POTENTIAL/SUSPENDED/ELIMINATED 四态。
 
 ```
 Factory（聚合根）
@@ -65,7 +64,7 @@ Factory（聚合根）
 ├── contactPhone: String        # 手机号
 ├── contactWechat: String       # 微信号
 ├── contactQq: String          # QQ号
-├── cooperationStatus: CooperationStatus  # 合作状态（渲染时：有关联商品 → ACTIVE）
+├── cooperationStatus: CooperationStatus  # 合作状态（DB直传，管理员手动维护）
 ├── paymentTerms: PaymentTerms  # 账期
 ├── notes: String              # 备注
 └── 领域方法
@@ -103,6 +102,8 @@ Procurement（聚合根）
 ├── customerCompany: String    # 客户公司
 ├── linkedDemandId: Long     # 关联的需求单 ID（v1.6.0 新增）
 ├── linkedDemandItemId: Long  # 关联的需求单子货号明细 ID（v1.6.0 新增）
+├── leadTimeDays: Integer     # 交货期天数（30/45/60），默认值 30
+├── cartonNotes: String       # 纸箱备注（v1.9.0 新增）
 ├── status: ShipmentStatus     # 19态（含完了终态）
 └── 领域方法
     ├── calculateEstimatedPriceJpy()  # 估算批发价
@@ -244,7 +245,7 @@ DELETE /api/v1/procurements/{id}
 - [x] ✅ `ProcurementController` REST 控制器
 - [x] ✅ `ProcurementUseCaseTest` 单元测试（14个用例，全部通过）
 - [x] ✅ `FactoryUseCaseTest` 单元测试（8个用例，全部通过）
-- [x] ✅ `FactorySynergyPort` 跨模块防腐口（检查 product_factory 关联）
+- [x] ✅ ~~`FactorySynergyPort`~~ （v1.8.0 已移除，强耦合，已改用 DB 直传）
 - [x] ✅ `@/api/order.ts` 前端 API 客户端
 - [x] ✅ `OrderPage.vue` 页面（已对接真实 API）
 - [x] ✅ 工厂内嵌选择器（新建/编辑）

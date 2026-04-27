@@ -86,6 +86,12 @@ public class Procurement extends BaseEntity {
     @Column(name = "actual_ship_date")
     private java.time.LocalDate actualShipDate;  // 实际出货日（v1.3.0 新增）
 
+    @Column(name = "lead_time_days")
+    private Integer leadTimeDays;    // 交货期天数（30/45/60）
+
+    @Column(name = "carton_notes", length = 512)
+    private String cartonNotes;     // 纸箱备注（v1.9.0 新增）
+
     // ===== 担当 =====
     @Column(name = "product_lead", length = 64)
     private String productLead;        // 商品担当
@@ -107,14 +113,6 @@ public class Procurement extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 32)
     private ShipmentStatus status = ShipmentStatus.未定;
-
-    // ===== 关联需求单（v1.6.0：转采购时填充） =====
-    @Column(name = "linked_demand_id")
-    private Long linkedDemandId;
-
-    /** 关联的需求单子货号明细索引（对应 ReplenishmentDemand.subProductItems 数组下标，v1.6.0） */
-    @Column(name = "linked_demand_item_id")
-    private Long linkedDemandItemId;
 
     // ===== 领域方法 =====
 

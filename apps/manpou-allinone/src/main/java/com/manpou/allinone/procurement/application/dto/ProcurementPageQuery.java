@@ -51,6 +51,8 @@ public class ProcurementPageQuery {
     private LocalDate factoryShipDate; // 厂家出货日
     private LocalDate plannedShipDate; // 计划出货日（交货期）
     private LocalDate actualShipDate;  // 实际出货日（v1.3.0 新增）
+    private Integer leadTimeDays;      // 交货期天数（30/45/60）
+    private String cartonNotes;       // 纸箱备注（v1.9.0 新增）
 
     // ===== 担当 =====
     private String productLead;        // 商品担当
@@ -63,10 +65,6 @@ public class ProcurementPageQuery {
 
     // ===== 状态 =====
     private ShipmentStatus status;    // 状态
-
-    // ===== 关联需求单（v1.6.0） =====
-    private Long linkedDemandId;
-    private Long linkedDemandItemId;
 
     // ===== 审计 =====
     private String createBy;

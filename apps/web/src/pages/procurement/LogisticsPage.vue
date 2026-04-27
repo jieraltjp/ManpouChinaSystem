@@ -63,6 +63,7 @@
     <el-card class="table-card" shadow="never">
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="planCode" :label="$t('logistics.column.planCode')" min-width="160" />
+        <el-table-column prop="qcCode" :label="$t('logistics.column.qcCode')" min-width="130" show-overflow-tooltip />
         <el-table-column prop="factoryName" :label="$t('logistics.column.factoryName')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="productCode" :label="$t('logistics.column.productCode')" min-width="120">
           <template #default="{ row }">
@@ -101,7 +102,7 @@
         <el-table-column :label="$t('logistics.column.action')" min-width="160" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('logistics.action.detail') }}</el-button>
-            <el-button v-if="row.procurementId" link type="warning" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
+            <el-button v-if="row.qcRecordId" link type="warning" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -121,28 +122,24 @@
     </el-card>
 
     <!-- 新增调配弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="$t('logistics.dialog.newTitle')" width="640px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="$t('logistics.dialog.newTitle')" width="900px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="formRules" label-width="100px">
-        <el-form-item :label="$t('logistics.dialog.procurement')" prop="procurementId">
+        <el-form-item :label="$t('logistics.dialog.qcRecord')" prop="qcRecordId">
           <el-select
-            v-model="form.procurementId"
-            :placeholder="$t('logistics.dialog.procurementPlaceholder')"
+            v-model="form.qcRecordId"
+            :placeholder="$t('logistics.dialog.qcRecordPlaceholder')"
             filterable
-            remote
-            :remote-method="searchProcurement"
-            :loading="procurementLoading"
             style="width:100%"
-            @change="onProcurementSelected"
+            @change="onQcRecordSelected"
           >
             <el-option
-              v-for="p in procurementList"
-              :key="p.id"
-              :label="`${p.productCode}${p.subProductCode ? '-' + p.subProductCode : ''} / ${p.customerCompany || ''} / ${p.orderDate || ''}`"
-              :value="p.id"
+              v-for="r in qcRecordOptions"
+              :key="r.id"
+              :label="`${r.qcCode} / ${r.productCode} / ${r.result}`"
+              :value="r.id"
             />
           </el-select>
         </el-form-item>
-        <el-divider content-position="left"><span class="divider-label">{{ $t('logistics.dialog.cargoInfo') }}</span></el-divider>
         <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item :label="$t('logistics.dialog.productCode')" prop="productCode">
@@ -172,17 +169,17 @@
           </el-col>
         </el-row>
         <el-row :gutter="16">
-          <el-col :span="8">
+          <el-col :span="6">
             <el-form-item :label="$t('logistics.dialog.cargoLengthCm')">
               <el-input-number v-model="form.cargoLengthCm" :min="0" style="width:100%" />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="6">
             <el-form-item :label="$t('logistics.dialog.cargoWidthCm')">
               <el-input-number v-model="form.cargoWidthCm" :min="0" style="width:100%" />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="6">
             <el-form-item :label="$t('logistics.dialog.cargoHeightCm')">
               <el-input-number v-model="form.cargoHeightCm" :min="0" style="width:100%" />
             </el-form-item>
@@ -200,7 +197,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-divider content-position="left"><span class="divider-label">{{ $t('logistics.dialog.shipPlan') }}</span></el-divider>
         <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item :label="$t('logistics.dialog.estimatedShipDate')">
@@ -257,12 +253,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Van, Top, Loading } from '@element-plus/icons-vue'
 import { logisticsApi, type LogisticsPlanVO, type LogisticsStatus, type PlanType } from '@/api/logistics'
-import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
+import { inspectionApi, type QcRecordVO } from '@/api/inspection'
 import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
@@ -270,21 +266,22 @@ const loading = ref(false)
 const submitting = ref(false)
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
-const procurementLoading = ref(false)
+const qcRecordLoading = ref(false)
 
 const currentRow = ref<LogisticsPlanVO | null>(null)
+const qcRecordOptions = ref<QcRecordVO[]>([])
 const filterForm = reactive({
   planType: '' as PlanType | '',
   status: '' as LogisticsStatus | '',
 })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const tableData = ref<LogisticsPlanVO[]>([])
-const procurementList = ref<ProcurementPageVO[]>([])
 
 const formRef = ref<FormInstance>()
 const { t } = useI18n()
 
 const form = reactive({
+  qcRecordId: undefined as number | undefined,
   procurementId: undefined as number | undefined,
   factoryId: undefined as number | undefined,
   productCode: '',
@@ -302,7 +299,7 @@ const form = reactive({
 })
 
 const formRules: FormRules = {
-  procurementId: [{ required: true, message: () => t('logistics.validation.procurementRequired'), trigger: 'change' }],
+  qcRecordId: [{ required: true, message: () => t('logistics.validation.qcRecordRequired'), trigger: 'change' }],
   productCode: [{ required: true, message: () => t('logistics.validation.productCodeRequired'), trigger: 'blur' }],
   planType: [{ required: true, message: () => t('logistics.validation.planTypeRequired'), trigger: 'change' }],
 }
@@ -356,36 +353,49 @@ function onReset() {
   loadData()
 }
 
-async function searchProcurement(query: string) {
-  if (!query) { procurementList.value = []; return }
-  procurementLoading.value = true
+async function loadQcRecordOptions() {
+  qcRecordLoading.value = true
   try {
-    const res = await procurementApi.list({ page: 0, pageSize: 20, productCode: query })
-    procurementList.value = res.data.data?.content ?? []
-  } catch (e) { console.error('[LogisticsPage] searchProcurement failed', e); procurementList.value = [] }
-  finally { procurementLoading.value = false }
+    const res = await inspectionApi.list({ page: 0, pageSize: 100, result: 'PASS', status: 'COMPLETED' })
+    qcRecordOptions.value = res.data.data?.content ?? []
+  } catch (e) {
+    console.error('[LogisticsPage] loadQcRecordOptions failed', e)
+    qcRecordOptions.value = []
+  } finally {
+    qcRecordLoading.value = false
+  }
 }
 
-function onProcurementSelected(id: number) {
-  const p = procurementList.value.find(p => p.id === id)
-  if (!p) return
-  form.productCode = p.productCode
-  form.subProductCode = p.subProductCode || ''
-  form.factoryId = p.factoryId
-  form.quantity = p.quantity
-  form.requiresQc = p.requiresQc ?? false
+watch(dialogVisible, (val) => {
+  if (val) loadQcRecordOptions()
+})
+
+function onQcRecordSelected(id: number) {
+  const r = qcRecordOptions.value.find(r => r.id === id)
+  if (!r) return
+  // 货号/子货号/数量代入
+  form.productCode = r.productCode
+  form.subProductCode = r.subProductCode || ''
+  form.quantity = r.quantity
+  // 实际装箱尺寸 auto-fill（用户可手动覆盖）
+  if (!form.cargoLengthCm && r.boxLengthCm) form.cargoLengthCm = r.boxLengthCm
+  if (!form.cargoWidthCm && r.boxWidthCm) form.cargoWidthCm = r.boxWidthCm
+  if (!form.cargoHeightCm && r.boxHeightCm) form.cargoHeightCm = r.boxHeightCm
+  if (!form.cargoWeightKg && r.grossWeight) form.cargoWeightKg = r.grossWeight
 }
 
 function onNew() {
   formRef.value?.resetFields()
   Object.assign(form, {
-    procurementId: undefined, factoryId: undefined,
+    qcRecordId: undefined, procurementId: undefined, factoryId: undefined,
     productCode: '', subProductCode: '', planType: undefined,
-    cargoLengthCm: undefined, cargoWidthCm: undefined, cargoHeightCm: undefined,
-    cargoWeightKg: undefined, quantity: undefined, requiresQc: false,
+    // 数字字段默认 0（显示占位，用户可选中修改；auto-fill 时会被代入真实值）
+    cargoLengthCm: 0, cargoWidthCm: 0, cargoHeightCm: 0,
+    cargoWeightKg: 0, quantity: 0,
+    requiresQc: false,
     estimatedShipDate: '', actualShipDate: '', remarks: '',
   })
-  procurementList.value = []
+  qcRecordOptions.value = []
   dialogVisible.value = true
 }
 
@@ -395,6 +405,7 @@ async function onSubmit() {
   submitting.value = true
   try {
     await logisticsApi.create({
+      qcRecordId: form.qcRecordId,
       procurementId: form.procurementId,
       factoryId: form.factoryId,
       productCode: form.productCode,
@@ -427,7 +438,7 @@ function onView(row: LogisticsPlanVO) {
 }
 
 function onOverview(row: LogisticsPlanVO) {
-  router.push('/base/overview/' + row.procurementId)
+  router.push('/base/overview/' + row.qcRecordId)
 }
 
 function planTypeLabel(type?: string): string {

@@ -237,7 +237,8 @@
       "Read(//c/Program Files/**)",
       "Read(//c//**)",
       "Read(//d//**)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "Bash(echo \"Backend PID: $!\")"
     ]
   }
 }

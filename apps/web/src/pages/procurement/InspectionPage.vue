@@ -112,12 +112,6 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="taxRefund" :label="$t('inspection.column.taxRefund')" min-width="70" align="center">
-          <template #default="{ row }">
-            <span v-if="row.taxRefund">{{ $t('inspection.yes') }}</span>
-            <span v-else>-</span>
-          </template>
-        </el-table-column>
         <el-table-column :label="$t('inspection.column.action')" min-width="220" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('inspection.action.detail') }}</el-button>
@@ -143,33 +137,37 @@
     </el-card>
 
     <!-- 新规验货弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="$t('inspection.newDialogTitle')" width="680px" destroy-on-close>
-      <el-form ref="formRef" :model="form" :rules="formRules" label-width="100px">
-        <el-form-item :label="$t('inspection.dialog.procurement')" prop="procurementId">
-          <el-select
-            v-model="form.procurementId"
-            :placeholder="$t('inspection.dialog.procurementPlaceholder')"
-            filterable
-            remote
-            :remote-method="searchProcurement"
-            :loading="procurementLoading"
-            style="width:100%"
-            @change="onProcurementSelected"
-          >
-            <el-option
-              v-for="p in procurementList"
-              :key="p.id"
-              :label="`${p.productCode}${p.subProductCode ? '-' + p.subProductCode : ''} / ${p.customerCompany || ''} / ${p.orderDate || ''}`"
-              :value="p.id"
-            />
-          </el-select>
-        </el-form-item>
-        <!-- 卖家名称（自动代入） -->
-        <el-form-item :label="$t('inspection.column.sellerName')">
-          <el-input v-model="form.sellerName" disabled />
-        </el-form-item>
-        <el-divider content-position="left"><span class="divider-label">{{ $t('inspection.dialog.inspectionInfo') }}</span></el-divider>
-        <el-row :gutter="16">
+    <el-dialog v-model="dialogVisible" :title="$t('inspection.newDialogTitle')" width="820px" destroy-on-close>
+      <el-form ref="formRef" :model="form" :rules="formRules" label-width="86px">
+        <!-- Row 1: 关联采购单 + 卖家名称 -->
+        <el-row :gutter="10">
+          <el-col :span="14">
+            <el-form-item :label="$t('inspection.dialog.procurement')" prop="procurementId">
+              <el-select
+                v-model="form.procurementId"
+                :placeholder="$t('inspection.dialog.procurementPlaceholder')"
+                filterable
+                :loading="procurementLoading"
+                style="width:100%"
+                @change="onProcurementSelected"
+              >
+                <el-option
+                  v-for="p in procurementList"
+                  :key="p.id"
+                  :label="`${p.productCode}${p.subProductCode ? '-' + p.subProductCode : ''} / ${p.customerCompany || ''} / ${p.orderDate || ''}`"
+                  :value="p.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="10">
+            <el-form-item :label="$t('inspection.column.sellerName')">
+              <el-input v-model="form.sellerName" disabled />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <!-- Row 2: 货号 + 子货号 -->
+        <el-row :gutter="10">
           <el-col :span="12">
             <el-form-item :label="$t('inspection.dialog.productCode')" prop="productCode">
               <el-input v-model="form.productCode" :placeholder="$t('inspection.dialog.productCodePlaceholder')" disabled />
@@ -181,125 +179,120 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row :gutter="16">
-          <el-col :span="12">
+        <!-- Row 3: 验货类型 + 日期 + 数量 + 状态 -->
+        <el-row :gutter="10">
+          <el-col :span="6">
             <el-form-item :label="$t('inspection.dialog.qcType')">
-              <el-select v-model="form.qcType" :placeholder="$t('inspection.dialog.selectPlaceholder')" style="width:100%">
+              <el-select v-model="form.qcType" style="width:100%">
                 <el-option value="ONSITE" :label="$t('inspection.qcType.onsite')" />
                 <el-option value="REMOTE" :label="$t('inspection.qcType.remote')" />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="6">
             <el-form-item :label="$t('inspection.dialog.qcDate')">
-              <el-date-picker v-model="form.qcDate" type="date" value-format="YYYY-MM-DD" :placeholder="$t('inspection.dialog.datePlaceholder')" style="width:100%" />
+              <el-date-picker v-model="form.qcDate" type="date" value-format="YYYY-MM-DD" style="width:100%" />
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="16">
-          <el-col :span="8">
-            <el-form-item :label="$t('inspection.dialog.inspectionCount')" prop="inspectionCount">
-              <el-input-number v-model="form.inspectionCount" :min="0" style="width:100%" />
+          <el-col :span="6">
+            <el-form-item :label="$t('inspection.dialog.quantity')">
+              <el-input-number v-model="form.quantity" :min="0" style="width:100%" />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
-            <el-form-item :label="$t('inspection.dialog.passedCount')">
-              <el-input-number v-model="form.passedCount" :min="0" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item :label="$t('inspection.dialog.defectiveCount')">
-              <el-input-number v-model="form.defectiveCount" :min="0" style="width:100%" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="16">
-          <el-col :span="8">
-            <el-form-item :label="$t('inspection.dialog.result')">
-              <el-select v-model="form.result" :placeholder="$t('inspection.dialog.selectPlaceholder')" style="width:100%">
-                <el-option value="PASS" :label="$t('inspection.result.pass')" />
-                <el-option value="FAIL" :label="$t('inspection.result.fail')" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
+          <el-col :span="6">
             <el-form-item :label="$t('inspection.dialog.qcStatus')">
-              <el-select v-model="form.status" :placeholder="$t('inspection.dialog.selectPlaceholder')" style="width:100%">
+              <el-select v-model="form.status" style="width:100%">
                 <el-option value="PENDING" :label="$t('inspection.qcStatus.pending')" />
                 <el-option value="COMPLETED" :label="$t('inspection.qcStatus.completed')" />
                 <el-option value="RETURN_REQUESTED" :label="$t('inspection.qcStatus.returnRequested')" />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+        </el-row>
+        <!-- Row 4: 检品数 + 合格数 + 结果 + 箱数 -->
+        <el-row :gutter="10">
+          <el-col :span="6">
+            <el-form-item :label="$t('inspection.dialog.inspectionCount')" prop="inspectionCount">
+              <el-input-number v-model="form.inspectionCount" :min="0" style="width:100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item :label="$t('inspection.dialog.passedCount')">
+              <el-input-number v-model="form.passedCount" :min="0" style="width:100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item :label="$t('inspection.dialog.result')">
+              <el-select v-model="form.result" style="width:100%">
+                <el-option value="PASS" :label="$t('inspection.result.pass')" />
+                <el-option value="FAIL" :label="$t('inspection.result.fail')" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
             <el-form-item :label="$t('inspection.dialog.boxCount')">
               <el-input-number v-model="form.boxCount" :min="0" style="width:100%" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-divider content-position="left"><span class="divider-label">{{ $t('inspection.dialog.cargoInfo') }}</span></el-divider>
-        <el-row :gutter="16">
+        <!-- Row 5: 材质 + 目的地 -->
+        <el-row :gutter="10">
           <el-col :span="12">
+            <el-form-item :label="$t('inspection.dialog.material')">
+              <el-input v-model="form.material" :placeholder="$t('inspection.dialog.materialPlaceholder')" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('inspection.dialog.destination')">
+              <el-input v-model="form.destination" :placeholder="$t('inspection.dialog.destinationPlaceholder')" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <!-- Row 6: 体积（长+宽+高） -->
+        <el-row :gutter="10">
+          <el-col :span="8">
             <el-form-item :label="$t('inspection.dialog.boxLengthCm')">
               <el-input-number v-model="form.boxLengthCm" :min="0" style="width:100%" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item :label="$t('inspection.dialog.boxWidthCm')">
               <el-input-number v-model="form.boxWidthCm" :min="0" style="width:100%" />
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="16">
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item :label="$t('inspection.dialog.boxHeightCm')">
               <el-input-number v-model="form.boxHeightCm" :min="0" style="width:100%" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+        </el-row>
+        <!-- Row 7: 重量 + 价格 -->
+        <el-row :gutter="10">
+          <el-col :span="8">
             <el-form-item :label="$t('inspection.dialog.netWeightPerUnit')">
               <el-input-number v-model="form.netWeightPerUnit" :min="0" :precision="3" style="width:100%" />
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="16">
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item :label="$t('inspection.dialog.grossWeight')">
               <el-input-number v-model="form.grossWeight" :min="0" :precision="2" style="width:100%" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item :label="$t('inspection.dialog.taxInclusivePrice')">
               <el-input-number v-model="form.taxInclusivePrice" :min="0" :precision="2" style="width:100%" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row :gutter="16">
-          <el-col :span="12">
-            <el-form-item :label="$t('inspection.dialog.quantity')">
-              <el-input-number v-model="form.quantity" :min="0" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('inspection.dialog.taxRefund')">
-              <el-switch v-model="form.taxRefund" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item :label="$t('inspection.dialog.material')">
-          <el-input v-model="form.material" :placeholder="$t('inspection.dialog.materialPlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="$t('inspection.dialog.destination')">
-          <el-input v-model="form.destination" :placeholder="$t('inspection.dialog.destinationPlaceholder')" />
-        </el-form-item>
+        <!-- 备注 -->
         <el-form-item :label="$t('inspection.dialog.qcStandard')">
-          <el-input v-model="form.qcStandard" type="textarea" :rows="2" :placeholder="$t('inspection.dialog.qcStandardPlaceholder')" />
+          <el-input v-model="form.qcStandard" type="textarea" :rows="1" :placeholder="$t('inspection.dialog.qcStandardPlaceholder')" />
         </el-form-item>
         <el-form-item :label="$t('inspection.dialog.remarks')">
-          <el-input v-model="form.remarks" type="textarea" :rows="2" :placeholder="$t('inspection.dialog.remarksPlaceholder')" />
+          <el-input v-model="form.remarks" type="textarea" :rows="1" :placeholder="$t('inspection.dialog.remarksPlaceholder')" />
         </el-form-item>
         <el-form-item :label="$t('inspection.dialog.images')">
-          <el-input v-model="form.images" type="textarea" :rows="2" :placeholder="$t('inspection.dialog.imagesPlaceholder')" />
+          <el-input v-model="form.images" type="textarea" :rows="1" :placeholder="$t('inspection.dialog.imagesPlaceholder')" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -309,16 +302,14 @@
     </el-dialog>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" :title="$t('inspection.drawerTitle')" size="600px" direction="rtl">
-      <el-descriptions :column="2" border v-if="currentRow">
+    <el-drawer v-model="drawerVisible" :title="$t('inspection.drawerTitle')" size="720px" direction="rtl">
+      <el-descriptions :column="2" border v-if="currentRow" label-class-name="drawer-label">
+        <!-- 基本信息 -->
         <el-descriptions-item :label="$t('inspection.column.qcCode')">{{ currentRow.qcCode }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.result')">
           <el-tag :type="currentRow.result === 'PASS' ? 'success' : 'danger'" size="small">
             {{ currentRow.result === 'PASS' ? $t('inspection.result.pass') : $t('inspection.result.fail') }}
           </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item :label="$t('inspection.column.productCode')">
-          <span class="product-code">{{ currentRow.productCode }}</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.qcStatus')">
           <el-tag :type="currentRow.status === 'COMPLETED' ? 'success' : currentRow.status === 'RETURN_REQUESTED' ? 'danger' : 'info'" size="small">
@@ -327,19 +318,26 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.qcType')">{{ qcTypeLabel(currentRow.qcType) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.qcDate')">{{ currentRow.qcDate || '-' }}</el-descriptions-item>
+        <!-- 商品信息 -->
+        <el-descriptions-item :label="$t('inspection.column.productCode')">
+          <span class="product-code">{{ currentRow.productCode }}</span>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('inspection.column.subProductCode')">{{ currentRow.subProductCode || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.sellerName')" :span="2">{{ currentRow.sellerName || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('inspection.dialog.material')">{{ currentRow.material || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.destination')">{{ currentRow.destination || '-' }}</el-descriptions-item>
+        <!-- 验货数据 -->
         <el-descriptions-item :label="$t('inspection.dialog.quantity')">{{ currentRow.quantity ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.inspectionCount')">{{ currentRow.inspectionCount ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.passedCount')">{{ currentRow.passedCount ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.defectiveCount')">{{ currentRow.defectiveCount ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.boxCount')">{{ currentRow.boxCount ?? '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('inspection.dialog.netWeightPerUnit')">{{ currentRow.netWeightPerUnit ? currentRow.netWeightPerUnit + $t('common.units.kg') : '' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('inspection.dialog.grossWeight')">{{ currentRow.grossWeight ? currentRow.grossWeight + $t('common.units.kg') : '' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('inspection.dialog.taxInclusivePrice')">{{ currentRow.taxInclusivePrice ? $t('common.units.cny') + currentRow.taxInclusivePrice : '' }}</el-descriptions-item>
+        <!-- 体积重量 -->
         <el-descriptions-item :label="$t('inspection.dialog.boxDimension')" :span="2">{{ boxDimension }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('inspection.dialog.material')">{{ currentRow.material || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('inspection.dialog.taxRefund')">{{ currentRow.taxRefund ? $t('inspection.yes') : $t('inspection.no') }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('inspection.dialog.netWeightPerUnit')">{{ currentRow.netWeightPerUnit ? currentRow.netWeightPerUnit + ' kg' : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('inspection.dialog.grossWeight')">{{ currentRow.grossWeight ? currentRow.grossWeight + ' kg' : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('inspection.dialog.taxInclusivePrice')">{{ currentRow.taxInclusivePrice ? '¥' + currentRow.taxInclusivePrice : '-' }}</el-descriptions-item>
+        <!-- 备注 -->
         <el-descriptions-item :label="$t('inspection.dialog.qcStandard')" :span="2">{{ currentRow.qcStandard || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.images')" :span="2">
@@ -351,15 +349,18 @@
             </span>
           </template>
         </el-descriptions-item>
+        <!-- 元数据 -->
         <el-descriptions-item :label="$t('inspection.dialog.createBy')">{{ currentRow.createBy || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('inspection.dialog.createTime')">{{ currentRow.createTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('inspection.dialog.createTime')">
+          {{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
+        </el-descriptions-item>
       </el-descriptions>
     </el-drawer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules, ElMessageBox } from 'element-plus'
 import { Plus, Document, CircleCheck, Warning } from '@element-plus/icons-vue'
@@ -381,7 +382,8 @@ const tableData = ref<QcRecordVO[]>([])
 const procurementList = ref<ProcurementPageVO[]>([])
 
 const formRef = ref<FormInstance>()
-const { t } = useI18n()
+const { t, locale: localeRef } = useI18n()
+const currentLocale = computed(() => localeRef.value)
 
 const form = reactive({
   procurementId: undefined as number | undefined,
@@ -394,7 +396,6 @@ const form = reactive({
   status: 'PENDING' as QcStatus,
   inspectionCount: undefined as number | undefined,
   passedCount: undefined as number | undefined,
-  defectiveCount: undefined as number | undefined,
   boxCount: undefined as number | undefined,
   boxLengthCm: undefined as number | undefined,
   boxWidthCm: undefined as number | undefined,
@@ -403,7 +404,6 @@ const form = reactive({
   grossWeight: undefined as number | undefined,
   taxInclusivePrice: undefined as number | undefined,
   material: '',
-  taxRefund: false,
   qcStandard: '',
   remarks: '',
   images: '',
@@ -411,6 +411,21 @@ const form = reactive({
   quantity: undefined as number | undefined,
   orderDate: '',
   sellerName: '',
+})
+
+// 弹窗打开时预加载采购单（下拉默认有选项）
+watch(dialogVisible, async (val) => {
+  if (val) {
+    procurementLoading.value = true
+    try {
+      const res = await procurementApi.list({ page: 0, pageSize: 100 })
+      procurementList.value = res.data.data?.content ?? []
+    } catch {
+      procurementList.value = []
+    } finally {
+      procurementLoading.value = false
+    }
+  }
 })
 
 const formRules: FormRules = {
@@ -472,39 +487,34 @@ function onReset() {
   loadData()
 }
 
-async function searchProcurement(query: string) {
-  if (!query) { procurementList.value = []; return }
-  procurementLoading.value = true
-  try {
-    const res = await procurementApi.list({ page: 0, pageSize: 20, productCode: query })
-    procurementList.value = res.data.data?.content ?? []
-  } catch (e) { console.error('[InspectionPage] searchProcurement failed', e); procurementList.value = [] }
-  finally { procurementLoading.value = false }
-}
-
 function onProcurementSelected(id: number) {
   const p = procurementList.value.find(p => p.id === id)
   if (!p) return
+  form.procurementId = p.id
   form.productCode = p.productCode
   form.subProductCode = p.subProductCode || ''
-  form.quantity = p.quantity
+  form.quantity = p.quantity ?? 0
   form.material = p.material || ''
   form.destination = p.destination || ''
   form.sellerName = p.factoryName || ''
+  form.orderDate = p.orderDate || ''
+  if (!form.qcDate) {
+    form.qcDate = new Date().toISOString().slice(0, 10)
+  }
 }
 
 function onNew() {
   formRef.value?.resetFields()
+  const today = new Date().toISOString().slice(0, 10)
   Object.assign(form, {
     procurementId: undefined, productCode: '', subProductCode: '', qcUserId: undefined,
-    qcType: undefined, qcDate: '', result: undefined, status: 'PENDING',
-    inspectionCount: undefined, passedCount: undefined, defectiveCount: undefined,
-    boxCount: undefined, boxLengthCm: undefined, boxWidthCm: undefined,
-    boxHeightCm: undefined, netWeightPerUnit: undefined, grossWeight: undefined,
-    taxInclusivePrice: undefined, material: '', taxRefund: false,
-    qcStandard: '', remarks: '', images: '', destination: '', quantity: undefined, orderDate: '', sellerName: '',
+    qcType: 'ONSITE', qcDate: today, result: 'PASS', status: 'PENDING',
+    inspectionCount: 0, passedCount: 0,
+    boxCount: 0, boxLengthCm: 0, boxWidthCm: 0,
+    boxHeightCm: 0, netWeightPerUnit: 0, grossWeight: 0,
+    taxInclusivePrice: 0, material: '',
+    qcStandard: '', remarks: '', images: '', destination: '', quantity: 0, orderDate: '', sellerName: '',
   })
-  procurementList.value = []
   dialogVisible.value = true
 }
 
@@ -537,7 +547,6 @@ async function onSubmit() {
         grossWeight: form.grossWeight,
         taxInclusivePrice: form.taxInclusivePrice,
         material: form.material || undefined,
-        taxRefund: form.taxRefund,
         qcStandard: form.qcStandard || undefined,
         remarks: form.remarks || undefined,
         images: form.images || undefined,
@@ -563,7 +572,6 @@ async function onSubmit() {
         grossWeight: form.grossWeight,
         taxInclusivePrice: form.taxInclusivePrice,
         material: form.material || undefined,
-        taxRefund: form.taxRefund,
         qcStandard: form.qcStandard || undefined,
         remarks: form.remarks || undefined,
         images: form.images || undefined,
@@ -602,7 +610,6 @@ function onEdit(row: QcRecordVO) {
     status: row.status as QcStatus || 'PENDING',
     inspectionCount: row.inspectionCount ?? undefined,
     passedCount: row.passedCount ?? undefined,
-    defectiveCount: row.defectiveCount ?? undefined,
     boxCount: row.boxCount ?? undefined,
     boxLengthCm: row.boxLengthCm ?? undefined,
     boxWidthCm: row.boxWidthCm ?? undefined,
@@ -611,7 +618,6 @@ function onEdit(row: QcRecordVO) {
     grossWeight: row.grossWeight ?? undefined,
     taxInclusivePrice: row.taxInclusivePrice ?? undefined,
     material: row.material || '',
-    taxRefund: row.taxRefund ?? false,
     qcStandard: row.qcStandard || '',
     remarks: row.remarks || '',
     images: row.images || '',
@@ -687,4 +693,5 @@ onMounted(() => loadData())
 .product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
 .divider-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+.drawer-label { font-weight: 600; }
 </style>

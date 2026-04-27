@@ -1,6 +1,7 @@
 package com.manpou.allinone.logistics.application.usecase;
 
 import com.manpou.allinone.common.exception.BusinessException;
+import com.manpou.allinone.common.port.QcQueryPort;
 import com.manpou.allinone.logistics.application.assembler.LogisticsPlanAssembler;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanCreateCmd;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanPageQuery;
@@ -23,6 +24,7 @@ public class LogisticsPlanUseCase {
 
     private final LogisticsPlanRepository logisticsPlanRepository;
     private final LogisticsPlanAssembler logisticsPlanAssembler;
+    private final QcQueryPort qcQueryPort;
 
     @Transactional(readOnly = true)
     public Page<LogisticsPlanPageQuery> pageQuery(LogisticsPlanQuery query) {
@@ -34,6 +36,8 @@ public class LogisticsPlanUseCase {
             page = logisticsPlanRepository.findByStatusAndDeletedIsFalse(query.getStatus(), pageRequest);
         } else if (query.getPlanType() != null) {
             page = logisticsPlanRepository.findByPlanTypeAndDeletedIsFalse(query.getPlanType(), pageRequest);
+        } else if (query.getQcRecordId() != null) {
+            page = logisticsPlanRepository.findByQcRecordIdAndDeletedIsFalse(query.getQcRecordId(), pageRequest);
         } else if (query.getProcurementId() != null) {
             page = logisticsPlanRepository.findByProcurementIdAndDeletedIsFalse(query.getProcurementId(), pageRequest);
         } else if (query.getProductCode() != null && !query.getProductCode().isBlank()) {
@@ -53,11 +57,24 @@ public class LogisticsPlanUseCase {
 
     @Transactional
     public Long create(LogisticsPlanCreateCmd cmd) {
+        // v1.2.0: 校验 qcRecordId 存在且验货结果为 PASS，并 auto-fill cargo 尺寸
+        if (cmd.getQcRecordId() != null) {
+            var qcRecord = qcQueryPort.findById(cmd.getQcRecordId())
+                    .orElseThrow(() -> new BusinessException("logistics.qc_record_not_found", "验货记录不存在"));
+            if (qcRecord.getResult() != com.manpou.allinone.qc.domain.model.QcResult.PASS) {
+                throw new BusinessException("logistics.qc_record_not_pass", "验货结果非 PASS，无法创建调配计划");
+            }
+            // auto-fill: QC 记录含实际装箱尺寸，用于订舱计算
+            if (cmd.getCargoLengthCm() == null && qcRecord.getBoxLengthCm() != null) cmd.setCargoLengthCm(qcRecord.getBoxLengthCm());
+            if (cmd.getCargoWidthCm() == null && qcRecord.getBoxWidthCm() != null) cmd.setCargoWidthCm(qcRecord.getBoxWidthCm());
+            if (cmd.getCargoHeightCm() == null && qcRecord.getBoxHeightCm() != null) cmd.setCargoHeightCm(qcRecord.getBoxHeightCm());
+            if (cmd.getCargoWeightKg() == null && qcRecord.getGrossWeight() != null) cmd.setCargoWeightKg(qcRecord.getGrossWeight());
+        }
         LogisticsPlan entity = logisticsPlanAssembler.toEntity(cmd);
         entity.calculateVolume();
         LogisticsPlan saved = logisticsPlanRepository.save(entity);
-        log.info("[LogisticsPlan] created, traceId={}, id={}, planCode={}, planType={}",
-                null, saved.getId(), saved.getPlanCode(), saved.getPlanType());
+        log.info("[LogisticsPlan] created, traceId={}, id={}, planCode={}, planType={}, qcRecordId={}",
+                null, saved.getId(), saved.getPlanCode(), saved.getPlanType(), saved.getQcRecordId());
         return saved.getId();
     }
 

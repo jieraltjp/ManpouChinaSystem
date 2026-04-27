@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "logistics_plan", indexes = {
         @Index(name = "uk_plan_code", columnList = "plan_code", unique = true),
+        @Index(name = "idx_logistics_qc_record", columnList = "qc_record_id"),
         @Index(name = "idx_logistics_procurement", columnList = "procurement_id"),
         @Index(name = "idx_logistics_status", columnList = "status"),
         @Index(name = "idx_logistics_plan_type", columnList = "plan_type"),
@@ -27,8 +28,11 @@ public class LogisticsPlan extends BaseEntity {
     @Column(name = "plan_code", nullable = false, unique = true, length = 32)
     private String planCode;              // 系统流水号，如 L-20260421-001
 
+    @Column(name = "qc_record_id")
+    private Long qcRecordId;            // 关联验货记录（调配锚点，v1.2.0；验完货才知道实际装箱尺寸）
+
     @Column(name = "procurement_id")
-    private Long procurementId;          // 关联采购单（拼柜时可为空）
+    private Long procurementId;          // 关联采购单（拼柜时可为空；正常流程由 qcRecordId 反查）
 
     @Column(name = "factory_id")
     private Long factoryId;              // 关联工厂ID

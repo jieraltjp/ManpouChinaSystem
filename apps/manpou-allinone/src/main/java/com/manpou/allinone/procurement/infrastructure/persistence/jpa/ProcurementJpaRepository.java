@@ -36,6 +36,4 @@ public interface ProcurementJpaRepository extends ProcurementRepository, JpaRepo
     boolean existsActiveByFactoryId(@Param("factoryId") Long factoryId);
 
     List<Procurement> findAllByIdInAndDeletedIsFalse(List<Long> ids);
-
-    List<Procurement> findByLinkedDemandIdAndDeletedIsFalse(Long linkedDemandId);
 }

@@ -219,6 +219,8 @@
       "customerCompany": "顧客会社名",
       "productLead": "商品担当",
       "plannedShipDate": "計画出荷日",
+      "leadTimeDays": "リードタイム(日)",
+      "cartonNotes": "カートン備考",
       "status": "ステータス",
       "createTime": "作成日時",
       "action": "操作"
@@ -270,6 +272,8 @@
       "factoryShipDate": "工場出荷日",
       "plannedShipDate": "計画出荷日",
       "actualShipDate": "実際出荷日",
+      "leadTimeDays": "リードタイム(日)",
+      "cartonNotes": "カートン備考",
       "productLead": "商品担当",
       "japanLead": "日本担当",
       "chinaLead": "中国担当",
@@ -320,6 +324,10 @@
       "factoryShipDate": "工場出荷日",
       "plannedShipDate": "計画出荷日",
       "actualShipDate": "実際出荷日",
+      "leadTimeDays": "リードタイム(日)",
+      "leadTimeDaysPlaceholder": "30/45/60",
+      "cartonNotes": "カートン備考",
+      "cartonNotesPlaceholder": "カートン備考情報",
       "status": "ステータス",
       "cancel": "キャンセル",
       "save": "保存"
@@ -479,7 +487,9 @@
       "imagesPlaceholder": "写真のURL、改行区切り（JSON配列形式）",
       "selectPlaceholder": "選択してください",
       "datePlaceholder": "日付を選択",
-      "boxDimension": "カートンサイズ"
+      "boxDimension": "カートンサイズ",
+      "createBy": "作成者",
+      "createTime": "作成日時"
     },
     "yes": "はい",
     "no": "いいえ",
@@ -528,6 +538,7 @@
     },
     "column": {
       "planCode": "配送番号",
+      "qcCode": "検査番号",
       "factoryName": "関連工場",
       "productCode": "品番",
       "planType": "配送タイプ",
@@ -546,6 +557,8 @@
     },
     "dialog": {
       "newTitle": "新規追加",
+      "qcRecord": "関連検査記録",
+      "qcRecordPlaceholder": "検査番号または品番を検索",
       "procurement": "関連発注書",
       "procurementPlaceholder": "発注書を選択してください",
       "cargoInfo": "貨物情報",
@@ -575,6 +588,7 @@
     },
     "drawerTitle": "配送詳細",
     "validation": {
+      "qcRecordRequired": "関連検査記録を選択してください",
       "procurementRequired": "関連発注書を選択してください",
       "productCodeRequired": "品番を入力してください",
       "planTypeRequired": "配送タイプを選択してください"

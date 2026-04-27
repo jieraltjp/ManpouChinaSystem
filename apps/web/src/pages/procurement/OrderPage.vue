@@ -102,6 +102,10 @@
         <el-table-column prop="customerCompany" :label="$t('order.column.customerCompany')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="productLead" :label="$t('order.column.productLead')" min-width="100" />
         <el-table-column prop="plannedShipDate" :label="$t('order.column.plannedShipDate')" min-width="130" />
+        <el-table-column prop="leadTimeDays" :label="$t('order.column.leadTimeDays')" min-width="100" align="center">
+          <template #default="{ row }">{{ row.leadTimeDays ? `${row.leadTimeDays}天` : '-' }}</template>
+        </el-table-column>
+        <el-table-column prop="cartonNotes" :label="$t('order.column.cartonNotes')" min-width="120" show-overflow-tooltip />
         <el-table-column prop="status" :label="$t('order.column.status')" min-width="110" align="center">
           <template #default="{ row }">
             <el-tag :type="statusType(row.status)" size="small">
@@ -166,6 +170,8 @@
         <el-descriptions-item :label="$t('order.drawer.factoryShipDate')">{{ currentRow.factoryShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.plannedShipDate')">{{ currentRow.plannedShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.actualShipDate')">{{ currentRow.actualShipDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.leadTimeDays')">{{ currentRow.leadTimeDays ? `${currentRow.leadTimeDays}天` : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.cartonNotes')">{{ currentRow.cartonNotes || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.productLead')">{{ currentRow.productLead || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.japanLead')">{{ currentRow.japanLead || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.chinaLead')">{{ currentRow.chinaLead || '-' }}</el-descriptions-item>
@@ -181,8 +187,8 @@
     </el-drawer>
 
     <!-- 新建/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? $t('order.newDialogTitle') : $t('order.editDialogTitle')" width="800px">
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="110px">
+    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? $t('order.newDialogTitle') : $t('order.editDialogTitle')" width="900px">
+      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="88px">
         <!-- 关联需求（创建时可选） -->
         <el-form-item v-if="dialogMode === 'create'" :label="$t('order.dialog.linkedDemand')">
           <el-select v-model="selectedDemandId" :placeholder="$t('order.dialog.linkedDemandPlaceholder')" clearable filterable style="width:100%" @change="onDemandChange">
@@ -337,6 +343,22 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item :label="$t('order.dialog.leadTimeDays')">
+              <el-select v-model="formData.leadTimeDays" style="width: 100%" clearable>
+                <el-option :value="30" label="30天" />
+                <el-option :value="45" label="45天" />
+                <el-option :value="60" label="60天" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('order.dialog.cartonNotes')">
+              <el-input v-model="formData.cartonNotes" :placeholder="$t('order.dialog.cartonNotesPlaceholder')" maxlength="512" />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <!-- 状态（仅更新模式） -->
         <el-form-item v-if="dialogMode === 'update'" :label="$t('order.dialog.status')" prop="status">
           <el-select v-model="formData.status" style="width: 100%">
@@ -474,7 +496,7 @@ const factoryOptions = ref<FactoryPageVO[]>([])
 async function loadFactories() {
   try {
     const res = await factoryApi.list({ page: 0, pageSize: 200 })
-    factoryOptions.value = (res.data.data as { content: FactoryPageVO[] }).content || []
+    factoryOptions.value = (res.data.data as { content: FactoryPageVO[] })?.content ?? []
   } catch { /* handled by interceptor */ }
 }
 
@@ -484,7 +506,7 @@ const selectedDemandId = ref<number | null>(null)
 async function loadDemands() {
   try {
     const res = await demandApi.list({ page: 0, pageSize: 200, status: 'PENDING' })
-    demandOptions.value = (res.data.data as { content: DemandPageVO[] }).content || []
+    demandOptions.value = (res.data.data as { content: DemandPageVO[] })?.content ?? []
   } catch { /* handled by interceptor */ }
 }
 
@@ -549,9 +571,9 @@ function onFactoryNew() {
   factoryDialogVisible.value = true
 }
 
-/** 选中工厂变更 — 清空需求关联（避免混淆） */
+/** 选中工厂变更 — 需求单与工厂完全独立，互不影响 */
 function onFactorySelected(_id: number | null) {
-  selectedDemandId.value = null
+  // no-op：工厂选择不干扰需求单选择
 }
 
 /** 编辑当前选中的工厂 */
@@ -637,6 +659,8 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string } => ({
   orderDate: '',
   factoryShipDate: '',
   plannedShipDate: '',
+  leadTimeDays: undefined as number | undefined,
+  cartonNotes: '',
   customerCompany: '',
   productLead: '',
   japanLead: '',
@@ -684,8 +708,8 @@ async function loadData() {
       customerCompany: filterForm.customerCompany.trim() || undefined,
     })
     const payload = res.data.data as { content: ProcurementPageVO[]; totalElements: number }
-    tableRows.value = payload.content || []
-    pagination.total = payload.totalElements || 0
+    tableRows.value = payload?.content ?? []
+    pagination.total = payload?.totalElements ?? 0
     // 删除后若当前页越界，回退到第1页
     if (tableRows.value.length === 0 && pagination.total > 0 && pagination.page > 1) {
       pagination.page = 1
@@ -743,6 +767,8 @@ function onEdit(row: ProcurementPageVO | null) {
     orderDate: row?.orderDate ?? '',
     factoryShipDate: row?.factoryShipDate ?? '',
     plannedShipDate: row?.plannedShipDate ?? '',
+    leadTimeDays: row?.leadTimeDays ?? undefined,
+    cartonNotes: row?.cartonNotes ?? '',
     customerCompany: row?.customerCompany ?? '',
     productLead: row?.productLead ?? '',
     japanLead: row?.japanLead ?? '',
@@ -798,6 +824,8 @@ async function onSubmit() {
           orderDate: formData.orderDate || undefined,
           factoryShipDate: formData.factoryShipDate || undefined,
           plannedShipDate: formData.plannedShipDate || undefined,
+          leadTimeDays: formData.leadTimeDays ?? undefined,
+          cartonNotes: formData.cartonNotes || undefined,
           customerCompany: formData.customerCompany || undefined,
           productLead: formData.productLead || undefined,
           japanLead: formData.japanLead || undefined,
@@ -832,6 +860,8 @@ async function onSubmit() {
           orderDate: formData.orderDate || undefined,
           factoryShipDate: formData.factoryShipDate || undefined,
           plannedShipDate: formData.plannedShipDate || undefined,
+          leadTimeDays: formData.leadTimeDays ?? undefined,
+          cartonNotes: formData.cartonNotes || undefined,
           customerCompany: formData.customerCompany || undefined,
           productLead: formData.productLead || undefined,
           japanLead: formData.japanLead || undefined,

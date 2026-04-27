@@ -315,3 +315,50 @@ graph TB
 ---
 
 *相关文档：[docs/ui/README.md](README.md) · [docs/lessons/Lombok-Decoupling-DI-Lessons.md#Lesson-46]*
+
+---
+
+## 9. Element Plus el-input-number 布局规范
+
+> 版本: 1.0.0 · 更新: 2026-04-27
+> 来源: Lesson 58 — 列宽计算须扣 button×2 + el-col padding，内容 < 150px 时按钮截断
+
+### 9.1 el-input-number 内部结构
+
+```
+┌──────────────────────────────────────────┐
+│ [− 30px] │     input content (数字)     │ [+ 30px] │
+└──────────────────────────────────────────┘
+  按钮         content = 列宽 - 60px          按钮
+```
+
+### 9.2 最小可用宽度
+
+| 元素 | 宽度 |
+|------|------|
+| 按钮（-/+） | 各 30px × 2 = 60px |
+| `el-input__wrapper` 内边距 | 11px × 2 = 22px |
+| `el-col` gutter padding | 8px × 2 = 16px |
+| **最小可用 content** | **150px** |
+| **最小列宽** | **content + 60px + 16px = 226px** |
+
+### 9.3 判定速查表
+
+| 弹窗宽度 | gutter | label | 列数 | span | 估算 content | 可用? |
+|---------|--------|-------|------|------|-------------|--------|
+| 640px | 16 | 100 | 3 | span 6 | ≈ 153px | ✅ |
+| 680px | 10 | 86 | 3 | span 6 | ≈ 193px | ✅ |
+| 820px | 16 | 100 | 3 | span 6 | ≈ 213px | ✅ |
+| 820px | 16 | 100 | 3 | span 8 | ≈ 158px | ✅ 宽松 |
+| 640px | 16 | 100 | 4 | span 4 | ≈ 113px | ❌ 截断 |
+
+### 9.4 规则总结
+
+| 规则 | 说明 |
+|------|------|
+| `el-input-number` 默认 controls 在两侧 | 禁止使用 `controls-position="right"`（Lesson 49） |
+| 列宽 < 226px 时按钮截断 | content = 列宽 - 60px（按钮）- 16px（el-col padding） |
+| 数字字段默认值为 `0` | `undefined` 显示空白；默认值 0 提供视觉锚点 |
+| `is-required` 不加在数字字段 form-item | 视觉 asterisk 与表单校验不一致；由 `formRules` 统一控制 |
+| span 6 适合三列布局（820px 弹窗） | content ≈ 213px，超出 150px 最小值 |
+

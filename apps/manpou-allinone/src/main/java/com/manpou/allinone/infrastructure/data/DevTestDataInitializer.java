@@ -86,7 +86,7 @@ public class DevTestDataInitializer implements CommandLineRunner {
                 new BigDecimal("1.1000"), BillingType.ZHE_LU_KAI_PIAO,
                 LocalDate.of(2026, 4, 10), LocalDate.of(2026, 4, 20),
                 LocalDate.of(2026, 4, 25), "商品担当-张伟", "田中太郎", "李明",
-                "久留米", "久留米贸易株式会社", ShipmentStatus.完了, d1.getId());
+                "久留米", "久留米贸易株式会社", ShipmentStatus.完了);
 
         // d2 → p2（odn012-wh，80台，久留米）
         procurementOf(f1, "odn012", "odn012-wh", "PU面料", true,
@@ -94,7 +94,7 @@ public class DevTestDataInitializer implements CommandLineRunner {
                 new BigDecimal("1.1000"), BillingType.ZHE_LU_KAI_PIAO,
                 LocalDate.of(2026, 4, 12), LocalDate.of(2026, 4, 22),
                 LocalDate.of(2026, 4, 26), "商品担当-张伟", "田中太郎", "李明",
-                "久留米", "久留米贸易株式会社", ShipmentStatus.完了, d2.getId());
+                "久留米", "久留米贸易株式会社", ShipmentStatus.完了);
 
         // d4 → p4（cpn101，300台，大阪）
         procurementOf(f2, "cpn101", "cpn101", "尼龙布+金属扣", false,
@@ -102,7 +102,7 @@ public class DevTestDataInitializer implements CommandLineRunner {
                 new BigDecimal("1.1000"), BillingType.ZHE_LU_KAI_PIAO,
                 LocalDate.of(2026, 4, 8), LocalDate.of(2026, 4, 18),
                 LocalDate.of(2026, 4, 25), "商品担当-张伟", "佐藤花子", "李明",
-                "大阪", "大阪商会", ShipmentStatus.発注待, d4.getId());
+                "大阪", "大阪商会", ShipmentStatus.発注待);
 
         // d5 → p5（odn088-bk，50台，福冈）
         procurementOf(f3, "odn088", "odn088-bk", "真皮", false,
@@ -110,7 +110,7 @@ public class DevTestDataInitializer implements CommandLineRunner {
                 new BigDecimal("1.1000"), BillingType.NO_REFUND,
                 LocalDate.of(2026, 4, 15), LocalDate.of(2026, 4, 25),
                 LocalDate.of(2026, 5, 5), "商品担当-张伟", "山本健一", "李明",
-                "福冈", "福冈商店", ShipmentStatus.未定, d5.getId());
+                "福冈", "福冈商店", ShipmentStatus.未定);
     }
 
     private ReplenishmentDemand demandOf(String code, DemandType type, String productCode,
@@ -159,7 +159,7 @@ public class DevTestDataInitializer implements CommandLineRunner {
                                 LocalDate plannedShip, LocalDate actualShip,
                                 String productLead, String japanLead, String chinaLead,
                                 String destination, String customer,
-                                ShipmentStatus status, Long linkedDemandId) {
+                                ShipmentStatus status) {
         Procurement p = new Procurement();
         p.setFactoryId(factory.getId());
         p.setProductCode(productCode);
@@ -180,7 +180,6 @@ public class DevTestDataInitializer implements CommandLineRunner {
         p.setDestination(destination);
         p.setCustomerCompany(customer);
         p.setStatus(status);
-        p.setLinkedDemandId(linkedDemandId);
         p.calculateEstimatedPriceJpy();
         procurementRepository.save(p);
     }

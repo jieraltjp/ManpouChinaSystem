@@ -11,7 +11,9 @@ import java.time.LocalDate;
 @Data
 public class LogisticsPlanCreateCmd {
 
-    private Long procurementId;           // 关联采购单（可选）
+    private Long qcRecordId;              // 关联验货记录（调配锚点，v1.2.0）
+
+    private Long procurementId;          // 关联采购单（可选，拼柜场景）
 
     private Long factoryId;               // 关联工厂
 

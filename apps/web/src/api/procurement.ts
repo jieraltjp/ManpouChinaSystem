@@ -36,6 +36,8 @@ export interface ProcurementPageVO {
   factoryShipDate?: string
   plannedShipDate?: string
   actualShipDate?: string     // 实际出货日（v1.3.0）
+  leadTimeDays?: number       // 交货期天数（v1.9.0）
+  cartonNotes?: string       // 纸箱备注（v1.9.0）
   productLead?: string
   japanLead?: string
   chinaLead?: string
@@ -73,6 +75,8 @@ export interface CreateProcurementRequest {
   factoryShipDate?: string
   plannedShipDate?: string
   actualShipDate?: string
+  leadTimeDays?: number
+  cartonNotes?: string
   productLead?: string
   japanLead?: string
   chinaLead?: string
@@ -99,6 +103,8 @@ export interface UpdateProcurementRequest {
   factoryShipDate?: string
   plannedShipDate?: string
   actualShipDate?: string
+  leadTimeDays?: number
+  cartonNotes?: string
   productLead?: string
   japanLead?: string
   chinaLead?: string

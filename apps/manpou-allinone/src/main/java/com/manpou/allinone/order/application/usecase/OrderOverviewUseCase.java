@@ -73,11 +73,11 @@ public class OrderOverviewUseCase {
                 : null;
         ProcurementVO procurementVO = assembler.toProcurementVO(procurement, factoryName);
 
-        // 步骤1：补货需求（通过 Procurement.linkedDemandId 关联，v1.6.0）
+        // 步骤1：补货需求（通过 ReplenishmentDemand.linkedProcurementId 反向关联，v2.0.0）
         DemandVO demandVO = null;
-        if (procurement.getLinkedDemandId() != null) {
-            demandVO = demandRepository.findByIdAndDeletedIsFalse(procurement.getLinkedDemandId())
-                    .map(assembler::toDemandVO).orElse(null);
+        List<ReplenishmentDemand> demands = demandRepository.findByLinkedProcurementIdAndDeletedIsFalse(procurementId);
+        if (!demands.isEmpty()) {
+            demandVO = assembler.toDemandVO(demands.get(0));
         }
 
         // 步骤3：验货记录（取最新一条）

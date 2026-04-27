@@ -1,6 +1,8 @@
 # SPEC-B03 — 验货记录业务规格（步骤3）
 
-> **版本**: 1.0.0
+> **版本**: 1.1.1
+> **更新**: 2026-04-27（v1.1.1：移除 QcRecord.taxRefund，退税由采购层 billingType 决定）
+> **更新**: 2026-04-27（v1.1.0：新增验货完成后自动推进采购单状态；新增选择采购后代入字段自动预填）
 > **更新**: 2026-04-23（补充元数据字段）
 > **创建**: 2026-04-22
 > **状态**: ✅ 已实现
@@ -19,6 +21,12 @@
 > FAIL 后退货处理完成后，工厂重新发货，需由验货员新建另一条 QcRecord 重新验货，原 QcRecord 不再变更。
 
 **关键设计**：QcRecord 从内嵌值对象升级为独立聚合根，可独立查询和追踪。
+
+**v1.1.1 字段移除**：`taxRefund`（是否退税）已从 QcRecord 移除。退税决策属于采购层，由 `Procurement.billingType`（报关类型）决定。
+
+**v1.1.0 新增自动行为**：
+- 创建验货记录时，若 `sellerName` 未填，自动从关联 Procurement.factoryId → Factory.factoryName 代入（K-03 规则）
+- 验货通过（COMPLETED）后，自动推进关联 Procurement 状态（`ProcurementQcPassedEventListener`）
 
 ---
 
@@ -50,7 +58,6 @@ QcRecord（聚合根）
 ├── grossWeight: BigDecimal    # 毛重(kg)
 ├── taxInclusivePrice: BigDecimal # 含税价（元）
 ├── material: String          # 材质
-├── taxRefund: Boolean       # 是否退税
 ├── qcStandard: String       # 验收标准
 ├── remarks: String           # 备注
 ├── images: String            # 缺陷照片URL列表（JSON数组）
@@ -117,6 +124,23 @@ public enum QcStatus {
 |------|------|---------|
 | defectiveCount | `inspectionCount - passedCount` | `QcRecord.calculateDefectiveCount()` |
 | result | `defectiveCount == 0 ? PASS : FAIL` | 由验货员手动判断 |
+| sellerName | 未填时自动代入 Factory.factoryName | `QcRecordUseCase.create()` → K-03 规则 |
+
+## 5.1 验货完成后自动推进采购单
+
+| 事件 | 触发条件 | 副作用 |
+|------|---------|--------|
+| `QcRecordCompletedEvent` | 验货记录 `status = COMPLETED` 时发布 | `ProcurementQcPassedEventListener` 自动推进关联 Procurement 状态 |
+
+**状态推进规则（SPEC-B02 §5）：**
+
+| QC 类型 | 条件 | Procurement 新状态 |
+|---------|------|------------------|
+| 現地検品(REMOTE) | — | メーカー直送 |
+| 倉庫検品(ONSITE) | 体积 ≤ 0.5m³ | エア便 |
+| 倉庫検品(ONSITE) | 体积 > 0.5m³ | 輸出 |
+
+> 仅当 Procurement 当前状态处于「検品」或「現地検品」时才推进（幂等）。
 
 ---
 
@@ -145,3 +169,5 @@ DELETE /api/v1/qc-records/{id}
 - [x] ✅ `QcRecordUseCaseTest` 单元测试（10个用例，全部通过）
 - [x] ✅ `@/api/inspection.ts` 前端 API 客户端
 - [x] ✅ `InspectionPage.vue` 页面（已对接真实 API）
+- [x] ✅ `ProcurementQcPassedEventListener` 验货完成后自动推进采购单状态
+- [x] ✅ `QcRecordCompletedEvent` 领域事件

@@ -102,7 +102,7 @@ export interface UpdateQcRecordRequest {
 }
 
 export const inspectionApi = {
-  list(params: { page?: number; pageSize?: number; qcCode?: string; productCode?: string; result?: QcResult; qcDateFrom?: string; qcDateTo?: string; procurementId?: number }) {
+  list(params: { page?: number; pageSize?: number; qcCode?: string; productCode?: string; result?: QcResult; status?: string; qcDateFrom?: string; qcDateTo?: string; procurementId?: number }) {
     return client.get<{ code: string; data: QcRecordPageResponse }>('/qc-records', { params })
   },
   get(id: number) {

@@ -10,6 +10,8 @@ export type PlanType = 'SEA' | 'AIR' | 'CONSOLIDATION'
 export interface LogisticsPlanVO {
   id: number
   planCode: string
+  qcRecordId?: number    // 关联验货记录（v1.2.0）
+  qcCode?: string        // 验货编号（v1.2.0，来自 QC record）
   procurementId?: number
   factoryId?: number
   factoryName?: string   // 关联工厂名称（来自 factory 表 JOIN）
@@ -42,6 +44,7 @@ export interface LogisticsPlanPageResponse {
 }
 
 export interface CreateLogisticsPlanRequest {
+  qcRecordId?: number    // 关联验货记录（v1.2.0）
   procurementId?: number
   factoryId?: number
   productCode: string
@@ -75,7 +78,7 @@ export interface UpdateLogisticsPlanRequest {
 }
 
 export const logisticsApi = {
-  list(params: { page?: number; pageSize?: number; productCode?: string; planType?: PlanType; status?: LogisticsStatus; procurementId?: number; factoryId?: number }) {
+  list(params: { page?: number; pageSize?: number; productCode?: string; planType?: PlanType; status?: LogisticsStatus; qcRecordId?: number; procurementId?: number; factoryId?: number }) {
     return client.get<{ code: string; data: LogisticsPlanPageResponse }>('/logistics-plans', { params })
   },
   get(id: number) {

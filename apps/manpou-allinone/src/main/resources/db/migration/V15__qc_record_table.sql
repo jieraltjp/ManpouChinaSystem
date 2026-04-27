@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS qc_record (
     tax_inclusive_price       DECIMAL(14,2) COMMENT '含税单价',
 
     -- 质检配置
-    tax_refund                TINYINT(1) COMMENT '是否退税',
+    tax_refund                TINYINT(1) COMMENT '是否退税（v1.1.1 前端废弃，列保留）',
     qc_standard              VARCHAR(512) COMMENT '验货标准',
 
     -- 图片/备注

@@ -57,6 +57,8 @@ public class ProcurementUpdateCmd {
     private LocalDate factoryShipDate; // 厂家出货日
     private LocalDate plannedShipDate;  // 计划出货日
     private LocalDate actualShipDate;   // 实际出货日
+    private Integer leadTimeDays;      // 交货期天数（30/45/60）
+    private String cartonNotes;       // 纸箱备注（v1.9.0 新增）
 
     // ===== 担当 =====
     @Length(max = 64)

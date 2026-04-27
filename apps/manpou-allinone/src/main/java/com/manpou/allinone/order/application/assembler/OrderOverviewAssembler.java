@@ -215,8 +215,6 @@ public class OrderOverviewAssembler {
     }
 
     /**
-
-    /**
      * Demand 锚点专用状态数组。
      * 规则：step1=COMPLETED（需求单存在），step2-8=NOT_STARTED
      */

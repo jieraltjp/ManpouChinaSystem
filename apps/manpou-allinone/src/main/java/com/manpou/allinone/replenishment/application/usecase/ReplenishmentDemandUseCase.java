@@ -126,7 +126,6 @@ public class ReplenishmentDemandUseCase {
         pCmd.setPriceRmb(BigDecimal.ZERO);
         pCmd.setExchangeRate(BigDecimal.ONE);
         pCmd.setTaxPoint(new BigDecimal("1.1"));
-        pCmd.setLinkedDemandId(demandId);
 
         Long procurementId = procurementUseCase.create(pCmd);
         entity.markAsConverted(procurementId);

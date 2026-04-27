@@ -1,8 +1,8 @@
 # 页面规格 — 步骤3：验货记录
 
-> **版本**: 1.1.0
+> **版本**: 1.1.1
 > **创建**: 2026-04-22
-> **更新**: 2026-04-27（v1.1.0：补充分页查询参数/编辑删除功能/sellerName disabled代入，修正统计卡描述）
+> **更新**: 2026-04-27（v1.1.1：移除 taxRefund 字段；移除 defectiveCount 输入框（后端自动计算）；新规默认值 qcType=ONSITE/qcDate=今天；弹窗宽度 680→820px；布局优化）
 > **路由**: `/procurement/inspection`
 > **组件**: `InspectionPage.vue`
 > **对应后端**: `QcRecord` 聚合根
@@ -56,10 +56,9 @@
 | 卖家名称 | `sellerName` | 来自 Factory.factoryName |
 | 检品数 | `inspectionCount` | 检品总数 |
 | 合格数 | `passedCount` | 合格数量 |
-| 不良数 | `defectiveCount` | 自动 = inspectionCount - passedCount |
+| 不良数 | `defectiveCount` | 自动计算（后端），表格/抽屉只读 |
 | 结果 | `result` | PASS（绿色）/ FAIL（红色） |
 | 状态 | `status` | PENDING / COMPLETED / RETURN_REQUESTED |
-| 是否退税 | `taxRefund` | 开关，显示 ✓/✗ |
 | 验货日期 | `qcDate` | — |
 | 操作 | — | 详情 / **总览** / 编辑 / 删除 |
 
@@ -73,36 +72,25 @@
 
 点击 `[+ 新规验货]` → 弹出验货表单弹窗。
 
-### 4.2 表单结构（两栏布局）
+### 4.2 表单结构（紧凑行布局，820px 弹窗）
 
-**左栏 — 采购单关联 + 基础信息**：
+弹窗宽度 820px，label-width 86px，行内字段用 `el-row gutter=10` 紧凑排列。
 
-| 字段 | 控件 | 必填 | 来源 |
-|------|------|------|------|
-| 关联采购单 | `el-select` + 搜索框 | ✅ | 调用 `GET /api/v1/procurements?page=0&pageSize=20` |
-| 卖家名称 | `el-input`（disabled） | | 选采购单后代入 Factory.factoryName |
-| 货号 | `el-input`（disabled） | ✅ | 选采购单后代入（不可编辑） |
-| 子货号 | `el-input`（disabled） | | 选采购单后代入（不可编辑） |
-| 开单人 | `el-select` | | 担当者列表 |
-| 验货日期 | `el-date-picker` | | 默认今天 |
-| 是否退税 | `el-switch` | | 根据采购单 billingType 推断 |
+| 行 | 字段组合 |
+|----|---------|
+| Row1 | 关联采购单（span 14）+ 卖家名称（span 10，disabled） |
+| Row2 | 货号（span 12）+ 子货号（span 12，disabled） |
+| Row3 | 验货类型（span 6）+ 验货日期（span 6）+ 数量（span 6）+ 状态（span 6） |
+| Row4 | 检品数（span 6）+ 合格数（span 6）+ 验货结果（span 6）+ 箱数（span 6） |
+| Row5 | 材质（span 12）+ 目的地（span 12） |
+| Row6 | 箱子长（span 8）+ 箱子宽（span 8）+ 箱子高（span 8） |
+| Row7 | 单件净重（span 8）+ 毛重（span 8）+ 含税价（span 8） |
+| Row8 | 验收标准（textarea rows=1） |
+| Row9 | 备注（textarea rows=1） |
+| Row10 | 缺陷照片（textarea rows=1） |
 
-**右栏 — 验货结果**：
-
-| 字段 | 控件 | 必填 | 说明 |
-|------|------|------|------|
-| 检品数 | `el-input-number` | ✅ | 验货总数 |
-| 合格数量 | `el-input-number` | ✅ | 合格数 ≤ 检品数 |
-| 箱数 | `el-input-number` | | — |
-| 箱子长(cm) | `el-input-number` | | — |
-| 箱子宽(cm) | `el-input-number` | | — |
-| 箱子高(cm) | `el-input-number` | | — |
-| 单个净重(kg) | `el-input-number` | | — |
-| 毛重(kg) | `el-input-number` | | — |
-| 含税价(元) | `el-input-number` | | — |
-| 材质 | `el-input` | | 来自采购单 |
-| 验收标准 | `el-input`（textarea） | | — |
-| 备注 | `el-input`（textarea） | | — |
+> **注意**：`defectiveCount` 不在前端输入，后端自动计算 `inspectionCount - passedCount`。
+> **注意**：`是否退税（taxRefund）` 已移除，退税由采购层 `billingType` 决定。
 
 ### 4.3 自动计算
 
@@ -118,7 +106,7 @@
   - `quantity` → Procurement
   - `destination` → Procurement
   - `material` → Procurement
-  - `taxRefund` → 由 billingType 推断（超慧退税=true）
+- `qcType` 默认 `ONSITE`，`qcDate` 默认当天日期，数字字段默认 0
 - 验货结果 PASS → 状态 = `COMPLETED` → 可创建调配计划
 - 验货结果 FAIL → 状态 = `RETURN_REQUESTED` → 触发退货流程
 

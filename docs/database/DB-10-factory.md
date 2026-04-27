@@ -278,7 +278,7 @@ public enum PaymentTerms {
 |------|------|------|------|
 | 分页查询工厂 | GET | `/api/factories` | 支持分类/状态/省市筛选 |
 | 按ID查询 | GET | `/api/factories/{id}` | 详情 |
-| 按名称模糊搜索 | GET | `/api/factories/search?name=` | 补全候选 |
+| 按名称筛选查询 | GET | `/api/factories?name=` | 列表筛选（支持模糊） |
 | 新增工厂 | POST | `/api/factories` | 含幂等校验 |
 | 更新工厂 | PUT | `/api/factories/{id}` | 含版本校验 |
 | 删除工厂 | DELETE | `/api/factories/{id}` | 逻辑删除（需校验无关联发注单） |

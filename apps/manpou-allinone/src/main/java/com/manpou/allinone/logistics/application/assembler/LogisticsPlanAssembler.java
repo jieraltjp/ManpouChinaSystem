@@ -1,6 +1,7 @@
 package com.manpou.allinone.logistics.application.assembler;
 
 import com.manpou.allinone.common.port.FactoryQueryPort;
+import com.manpou.allinone.common.port.QcQueryPort;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanCreateCmd;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanPageQuery;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanUpdateCmd;
@@ -15,9 +16,11 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LogisticsPlanAssembler {
 
     private final FactoryQueryPort factoryQueryPort;
+    private final QcQueryPort qcQueryPort;
 
-    public LogisticsPlanAssembler(FactoryQueryPort factoryQueryPort) {
+    public LogisticsPlanAssembler(FactoryQueryPort factoryQueryPort, QcQueryPort qcQueryPort) {
         this.factoryQueryPort = factoryQueryPort;
+        this.qcQueryPort = qcQueryPort;
     }
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -36,9 +39,17 @@ public class LogisticsPlanAssembler {
                     .map(f -> f.getFactoryName())
                     .orElse(null);
         }
+        String qcCode = null;
+        if (entity.getQcRecordId() != null) {
+            qcCode = qcQueryPort.findById(entity.getQcRecordId())
+                    .map(qc -> qc.getQcCode())
+                    .orElse(null);
+        }
         return LogisticsPlanPageQuery.builder()
                 .id(entity.getId())
                 .planCode(entity.getPlanCode())
+                .qcRecordId(entity.getQcRecordId())
+                .qcCode(qcCode)
                 .procurementId(entity.getProcurementId())
                 .factoryId(entity.getFactoryId())
                 .factoryName(factoryName)
@@ -73,6 +84,7 @@ public class LogisticsPlanAssembler {
     }
 
     public void copyCreate(LogisticsPlanCreateCmd cmd, LogisticsPlan entity) {
+        if (cmd.getQcRecordId() != null) entity.setQcRecordId(cmd.getQcRecordId());
         if (cmd.getProcurementId() != null) entity.setProcurementId(cmd.getProcurementId());
         if (cmd.getFactoryId() != null) entity.setFactoryId(cmd.getFactoryId());
         if (cmd.getSubProductCode() != null) entity.setSubProductCode(cmd.getSubProductCode());

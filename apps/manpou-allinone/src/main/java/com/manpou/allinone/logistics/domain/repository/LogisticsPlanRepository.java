@@ -28,6 +28,8 @@ public interface LogisticsPlanRepository {
 
     Page<LogisticsPlan> findByPlanTypeAndDeletedIsFalse(PlanType planType, Pageable pageable);
 
+    Page<LogisticsPlan> findByQcRecordIdAndDeletedIsFalse(Long qcRecordId, Pageable pageable);
+
     Page<LogisticsPlan> findByProcurementIdAndDeletedIsFalse(Long procurementId, Pageable pageable);
 
     List<LogisticsPlan> findByProcurementIdAndDeletedIsFalse(Long procurementId);

@@ -219,6 +219,8 @@
       "customerCompany": "客户公司",
       "productLead": "商品担当",
       "plannedShipDate": "计划出货日",
+      "leadTimeDays": "交货周期(天)",
+      "cartonNotes": "纸箱备注",
       "status": "状态",
       "createTime": "创建时间",
       "action": "操作"
@@ -270,6 +272,8 @@
       "factoryShipDate": "厂家出货日",
       "plannedShipDate": "计划出货日",
       "actualShipDate": "实际出货日",
+      "leadTimeDays": "交货周期(天)",
+      "cartonNotes": "纸箱备注",
       "productLead": "商品担当",
       "japanLead": "日本担当",
       "chinaLead": "中国担当",
@@ -320,6 +324,10 @@
       "factoryShipDate": "厂家出货日",
       "plannedShipDate": "计划出货日",
       "actualShipDate": "实际出货日",
+      "leadTimeDays": "交货周期(天)",
+      "leadTimeDaysPlaceholder": "30/45/60",
+      "cartonNotes": "纸箱备注",
+      "cartonNotesPlaceholder": "纸箱备注信息",
       "status": "状态",
       "cancel": "取消",
       "save": "保存"
@@ -479,7 +487,9 @@
       "imagesPlaceholder": "照片URL，多个用换行分隔（JSON数组格式）",
       "selectPlaceholder": "请选择",
       "datePlaceholder": "选择日期",
-      "boxDimension": "箱子尺寸"
+      "boxDimension": "箱子尺寸",
+      "createBy": "创建人",
+      "createTime": "创建时间"
     },
     "yes": "是",
     "no": "否",
@@ -528,6 +538,7 @@
     },
     "column": {
       "planCode": "调配编号",
+      "qcCode": "验货编号",
       "factoryName": "关联工厂",
       "productCode": "货号",
       "planType": "调配类型",
@@ -546,6 +557,8 @@
     },
     "dialog": {
       "newTitle": "新增调配",
+      "qcRecord": "关联验货记录",
+      "qcRecordPlaceholder": "搜索验货编号或货号",
       "procurement": "关联采购单",
       "procurementPlaceholder": "请选择采购单",
       "cargoInfo": "货物信息",
@@ -575,6 +588,7 @@
     },
     "drawerTitle": "调配详情",
     "validation": {
+      "qcRecordRequired": "请选择关联验货记录",
       "procurementRequired": "请选择关联采购单",
       "productCodeRequired": "请输入货号",
       "planTypeRequired": "请选择调配类型"

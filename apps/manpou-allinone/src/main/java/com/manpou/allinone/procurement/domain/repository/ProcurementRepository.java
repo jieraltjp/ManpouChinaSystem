@@ -37,7 +37,4 @@ public interface ProcurementRepository {
 
     /** 按 ID 批量查询（v1.6.0：撤销转换时批量加载状态检查） */
     List<Procurement> findAllByIdInAndDeletedIsFalse(List<Long> ids);
-
-    /** 按关联需求单 ID 查询（v1.6.0：查看该需求生成的所有发注单） */
-    List<Procurement> findByLinkedDemandIdAndDeletedIsFalse(Long linkedDemandId);
 }

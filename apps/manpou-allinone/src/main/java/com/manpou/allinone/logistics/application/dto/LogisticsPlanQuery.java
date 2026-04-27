@@ -13,6 +13,7 @@ public class LogisticsPlanQuery {
     private String productCode;
     private PlanType planType;
     private LogisticsStatus status;
+    private Long qcRecordId;
     private Long procurementId;
     private Long factoryId;
 }

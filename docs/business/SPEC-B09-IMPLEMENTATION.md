@@ -44,8 +44,8 @@
 │   │       └── OrderOverviewUseCase.java    # 聚合查询编排
 │   └── interfaces/
 │       └── controller/
-│           └── OrderOverviewController.java # GET /api/v1/orders/{id}/overview
-│                                              GET /api/v1/orders/selector（采购单列表）
+│           └── OrderOverviewController.java # GET /api/v1/orders/procurement/{procurementId}/overview
+│                                              GET /api/v1/orders/procurement/selector（采购单列表）
 └── （复用已有 Repository）
     ├── ProcurementRepository
     ├── ReplenishmentDemandRepository
@@ -165,7 +165,7 @@ const STEP_COLORS = {
 ### 4.1 获取订单总览
 
 ```
-GET /api/v1/orders/{procurementId}/overview
+GET /api/v1/orders/procurement/{procurementId}/overview
 ```
 
 **响应 200**：
@@ -259,7 +259,7 @@ GET /api/v1/orders/demands/{demandId}/overview
 ### 4.4 采购单选择器（列表）
 
 ```
-GET /api/v1/orders/selector?page=0&pageSize=20&keyword=
+GET /api/v1/orders/procurement/selector?page=0&pageSize=20&keyword=
 
 ---
 
@@ -296,9 +296,7 @@ public class OrderOverviewController {
 public class OrderOverviewUseCase {
 
     private final ProcurementRepository procurementRepository;
-    private final ProcurementAssembler procurementAssembler;
     private final FactoryRepository factoryRepository;
-    private final FactoryAssembler factoryAssembler;
     private final ReplenishmentDemandRepository demandRepository;
     private final QcRecordRepository qcRecordRepository;
     private final LogisticsPlanRepository logisticsPlanRepository;
@@ -315,48 +313,58 @@ public class OrderOverviewUseCase {
                 .orElseThrow(() -> BusinessException.notFound("Procurement", procurementId));
 
         // 锚点
-        ProcurementVO procurementVO = procurementAssembler.toOverviewVO(procurement);
-
-        // 工厂（通过 factoryId 补全 factoryName）
-        FactoryVO factoryVO = procurement.getFactoryId() != null
+        String factoryName = procurement.getFactoryId() != null
                 ? factoryRepository.findByIdAndDeletedIsFalse(procurement.getFactoryId())
-                        .map(factoryAssembler::toOverviewVO).orElse(null)
+                        .map(Factory::getFactoryName).orElse(null)
                 : null;
+        ProcurementVO procurementVO = assembler.toProcurementVO(procurement, factoryName);
 
-        // 步骤1：补货需求（通过 linked_procurement_id 关联）
-        DemandVO demandVO = demandRepository
-                .findByLinkedProcurementIdAndDeletedIsFalse(procurementId)
-                .map(demand -> assembler.toDemandVO(demand)).orElse(null);
+        // 步骤1：补货需求（通过 ReplenishmentDemand.linkedProcurementId 反向关联，v2.0.0）
+        DemandVO demandVO = null;
+        List<ReplenishmentDemand> demands = demandRepository.findByLinkedProcurementIdAndDeletedIsFalse(procurementId);
+        if (!demands.isEmpty()) {
+            demandVO = assembler.toDemandVO(demands.get(0));
+        }
 
-        // 步骤3：验货记录
+        // 步骤3：验货记录（取最新一条）
         QcRecordVO qcVO = qcRecordRepository
-                .findFirstByProcurementIdAndDeletedIsFalseOrderByCreateTimeDesc(procurementId)
-                .map(qc -> assembler.toQcVO(qc)).orElse(null);
+                .findByProcurementIdAndDeletedIsFalse(procurementId, Pageable.ofSize(1))
+                .stream().findFirst()
+                .map(assembler::toQcVO).orElse(null);
 
-        // 步骤4：调配计划
+        // 步骤4：调配计划（取最新一条）
         LogisticsPlanVO lpVO = logisticsPlanRepository
-                .findFirstByProcurementIdAndDeletedIsFalseOrderByCreateTimeDesc(procurementId)
-                .map(lp -> assembler.toLogisticsVO(lp)).orElse(null);
+                .findByProcurementIdAndDeletedIsFalse(procurementId, Pageable.ofSize(1))
+                .stream().findFirst()
+                .map(assembler::toLogisticsVO).orElse(null);
 
-        // 步骤5：国内报关
-        DomesticCustomsVO dcVO = domesticCustomsRepository
-                .findByProcurementIdAndDeletedIsFalse(procurementId)
-                .map(dc -> assembler.toDomesticCustomsVO(dc)).orElse(null);
+        // 步骤5：国内报关（取最新一条）
+        DomesticCustomsVO dcVO = null;
+        List<DomesticCustomsRecord> dcRecords = domesticCustomsRepository.findByProcurementIdAndDeletedIsFalse(procurementId);
+        if (!dcRecords.isEmpty()) {
+            dcVO = assembler.toDomesticCustomsVO(dcRecords.get(0));
+        }
 
-        // 步骤6：日本清关
-        JapanCustomsVO jpVO = japanCustomsRepository
-                .findByProcurementIdAndDeletedIsFalse(procurementId)
-                .map(jp -> assembler.toJapanCustomsVO(jp)).orElse(null);
+        // 步骤6：日本清关（取最新一条）
+        JapanCustomsVO jpVO = null;
+        List<JapanCustomsRecord> jpRecords = japanCustomsRepository.findByProcurementIdAndDeletedIsFalse(procurementId);
+        if (!jpRecords.isEmpty()) {
+            jpVO = assembler.toJapanCustomsVO(jpRecords.get(0));
+        }
 
-        // 步骤7：退税
-        TaxRefundVO trVO = taxRefundRepository
-                .findByProcurementIdAndDeletedIsFalse(procurementId)
-                .map(tr -> assembler.toTaxRefundVO(tr)).orElse(null);
+        // 步骤7：退税（取最新一条）
+        TaxRefundVO trVO = null;
+        List<TaxRefundRecord> trRecords = taxRefundRepository.findByProcurementIdAndDeletedIsFalse(procurementId);
+        if (!trRecords.isEmpty()) {
+            trVO = assembler.toTaxRefundVO(trRecords.get(0));
+        }
 
-        // 步骤8：运营销售
-        SalesRecordVO srVO = salesRecordRepository
-                .findByProcurementIdAndDeletedIsFalse(procurementId)
-                .map(sr -> assembler.toSalesVO(sr)).orElse(null);
+        // 步骤8：运营销售（取最新一条）
+        SalesRecordVO srVO = null;
+        List<SalesRecord> srRecords = salesRecordRepository.findByProcurementIdAndDeletedIsFalse(procurementId);
+        if (!srRecords.isEmpty()) {
+            srVO = assembler.toSalesVO(srRecords.get(0));
+        }
 
         // 计算8步状态
         StepStatus[] stepStatuses = assembler.computeStepStatuses(
@@ -516,9 +524,9 @@ export function useOrderOverview(procurementId: Ref<number>) {
 | 步骤6 JapanCustoms 字段 | P1 | DB-06 · SPEC-B06 | 🟢 已完成 |
 | 步骤7 TaxRefund 字段 | P1 | DB-07 · SPEC-B07 | 🟢 已完成 |
 | 步骤8 SalesRecord 字段 | P1 | DB-08 · SPEC-B08 | 🟢 已完成 |
-| v1.6.0 前端 Step1 卡片修复 | P0 | DemandVO.subProductItemsSummary | 🟢 已完成 |
+| 前端 Step1 卡片适配 v2.0.0 | P0 | DemandVO 直接字段（subProductCode/quantity/destination） | 🟢 已完成 |
 | Phase 5 Demand 中心化 | P0 | 双入口架构 | 🟢 已完成 |
-| JapanCustomsRecord 补充 subProductCode | P2 | DB 迁移 + 实体 + Assembler | ✅ 已完成（v1.6.1） |
+| JapanCustomsRecord subProductCode | P2 | DB 迁移 + 实体 + Assembler | ✅ 已完成（v1.6.1） |
 | v2.0.0 前端类型同步 | P0 | OrderPage/DemandPage subProductItems → 直接字段 | ✅ 已完成（v1.6.0） |
 | DemandOverviewVO 独立 DTO | P0 | Demand 锚点专用 VO，与 OrderOverviewPageVO 解耦 | ✅ 已完成（v1.6.0） |
 | 前端 i18n 枚举本地化 | P0 | 8步所有 status/enum 值通过 t() 渲染，非原始字符串 | ✅ 已完成（v1.6.0） |
@@ -556,7 +564,7 @@ v1.3.0：Overview 从 Procurement 中心 → Demand 中心，支持双入口。
 ### v2.0.0 子货号追踪
 
 ```
-Demand → N×Procurement → N×DomesticCustoms → LogisticsPlan → JapanCustoms → SalesRecord
+Demand → Procurement → DomesticCustoms → LogisticsPlan → JapanCustoms → SalesRecord
                   ↓
               N×SalesRecord（从 Procurement 直接触发）
 ```
@@ -564,10 +572,10 @@ Demand → N×Procurement → N×DomesticCustoms → LogisticsPlan → JapanCust
 | 步骤 | 实体 | 子货号精确 | 备注 |
 |------|------|:---:|------|
 | 需求单 | ReplenishmentDemand | ✅ | v2.0.0 直接字段（非 JSON） |
-| 发注单 | Procurement | ✅ | 每条 SubProductItem 一个 |
+| 发注单 | Procurement | ✅ | v2.0.0 1:1（Demand → Procurement） |
 | 国内报关 | DomesticCustomsRecord | ✅ | 事件驱动自动 |
 | 调配计划 | LogisticsPlan | ✅ | 可按批次合并 |
-| 日本清关 | JapanCustomsRecord | ⚠️ | 无 subProductCode（可延后补充） |
+| 日本清关 | JapanCustomsRecord | ✅ | v1.6.1 已补全 subProductCode |
 | 退税 | TaxRefundRecord | — | 按采购单总额，维度不同 |
 | 销售记录 | SalesRecord | ✅ | 事件驱动自动 |
 

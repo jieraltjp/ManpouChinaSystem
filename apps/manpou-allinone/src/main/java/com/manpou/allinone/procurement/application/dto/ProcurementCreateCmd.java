@@ -63,6 +63,8 @@ public class ProcurementCreateCmd {
     private LocalDate factoryShipDate; // 厂家出货日
     private LocalDate plannedShipDate;  // 计划出货日（交货期）
     private LocalDate actualShipDate;   // 实际出货日
+    private Integer leadTimeDays;      // 交货期天数（30/45/60，默认30）
+    private String cartonNotes;       // 纸箱备注（v1.9.0 新增）
 
     // ===== 担当 =====
     @Length(max = 64)
@@ -82,8 +84,4 @@ public class ProcurementCreateCmd {
     private String customerCompany;  // 客户公司
 
     private ShipmentStatus status;   // 状态（默认未定）
-
-    // ===== 关联需求单（v1.6.0：转采购时由 UseCase 填充） =====
-    private Long linkedDemandId;
-    private Long linkedDemandItemId;
 }

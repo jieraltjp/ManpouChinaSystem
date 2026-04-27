@@ -47,7 +47,6 @@ CREATE TABLE qc_record (
     gross_weight       DECIMAL(10,4) COMMENT '毛重(kg)',
     tax_inclusive_price DECIMAL(14,2) COMMENT '含税价（元）',
     material           VARCHAR(64) COMMENT '材质',
-    tax_refund         BOOLEAN COMMENT '是否退税',
     qc_standard        VARCHAR(512) COMMENT '验收标准',
     remarks            VARCHAR(512) COMMENT '备注',
     images             JSON COMMENT '缺陷照片URL列表',
@@ -96,7 +95,6 @@ CREATE TABLE qc_record (
 | grossWeight | `gross_weight` | 毛重 |
 | taxInclusivePrice | `tax_inclusive_price` | 含税价 |
 | material | `material` | 材质 |
-| taxRefund | `tax_refund` | 是否退税 |
 | qcStandard | `qc_standard` | 验收标准 |
 | remarks | `remarks` | 备注 |
 | images | `images` | JSON 数组 |

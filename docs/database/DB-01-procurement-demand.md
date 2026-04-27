@@ -69,7 +69,7 @@ CREATE TABLE replenishment_demand (
 | 实体字段 | 数据库列 | 类型 | 说明 |
 |---------|---------|------|------|
 | id | `id` | BIGINT | 主键 |
-| demandCode | `demand_code` | VARCHAR(32) | 格式 `D-YYYYMMDD-NNN` |
+| demandCode | `demand_code` | VARCHAR(32) | 格式 `DM-YYYYMMDD-NNN` |
 | demandType | `demand_type` | VARCHAR(32) | REPLENISHMENT / NEW_PURCHASE |
 | productCode | `product_code` | VARCHAR(32) | 主货号 |
 | subProductCode | `sub_product_code` | VARCHAR(64) | v2.0.0 子货号全码 |

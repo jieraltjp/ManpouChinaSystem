@@ -15,7 +15,7 @@
 
 ```
 Procurement (锚点)
-  ├── ReplenishmentDemand   (步骤1)  → procurement.linked_demand_id → replenishment_demand.id
+  ├── ReplenishmentDemand   (步骤1)  → replenishment_demand.linked_procurement_id → procurement.id
   ├── Factory              (步骤2)  → procurement.factory_id
   ├── QcRecord             (步骤3)  → qc_record.procurement_id
   ├── LogisticsPlan         (步骤4)  → logistics_plan.procurement_id
@@ -27,8 +27,7 @@ Procurement (锚点)
   └── SalesRecord           (步骤8)  → sales_record.procurement_id
 ```
 
-> ⚠️ v1.6.0 关联关系已反转：`Procurement.linked_demand_id` 指向 `ReplenishmentDemand.id`，
-> 不再使用旧版的 `replenishment_demand.linked_procurement_id`。
+> ⚠️ v2.0.0 关联关系：`Demand.linked_procurement_id` → `Procurement.id`（1 Demand = 1 Procurement）。
 
 ---
 
@@ -61,9 +60,9 @@ SELECT
 FROM procurement p
 WHERE p.id = :procurementId AND p.is_deleted = FALSE;
 
--- 步骤1：ReplenishmentDemand（v1.6.0: procurement.linked_demand_id → replenishment_demand.id）
+-- 步骤1：ReplenishmentDemand（v2.0.0: replenishment_demand.linked_procurement_id → procurement.id）
 SELECT d.* FROM replenishment_demand d
-WHERE d.id = (SELECT linked_demand_id FROM procurement WHERE id = :procurementId)
+WHERE d.linked_procurement_id = :procurementId
   AND d.is_deleted = FALSE
 LIMIT 1;
 
@@ -116,7 +115,7 @@ public interface OrderOverviewRepository {
 ## 代码实现状态
 
 - [x] ✅ `OrderOverviewUseCase` 用例服务（含 Demand 锚点 + Procurement 锚点）
-- [x] ✅ `OrderOverviewController` REST 控制器（GET /api/v1/orders/{id}/overview + /demands 端点）
+- [x] ✅ `OrderOverviewController` REST 控制器（GET /api/v1/orders/procurement/{procurementId}/overview + /demands 端点）
 - [x] ✅ `OrderOverviewPageVO` 聚合响应对象（含 StepStatus 数组）
 - [x] ✅ 前端 `OrderOverviewPage.vue`（双入口架构）
 - [x] ✅ 前端 `DemandOverviewPage.vue`（Demand 锚点详情页）

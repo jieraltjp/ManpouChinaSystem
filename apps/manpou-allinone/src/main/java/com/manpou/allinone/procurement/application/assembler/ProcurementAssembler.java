@@ -49,14 +49,14 @@ public class ProcurementAssembler {
                 .factoryShipDate(entity.getFactoryShipDate())
                 .plannedShipDate(entity.getPlannedShipDate())
                 .actualShipDate(entity.getActualShipDate())
+                .leadTimeDays(entity.getLeadTimeDays())
+                .cartonNotes(entity.getCartonNotes())
                 .productLead(entity.getProductLead())
                 .japanLead(entity.getJapanLead())
                 .chinaLead(entity.getChinaLead())
                 .destination(entity.getDestination())
                 .customerCompany(entity.getCustomerCompany())
                 .status(entity.getStatus())
-                .linkedDemandId(entity.getLinkedDemandId())
-                .linkedDemandItemId(entity.getLinkedDemandItemId())
                 .createBy(entity.getCreateBy())
                 .createTime(entity.getCreateTime())
                 .updateTime(entity.getUpdateTime())
@@ -117,14 +117,14 @@ public class ProcurementAssembler {
         if (cmd.getFactoryShipDate() != null) entity.setFactoryShipDate(cmd.getFactoryShipDate());
         if (cmd.getPlannedShipDate() != null) entity.setPlannedShipDate(cmd.getPlannedShipDate());
         if (cmd.getActualShipDate() != null) entity.setActualShipDate(cmd.getActualShipDate());
+        if (cmd.getLeadTimeDays() != null) entity.setLeadTimeDays(cmd.getLeadTimeDays());
+        if (cmd.getCartonNotes() != null) entity.setCartonNotes(cmd.getCartonNotes());
         if (cmd.getProductLead() != null) entity.setProductLead(cmd.getProductLead());
         if (cmd.getJapanLead() != null) entity.setJapanLead(cmd.getJapanLead());
         if (cmd.getChinaLead() != null) entity.setChinaLead(cmd.getChinaLead());
         if (cmd.getDestination() != null) entity.setDestination(cmd.getDestination());
         if (cmd.getCustomerCompany() != null) entity.setCustomerCompany(cmd.getCustomerCompany());
         if (cmd.getStatus() != null) entity.setStatus(cmd.getStatus());
-        if (cmd.getLinkedDemandId() != null) entity.setLinkedDemandId(cmd.getLinkedDemandId());
-        if (cmd.getLinkedDemandItemId() != null) entity.setLinkedDemandItemId(cmd.getLinkedDemandItemId());
     }
 
     public void copyToEntity(ProcurementUpdateCmd cmd, Procurement entity) {
@@ -144,6 +144,8 @@ public class ProcurementAssembler {
         if (cmd.getFactoryShipDate() != null) entity.setFactoryShipDate(cmd.getFactoryShipDate());
         if (cmd.getPlannedShipDate() != null) entity.setPlannedShipDate(cmd.getPlannedShipDate());
         if (cmd.getActualShipDate() != null) entity.setActualShipDate(cmd.getActualShipDate());
+        if (cmd.getLeadTimeDays() != null) entity.setLeadTimeDays(cmd.getLeadTimeDays());
+        if (cmd.getCartonNotes() != null) entity.setCartonNotes(cmd.getCartonNotes());
         if (cmd.getProductLead() != null) entity.setProductLead(cmd.getProductLead());
         if (cmd.getJapanLead() != null) entity.setJapanLead(cmd.getJapanLead());
         if (cmd.getChinaLead() != null) entity.setChinaLead(cmd.getChinaLead());
