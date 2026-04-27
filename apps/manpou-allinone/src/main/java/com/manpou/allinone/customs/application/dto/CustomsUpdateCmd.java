@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 @Data
 public class CustomsUpdateCmd {
 
+    private String containerNo;   // 货柜号（v1.3.0）
+
     private Long factoryId;
 
     @Size(max = 32, message = "货号最多 32 字符")

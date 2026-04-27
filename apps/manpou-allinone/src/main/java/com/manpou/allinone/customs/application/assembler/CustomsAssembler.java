@@ -16,6 +16,7 @@ public class CustomsAssembler {
         return CustomsPageQuery.builder()
                 .id(entity.getId())
                 .customsCode(entity.getCustomsCode())
+                .containerNo(entity.getContainerNo())
                 .procurementId(entity.getProcurementId())
                 .logisticsPlanId(entity.getLogisticsPlanId())
                 .factoryId(entity.getFactoryId())
@@ -34,6 +35,7 @@ public class CustomsAssembler {
     public DomesticCustomsRecord toEntity(CustomsCreateCmd cmd) {
         DomesticCustomsRecord entity = new DomesticCustomsRecord();
         entity.setCustomsCode(generateCustomsCode());
+        entity.setContainerNo(cmd.getContainerNo());
         entity.setProcurementId(cmd.getProcurementId());
         entity.setLogisticsPlanId(cmd.getLogisticsPlanId());
         entity.setFactoryId(cmd.getFactoryId());
@@ -46,6 +48,7 @@ public class CustomsAssembler {
     }
 
     public void copyToEntity(CustomsUpdateCmd cmd, DomesticCustomsRecord entity) {
+        if (cmd.getContainerNo() != null) entity.setContainerNo(cmd.getContainerNo());
         if (cmd.getFactoryId() != null) entity.setFactoryId(cmd.getFactoryId());
         if (cmd.getProductCode() != null) entity.setProductCode(cmd.getProductCode());
         if (cmd.getSubProductCode() != null) entity.setSubProductCode(cmd.getSubProductCode());

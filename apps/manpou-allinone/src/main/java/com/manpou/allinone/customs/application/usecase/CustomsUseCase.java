@@ -37,6 +37,12 @@ public class CustomsUseCase {
                 Math.min(query.getPageSize(), 100),
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
+        // v1.3.0: containerNo 筛选支持（模糊匹配）
+        if (query.getContainerNo() != null && !query.getContainerNo().isBlank()) {
+            Page<DomesticCustomsRecord> page = customsRepository
+                    .findByContainerNoContainingAndDeletedIsFalse(query.getContainerNo(), pageRequest);
+            return page.map(customsAssembler::toDto);
+        }
         Page<DomesticCustomsRecord> page = customsRepository.findAllByDeletedIsFalse(pageRequest);
         return page.map(customsAssembler::toDto);
     }

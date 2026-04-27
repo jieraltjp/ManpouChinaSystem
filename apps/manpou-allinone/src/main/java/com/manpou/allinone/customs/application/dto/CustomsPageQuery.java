@@ -22,6 +22,7 @@ public class CustomsPageQuery {
 
     private Long id;
     private String customsCode;
+    private String containerNo;    // 货柜号（v1.3.0）
     private Long procurementId;
     private Long logisticsPlanId;
     private Long factoryId;

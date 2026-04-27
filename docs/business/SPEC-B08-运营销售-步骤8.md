@@ -1,7 +1,8 @@
 # 运营销售 — 业务规格（步骤8）
 
-> **版本**: 1.2.0
+> **版本**: 1.3.0
 > **创建**: 2026-04-22
+> **更新**: 2026-04-27（v1.3.0：修正 estimatedPriceJpy 字段——实际 Entity 不存在，移除；同步实现清单）
 > **更新**: 2026-04-23（v1.2.0：实现 JapanCustoms→SalesRecord 自动创建 + SalesRecord→ReplenishmentDemand 反馈循环 + SalesChannel 枚举）
 > **状态**: ✅ 已实现
 > **路由**: `/sales/operations`
@@ -45,7 +46,6 @@ SalesRecord（聚合根）
 ├── returnedQuantity: Integer           # 累计退货数量
 ├── returnRate: BigDecimal              # 退货率（自动计算）
 ├── sellingPriceJpy: BigDecimal         # 实际销售价（JPY）
-├── estimatedPriceJpy: BigDecimal       # 估算批发价（来自 Procurement，参考）
 ├── safetyThreshold: Integer            # 安全库存阈值
 ├── status: SalesStatus                 # LISTED / LOW_STOCK / OUT_OF_STOCK / DISCONTINUED
 ├── remarks: String                    # 备注

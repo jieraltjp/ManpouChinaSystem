@@ -65,9 +65,10 @@
   },
   "demand": {
     "title": "补货需求",
-    "newButton": "新规录入",
-    "newDialogTitle": "新规录入 — 补货需求",
+    "newButton": "新建需求",
+    "newDialogTitle": "新建需求 — 补货需求",
     "editDialogTitle": "编辑需求",
+    "drawerTitle": "需求详情",
     "stat": {
       "total": "全部需求",
       "pending": "待确认",
@@ -86,19 +87,21 @@
       "demandType": "类型",
       "productCode": "主货号",
       "subProductCode": "子货号",
+      "category": "商品分类",
       "subProductItems": "子货号明细",
       "quantity": "数量",
       "destination": "目的地",
       "japanLead": "日本担当",
       "status": "状态",
       "createTime": "录入时间",
+      "createBy": "创建人",
       "action": "操作"
     },
     "type": {
-      "replenishment": "补货（非新品）",
-      "newPurchase": "新品采购",
-      "REPLENISHMENT": "补货（非新品）",
-      "NEW_PURCHASE": "新品采购"
+      "replenishment": "补货",
+      "newPurchase": "新品",
+      "REPLENISHMENT": "补货",
+      "NEW_PURCHASE": "新品"
     },
     "status": {
       "PENDING": "待确认",
@@ -110,7 +113,13 @@
       "viewLinked": "查看采购单",
       "revert": "撤销转换",
       "edit": "编辑",
-      "delete": "删除"
+      "delete": "删除",
+      "convertToProcurement": "转采购"
+    },
+    "message": {
+      "convertSuccess": "转采购成功，已生成 {n} 条发注单",
+      "convertFailed": "转采购失败",
+      "loadFailed": "加载失败，请重试"
     },
     "dialog": {
       "demandType": "需求类型",
@@ -551,7 +560,9 @@
     },
     "action": {
       "detail": "详情",
-      "edit": "编辑"
+      "edit": "编辑",
+      "delete": "删除",
+      "createCustoms": "创建报关"
     },
     "requiresQc": {
       "yes": "需检测",
@@ -605,7 +616,11 @@
       "createSuccess": "调配计划创建成功",
       "createFailed": "创建调配计划失败",
       "updateSuccess": "调配计划更新成功",
-      "updateFailed": "更新调配计划失败"
+      "updateFailed": "更新调配计划失败",
+      "deleteConfirm": "确认删除调配计划「{code}」？",
+      "deleteSuccess": "删除调配计划成功",
+      "deleteFailed": "删除调配计划失败",
+      "containerNoRequiredForCustoms": "请先填写货柜号再创建报关"
     }
   },
   "factory": {
@@ -1106,6 +1121,8 @@
     "confirm": "确认",
     "delete": "删除",
     "edit": "编辑",
+    "view": "详情",
+    "warning": "警告",
     "close": "关闭",
     "loading": "加载中...",
     "noData": "暂无数据",
@@ -1134,7 +1151,13 @@
       "network": "网络异常，请重试",
       "tokenExpired": "登录已过期，请重新登录",
       "forbidden": "无权限访问该资源",
-      "server": "服务器错误："
+      "actionFailed": "操作失败",
+      "server": "服务器错误：",
+      "loadFailed": "加载失败，请重试"
+    },
+    "action": {
+      "back": "返回",
+      "retry": "重试"
     },
     "yes": "是",
     "no": "否"
@@ -1154,12 +1177,15 @@
     "filter": {
       "customsCode": "报关单号",
       "customsCodePlaceholder": "请输入报关单号",
+      "containerNo": "货柜号",
+      "containerNoPlaceholder": "请输入货柜号",
       "procurementId": "采购单号",
       "procurementIdPlaceholder": "采购单ID",
       "status": "状态"
     },
     "column": {
       "customsCode": "报关单号",
+      "containerNo": "货柜号",
       "procurementId": "采购单号",
       "productCode": "货号",
       "subProductCode": "子货号",
@@ -1185,6 +1211,8 @@
     "dialog": {
       "procurementId": "采购单号",
       "procurementIdPlaceholder": "请输入采购单ID",
+      "containerNo": "货柜号",
+      "containerNoPlaceholder": "请输入货柜号",
       "productCode": "货号",
       "productCodePlaceholder": "请输入货号",
       "subProductCode": "子货号",

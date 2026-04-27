@@ -14,11 +14,19 @@ import lombok.Setter;
  *   PENDING → SUBMITTED → CLEARED | REJECTED
  *   REJECTED 可修正后重新提交。
  *
- * 生命周期由 LogisticsPlan.status=IN_TRANSIT 事件自动触发创建。
+ * v1.3.0 新增 containerNo 字段，支持货柜级聚合。
+ * 创建方式：由用户在 LogisticsPage 点击「创建报关」手动发起。
  */
 @Entity
 @Table(name = "domestic_customs_record",
-        uniqueConstraints = @UniqueConstraint(name = "uk_domestic_customs_code", columnNames = "customs_code"))
+        uniqueConstraints = @UniqueConstraint(name = "uk_domestic_customs_code", columnNames = "customs_code"),
+        indexes = {
+                @Index(name = "idx_dc_container_no", columnList = "container_no"),
+                @Index(name = "idx_dc_procurement_id", columnList = "procurement_id"),
+                @Index(name = "idx_dc_logistics_plan_id", columnList = "logistics_plan_id"),
+                @Index(name = "idx_dc_factory_id", columnList = "factory_id"),
+                @Index(name = "idx_dc_status", columnList = "status")
+        })
 @Access(AccessType.FIELD)
 @Getter
 @Setter
@@ -26,6 +34,9 @@ public class DomesticCustomsRecord extends BaseEntity {
 
     @Column(name = "customs_code", nullable = false, unique = true, length = 32)
     private String customsCode;           // 系统流水号，如 DC-20260421-001
+
+    @Column(name = "container_no", length = 32)
+    private String containerNo;           // 货柜号（v1.3.0，来自 LogisticsPlan.containerNo）
 
     @Column(name = "procurement_id")
     private Long procurementId;           // 关联发注单

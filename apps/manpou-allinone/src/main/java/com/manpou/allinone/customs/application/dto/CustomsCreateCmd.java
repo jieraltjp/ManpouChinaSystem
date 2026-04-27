@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 @Data
 public class CustomsCreateCmd {
 
+    private String containerNo;   // 货柜号（v1.3.0）
+
     private Long procurementId;
 
     private Long logisticsPlanId;

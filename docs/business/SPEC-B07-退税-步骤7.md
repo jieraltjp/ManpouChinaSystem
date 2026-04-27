@@ -1,9 +1,9 @@
 # 退税 — 业务规格（步骤7）
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-23（补充元数据字段）
-> **状态**: ✅ 已实现
+> **更新**: 2026-04-27（v1.2.0：修正触发规则为手动创建；原「JapanClear → 自动创建」为错误描述，代码中无对应实现）
+> **状态**: ✅ 已实现（手动创建）
 > **对应前端**: `TaxRefundPage.vue` · `docs/ui/pages/07-tax-refund.md`
 > **前置**: JapanCustomsRecord.status = CLEARED（货物抵达日本）
 > **后续**: SalesRecord（步骤8）/ FinanceRecord
@@ -83,16 +83,12 @@ public enum TaxRefundStatus {
 
 ---
 
-## 4. 自动触发规则
+## 4. 触发规则（v1.2.0 修正）
 
-**规则**：JapanCustomsRecord.status = CLEARED 时：
-```
-if (Procurement.billingType ∈ {ZHE_LU_KAI_PIAO, CHAO_HUI_TUI_SHUI}) {
-    create TaxRefundRecord(status = APPLYING)
-} else {
-    // NO_REFUND 或跳过
-}
-```
+**手动创建**：用户在 TaxRefundPage 点击「新建」，录入退税信息。
+
+> ⚠️ 原「JapanCustomsRecord.status = CLEARED → 自动创建 TaxRefundRecord」为错误描述，
+> 代码中无对应事件+监听器实现，已修正为手动创建。
 
 ---
 

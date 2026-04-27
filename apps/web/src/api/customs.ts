@@ -14,6 +14,7 @@ export type DomesticCustomsStatus = 'PENDING' | 'SUBMITTED' | 'CLEARED' | 'REJEC
 export interface CustomsVO {
   id: number
   customsCode: string
+  containerNo?: string   // 货柜号（v1.3.0）
   procurementId: number | null
   logisticsPlanId: number | null
   factoryId: number | null
@@ -39,12 +40,14 @@ export interface CustomsQuery {
   page?: number
   pageSize?: number
   keyword?: string
+  containerNo?: string   // 货柜号筛选（v1.3.0）
   status?: DomesticCustomsStatus
   procurementId?: number
   logisticsPlanId?: number
 }
 
 export interface CustomsCreateRequest {
+  containerNo?: string   // 货柜号（v1.3.0）
   procurementId?: number
   logisticsPlanId?: number
   factoryId?: number
@@ -56,7 +59,7 @@ export interface CustomsCreateRequest {
 }
 
 export interface CustomsUpdateRequest {
-  procurementId?: number
+  containerNo?: string   // 货柜号（v1.3.0）
   factoryId?: number
   productCode?: string
   subProductCode?: string

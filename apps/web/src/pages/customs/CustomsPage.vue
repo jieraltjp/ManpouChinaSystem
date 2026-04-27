@@ -51,6 +51,9 @@
         <el-form-item :label="$t('customs.filter.customsCode')">
           <el-input v-model="filterForm.keyword" :placeholder="$t('customs.filter.customsCodePlaceholder')" clearable style="width:160px" />
         </el-form-item>
+        <el-form-item :label="$t('customs.filter.containerNo')">
+          <el-input v-model="filterForm.containerNo" :placeholder="$t('customs.filter.containerNoPlaceholder')" clearable style="width:150px" />
+        </el-form-item>
         <el-form-item :label="$t('customs.filter.procurementId')">
           <el-input-number v-model="filterForm.procurementId" :placeholder="$t('customs.filter.procurementIdPlaceholder')" :min="1" style="width:130px" clearable />
         </el-form-item>
@@ -77,6 +80,7 @@
             <span class="code-badge">{{ row.customsCode }}</span>
           </template>
         </el-table-column>
+        <el-table-column prop="containerNo" :label="$t('customs.column.containerNo')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="procurementId" :label="$t('customs.column.procurementId')" min-width="110" align="center">
           <template #default="{ row }">
             <span v-if="row.procurementId">{{ row.procurementId }}</span>
@@ -142,6 +146,9 @@
         <el-form-item :label="$t('customs.dialog.procurementId')" prop="procurementId">
           <el-input-number v-model="form.procurementId" :min="1" :placeholder="$t('customs.dialog.procurementIdPlaceholder')" style="width:100%" />
         </el-form-item>
+        <el-form-item :label="$t('customs.dialog.containerNo')">
+          <el-input v-model="form.containerNo" :placeholder="$t('customs.dialog.containerNoPlaceholder')" />
+        </el-form-item>
         <el-form-item :label="$t('customs.dialog.productCode')" prop="productCode">
           <el-input v-model="form.productCode" :placeholder="$t('customs.dialog.productCodePlaceholder')" />
         </el-form-item>
@@ -185,6 +192,7 @@
         <el-descriptions-item :label="$t('customs.column.customsCode')">
           <span class="code-badge">{{ currentRow.customsCode }}</span>
         </el-descriptions-item>
+        <el-descriptions-item :label="$t('customs.column.containerNo')">{{ currentRow.containerNo ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('customs.column.status')">
           <el-tag :type="statusTagType(currentRow.status)" size="small">{{ statusLabel(currentRow.status) }}</el-tag>
         </el-descriptions-item>
@@ -223,6 +231,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Document, Clock, Top, CircleCheck } from '@element-plus/icons-vue'
 import { customsApi, type CustomsVO, type DomesticCustomsStatus, type CustomsCreateRequest } from '@/api/customs'
@@ -240,6 +249,7 @@ const rejectingRowId = ref<number | null>(null)
 const currentRow = ref<CustomsVO | null>(null)
 const filterForm = reactive({
   keyword: '',
+  containerNo: '',
   procurementId: undefined as number | undefined,
   status: '' as DomesticCustomsStatus | '',
 })
@@ -247,9 +257,11 @@ const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const tableData = ref<CustomsVO[]>([])
 
 const formRef = ref<FormInstance>()
+const route = useRoute()
 const { t } = useI18n()
 
 const form = reactive<CustomsCreateRequest>({
+  containerNo: '',
   procurementId: undefined,
   factoryId: undefined,
   productCode: '',
@@ -296,6 +308,7 @@ async function loadData() {
       page: pagination.page - 1,
       pageSize: pagination.pageSize,
       keyword: filterForm.keyword || undefined,
+      containerNo: filterForm.containerNo || undefined,
       procurementId: filterForm.procurementId,
       status: filterForm.status || undefined,
     })
@@ -315,6 +328,7 @@ function onSearchFromButton() { pagination.page = 1; loadData() }
 
 function onReset() {
   filterForm.keyword = ''
+  filterForm.containerNo = ''
   filterForm.procurementId = undefined
   filterForm.status = ''
   pagination.page = 1
@@ -323,7 +337,10 @@ function onReset() {
 
 function onNew() {
   formRef.value?.resetFields()
+  // v1.3.0: 优先使用 URL 参数中的货柜号，否则清空
+  const urlContainerNo = route.query.containerNo as string | undefined
   Object.assign(form, {
+    containerNo: urlContainerNo ?? '',
     procurementId: undefined,
     factoryId: undefined,
     productCode: '',
@@ -429,7 +446,14 @@ async function onDelete(row: CustomsVO) {
   }
 }
 
-onMounted(() => loadData())
+onMounted(() => {
+  // v1.3.0: URL 参数货柜号自动填入筛选栏
+  const urlContainerNo = route.query.containerNo as string | undefined
+  if (urlContainerNo) {
+    filterForm.containerNo = urlContainerNo
+  }
+  loadData()
+})
 
 // 修正 el-table 空状态时 empty-block 宽度超出列宽
 watch(tableData, () => {

@@ -2,10 +2,11 @@
 
 > **版本**: 1.3.0
 > **创建**: 2026-04-22
+> **更新**: 2026-04-27（v1.3.0：增加 container_no 字段，实现货柜级聚合；V36 迁移待执行）
 > **更新**: 2026-04-24（v1.3.0：全量实现已确认，修正为 ✅ 已实现；修正代码文件名DomesticCustomsRepository/customs.ts/CustomsPage.vue）
 > **更新**: 2026-04-24（修正状态：仅聚合根+枚举已实现，UseCase/Controller/前端均未实现，修正为🔴未实现）
 > **更新**: 2026-04-23（对齐 V17 迁移 + 实体实现）
-> **状态**: ✅ 已实现
+> **状态**: ✅ 已实现（含 v1.3.0 container_no 字段待迁移）
 > **业务步号**: 05（国内报关）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B05-国内报关-步骤5.md`
 > **对应 UI 文档**: `docs/ui/pages/05-domestic-customs.md`
@@ -17,7 +18,7 @@
 
 | 序号 | 表名 | 聚合根 | 状态 |
 |------|------|--------|------|
-| 1 | `domestic_customs_record` | DomesticCustomsRecord | ✅ 已实现 |
+| 1 | `domestic_customs_record` | DomesticCustomsRecord | ✅ 已实现（container_no 待 V36） |
 
 ---
 
@@ -29,8 +30,9 @@
 CREATE TABLE domestic_customs_record (
     id                     BIGINT AUTO_INCREMENT PRIMARY KEY,
     customs_code           VARCHAR(32) NOT NULL COMMENT '报关单号（DC-YYYYMMDD-NNN）',
+    container_no           VARCHAR(32) DEFAULT NULL COMMENT '货柜号（v1.3.0，来自 LogisticsPlan.containerNo）',
     procurement_id         BIGINT COMMENT '关联发注单 FK → procurement.id',
-    logistics_plan_id      BIGINT COMMENT '关联调配计划 FK → logistics_plan.id',
+    logistics_plan_id      BIGINT COMMENT '关联调配计划 FK → logistics_plan.id（v1.3.0 保留，可选）',
     factory_id             BIGINT COMMENT '关联工厂 FK → factory.id',
     product_code           VARCHAR(32) NOT NULL COMMENT '货号',
     sub_product_code       VARCHAR(64) COMMENT '子货号',
@@ -38,17 +40,27 @@ CREATE TABLE domestic_customs_record (
     estimated_value_cny    DECIMAL(14,2) COMMENT '预估货值（元）',
     status                 VARCHAR(24) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING / SUBMITTED / CLEARED / REJECTED',
     remarks                VARCHAR(512) COMMENT '备注',
-    create_time            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    create_time            DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    update_time            DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     create_by              VARCHAR(64) NOT NULL,
     update_by              VARCHAR(64) NOT NULL,
-    is_deleted             TINYINT(1) NOT NULL DEFAULT 0,
+    is_deleted             BIT(1) NOT NULL DEFAULT b'0',
     UNIQUE KEY uk_domestic_customs_code (customs_code),
+    INDEX idx_dc_container_no (container_no),
     INDEX idx_dc_procurement_id (procurement_id),
     INDEX idx_dc_logistics_plan_id (logistics_plan_id),
+    INDEX idx_dc_factory_id (factory_id),
     INDEX idx_dc_status (status)
 );
 ```
+
+---
+
+## 待执行迁移
+
+| 序号 | 文件 | 内容 | 状态 |
+|------|------|------|------|
+| V36 | `V36__domestic_customs_container_no.sql` | domestic_customs_record 增加 container_no 字段 + 索引 | 🔴 待执行 |
 
 ---
 
@@ -58,6 +70,7 @@ CREATE TABLE domestic_customs_record (
 |---------|---------|------|
 | id | `id` | ✅ |
 | customsCode | `customs_code` | ✅ |
+| containerNo | `container_no` | ✅（v1.3.0，V36迁移后） |
 | procurementId | `procurement_id` | ✅ |
 | logisticsPlanId | `logistics_plan_id` | ✅ |
 | factoryId | `factory_id` | ✅ |
@@ -72,7 +85,7 @@ CREATE TABLE domestic_customs_record (
 
 ## 代码实现状态
 
-- [x] ✅ `DomesticCustomsRecord` 聚合根实体（含 submit/clear/reject 领域方法）
+- [x] ✅ `DomesticCustomsRecord` 聚合根实体（含 `containerNo` 字段 v1.3.0）
 - [x] ✅ `DomesticCustomsStatus` 枚举
 - [x] ✅ `DomesticCustomsRepository` 领域接口（含 @Repository，无分离 JPA Adapter）
 - [ ] 🔴 单元测试

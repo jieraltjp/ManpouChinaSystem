@@ -22,5 +22,7 @@ public interface DomesticCustomsRepository extends JpaRepository<DomesticCustoms
 
     List<DomesticCustomsRecord> findByProcurementIdAndDeletedIsFalse(Long procurementId);
 
+    Page<DomesticCustomsRecord> findByContainerNoContainingAndDeletedIsFalse(String containerNo, Pageable pageable);
+
     Page<DomesticCustomsRecord> findAllByDeletedIsFalse(Pageable pageable);
 }

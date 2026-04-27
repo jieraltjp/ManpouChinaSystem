@@ -65,9 +65,10 @@
   },
   "demand": {
     "title": "補充需要管理",
-    "newButton": "新規入力",
-    "newDialogTitle": "新規入力 — 補充需要",
+    "newButton": "新規需要",
+    "newDialogTitle": "新規需要 — 補充需要",
     "editDialogTitle": "需要編集",
+    "drawerTitle": "需要詳細",
     "stat": {
       "total": "全需要",
       "pending": "確認待ち",
@@ -86,19 +87,21 @@
       "demandType": "タイプ",
       "productCode": "主品番",
       "subProductCode": "子品番",
+      "category": "商品分類",
       "subProductItems": "子品番明細",
       "quantity": "数量",
       "destination": "出荷先",
       "japanLead": "日本担当",
       "status": "ステータス",
       "createTime": "作成日時",
+      "createBy": "作成者",
       "action": "操作"
     },
     "type": {
-      "replenishment": "補充（非新品）",
-      "newPurchase": "新品発注",
-      "REPLENISHMENT": "補充（非新品）",
-      "NEW_PURCHASE": "新品発注"
+      "replenishment": "補充",
+      "newPurchase": "新品",
+      "REPLENISHMENT": "補充",
+      "NEW_PURCHASE": "新品"
     },
     "status": {
       "PENDING": "確認待ち",
@@ -110,7 +113,13 @@
       "viewLinked": "発注書を表示",
       "revert": "変換取消",
       "edit": "編集",
-      "delete": "削除"
+      "delete": "削除",
+      "convertToProcurement": "発注へ変換"
+    },
+    "message": {
+      "convertSuccess": "変換成功、{n} 件の新規発注書を作成しました",
+      "convertFailed": "変換に失敗しました",
+      "loadFailed": "読み込みに失敗しました、再試行してください"
     },
     "dialog": {
       "demandType": "需要タイプ",
@@ -551,7 +560,12 @@
     },
     "action": {
       "detail": "詳細",
-      "edit": "編集"
+      "edit": "編集",
+      "delete": "削除",
+      "createCustoms": "通関作成"
+    },
+    "message": {
+      "containerNoRequiredForCustoms": "先にコンテナ番号を入力してから通関を作成してください"
     },
     "requiresQc": {
       "yes": "検品要",
@@ -605,7 +619,10 @@
       "createSuccess": "配送計画の作成が完了しました",
       "createFailed": "配送計画の作成に失敗しました",
       "updateSuccess": "配送計画の更新が完了しました",
-      "updateFailed": "配送計画の更新に失敗しました"
+      "updateFailed": "配送計画の更新に失敗しました",
+      "deleteConfirm": "配送計画「{code}」を削除しますか？",
+      "deleteSuccess": "配送計画の削除が完了しました",
+      "deleteFailed": "配送計画の削除に失敗しました"
     }
   },
   "factory": {
@@ -782,6 +799,11 @@
       "delete": "削除"
     },
     "factoryUnit": "社",
+    "category": {
+      "OEM": "OEM",
+      "ORDINARY": "普通",
+      "FACTORY_DIRECT": "工場直送"
+    },
     "drawer": {
       "title": "商品詳細",
       "masterCode": "主品番",
@@ -1062,6 +1084,8 @@
     "confirm": "確認",
     "delete": "削除",
     "edit": "編集",
+    "view": "詳細",
+    "warning": "警告",
     "close": "閉じる",
     "loading": "読み込み中...",
     "noData": "データがありません",
@@ -1090,7 +1114,13 @@
       "network": "ネットワークエラー、再試行してください",
       "tokenExpired": "ログイン期限切れです。再度ログインしてください",
       "forbidden": "このリソースにアクセスする権限がありません",
-      "server": "サーバーエラー："
+      "actionFailed": "操作に失敗しました",
+      "server": "サーバーエラー：",
+      "loadFailed": "読み込みに失敗しました。再試行してください"
+    },
+    "action": {
+      "back": "戻る",
+      "retry": "再試行"
     }
   },
   "validation": {
@@ -1111,12 +1141,15 @@
     "filter": {
       "customsCode": "通関書類番号",
       "customsCodePlaceholder": "通関書類番号を入力",
+      "containerNo": "コンテナ番号",
+      "containerNoPlaceholder": "コンテナ番号を入力",
       "procurementId": "仕入書類番号",
       "procurementIdPlaceholder": "仕入書類ID",
       "status": "ステータス"
     },
     "column": {
       "customsCode": "通関書類番号",
+      "containerNo": "コンテナ番号",
       "procurementId": "仕入書類番号",
       "productCode": "商品コード",
       "subProductCode": "枝番",
@@ -1142,6 +1175,8 @@
     "dialog": {
       "procurementId": "仕入書類番号",
       "procurementIdPlaceholder": "仕入書類IDを入力",
+      "containerNo": "コンテナ番号",
+      "containerNoPlaceholder": "コンテナ番号を入力",
       "productCode": "商品コード",
       "productCodePlaceholder": "商品コードを入力",
       "subProductCode": "枝番",

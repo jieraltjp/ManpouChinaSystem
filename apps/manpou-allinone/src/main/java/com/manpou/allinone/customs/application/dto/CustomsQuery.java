@@ -18,6 +18,9 @@ public class CustomsQuery {
     /** 货号关键词（模糊匹配） */
     private String keyword;
 
+    /** 货柜号（模糊匹配，v1.3.0） */
+    private String containerNo;
+
     /** 状态筛选 */
     private DomesticCustomsStatus status;
 

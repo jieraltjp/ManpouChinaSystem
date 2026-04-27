@@ -144,9 +144,19 @@ public enum LogisticsStatus {
 
 ---
 
-## 5. 自动触发规则
+## 5. 触发规则（v1.3.0 修正）
 
-- **LogisticsPlan.status = IN_TRANSIT** → 自动创建 DomesticCustomsRecord（步骤5）
+**不自动触发，由用户在 LogisticsPage 手动发起报关。**
+
+> 原因：1货柜 = N 个 LogisticsPlan = N 个 DomesticCustomsRecord（按商品+工厂分组），自动触发无法正确处理多计划场景。
+
+**操作路径**：
+```
+LogisticsPage → 选中某货柜号下的计划 → 点击「创建报关」
+    → 跳转 /procurement/customs?containerNo=XXX
+    → CustomsPage 自动填入货柜号，用户按商品+工厂分别创建报关单
+```
+
 - **检品合格后** → 可创建 LogisticsPlan
 
 ---

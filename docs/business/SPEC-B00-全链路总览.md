@@ -1,9 +1,9 @@
 # 全链路业务流索引 — MANPOU 中国系统
 
-> **版本**: 1.1.0
+> **版本**: 1.3.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-23（v1.1.0：版本号同步）
-> **状态**: 初稿
+> **更新**: 2026-04-27（v1.3.0：步骤5-8全部实现，与各SPEC文档同步；修正全链路总览图中的步骤5/6/7/8状态）
+> **状态**: ✅ 已实现（全链路8步 CRUD + 事件驱动 + 反馈循环）
 > **依据**: 用户业务描述（8步全链路 + 商品数据库 + 循环反馈）
 
 ---
@@ -324,8 +324,8 @@
 
 ## 第五步：国内报关
 
-**对应文档**: `DOMAIN-发注管理领域模型.md` §4（仅骨架）
-**对应代码**: `DomesticCustomsRecord` 🔴未实现
+**对应文档**: `SPEC-B05-国内报关-步骤5.md` · `DB-05-domestic-customs.md`
+**对应代码**: `DomesticCustomsRecord` ✅ 已实现
 
 ### 需要什么（输入）
 
@@ -365,8 +365,8 @@
 
 ## 第六步：日本清关
 
-**对应文档**: `DOMAIN-发注管理领域模型.md` §4（仅骨架）
-**对应代码**: `JapanCustomsRecord` 🔴未实现
+**对应文档**: `SPEC-B06-日本清关-步骤6.md` · `DB-06-japan-customs.md`
+**对应代码**: `JapanCustomsRecord` ✅ 已实现（含自动创建 SalesRecord）
 
 ### 需要什么（输入）
 
@@ -405,10 +405,8 @@
 
 ## 第七步：退税
 
-> 触发条件：货物抵达日本（JAPAN_ARRIVED → JAPAN_CLEARED）
-
-**对应文档**: 无
-**对应代码**: 🔴未实现
+**对应文档**: `SPEC-B07-退税-步骤7.md` · `DB-07-tax-refund.md`
+**对应代码**: `TaxRefundRecord` ✅ 已实现（手动创建）
 
 ### 需要什么（输入）
 
@@ -444,10 +442,8 @@
 
 ## 第八步：运营（销售）
 
-> 触发条件：退税完成 / 日本清关完成
-
-**对应文档**: 无
-**对应代码**: 🔴未实现
+**对应文档**: `SPEC-B08-运营销售-步骤8.md` · `DB-08-sales.md`
+**对应代码**: `SalesRecord` ✅ 已实现（含 JapanCustomsClearedEvent 事件驱动自动创建 + 低库存触发补货反馈）
 
 ### 需要什么（输入）
 
@@ -615,21 +611,19 @@
 
 ## 下一步行动
 
-1. **业务方确认**（阻塞步骤5-8）
-   - [ ] 提供真实国内报关单样本 → 补充 DomesticCustomsRecord 字段
-   - [ ] 提供真实日本清关文件样本 → 补充 JapanCustomsRecord 字段
-   - [ ] 确认退税计算公式和触发时机
-   - [ ] 确认运营销售数据来源（平台 API / 人工维护）
+1. **代码实现**（已完成的 P0/P1/P2 项）
+   - [x] ✅ Product 表 hsCode / taxPoint（V30 MySQL 直接迁移）
+   - [x] ✅ Factory 表 wechat / qq / longitude / latitude（全字段已实现）
+   - [x] ✅ DomesticCustomsRecord 聚合根（国内报关 v1.3.0）
+   - [x] ✅ JapanCustomsRecord 聚合根（日本清关 v1.2.0）
+   - [x] ✅ TaxRefundRecord 聚合根（退税 v1.1.0）
+   - [x] ✅ SalesRecord 聚合根（运营销售 v1.2.0）
+   - [x] ✅ Container / ConsolidationPool（占位，待业务方确认字段）
 
-2. **代码实现**（按优先级）
-   - [ ] P0: Product 表新增 hsCode / taxPoint 字段
-   - [ ] P0: Factory 表新增 wechat / qq / longitude / latitude 字段
-   - [ ] P1: Container 聚合根（货柜管理）
-   - [ ] P1: ConsolidationPool 聚合根（拼柜池）
-   - [ ] P1: DomesticCustomsRecord 聚合根（国内报关）
-   - [ ] P1: JapanCustomsRecord 聚合根（日本清关）
-   - [ ] P2: TaxRefundRecord 聚合根（退税）
-   - [ ] P2: SalesRecord 聚合根（运营销售）
+2. **业务方确认**（仍在阻塞中）
+   - [ ] 提供真实国内报关单样本 → 补充 HS 编码/申报价值/出口口岸等字段
+   - [ ] 确认运营销售数据来源（平台 API / 人工维护）
+   - [ ] Container 货柜管理字段确认
 
 3. **反馈循环设计**
    - [ ] 确定库存预警阈值机制
