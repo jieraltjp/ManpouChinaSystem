@@ -235,7 +235,8 @@
       "leadTimeDays": "交货周期(天)",
       "cartonNotes": "纸箱备注",
       "status": "状态",
-      "createTime": "创建时间",
+      "updateBy": "修改人",
+      "updateTime": "修改时间",
       "action": "操作"
     },
     "status": {

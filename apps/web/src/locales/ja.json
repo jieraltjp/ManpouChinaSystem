@@ -235,7 +235,8 @@
       "leadTimeDays": "リードタイム(日)",
       "cartonNotes": "カートン備考",
       "status": "ステータス",
-      "createTime": "作成日時",
+      "updateBy": "更新者",
+      "updateTime": "更新日時",
       "action": "操作"
     },
     "status": {

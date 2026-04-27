@@ -59,6 +59,7 @@ public class ProcurementAssembler {
                 .status(entity.getStatus())
                 .createBy(entity.getCreateBy())
                 .createTime(entity.getCreateTime())
+                .updateBy(entity.getUpdateBy())
                 .updateTime(entity.getUpdateTime())
                 .build();
     }

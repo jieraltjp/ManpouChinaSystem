@@ -69,5 +69,6 @@ public class ProcurementPageQuery {
     // ===== 审计 =====
     private String createBy;
     private LocalDateTime createTime;
+    private String updateBy;
     private LocalDateTime updateTime;
 }

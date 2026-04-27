@@ -46,6 +46,7 @@ export interface ProcurementPageVO {
   status: string
   createBy?: string
   createTime?: string
+  updateBy?: string
   updateTime?: string
 }
 

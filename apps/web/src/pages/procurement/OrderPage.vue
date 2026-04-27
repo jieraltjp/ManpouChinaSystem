@@ -118,9 +118,14 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" :label="$t('order.column.createTime')" min-width="160">
+        <el-table-column :label="$t('order.column.updateBy')" min-width="100" align="center">
           <template #default="{ row }">
-            {{ row.createTime ? new Date(row.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
+            {{ row.updateBy || '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('order.column.updateTime')" min-width="160">
+          <template #default="{ row }">
+            {{ row.updateTime ? new Date(row.updateTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
           </template>
         </el-table-column>
         <el-table-column :label="$t('order.column.action')" min-width="220" align="center">
