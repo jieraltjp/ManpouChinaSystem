@@ -140,7 +140,7 @@
         </el-table-column>
         <el-table-column :label="$t('sales.column.action')" min-width="220" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('sales.action.detail') }}</el-button>
+            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('sales.action.detail') }}</el-button>
             <template v-if="row.status !== 'DISCONTINUED'">
               <el-button link type="info" size="small" @click.stop="onUpdateStock(row)">{{ $t('sales.action.updateStock') }}</el-button>
               <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-discontinue'" @click.stop="onDiscontinue(row)">{{ $t('sales.action.discontinue') }}</el-button>

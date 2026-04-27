@@ -114,10 +114,10 @@
         </el-table-column>
         <el-table-column :label="$t('inspection.column.action')" min-width="220" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('inspection.action.detail') }}</el-button>
-            <el-button link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('inspection.action.edit') }}</el-button>
+            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('inspection.action.detail') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('inspection.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('inspection.action.delete') }}</el-button>
-            <el-button v-if="row.procurementId" link type="warning" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
+            <el-button v-if="row.procurementId" link type="info" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
           </template>
         </el-table-column>
       </el-table>

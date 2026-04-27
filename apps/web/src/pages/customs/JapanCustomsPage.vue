@@ -107,7 +107,7 @@
         </el-table-column>
         <el-table-column :label="$t('japanCustoms.column.action')" min-width="200" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('japanCustoms.action.detail') }}</el-button>
+            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('japanCustoms.action.detail') }}</el-button>
             <template v-if="row.status === 'PENDING'">
               <el-button link type="success" size="small" :loading="actionLoading === row.id + '-start'" @click.stop="onStart(row)">{{ $t('japanCustoms.action.start') }}</el-button>
               <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>

@@ -237,3 +237,8 @@ a:hover {
   color: var(--text-primary);
   letter-spacing: 0.3px;
 }
+
+/* ── 操作列「详情」按钮：Element Plus link 型按钮用蓝色文字 ── */
+.btn-blue {
+  color: #409EFF !important;
+}

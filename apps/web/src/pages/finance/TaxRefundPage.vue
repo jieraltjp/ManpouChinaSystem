@@ -107,8 +107,8 @@
         </el-table-column>
         <el-table-column :label="$t('taxRefund.column.action')" min-width="240" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('taxRefund.action.detail') }}</el-button>
-            <el-button link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('taxRefund.action.edit') }}</el-button>
+            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('taxRefund.action.detail') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('taxRefund.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('taxRefund.action.delete') }}</el-button>
             <template v-if="row.status === 'APPLYING'">
               <el-button link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('taxRefund.action.complete') }}</el-button>

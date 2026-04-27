@@ -84,8 +84,8 @@
         </el-table-column>
         <el-table-column :label="$t('factory.column.action')" min-width="150" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('factory.action.detail') }}</el-button>
-            <el-button link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('factory.action.edit') }}</el-button>
+            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('factory.action.detail') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('factory.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('factory.action.delete') }}</el-button>
           </template>
         </el-table-column>

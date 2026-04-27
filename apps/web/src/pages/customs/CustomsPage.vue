@@ -113,7 +113,7 @@
         <el-table-column prop="createTime" :label="$t('customs.column.createTime')" min-width="160" />
         <el-table-column :label="$t('customs.column.action')" min-width="200" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
+            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
             <template v-if="row.status === 'PENDING'">
               <el-button link type="success" size="small" :loading="actionLoading === row.id + '-submit'" @click.stop="onSubmit(row)">{{ $t('customs.action.submit') }}</el-button>
               <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
