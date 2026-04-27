@@ -538,6 +538,7 @@
     },
     "column": {
       "planCode": "调配编号",
+      "containerNo": "货柜号",
       "qcCode": "验货编号",
       "factoryName": "关联工厂",
       "productCode": "货号",
@@ -559,6 +560,8 @@
       "newTitle": "新增调配",
       "qcRecord": "关联验货记录",
       "qcRecordPlaceholder": "搜索验货编号或货号",
+      "containerNo": "货柜号",
+      "containerNoPlaceholder": "同批次货物填入相同货柜号",
       "procurement": "关联采购单",
       "procurementPlaceholder": "请选择采购单",
       "cargoInfo": "货物信息",

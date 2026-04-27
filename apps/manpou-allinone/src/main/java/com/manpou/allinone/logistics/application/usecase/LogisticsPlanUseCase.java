@@ -42,6 +42,8 @@ public class LogisticsPlanUseCase {
             page = logisticsPlanRepository.findByProcurementIdAndDeletedIsFalse(query.getProcurementId(), pageRequest);
         } else if (query.getProductCode() != null && !query.getProductCode().isBlank()) {
             page = logisticsPlanRepository.findByProductCodeAndDeletedIsFalse(query.getProductCode(), pageRequest);
+        } else if (query.getContainerNo() != null && !query.getContainerNo().isBlank()) {
+            page = logisticsPlanRepository.findByContainerNoContainingAndDeletedIsFalse(query.getContainerNo(), pageRequest);
         } else {
             page = logisticsPlanRepository.findAllByDeletedIsFalse(pageRequest);
         }

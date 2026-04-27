@@ -10,6 +10,7 @@ export type PlanType = 'SEA' | 'AIR' | 'CONSOLIDATION'
 export interface LogisticsPlanVO {
   id: number
   planCode: string
+  containerNo?: string    // 货柜号（v1.3.0）
   qcRecordId?: number    // 关联验货记录（v1.2.0）
   qcCode?: string        // 验货编号（v1.2.0，来自 QC record）
   procurementId?: number
@@ -45,6 +46,7 @@ export interface LogisticsPlanPageResponse {
 
 export interface CreateLogisticsPlanRequest {
   qcRecordId?: number    // 关联验货记录（v1.2.0）
+  containerNo?: string   // 货柜号（v1.3.0）
   procurementId?: number
   factoryId?: number
   productCode: string
@@ -64,6 +66,7 @@ export interface CreateLogisticsPlanRequest {
 export interface UpdateLogisticsPlanRequest {
   planType?: PlanType
   status?: LogisticsStatus
+  containerNo?: string    // 货柜号（v1.3.0）
   cargoLengthCm?: number
   cargoWidthCm?: number
   cargoHeightCm?: number
@@ -78,7 +81,7 @@ export interface UpdateLogisticsPlanRequest {
 }
 
 export const logisticsApi = {
-  list(params: { page?: number; pageSize?: number; productCode?: string; planType?: PlanType; status?: LogisticsStatus; qcRecordId?: number; procurementId?: number; factoryId?: number }) {
+  list(params: { page?: number; pageSize?: number; productCode?: string; planType?: PlanType; status?: LogisticsStatus; qcRecordId?: number; procurementId?: number; factoryId?: number; containerNo?: string }) {
     return client.get<{ code: string; data: LogisticsPlanPageResponse }>('/logistics-plans', { params })
   },
   get(id: number) {

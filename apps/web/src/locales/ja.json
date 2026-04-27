@@ -538,6 +538,7 @@
     },
     "column": {
       "planCode": "配送番号",
+      "containerNo": "コンテナ番号",
       "qcCode": "検査番号",
       "factoryName": "関連工場",
       "productCode": "品番",
@@ -559,6 +560,8 @@
       "newTitle": "新規追加",
       "qcRecord": "関連検査記録",
       "qcRecordPlaceholder": "検査番号または品番を検索",
+      "containerNo": "コンテナ番号",
+      "containerNoPlaceholder": "同じバッチの貨物には同じコンテナ番号を入力",
       "procurement": "関連発注書",
       "procurementPlaceholder": "発注書を選択してください",
       "cargoInfo": "貨物情報",

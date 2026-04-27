@@ -11,6 +11,7 @@ public class LogisticsPlanQuery {
     private Integer pageSize = 20;
 
     private String productCode;
+    private String containerNo;          // 货柜号，支持模糊查询（v1.3.0）
     private PlanType planType;
     private LogisticsStatus status;
     private Long qcRecordId;

@@ -48,6 +48,7 @@ public class LogisticsPlanAssembler {
         return LogisticsPlanPageQuery.builder()
                 .id(entity.getId())
                 .planCode(entity.getPlanCode())
+                .containerNo(entity.getContainerNo())
                 .qcRecordId(entity.getQcRecordId())
                 .qcCode(qcCode)
                 .procurementId(entity.getProcurementId())
@@ -85,6 +86,7 @@ public class LogisticsPlanAssembler {
 
     public void copyCreate(LogisticsPlanCreateCmd cmd, LogisticsPlan entity) {
         if (cmd.getQcRecordId() != null) entity.setQcRecordId(cmd.getQcRecordId());
+        if (cmd.getContainerNo() != null) entity.setContainerNo(cmd.getContainerNo());
         if (cmd.getProcurementId() != null) entity.setProcurementId(cmd.getProcurementId());
         if (cmd.getFactoryId() != null) entity.setFactoryId(cmd.getFactoryId());
         if (cmd.getSubProductCode() != null) entity.setSubProductCode(cmd.getSubProductCode());
@@ -110,6 +112,7 @@ public class LogisticsPlanAssembler {
         if (cmd.getQuantity() != null) entity.setQuantity(cmd.getQuantity());
         if (cmd.getRequiresQc() != null) entity.setRequiresQc(cmd.getRequiresQc());
         if (cmd.getContainerId() != null) entity.setContainerId(cmd.getContainerId());
+        if (cmd.getContainerNo() != null) entity.setContainerNo(cmd.getContainerNo());
         if (cmd.getPoolId() != null) entity.setPoolId(cmd.getPoolId());
         if (cmd.getEstimatedShipDate() != null) entity.setEstimatedShipDate(cmd.getEstimatedShipDate());
         if (cmd.getActualShipDate() != null) entity.setActualShipDate(cmd.getActualShipDate());

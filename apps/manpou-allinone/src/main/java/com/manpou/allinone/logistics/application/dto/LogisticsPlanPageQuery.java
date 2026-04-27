@@ -15,6 +15,7 @@ public class LogisticsPlanPageQuery {
 
     private Long id;
     private String planCode;
+    private String containerNo;          // 货柜号（v1.3.0）
     private Long qcRecordId;
     private String qcCode;          // 验货编号（来自 QC record，v1.2.0）
     private Long procurementId;

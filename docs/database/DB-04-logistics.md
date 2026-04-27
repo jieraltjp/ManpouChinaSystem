@@ -1,7 +1,8 @@
 # DB-04 — 调配计划数据库设计
 
-> **版本**: 1.2.0
+> **版本**: 1.3.0
 > **创建**: 2026-04-22
+> **更新**: 2026-04-27（v1.3.0：新增 container_no 货柜号字段，支持多货物合柜追踪）
 > **更新**: 2026-04-27（v1.2.0：新增 qc_record_id 列，关联验货记录；保留 procurement_id 用于拼柜场景兼容）
 > **状态**: ✅ 已实现
 > **业务步号**: 04（调配计划）
@@ -44,7 +45,8 @@ CREATE TABLE logistics_plan (
     cargo_weight_kg    DECIMAL(10,4) COMMENT '重量(kg)',
     quantity           INT COMMENT '数量',
     requires_qc       BOOLEAN COMMENT '是否需要检测',
-    container_id       BIGINT COMMENT '货柜ID（装柜后赋值）',
+    container_no      VARCHAR(32) COMMENT '货柜号（船公司提供，同批次货物填入相同货柜号，v1.3.0新增）',
+    container_id      BIGINT COMMENT '货柜ID（装柜后赋值，关联 container 表）',
     pool_id            BIGINT COMMENT '拼柜池ID',
     estimated_ship_date DATE COMMENT '预计发货日',
     actual_ship_date   DATE COMMENT '实际发货日',
@@ -61,6 +63,7 @@ CREATE TABLE logistics_plan (
     INDEX idx_logistics_plan_type (plan_type),
     INDEX idx_logistics_factory (factory_id),
     INDEX idx_lp_product_code (product_code),
+    INDEX idx_lp_container_no (container_no),           -- v1.3.0
     INDEX idx_lp_estimated_ship_date (estimated_ship_date),
     INDEX idx_lp_create_time (create_time),
     INDEX idx_lp_is_deleted (is_deleted)
@@ -132,7 +135,7 @@ CREATE TABLE consolidation_pool (
 
 ## 代码实现状态
 
-- [x] ✅ `LogisticsPlan` 聚合根实体（含 `calculateVolume()`，v1.2.0 新增 `qcRecordId`）
+- [x] ✅ `LogisticsPlan` 聚合根实体（含 `calculateVolume()`，v1.2.0 新增 `qcRecordId`，v1.3.0 新增 `containerNo`）
 - [x] ✅ `LogisticsStatus` 枚举（含 `isTerminal()` + `canTransitionTo()` + FSM map）
 - [x] ✅ `PlanType` 枚举
 - [x] ✅ `LogisticsPlanRepository` 领域接口（v1.2.0 新增 `findByQcRecordIdAndDeletedIsFalse`）

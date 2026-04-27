@@ -35,4 +35,6 @@ public interface LogisticsPlanRepository {
     List<LogisticsPlan> findByProcurementIdAndDeletedIsFalse(Long procurementId);
 
     Page<LogisticsPlan> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
+
+    Page<LogisticsPlan> findByContainerNoContainingAndDeletedIsFalse(String containerNo, Pageable pageable);
 }

@@ -27,4 +27,6 @@ public interface LogisticsPlanJpaRepository extends LogisticsPlanRepository, Jpa
     Page<LogisticsPlan> findByProcurementIdAndDeletedIsFalse(Long procurementId, Pageable pageable);
 
     Page<LogisticsPlan> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
+
+    Page<LogisticsPlan> findByContainerNoContainingAndDeletedIsFalse(String containerNo, Pageable pageable);
 }

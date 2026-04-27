@@ -18,7 +18,8 @@ import java.math.BigDecimal;
         @Index(name = "idx_logistics_procurement", columnList = "procurement_id"),
         @Index(name = "idx_logistics_status", columnList = "status"),
         @Index(name = "idx_logistics_plan_type", columnList = "plan_type"),
-        @Index(name = "idx_logistics_factory", columnList = "factory_id")
+        @Index(name = "idx_lp_container_no", columnList = "container_no"),
+    @Index(name = "idx_logistics_factory", columnList = "factory_id")
 })
 @Access(AccessType.FIELD)
 @Getter
@@ -27,6 +28,9 @@ public class LogisticsPlan extends BaseEntity {
 
     @Column(name = "plan_code", nullable = false, unique = true, length = 32)
     private String planCode;              // 系统流水号，如 L-20260421-001
+
+    @Column(name = "container_no", length = 32)
+    private String containerNo;           // 货柜号（船公司提供，同批次货物填入相同货柜号，v1.3.0新增）
 
     @Column(name = "qc_record_id")
     private Long qcRecordId;            // 关联验货记录（调配锚点，v1.2.0；验完货才知道实际装箱尺寸）

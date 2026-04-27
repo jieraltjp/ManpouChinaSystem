@@ -63,6 +63,7 @@
     <el-card class="table-card" shadow="never">
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="planCode" :label="$t('logistics.column.planCode')" min-width="160" />
+        <el-table-column prop="containerNo" :label="$t('logistics.column.containerNo')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="qcCode" :label="$t('logistics.column.qcCode')" min-width="130" show-overflow-tooltip />
         <el-table-column prop="factoryName" :label="$t('logistics.column.factoryName')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="productCode" :label="$t('logistics.column.productCode')" min-width="120">
@@ -102,7 +103,8 @@
         <el-table-column :label="$t('logistics.column.action')" min-width="160" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('logistics.action.detail') }}</el-button>
-            <el-button v-if="row.qcRecordId" link type="warning" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onEdit(row)" :disabled="row.status === 'DELIVERED'">{{ $t('logistics.action.edit') }}</el-button>
+            <el-button v-if="row.qcRecordId" link type="info" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -122,8 +124,8 @@
     </el-card>
 
     <!-- 新增调配弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="$t('logistics.dialog.newTitle')" width="900px" destroy-on-close>
-      <el-form ref="formRef" :model="form" :rules="formRules" label-width="100px">
+    <el-dialog v-model="dialogVisible" :title="editId ? $t('logistics.dialog.editTitle') : $t('logistics.dialog.newTitle')" width="900px" destroy-on-close>
+      <el-form ref="formRef" :model="form" :rules="formRules" label-position="top">
         <el-form-item :label="$t('logistics.dialog.qcRecord')" prop="qcRecordId">
           <el-select
             v-model="form.qcRecordId"
@@ -139,6 +141,9 @@
               :value="r.id"
             />
           </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('logistics.dialog.containerNo')">
+          <el-input v-model="form.containerNo" :placeholder="$t('logistics.dialog.containerNoPlaceholder')" style="width:100%;max-width:400px" />
         </el-form-item>
         <el-row :gutter="16">
           <el-col :span="12">
@@ -168,23 +173,23 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row :gutter="16">
-          <el-col :span="6">
-            <el-form-item :label="$t('logistics.dialog.cargoLengthCm')">
-              <el-input-number v-model="form.cargoLengthCm" :min="0" style="width:100%" />
+        <div class="dim-section">
+          <div class="dim-label">{{ $t('logistics.dialog.cargoDimension') }}</div>
+          <div class="dim-row">
+            <el-form-item style="margin-bottom:0;flex:1;min-width:90px">
+              <el-input-number v-model="form.cargoLengthCm" :min="0" size="small" style="width:100%" />
             </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item :label="$t('logistics.dialog.cargoWidthCm')">
-              <el-input-number v-model="form.cargoWidthCm" :min="0" style="width:100%" />
+            <span class="dim-sep">{{ $t('common.format.times') }}</span>
+            <el-form-item style="margin-bottom:0;flex:1;min-width:90px">
+              <el-input-number v-model="form.cargoWidthCm" :min="0" size="small" style="width:100%" />
             </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item :label="$t('logistics.dialog.cargoHeightCm')">
-              <el-input-number v-model="form.cargoHeightCm" :min="0" style="width:100%" />
+            <span class="dim-sep">{{ $t('common.format.times') }}</span>
+            <el-form-item style="margin-bottom:0;flex:1;min-width:90px">
+              <el-input-number v-model="form.cargoHeightCm" :min="0" size="small" style="width:100%" />
             </el-form-item>
-          </el-col>
-        </el-row>
+            <span class="dim-unit">{{ $t('common.units.cm') }}</span>
+          </div>
+        </div>
         <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item :label="$t('logistics.dialog.cargoWeightKg')">
@@ -223,6 +228,7 @@
     <el-drawer v-model="drawerVisible" :title="$t('logistics.drawerTitle')" size="560px" direction="rtl">
       <el-descriptions :column="2" border v-if="currentRow">
         <el-descriptions-item :label="$t('logistics.column.planCode')">{{ currentRow.planCode }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.containerNo')">{{ currentRow.containerNo || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.column.planType')">
           <el-tag :type="planTypeTag(currentRow.planType)" size="small">{{ planTypeLabel(currentRow.planType) }}</el-tag>
         </el-descriptions-item>
@@ -248,6 +254,11 @@
         <el-descriptions-item :label="$t('logistics.dialog.createTime')">{{ currentRow.createTime || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.dialog.updateTime')">{{ currentRow.updateTime || '-' }}</el-descriptions-item>
       </el-descriptions>
+      <div class="drawer-footer" v-if="currentRow">
+        <el-button type="primary" :disabled="currentRow.status === 'DELIVERED'" @click="onEditFromDrawer">
+          {{ $t('logistics.action.edit') }}
+        </el-button>
+      </div>
     </el-drawer>
   </div>
 </template>
@@ -267,6 +278,7 @@ const submitting = ref(false)
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
 const qcRecordLoading = ref(false)
+const editId = ref<number | null>(null)
 
 const currentRow = ref<LogisticsPlanVO | null>(null)
 const qcRecordOptions = ref<QcRecordVO[]>([])
@@ -284,6 +296,7 @@ const form = reactive({
   qcRecordId: undefined as number | undefined,
   procurementId: undefined as number | undefined,
   factoryId: undefined as number | undefined,
+  containerNo: '',
   productCode: '',
   subProductCode: '',
   planType: undefined as PlanType | undefined,
@@ -388,14 +401,15 @@ function onNew() {
   formRef.value?.resetFields()
   Object.assign(form, {
     qcRecordId: undefined, procurementId: undefined, factoryId: undefined,
-    productCode: '', subProductCode: '', planType: undefined,
+    containerNo: '', productCode: '', subProductCode: '', planType: undefined,
     // 数字字段默认 0（显示占位，用户可选中修改；auto-fill 时会被代入真实值）
-    cargoLengthCm: 0, cargoWidthCm: 0, cargoHeightCm: 0,
+    cargoLengthCm: undefined, cargoWidthCm: undefined, cargoHeightCm: undefined,
     cargoWeightKg: 0, quantity: 0,
     requiresQc: false,
     estimatedShipDate: '', actualShipDate: '', remarks: '',
   })
   qcRecordOptions.value = []
+  editId.value = null
   dialogVisible.value = true
 }
 
@@ -404,12 +418,29 @@ async function onSubmit() {
   if (!valid) return
   submitting.value = true
   try {
-    await logisticsApi.create({
+    if (editId.value) {
+      await logisticsApi.update(editId.value, {
+        containerNo: form.containerNo || undefined,
+        planType: form.planType!,
+        cargoLengthCm: form.cargoLengthCm,
+        cargoWidthCm: form.cargoWidthCm,
+        cargoHeightCm: form.cargoHeightCm,
+        cargoWeightKg: form.cargoWeightKg || undefined,
+        quantity: form.quantity || undefined,
+        requiresQc: form.requiresQc,
+        estimatedShipDate: form.estimatedShipDate || undefined,
+        actualShipDate: form.actualShipDate || undefined,
+        remarks: form.remarks || undefined,
+      })
+      ElMessage.success(t('logistics.message.updateSuccess'))
+    } else {
+      await logisticsApi.create({
       qcRecordId: form.qcRecordId,
       procurementId: form.procurementId,
       factoryId: form.factoryId,
       productCode: form.productCode,
       subProductCode: form.subProductCode || undefined,
+      containerNo: form.containerNo || undefined,
       planType: form.planType!,
       cargoLengthCm: form.cargoLengthCm,
       cargoWidthCm: form.cargoWidthCm,
@@ -480,4 +511,33 @@ onMounted(() => loadData())
 .product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
 .divider-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+
+<style scoped>
+.page { display: flex; flex-direction: column; gap: 16px; }
+.page-header { display: flex; align-items: center; justify-content: space-between; }
+.page-title { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
+.page-title::before { content: ''; display: inline-block; width: 4px; height: 20px; background: var(--color-primary); border-radius: 2px; margin-right: 10px; vertical-align: middle; }
+.filter-card :deep(.el-card__body) { padding-bottom: 0; }
+.stats-row { margin-bottom: 4px; }
+.stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light)); border-radius: var(--radius-md) var(--radius-md) 0 0; }
+.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.stat-content { display: flex; align-items: center; gap: 14px; }
+.stat-icon-wrap { width: 48px; height: 48px; border-radius: 50%; background: var(--color-primary-pale); display: flex; align-items: center; justify-content: center; }
+.icon-transit { animation: spin 1.5s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.stat-icon { font-size: 22px; }
+.stat-value { font-size: 26px; font-weight: 800; color: var(--text-primary); line-height: 1; font-variant-numeric: tabular-nums; }
+.stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+.product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
+.pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
+.divider-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+:deep(.el-select-dropdown__item) { max-width: 640px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dim-section { margin-bottom: 18px; }
+.dim-label { font-size: 14px; color: var(--text-regular); margin-bottom: 8px; }
+.dim-row { display: flex; align-items: center; gap: 8px; }
+.dim-row .el-form-item { margin-bottom: 0; flex: 1; min-width: 90px; }
+.dim-sep { color: var(--text-secondary); font-size: 14px; flex-shrink: 0; }
+.dim-unit { color: var(--text-secondary); font-size: 13px; flex-shrink: 0; }
+.drawer-footer { padding: 16px 0 0; border-top: 1px solid var(--border-color); margin-top: 16px; display: flex; gap: 8px; }
 </style>
