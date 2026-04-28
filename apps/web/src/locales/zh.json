@@ -72,12 +72,11 @@
     "stat": {
       "total": "全部需求",
       "pending": "待确认",
-      "converted": "已转采购"
+      "confirmed": "已确认"
     },
     "filter": {
       "demandType": "需求类型",
       "productCode": "货号",
-      "status": "状态",
       "all": "全部",
       "search": "查询",
       "reset": "重置"
@@ -107,22 +106,19 @@
     },
     "status": {
       "PENDING": "待确认",
-      "CONFIRMED": "已确认",
-      "CONVERTED": "已转采购",
-      "CANCELLED": "已取消"
+      "CONFIRMED": "已确认"
     },
     "action": {
-      "convert": "转采购",
-      "viewLinked": "查看采购单",
-      "revert": "撤销转换",
       "edit": "编辑",
-      "delete": "删除",
-      "convertToProcurement": "转采购"
+      "delete": "删除"
     },
     "message": {
-      "convertSuccess": "转采购成功，已生成 {n} 条发注单",
-      "convertFailed": "转采购失败",
-      "loadFailed": "加载失败，请重试"
+      "loadFailed": "加载失败，请重试",
+      "deleteSuccess": "删除成功",
+      "deleteConfirm": "确认删除需求单「{code}」？",
+      "deleteConfirmTitle": "确认删除",
+      "unlinkedSuccess": "已取消关联，需求单恢复为待确认状态",
+      "pleaseLinkInProcurement": "请在发注单页面关联此需求"
     },
     "dialog": {
       "demandType": "需求类型",
@@ -189,16 +185,12 @@
     "message": {
       "createSuccess": "需求录入成功",
       "updateSuccess": "更新成功",
+      "loadFailed": "加载失败，请重试",
       "deleteSuccess": "删除成功",
-      "loadFailed": "加载需求单总览失败",
-      "convertFailed": "转采购失败",
-      "deleteConfirm": "确认删除需求「{code}」？",
-      "deleteConfirmTitle": "删除确认",
-      "revertConfirm": "撤销转换后，需求单将恢复为待确认状态，可重新转采购。是否继续？",
-      "revertConfirmTitle": "撤销转换确认",
-      "revertSuccess": "撤销成功，需求单已恢复为待确认状态",
-      "convertSuccess": "转采购成功，生成 {n} 条发注单（ID: {ids}）",
-      "loadLinkedFailed": "加载关联发注单失败"
+      "deleteConfirm": "确认删除需求单「{code}」？",
+      "deleteConfirmTitle": "确认删除",
+      "unlinkedSuccess": "已取消关联，需求单恢复为待确认状态",
+      "pleaseLinkInProcurement": "请在发注单页面关联此需求"
     }
   },
   "order": {
@@ -937,9 +929,9 @@
       "imageUrlPlaceholder": "图片URL"
     },
     "category": {
-      "OEM": "OEM",
-      "ORDINARY": "普通",
-      "FACTORY_DIRECT": "工厂直供"
+      "OEM": "批发",
+      "ORDINARY": "普货",
+      "FACTORY_DIRECT": "出口"
     },
     "factoryUnit": "家",
     "validation": {

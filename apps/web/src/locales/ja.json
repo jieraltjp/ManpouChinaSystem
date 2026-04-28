@@ -809,9 +809,9 @@
     },
     "factoryUnit": "社",
     "category": {
-      "OEM": "OEM",
+      "OEM": "卸売",
       "ORDINARY": "普通",
-      "FACTORY_DIRECT": "工場直送"
+      "FACTORY_DIRECT": "輸出"
     },
     "drawer": {
       "title": "商品詳細",
