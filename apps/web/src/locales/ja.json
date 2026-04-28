@@ -72,12 +72,11 @@
     "stat": {
       "total": "全需要",
       "pending": "確認待ち",
-      "converted": "発注済み"
+      "confirmed": "確認済み"
     },
     "filter": {
       "demandType": "需要タイプ",
       "productCode": "品番",
-      "status": "ステータス",
       "all": "すべて",
       "search": "検索",
       "reset": "リセット"
@@ -107,22 +106,19 @@
     },
     "status": {
       "PENDING": "確認待ち",
-      "CONFIRMED": "確認済み",
-      "CONVERTED": "発注済み",
-      "CANCELLED": "キャンセル済み"
+      "CONFIRMED": "確認済み"
     },
     "action": {
-      "convert": "発注へ変換",
-      "viewLinked": "発注書を表示",
-      "revert": "変換取消",
       "edit": "編集",
-      "delete": "削除",
-      "convertToProcurement": "発注へ変換"
+      "delete": "削除"
     },
     "message": {
-      "convertSuccess": "変換成功、{n} 件の新規発注書を作成しました",
-      "convertFailed": "変換に失敗しました",
-      "loadFailed": "読み込みに失敗しました、再試行してください"
+      "loadFailed": "読み込みに失敗しました，再試行してください",
+      "deleteSuccess": "削除が完了しました",
+      "deleteConfirm": "需要「{code}」を削除しますか？",
+      "deleteConfirmTitle": "削除確認",
+      "unlinkedSuccess": "関連を解除しました，需要は未確認状態に戻りました",
+      "pleaseLinkInProcurement": "発注書ページで関連付けてください"
     },
     "dialog": {
       "demandType": "需要タイプ",
@@ -189,16 +185,12 @@
     "message": {
       "createSuccess": "需要の入力が完了しました",
       "updateSuccess": "更新が完了しました",
+      "loadFailed": "読み込みに失敗しました，再試行してください",
       "deleteSuccess": "削除が完了しました",
       "deleteConfirm": "需要「{code}」を削除しますか？",
-      "loadFailed": "需要一覧の読み込みに失敗しました",
-      "convertFailed": "発注への変換に失敗しました",
       "deleteConfirmTitle": "削除確認",
-      "revertConfirm": "変換取消後、需要は未確認状態に戻り、再変換が可能になります。続行しますか？",
-      "revertConfirmTitle": "変換取消の確認",
-      "revertSuccess": "変換取消が完了しました。需要は未確認状態に戻りました",
-      "convertSuccess": "発注への変換が完了しました。{n}件の発注書を生成しました（ID: {ids}）",
-      "loadLinkedFailed": "関連発注書の読み込みに失敗しました"
+      "unlinkedSuccess": "関連を解除しました，需要は未確認状態に戻りました",
+      "pleaseLinkInProcurement": "発注書ページで関連付けてください"
     }
   },
   "order": {

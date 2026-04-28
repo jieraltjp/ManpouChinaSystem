@@ -1,10 +1,6 @@
 package com.manpou.allinone.replenishment.usecase;
 
 import com.manpou.allinone.common.exception.BusinessException;
-import com.manpou.allinone.factory.domain.model.CooperationStatus;
-import com.manpou.allinone.factory.domain.model.Factory;
-import com.manpou.allinone.replenishment.application.dto.ConvertDemandCmd;
-import com.manpou.allinone.replenishment.application.dto.ConvertDemandResponse;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandCreateCmd;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandPageQuery;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandQuery;
@@ -43,21 +39,10 @@ class ReplenishmentDemandUseCaseTest {
     @Autowired
     private ReplenishmentDemandRepository demandRepository;
 
-    @Autowired
-    private com.manpou.allinone.factory.domain.repository.FactoryRepository factoryRepository;
-
     private ReplenishmentDemand savedDemand;
-    private Factory savedFactory;
 
     @BeforeEach
     void setUp() {
-        Factory factory = new Factory();
-        factory.setFactoryCode("FAC-TEST-001");
-        factory.setFactoryName("测试工厂");
-        factory.setCooperationStatus(CooperationStatus.ACTIVE);
-        savedFactory = factoryRepository.save(factory);
-
-        // v2.0.0: 一行 = 一个子货号
         ReplenishmentDemand d = new ReplenishmentDemand();
         d.setDemandCode("DM-20260424-T001");
         d.setDemandType(DemandType.REPLENISHMENT);
@@ -123,59 +108,39 @@ class ReplenishmentDemandUseCaseTest {
     }
 
     @Test
-    void convertToProcurement_updatesStatus_1_to_1() {
-        ConvertDemandCmd cmd = new ConvertDemandCmd();
-        cmd.setFactoryId(savedFactory.getId());
-
-        ConvertDemandResponse resp = demandUseCase.convertToProcurement(savedDemand.getId(), cmd);
-
-        assertThat(resp.getDemandStatus()).isEqualTo(DemandStatus.CONVERTED);
-        assertThat(resp.getLinkedProcurementId()).isNotNull();
+    void linkToProcurement_setsConfirmed() {
+        demandUseCase.linkToProcurement(savedDemand.getId(), 123L);
 
         ReplenishmentDemand updated = demandRepository.findById(savedDemand.getId()).orElseThrow();
-        assertThat(updated.getStatus()).isEqualTo(DemandStatus.CONVERTED);
-        assertThat(updated.getLinkedProcurementId()).isEqualTo(resp.getLinkedProcurementId());
+        assertThat(updated.getStatus()).isEqualTo(DemandStatus.CONFIRMED);
+        assertThat(updated.getLinkedProcurementId()).isEqualTo(123L);
     }
 
     @Test
-    void convertToProcurement_alreadyProcessed_throws() {
-        ConvertDemandCmd cmd = new ConvertDemandCmd();
-        cmd.setFactoryId(savedFactory.getId());
+    void unlinkProcurement_restoresPending() {
+        demandUseCase.linkToProcurement(savedDemand.getId(), 123L);
+        demandUseCase.unlinkProcurement(savedDemand.getId());
 
-        demandUseCase.convertToProcurement(savedDemand.getId(), cmd);
-
-        assertThatThrownBy(() -> demandUseCase.convertToProcurement(savedDemand.getId(), cmd))
-                .isInstanceOf(BusinessException.class);
+        ReplenishmentDemand updated = demandRepository.findById(savedDemand.getId()).orElseThrow();
+        assertThat(updated.getStatus()).isEqualTo(DemandStatus.PENDING);
+        assertThat(updated.getLinkedProcurementId()).isNull();
     }
 
     @Test
-    void delete_pendingDemand_succeeds() {
+    void unlinkProcurement_notLinked_throws() {
+        assertThatThrownBy(() -> demandUseCase.unlinkProcurement(savedDemand.getId()))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("未关联");
+    }
+
+    @Test
+    void delete_anyStatus_succeeds() {
+        // v2.2.0: any status can be deleted
+        demandUseCase.linkToProcurement(savedDemand.getId(), 999L);
         demandUseCase.delete(savedDemand.getId());
 
         ReplenishmentDemand deleted = demandRepository.findByIdAndDeletedIsFalse(savedDemand.getId()).orElse(null);
         assertThat(deleted).isNull();
-    }
-
-    @Test
-    void delete_convertedDemand_throws() {
-        ConvertDemandCmd cmd = new ConvertDemandCmd();
-        cmd.setFactoryId(savedFactory.getId());
-        demandUseCase.convertToProcurement(savedDemand.getId(), cmd);
-
-        assertThatThrownBy(() -> demandUseCase.delete(savedDemand.getId()))
-                .isInstanceOf(BusinessException.class);
-    }
-
-    @Test
-    void pageQuery_filtersByStatus() {
-        ReplenishmentDemandQuery query = new ReplenishmentDemandQuery();
-        query.setPage(0);
-        query.setPageSize(20);
-        query.setStatus(DemandStatus.PENDING);
-
-        var result = demandUseCase.pageQuery(query);
-
-        assertThat(result.getContent()).allMatch(d -> d.getStatus() == DemandStatus.PENDING);
     }
 
     @Test
@@ -192,15 +157,15 @@ class ReplenishmentDemandUseCaseTest {
     }
 
     @Test
-    void revertConversion_restoresPendingStatus() {
-        ConvertDemandCmd cmd = new ConvertDemandCmd();
-        cmd.setFactoryId(savedFactory.getId());
-        demandUseCase.convertToProcurement(savedDemand.getId(), cmd);
+    void pageQuery_filtersByDemandType() {
+        ReplenishmentDemandQuery query = new ReplenishmentDemandQuery();
+        query.setPage(0);
+        query.setPageSize(20);
+        query.setDemandType(DemandType.REPLENISHMENT);
 
-        demandUseCase.revertConversion(savedDemand.getId());
+        var result = demandUseCase.pageQuery(query);
 
-        ReplenishmentDemand reverted = demandRepository.findById(savedDemand.getId()).orElseThrow();
-        assertThat(reverted.getStatus()).isEqualTo(DemandStatus.PENDING);
-        assertThat(reverted.getLinkedProcurementId()).isNull();
+        assertThat(result.getContent())
+                .allMatch(d -> d.getDemandType() == DemandType.REPLENISHMENT);
     }
 }

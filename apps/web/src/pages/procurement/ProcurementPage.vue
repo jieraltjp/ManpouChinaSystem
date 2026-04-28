@@ -510,7 +510,7 @@ const demandOptions = ref<DemandPageVO[]>([])
 const selectedDemandId = ref<number | null>(null)
 async function loadDemands() {
   try {
-    const res = await demandApi.list({ page: 0, pageSize: 200, status: 'PENDING' })
+    const res = await demandApi.list({ page: 0, pageSize: 200 })
     demandOptions.value = (res.data.data as { content: DemandPageVO[] })?.content ?? []
   } catch { /* handled by interceptor */ }
 }
@@ -860,12 +860,13 @@ async function onSubmit() {
           destination: formData.destination || undefined,
           status: formData.status || undefined,
         }
-        await procurementApi.create(req)
+        const res = await procurementApi.create(req)
+        const newProcurementId = res.data.data as number
         const savedMsg = convertingDemandId.value !== null ? t('order.message.createSuccessConverting') : t('order.message.createSuccess')
         ElMessage.success(savedMsg)
-        // 若为转采购模式，则关联需求单
+        // 若为转采购模式，则关联需求单（v2.2.0）
         if (convertingDemandId.value !== null) {
-          await demandApi.convertToProcurement(convertingDemandId.value, { factoryId: req.factoryId as number })
+          await demandApi.link(convertingDemandId.value, newProcurementId)
           ElMessage.success(t('order.message.demandConverted'))
           convertingDemandId.value = null
         }

@@ -3,17 +3,11 @@ package com.manpou.allinone.replenishment.application.usecase;
 import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.common.filter.TraceFilter;
 import com.manpou.allinone.common.port.ProductQueryPort;
-import com.manpou.allinone.factory.domain.model.Factory;
-import com.manpou.allinone.factory.domain.repository.FactoryRepository;
-import com.manpou.allinone.procurement.application.dto.ProcurementCreateCmd;
 import com.manpou.allinone.procurement.application.assembler.ProcurementAssembler;
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
-import com.manpou.allinone.procurement.application.usecase.ProcurementUseCase;
 import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import com.manpou.allinone.replenishment.application.assembler.ReplenishmentDemandAssembler;
-import com.manpou.allinone.replenishment.application.dto.ConvertDemandCmd;
-import com.manpou.allinone.replenishment.application.dto.ConvertDemandResponse;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandCreateCmd;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandPageQuery;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandQuery;
@@ -30,13 +24,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * 补货需求用例服务（v2.0.0）。
+ * 补货需求用例服务（v2.2.0）。
  * 一条 Demand = 一个子货号（商品唯一标识 = 主货号+子货号）。
- * 转采购：1 Demand → 1 Procurement（一对一）。
+ * Demand 由 Procurement 主动关联（反向关联），不再由 Demand 生成 Procurement。
  */
 @Slf4j
 @Service
@@ -46,9 +39,7 @@ public class ReplenishmentDemandUseCase {
     private final ReplenishmentDemandRepository demandRepository;
     private final ReplenishmentDemandAssembler assembler;
     private final ProcurementRepository procurementRepository;
-    private final FactoryRepository factoryRepository;
     private final ProductQueryPort productQueryPort;
-    private final ProcurementUseCase procurementUseCase;
     private final ProcurementAssembler procurementAssembler;
 
     @Transactional(readOnly = true)
@@ -59,9 +50,7 @@ public class ReplenishmentDemandUseCase {
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
         Page<ReplenishmentDemand> page;
-        if (query.getStatus() != null) {
-            page = demandRepository.findByStatusAndDeletedIsFalse(query.getStatus(), pageRequest);
-        } else if (query.getDemandType() != null) {
+        if (query.getDemandType() != null) {
             page = demandRepository.findByDemandTypeAndDeletedIsFalse(query.getDemandType(), pageRequest);
         } else if (query.getProductCode() != null && !query.getProductCode().isBlank()) {
             page = demandRepository.findByProductCodeAndDeletedIsFalse(query.getProductCode(), pageRequest);
@@ -123,78 +112,33 @@ public class ReplenishmentDemandUseCase {
     }
 
     /**
-     * 转采购（v2.0.0）。
-     * 一条 Demand → 一条 Procurement（1:1）。
+     * 关联到发注单（v2.2.0）。
+     * 由 ProcurementPage 新建/编辑弹窗选择关联需求时调用。
      */
     @Transactional
-    public ConvertDemandResponse convertToProcurement(Long demandId, ConvertDemandCmd cmd) {
+    public void linkToProcurement(Long demandId, Long procurementId) {
         ReplenishmentDemand entity = demandRepository.findByIdAndDeletedIsFalse(demandId)
                 .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", demandId));
-
-        if (entity.getStatus() != DemandStatus.PENDING) {
-            throw BusinessException.invalidParam("需求单已处理，无法转采购");
-        }
-
-        if (entity.getQuantity() == null || entity.getQuantity() <= 0) {
-            throw BusinessException.invalidParam("需求数量无效，无法转采购");
-        }
-
-        Factory factory = factoryRepository.findByIdAndDeletedIsFalse(cmd.getFactoryId())
-                .orElseThrow(() -> BusinessException.notFound("Factory", cmd.getFactoryId()));
-
-        ProcurementCreateCmd pCmd = new ProcurementCreateCmd();
-        pCmd.setFactoryId(cmd.getFactoryId());
-        pCmd.setProductCode(entity.getProductCode());
-        pCmd.setSubProductCode(entity.getSubProductCode());
-        pCmd.setQuantity(entity.getQuantity());
-        pCmd.setDestination(entity.getDestination());
-        pCmd.setJapanLead(entity.getJapanLead());
-        pCmd.setPriceRmb(BigDecimal.ZERO);
-        pCmd.setExchangeRate(BigDecimal.ONE);
-        pCmd.setTaxPoint(new BigDecimal("1.1"));
-
-        Long procurementId = procurementUseCase.create(pCmd);
-        entity.markAsConverted(procurementId);
+        entity.markAsLinked(procurementId);
         demandRepository.save(entity);
-
-        log.info("[ReplenishmentDemand] converted to procurement, traceId={}, demandId={}, procurementId={}",
+        log.info("[ReplenishmentDemand] linked to procurement, traceId={}, demandId={}, procurementId={}",
                 MDC.get(TraceFilter.TRACE_ID_KEY), demandId, procurementId);
-
-        return ConvertDemandResponse.builder()
-                .demandStatus(DemandStatus.CONVERTED)
-                .linkedProcurementId(procurementId)
-                .build();
     }
 
     /**
-     * 撤销转换（v2.0.0）。
-     * 删除关联 Procurement，回滚 Demand → PENDING。
+     * 取消关联（v2.2.0）。
+     * 由 DemandPage 点击 CONFIRMED 标签，或由 ProcurementPage 取消关联时调用。
      */
     @Transactional
-    public void revertConversion(Long demandId) {
+    public void unlinkProcurement(Long demandId) {
         ReplenishmentDemand entity = demandRepository.findByIdAndDeletedIsFalse(demandId)
                 .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", demandId));
-
-        if (entity.getStatus() != DemandStatus.CONVERTED) {
-            throw BusinessException.invalidParam("需求单未转采购，无需撤销");
+        if (entity.getStatus() != DemandStatus.CONFIRMED) {
+            throw BusinessException.invalidParam("当前需求单未关联发注单，无法取消关联");
         }
-
-        Long procurementId = entity.getLinkedProcurementId();
-        if (procurementId != null) {
-            Procurement procurement = procurementRepository.findByIdAndDeletedIsFalse(procurementId)
-                    .orElse(null);
-            if (procurement != null && procurement.getStatus().isTerminal()) {
-                throw BusinessException.invalidParam(
-                        "关联发注单 [" + procurementId + "] 已推进至终态，禁止撤销");
-            }
-            procurementRepository.deleteById(procurementId);
-        }
-
-        entity.revertConversion();
+        entity.unlinkProcurement();
         demandRepository.save(entity);
-
-        log.info("[ReplenishmentDemand] conversion reverted, traceId={}, demandId={}, deletedProcurementId={}",
-                MDC.get(TraceFilter.TRACE_ID_KEY), demandId, procurementId);
+        log.info("[ReplenishmentDemand] unlinked, traceId={}, demandId={}", MDC.get(TraceFilter.TRACE_ID_KEY), demandId);
     }
 
     /**
@@ -231,13 +175,14 @@ public class ReplenishmentDemandUseCase {
                 .toList();
     }
 
+    /**
+     * 删除需求单（v2.2.0）。
+     * 任何状态均可删除，无状态限制。
+     */
     @Transactional
     public void delete(Long id) {
         ReplenishmentDemand entity = demandRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", id));
-        if (entity.getStatus() != DemandStatus.PENDING) {
-            throw BusinessException.invalidParam("仅待确认状态可删除");
-        }
         entity.markDeleted();
         demandRepository.save(entity);
         log.info("[ReplenishmentDemand] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
@@ -253,24 +198,5 @@ public class ReplenishmentDemandUseCase {
     @Transactional(readOnly = true)
     public List<String> findDistinctJapanLeads() {
         return demandRepository.findDistinctJapanLeads();
-    }
-
-    /**
-     * 切换确认状态（PENDING → CONFIRMED，或 CONFIRMED → PENDING）。
-     */
-    @Transactional
-    public void toggleConfirm(Long id) {
-        ReplenishmentDemand entity = demandRepository.findByIdAndDeletedIsFalse(id)
-                .orElseThrow(() -> BusinessException.notFound("ReplenishmentDemand", id));
-        if (entity.getStatus() == DemandStatus.PENDING) {
-            entity.setStatus(DemandStatus.CONFIRMED);
-        } else if (entity.getStatus() == DemandStatus.CONFIRMED) {
-            entity.setStatus(DemandStatus.PENDING);
-        } else {
-            throw BusinessException.invalidParam("当前状态不允许切换确认状态");
-        }
-        demandRepository.save(entity);
-        log.info("[ReplenishmentDemand] toggleConfirm, traceId={}, id={}, newStatus={}",
-                MDC.get(TraceFilter.TRACE_ID_KEY), id, entity.getStatus());
     }
 }

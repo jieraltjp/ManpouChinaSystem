@@ -38,8 +38,8 @@
           <div class="stat-content">
             <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#16A34A"><CircleCheck /></el-icon></div>
             <div>
-              <div class="stat-value">{{ convertedCount }}</div>
-              <div class="stat-label">{{ $t('demand.stat.converted') }}</div>
+              <div class="stat-value">{{ confirmedCount }}</div>
+              <div class="stat-label">{{ $t('demand.stat.confirmed') }}</div>
             </div>
           </div>
         </el-card>
@@ -119,13 +119,13 @@
         <el-table-column prop="status" :label="$t('demand.column.status')" min-width="100" align="center">
           <template #default="{ row }">
             <el-tag
-              :type="demandStatusType(row.status)"
+              :type="demandStatusType(row)"
               size="small"
               :disable-transitions="false"
-              :class="{ 'status-toggle': row.status === 'PENDING' || row.status === 'CONFIRMED' }"
+              class="status-toggle"
               @click.stop="onToggleStatus(row)"
             >
-              {{ demandStatusLabel(row.status) }}
+              {{ demandStatusLabel(row) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -133,7 +133,6 @@
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('common.view') }}</el-button>
             <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('demand.action.edit') }}</el-button>
-            <el-button link type="info" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
@@ -175,7 +174,7 @@
         <el-descriptions-item :label="$t('demand.column.quantity')">{{ currentRow.quantity }}</el-descriptions-item>
         <el-descriptions-item :label="$t('demand.column.destination')">{{ currentRow.destination || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('demand.column.japanLead')">{{ currentRow.japanLead || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('demand.column.status')">{{ demandStatusLabel(currentRow.status) }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('demand.column.status')">{{ demandStatusLabel(currentRow) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('demand.dialog.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('demand.column.createTime')">{{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN') : '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('demand.column.createBy')">{{ currentRow.createBy || '-' }}</el-descriptions-item>
@@ -362,47 +361,6 @@
       </template>
     </el-dialog>
 
-    <!-- 转采购弹窗（v2.0.0：1:1 预览） -->
-    <el-dialog v-model="convertDialogVisible" :title="$t('demand.dialog.convertDialog.title')" width="500px">
-      <el-form label-width="100px">
-        <el-form-item :label="$t('demand.dialog.convertDialog.factory')" required>
-          <el-select
-            v-model="convertForm.factoryId"
-            filterable
-            remote
-            reserve-keyword
-            :remote-method="searchFactory"
-            :loading="factoryLoading"
-            :placeholder="$t('demand.dialog.convertDialog.factoryPlaceholder')"
-            style="width:100%"
-          >
-            <el-option
-              v-for="f in factoryOptions"
-              :key="f.id"
-              :label="f.factoryName + ' (' + f.factoryCode + ')'"
-              :value="f.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('demand.dialog.convertDialog.preview')">
-          <div v-if="convertForm.demand" style="font-size:13px;color:#666">
-            <div><b>{{ convertForm.demand.subProductCode }}</b> × {{ convertForm.demand.quantity }}
-              <span v-if="convertForm.demand.destination"> → {{ convertForm.demand.destination }}</span>
-            </div>
-            <div style="margin-top:4px;color:#D97706">
-              {{ $t('demand.dialog.convertDialog.willCreateOne') }}
-            </div>
-          </div>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="convertDialogVisible = false">{{ $t('demand.dialog.cancel') }}</el-button>
-        <el-button type="primary" :loading="converting" @click="doConvert">
-          {{ $t('demand.dialog.convertDialog.confirm') }}
-        </el-button>
-      </template>
-    </el-dialog>
-
     <!-- 查看关联采购单弹窗（v2.0.0：单条） -->
     <el-dialog v-model="linkedDialogVisible" :title="$t('demand.dialog.linkedDialog.title')" width="600px">
       <el-table :data="linkedProcurement ? [linkedProcurement] : []" border size="small" v-loading="linkedLoading">
@@ -427,21 +385,16 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, Clock, Warning, CircleCheck } from '@element-plus/icons-vue'
 import { demandApi, type DemandPageVO, type DemandType } from '@/api/demand'
 import { productApi, type MasterCodeSuggestVO, type SubCodeSuggestVO } from '@/api/product'
-import { factoryApi, type FactoryPageVO } from '@/api/factory'
 import { useI18n } from 'vue-i18n'
 
-const router = useRouter()
 const loading = ref(false)
 const submitting = ref(false)
 const masterCodeLoading = ref(false)
 const subCodeLoading = ref(false)
-const factoryLoading = ref(false)
-const converting = ref(false)
 const linkedLoading = ref(false)
 const masterCodeRaw = ref<MasterCodeSuggestVO[]>([])
 const masterCodeOptions = computed<MasterCodeSuggestVO[]>(() =>
@@ -452,12 +405,10 @@ const destOptions = ref<string[]>([])
 const destLoading = ref(false)
 const leadOptions = ref<string[]>([])
 const leadLoading = ref(false)
-const factoryOptions = ref<FactoryPageVO[]>([])
 const linkedProcurement = ref<unknown | null>(null)
 const loadedSubCodesFor = ref<string>('')
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
-const convertDialogVisible = ref(false)
 const linkedDialogVisible = ref(false)
 const dialogMode = ref<'create' | 'update'>('create')
 const entryMode = ref<'single' | 'batch'>('single')
@@ -494,14 +445,8 @@ async function fetchProductCategories(rows: DemandPageVO[]) {
   productCategoryMap.value = { ...productCategoryMap.value, ...map }
 }
 
-const pendingCount = computed(() => tableData.value.filter(r => r.status === 'PENDING').length)
-const convertedCount = computed(() => tableData.value.filter(r => r.status === 'CONVERTED').length)
-
-// 转采购弹窗
-const convertForm = reactive<{ factoryId: number | null; demand: DemandPageVO | null }>({
-  factoryId: null,
-  demand: null,
-})
+const pendingCount = computed(() => tableData.value.filter(r => !r.linkedProcurementId).length)
+const confirmedCount = computed(() => tableData.value.filter(r => r.linkedProcurementId).length)
 
 const formData = reactive<{
   demandType: DemandType
@@ -588,35 +533,9 @@ function onEdit(row: DemandPageVO) {
   loadSubCodeOptions()
 }
 
-async function searchFactory(query: string) {
-  if (!query || query.length < 1) { factoryOptions.value = []; return }
-  factoryLoading.value = true
-  try {
-    const res = await factoryApi.list({ factoryName: query, pageSize: 20 })
-    factoryOptions.value = res.data.data?.content || []
-  } catch { factoryOptions.value = [] } finally { factoryLoading.value = false }
-}
-
-async function doConvert() {
-  if (!convertForm.factoryId) { ElMessage.warning(t('demand.dialog.convertDialog.factoryRequired')); return }
-  if (!convertForm.demand) return
-  converting.value = true
-  try {
-    const res = await demandApi.convertToProcurement(convertForm.demand.id, { factoryId: convertForm.factoryId! })
-    const data = res.data.data!
-    convertDialogVisible.value = false
-    ElMessage.success(t('demand.message.convertSuccess', { id: data.linkedProcurementId }))
-    loadData()
-  } catch { /* interceptor */ } finally { converting.value = false }
-}
-
 function onView(row: DemandPageVO) {
   currentRow.value = row
   drawerVisible.value = true
-}
-
-function onOverview(row: DemandPageVO) {
-  router.push('/base/overview/demand/' + row.id)
 }
 
 let masterCodeTimer: ReturnType<typeof setTimeout>
@@ -724,24 +643,33 @@ async function onSubmit() {
   })
 }
 
-function demandStatusLabel(status: string): string {
-  return { PENDING: t('demand.status.PENDING'), CONFIRMED: t('demand.status.CONFIRMED'), CONVERTED: t('demand.status.CONVERTED'), CANCELLED: t('demand.status.CANCELLED') }[status] ?? status
+function demandStatusLabel(row: DemandPageVO): string {
+  // 有 linkedProcurementId 即显示"已确认"（v2.2.0）
+  if (row.linkedProcurementId) return t('demand.status.CONFIRMED')
+  return t('demand.status.PENDING')
 }
 
 function demandTypeLabel(type: string): string {
   return { REPLENISHMENT: t('demand.type.replenishment'), NEW_PURCHASE: t('demand.type.newPurchase') }[type] ?? type
 }
 
-function demandStatusType(status: string): string {
-  return { PENDING: 'warning', CONFIRMED: 'success', CONVERTED: 'success', CANCELLED: 'info' }[status] ?? 'info'
+function demandStatusType(row: DemandPageVO): string {
+  // 有 linkedProcurementId → success（绿）；否则 warning（橙）（v2.2.0）
+  return row.linkedProcurementId ? 'success' : 'warning'
 }
 
 async function onToggleStatus(row: DemandPageVO) {
-  if (row.status !== 'PENDING' && row.status !== 'CONFIRMED') return
-  try {
-    await demandApi.toggleConfirm(row.id)
-    loadData()
-  } catch { /* interceptor handles error */ }
+  if (row.linkedProcurementId) {
+    // 已确认 → 点击取消关联（v2.2.0）
+    try {
+      await demandApi.unlink(row.id)
+      ElMessage.success(t('demand.message.unlinkedSuccess'))
+      loadData()
+    } catch { /* interceptor handles error */ }
+  } else {
+    // 待确认 → 提示去发注单页面关联（v2.2.0）
+    ElMessage.info(t('demand.message.pleaseLinkInProcurement'))
+  }
 }
 
 onMounted(() => loadData())

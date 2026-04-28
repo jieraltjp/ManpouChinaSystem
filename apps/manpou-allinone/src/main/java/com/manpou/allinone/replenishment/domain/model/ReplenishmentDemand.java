@@ -75,9 +75,9 @@ public class ReplenishmentDemand extends BaseEntity {
     private DemandStatus status = DemandStatus.PENDING;
 
     /**
-     * 关联的 Procurement ID（v2.0.0）。
-     * CONVERTED 时记录对应的 Procurement.id。
-     * 撤销转换时删除该 Procurement 并清空此字段。
+     * 关联的 Procurement ID（v2.2.0）。
+     * CONFIRMED 时记录对应的 Procurement.id。
+     * 取消关联时清空此字段。
      */
     @Column(name = "linked_procurement_id")
     private Long linkedProcurementId;
@@ -95,32 +95,21 @@ public class ReplenishmentDemand extends BaseEntity {
 
     // ===== 领域方法 =====
 
-    public void markAsConverted(Long procurementId) {
-        if (this.status != DemandStatus.PENDING) {
-            throw new com.manpou.allinone.common.exception.BusinessException(
-                    "demand.already_processed",
-                    "需求单已处理，无法转为采购单");
-        }
-        this.status = DemandStatus.CONVERTED;
+    /**
+     * 标记已关联发注单（v2.2.0）。
+     * 由 ProcurementPage 关联 Demand 时调用。
+     */
+    public void markAsLinked(Long procurementId) {
+        this.status = DemandStatus.CONFIRMED;
         this.linkedProcurementId = procurementId;
     }
 
-    public void revertConversion() {
-        if (this.status != DemandStatus.CONVERTED) {
-            throw new com.manpou.allinone.common.exception.BusinessException(
-                    "demand.not_converted",
-                    "需求单未转换，无需撤销");
-        }
+    /**
+     * 取消关联（v2.2.0）。
+     * 由 DemandPage 点击 CONFIRMED 标签时调用，或由 ProcurementPage 取消关联时调用。
+     */
+    public void unlinkProcurement() {
         this.status = DemandStatus.PENDING;
         this.linkedProcurementId = null;
-    }
-
-    public void cancel() {
-        if (this.status != DemandStatus.PENDING) {
-            throw new com.manpou.allinone.common.exception.BusinessException(
-                    "demand.already_processed",
-                    "需求单已处理，无法取消");
-        }
-        this.status = DemandStatus.CANCELLED;
     }
 }

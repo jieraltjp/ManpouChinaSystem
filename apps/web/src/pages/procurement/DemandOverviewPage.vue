@@ -37,10 +37,7 @@
               <el-tag :type="demandStatusType(overview.demand.status)" size="small">{{ demandStatusLabel(overview.demand.status) }}</el-tag>
             </div>
           </div>
-          <!-- 转采购按钮 -->
-          <div v-if="overview.demand.status === 'PENDING'" class="action-bar">
-            <el-button type="primary" @click="openConvertDialog">{{ $t('demand.action.convertToProcurement') }}</el-button>
-          </div>
+          <!-- 转采购按钮（v2.2.0 已移除） -->
         </template>
         <template v-else>
           <div class="step-empty">{{ $t('orderOverview.step.notStarted') }}</div>
@@ -53,32 +50,6 @@
       </StepCard>
     </div>
 
-    <!-- 转采购弹窗（工厂选择） -->
-    <el-dialog v-model="convertDialogVisible" :title="$t('demand.dialog.convertDialog.title')" width="500px">
-      <el-form label-width="100px">
-        <el-form-item :label="$t('demand.dialog.convertDialog.factory')" required>
-          <el-select
-            v-model="convertFactoryId"
-            filterable remote reserve-keyword
-            :remote-method="searchFactory"
-            :loading="factoryLoading"
-            :placeholder="$t('demand.dialog.convertDialog.factoryPlaceholder')"
-            style="width:100%"
-          >
-            <el-option
-              v-for="f in factoryOptions"
-              :key="f.id"
-              :label="f.factoryName + ' (' + f.factoryCode + ')'"
-              :value="f.id"
-            />
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="convertDialogVisible = false">{{ $t('common.cancel') }}</el-button>
-        <el-button type="primary" :loading="converting" @click="doConvert">{{ $t('demand.dialog.convertDialog.confirm') }}</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -86,11 +57,8 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { ElMessage } from 'element-plus'
 import { ArrowLeft, Loading } from '@element-plus/icons-vue'
 import { orderOverviewApi, type DemandOverviewVO } from '@/api/orderOverview'
-import { demandApi } from '@/api/demand'
-import { factoryApi, type FactoryPageVO } from '@/api/factory'
 import StatusProgressBar from './components/StatusProgressBar.vue'
 import StepCard from './components/StepCard.vue'
 
@@ -103,52 +71,6 @@ const demandId = computed(() => Number(route.params.demandId))
 const overview = ref<DemandOverviewVO | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
-const converting = ref(false)
-const convertDialogVisible = ref(false)
-const convertFactoryId = ref<number | null>(null)
-const factoryOptions = ref<FactoryPageVO[]>([])
-const factoryLoading = ref(false)
-
-// 转采购弹窗 — 工厂搜索
-async function searchFactory(query: string) {
-  if (!query || query.length < 1) { factoryOptions.value = []; return }
-  factoryLoading.value = true
-  try {
-    const res = await factoryApi.list({ factoryName: query, pageSize: 20 })
-    factoryOptions.value = res.data.data?.content || []
-  } catch { factoryOptions.value = [] }
-  finally { factoryLoading.value = false }
-}
-
-function openConvertDialog() {
-  convertFactoryId.value = null
-  factoryOptions.value = []
-  convertDialogVisible.value = true
-}
-
-async function doConvert() {
-  if (!convertFactoryId.value) {
-    ElMessage.warning(t('demand.dialog.convertDialog.factoryRequired'))
-    return
-  }
-  converting.value = true
-  try {
-    const res = await demandApi.convertToProcurement(demandId.value, { factoryId: convertFactoryId.value })
-    const procurementId = res.data.data?.linkedProcurementId
-    convertDialogVisible.value = false
-    if (procurementId) {
-      ElMessage.success(t('demand.message.convertSuccess', { n: 1 }))
-      router.push(`/base/overview/procurement/${procurementId}`)
-    } else {
-      router.push('/base/overview')
-    }
-  } catch (e: unknown) {
-    error.value = (e as Error).message ?? t('demand.message.convertFailed')
-  } finally {
-    converting.value = false
-  }
-}
-
 async function fetch() {
   loading.value = true
   error.value = null

@@ -1,15 +1,11 @@
 package com.manpou.allinone.replenishment.domain.model;
 
 /**
- * 需求单状态枚举。
- * - PENDING: 待确认（录入后默认状态）
- * - CONFIRMED: 已确认（补货人员确认）
- * - CONVERTED: 已转采购（生成 Procurement 后推进至此）
- * - CANCELLED: 已取消
+ * 需求单状态枚举（v2.2.0）。
+ * - PENDING: 待确认（录入后默认，或取消关联后）
+ * - CONFIRMED: 已确认（已关联发注单，由发注单页面关联时写入 linkedProcurementId）
  */
 public enum DemandStatus {
-    PENDING,      // 待确认
-    CONFIRMED,    // 已确认
-    CONVERTED,   // 已转采购
-    CANCELLED    // 已取消
+    PENDING,     // 待确认
+    CONFIRMED    // 已确认（已关联发注单）
 }

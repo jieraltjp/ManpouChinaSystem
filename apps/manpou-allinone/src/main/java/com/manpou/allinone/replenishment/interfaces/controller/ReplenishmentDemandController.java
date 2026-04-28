@@ -4,8 +4,6 @@ import java.util.List;
 
 import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
-import com.manpou.allinone.replenishment.application.dto.ConvertDemandCmd;
-import com.manpou.allinone.replenishment.application.dto.ConvertDemandResponse;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandCreateCmd;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandPageQuery;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandQuery;
@@ -53,36 +51,25 @@ public class ReplenishmentDemandController {
     }
 
     /**
-     * 转采购（v2.0.0）。
-     * POST /api/v1/demands/{id}/convert
-     * 一条 Demand → 一条 Procurement（1:1）。
+     * 关联到发注单（v2.2.0）。
+     * POST /api/v1/demands/{id}/link?procurementId={procurementId}
      */
-    @PostMapping("/{id}/convert")
-    public Result<ConvertDemandResponse> convertToProcurement(
+    @PostMapping("/{id}/link")
+    public Result<Void> linkToProcurement(
             @PathVariable("id") Long id,
-            @Valid @RequestBody ConvertDemandCmd cmd) {
-        ConvertDemandResponse response = demandUseCase.convertToProcurement(id, cmd);
-        return Result.ok("已转采购，生成发注单 #" + response.getLinkedProcurementId(), response);
+            @RequestParam("procurementId") Long procurementId) {
+        demandUseCase.linkToProcurement(id, procurementId);
+        return Result.ok("需求单已关联发注单", null);
     }
 
     /**
-     * 撤销转换（v2.0.0）。
-     * POST /api/v1/demands/{id}/revert
+     * 取消关联（v2.2.0）。
+     * POST /api/v1/demands/{id}/unlink
      */
-    @PostMapping("/{id}/revert")
-    public Result<Void> revertConversion(@PathVariable("id") Long id) {
-        demandUseCase.revertConversion(id);
-        return Result.ok("已撤销转换，需求单可重新转采购", null);
-    }
-
-    /**
-     * 切换确认状态（PENDING ↔ CONFIRMED）。
-     * POST /api/v1/demands/{id}/toggle-confirm
-     */
-    @PostMapping("/{id}/toggle-confirm")
-    public Result<Void> toggleConfirm(@PathVariable("id") Long id) {
-        demandUseCase.toggleConfirm(id);
-        return Result.ok("状态已更新", null);
+    @PostMapping("/{id}/unlink")
+    public Result<Void> unlinkProcurement(@PathVariable("id") Long id) {
+        demandUseCase.unlinkProcurement(id);
+        return Result.ok("已取消关联", null);
     }
 
     /**

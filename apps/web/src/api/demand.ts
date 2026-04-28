@@ -1,12 +1,12 @@
 /**
  * 补货需求单 API 客户端。
- * 与 docs/business/SPEC-B01-补货需求-步骤1.md v2.0.0 完全对齐。
+ * 与 docs/business/SPEC-B01-补货需求-步骤1.md v2.2.0 完全对齐。
  * 一行 = 一个子货号（商品唯一标识 = 主货号+子货号）。
  */
 import client from './client'
 
 export type DemandType = 'REPLENISHMENT' | 'NEW_PURCHASE'
-export type DemandStatus = 'PENDING' | 'CONFIRMED' | 'CONVERTED' | 'CANCELLED'
+export type DemandStatus = 'PENDING' | 'CONFIRMED'
 
 export interface DemandPageVO {
   id: number
@@ -22,7 +22,7 @@ export interface DemandPageVO {
   destination?: string
   japanLead?: string
   status: DemandStatus
-  /** 关联的 Procurement ID（CONVERTED 时有值） */
+  /** 关联的 Procurement ID（CONFIRMED 时有值，v2.2.0） */
   linkedProcurementId?: number
   remarks?: string
   /** 商品图片URL（v2.1.0） */
@@ -37,12 +37,6 @@ export interface DemandPageResponse {
   totalElements: number
   totalPages: number
   pageNumber: number
-}
-
-/** 转采购响应（v2.0.0：1:1） */
-export interface ConvertDemandResponse {
-  demandStatus: DemandStatus
-  linkedProcurementId: number
 }
 
 export interface CreateDemandRequest {
@@ -63,16 +57,10 @@ export interface UpdateDemandRequest {
   destination?: string
   japanLead?: string
   remarks?: string
-  status?: DemandStatus
-}
-
-/** 转采购请求（v2.0.0） */
-export interface ConvertDemandCmd {
-  factoryId: number
 }
 
 export const demandApi = {
-  list(params: { page?: number; pageSize?: number; status?: string; demandType?: string; productCode?: string }) {
+  list(params: { page?: number; pageSize?: number; demandType?: string; productCode?: string }) {
     return client.get<{ code: string; data: DemandPageResponse }>('/demands', { params })
   },
   get(id: number) {
@@ -87,15 +75,15 @@ export const demandApi = {
   delete(id: number) {
     return client.delete<{ code: string }>(`/demands/${id}`)
   },
-  /** 转采购（v2.0.0）：POST /demands/{id}/convert body={factoryId} */
-  convertToProcurement(id: number, cmd: ConvertDemandCmd) {
-    return client.post<{ code: string; data: ConvertDemandResponse }>(`/demands/${id}/convert`, cmd)
+  /** 关联到发注单（v2.2.0）：POST /demands/{id}/link?procurementId= */
+  link(id: number, procurementId: number) {
+    return client.post<{ code: string }>(`/demands/${id}/link?procurementId=${procurementId}`)
   },
-  /** 撤销转换（v2.0.0） */
-  revertConversion(id: number) {
-    return client.post<{ code: string }>(`/demands/${id}/revert`)
+  /** 取消关联（v2.2.0）：POST /demands/{id}/unlink */
+  unlink(id: number) {
+    return client.post<{ code: string }>(`/demands/${id}/unlink`)
   },
-  /** 查看关联的采购单（v2.0.0） */
+  /** 查看关联的采购单 */
   getLinkedProcurement(id: number) {
     return client.get<{ code: string; data: unknown }>(`/demands/${id}/procurement`)
   },
@@ -106,9 +94,5 @@ export const demandApi = {
   /** 日本担当建议（下拉去重列表） */
   suggestJapanLeads() {
     return client.get<{ code: string; data: string[] }>('/demands/suggest/japan-leads')
-  },
-  /** 切换确认状态（PENDING ↔ CONFIRMED） */
-  toggleConfirm(id: number) {
-    return client.post<{ code: string }>(`/demands/${id}/toggle-confirm`)
   },
 }
