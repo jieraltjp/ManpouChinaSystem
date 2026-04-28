@@ -57,9 +57,11 @@
           </template>
         </el-table-column>
         <!-- 操作 -->
-        <el-table-column :label="$t('orderOverview.column.action')" min-width="80" align="center">
+        <el-table-column :label="$t('orderOverview.column.action')" min-width="260" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('orderOverview.action.view') }}</el-button>
+            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('common.view') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('demand.action.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -98,7 +100,8 @@
           <el-descriptions-item :label="$t('orderOverview.column.demandCreateTime')">{{ currentRow.demandCreateTime || '-' }}</el-descriptions-item>
         </el-descriptions>
         <div class="drawer-footer">
-          <el-button type="primary" @click="drawerVisible = false; router.push('/base/overview/demand/' + currentRow!.demandId)">{{ $t('orderOverview.action.viewDetail') }}</el-button>
+          <el-button @click="drawerVisible = false">{{ $t('common.close') }}</el-button>
+          <el-button type="primary" @click="drawerVisible = false; currentRow && onEdit(currentRow)">{{ $t('demand.action.edit') }}</el-button>
         </div>
       </div>
     </el-drawer>
@@ -108,6 +111,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { orderChainApi, type OrderChainVO } from '@/api/orderChain'
 
 const router = useRouter()
@@ -158,6 +162,23 @@ function onView(row: OrderChainVO) {
   drawerVisible.value = true
 }
 
+function onEdit(row: OrderChainVO) {
+  router.push('/procurement/demand/edit/' + row.demandId)
+}
+
+async function onDelete(row: OrderChainVO) {
+  try {
+    await ElMessageBox.confirm(
+      `当前行号：${row.demandCode}，确定删除？`,
+      `删除确认`,
+      { type: 'warning' },
+    )
+  } catch {
+    return
+  }
+  ElMessage.success('删除功能未实现，请到发注页面操作')
+}
+
 onMounted(() => {
   loadChainList()
 })
@@ -175,4 +196,5 @@ onMounted(() => {
 .text-muted { color: #999; }
 .drawer-content { padding: 0 20px; }
 .drawer-footer { padding: 20px 0 0; border-top: 1px solid var(--border-color); margin-top: 20px; display: flex; gap: 8px; }
+.btn-blue { color: #409EFF !important; }
 </style>

@@ -12,12 +12,12 @@
 |------|---------|------------|
 | [LESSONS-BACKEND.md](./LESSONS-BACKEND.md) | 后端 Java / Spring / JPA / DDD | 1–6, 10, 25, 29–34, 38 |
 | [LESSONS-OPS.md](./LESSONS-OPS.md) | 构建 / 部署 / 环境 / 运维 | 7–9, 17–18, 20, 26–28 |
-| [LESSONS-DATABASE.md](./LESSONS-DATABASE.md) | 数据库 / Flyway / Schema | 8, 13, 31–32, 39, 45, 51, 59 |
+| [LESSONS-DATABASE.md](./LESSONS-DATABASE.md) | 数据库 / Flyway / Schema | 8, 13, 31–32, 39, 45, 51, 59, 60 |
 | [LESSONS-FRONTEND.md](./LESSONS-FRONTEND.md) | 前端 Vue / TS / i18n / Element Plus | 11–12, 14, 16, 33–34, 37, 40–44, 46–50, 52–59 |
 
 ---
 
-## 铁律总表（59 条）
+## 铁律总表（60 条）
 
 ### 后端（17 条）
 
@@ -53,7 +53,7 @@
 | 27 | 运行时依赖不能是 test scope | 启动失败 |
 | 28 | 编译与启动必须分离，错误必须可见 | 错误被掩盖 |
 
-### 数据库（7 条）
+### 数据库（8 条）
 
 | # | 铁律 | 违反后果 |
 |---|------|---------|
@@ -95,6 +95,7 @@
 | 57 | 业务关联变更须从 SPEC → DB → 后端 → 前端八层同步，锚点选择决定数据质量 | 调配计划用采购单锚点导致无实际 cargo 尺寸 |
 | 59 | Flyway 禁用项目新增枚举值须同步 ALTER DB 列类型，V38 类迁移组件幂等设计 | Data truncated 500 错误 |
 | 58 | el-input-number 列宽 = content - 60px(按钮) - 16px(el-col padding)，content < 150px 时按钮截断 | 按钮文字被遮挡 |
+| 60 | nativeQuery=true + Pageable 排序 → Spring Data 追加实体属性名（非列名）→ 报错 Unknown column | 500 错误 |
 
 ---
 
@@ -108,6 +109,7 @@
 | 打包后 JAR 无法启动 | LESSONS-OPS.md → Lesson 26 |
 | DB 迁移报错 / VARCHAR 超限 | LESSONS-DATABASE.md → Lesson 31, 32 |
 | i18n 重复 key / 硬编码 | LESSONS-FRONTEND.md → Lesson 44, 53 |
+| nativeQuery + Pageable ORDER BY 500 | LESSONS-DATABASE.md → Lesson 60 |
 | 接口变更后数据不对 | LESSONS-BACKEND.md → Lesson 34 |
 
 ---
@@ -126,3 +128,4 @@
 | 57 | 2026-04-27 LogisticsPlan procurementId → qcRecordId 业务锚点修正 |
 | 58 | 2026-04-27 LogisticsPlanPage el-input-number 按钮截断宽度计算修正 |
 | 59 | 2026-04-28 DemandStatus CONFIRMED 新增 + Flyway 禁用项目 @PostConstruct 幂等迁移组件 |
+| 60 | 2026-04-28 `/api/v1/orders/chain` nativeQuery=true + Pageable ORDER BY → Unknown column |

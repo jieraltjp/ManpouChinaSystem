@@ -2,6 +2,12 @@ package com.manpou.allinone.procurement.application.usecase;
 
 import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.common.filter.TraceFilter;
+import com.manpou.allinone.factory.domain.model.Factory;
+import com.manpou.allinone.factory.domain.repository.FactoryRepository;
+import com.manpou.allinone.order.domain.model.ProcurementSnapshot;
+import com.manpou.allinone.order.domain.repository.ProcurementSnapshotRepository;
+import com.manpou.allinone.product.domain.model.Product;
+import com.manpou.allinone.product.domain.repository.ProductRepository;
 import com.manpou.allinone.procurement.application.assembler.ProcurementAssembler;
 import com.manpou.allinone.procurement.application.dto.ProcurementCreateCmd;
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
@@ -31,6 +37,9 @@ public class ProcurementUseCase {
 
     private final ProcurementRepository procurementRepository;
     private final ProcurementAssembler procurementAssembler;
+    private final FactoryRepository factoryRepository;
+    private final ProductRepository productRepository;
+    private final ProcurementSnapshotRepository snapshotRepository;
 
     /**
      * 分页查询。
@@ -83,11 +92,14 @@ public class ProcurementUseCase {
         }
         entity.calculateEstimatedPriceJpy();
         Procurement saved = procurementRepository.save(entity);
-        log.info("[Procurement] created, traceId={}, id={}, productCode={}, factoryId={}, factoryName={}",
+
+        // 自动填入快照（下单时刻的工厂+商品信息）
+        createSnapshot(saved);
+
+        log.info("[Procurement] created, traceId={}, id={}, productCode={}, factoryId={}",
                 MDC.get(TraceFilter.TRACE_ID_KEY),
                 saved.getId(),
                 saved.getProductCode(),
-                saved.getFactoryId(),
                 saved.getFactoryId());
         return saved.getId();
     }
@@ -131,5 +143,44 @@ public class ProcurementUseCase {
         entity.markDeleted();
         procurementRepository.save(entity);
         log.info("[Procurement] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
+    }
+
+    /**
+     * 创建或更新发注单快照（下单时刻的工厂+商品信息）。
+     * 由 create/update 调用，自动从当前工厂和商品实时数据填充。
+     */
+    private void createSnapshot(Procurement procurement) {
+        Factory factory = null;
+        if (procurement.getFactoryId() != null) {
+            factory = factoryRepository.findByIdAndDeletedIsFalse(procurement.getFactoryId()).orElse(null);
+        }
+
+        Product product = null;
+        if (procurement.getProductCode() != null && !procurement.getProductCode().isBlank()) {
+            product = productRepository
+                    .findByMasterCodeAndSubCodeIsNullAndDeletedIsFalse(procurement.getProductCode())
+                    .orElse(null);
+        }
+
+        ProcurementSnapshot snapshot = snapshotRepository.findByProcurementId(procurement.getId())
+                .orElse(new ProcurementSnapshot());
+
+        snapshot.setProcurementId(procurement.getId());
+        if (factory != null) {
+            snapshot.setFactoryId(factory.getId());
+            snapshot.setFactoryCode(factory.getFactoryCode());
+            snapshot.setFactoryName(factory.getFactoryName());
+            snapshot.setFactoryProvince(factory.getProvince());
+            snapshot.setFactoryCity(factory.getCity());
+            snapshot.setFactoryContactName(factory.getContactName());
+            snapshot.setFactoryContactPhone(factory.getContactPhone());
+        }
+        if (product != null) {
+            snapshot.setProductNameZh(product.getNameZh());
+            snapshot.setProductNameJa(product.getNameJa());
+            snapshot.setProductCategory(product.getCategory() != null ? product.getCategory().name() : null);
+        }
+
+        snapshotRepository.save(snapshot);
     }
 }

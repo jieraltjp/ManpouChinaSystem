@@ -284,109 +284,110 @@ GET /api/v1/orders/chain/{demandId}
 
 ---
 
-## 7. Phase 1 视图 SQL（步骤 1~4 + 工厂）
+## 7. Phase 1 视图 SQL（步骤 1~4 + 快照工厂/商品）
+
+> **v2.0.0 变更（2026-04-28）**：`factory` / `product` 表 JOIN 改为 `procurement_snapshot`（下单时刻快照，历史数据不变）
 
 ```sql
 CREATE OR REPLACE VIEW v_order_chain_v1 AS
 SELECT
   -- ====== 锚点：Demand（步骤1）======
-  d.id                        AS demand_id,
-  d.demand_code               AS demand_code,
-  d.demand_type              AS demand_type,
-  d.product_code             AS demand_product_code,
-  d.sub_product_code          AS demand_sub_product_code,
-  d.quantity                 AS demand_quantity,
-  d.destination              AS demand_destination,
-  d.japan_lead              AS demand_japan_lead,
-  d.status                  AS demand_status,
-  d.linked_procurement_id   AS linked_procurement_id,
-  d.image_url              AS demand_image_url,
-  d.create_time            AS demand_create_time,
-  d.update_time            AS demand_update_time,
+  d.id                           AS demand_id,
+  d.demand_code                  AS demand_code,
+  d.demand_type                  AS demand_type,
+  d.product_code                 AS demand_product_code,
+  d.sub_product_code             AS demand_sub_product_code,
+  d.quantity                     AS demand_quantity,
+  d.destination                  AS demand_destination,
+  d.japan_lead                   AS demand_japan_lead,
+  d.status                       AS demand_status,
+  d.linked_procurement_id        AS linked_procurement_id,
+  d.image_url                    AS demand_image_url,
+  d.create_time                  AS demand_create_time,
+  d.update_time                  AS demand_update_time,
 
   -- ====== 步骤2：Procurement ======
-  p.id                        AS procurement_id,
+  p.id                           AS procurement_id,
   CONCAT('P-', CAST(p.id AS CHAR)) AS procurement_code,
-  p.factory_id               AS procurement_factory_id,
-  p.product_code             AS procurement_product_code,
-  p.sub_product_code         AS procurement_sub_product_code,
-  p.quantity                AS procurement_quantity,
-  p.price_rmb               AS procurement_price_rmb,
-  p.tax_point               AS procurement_tax_point,
-  p.exchange_rate           AS procurement_exchange_rate,
-  p.billing_type            AS procurement_billing_type,
-  p.estimated_price_jpy    AS procurement_estimated_price_jpy,
-  p.order_date              AS procurement_order_date,
-  p.factory_ship_date       AS procurement_factory_ship_date,
-  p.planned_ship_date       AS procurement_planned_ship_date,
-  p.actual_ship_date        AS procurement_actual_ship_date,
-  p.lead_time_days         AS procurement_lead_time_days,
-  p.product_lead           AS procurement_product_lead,
-  p.japan_lead             AS procurement_japan_lead,
-  p.china_lead             AS procurement_china_lead,
-  p.destination            AS procurement_destination,
-  p.customer_company       AS procurement_customer_company,
-  p.status                 AS procurement_status,
-  p.create_time            AS procurement_create_time,
+  p.factory_id                   AS procurement_factory_id,
+  p.product_code                 AS procurement_product_code,
+  p.sub_product_code             AS procurement_sub_product_code,
+  p.quantity                     AS procurement_quantity,
+  p.price_rmb                    AS procurement_price_rmb,
+  p.tax_point                    AS procurement_tax_point,
+  p.exchange_rate                AS procurement_exchange_rate,
+  p.billing_type                 AS procurement_billing_type,
+  p.estimated_price_jpy           AS procurement_estimated_price_jpy,
+  p.order_date                   AS procurement_order_date,
+  p.factory_ship_date            AS procurement_factory_ship_date,
+  p.planned_ship_date            AS procurement_planned_ship_date,
+  p.actual_ship_date             AS procurement_actual_ship_date,
+  p.lead_time_days               AS procurement_lead_time_days,
+  p.product_lead                 AS procurement_product_lead,
+  p.japan_lead                   AS procurement_japan_lead,
+  p.china_lead                   AS procurement_china_lead,
+  p.destination                  AS procurement_destination,
+  p.customer_company             AS procurement_customer_company,
+  p.status                       AS procurement_status,
+  p.create_time                  AS procurement_create_time,
 
-  -- ====== 步骤2：关联工厂 ======
-  f.id                        AS factory_id,
-  f.factory_code             AS factory_code,
-  f.factory_name             AS factory_name,
-  f.province                AS factory_province,
-  f.city                   AS factory_city,
-  f.county                 AS factory_county,
-  f.contact_name           AS factory_contact_name,
-  f.contact_phone          AS factory_contact_phone,
+  -- ====== 工厂快照（来自 procurement_snapshot，下单时刻不变）======
+  sn.factory_id                  AS snapshot_factory_id,
+  sn.factory_code                AS snapshot_factory_code,
+  sn.factory_name                AS snapshot_factory_name,
+  sn.factory_province            AS snapshot_factory_province,
+  sn.factory_city                AS snapshot_factory_city,
+  sn.factory_contact_name        AS snapshot_factory_contact_name,
+  sn.factory_contact_phone       AS snapshot_factory_contact_phone,
+
+  -- ====== 商品快照（来自 procurement_snapshot，下单时刻不变）======
+  sn.product_name_zh             AS snapshot_product_name_zh,
+  sn.product_name_ja             AS snapshot_product_name_ja,
+  sn.product_category            AS snapshot_product_category,
 
   -- ====== 步骤3：验货记录 ======
-  q.id                        AS qc_record_id,
-  q.qc_code                  AS qc_code,
-  q.result                  AS qc_result,
-  q.inspection_count         AS qc_inspection_count,
-  q.passed_count           AS qc_passed_count,
-  q.defective_count         AS qc_defective_count,
-  q.box_count              AS qc_box_count,
-  q.box_length_cm          AS qc_box_length_cm,
-  q.box_width_cm           AS qc_box_width_cm,
-  q.box_height_cm          AS qc_box_height_cm,
-  q.net_weight_per_unit    AS qc_net_weight_per_unit,
-  q.gross_weight           AS qc_gross_weight,
-  q.qc_date               AS qc_date,
-  q.status                 AS qc_status,
-  q.create_time            AS qc_create_time,
+  q.id                           AS qc_record_id,
+  q.qc_code                     AS qc_code,
+  q.result                      AS qc_result,
+  q.inspection_count             AS qc_inspection_count,
+  q.passed_count                AS qc_passed_count,
+  q.defective_count             AS qc_defective_count,
+  q.box_count                   AS qc_box_count,
+  q.box_length_cm               AS qc_box_length_cm,
+  q.box_width_cm                AS qc_box_width_cm,
+  q.box_height_cm               AS qc_box_height_cm,
+  q.net_weight_per_unit         AS qc_net_weight_per_unit,
+  q.gross_weight                AS qc_gross_weight,
+  q.qc_date                     AS qc_date,
+  q.status                      AS qc_status,
+  q.create_time                 AS qc_create_time,
 
   -- ====== 步骤4：调配计划 ======
-  l.id                        AS logistics_plan_id,
-  l.plan_code                AS logistics_plan_code,
-  l.container_no             AS logistics_container_no,
-  l.plan_type               AS logistics_plan_type,
-  l.cargo_length_cm         AS logistics_cargo_length_cm,
-  l.cargo_width_cm          AS logistics_cargo_width_cm,
-  l.cargo_height_cm         AS logistics_cargo_height_cm,
-  l.cargo_volume_cbm       AS logistics_cargo_volume_cbm,
-  l.cargo_weight_kg        AS logistics_cargo_weight_kg,
-  l.requires_qc            AS logistics_requires_qc,
-  l.estimated_ship_date     AS logistics_estimated_ship_date,
-  l.actual_ship_date        AS logistics_actual_ship_date,
-  l.status                 AS logistics_status,
-  l.create_time            AS logistics_create_time,
-
-  -- ====== 商品基础信息（来自 product 表）======
-  prd.name_zh               AS product_name_zh,
-  prd.name_ja               AS product_name_ja,
-  prd.category             AS product_category,
+  l.id                           AS logistics_plan_id,
+  l.plan_code                   AS logistics_plan_code,
+  l.container_no                AS logistics_container_no,
+  l.plan_type                   AS logistics_plan_type,
+  l.cargo_length_cm             AS logistics_cargo_length_cm,
+  l.cargo_width_cm              AS logistics_cargo_width_cm,
+  l.cargo_height_cm             AS logistics_cargo_height_cm,
+  l.cargo_volume_cbm            AS logistics_cargo_volume_cbm,
+  l.cargo_weight_kg             AS logistics_cargo_weight_kg,
+  l.requires_qc                 AS logistics_requires_qc,
+  l.estimated_ship_date          AS logistics_estimated_ship_date,
+  l.actual_ship_date            AS logistics_actual_ship_date,
+  l.status                      AS logistics_status,
+  l.create_time                 AS logistics_create_time,
 
   -- ====== 4步状态汇总 =======
   CASE WHEN d.id IS NOT NULL THEN 'COMPLETED' ELSE 'NOT_STARTED' END AS step1_status,
   CASE WHEN p.id IS NOT NULL THEN 'COMPLETED' ELSE 'NOT_STARTED' END AS step2_status,
   CASE WHEN q.id IS NOT NULL THEN 'COMPLETED' ELSE 'NOT_STARTED' END AS step3_status,
   CASE WHEN l.id IS NOT NULL THEN 'COMPLETED' ELSE 'NOT_STARTED' END AS step4_status,
-  -- step5-step8 Phase1 占位（返回 NULL）
+  -- step5-step8 Phase1 占位
   NULL AS step5_status,
   NULL AS step6_status,
   NULL AS step7_status,
-  NULL AS step8_status
+  NULL AS step8_status,
 
   -- ====== Phase1 步骤5~8 字段占位 ======
   NULL AS domestic_customs_id,
@@ -428,10 +429,12 @@ SELECT
 
 FROM replenishment_demand d
   LEFT JOIN procurement p ON p.id = d.linked_procurement_id AND p.is_deleted = b'0'
-  LEFT JOIN factory f ON f.id = p.factory_id AND f.is_deleted = b'0'
+  -- 工厂+商品快照（通过 procurement.id → procurement_snapshot.procurement_id）
+  LEFT JOIN procurement_snapshot sn ON sn.procurement_id = p.id
+  -- 步骤3：验货记录（通过 procurement.id）
   LEFT JOIN qc_record q ON q.procurement_id = p.id AND q.is_deleted = b'0'
+  -- 步骤4：调配计划（通过 qc_record.id 作为锚点）
   LEFT JOIN logistics_plan l ON l.qc_record_id = q.id AND l.is_deleted = b'0'
-  LEFT JOIN product prd ON prd.master_code = d.product_code COLLATE utf8mb4_unicode_ci AND prd.sub_code IS NULL AND prd.is_deleted = b'0'
 
 WHERE d.is_deleted = b'0';
 ```
