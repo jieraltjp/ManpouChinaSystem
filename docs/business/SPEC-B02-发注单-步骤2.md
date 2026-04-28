@@ -1,7 +1,7 @@
 # SPEC-B02 — 发注单业务规格（步骤2）
 
-> **版本**: 1.9.0
-> **更新**: 2026-04-27（v1.9.0：新增交货期 leadTimeDays 和纸箱备注 cartonNotes 两字段）
+> **版本**: 1.10.0
+> **更新**: 2026-04-28（v1.10.0：新增售后截止日 afterSalesDeadline 字段）
 > **更新**: 2026-04-24（v1.6.0：补货需求转采购改为批量模式；一个 ReplenishmentDemand 批量生成多条 Procurement）
 > **更新**: 2026-04-23（补充元数据字段）
 > **创建**: 2026-04-22
@@ -104,6 +104,7 @@ Procurement（聚合根）
 ├── linkedDemandItemId: Long  # 关联的需求单子货号明细 ID（v1.6.0 新增）
 ├── leadTimeDays: Integer     # 交货期天数（30/45/60），默认值 30
 ├── cartonNotes: String       # 纸箱备注（v1.9.0 新增）
+├── afterSalesDeadline: LocalDate  # 售后截止日（v1.10.0 新增）
 ├── status: ShipmentStatus     # 19态（含完了终态）
 └── 领域方法
     ├── calculateEstimatedPriceJpy()  # 估算批发价

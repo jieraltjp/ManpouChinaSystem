@@ -1,8 +1,9 @@
 # DB-02 — 发注单数据库设计
 
-> **版本**: 1.2.0
+> **版本**: 1.3.0
 > **创建**: 2026-04-22
 > **更新**: 2026-04-23（v1.2.0：移除不存在的 billing_method 字段，与 V18 脚本对齐）
+> **更新**: 2026-04-28（v1.3.0：新增 after_sales_deadline 售后截止日字段）
 > **状态**: ✅ 已实现
 > **业务步号**: 02（发注单+工厂）
 > **对应业务文档**: `SPEC-B02-发注单-步骤2.md`
@@ -47,6 +48,7 @@ CREATE TABLE procurement (
     actual_ship_date    DATE COMMENT '实际出货日',
     lead_time_days      INT COMMENT '交货期天数（30/45/60），默认30',
     carton_notes        VARCHAR(512) COMMENT '纸箱备注',
+    after_sales_deadline DATE COMMENT '售后截止日（v1.3.0 新增）',
     product_lead        VARCHAR(64) COMMENT '商品担当',
     japan_lead          VARCHAR(64) COMMENT '日本担当',
     china_lead          VARCHAR(64) COMMENT '中国担当',
