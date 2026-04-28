@@ -148,6 +148,7 @@ onMounted(() => {
 
 <style scoped>
 .page { padding: 16px; }
+.filter-card :deep(.el-card__body) { padding-bottom: 0; }
 .filter-card { margin-bottom: 12px; }
 .table-card { margin-top: 0; }
 .pagination-wrap { display: flex; justify-content: flex-end; margin-top: 12px; }
