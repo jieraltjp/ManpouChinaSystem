@@ -39,39 +39,35 @@
 
     <!-- 筛选 -->
     <el-card class="filter-card" shadow="never">
-      <template #header>
-        <div class="filter-header">
-          <el-form :inline="true" :model="filterForm">
-            <el-form-item :label="$t('factory.filter.factoryName')">
-              <el-input v-model="filterForm.factoryName" :placeholder="$t('factory.filter.factoryNamePlaceholder')" clearable style="width:180px" />
-            </el-form-item>
-            <el-form-item :label="$t('factory.filter.cooperationStatus')">
-              <el-select v-model="filterForm.cooperationStatus" :placeholder="$t('factory.filter.cooperationStatusPlaceholder')" clearable style="width:160px">
-                <el-option :label="$t('factory.cooperationStatus.ACTIVE')" value="ACTIVE" />
-                <el-option :label="$t('factory.cooperationStatus.SUSPENDED')" value="SUSPENDED" />
-                <el-option :label="$t('factory.cooperationStatus.ELIMINATED')" value="ELIMINATED" />
-                <el-option :label="$t('factory.cooperationStatus.POTENTIAL')" value="POTENTIAL" />
-              </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('factory.filter.province')">
-              <el-input v-model="filterForm.province" :placeholder="$t('factory.filter.provincePlaceholder')" clearable style="width:120px" />
-            </el-form-item>
-            <el-form-item :label="$t('factory.filter.city')">
-              <el-input v-model="filterForm.city" :placeholder="$t('factory.filter.cityPlaceholder')" clearable style="width:120px" />
-            </el-form-item>
-            <el-form-item :label="$t('factory.filter.county')">
-              <el-input v-model="filterForm.county" :placeholder="$t('factory.filter.countyPlaceholder')" clearable style="width:120px" />
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="onSearch">{{ $t('factory.filter.search') }}</el-button>
-              <el-button @click="onReset">{{ $t('factory.filter.reset') }}</el-button>
-            </el-form-item>
-          </el-form>
+      <el-form :inline="true" :model="filterForm">
+        <el-form-item :label="$t('factory.filter.factoryName')">
+          <el-input v-model="filterForm.factoryName" :placeholder="$t('factory.filter.factoryNamePlaceholder')" clearable style="width:180px" />
+        </el-form-item>
+        <el-form-item :label="$t('factory.filter.cooperationStatus')">
+          <el-select v-model="filterForm.cooperationStatus" :placeholder="$t('factory.filter.cooperationStatusPlaceholder')" clearable style="width:160px">
+            <el-option :label="$t('factory.cooperationStatus.ACTIVE')" value="ACTIVE" />
+            <el-option :label="$t('factory.cooperationStatus.SUSPENDED')" value="SUSPENDED" />
+            <el-option :label="$t('factory.cooperationStatus.ELIMINATED')" value="ELIMINATED" />
+            <el-option :label="$t('factory.cooperationStatus.POTENTIAL')" value="POTENTIAL" />
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('factory.filter.province')">
+          <el-input v-model="filterForm.province" :placeholder="$t('factory.filter.provincePlaceholder')" clearable style="width:120px" />
+        </el-form-item>
+        <el-form-item :label="$t('factory.filter.city')">
+          <el-input v-model="filterForm.city" :placeholder="$t('factory.filter.cityPlaceholder')" clearable style="width:120px" />
+        </el-form-item>
+        <el-form-item :label="$t('factory.filter.county')">
+          <el-input v-model="filterForm.county" :placeholder="$t('factory.filter.countyPlaceholder')" clearable style="width:120px" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSearch">{{ $t('factory.filter.search') }}</el-button>
+          <el-button @click="onReset">{{ $t('factory.filter.reset') }}</el-button>
           <el-button type="primary" @click="onNew">
             <el-icon><Plus /></el-icon>{{ $t('factory.newButton') }}
           </el-button>
-        </div>
-      </template>
+        </el-form-item>
+      </el-form>
     </el-card>
 
     <!-- 表格 -->
@@ -479,5 +475,4 @@ loadData()
   padding-left: 4px;
   border-left: 3px solid #409EFF;
 }
-.filter-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 </style>

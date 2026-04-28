@@ -39,28 +39,24 @@
 
     <!-- 筛选 -->
     <el-card class="filter-card" shadow="never">
-      <template #header>
-        <div class="filter-header">
-          <el-form :inline="true" :model="filterForm" @keyup.enter="loadData">
-            <el-form-item :label="$t('demand.filter.demandType')">
-              <el-select v-model="filterForm.demandType" :placeholder="$t('demand.filter.all')" clearable style="width:140px">
-                <el-option value="REPLENISHMENT" :label="$t('demand.type.replenishment')" />
-                <el-option value="NEW_PURCHASE" :label="$t('demand.type.newPurchase')" />
-              </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('demand.filter.productCode')">
-              <el-input v-model="filterForm.productCode" :placeholder="$t('demand.dialog.productCodePlaceholder')" clearable style="width:140px" />
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="loadData">{{ $t('demand.filter.search') }}</el-button>
-              <el-button @click="onReset">{{ $t('demand.filter.reset') }}</el-button>
-            </el-form-item>
-          </el-form>
+      <el-form :inline="true" :model="filterForm" @keyup.enter="loadData">
+        <el-form-item :label="$t('demand.filter.demandType')">
+          <el-select v-model="filterForm.demandType" :placeholder="$t('demand.filter.all')" clearable style="width:140px">
+            <el-option value="REPLENISHMENT" :label="$t('demand.type.replenishment')" />
+            <el-option value="NEW_PURCHASE" :label="$t('demand.type.newPurchase')" />
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('demand.filter.productCode')">
+          <el-input v-model="filterForm.productCode" :placeholder="$t('demand.dialog.productCodePlaceholder')" clearable style="width:140px" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="loadData">{{ $t('demand.filter.search') }}</el-button>
+          <el-button @click="onReset">{{ $t('demand.filter.reset') }}</el-button>
           <el-button type="primary" @click="onNew">
             <el-icon><Plus /></el-icon> {{ $t('demand.newButton') }}
           </el-button>
-        </div>
-      </template>
+        </el-form-item>
+      </el-form>
     </el-card>
 
     <!-- 表格（v2.0.0：一行 = 一个子货号） -->
@@ -678,7 +674,6 @@ onMounted(() => loadData())
 <style scoped>
 .page { display: flex; flex-direction: column; gap: 16px; }
 .page-header { display: flex; align-items: center; justify-content: space-between; }
-.filter-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
 .table-card :deep(.el-card__body) { padding: 16px; }
 .stats-row { margin-bottom: 4px; }

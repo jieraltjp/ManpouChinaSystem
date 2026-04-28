@@ -972,7 +972,14 @@
       "subProductCode": "子货号",
       "quantity": "数量",
       "subProductItems": "子货号明细",
-      "japanLead": "担当"
+      "japanLead": "担当",
+      "stepStatus": "步骤进度"
+    },
+    "step": {
+      "1": "需求",
+      "2": "发注",
+      "3": "验货",
+      "4": "调配"
     },
     "action": {
       "view": "总览"

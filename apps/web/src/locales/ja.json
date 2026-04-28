@@ -943,7 +943,14 @@
       "subProductCode": "枝番",
       "quantity": "数量",
       "subProductItems": "サブ品番明細",
-      "japanLead": "担当者"
+      "japanLead": "担当者",
+      "stepStatus": "ステップ進捗"
+    },
+    "step": {
+      "1": "需要",
+      "2": "発注",
+      "3": "検品",
+      "4": "配車"
     },
     "action": {
       "view": "一覧"

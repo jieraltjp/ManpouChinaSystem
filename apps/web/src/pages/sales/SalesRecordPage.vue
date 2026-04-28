@@ -46,38 +46,34 @@
 
     <!-- 筛选栏 -->
     <el-card class="filter-card" shadow="never">
-      <template #header>
-        <div class="filter-header">
-          <el-form :inline="true" :model="filterForm">
-            <el-form-item :label="$t('sales.filter.productCode')">
-              <el-input v-model="filterForm.productCode" :placeholder="$t('sales.filter.productCodePlaceholder')" clearable style="width:150px" />
-            </el-form-item>
-            <el-form-item :label="$t('sales.filter.salesChannel')">
-              <el-select v-model="filterForm.salesChannel" :placeholder="$t('common.all')" clearable style="width:140px">
-                <el-option value="AMAZON" :label="$t('sales.channel.amazon')" />
-                <el-option value="MERCALI" :label="$t('sales.channel.mercali')" />
-                <el-option value="SELF_SITE" :label="$t('sales.channel.selfSite')" />
-                <el-option value="OTHER" :label="$t('sales.channel.other')" />
-              </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('sales.filter.status')">
-              <el-select v-model="filterForm.status" :placeholder="$t('common.all')" clearable style="width:140px">
-                <el-option value="LISTED" :label="$t('sales.status.listed')" />
-                <el-option value="LOW_STOCK" :label="$t('sales.status.lowStock')" />
-                <el-option value="OUT_OF_STOCK" :label="$t('sales.status.outOfStock')" />
-                <el-option value="DISCONTINUED" :label="$t('sales.status.discontinued')" />
-              </el-select>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
-              <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
-            </el-form-item>
-          </el-form>
+      <el-form :inline="true" :model="filterForm">
+        <el-form-item :label="$t('sales.filter.productCode')">
+          <el-input v-model="filterForm.productCode" :placeholder="$t('sales.filter.productCodePlaceholder')" clearable style="width:150px" />
+        </el-form-item>
+        <el-form-item :label="$t('sales.filter.salesChannel')">
+          <el-select v-model="filterForm.salesChannel" :placeholder="$t('common.all')" clearable style="width:140px">
+            <el-option value="AMAZON" :label="$t('sales.channel.amazon')" />
+            <el-option value="MERCALI" :label="$t('sales.channel.mercali')" />
+            <el-option value="SELF_SITE" :label="$t('sales.channel.selfSite')" />
+            <el-option value="OTHER" :label="$t('sales.channel.other')" />
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('sales.filter.status')">
+          <el-select v-model="filterForm.status" :placeholder="$t('common.all')" clearable style="width:140px">
+            <el-option value="LISTED" :label="$t('sales.status.listed')" />
+            <el-option value="LOW_STOCK" :label="$t('sales.status.lowStock')" />
+            <el-option value="OUT_OF_STOCK" :label="$t('sales.status.outOfStock')" />
+            <el-option value="DISCONTINUED" :label="$t('sales.status.discontinued')" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
+          <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
           <el-button type="primary" @click="onCreate">
             <el-icon><Plus /></el-icon>{{ $t('sales.newButton') }}
           </el-button>
-        </div>
-      </template>
+        </el-form-item>
+      </el-form>
     </el-card>
 
     <!-- 数据表 -->
@@ -544,7 +540,6 @@ watch(tableData, () => {
 
 <style scoped>
 .page { display: flex; flex-direction: column; gap: 16px; }
-.filter-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
 .stats-row { margin-bottom: 0; }
 .stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }

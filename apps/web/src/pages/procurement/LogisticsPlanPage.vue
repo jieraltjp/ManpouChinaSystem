@@ -28,34 +28,30 @@
     </el-row>
 
     <el-card class="filter-card" shadow="never">
-      <template #header>
-        <div class="filter-header">
-          <el-form :inline="true" :model="filterForm">
-            <el-form-item :label="$t('logistics.filter.planType')">
-              <el-select v-model="filterForm.planType" :placeholder="$t('logistics.filter.all')" clearable style="width:140px">
-                <el-option value="SEA" :label="$t('logistics.planType.SEA')" />
-                <el-option value="AIR" :label="$t('logistics.planType.AIR')" />
-                <el-option value="CONSOLIDATION" :label="$t('logistics.planType.CONSOLIDATION')" />
-              </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('logistics.filter.status')">
-              <el-select v-model="filterForm.status" :placeholder="$t('logistics.filter.all')" clearable style="width:140px">
-                <el-option value="PLANNED" :label="$t('logistics.status.PLANNED')" />
-                <el-option value="BOOKED" :label="$t('logistics.status.BOOKED')" />
-                <el-option value="IN_TRANSIT" :label="$t('logistics.status.IN_TRANSIT')" />
-                <el-option value="DELIVERED" :label="$t('logistics.status.DELIVERED')" />
-              </el-select>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="onSearchFromButton">{{ $t('logistics.filter.search') }}</el-button>
-              <el-button @click="onReset">{{ $t('logistics.filter.reset') }}</el-button>
-            </el-form-item>
-          </el-form>
+      <el-form :inline="true" :model="filterForm">
+        <el-form-item :label="$t('logistics.filter.planType')">
+          <el-select v-model="filterForm.planType" :placeholder="$t('logistics.filter.all')" clearable style="width:140px">
+            <el-option value="SEA" :label="$t('logistics.planType.SEA')" />
+            <el-option value="AIR" :label="$t('logistics.planType.AIR')" />
+            <el-option value="CONSOLIDATION" :label="$t('logistics.planType.CONSOLIDATION')" />
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('logistics.filter.status')">
+          <el-select v-model="filterForm.status" :placeholder="$t('logistics.filter.all')" clearable style="width:140px">
+            <el-option value="PLANNED" :label="$t('logistics.status.PLANNED')" />
+            <el-option value="BOOKED" :label="$t('logistics.status.BOOKED')" />
+            <el-option value="IN_TRANSIT" :label="$t('logistics.status.IN_TRANSIT')" />
+            <el-option value="DELIVERED" :label="$t('logistics.status.DELIVERED')" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSearchFromButton">{{ $t('logistics.filter.search') }}</el-button>
+          <el-button @click="onReset">{{ $t('logistics.filter.reset') }}</el-button>
           <el-button type="primary" @click="onNew">
             <el-icon><Plus /></el-icon>{{ $t('logistics.newButton') }}
           </el-button>
-        </div>
-      </template>
+        </el-form-item>
+      </el-form>
     </el-card>
 
     <el-card class="table-card" shadow="never">
@@ -609,7 +605,6 @@ onMounted(() => loadData())
 
 <style scoped>
 .page { display: flex; flex-direction: column; gap: 16px; }
-.filter-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
 .stats-row { margin-bottom: 0; }
 .stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }
