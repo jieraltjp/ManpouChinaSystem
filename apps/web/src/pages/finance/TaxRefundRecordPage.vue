@@ -79,7 +79,11 @@
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="billingType" :label="$t('taxRefund.column.billingType')" min-width="130" align="center" />
+        <el-table-column :label="$t('taxRefund.column.billingType')" min-width="130" align="center">
+          <template #default="{ row }">
+            {{ row.billingType ? $t('taxRefund.enum.billingType.' + row.billingType) : '-' }}
+          </template>
+        </el-table-column>
         <el-table-column prop="taxPoint" :label="$t('taxRefund.column.taxPoint')" min-width="90" align="right">
           <template #default="{ row }">
             <span v-if="row.taxPoint !== null">{{ (Number(row.taxPoint) * 100).toFixed(1) }}%</span>
@@ -143,7 +147,7 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.procurementId')">{{ currentRow.procurementId ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.japanCustomsId')">{{ currentRow.japanCustomsId ?? '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('taxRefund.column.billingType')">{{ currentRow.billingType ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('taxRefund.column.billingType')">{{ currentRow.billingType ? $t('taxRefund.enum.billingType.' + currentRow.billingType) : '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.taxPoint')">
           <span v-if="currentRow.taxPoint !== null">{{ (Number(currentRow.taxPoint) * 100).toFixed(1) }}%</span>
           <span v-else>-</span>
@@ -469,7 +473,7 @@ async function onDelete(row: TaxRefundVO) {
 
 function billingTypeLabel(val?: string | null): string {
   if (!val) return '-'
-  return val
+  return t('taxRefund.enum.billingType.' + val) ?? val
 }
 
 const { t } = useI18n()

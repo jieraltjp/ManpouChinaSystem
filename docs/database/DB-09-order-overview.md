@@ -1,124 +1,268 @@
 # DB-09 — 订单总览数据库设计
 
-> **版本**: 1.2.0
-> **更新**: 2026-04-24（v1.2.0：同步 v1.6.0 Demand 锚点关联；更新代码实现状态为已完成）
+> **版本**: 2.0.0
+> **更新**: 2026-04-28（v2.0.0：重构为 Demand 单行视图，逐步 LEFT JOIN 串联全链路8步）
 > **创建**: 2026-04-22
-> **状态**: ✅ 已实现（步骤1-4 + Demand 锚点；步骤5-8 待填充）
+> **状态**: ✅ 设计中
 > **业务步号**: 09（订单总览 — 核心视图）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B09-订单总览-API设计.md`
 > **对应 UI 文档**: `docs/ui/pages/09-order-overview.md`
-> **说明**: 订单总览不新增表，而是以 Procurement.id 为锚点，聚合查询全链路 8 步数据。
 
 ---
 
-## 1. 数据聚合关系
+## 1. 设计原则
+
+**一张单子 = replenishment_demand 为锚点，逐步 LEFT JOIN 串联全链路8步。**
 
 ```
-Procurement (锚点)
-  ├── ReplenishmentDemand   (步骤1)  → replenishment_demand.linked_procurement_id → procurement.id
-  ├── Factory              (步骤2)  → procurement.factory_id
-  ├── QcRecord             (步骤3)  → qc_record.procurement_id
-  ├── LogisticsPlan         (步骤4)  → logistics_plan.procurement_id
-  │     ├── Container      (步骤4)  → logistics_plan.container_id
-  │     └── ConsolidationPool (步骤4) → logistics_plan.pool_id
-  ├── DomesticCustomsRecord (步骤5)  → domestic_customs_record.procurement_id
-  ├── JapanCustomsRecord    (步骤6)  → japan_customs_record.procurement_id
-  ├── TaxRefundRecord       (步骤7)  → tax_refund_record.procurement_id
-  └── SalesRecord           (步骤8)  → sales_record.procurement_id
+Demand (PENDING) ──[关联]──▶ Procurement ──▶ QcRecord ──▶ LogisticsPlan ──┬─▶ DomesticCustoms
+                                                                         └─▶ JapanCustoms
+                                              TaxRefund ◀──
+                                              SalesRecord ◀──
 ```
 
-> ⚠️ v2.0.0 关联关系：`Demand.linked_procurement_id` → `Procurement.id`（1 Demand = 1 Procurement）。
+- **1:1 链条**：Demand ↔ Procurement ↔ QcRecord ↔ LogisticsPlan → DomesticCustoms / JapanCustoms
+- **侧挂表**：TaxRefund（via procurement）、SalesRecord（via procurement）
+- 所有 JOIN 均为 LEFT JOIN（未到该步骤时为 NULL）
 
 ---
 
-## 2. 聚合查询 SQL（步骤1-4 已实现，步骤5-8 占位）
+## 2. 数据聚合关系
+
+```
+replenishment_demand (锚点)
+  └── linked_procurement_id → procurement.id
+                              ├── factory_id → factory.id
+                              ├── procurement_id → qc_record.id（1:1）
+                              ├── qc_record.id → logistics_plan.qc_record_id（1:1）
+                              │                  ├── logistics_plan_id → domestic_customs_record.id
+                              │                  └── logistics_plan_id → japan_customs_record.id
+                              ├── procurement_id → tax_refund_record.id
+                              └── procurement_id → sales_record.id
+```
+
+---
+
+## 3. MySQL VIEW — v_order_chain
 
 ```sql
--- 锚点 Procurement
+CREATE OR REPLACE VIEW v_order_chain AS
 SELECT
-    p.id                         AS procurement_id,
-    p.factory_id,
-    p.product_code,
-    p.sub_product_code,
-    p.quantity,
-    p.price_rmb,
-    p.tax_point,
-    p.exchange_rate,
-    p.billing_type,
-    p.estimated_price_jpy,
-    p.status,
-    p.order_date,
-    p.factory_ship_date,
-    p.planned_ship_date,
-    p.actual_ship_date,
-    p.product_lead,
-    p.japan_lead,
-    p.china_lead,
-    p.destination,
-    p.customer_company,
-    p.create_time
-FROM procurement p
-WHERE p.id = :procurementId AND p.is_deleted = FALSE;
+  -- ====== 锚点：Demand（步骤1）======
+  d.id                        AS demand_id,
+  d.demand_code               AS demand_code,
+  d.demand_type              AS demand_type,
+  d.product_code             AS demand_product_code,
+  d.sub_product_code          AS demand_sub_product_code,
+  d.quantity                 AS demand_quantity,
+  d.destination              AS demand_destination,
+  d.japan_lead              AS demand_japan_lead,
+  d.status                  AS demand_status,          -- PENDING / CONFIRMED
+  d.linked_procurement_id   AS linked_procurement_id,
+  d.image_url              AS demand_image_url,
+  d.create_time            AS demand_create_time,
+  d.update_time            AS demand_update_time,
 
--- 步骤1：ReplenishmentDemand（v2.0.0: replenishment_demand.linked_procurement_id → procurement.id）
-SELECT d.* FROM replenishment_demand d
-WHERE d.linked_procurement_id = :procurementId
-  AND d.is_deleted = FALSE
-LIMIT 1;
+  -- ====== 步骤2：发注单 Procurement ======
+  p.id                        AS procurement_id,
+  p.procurement_code         AS procurement_code,
+  p.factory_id               AS procurement_factory_id,
+  p.product_code             AS procurement_product_code,
+  p.sub_product_code         AS procurement_sub_product_code,
+  p.quantity                AS procurement_quantity,
+  p.price_rmb               AS procurement_price_rmb,
+  p.tax_point               AS procurement_tax_point,
+  p.exchange_rate           AS procurement_exchange_rate,
+  p.billing_type            AS procurement_billing_type,
+  p.estimated_price_jpy    AS procurement_estimated_price_jpy,
+  p.order_date              AS procurement_order_date,
+  p.factory_ship_date       AS procurement_factory_ship_date,
+  p.planned_ship_date       AS procurement_planned_ship_date,
+  p.actual_ship_date        AS procurement_actual_ship_date,
+  p.lead_time_days         AS procurement_lead_time_days,
+  p.product_lead           AS procurement_product_lead,
+  p.japan_lead             AS procurement_japan_lead,
+  p.china_lead             AS procurement_china_lead,
+  p.destination            AS procurement_destination,
+  p.customer_company       AS procurement_customer_company,
+  p.status                 AS procurement_status,
+  p.create_time            AS procurement_create_time,
 
--- 步骤2：Factory
-SELECT f.* FROM factory f
-WHERE f.id = (SELECT factory_id FROM procurement WHERE id = :procurementId)
-  AND f.is_deleted = FALSE
-LIMIT 1;
+  -- ====== 步骤2：关联工厂 Factory ======
+  f.id                        AS factory_id,
+  f.factory_code             AS factory_code,
+  f.factory_name             AS factory_name,
+  f.province                AS factory_province,
+  f.city                   AS factory_city,
+  f.county                 AS factory_county,
+  f.contact_name           AS factory_contact_name,
+  f.contact_phone          AS factory_contact_phone,
 
--- 步骤3：QcRecord
-SELECT q.* FROM qc_record q
-WHERE q.procurement_id = :procurementId AND q.is_deleted = FALSE
-ORDER BY q.create_time DESC
-LIMIT 1;
+  -- ====== 步骤3：验货记录 QcRecord ======
+  q.id                        AS qc_record_id,
+  q.qc_code                  AS qc_code,
+  q.result                  AS qc_result,             -- PASS / FAIL
+  q.inspection_count         AS qc_inspection_count,
+  q.passed_count           AS qc_passed_count,
+  q.defective_count         AS qc_defective_count,
+  q.box_count              AS qc_box_count,
+  q.box_length_cm          AS qc_box_length_cm,
+  q.box_width_cm           AS qc_box_width_cm,
+  q.box_height_cm          AS qc_box_height_cm,
+  q.net_weight_per_unit    AS qc_net_weight_per_unit,
+  q.gross_weight           AS qc_gross_weight,
+  q.qc_date               AS qc_date,
+  q.status                 AS qc_status,
+  q.create_time            AS qc_create_time,
 
--- 步骤4：LogisticsPlan
-SELECT l.* FROM logistics_plan l
-WHERE l.procurement_id = :procurementId AND l.is_deleted = FALSE
-ORDER BY l.create_time DESC
-LIMIT 1;
+  -- ====== 步骤4：调配计划 LogisticsPlan ======
+  l.id                        AS logistics_plan_id,
+  l.plan_code                AS logistics_plan_code,
+  l.container_no             AS logistics_container_no,
+  l.plan_type               AS logistics_plan_type,      -- SEA / AIR / LANDING
+  l.cargo_length_cm         AS logistics_cargo_length_cm,
+  l.cargo_width_cm          AS logistics_cargo_width_cm,
+  l.cargo_height_cm         AS logistics_cargo_height_cm,
+  l.cargo_volume_cbm       AS logistics_cargo_volume_cbm,
+  l.cargo_weight_kg        AS logistics_cargo_weight_kg,
+  l.requires_qc            AS logistics_requires_qc,
+  l.estimated_ship_date     AS logistics_estimated_ship_date,
+  l.actual_ship_date        AS logistics_actual_ship_date,
+  l.departure_port         AS logistics_departure_port,
+  l.arrival_port           AS logistics_arrival_port,
+  l.status                 AS logistics_status,
+  l.create_time            AS logistics_create_time,
 
--- 步骤5-8：待实现（字段占位）
--- domestic_customs_record.procurement_id = :procurementId
--- japan_customs_record.procurement_id = :procurementId
--- tax_refund_record.procurement_id = :procurementId
--- sales_record.procurement_id = :procurementId
+  -- ====== 步骤5：国内报关 DomesticCustomsRecord ======
+  dc.id                       AS domestic_customs_id,
+  dc.customs_no             AS domestic_customs_no,
+  dc.hs_code                AS domestic_hs_code,
+  dc.declaration_date       AS domestic_declaration_date,
+  dc.export_port            AS domestic_export_port,
+  dc.declared_value_rmb    AS domestic_declared_value_rmb,
+  dc.status                 AS domestic_customs_status,
+  dc.create_time            AS domestic_create_time,
+
+  -- ====== 步骤6：日本清关 JapanCustomsRecord ======
+  jc.id                       AS japan_customs_id,
+  jc.customs_entry_no       AS japan_customs_entry_no,
+  jc.arrival_date           AS japan_arrival_date,
+  jc.customs_broker         AS japan_customs_broker,
+  jc.broker_phone          AS japan_broker_phone,
+  jc.import_duty_paid       AS japan_import_duty_paid,
+  jc.consumption_tax_paid  AS japan_consumption_tax_paid,
+  jc.clearance_date          AS japan_clearance_date,
+  jc.status                 AS japan_customs_status,
+  jc.create_time            AS japan_create_time,
+
+  -- ====== 步骤7：退税 TaxRefundRecord ======
+  tr.id                       AS tax_refund_id,
+  tr.tax_refund_amount      AS tax_refund_amount,
+  tr.refund_date            AS tax_refund_date,
+  tr.status                 AS tax_refund_status,
+  tr.create_time            AS tax_refund_create_time,
+
+  -- ====== 步骤8：运营销售 SalesRecord ======
+  sr.id                       AS sales_record_id,
+  sr.record_code             AS sales_record_code,
+  sr.sales_channel          AS sales_channel,
+  sr.listing_date           AS sales_listing_date,
+  sr.initial_stock         AS sales_initial_stock,
+  sr.current_stock         AS sales_current_stock,
+  sr.safety_stock          AS sales_safety_stock,
+  sr.sales_quantity        AS sales_quantity,
+  sr.returned_quantity     AS sales_returned_quantity,
+  sr.return_rate           AS sales_return_rate,
+  sr.selling_price_jpy     AS sales_selling_price_jpy,
+  sr.status                 AS sales_status,
+  sr.create_time            AS sales_create_time,
+
+  -- ====== 商品基础信息（来自 product 表）======
+  prd.name_zh               AS product_name_zh,
+  prd.name_ja               AS product_name_ja,
+  prd.category             AS product_category,       -- OEM / ORDINARY / FACTORY_DIRECT
+
+  -- ====== 8步状态汇总（一目了然）======
+  CASE WHEN d.id IS NOT NULL THEN 'COMPLETED' ELSE 'NOT_STARTED' END AS step1_status,
+  CASE WHEN p.id IS NOT NULL THEN 'COMPLETED' ELSE 'NOT_STARTED' END AS step2_status,
+  CASE WHEN q.id IS NOT NULL THEN 'COMPLETED' ELSE 'NOT_STARTED' END AS step3_status,
+  CASE WHEN l.id IS NOT NULL THEN 'COMPLETED' ELSE 'NOT_STARTED' END AS step4_status,
+  CASE WHEN dc.id IS NOT NULL THEN 'COMPLETED' ELSE 'NOT_STARTED' END AS step5_status,
+  CASE WHEN jc.id IS NOT NULL THEN 'COMPLETED' ELSE 'NOT_STARTED' END AS step6_status,
+  CASE WHEN tr.id IS NOT NULL THEN 'COMPLETED' ELSE 'NOT_STARTED' END AS step7_status,
+  CASE WHEN sr.id IS NOT NULL THEN 'COMPLETED' ELSE 'NOT_STARTED' END AS step8_status
+
+FROM replenishment_demand d
+  -- 步骤2：Procurement（通过 demand.linked_procurement_id 关联）
+  LEFT JOIN procurement p ON p.id = d.linked_procurement_id AND p.is_deleted = FALSE
+  -- 步骤2：关联工厂（通过 procurement.factory_id）
+  LEFT JOIN factory f ON f.id = p.factory_id AND f.is_deleted = FALSE
+  -- 步骤3：验货记录（通过 procurement.id）
+  LEFT JOIN qc_record q ON q.procurement_id = p.id AND q.is_deleted = FALSE
+  -- 步骤4：调配计划（通过 qc_record.id 作为锚点）
+  LEFT JOIN logistics_plan l ON l.qc_record_id = q.id AND l.is_deleted = FALSE
+  -- 步骤5：国内报关（通过 logistics_plan.id）
+  LEFT JOIN domestic_customs_record dc ON dc.logistics_plan_id = l.id AND dc.is_deleted = FALSE
+  -- 步骤6：日本清关（通过 logistics_plan.id）
+  LEFT JOIN japan_customs_record jc ON jc.logistics_plan_id = l.id AND jc.is_deleted = FALSE
+  -- 步骤7：退税（直接挂 procurement）
+  LEFT JOIN tax_refund_record tr ON tr.procurement_id = p.id AND tr.is_deleted = FALSE
+  -- 步骤8：运营销售（直接挂 procurement）
+  LEFT JOIN sales_record sr ON sr.procurement_id = p.id AND sr.is_deleted = FALSE
+  -- 商品基础信息（通过主货号）
+  LEFT JOIN product prd ON prd.master_code = d.product_code AND prd.sub_code IS NULL AND prd.is_deleted = FALSE
+
+WHERE d.is_deleted = FALSE;
 ```
 
 ---
 
-## 3. 聚合接口
+## 4. 索引建议
 
-```java
-// 后端实现
-public interface OrderOverviewRepository {
-    Optional<Procurement> findProcurement(Long procurementId);
-    Optional<ReplenishmentDemand> findDemandByProcurement(Long procurementId);
-    Optional<Factory> findFactoryByProcurement(Long procurementId);
-    Optional<QcRecord> findQcRecordByProcurement(Long procurementId);
-    Optional<LogisticsPlan> findLogisticsPlanByProcurement(Long procurementId);
-    Optional<DomesticCustomsRecord> findDomesticCustomsByProcurement(Long procurementId);  // 待实现
-    Optional<JapanCustomsRecord> findJapanCustomsByProcurement(Long procurementId);        // 待实现
-    Optional<TaxRefundRecord> findTaxRefundByProcurement(Long procurementId);              // 待实现
-    Optional<SalesRecord> findSalesRecordByProcurement(Long procurementId);                // 待实现
-}
+```sql
+-- 核心查询索引（Demand 列表 + 8步状态）
+CREATE INDEX idx_chain_demand_status ON replenishment_demand(status, is_deleted);
+CREATE INDEX idx_chain_linked_proc ON replenishment_demand(linked_procurement_id);
+
+-- 逐步JOIN索引
+CREATE INDEX idx_chain_procurement_del ON procurement(is_deleted, id);
+CREATE INDEX idx_chain_qc_proc ON qc_record(procurement_id, is_deleted);
+CREATE INDEX idx_chain_logistics_qc ON logistics_plan(qc_record_id, is_deleted);
+CREATE INDEX idx_chain_domestic_lp ON domestic_customs_record(logistics_plan_id, is_deleted);
+CREATE INDEX idx_chain_japan_lp ON japan_customs_record(logistics_plan_id, is_deleted);
+CREATE INDEX idx_chain_tax_proc ON tax_refund_record(procurement_id, is_deleted);
+CREATE INDEX idx_chain_sales_proc ON sales_record(procurement_id, is_deleted);
 ```
 
 ---
 
-## 代码实现状态
+## 5. 前端使用方式
 
-- [x] ✅ `OrderOverviewUseCase` 用例服务（含 Demand 锚点 + Procurement 锚点）
-- [x] ✅ `OrderOverviewController` REST 控制器（GET /api/v1/orders/procurement/{procurementId}/overview + /demands 端点）
-- [x] ✅ `OrderOverviewPageVO` 聚合响应对象（含 StepStatus 数组）
-- [x] ✅ 前端 `OrderOverviewPage.vue`（双入口架构）
-- [x] ✅ 前端 `DemandOverviewPage.vue`（Demand 锚点详情页）
-- [x] ✅ 前端 `ProcurementOverviewPage.vue`（Procurement 锚点详情页）
-- [x] ✅ 前端 `@/api/orderOverview.ts` + `@/api/demand.ts`
-- [ ] 🟡 步骤5-8 聚合数据填充（DomesticCustoms/JapanCustoms/TaxRefund/SalesRecord）
+### 5.1 列表页（单一表格，一行 = 一个 Demand）
+
+```
+GET /api/v1/orders/chain?page=&pageSize=&demandStatus=&keyword=
+
+响应：Page<OrderChainVO>
+每行 = v_order_chain 的一行
+```
+
+### 5.2 详情页（点击行后进入）
+
+```
+GET /api/v1/orders/chain/{demandId}
+
+响应：OrderChainVO（含全部8步数据，NULL=未到该步骤）
+```
+
+---
+
+## 6. 代码实现状态
+
+- [ ] 🔲 `v_order_chain` MySQL VIEW（新建）
+- [ ] 🔲 `OrderChainViewRepository`（JPA 视图 Repository）
+- [ ] 🔲 `GET /api/v1/orders/chain` 列表接口
+- [ ] 🔲 `GET /api/v1/orders/chain/{demandId}` 详情接口
+- [ ] 🔲 `OrderChainVO` 响应对象
+- [ ] 🔲 前端 `OrderOverviewPage.vue` 合并为单列表
+- [ ] 🔲 前端 `DemandOverviewPage.vue` 改用 `/chain/{demandId}`

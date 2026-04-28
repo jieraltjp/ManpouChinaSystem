@@ -103,16 +103,35 @@
           </template>
         </el-table-column>
         <el-table-column prop="factoryName" :label="$t('order.column.factoryName')" min-width="140" show-overflow-tooltip />
+        <el-table-column :label="$t('order.column.priceRmb')" min-width="110" align="right">
+          <template #default="{ row }">
+            {{ row.priceRmb != null ? row.priceRmb.toLocaleString() : '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('order.column.exchangeRate')" min-width="80" align="center">
+          <template #default="{ row }">
+            {{ row.exchangeRate != null ? row.exchangeRate : '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('order.column.taxPoint')" min-width="80" align="center">
+          <template #default="{ row }">
+            {{ row.taxPoint != null ? row.taxPoint : '-' }}
+          </template>
+        </el-table-column>
         <el-table-column prop="quantity" :label="$t('order.column.quantity')" min-width="80" align="right" />
         <el-table-column :label="$t('order.column.estimatedPriceJpy')" min-width="150" align="right">
           <template #default="{ row }">
             {{ row.estimatedPriceJpy ? row.estimatedPriceJpy.toLocaleString() : '-' }}
           </template>
         </el-table-column>
+        <el-table-column :label="$t('order.column.billingType')" min-width="110" align="center">
+          <template #default="{ row }">
+            {{ billingTypeLabel(row.billingType) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="leadTimeDays" :label="$t('order.column.leadTimeDays')" min-width="100" align="center">
           <template #default="{ row }">{{ row.leadTimeDays ? `${row.leadTimeDays}天` : '-' }}</template>
         </el-table-column>
-        <el-table-column prop="cartonNotes" :label="$t('order.column.cartonNotes')" min-width="120" show-overflow-tooltip />
         <el-table-column prop="status" :label="$t('order.column.status')" min-width="110" align="center">
           <template #default="{ row }">
             <el-tag :type="statusType(row.status)" size="small">

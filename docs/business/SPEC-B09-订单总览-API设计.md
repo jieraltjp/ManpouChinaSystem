@@ -1,319 +1,189 @@
 # 订单总览 — API 设计
 
-> **版本**: 2.0.0
+> **版本**: 3.0.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-24（v2.0.0：Demand 每行 = 一个子货号；DemandVO/OrderDemandSelectorDTO 改为直接字段）
-> **状态**: ✅ 已实现（Phase 1 + Phase 5）
+> **更新**: 2026-04-28（v3.0.0：彻底移除双 Tab 架构，改为单一 v_order_chain 视图；一行 = 一个 Demand，LEFT JOIN 串联全链路8步）
+> **状态**: 🔄 设计中
 > **对应前端**: `OrderOverviewPage.vue` · `docs/ui/pages/09-order-overview.md`
-> **核心**: 双入口架构 — Demand 锚点（每行 = 一个子货号，从步骤1到步骤8的完整链路）+ Procurement 锚点（8步全链路聚合）
+> **对应 DB 文档**: `docs/database/DB-09-order-overview.md`
+> **核心**: 单视图架构 — Demand 锚点（每行 = 一个子货号，从步骤1到步骤8的完整链路，通过 v_order_chain 视图暴露）
 
 ---
 
-## 1. 设计背景
+## 1. 设计背景（v3.0.0）
 
-目前系统各步骤（补货/发注/验货/调配/报关/清关/退税/运营）数据独立存储、分散展示。用户需要切换多个页面才能了解一个订单的完整生命周期。
+**问题（v2.x 双 Tab 架构）**：
+- `/base/overview` 分"需求单"和"发注单"两个 Tab，本质上是同一个订单在不同阶段的状态
+- 用户困惑：为什么同一个订单要切换两个 Tab 才能看到全貌？
+- 状态不统一：Procurement 锚点和 Demand 锚点数据分离，维护两套 API
 
-**订单总览接口**解决这个问题：以一条 Procurement 为锚点，一次调用返回全链路聚合数据。
+**解决方案（v3.0.0）**：
+- **一张单子 = replenishment_demand 为锚点，逐步 LEFT JOIN 串联全链路8步**
+- 单一列表视图，一行 = 一个 Demand，显示8步完成状态
+- 点击行进入详情，展示该 Demand 对应全链路8步数据
+
+**数据聚合关系**：
+
+```
+replenishment_demand (锚点)
+  └── linked_procurement_id → procurement.id
+                              ├── factory_id → factory.id
+                              ├── procurement_id → qc_record.id（1:1）
+                              ├── qc_record.id → logistics_plan.qc_record_id（1:1）
+                              │                  ├── logistics_plan_id → domestic_customs_record.id
+                              │                  └── logistics_plan_id → japan_customs_record.id
+                              ├── procurement_id → tax_refund_record.id
+                              └── procurement_id → sales_record.id
+```
 
 ---
 
-## 2. 接口契约
+## 2. 核心接口
 
-### 2.1 双入口端点
+### 2.1 列表接口 — `/api/v1/orders/chain`
 
-```
-# 入口A：Demand 锚点（新建需求单立即可见）
-GET /api/v1/orders/demands                      # Demand 列表（selector）
-GET /api/v1/orders/demands/{demandId}/overview   # Demand 详情总览（Step1 有数据，Step2-8 NOT_STARTED）
+**Query 参数**：
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `page` | int | 否 | 页码，默认 0 |
+| `pageSize` | int | 否 | 每页条数，默认 20 |
+| `demandStatus` | string | 否 | 筛选 Demand 状态：PENDING / CONFIRMED |
+| `keyword` | string | 否 | 搜索关键词（需求单号/子货号/目的地） |
 
-# 入口B：Procurement 锚点（8步全链路聚合）
-GET /api/v1/orders/procurement/{procurementId}/overview  # Procurement 详情总览
-GET /api/v1/orders/procurement/selector                  # Procurement 列表（selector）
-```
-
-**入口A — GET `/api/v1/orders/demands`**
-
-Query 参数：`page`, `pageSize`, `status`（可选）, `keyword`（可选）
-
-响应 200：`Page<OrderDemandSelectorDTO>`（Demand 选择器分页列表）
-
-**入口A — GET `/api/v1/orders/demands/{demandId}/overview`**
-
-> Demand 锚点详情：step1=COMPLETED（数据来自 Demand 自身），step2-8=NOT_STARTED
-
-响应 200：
+**响应 200**：`Page<OrderChainVO>`
 
 ```json
 {
-  "demand": { ... },
-  "stepStatuses": ["COMPLETED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED"]
+  "content": [
+    {
+      "demandId": 5,
+      "demandCode": "DM-20260401-001",
+      "demandType": "REPLENISHMENT",
+      "demandProductCode": "ad009",
+      "demandSubProductCode": "ad009-be",
+      "demandQuantity": 100,
+      "demandDestination": "久留米",
+      "demandJapanLead": "田中",
+      "demandStatus": "CONFIRMED",
+      "linkedProcurementId": 1,
+      "productNameZh": "木制椅子",
+      "productCategory": "OEM",
+      "step1Status": "COMPLETED",
+      "step2Status": "COMPLETED",
+      "step3Status": "COMPLETED",
+      "step4Status": "NOT_STARTED",
+      "step5Status": "NOT_STARTED",
+      "step6Status": "NOT_STARTED",
+      "step7Status": "NOT_STARTED",
+      "step8Status": "NOT_STARTED"
+    }
+  ],
+  "totalElements": 50,
+  "totalPages": 3,
+  "number": 0,
+  "size": 20
 }
 ```
 
-**入口B — GET `/api/v1/orders/procurement/{procurementId}/overview`**
+> **step1-step8 状态说明**：
+> - `COMPLETED`：该步骤已有数据（LEFT JOIN 结果非 NULL）
+> - `NOT_STARTED`：该步骤尚无数据（LEFT JOIN 结果为 NULL）
 
-**响应 200**：
+### 2.2 详情接口 — `/api/v1/orders/chain/{demandId}`
+
+**路径参数**：`demandId` — ReplenishmentDemand.id
+
+**响应 200**：`OrderChainDetailVO`
 
 ```json
 {
-  "procurementId": 1,
-  "procurement": { ... },
+  "demandId": 5,
   "demand": { ... },
+  "procurement": { ... },
+  "factory": { ... },
   "qcRecord": { ... },
   "logisticsPlan": { ... },
   "domesticCustoms": { ... },
   "japanCustoms": { ... },
   "taxRefund": { ... },
-  "salesRecord": { ... },
-  "factory": { ... },
-  "product": { ... }
+  "salesRecord": { ... }
 }
 ```
 
-> ⚠️ 响应体各步骤字段为占位，待对应聚合根实现后填充完整。
-
-**响应 404**：`Procurement` / `ReplenishmentDemand` 不存在或已删除
+**响应 404**：`ReplenishmentDemand` 不存在或已删除
 
 ---
 
-## 3. 聚合数据模型
+## 3. 数据模型
 
-### 3.1 锚点 — Procurement（必定返回）
+### 3.1 OrderChainVO（列表行）
 
-```json
-{
-  "id": 1,
-  "factoryId": 10,
-  "productCode": "odn012",
-  "subProductCode": "re",
-  "material": "木质",
-  "requiresQc": true,
-  "quantity": 200,
-  "priceRmb": "100.00",
-  "exchangeRate": "21.5000",
-  "taxPoint": "1.1000",
-  "billingType": "CHAO_HUI_TUI_SHUI",
-  "estimatedPriceJpy": "2593.00",
-  "orderDate": "2026-04-01",
-  "factoryShipDate": "2026-04-10",
-  "plannedShipDate": "2026-04-20",
-  "actualShipDate": "2026-04-18",
-  "productLead": "张三",
-  "japanLead": "田中",
-  "chinaLead": "李四",
-  "destination": "久留米",
-  "customerCompany": "久留米商事",
-  "status": "倉庫着",
-  "createTime": "2026-04-01T10:00:00Z"
-}
-```
+| 字段 | 类型 | 来源表 | 说明 |
+|------|------|--------|------|
+| `demandId` | Long | replenishment_demand | 需求单 ID |
+| `demandCode` | String | replenishment_demand | 需求单号 |
+| `demandType` | String | replenishment_demand | REPLENISHMENT / NEW_PURCHASE |
+| `demandProductCode` | String | replenishment_demand | 主货号 |
+| `demandSubProductCode` | String | replenishment_demand | 子货号全码 |
+| `demandQuantity` | Integer | replenishment_demand | 需求数量 |
+| `demandDestination` | String | replenishment_demand | 目的地 |
+| `demandJapanLead` | String | replenishment_demand | 日本担当 |
+| `demandStatus` | String | replenishment_demand | PENDING / CONFIRMED |
+| `linkedProcurementId` | Long | replenishment_demand | 关联的发注单 ID |
+| `productNameZh` | String | product | 商品中文名 |
+| `productCategory` | String | product | OEM / ORDINARY / FACTORY_DIRECT |
+| `step1Status` | String | computed | COMPLETED / NOT_STARTED |
+| `step2Status` | String | computed | COMPLETED / NOT_STARTED |
+| `step3Status` | String | computed | COMPLETED / NOT_STARTED |
+| `step4Status` | String | computed | COMPLETED / NOT_STARTED |
+| `step5Status` | String | computed | COMPLETED / NOT_STARTED |
+| `step6Status` | String | computed | COMPLETED / NOT_STARTED |
+| `step7Status` | String | computed | COMPLETED / NOT_STARTED |
+| `step8Status` | String | computed | COMPLETED / NOT_STARTED |
 
-### 3.2 步骤1 — ReplenishmentDemand（可选，v2.0.0）
+### 3.2 OrderChainDetailVO（详情）
 
-> **v2.0.0 变更**：每条 Demand = 一个子货号（商品唯一标识 = 主货号+子货号）。
-> `subProductCode`（子货号全码，如 ad009-be）直接存储，不再用 JSON 摘要。
-
-```json
-{
-  "id": 5,
-  "demandCode": "D-20260401-001",
-  "demandType": "NEW_PURCHASE",
-  "productCode": "odn012",
-  "subProductCode": "odn012-be",
-  "quantity": 100,
-  "destination": "久留米",
-  "japanLead": "田中",
-  "status": "CONVERTED",
-  "createTime": "2026-04-01T09:00:00Z"
-}
-```
-
-### OrderDemandSelectorDTO（v2.0.0，需求单 Tab 列表用）
-
-```json
-{
-  "id": 5,
-  "demandCode": "D-20260401-001",
-  "demandType": "NEW_PURCHASE",
-  "productCode": "odn012",
-  "subProductCode": "odn012-be",
-  "quantity": 100,
-  "destination": "久留米",
-  "japanLead": "田中",
-  "status": "CONVERTED",
-  "createTime": "2026-04-01T09:00:00Z"
-}
-```
-
-### 3.3 步骤2 — Factory（可选）
-
-```json
-{
-  "id": 10,
-  "factoryCode": "F-20260401-001",
-  "factoryName": "义乌XX家具厂",
-  "location": "浙江省金华市",
-  "roughLocation": "义乌工业区",
-  "contactName": "王五",
-  "contactPhone": "13800138000",
-  "status": "ACTIVE"
-}
-```
-
-### 3.4 步骤3 — QcRecord（可选）
-
-```json
-{
-  "id": 20,
-  "qcCode": "Q-20260418-003",
-  "procurementId": 1,
-  "sellerName": "义乌XX家具厂",
-  "productCode": "odn012",
-  "subProductCode": "re",
-  "result": "PASS",
-  "inspectionCount": 200,
-  "passedCount": 198,
-  "defectiveCount": 2,
-  "boxCount": 10,
-  "boxLengthCm": "60.00",
-  "boxWidthCm": "40.00",
-  "boxHeightCm": "30.00",
-  "netWeightPerUnit": "5.5000",
-  "grossWeight": "1100.0000",
-  "qcDate": "2026-04-18",
-  "qcUserId": 3,
-  "status": "COMPLETED"
-}
-```
-
-### 3.5 步骤4 — LogisticsPlan（可选）
-
-```json
-{
-  "id": 30,
-  "planCode": "L-20260419-001",
-  "procurementId": 1,
-  "factoryId": 10,
-  "productCode": "odn012",
-  "subProductCode": "re",
-  "planType": "SEA",
-  "status": "IN_TRANSIT",
-  "cargoLengthCm": "60.00",
-  "cargoWidthCm": "40.00",
-  "cargoHeightCm": "30.00",
-  "cargoVolumeCbm": "0.0720",
-  "cargoWeightKg": "1100.0000",
-  "quantity": 200,
-  "requiresQc": true,
-  "containerId": 1,        // ⚠️ containerNo/departurePort/arrivalPort 待 Container 实体实现后补充
-  "estimatedShipDate": "2026-04-20",
-  "actualShipDate": "2026-04-19"
-}
-```
-
-### 3.6 步骤5 — DomesticCustomsRecord（可选）
-
-> ⚠️ 占位，待 DomesticCustomsRecord 实现后填充。
-
-```json
-{
-  "id": 40,
-  "procurementId": 1,
-  "logisticsPlanId": 30,
-  "status": "SUBMITTED",
-  "customsDeclarationNo": "CUS-20260420-001",
-  "hsCode": "940360",
-  "productCode": "odn012",
-  "productName": "木制家具",
-  "declarationDate": "2026-04-20",
-  "exportPort": "宁波",
-  "declaredValueRmb": "20000.00"
-}
-```
-
-### 3.7 步骤6 — JapanCustomsRecord（可选）
-
-> ⚠️ 占位，待 JapanCustomsRecord 实现后填充。
-
-```json
-{
-  "id": 50,
-  "procurementId": 1,
-  "domesticCustomsId": 40,
-  "status": "CLEARED",
-  "customsEntryNo": "JP-20260428-001",
-  "arrivalDate": "2026-04-28",
-  "customsBroker": "東京通関株式会社",
-  "brokerPhone": "+81-3-xxxx-xxxx",
-  "importDutyPaid": 150000,
-  "consumptionTaxPaid": 30000,
-  "clearanceDate": "2026-04-29"
-}
-```
-
-### 3.8 步骤7 — TaxRefundRecord（可选）
-
-> ⚠️ 占位，待 TaxRefundRecord 实现后填充。
-
-```json
-{
-  "id": 60,
-  "procurementId": 1,
-  "japanCustomsId": 50,
-  "status": "COMPLETED",
-  "billingType": "CHAO_HUI_TUI_SHUI",
-  "priceRmb": "100.00",
-  "quantity": 200,
-  "taxPoint": "1.1000",
-  "estimatedRefundRmb": "2000.00",
-  "actualRefundRmb": "2000.00",
-  "refundDate": "2026-04-30"
-}
-```
-
-### 3.9 步骤8 — SalesRecord（可选）
-
-> ⚠️ 占位，待 SalesRecord 实现后填充。
-
-```json
-{
-  "id": 70,
-  "procurementId": 1,
-  "japanCustomsId": 50,
-  "productCode": "odn012",
-  "subProductCode": "re",
-  "salesChannel": "AMAZON",
-  "listingDate": "2026-05-01",
-  "initialStock": 200,
-  "currentStock": 180,
-  "salesQuantity": 20,
-  "returnedQuantity": 2,
-  "returnRate": "0.10",
-  "sellingPriceJpy": "2800.00",
-  "estimatedPriceJpy": "2593.00",
-  "safetyThreshold": 50,
-  "status": "LISTED"
-}
-```
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `demandId` | Long | 需求单 ID |
+| `demand` | ReplenishmentDemandVO | 步骤1数据（必定有） |
+| `procurement` | ProcurementVO | 步骤2数据（可能为 null） |
+| `factory` | FactoryVO | 步骤2关联工厂（可能为 null） |
+| `qcRecord` | QcRecordVO | 步骤3数据（可能为 null） |
+| `logisticsPlan` | LogisticsPlanVO | 步骤4数据（可能为 null） |
+| `domesticCustoms` | DomesticCustomsVO | 步骤5数据（可能为 null） |
+| `japanCustoms` | JapanCustomsVO | 步骤6数据（可能为 null） |
+| `taxRefund` | TaxRefundVO | 步骤7数据（可能为 null） |
+| `salesRecord` | SalesRecordVO | 步骤8数据（可能为 null） |
 
 ---
 
 ## 4. 后端实现
 
-### 4.1 控制器
+### 4.1 Repository — v_order_chain 视图
 
 ```java
-@RestController
-@RequestMapping("/api/v1/orders")
-@RequiredArgsConstructor
-public class OrderOverviewController {
+@Repository
+public interface OrderChainViewRepository extends JpaRepository<OrderChainView, Long> {
 
-    private final OrderOverviewUseCase orderOverviewUseCase;
+    // 列表查询（支持分页 + 状态筛选 + 关键词搜索）
+    @Query("""
+        SELECT v FROM OrderChainView v
+        WHERE (:demandStatus IS NULL OR v.demandStatus = :demandStatus)
+          AND (:keyword IS NULL
+               OR v.demandCode LIKE %:keyword%
+               OR v.demandSubProductCode LIKE %:keyword%
+               OR v.demandDestination LIKE %:keyword%)
+        ORDER BY v.demandCreateTime DESC
+        """)
+    Page<OrderChainView> findChainList(
+        @Param("demandStatus") String demandStatus,
+        @Param("keyword") String keyword,
+        Pageable pageable
+    );
 
-    @GetMapping("/{procurementId}/overview")
-    public OrderOverviewPageVO getOverview(@PathVariable Long procurementId) {
-        return orderOverviewUseCase.getOverview(procurementId);
-    }
+    // 详情查询
+    Optional<OrderChainView> findByDemandId(Long demandId);
 }
 ```
 
@@ -322,53 +192,22 @@ public class OrderOverviewController {
 ```java
 @Service
 @RequiredArgsConstructor
-public class OrderOverviewUseCase {
+public class OrderChainUseCase {
 
-    private final ProcurementRepository procurementRepository;
-    private final ReplenishmentDemandRepository demandRepository;
-    private final QcRecordRepository qcRecordRepository;
-    private final LogisticsPlanRepository logisticsPlanRepository;
-    private final FactoryRepository factoryRepository;
-    // 步骤5-8 Repository（待实现）
+    private final OrderChainViewRepository chainViewRepository;
 
     @Transactional(readOnly = true)
-    public OrderOverviewPageVO getOverview(Long procurementId) {
-        Procurement procurement = procurementRepository
-                .findByIdAndDeletedIsFalse(procurementId)
-                .orElseThrow(() -> BusinessException.notFound("Procurement", procurementId));
-
-        return OrderOverviewPageVO.builder()
-                .procurementId(procurement.getId())
-                .procurement(mapProcurement(procurement))
-                .demand(findDemand(procurement))
-                .factory(findFactory(procurement.getFactoryId()))
-                .qcRecord(findQcRecord(procurementId))
-                .logisticsPlan(findLogisticsPlan(procurementId))
-                .domesticCustoms(findDomesticCustoms(procurementId))   // 待实现
-                .japanCustoms(findJapanCustoms(procurementId))           // 待实现
-                .taxRefund(findTaxRefund(procurementId))                 // 待实现
-                .salesRecord(findSalesRecord(procurementId))             // 待实现
-                .build();
+    public Page<OrderChainVO> getChainList(String demandStatus, String keyword, Pageable pageable) {
+        return chainViewRepository.findChainList(demandStatus, keyword, pageable)
+            .map(this::toChainVO);
     }
-}
-```
 
-### 4.3 VO 结构
-
-```java
-@Data
-@Builder
-public class OrderOverviewPageVO {
-    private Long procurementId;
-    private ProcurementVO procurement;          // 必定非空
-    private ReplenishmentDemandVO demand;       // 可能为空
-    private FactoryVO factory;                   // 可能为空
-    private QcRecordVO qcRecord;                // 可能为空
-    private LogisticsPlanVO logisticsPlan;     // 可能为空
-    private DomesticCustomsVO domesticCustoms; // 可能为空（待实现）
-    private JapanCustomsVO japanCustoms;        // 可能为空（待实现）
-    private TaxRefundVO taxRefund;              // 可能为空（待实现）
-    private SalesRecordVO salesRecord;          // 可能为空（待实现）
+    @Transactional(readOnly = true)
+    public OrderChainDetailVO getChainDetail(Long demandId) {
+        OrderChainView view = chainViewRepository.findByDemandId(demandId)
+            .orElseThrow(() -> BusinessException.notFound("Demand", demandId));
+        return toDetailVO(view);
+    }
 }
 ```
 
@@ -379,71 +218,66 @@ public class OrderOverviewPageVO {
 ### 5.1 API 客户端
 
 ```typescript
-// apps/web/src/api/orderOverview.ts
+// apps/web/src/api/orderChain.ts
 import { client } from './client'
 
-export interface OrderOverviewPageVO {
-  procurementId: number
-  procurement: ProcurementVO
-  demand?: ReplenishmentDemandVO
-  factory?: FactoryVO
-  qcRecord?: QcRecordVO
-  logisticsPlan?: LogisticsPlanVO
-  domesticCustoms?: DomesticCustomsVO     // 待实现
-  japanCustoms?: JapanCustomsVO           // 待实现
-  taxRefund?: TaxRefundVO                 // 待实现
-  salesRecord?: SalesRecordVO             // 待实现
+export interface OrderChainVO {
+  demandId: number
+  demandCode: string
+  demandType: string
+  demandProductCode: string
+  demandSubProductCode: string
+  demandQuantity: number
+  demandDestination: string
+  demandJapanLead: string
+  demandStatus: string
+  linkedProcurementId: number | null
+  productNameZh: string
+  productCategory: string
+  step1Status: string
+  step2Status: string
+  step3Status: string
+  step4Status: string
+  step5Status: string
+  step6Status: string
+  step7Status: string
+  step8Status: string
 }
 
-export const orderOverviewApi = {
-  getOverview(procurementId: number) {
-    return client.get<OrderOverviewPageVO>(`/orders/${procurementId}/overview`)
-  }
+export interface OrderChainDetailVO {
+  demandId: number
+  demand: ReplenishmentDemandVO
+  procurement: ProcurementVO | null
+  factory: FactoryVO | null
+  qcRecord: QcRecordVO | null
+  logisticsPlan: LogisticsPlanVO | null
+  domesticCustoms: DomesticCustomsVO | null
+  japanCustoms: JapanCustomsVO | null
+  taxRefund: TaxRefundVO | null
+  salesRecord: SalesRecordVO | null
 }
-```
 
-### 5.2 composable
-
-```typescript
-// apps/web/src/pages/procurement/useOrderOverview.ts
-import { ref, computed } from 'vue'
-import { orderOverviewApi, type OrderOverviewPageVO } from '@/api/orderOverview'
-
-export function useOrderOverview(procurementId: Ref<number>) {
-  const overview = ref<OrderOverviewPageVO | null>(null)
-  const loading = ref(false)
-  const error = ref<string | null>(null)
-
-  const fetch = async () => {
-    loading.value = true
-    error.value = null
-    try {
-      overview.value = await orderOverviewApi.getOverview(procurementId.value)
-    } catch (e: any) {
-      error.value = e.message
-    } finally {
-      loading.value = false
-    }
+export const orderChainApi = {
+  getChainList(params: { page?: number, pageSize?: number, demandStatus?: string, keyword?: string }) {
+    return client.get<Page<OrderChainVO>>('/orders/chain', { params })
+  },
+  getChainDetail(demandId: number) {
+    return client.get<OrderChainDetailVO>(`/orders/chain/${demandId}`)
   }
-
-  const currentStep = computed(() => {
-    if (!overview.value) return 0
-    // 计算当前步骤（0-8）
-  })
-
-  return { overview, loading, error, currentStep, fetch }
 }
 ```
 
 ---
 
-## 6. 缺口与TODO
+## 6. 实现状态
 
-| 项目 | 优先级 | 状态 | 说明 |
-|------|--------|------|------|
-| 聚合接口实现 | P0 | ✅ 已完成 | GET `/api/v1/orders/{id}/overview` 后端实现 |
-| Phase 5 Demand 中心化 | P0 | ✅ 已完成 | GET `/api/v1/orders/demands` + `/demands/{id}/overview` |
-| 步骤5-8 填充 | P1 | 🟡 进行中 | DomesticCustoms/JapanCustoms/TaxRefund/SalesRecord 实现后填充 |
-| 前端页面实现 | P1 | ✅ 已完成 | `OrderOverviewPage.vue` + `DemandOverviewPage.vue` |
-| 路由注册 | P1 | ✅ 已完成 | `/procurement/overview/:id` 及 `/demand-overview/:id` |
-| 列表页入口 | P2 | Procurement/Inspection/Logistics 列表页「总览」按钮 |
+| 项目 | 状态 | 说明 |
+|------|------|------|
+| `v_order_chain` MySQL VIEW | 🔲 待建 | DB-09 文档已完成 |
+| `OrderChainView` JPA Entity | 🔲 待建 | 映射 v_order_chain 视图 |
+| `OrderChainViewRepository` | 🔲 待建 | JPA Repository |
+| `GET /api/v1/orders/chain` 列表接口 | 🔲 待建 | 分页 + 筛选 |
+| `GET /api/v1/orders/chain/{demandId}` 详情接口 | 🔲 待建 | 全链路8步数据 |
+| `OrderChainVO` / `OrderChainDetailVO` | 🔲 待建 | 响应对象 |
+| 前端 `OrderOverviewPage.vue` 单列表 | 🔲 待改 | 移除双 Tab，改为单列表 |
+| 前端路由更新 | 🔲 待改 | `/procurement/overview` → `/orders/chain` |

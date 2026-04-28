@@ -425,7 +425,9 @@ const productCategoryMap = ref<Record<string, string>>({}) // productCode -> cat
 
 function getCategoryLabel(code: string): string {
   if (!code) return '-'
-  return productCategoryMap.value[code] || '-'
+  const category = productCategoryMap.value[code]
+  if (!category) return '-'
+  return t('product.category.' + category) ?? category
 }
 
 async function fetchProductCategories(rows: DemandPageVO[]) {
