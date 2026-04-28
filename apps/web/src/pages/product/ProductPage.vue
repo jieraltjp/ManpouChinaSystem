@@ -216,11 +216,11 @@
           <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.createTime') }}</span><span class="detail-value">{{ currentRow.createTime || '-' }}</span></div>
           <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.updateTime') }}</span><span class="detail-value">{{ currentRow.updateTime || '-' }}</span></div>
         </div>
+        <div class="drawer-footer">
+          <el-button @click="detailVisible = false">{{ $t('product.drawer.close') }}</el-button>
+          <el-button type="primary" @click="onEditFromDrawer">{{ $t('product.drawer.edit') }}</el-button>
+        </div>
       </div>
-      <template #footer>
-        <el-button @click="detailVisible = false">{{ $t('product.drawer.close') }}</el-button>
-        <el-button type="primary" @click="onEditFromDrawer">{{ $t('product.drawer.edit') }}</el-button>
-      </template>
     </el-drawer>
 
     <!-- 新规/编辑弹窗 -->
@@ -746,5 +746,12 @@ loadData()
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;
+}
+.drawer-footer {
+  padding: 16px 0 0;
+  border-top: 1px solid var(--border-color);
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
 }
 </style>

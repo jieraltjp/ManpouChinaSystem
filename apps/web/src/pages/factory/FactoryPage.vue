@@ -143,11 +143,11 @@
           <span class="detail-label">{{ $t('factory.drawer.notes') }}</span>
           <span class="detail-value">{{ currentRow.notes }}</span>
         </div>
+        <div class="drawer-footer">
+          <el-button @click="detailVisible = false">{{ $t('factory.drawer.close') }}</el-button>
+          <el-button type="primary" @click="onEditFromDrawer">{{ $t('factory.drawer.edit') }}</el-button>
+        </div>
       </div>
-      <template #footer>
-        <el-button @click="detailVisible = false">{{ $t('factory.drawer.close') }}</el-button>
-        <el-button type="primary" @click="onEditFromDrawer">{{ $t('factory.drawer.edit') }}</el-button>
-      </template>
     </el-drawer>
 
     <!-- 新规/编辑弹窗 -->
@@ -478,5 +478,12 @@ loadData()
   margin: 8px 0 4px;
   padding-left: 4px;
   border-left: 3px solid #409EFF;
+}
+.drawer-footer {
+  padding: 16px 0 0;
+  border-top: 1px solid var(--border-color);
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
 }
 </style>
