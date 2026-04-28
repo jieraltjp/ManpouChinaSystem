@@ -426,7 +426,7 @@ const productCategoryMap = ref<Record<string, string>>({}) // productCode -> cat
 function getCategoryLabel(code: string): string {
   if (!code) return '-'
   const category = productCategoryMap.value[code]
-  if (!category) return '-'
+  if (!category || category === '-') return '-'
   return t('product.category.' + category) ?? category
 }
 

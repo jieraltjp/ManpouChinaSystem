@@ -269,15 +269,27 @@ export const orderChainApi = {
 
 ---
 
-## 6. 实现状态
+## 6. 分阶段实现计划
+
+### Phase 1：步骤 1~4（补货 → 发注 → 验货 → 调配）
 
 | 项目 | 状态 | 说明 |
 |------|------|------|
-| `v_order_chain` MySQL VIEW | 🔲 待建 | DB-09 文档已完成 |
-| `OrderChainView` JPA Entity | 🔲 待建 | 映射 v_order_chain 视图 |
-| `OrderChainViewRepository` | 🔲 待建 | JPA Repository |
+| `v_order_chain_v1` MySQL VIEW | 🔲 待建 | 视图包含 Demand/Procurement/Factory/QcRecord/LogisticsPlan |
+| `OrderChainView` JPA Entity | 🔲 待建 | 映射 `v_order_chain_v1` |
+| `OrderChainRepository` | 🔲 待建 | JPA Repository |
 | `GET /api/v1/orders/chain` 列表接口 | 🔲 待建 | 分页 + 筛选 |
-| `GET /api/v1/orders/chain/{demandId}` 详情接口 | 🔲 待建 | 全链路8步数据 |
+| `GET /api/v1/orders/chain/{demandId}` 详情接口 | 🔲 待建 | 步骤1~4数据 |
 | `OrderChainVO` / `OrderChainDetailVO` | 🔲 待建 | 响应对象 |
+| 前端 API 层 `orderChain.ts` | 🔲 待建 | |
 | 前端 `OrderOverviewPage.vue` 单列表 | 🔲 待改 | 移除双 Tab，改为单列表 |
-| 前端路由更新 | 🔲 待改 | `/procurement/overview` → `/orders/chain` |
+
+> **Phase 1 scope**：Procurement/QcRecord/LogisticsPlan/DomesticCustoms/JapanCustoms/TaxRefund/SalesRecord 字段返回 NULL 占位。
+
+### Phase 2：步骤 5~8（国内报关 → 日本清关 → 退税 → 运营销售）
+
+| 项目 | 状态 |
+|------|------|
+| VIEW 升级为完整 8 步 | 🔲 待建 |
+| 步骤 5~8 字段补全 | 🔲 待建 |
+| 详情抽屉全 8 步展示 | 🔲 待改 |
