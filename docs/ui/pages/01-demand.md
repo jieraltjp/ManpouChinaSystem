@@ -57,19 +57,20 @@
 
 ---
 
-## 4. 表格列定义（v2.0.0）
+## 4. 表格列定义（v2.2.0）
 
 | 列名 | 字段 | 说明 |
 |------|------|------|
 | 编号 | `demandCode` | 格式 `D-YYYYMMDD-NNN` |
 | 类型 | `demandType` | `REPLENISHMENT`(补货) / `NEW_PURCHASE`(新品采购) |
 | 子货号 | `subProductCode` | 子货号全码，如 `odn012-be`，显示为等宽标签 |
+| 图片 | `imageUrl` | 商品图片缩略图（el-image 48×48），悬停放大 |
 | 数量 | `quantity` | 该子货号的需求数量，右对齐，橙色数字 |
 | 目的地 | `destination` | 出货目的地，如久留米/名古屋 |
 | 日本担当 | `japanLead` | 日本担当 |
-| 状态 | `status` | PENDING / CONVERTED / CANCELLED |
-| 创建时间 | `createTime` | — |
-| 操作 | — | 转采购 / 查看采购单 / **撤销转换** / 编辑 / 删除 |
+| 状态 | `status` | PENDING（待确认）/ CONFIRMED（已确认） |
+| 备注 | `remarks` | 备注信息（v2.1.0） |
+| 操作 | — | 详情 / 编辑 / 删除 |
 
 > **前端表格布局**：列宽用 `min-width`，不写 `table-layout="fixed"`，操作列不写 `fixed="right"`。详见 [docs/ui/ARCHITECTURE.md §8](../ARCHITECTURE.md#8-element-plus-表格布局规范)。
 
@@ -224,45 +225,35 @@ POST /api/v1/demands  × N（每条子货号一行）
 
 ---
 
-## 6. 转采购（v2.0.0 — 1:1 模式）
+## 6. 状态标签交互（v2.2.0）
 
-### 6.1 触发条件
+### 6.1 状态说明
 
-状态 = `PENDING`，操作列点击 `[转采购]`。
+| 状态 | 含义 | 标签颜色 | 可点击 |
+|------|------|---------|--------|
+| PENDING | 待确认（未关联发注单） | warning（橙） | ✅ 点击无效（提示"请在发注单页面关联"） |
+| CONFIRMED | 已确认（已关联发注单） | success（绿） | ✅ 点击取消关联 |
 
-### 6.2 行为
+### 6.2 取消关联行为
 
-1. 弹出工厂选择弹窗
-2. 选择工厂后确认
-3. **1 Demand → 1 Procurement**（该子货号独立生成一条 Procurement）
-4. 需求单状态 → CONVERTED
-5. `linkedProcurementId` 记录对应的 Procurement.id
-
-### 6.3 API 调用
-
-```
-POST /api/v1/demands/{id}/convert
-请求体：{ "factoryId": 123 }
-响应：{ "code": "ok", "data": { "demandStatus": "CONVERTED", "linkedProcurementId": 101 } }
-```
-
-### 6.4 查看采购单（CONVERTED）
-
-操作列 `[查看采购单]` → 弹窗显示对应的 Procurement 明细
-
-### 6.5 撤销转换
-
-操作列 `[撤销转换]` → 删除关联的 Procurement，回滚需求状态 → PENDING
+点击 CONFIRMED 标签 → 调用 `POST /api/v1/demands/{id}/unlink` → 状态回 PENDING，linkedProcurementId 清空
 
 ---
 
 ## 7. 状态流转
 
 ```
-  PENDING ──[转采购]──▶ CONVERTED
+  PENDING（待确认）
      │
-     └──[取消]──▶ CANCELLED
+     └──[发注单页面关联]──▶ CONFIRMED（已确认）
+     │                                │
+     └──[点击状态标签取消关联]◀─────────┘
 ```
+
+**v2.2.0 说明**：
+- Demand 由发注单（Procurement）主动关联，不在 Demand 页面操作转采购
+- CONFIRMED 状态可点击，点击后取消关联，状态回 PENDING
+- PENDING/CONFIRMED 均可删除，无状态限制
 
 ---
 
@@ -270,14 +261,14 @@ POST /api/v1/demands/{id}/convert
 
 | 操作 | Method | Endpoint |
 |------|--------|----------|
-| 分页查询 | GET | `/api/v1/demands?page=&pageSize=&demandType=&productCode=&status=` |
+| 分页查询 | GET | `/api/v1/demands?page=&pageSize=&demandType=&productCode=` |
 | 详情 | GET | `/api/v1/demands/{id}` |
-| 创建（单个/批量） | POST | `/api/v1/demands`（循环调用） |
+| 创建 | POST | `/api/v1/demands` |
 | 更新 | PATCH | `/api/v1/demands/{id}` |
-| 转采购（1:1） | POST | `/api/v1/demands/{id}/convert` → 返回 `linkedProcurementId` |
-| 撤销转换 | POST | `/api/v1/demands/{id}/revert` |
-| 查看采购单 | GET | `/api/v1/demands/{id}/procurement` |
 | 删除 | DELETE | `/api/v1/demands/{id}` |
+| 关联到发注单 | POST | `/api/v1/demands/{id}/link?procurementId=` |
+| 取消关联 | POST | `/api/v1/demands/{id}/unlink` |
+| 查看采购单 | GET | `/api/v1/demands/{id}/procurement` |
 
 ---
 
@@ -285,15 +276,16 @@ POST /api/v1/demands/{id}/convert
 
 | 项目 | 状态 |
 |------|------|
-| `DemandPage.vue` 表单（v2.0.0：直接字段） | ✅ |
-| `DemandPage.vue` 表格（v2.0.0：子货号/数量/目的地列） | ✅ |
+| `DemandPage.vue` 表格（v2.2.0：子货号/图片/数量/目的地/状态/备注列） | ✅ |
 | `DemandPage.vue` 表格列宽规范（min-width，移除 fixed/table-layout） | ✅ 2026-04-24 |
-| `DemandPage.vue` 转采购弹窗（1:1 预览） | ✅ |
-| `DemandPage.vue` 查看采购单弹窗（单条） | ✅ |
+| `DemandPage.vue` 状态标签可点击取消关联（v2.2.0） | 🔲 待实现 |
+| `DemandPage.vue` 移除转采购弹窗（v2.2.0） | 🔲 待实现 |
+| `DemandPage.vue` 统计栏：全部/待确认/已确认（v2.2.0） | 🔲 待实现 |
 | `DemandPage.vue` 单个录入模式重设计（v2.1.0：分组布局 + 680px） | ✅ |
 | `DemandPage.vue` 批量录入模式（v2.1.0） | 🔲 待实现 |
-| `demand.ts` API 客户端 | ✅ |
+| `demand.ts` API 客户端（v2.2.0：link/unlink 方法） | 🔲 待实现 |
 | `OrderOverviewPage.vue` 需求单 Tab（v2.0.0 列） | ✅ |
 | `orderOverview.ts` DemandVO / DemandSelectorVO | ✅ |
 | `OrderOverviewAssembler` / `OrderOverviewUseCase` | ✅ |
 | 数据库迁移脚本 V31 | ✅ |
+| SPEC-B01 v2.2.0 文档 | ✅ |
