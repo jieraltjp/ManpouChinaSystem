@@ -1,13 +1,5 @@
 <template>
   <div class="page">
-    <div class="page-header">
-      <div class="header-actions">
-        <el-button type="primary" @click="onNew">
-          <el-icon><Plus /></el-icon> {{ $t('taxRefund.newButton') }}
-        </el-button>
-      </div>
-    </div>
-
     <!-- 统计卡片 -->
     <el-row :gutter="16" class="stats-row">
       <el-col :span="6">
@@ -46,22 +38,29 @@
 
     <!-- 筛选栏 -->
     <el-card class="filter-card" shadow="never">
-      <el-form :inline="true" :model="filterForm">
-        <el-form-item :label="$t('taxRefund.filter.procurementId')">
-          <el-input-number v-model="filterForm.procurementId" :min="1" style="width:130px" clearable />
-        </el-form-item>
-        <el-form-item :label="$t('taxRefund.filter.status')">
-          <el-select v-model="filterForm.status" :placeholder="$t('common.all')" clearable style="width:140px">
-            <el-option value="APPLYING" :label="$t('taxRefund.status.applying')" />
-            <el-option value="COMPLETED" :label="$t('taxRefund.status.completed')" />
-            <el-option value="NO_REFUND" :label="$t('taxRefund.status.noRefund')" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
-          <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
-        </el-form-item>
-      </el-form>
+      <template #header>
+        <div class="filter-header">
+          <el-form :inline="true" :model="filterForm">
+            <el-form-item :label="$t('taxRefund.filter.procurementId')">
+              <el-input-number v-model="filterForm.procurementId" :min="1" style="width:130px" clearable />
+            </el-form-item>
+            <el-form-item :label="$t('taxRefund.filter.status')">
+              <el-select v-model="filterForm.status" :placeholder="$t('common.all')" clearable style="width:140px">
+                <el-option value="APPLYING" :label="$t('taxRefund.status.applying')" />
+                <el-option value="COMPLETED" :label="$t('taxRefund.status.completed')" />
+                <el-option value="NO_REFUND" :label="$t('taxRefund.status.noRefund')" />
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
+              <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
+            </el-form-item>
+          </el-form>
+          <el-button type="primary" @click="onNew">
+            <el-icon><Plus /></el-icon>{{ $t('taxRefund.newButton') }}
+          </el-button>
+        </div>
+      </template>
     </el-card>
 
     <!-- 数据表 -->
@@ -602,12 +601,9 @@ watch(tableData, () => {
 
 <style scoped>
 .page { display: flex; flex-direction: column; gap: 16px; }
-.page-header { display: flex; align-items: center; justify-content: space-between; }
-.page-title { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
-.page-title::before { content: ''; display: inline-block; width: 4px; height: 20px; background: var(--color-primary); border-radius: 2px; margin-right: 10px; vertical-align: middle; }
-.header-actions { display: flex; gap: 8px; }
+.filter-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
-.stats-row { margin-bottom: 4px; }
+.stats-row { margin-bottom: 0; }
 .stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }
 .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light)); border-radius: var(--radius-md) var(--radius-md) 0 0; }
 .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }

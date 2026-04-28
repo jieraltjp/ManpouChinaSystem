@@ -1,14 +1,5 @@
 <template>
   <div class="test-page">
-    <div class="page-header">
-      <div class="header-actions">
-        <el-button type="primary" @click="onNew">
-          <el-icon><Plus /></el-icon>
-          {{ $t('order.newButton') }}
-        </el-button>
-      </div>
-    </div>
-
     <!-- 统计行 -->
     <el-row :gutter="16" class="stats-row">
       <el-col :span="6">
@@ -59,23 +50,30 @@
 
     <!-- 筛选栏 -->
     <el-card class="filter-card" shadow="never">
-      <el-form :inline="true" :model="filterForm">
-        <el-form-item :label="$t('order.filter.productCode')">
-          <el-input v-model="filterForm.productCode" :placeholder="$t('order.filter.productCodePlaceholder')" clearable style="width: 140px" />
-        </el-form-item>
-        <el-form-item :label="$t('order.filter.status')">
-          <el-select v-model="filterForm.status" :placeholder="$t('order.filter.all')" clearable style="width: 140px">
-            <el-option v-for="s in statusOptionsWithI18n" :key="s.value" :label="s.label" :value="s.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('order.filter.customerCompany')">
-          <el-input v-model="filterForm.customerCompany" :placeholder="$t('order.filter.customerCompanyPlaceholder')" clearable style="width: 160px" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="loadData">{{ $t('order.filter.search') }}</el-button>
-          <el-button @click="onReset">{{ $t('order.filter.reset') }}</el-button>
-        </el-form-item>
-      </el-form>
+      <template #header>
+        <div class="filter-header">
+          <el-form :inline="true" :model="filterForm">
+            <el-form-item :label="$t('order.filter.productCode')">
+              <el-input v-model="filterForm.productCode" :placeholder="$t('order.filter.productCodePlaceholder')" clearable style="width: 140px" />
+            </el-form-item>
+            <el-form-item :label="$t('order.filter.status')">
+              <el-select v-model="filterForm.status" :placeholder="$t('order.filter.all')" clearable style="width: 140px">
+                <el-option v-for="s in statusOptionsWithI18n" :key="s.value" :label="s.label" :value="s.value" />
+              </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('order.filter.customerCompany')">
+              <el-input v-model="filterForm.customerCompany" :placeholder="$t('order.filter.customerCompanyPlaceholder')" clearable style="width: 160px" />
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="loadData">{{ $t('order.filter.search') }}</el-button>
+              <el-button @click="onReset">{{ $t('order.filter.reset') }}</el-button>
+            </el-form-item>
+          </el-form>
+          <el-button type="primary" @click="onNew">
+            <el-icon><Plus /></el-icon>{{ $t('order.newButton') }}
+          </el-button>
+        </div>
+      </template>
     </el-card>
 
     <!-- 数据表格 -->
@@ -1032,36 +1030,14 @@ defineExpose({ prefillFromDemand })
   gap: 16px;
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.page-title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: 0.3px;
-}
-.page-title::before {
-  content: '';
-  display: inline-block;
-  width: 4px;
-  height: 20px;
-  background: var(--color-primary);
-  border-radius: 2px;
-  margin-right: 10px;
-  vertical-align: middle;
-}
+.filter-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
 .filter-card :deep(.el-card__body) {
   padding-bottom: 0;
 }
 
 .stats-row {
-  margin-bottom: 4px;
+  margin-bottom: 0;
 }
 
 /* ── 统计卡 ── */

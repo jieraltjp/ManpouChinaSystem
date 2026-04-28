@@ -1,18 +1,5 @@
 <template>
   <div class="page">
-    <div class="page-header">
-      <div class="header-actions">
-        <el-button type="warning" @click="onShowAlerts">
-          <el-icon><Warning /></el-icon>
-          {{ $t('sales.alertButton') }} <span v-if="alertCount > 0" class="alert-badge">{{ alertCount }}</span>
-        </el-button>
-        <el-button type="primary" @click="onCreate">
-          <el-icon><Plus /></el-icon>
-          {{ $t('sales.newButton') }}
-        </el-button>
-      </div>
-    </div>
-
     <!-- 统计卡片 -->
     <el-row :gutter="16" class="stats-row">
       <el-col :span="5">
@@ -59,31 +46,38 @@
 
     <!-- 筛选栏 -->
     <el-card class="filter-card" shadow="never">
-      <el-form :inline="true" :model="filterForm">
-        <el-form-item :label="$t('sales.filter.productCode')">
-          <el-input v-model="filterForm.productCode" :placeholder="$t('sales.filter.productCodePlaceholder')" clearable style="width:150px" />
-        </el-form-item>
-        <el-form-item :label="$t('sales.filter.salesChannel')">
-          <el-select v-model="filterForm.salesChannel" :placeholder="$t('common.all')" clearable style="width:140px">
-            <el-option value="AMAZON" :label="$t('sales.channel.amazon')" />
-            <el-option value="MERCALI" :label="$t('sales.channel.mercali')" />
-            <el-option value="SELF_SITE" :label="$t('sales.channel.selfSite')" />
-            <el-option value="OTHER" :label="$t('sales.channel.other')" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('sales.filter.status')">
-          <el-select v-model="filterForm.status" :placeholder="$t('common.all')" clearable style="width:140px">
-            <el-option value="LISTED" :label="$t('sales.status.listed')" />
-            <el-option value="LOW_STOCK" :label="$t('sales.status.lowStock')" />
-            <el-option value="OUT_OF_STOCK" :label="$t('sales.status.outOfStock')" />
-            <el-option value="DISCONTINUED" :label="$t('sales.status.discontinued')" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
-          <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
-        </el-form-item>
-      </el-form>
+      <template #header>
+        <div class="filter-header">
+          <el-form :inline="true" :model="filterForm">
+            <el-form-item :label="$t('sales.filter.productCode')">
+              <el-input v-model="filterForm.productCode" :placeholder="$t('sales.filter.productCodePlaceholder')" clearable style="width:150px" />
+            </el-form-item>
+            <el-form-item :label="$t('sales.filter.salesChannel')">
+              <el-select v-model="filterForm.salesChannel" :placeholder="$t('common.all')" clearable style="width:140px">
+                <el-option value="AMAZON" :label="$t('sales.channel.amazon')" />
+                <el-option value="MERCALI" :label="$t('sales.channel.mercali')" />
+                <el-option value="SELF_SITE" :label="$t('sales.channel.selfSite')" />
+                <el-option value="OTHER" :label="$t('sales.channel.other')" />
+              </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('sales.filter.status')">
+              <el-select v-model="filterForm.status" :placeholder="$t('common.all')" clearable style="width:140px">
+                <el-option value="LISTED" :label="$t('sales.status.listed')" />
+                <el-option value="LOW_STOCK" :label="$t('sales.status.lowStock')" />
+                <el-option value="OUT_OF_STOCK" :label="$t('sales.status.outOfStock')" />
+                <el-option value="DISCONTINUED" :label="$t('sales.status.discontinued')" />
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
+              <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
+            </el-form-item>
+          </el-form>
+          <el-button type="primary" @click="onCreate">
+            <el-icon><Plus /></el-icon>{{ $t('sales.newButton') }}
+          </el-button>
+        </div>
+      </template>
     </el-card>
 
     <!-- 数据表 -->
@@ -308,7 +302,6 @@ const actionLoading = ref('')
 
 const currentRow = ref<SalesRecordVO | null>(null)
 const alertData = ref<SalesRecordVO[]>([])
-const alertCount = ref(0)
 const stockRowId = ref<number | null>(null)
 
 const filterForm = reactive({
@@ -396,13 +389,6 @@ async function loadData() {
   }
 }
 
-async function loadAlertCount() {
-  try {
-    const res = await salesOperationsApi.alerts({ page: 0, pageSize: 1 })
-    alertCount.value = res.data.data.totalElements
-  } catch { /* ignore */ }
-}
-
 function onSearch() { loadData() }
 function onSearchFromButton() { pagination.page = 1; loadData() }
 
@@ -455,7 +441,6 @@ async function onCreateConfirm() {
     ElMessage.success(t('sales.message.createSuccess'))
     createDialogVisible.value = false
     loadData()
-    loadAlertCount()
   } catch (e) {
     console.error('[SalesRecordPage] create failed', e)
     ElMessage.error(t('sales.message.createFailed'))
@@ -482,7 +467,6 @@ async function onStockConfirm() {
     ElMessage.success(t('sales.message.updateSuccess'))
     stockDialogVisible.value = false
     loadData()
-    loadAlertCount()
   } catch (e) {
     console.error('[SalesRecordPage] updateStock failed', e)
     ElMessage.error(t('sales.message.actionFailed'))
@@ -498,7 +482,6 @@ async function onDiscontinue(row: SalesRecordVO) {
     await salesOperationsApi.discontinue(row.id)
     ElMessage.success(t('sales.message.discontinueSuccess'))
     loadData()
-    loadAlertCount()
   } catch (e) {
     console.error('[SalesRecordPage] discontinue failed', e)
     ElMessage.error(t('sales.message.actionFailed'))
@@ -513,7 +496,6 @@ async function onRelist(row: SalesRecordVO) {
     await salesOperationsApi.relist(row.id)
     ElMessage.success(t('sales.message.relistSuccess'))
     loadData()
-    loadAlertCount()
   } catch (e) {
     console.error('[SalesRecordPage] relist failed', e)
     ElMessage.error(t('sales.message.actionFailed'))
@@ -535,7 +517,6 @@ async function onDelete(row: SalesRecordVO) {
     await salesOperationsApi.delete(row.id)
     ElMessage.success(t('sales.message.deleteSuccess'))
     loadData()
-    loadAlertCount()
   } catch (e) {
     console.error('[SalesRecordPage] delete failed', e)
     ElMessage.error(t('sales.message.actionFailed'))
@@ -544,17 +525,7 @@ async function onDelete(row: SalesRecordVO) {
   }
 }
 
-async function onShowAlerts() {
-  alertDialogVisible.value = true
-  try {
-    const res = await salesOperationsApi.alerts({ page: 0, pageSize: 100 })
-    alertData.value = res.data.data?.content ?? []
-  } catch (e) {
-    console.error('[SalesRecordPage] load alerts failed', e)
-  }
-}
-
-onMounted(() => { loadData(); loadAlertCount() })
+onMounted(() => { loadData() })
 
 // 修正 el-table 空状态时 empty-block 宽度超出列宽
 watch(tableData, () => {
@@ -573,13 +544,9 @@ watch(tableData, () => {
 
 <style scoped>
 .page { display: flex; flex-direction: column; gap: 16px; }
-.page-header { display: flex; align-items: center; justify-content: space-between; }
-.page-title { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
-.page-title::before { content: ''; display: inline-block; width: 4px; height: 20px; background: var(--color-primary); border-radius: 2px; margin-right: 10px; vertical-align: middle; }
-.header-actions { display: flex; gap: 8px; align-items: center; }
-.alert-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; background: #DC2626; color: white; border-radius: 9px; font-size: 11px; font-weight: 700; padding: 0 4px; margin-left: 4px; }
+.filter-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
-.stats-row { margin-bottom: 4px; }
+.stats-row { margin-bottom: 0; }
 .stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }
 .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light)); border-radius: var(--radius-md) var(--radius-md) 0 0; }
 .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }

@@ -1,13 +1,5 @@
 <template>
   <div class="page">
-    <div class="page-header">
-      <div class="header-actions">
-        <el-button type="primary" @click="onNew">
-          <el-icon><Plus /></el-icon> {{ $t('product.newButton') }}
-        </el-button>
-      </div>
-    </div>
-
     <!-- 统计行 -->
     <el-row :gutter="16" class="stats-row">
       <el-col :span="6">
@@ -25,27 +17,34 @@
 
     <!-- 筛选 -->
     <el-card class="filter-card" shadow="never">
-      <el-form :inline="true" :model="filterForm">
-        <el-form-item :label="$t('product.filter.masterCode')">
-          <el-input v-model="filterForm.masterCode" :placeholder="$t('product.filter.masterCodePlaceholder')" clearable style="width:160px" />
-        </el-form-item>
-        <el-form-item :label="$t('product.filter.keyword')">
-          <el-input v-model="filterForm.keyword" :placeholder="$t('product.filter.keywordPlaceholder')" clearable style="width:160px" />
-        </el-form-item>
-        <el-form-item :label="$t('product.filter.hsCode')">
-          <el-input v-model="filterForm.hsCode" :placeholder="$t('product.filter.hsCode')" clearable style="width:120px" />
-        </el-form-item>
-        <el-form-item :label="$t('product.filter.hsCodeJp')">
-          <el-input v-model="filterForm.hsCodeJp" :placeholder="$t('product.filter.hsCodeJp')" clearable style="width:120px" />
-        </el-form-item>
-        <el-form-item :label="$t('product.filter.factoryName')">
-          <el-input v-model="filterForm.factoryName" :placeholder="$t('product.filter.factoryNamePlaceholder')" clearable style="width:120px" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="loadData">{{ $t('product.filter.search') }}</el-button>
-          <el-button @click="onReset">{{ $t('product.filter.reset') }}</el-button>
-        </el-form-item>
-      </el-form>
+      <template #header>
+        <div class="filter-header">
+          <el-form :inline="true" :model="filterForm">
+            <el-form-item :label="$t('product.filter.masterCode')">
+              <el-input v-model="filterForm.masterCode" :placeholder="$t('product.filter.masterCodePlaceholder')" clearable style="width:160px" />
+            </el-form-item>
+            <el-form-item :label="$t('product.filter.keyword')">
+              <el-input v-model="filterForm.keyword" :placeholder="$t('product.filter.keywordPlaceholder')" clearable style="width:160px" />
+            </el-form-item>
+            <el-form-item :label="$t('product.filter.hsCode')">
+              <el-input v-model="filterForm.hsCode" :placeholder="$t('product.filter.hsCode')" clearable style="width:120px" />
+            </el-form-item>
+            <el-form-item :label="$t('product.filter.hsCodeJp')">
+              <el-input v-model="filterForm.hsCodeJp" :placeholder="$t('product.filter.hsCodeJp')" clearable style="width:120px" />
+            </el-form-item>
+            <el-form-item :label="$t('product.filter.factoryName')">
+              <el-input v-model="filterForm.factoryName" :placeholder="$t('product.filter.factoryNamePlaceholder')" clearable style="width:120px" />
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="loadData">{{ $t('product.filter.search') }}</el-button>
+              <el-button @click="onReset">{{ $t('product.filter.reset') }}</el-button>
+            </el-form-item>
+          </el-form>
+          <el-button type="primary" @click="onNew">
+            <el-icon><Plus /></el-icon>{{ $t('product.newButton') }}
+          </el-button>
+        </div>
+      </template>
     </el-card>
 
     <!-- 表格 -->
@@ -636,11 +635,7 @@ loadData()
 </script>
 
 <style scoped>
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+.filter-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .drawer-content {
   padding: 0 16px;
 }

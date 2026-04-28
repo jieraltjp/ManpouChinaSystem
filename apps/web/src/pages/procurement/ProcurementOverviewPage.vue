@@ -1,13 +1,5 @@
 <template>
   <div class="page">
-    <div class="page-header">
-      <div class="header-left">
-        <el-button :icon="ArrowLeft" text @click="router.push('/base/overview')">
-          {{ $t('common.action.back') }}
-        </el-button>
-      </div>
-    </div>
-
     <div v-if="loading" class="loading-wrap">
       <el-icon class="is-loading" :size="24"><Loading /></el-icon>
     </div>
@@ -172,9 +164,9 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { ArrowLeft, Loading } from '@element-plus/icons-vue'
+import { Loading } from '@element-plus/icons-vue'
 import { orderOverviewApi, type OrderOverviewVO } from '@/api/orderOverview'
 import StatusProgressBar from './components/StatusProgressBar.vue'
 import StepCard from './components/StepCard.vue'
@@ -182,7 +174,6 @@ import StepCard from './components/StepCard.vue'
 const { t } = useI18n()
 
 const route = useRoute()
-const router = useRouter()
 
 const procurementId = computed(() => Number(route.params.procurementId))
 
@@ -280,11 +271,6 @@ function subProductSummary(demand: { subProductCode?: string; quantity?: number;
 
 <style scoped>
 .page { padding: 16px; }
-.page-header {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
-}
-.header-left { display: flex; align-items: center; gap: 8px; }
-.page-title { margin: 0; font-size: 18px; font-weight: 600; }
 .loading-wrap, .error-wrap { display: flex; justify-content: center; align-items: center; min-height: 200px; }
 .step-cards { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
 .step-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }

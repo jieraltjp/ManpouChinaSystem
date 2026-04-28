@@ -1,13 +1,5 @@
 <template>
   <div class="page">
-    <div class="page-header">
-      <div class="header-actions">
-        <el-button type="primary" @click="onNew">
-          <el-icon><Plus /></el-icon> {{ $t('inspection.newButton') }}
-        </el-button>
-      </div>
-    </div>
-
     <el-row :gutter="16" class="stats-row">
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
@@ -36,31 +28,38 @@
     </el-row>
 
     <el-card class="filter-card" shadow="never">
-      <el-form :inline="true" :model="filterForm">
-        <el-form-item :label="$t('inspection.filter.qcCode')">
-          <el-input v-model="filterForm.qcCode" :placeholder="$t('inspection.filter.qcCodePlaceholder')" clearable style="width:180px" />
-        </el-form-item>
-        <el-form-item :label="$t('inspection.filter.procurementId')">
-          <el-input-number v-model="filterForm.procurementId" :min="1" :placeholder="$t('inspection.filter.procurementIdPlaceholder')" style="width:140px" clearable />
-        </el-form-item>
-        <el-form-item :label="$t('inspection.filter.result')">
-          <el-select v-model="filterForm.result" :placeholder="$t('inspection.filter.all')" clearable style="width:120px">
-            <el-option value="PASS" :label="$t('inspection.result.pass')" />
-            <el-option value="FAIL" :label="$t('inspection.result.fail')" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('inspection.filter.status')">
-          <el-select v-model="filterForm.status" :placeholder="$t('inspection.filter.all')" clearable style="width:130px">
-            <el-option value="PENDING" :label="$t('inspection.qcStatus.pending')" />
-            <el-option value="COMPLETED" :label="$t('inspection.qcStatus.completed')" />
-            <el-option value="RETURN_REQUESTED" :label="$t('inspection.qcStatus.returnRequested')" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="onSearchFromButton">{{ $t('inspection.filter.search') }}</el-button>
-          <el-button @click="onReset">{{ $t('inspection.filter.reset') }}</el-button>
-        </el-form-item>
-      </el-form>
+      <template #header>
+        <div class="filter-header">
+          <el-form :inline="true" :model="filterForm">
+            <el-form-item :label="$t('inspection.filter.qcCode')">
+              <el-input v-model="filterForm.qcCode" :placeholder="$t('inspection.filter.qcCodePlaceholder')" clearable style="width:180px" />
+            </el-form-item>
+            <el-form-item :label="$t('inspection.filter.procurementId')">
+              <el-input-number v-model="filterForm.procurementId" :min="1" :placeholder="$t('inspection.filter.procurementIdPlaceholder')" style="width:140px" clearable />
+            </el-form-item>
+            <el-form-item :label="$t('inspection.filter.result')">
+              <el-select v-model="filterForm.result" :placeholder="$t('inspection.filter.all')" clearable style="width:120px">
+                <el-option value="PASS" :label="$t('inspection.result.pass')" />
+                <el-option value="FAIL" :label="$t('inspection.result.fail')" />
+              </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('inspection.filter.status')">
+              <el-select v-model="filterForm.status" :placeholder="$t('inspection.filter.all')" clearable style="width:130px">
+                <el-option value="PENDING" :label="$t('inspection.qcStatus.pending')" />
+                <el-option value="COMPLETED" :label="$t('inspection.qcStatus.completed')" />
+                <el-option value="RETURN_REQUESTED" :label="$t('inspection.qcStatus.returnRequested')" />
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="onSearchFromButton">{{ $t('inspection.filter.search') }}</el-button>
+              <el-button @click="onReset">{{ $t('inspection.filter.reset') }}</el-button>
+            </el-form-item>
+          </el-form>
+          <el-button type="primary" @click="onNew">
+            <el-icon><Plus /></el-icon>{{ $t('inspection.newButton') }}
+          </el-button>
+        </div>
+      </template>
     </el-card>
 
     <el-card class="table-card" shadow="never">
@@ -678,11 +677,9 @@ onMounted(() => loadData())
 
 <style scoped>
 .page { display: flex; flex-direction: column; gap: 16px; }
-.page-header { display: flex; align-items: center; justify-content: space-between; }
-.page-title { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
-.page-title::before { content: ''; display: inline-block; width: 4px; height: 20px; background: var(--color-primary); border-radius: 2px; margin-right: 10px; vertical-align: middle; }
+.filter-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
-.stats-row { margin-bottom: 4px; }
+.stats-row { margin-bottom: 0; }
 .stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }
 .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light)); border-radius: var(--radius-md) var(--radius-md) 0 0; }
 .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }

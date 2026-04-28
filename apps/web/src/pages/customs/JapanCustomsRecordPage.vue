@@ -1,8 +1,5 @@
 <template>
   <div class="page">
-    <div class="page-header">
-    </div>
-
     <!-- 统计卡片 -->
     <el-row :gutter="16" class="stats-row">
       <el-col :span="6">
@@ -407,11 +404,9 @@ watch(tableData, () => {
 
 <style scoped>
 .page { display: flex; flex-direction: column; gap: 16px; }
-.page-header { display: flex; align-items: center; justify-content: space-between; }
-.page-title { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
-.page-title::before { content: ''; display: inline-block; width: 4px; height: 20px; background: var(--color-primary); border-radius: 2px; margin-right: 10px; vertical-align: middle; }
+.filter-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
-.stats-row { margin-bottom: 4px; }
+.stats-row { margin-bottom: 0; }
 .stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }
 .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light)); border-radius: var(--radius-md) var(--radius-md) 0 0; }
 .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }

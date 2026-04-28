@@ -1,13 +1,5 @@
 <template>
   <div class="page">
-    <div class="page-header">
-      <div class="header-actions">
-        <el-button type="primary" @click="onNew">
-          <el-icon><Plus /></el-icon> {{ $t('logistics.newButton') }}
-        </el-button>
-      </div>
-    </div>
-
     <el-row :gutter="16" class="stats-row">
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
@@ -36,27 +28,34 @@
     </el-row>
 
     <el-card class="filter-card" shadow="never">
-      <el-form :inline="true" :model="filterForm">
-        <el-form-item :label="$t('logistics.filter.planType')">
-          <el-select v-model="filterForm.planType" :placeholder="$t('logistics.filter.all')" clearable style="width:140px">
-            <el-option value="SEA" :label="$t('logistics.planType.SEA')" />
-            <el-option value="AIR" :label="$t('logistics.planType.AIR')" />
-            <el-option value="CONSOLIDATION" :label="$t('logistics.planType.CONSOLIDATION')" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('logistics.filter.status')">
-          <el-select v-model="filterForm.status" :placeholder="$t('logistics.filter.all')" clearable style="width:140px">
-            <el-option value="PLANNED" :label="$t('logistics.status.PLANNED')" />
-            <el-option value="BOOKED" :label="$t('logistics.status.BOOKED')" />
-            <el-option value="IN_TRANSIT" :label="$t('logistics.status.IN_TRANSIT')" />
-            <el-option value="DELIVERED" :label="$t('logistics.status.DELIVERED')" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="onSearchFromButton">{{ $t('logistics.filter.search') }}</el-button>
-          <el-button @click="onReset">{{ $t('logistics.filter.reset') }}</el-button>
-        </el-form-item>
-      </el-form>
+      <template #header>
+        <div class="filter-header">
+          <el-form :inline="true" :model="filterForm">
+            <el-form-item :label="$t('logistics.filter.planType')">
+              <el-select v-model="filterForm.planType" :placeholder="$t('logistics.filter.all')" clearable style="width:140px">
+                <el-option value="SEA" :label="$t('logistics.planType.SEA')" />
+                <el-option value="AIR" :label="$t('logistics.planType.AIR')" />
+                <el-option value="CONSOLIDATION" :label="$t('logistics.planType.CONSOLIDATION')" />
+              </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('logistics.filter.status')">
+              <el-select v-model="filterForm.status" :placeholder="$t('logistics.filter.all')" clearable style="width:140px">
+                <el-option value="PLANNED" :label="$t('logistics.status.PLANNED')" />
+                <el-option value="BOOKED" :label="$t('logistics.status.BOOKED')" />
+                <el-option value="IN_TRANSIT" :label="$t('logistics.status.IN_TRANSIT')" />
+                <el-option value="DELIVERED" :label="$t('logistics.status.DELIVERED')" />
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="onSearchFromButton">{{ $t('logistics.filter.search') }}</el-button>
+              <el-button @click="onReset">{{ $t('logistics.filter.reset') }}</el-button>
+            </el-form-item>
+          </el-form>
+          <el-button type="primary" @click="onNew">
+            <el-icon><Plus /></el-icon>{{ $t('logistics.newButton') }}
+          </el-button>
+        </div>
+      </template>
     </el-card>
 
     <el-card class="table-card" shadow="never">
@@ -610,32 +609,9 @@ onMounted(() => loadData())
 
 <style scoped>
 .page { display: flex; flex-direction: column; gap: 16px; }
-.page-header { display: flex; align-items: center; justify-content: space-between; }
-.page-title { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
-.page-title::before { content: ''; display: inline-block; width: 4px; height: 20px; background: var(--color-primary); border-radius: 2px; margin-right: 10px; vertical-align: middle; }
+.filter-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
-.stats-row { margin-bottom: 4px; }
-.stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }
-.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light)); border-radius: var(--radius-md) var(--radius-md) 0 0; }
-.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
-.stat-content { display: flex; align-items: center; gap: 14px; }
-.stat-icon-wrap { width: 48px; height: 48px; border-radius: 50%; background: var(--color-primary-pale); display: flex; align-items: center; justify-content: center; }
-.icon-transit { animation: spin 1.5s linear infinite; }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-.stat-icon { font-size: 22px; }
-.stat-value { font-size: 26px; font-weight: 800; color: var(--text-primary); line-height: 1; font-variant-numeric: tabular-nums; }
-.stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-.product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
-.pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
-.divider-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
-
-<style scoped>
-.page { display: flex; flex-direction: column; gap: 16px; }
-.page-header { display: flex; align-items: center; justify-content: space-between; }
-.page-title { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
-.page-title::before { content: ''; display: inline-block; width: 4px; height: 20px; background: var(--color-primary); border-radius: 2px; margin-right: 10px; vertical-align: middle; }
-.filter-card :deep(.el-card__body) { padding-bottom: 0; }
-.stats-row { margin-bottom: 4px; }
+.stats-row { margin-bottom: 0; }
 .stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }
 .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light)); border-radius: var(--radius-md) var(--radius-md) 0 0; }
 .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
