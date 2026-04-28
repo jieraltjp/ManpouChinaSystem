@@ -934,7 +934,7 @@ onMounted(() => {
     formData.japanLead = (route.query.japanLead as string) || ''
     formData.quantity = Number(route.query.quantity) || 1
     dialogVisible.value = true
-    router.replace({ path: '/procurement/order' })
+    router.replace({ path: '/procurement/procurement' })
   }
 })
 

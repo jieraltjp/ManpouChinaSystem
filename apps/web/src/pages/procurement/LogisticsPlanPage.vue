@@ -525,7 +525,7 @@ function onCreateCustoms(row: LogisticsPlanVO) {
     ElMessage.warning(t('logistics.message.containerNoRequiredForCustoms'))
     return
   }
-  router.push('/procurement/customs?containerNo=' + encodeURIComponent(row.containerNo))
+  router.push('/procurement/domestic-customs?containerNo=' + encodeURIComponent(row.containerNo))
 }
 
 async function onEdit(row: LogisticsPlanVO) {

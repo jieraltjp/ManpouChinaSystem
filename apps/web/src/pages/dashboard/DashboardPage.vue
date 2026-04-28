@@ -101,7 +101,7 @@
         <span>{{ $t('dashboard.shortcut.title') }}</span>
       </template>
       <el-space wrap>
-        <el-button type="primary" @click="$router.push('/procurement/order')">
+        <el-button type="primary" @click="$router.push('/procurement/procurement')">
           <el-icon><Document /></el-icon>
           {{ $t('dashboard.shortcut.orderManagement') }}
         </el-button>
