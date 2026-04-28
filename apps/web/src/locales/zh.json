@@ -272,6 +272,7 @@
       "japanLead": "日本担当",
       "chinaLead": "中国担当",
       "destination": "发送目的地",
+      "createBy": "创建人",
       "createTime": "创建时间",
       "updateBy": "修改人",
       "updateTime": "更新时间",
