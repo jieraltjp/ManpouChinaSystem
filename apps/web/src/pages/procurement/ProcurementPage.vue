@@ -99,7 +99,7 @@
         </el-table-column>
         <el-table-column :label="$t('order.column.category')" min-width="100" align="center">
           <template #default="{ row }">
-            <span>{{ getCategoryLabel(row.productCode) }}</span>
+            <span>{{ $t('product.category.' + getCategoryLabel(row.productCode)) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="factoryName" :label="$t('order.column.factoryName')" min-width="140" show-overflow-tooltip />
@@ -152,7 +152,7 @@
         <el-descriptions-item :label="$t('order.drawer.factory')">{{ currentRow.factoryName || (currentRow.factoryId ? `ID:${currentRow.factoryId}` : '-') }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.productCode')">{{ currentRow.productCode }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.subProductCode')">{{ currentRow.subProductCode || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('order.drawer.category')">{{ getCategoryLabel(currentRow.productCode) }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.category')">{{ $t('product.category.' + getCategoryLabel(currentRow.productCode)) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.quantity')">{{ currentRow.quantity }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.material')">{{ currentRow.material || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.requiresQc')">{{ currentRow.requiresQc ? $t('order.drawer.yes') : $t('order.drawer.no') }}</el-descriptions-item>
