@@ -520,13 +520,6 @@ function onView(row: LogisticsPlanVO) {
   drawerVisible.value = true
 }
 
-function onCreateCustoms(row: LogisticsPlanVO) {
-  if (!row.containerNo) {
-    ElMessage.warning(t('logistics.message.containerNoRequiredForCustoms'))
-    return
-  }
-  router.push('/procurement/domestic-customs?containerNo=' + encodeURIComponent(row.containerNo))
-}
 
 async function onEdit(row: LogisticsPlanVO) {
   editId.value = row.id
