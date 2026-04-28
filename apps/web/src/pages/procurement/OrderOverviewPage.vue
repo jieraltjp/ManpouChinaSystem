@@ -57,11 +57,9 @@
           </template>
         </el-table-column>
         <!-- 操作 -->
-        <el-table-column :label="$t('orderOverview.column.action')" min-width="260" align="center">
+        <el-table-column :label="$t('orderOverview.column.action')" min-width="80" align="center">
           <template #default="{ row }">
-            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('common.view') }}</el-button>
-            <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('demand.action.edit') }}</el-button>
-            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
+            <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('orderOverview.action.view') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -100,7 +98,7 @@
           <el-descriptions-item :label="$t('orderOverview.column.demandCreateTime')">{{ currentRow.demandCreateTime || '-' }}</el-descriptions-item>
         </el-descriptions>
         <div class="drawer-footer">
-          <el-button type="primary" @click="router.push('/base/overview/demand/' + currentRow.demandId)">{{ $t('orderOverview.action.viewDetail') }}</el-button>
+          <el-button type="primary" @click="drawerVisible = false; router.push('/base/overview/demand/' + currentRow!.demandId)">{{ $t('orderOverview.action.viewDetail') }}</el-button>
         </div>
       </div>
     </el-drawer>
