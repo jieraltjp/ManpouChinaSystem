@@ -226,6 +226,7 @@
     "column": {
       "productCode": "主货号",
       "subProductCode": "子货号",
+      "category": "商品分类",
       "factoryName": "关联工厂",
       "quantity": "数量",
       "estimatedPriceJpy": "估算批发价(JPY)",
@@ -270,6 +271,7 @@
       "factory": "关联工厂",
       "productCode": "商品代码",
       "subProductCode": "子货号",
+      "category": "商品分类",
       "quantity": "数量",
       "material": "材质",
       "requiresQc": "需要检测",

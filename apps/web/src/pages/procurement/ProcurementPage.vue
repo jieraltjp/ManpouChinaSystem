@@ -97,6 +97,11 @@
             <span class="product-code">{{ row.subProductCode || '—' }}</span>
           </template>
         </el-table-column>
+        <el-table-column :label="$t('order.column.category')" min-width="100" align="center">
+          <template #default="{ row }">
+            <span>{{ getCategoryLabel(row.productCode) }}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="factoryName" :label="$t('order.column.factoryName')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="quantity" :label="$t('order.column.quantity')" min-width="80" align="right" />
         <el-table-column :label="$t('order.column.estimatedPriceJpy')" min-width="150" align="right">
@@ -104,9 +109,6 @@
             {{ row.estimatedPriceJpy ? row.estimatedPriceJpy.toLocaleString() : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="customerCompany" :label="$t('order.column.customerCompany')" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="productLead" :label="$t('order.column.productLead')" min-width="100" />
-        <el-table-column prop="plannedShipDate" :label="$t('order.column.plannedShipDate')" min-width="130" />
         <el-table-column prop="leadTimeDays" :label="$t('order.column.leadTimeDays')" min-width="100" align="center">
           <template #default="{ row }">{{ row.leadTimeDays ? `${row.leadTimeDays}天` : '-' }}</template>
         </el-table-column>
@@ -150,6 +152,7 @@
         <el-descriptions-item :label="$t('order.drawer.factory')">{{ currentRow.factoryName || (currentRow.factoryId ? `ID:${currentRow.factoryId}` : '-') }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.productCode')">{{ currentRow.productCode }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.subProductCode')">{{ currentRow.subProductCode || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.category')">{{ getCategoryLabel(currentRow.productCode) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.quantity')">{{ currentRow.quantity }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.material')">{{ currentRow.material || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.requiresQc')">{{ currentRow.requiresQc ? $t('order.drawer.yes') : $t('order.drawer.no') }}</el-descriptions-item>
@@ -448,6 +451,7 @@ import { Plus, Clock, CircleCheck, Warning, Document, Edit } from '@element-plus
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest, BILLING_TYPE_OPTIONS } from '@/api/procurement'
 import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest } from '@/api/factory'
 import { demandApi, type DemandPageVO } from '@/api/demand'
+import { productApi } from '@/api/product'
 import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
@@ -509,6 +513,27 @@ async function loadDemands() {
     const res = await demandApi.list({ page: 0, pageSize: 200, status: 'PENDING' })
     demandOptions.value = (res.data.data as { content: DemandPageVO[] })?.content ?? []
   } catch { /* handled by interceptor */ }
+}
+
+// 商品分类映射（productCode → category）
+const productCategoryMap = ref<Record<string, string>>({})
+function getCategoryLabel(code: string): string {
+  if (!code) return '-'
+  return productCategoryMap.value[code] || '-'
+}
+async function fetchProductCategories(rows: ProcurementPageVO[]) {
+  const codes = [...new Set(rows.map(r => r.productCode).filter(Boolean))]
+  if (!codes.length) return
+  const results = await Promise.allSettled(
+    codes.map(code => productApi.getByCode(code))
+  )
+  const map: Record<string, string> = {}
+  results.forEach((r, i) => {
+    if (r.status === 'fulfilled') {
+      map[codes[i]] = r.value.data.data?.category || '-'
+    }
+  })
+  productCategoryMap.value = { ...productCategoryMap.value, ...map }
 }
 
 /** 选中需求 → 自动带入 productCode / subProductCode / destination / japanLead / quantity */
@@ -711,6 +736,7 @@ async function loadData() {
     const payload = res.data.data as { content: ProcurementPageVO[]; totalElements: number }
     tableRows.value = payload?.content ?? []
     pagination.total = payload?.totalElements ?? 0
+    fetchProductCategories(tableRows.value)
     // 删除后若当前页越界，回退到第1页
     if (tableRows.value.length === 0 && pagination.total > 0 && pagination.page > 1) {
       pagination.page = 1

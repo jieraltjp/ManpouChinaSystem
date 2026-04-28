@@ -226,6 +226,7 @@
     "column": {
       "productCode": "主品番",
       "subProductCode": "子品番",
+      "category": "商品分類",
       "factoryName": "関連工場",
       "quantity": "数量",
       "estimatedPriceJpy": "見積もり卸値(JPY)",
@@ -270,6 +271,7 @@
       "factory": "関連工場",
       "productCode": "商品コード",
       "subProductCode": "子品番",
+      "category": "商品分類",
       "quantity": "数量",
       "material": "材質",
       "requiresQc": "検品要",
