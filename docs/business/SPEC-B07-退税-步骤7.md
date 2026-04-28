@@ -4,7 +4,7 @@
 > **创建**: 2026-04-22
 > **更新**: 2026-04-27（v1.2.0：修正触发规则为手动创建；原「JapanClear → 自动创建」为错误描述，代码中无对应实现）
 > **状态**: ✅ 已实现（手动创建）
-> **对应前端**: `TaxRefundPage.vue` · `docs/ui/pages/07-tax-refund.md`
+> **对应前端**: `TaxRefundRecordPage.vue` · `docs/ui/pages/07-tax-refund.md`
 > **前置**: JapanCustomsRecord.status = CLEARED（货物抵达日本）
 > **后续**: SalesRecord（步骤8）/ FinanceRecord
 
@@ -85,7 +85,7 @@ public enum TaxRefundStatus {
 
 ## 4. 触发规则（v1.2.0 修正）
 
-**手动创建**：用户在 TaxRefundPage 点击「新建」，录入退税信息。
+**手动创建**：用户在 TaxRefundRecordPage 点击「新建」，录入退税信息。
 
 > ⚠️ 原「JapanCustomsRecord.status = CLEARED → 自动创建 TaxRefundRecord」为错误描述，
 > 代码中无对应事件+监听器实现，已修正为手动创建。
@@ -127,7 +127,7 @@ DELETE /api/v1/tax-refunds/{id}            # 软删除（终态禁止删除）
 - [x] ✅ `TaxRefundUseCase` 用例服务（含理论退税计算）
 - [x] ✅ `TaxRefundController` REST 控制器（`/api/v1/tax-refunds`）
 - [x] ✅ `@/api/taxRefund.ts` 前端 API 客户端
-- [x] ✅ `TaxRefundPage.vue` 页面（`apps/web/src/pages/finance/TaxRefundPage.vue`）
+- [x] ✅ `TaxRefundRecordPage.vue` 页面（`apps/web/src/pages/finance/TaxRefundRecordPage.vue`）
 - [x] ✅ DB migration `V13__tax_refund_record_table.sql`
 - [x] ✅ 聚合接口 `GET /api/v1/orders/{id}/overview` step7 集成（`OrderOverviewUseCase`）
 - [ ] 🔴 `TaxRefundUseCaseTest` 单元测试（含理论计算验证）

@@ -146,15 +146,15 @@ public enum LogisticsStatus {
 
 ## 5. 触发规则（v1.3.0 修正）
 
-**不自动触发，由用户在 LogisticsPage 手动发起报关。**
+**不自动触发，由用户在 LogisticsPlanPage 手动发起报关。**
 
 > 原因：1货柜 = N 个 LogisticsPlan = N 个 DomesticCustomsRecord（按商品+工厂分组），自动触发无法正确处理多计划场景。
 
 **操作路径**：
 ```
-LogisticsPage → 选中某货柜号下的计划 → 点击「创建报关」
-    → 跳转 /procurement/customs?containerNo=XXX
-    → CustomsPage 自动填入货柜号，用户按商品+工厂分别创建报关单
+LogisticsPlanPage → 选中某货柜号下的计划 → 点击「创建报关」
+    → 跳转 /procurement/domestic-customs?containerNo=XXX
+    → DomesticCustomsPage 自动填入货柜号，用户按商品+工厂分别创建报关单
 ```
 
 - **检品合格后** → 可创建 LogisticsPlan
@@ -196,7 +196,7 @@ DELETE /api/v1/consolidation-pools/{poolId}/items/{itemId}
 - [x] ✅ `LogisticsPlanController` REST 控制器
 - [x] ✅ `LogisticsPlanUseCaseTest` 单元测试（12个用例，全部通过）
 - [x] ✅ `@/api/logistics.ts` 前端 API 客户端（v1.2.0 qcRecordId 类型）
-- [x] ✅ `LogisticsPage.vue` 页面（v1.2.0 验货记录下拉替代采购单下拉）
+- [x] ✅ `LogisticsPlanPage.vue` 页面（v1.2.0 验货记录下拉替代采购单下拉）
 - [ ] 🔴 `Container` 聚合根实体
 - [ ] 🔴 `ConsolidationPool` 聚合根实体
 - [ ] 🔴 `ConsolidationPoolItem` 聚合根实体

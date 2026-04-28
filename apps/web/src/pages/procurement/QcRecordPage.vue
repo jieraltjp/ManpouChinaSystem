@@ -462,7 +462,7 @@ async function loadData() {
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {
-    console.error('[InspectionPage] loadData failed', e)
+    console.error('[QcRecordPage] loadData failed', e)
     ElMessage.error(t('inspection.message.loadFailed'))
   } finally {
     loading.value = false
@@ -555,7 +555,7 @@ async function onSubmit() {
       ElMessage.success(t('inspection.message.updateSuccess'))
     } else {
       // 创建模式
-      console.log('[InspectionPage] CREATE mode')
+      console.log('[QcRecordPage] CREATE mode')
       await inspectionApi.create({
         procurementId: form.procurementId!,
         productCode: form.productCode,
@@ -657,7 +657,7 @@ async function onDelete(row: QcRecordVO) {
     ElMessage.success(t('inspection.message.deleteSuccess'))
     loadData()
   } catch (e) {
-    console.error('[InspectionPage] delete failed', e)
+    console.error('[QcRecordPage] delete failed', e)
     ElMessage.error(t('inspection.message.deleteFailed') || t('inspection.message.actionFailed'))
   }
 }

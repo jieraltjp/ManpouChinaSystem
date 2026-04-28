@@ -316,7 +316,7 @@ async function loadData() {
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {
-    console.error('[CustomsPage] loadData failed', e)
+    console.error('[DomesticCustomsPage] loadData failed', e)
     ElMessage.error(t('customs.message.loadFailed'))
   } finally {
     loading.value = false
@@ -362,7 +362,7 @@ async function onSubmitForm() {
     dialogVisible.value = false
     loadData()
   } catch (e) {
-    console.error('[CustomsPage] onSubmitForm failed', e)
+    console.error('[DomesticCustomsPage] onSubmitForm failed', e)
     ElMessage.error(t('customs.message.createFailed'))
   } finally {
     submitting.value = false
@@ -381,7 +381,7 @@ async function onSubmit(row: CustomsVO) {
     ElMessage.success(t('customs.message.submitSuccess'))
     loadData()
   } catch (e) {
-    console.error('[CustomsPage] submit failed', e)
+    console.error('[DomesticCustomsPage] submit failed', e)
     ElMessage.error(t('customs.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -395,7 +395,7 @@ async function onClear(row: CustomsVO) {
     ElMessage.success(t('customs.message.clearSuccess'))
     loadData()
   } catch (e) {
-    console.error('[CustomsPage] clear failed', e)
+    console.error('[DomesticCustomsPage] clear failed', e)
     ElMessage.error(t('customs.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -417,7 +417,7 @@ async function onRejectConfirm() {
     rejectDialogVisible.value = false
     loadData()
   } catch (e) {
-    console.error('[CustomsPage] reject failed', e)
+    console.error('[DomesticCustomsPage] reject failed', e)
     ElMessage.error(t('customs.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -439,7 +439,7 @@ async function onDelete(row: CustomsVO) {
     ElMessage.success(t('customs.message.deleteSuccess'))
     loadData()
   } catch (e) {
-    console.error('[CustomsPage] delete failed', e)
+    console.error('[DomesticCustomsPage] delete failed', e)
     ElMessage.error(t('customs.message.actionFailed'))
   } finally {
     actionLoading.value = ''

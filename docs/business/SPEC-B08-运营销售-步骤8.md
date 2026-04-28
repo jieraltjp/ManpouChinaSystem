@@ -5,8 +5,8 @@
 > **更新**: 2026-04-27（v1.3.0：修正 estimatedPriceJpy 字段——实际 Entity 不存在，移除；同步实现清单）
 > **更新**: 2026-04-23（v1.2.0：实现 JapanCustoms→SalesRecord 自动创建 + SalesRecord→ReplenishmentDemand 反馈循环 + SalesChannel 枚举）
 > **状态**: ✅ 已实现
-> **路由**: `/sales/operations`
-> **对应前端**: `SalesOperationsPage.vue` · `docs/ui/pages/08-sales.md`
+> **路由**: `/sales/sales-record`
+> **对应前端**: `SalesRecordPage.vue` · `docs/ui/pages/08-sales.md`
 > **前置**: TaxRefundRecord / JapanCustomsRecord 已完成
 > **反馈**: 步骤8 → 步骤1（补货需求 / 新品立项）
 
@@ -179,7 +179,7 @@ DELETE /api/v1/sales-records/{id}                   # 删除（非终态）
 - [x] ✅ `SalesRecordUseCase` 用例服务（含库存管理 + 退货率计算）
 - [x] ✅ `SalesRecordController` REST 控制器（`/api/v1/sales-records`）
 - [x] ✅ `@/api/salesOperations.ts` 前端 API 客户端
-- [x] ✅ `SalesOperationsPage.vue` 页面（`apps/web/src/pages/sales/SalesOperationsPage.vue`）
+- [x] ✅ `SalesRecordPage.vue` 页面（`apps/web/src/pages/sales/SalesRecordPage.vue`）
 - [x] ✅ DB migration `V14__sales_record_table.sql`
 - [x] ✅ 聚合接口 `GET /api/v1/orders/{id}/overview` step8 集成（`OrderOverviewUseCase`）
 - [x] ✅ `SalesChannel` 枚举（AMAZON / MERCALI / SELF_SITE / OTHER）

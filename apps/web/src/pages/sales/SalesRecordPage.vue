@@ -390,7 +390,7 @@ async function loadData() {
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {
-    console.error('[SalesOperationsPage] loadData failed', e)
+    console.error('[SalesRecordPage] loadData failed', e)
     ElMessage.error(t('sales.message.loadFailed'))
   } finally {
     loading.value = false
@@ -458,7 +458,7 @@ async function onCreateConfirm() {
     loadData()
     loadAlertCount()
   } catch (e) {
-    console.error('[SalesOperationsPage] create failed', e)
+    console.error('[SalesRecordPage] create failed', e)
     ElMessage.error(t('sales.message.createFailed'))
   } finally {
     saveLoading.value = false
@@ -485,7 +485,7 @@ async function onStockConfirm() {
     loadData()
     loadAlertCount()
   } catch (e) {
-    console.error('[SalesOperationsPage] updateStock failed', e)
+    console.error('[SalesRecordPage] updateStock failed', e)
     ElMessage.error(t('sales.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -501,7 +501,7 @@ async function onDiscontinue(row: SalesRecordVO) {
     loadData()
     loadAlertCount()
   } catch (e) {
-    console.error('[SalesOperationsPage] discontinue failed', e)
+    console.error('[SalesRecordPage] discontinue failed', e)
     ElMessage.error(t('sales.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -516,7 +516,7 @@ async function onRelist(row: SalesRecordVO) {
     loadData()
     loadAlertCount()
   } catch (e) {
-    console.error('[SalesOperationsPage] relist failed', e)
+    console.error('[SalesRecordPage] relist failed', e)
     ElMessage.error(t('sales.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -538,7 +538,7 @@ async function onDelete(row: SalesRecordVO) {
     loadData()
     loadAlertCount()
   } catch (e) {
-    console.error('[SalesOperationsPage] delete failed', e)
+    console.error('[SalesRecordPage] delete failed', e)
     ElMessage.error(t('sales.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -551,7 +551,7 @@ async function onShowAlerts() {
     const res = await salesOperationsApi.alerts({ page: 0, pageSize: 100 })
     alertData.value = res.data.data?.content ?? []
   } catch (e) {
-    console.error('[SalesOperationsPage] load alerts failed', e)
+    console.error('[SalesRecordPage] load alerts failed', e)
   }
 }
 

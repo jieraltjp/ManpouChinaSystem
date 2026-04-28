@@ -84,7 +84,7 @@ apps/web/
 | 登录页 | ✅ | 渐变背景 + 表单验证 |
 | 仪表盘 | ✅ | JWT Claims 显示 + 重新登录 |
 | 示例 CRUD | ✅ | 对接 user-service 示例 API |
-| 发注单管理 | ✅ | `/procurement/order`（OrderPage.vue）— 完整 CRUD + 需求带入 + 工厂选择 + 筛选 + 分页 + 详情抽屉 |
+| 发注单管理 | ✅ | `/procurement/procurement`（ProcurementPage.vue）— 完整 CRUD + 需求带入 + 工厂选择 + 筛选 + 分页 + 详情抽屉 |
 | Element Plus | ✅ | 组件库引入 |
 
 ---
@@ -97,9 +97,9 @@ apps/web/
 | 仪表盘 | `/dashboard` | DashboardPage | ✅ |
 | 示例列表 | `/examples` | ExamplesPage | ✅ |
 | 补货需求 | `/procurement/demand` | DemandPage | ✅ |
-| 发注单管理 | `/procurement/order` | OrderPage | ✅ |
-| 验货记录 | `/procurement/inspection` | InspectionPage | ✅ |
-| 调配计划 | `/procurement/logistics` | LogisticsPage | ✅ |
+| 发注单管理 | `/procurement/procurement` | ProcurementPage | ✅ |
+| 验货记录 | `/procurement/qc-record` | QcRecordPage | ✅ |
+| 调配计划 | `/procurement/logistics-plan` | LogisticsPlanPage | ✅ |
 | 仓储列表 | `/warehouse` | WarehouseListPage | 🔴 待实现 |
 | 报关管理 | `/customs` | CustomsListPage | 🔴 待实现 |
 | 物流管理 | `/logistics` | LogisticsListPage | 🔴 待实现 |
@@ -107,7 +107,7 @@ apps/web/
 | 商品管理 | `/product` | ProductListPage | 🔴 待实现 |
 | 用户管理 | `/user` | UserListPage | 🔴 待实现 |
 
-> 发注管理 4 个子页面：`/procurement/demand`（补货需求）、`/procurement/order`（发注单）、`/procurement/inspection`（验货记录）、`/procurement/logistics`（调配计划），均已完整实现并对接真实 API。
+> 发注管理 4 个子页面：`/procurement/demand`（补货需求）、`/procurement/procurement`（发注单）、`/procurement/qc-record`（验货记录）、`/procurement/logistics-plan`（调配计划），均已完整实现并对接真实 API。
 
 ---
 

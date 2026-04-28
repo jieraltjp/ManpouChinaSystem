@@ -371,7 +371,7 @@ async function loadData() {
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } catch (e) {
-    console.error('[LogisticsPage] loadData failed', e)
+    console.error('[LogisticsPlanPage] loadData failed', e)
     ElMessage.error(t('logistics.message.loadFailed'))
   } finally {
     loading.value = false
@@ -401,7 +401,7 @@ async function loadQcRecordOptions() {
     const res = await inspectionApi.list({ page: 0, pageSize: 100, result: 'PASS' })
     qcRecordOptions.value = res.data.data?.content ?? []
   } catch (e) {
-    console.error('[LogisticsPage] loadQcRecordOptions failed', e)
+    console.error('[LogisticsPlanPage] loadQcRecordOptions failed', e)
     qcRecordOptions.value = []
   } finally {
     qcRecordLoading.value = false
@@ -420,7 +420,7 @@ async function loadFactoryOptions() {
     const res = await factoryApi.list({ page: 0, pageSize: 200 })
     factoryOptions.value = res.data.data?.content ?? []
   } catch (e) {
-    console.error('[LogisticsPage] loadFactoryOptions failed', e)
+    console.error('[LogisticsPlanPage] loadFactoryOptions failed', e)
     factoryOptions.value = []
   }
 }
@@ -480,7 +480,7 @@ async function onSubmit() {
         actualShipDate: form.actualShipDate || undefined,
         remarks: form.remarks || undefined,
       }
-      console.log('[LogisticsPage] update payload:', JSON.stringify(payload))
+      console.log('[LogisticsPlanPage] update payload:', JSON.stringify(payload))
       await logisticsApi.update(editId.value, payload)
       ElMessage.success(t('logistics.message.updateSuccess'))
     } else {
@@ -508,7 +508,7 @@ async function onSubmit() {
     editId.value = null
     loadData()
   } catch (e) {
-    console.error('[LogisticsPage] onSubmit failed', e)
+    console.error('[LogisticsPlanPage] onSubmit failed', e)
     ElMessage.error(t(editId.value ? 'logistics.message.updateFailed' : 'logistics.message.createFailed'))
   } finally {
     submitting.value = false
@@ -592,7 +592,7 @@ async function onDelete(row: LogisticsPlanVO) {
     ElMessage.success(t('logistics.message.deleteSuccess'))
     loadData()
   } catch (e) {
-    console.error('[LogisticsPage] delete failed', e)
+    console.error('[LogisticsPlanPage] delete failed', e)
     ElMessage.error(t('logistics.message.deleteFailed') || t('common.error.actionFailed'))
   }
 }

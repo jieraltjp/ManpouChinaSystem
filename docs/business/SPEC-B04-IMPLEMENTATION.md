@@ -137,5 +137,5 @@ Body: { ..., "containerNo": "SBKU1234567" }
 | `LogisticsPlanJpaRepository.java` | +findByContainerNoContaining |
 | `LogisticsPlanUseCase.java` | pageQuery 支持 containerNo 筛选 |
 | `@/api/logistics.ts` | LogisticsPlanVO +containerNo |
-| `LogisticsPage.vue` | 表格列 + 弹窗字段 + 抽屉字段 |
+| `LogisticsPlanPage.vue` | 表格列 + 弹窗字段 + 抽屉字段 |
 | `zh.json / ja.json` | 翻译 |

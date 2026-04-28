@@ -500,7 +500,7 @@ export function useOrderOverview(procurementId: Ref<number>) {
 3. 创建调配按钮（验货 PASS 且无 logisticsPlan 时显示）
 
 ### Phase 4 — 体验优化（P2）✅ 已完成
-1. 列表页「总览」按钮（ProcurementPage / InspectionPage / LogisticsPage）
+1. 列表页「总览」按钮（ProcurementPage / QcRecordPage / LogisticsPlanPage）
 
 ### Phase 5 — Demand 中心化（P0）✅ v1.3.0 已完成
 1. `OrderDemandSelectorDTO.java`（新建 Demand 选择器 DTO）
@@ -527,7 +527,7 @@ export function useOrderOverview(procurementId: Ref<number>) {
 | 前端 Step1 卡片适配 v2.0.0 | P0 | DemandVO 直接字段（subProductCode/quantity/destination） | 🟢 已完成 |
 | Phase 5 Demand 中心化 | P0 | 双入口架构 | 🟢 已完成 |
 | JapanCustomsRecord subProductCode | P2 | DB 迁移 + 实体 + Assembler | ✅ 已完成（v1.6.1） |
-| v2.0.0 前端类型同步 | P0 | OrderPage/DemandPage subProductItems → 直接字段 | ✅ 已完成（v1.6.0） |
+| v2.0.0 前端类型同步 | P0 | ProcurementPage/DemandPage subProductItems → 直接字段 | ✅ 已完成（v1.6.0） |
 | DemandOverviewVO 独立 DTO | P0 | Demand 锚点专用 VO，与 OrderOverviewPageVO 解耦 | ✅ 已完成（v1.6.0） |
 | 前端 i18n 枚举本地化 | P0 | 8步所有 status/enum 值通过 t() 渲染，非原始字符串 | ✅ 已完成（v1.6.0） |
 

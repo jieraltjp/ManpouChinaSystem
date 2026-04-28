@@ -3,12 +3,12 @@
 > **版本**: 1.2.0
 > **创建**: 2026-04-22
 > **更新**: 2026-04-27（v1.2.0：新增货柜号字段，列表/弹窗/抽屉三处）
-> **状态**: ✅（LogisticsController + LogisticsPage.vue 完整实现）
+> **状态**: ✅（LogisticsController + LogisticsPlanPage.vue 完整实现）
 > **对应业务步号**: 04（调配计划）
 > **对应业务文档**: `docs/business/SPEC-B04-调配计划-步骤4.md`
 > **对应数据库文档**: `docs/database/DB-04-logistics.md`
-> **对应前端组件**: `LogisticsPage.vue`
-> **对应路由**: `/procurement/logistics`（侧边栏入口）
+> **对应前端组件**: `LogisticsPlanPage.vue`
+> **对应路由**: `/procurement/logistics-plan`（侧边栏入口）
 
 ---
 

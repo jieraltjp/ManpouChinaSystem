@@ -121,8 +121,8 @@
 | 52 | 2026-04-27 /procurement/demand dist 时间差审计 |
 | 53 | 2026-04-27 zh.json / ja.json 重复 key 修复 |
 | 54 | 2026-04-27 全局样式修复漏扫审计 |
-| 55 | 2026-04-27 InspectionPage el-input-number 列宽截断修复 |
-| 56 | 2026-04-27 InspectionPage dialog 无必要 divider 移除 |
+| 55 | 2026-04-27 QcRecordPage el-input-number 列宽截断修复 |
+| 56 | 2026-04-27 QcRecordPage dialog 无必要 divider 移除 |
 | 57 | 2026-04-27 LogisticsPlan procurementId → qcRecordId 业务锚点修正 |
-| 58 | 2026-04-27 LogisticsPage el-input-number 按钮截断宽度计算修正 |
+| 58 | 2026-04-27 LogisticsPlanPage el-input-number 按钮截断宽度计算修正 |
 | 59 | 2026-04-28 DemandStatus CONFIRMED 新增 + Flyway 禁用项目 @PostConstruct 幂等迁移组件 |

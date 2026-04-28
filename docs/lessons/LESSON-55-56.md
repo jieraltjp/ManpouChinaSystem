@@ -1,7 +1,7 @@
 # LESSON 55-56 — 表单 el-input-number 布局宽度 + dialog 紧凑设计
 
 > **日期**: 2026-04-27
-> **触发**: InspectionPage.vue 新规验货弹窗中 `el-input-number` 加减按钮显示异常
+> **触发**: QcRecordPage.vue 新规验货弹窗中 `el-input-number` 加减按钮显示异常
 > **根因**: `el-input-number` 所在列宽度（span 4 = 约 133px）不足以容纳「标签 + 输入框 + 两侧按钮」，按钮被截断
 
 ---
@@ -31,7 +31,7 @@ el-input-number span 最小值 ≈ 4（当 dialog width=800, gutter=10, label-wi
 
 ### 手术
 
-InspectionPage.vue 新规弹窗：
+QcRecordPage.vue 新规弹窗：
 - 改为 span 6（3列一行），content ≈ 200px
 - 弹窗宽度 680 → 820px
 - label-width 100 → 86px
@@ -46,7 +46,7 @@ InspectionPage.vue 新规弹窗：
 
 ### 手术
 
-InspectionPage.vue 新规弹窗移除两个 `el-divider`：
+QcRecordPage.vue 新规弹窗移除两个 `el-divider`：
 - ❌ 删除 `验货信息` 分隔线
 - ❌ 删除 `货物信息` 分隔线
 

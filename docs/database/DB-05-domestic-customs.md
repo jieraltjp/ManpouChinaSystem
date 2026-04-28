@@ -3,7 +3,7 @@
 > **版本**: 1.3.0
 > **创建**: 2026-04-22
 > **更新**: 2026-04-27（v1.3.0：增加 container_no 字段，实现货柜级聚合；V36 迁移待执行）
-> **更新**: 2026-04-24（v1.3.0：全量实现已确认，修正为 ✅ 已实现；修正代码文件名DomesticCustomsRepository/customs.ts/CustomsPage.vue）
+> **更新**: 2026-04-24（v1.3.0：全量实现已确认，修正为 ✅ 已实现；修正代码文件名DomesticCustomsRepository/customs.ts/DomesticCustomsPage.vue）
 > **更新**: 2026-04-24（修正状态：仅聚合根+枚举已实现，UseCase/Controller/前端均未实现，修正为🔴未实现）
 > **更新**: 2026-04-23（对齐 V17 迁移 + 实体实现）
 > **状态**: ✅ 已实现（含 v1.3.0 container_no 字段待迁移）
@@ -93,7 +93,7 @@ CREATE TABLE domestic_customs_record (
 - [x] ✅ `CustomsUseCase` 用例服务
 - [x] ✅ `CustomsController` REST 控制器（`/api/v1/customs`）
 - [x] ✅ `@/api/customs.ts` 前端 API 客户端
-- [x] ✅ `CustomsPage.vue` 前端页面
+- [x] ✅ `DomesticCustomsPage.vue` 前端页面
 
 > ⚠️ 技术债务：`DomesticCustomsRepository` 领域接口带 `@Repository`，违反铁律25。
 > 无 `XxxJpaAdapter` 分离，Repository 直接继承 `JpaRepository`。

@@ -4,8 +4,8 @@
 > **创建**: 2026-04-22
 > **实现**: 2026-04-22
 > **状态**: ✅ 已实现
-> **路由**: `/finance/tax-refund`
-> **组件**: `TaxRefundPage.vue`（`apps/web/src/pages/finance/TaxRefundPage.vue`）
+> **路由**: `/finance/tax-refund-record`
+> **组件**: `TaxRefundRecordPage.vue`（`apps/web/src/pages/finance/TaxRefundRecordPage.vue`）
 > **后端**: `TaxRefundController` at `/api/v1/tax-refunds`
 > **前置步骤**: 步骤6（日本清关已放行 JapanCustomsRecord.status = CLEARED）
 > **后续步骤**: 步骤8（运营销售 SalesRecord）
@@ -152,7 +152,7 @@
 
 | 组件 | 职责 |
 |------|------|
-| `TaxRefundPage.vue` | 容器：列表 + 筛选 + 统计卡 |
+| `TaxRefundRecordPage.vue` | 容器：列表 + 筛选 + 统计卡 |
 | `TaxRefundTable.vue` | 表格 + 分页 |
 | `TaxRefundFormDialog.vue` | 新规/编辑表单 |
 | `TaxRefundDetailDrawer.vue` | 详情抽屉 |

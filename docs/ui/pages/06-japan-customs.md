@@ -5,7 +5,7 @@
 > **更新**: 2026-04-27（v1.2.0：移除骨架状态标注，补全统计卡/筛选栏/表格列/表单完整字段）
 > **状态**: ✅ 已完整实现
 > **路由**: `/procurement/japan-customs`
-> **组件**: `JapanCustomsPage.vue`（`apps/web/src/pages/customs/JapanCustomsPage.vue`）
+> **组件**: `JapanCustomsRecordPage.vue`（`apps/web/src/pages/customs/JapanCustomsRecordPage.vue`）
 > **后端**: `JapanCustomsController` at `/api/v1/japan-customs`
 > **前置步骤**: 步骤5（国内报关已放行 DomesticCustomsRecord.status = CLEARED）
 > **后续步骤**: 步骤7（退税 TaxRefundRecord — ✅ 已实现）
@@ -144,7 +144,7 @@
 
 | 组件 | 职责 |
 |------|------|
-| `JapanCustomsPage.vue` | 容器：列表 + 筛选 + 统计卡 |
+| `JapanCustomsRecordPage.vue` | 容器：列表 + 筛选 + 统计卡 |
 | `JapanCustomsTable.vue` | 表格 + 分页 |
 | `JapanCustomsFormDialog.vue` | 新规/编辑表单 |
 | `JapanCustomsDetailDrawer.vue` | 详情抽屉 |

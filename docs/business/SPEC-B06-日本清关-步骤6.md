@@ -4,7 +4,7 @@
 > **创建**: 2026-04-22
 > **更新**: 2026-04-24（v1.2.0：补充 subProductCode 字段，全链路子货号追踪完整）
 > **状态**: ✅ 已实现（B06 日本清关核心 CRUD + 生命周期流转 + subProductCode）
-> **对应前端**: `JapanCustomsPage.vue`（`apps/web/src/pages/customs/JapanCustomsPage.vue`）· `docs/ui/pages/06-japan-customs.md`
+> **对应前端**: `JapanCustomsRecordPage.vue`（`apps/web/src/pages/customs/JapanCustomsRecordPage.vue`）· `docs/ui/pages/06-japan-customs.md`
 > **前置**: DomesticCustomsRecord.status = CLEARED
 > **后续**: TaxRefundRecord（步骤7）— ✅ 已实现
 
@@ -129,7 +129,7 @@ PATCH  /api/v1/japan-customs/{id}/fail     # 清关失败
 - [x] ✅ `JapanCustomsUseCase` 用例服务
 - [x] ✅ `JapanCustomsController` REST 控制器
 - [x] ✅ `@/api/japanCustoms.ts` 前端 API 客户端
-- [x] ✅ `JapanCustomsPage.vue` 前端页面（`apps/web/src/pages/customs/JapanCustomsPage.vue`）
+- [x] ✅ `JapanCustomsRecordPage.vue` 前端页面（`apps/web/src/pages/customs/JapanCustomsRecordPage.vue`）
 - [x] ✅ `OrderOverviewUseCase` 已集成 JapanCustomsRecord（步骤6）
 - [x] ✅ DB迁移脚本 `V12__japan_customs_record_table.sql`
 - [ ] 🔴 `JapanCustomsUseCaseTest` 单元测试

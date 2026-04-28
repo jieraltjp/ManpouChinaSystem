@@ -2,11 +2,11 @@
 
 > **版本**: 1.3.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-27（v1.3.0：方案C——货柜级报关，containerNo 字段 + LogisticsPage 发起流程）
+> **更新**: 2026-04-27（v1.3.0：方案C——货柜级报关，containerNo 字段 + LogisticsPlanPage 发起流程）
 > **更新**: 2026-04-24（v1.2.0：全量实现已确认，与 DB-05 v1.3.0 状态对齐）
 > **更新**: 2026-04-22 — 步骤6已实现，同步更新后续状态
 > **状态**: ✅ 已实现（B05 报关单核心 CRUD + 生命周期流转 + v1.3.0 货柜级聚合）
-> **对应前端**: `CustomsPage.vue`（`apps/web/src/pages/customs/CustomsPage.vue`）· `docs/ui/pages/05-domestic-customs.md`
+> **对应前端**: `DomesticCustomsPage.vue`（`apps/web/src/pages/customs/DomesticCustomsPage.vue`）· `docs/ui/pages/05-domestic-customs.md`
 > **前置**: LogisticsPlan 已编排货柜号（containerNo）
 > **后续**: JapanCustomsRecord（步骤6）— ✅ 已实现
 
@@ -25,7 +25,7 @@
   ├── LogisticsPlan-A: 商品X / 工厂甲 / 50件
   ├── LogisticsPlan-B: 商品X / 工厂乙 / 30件
   └── LogisticsPlan-C: 商品Y / 工厂甲 / 20件
-        ↓ 操作员从 LogisticsPage 点击"创建报关"
+        ↓ 操作员从 LogisticsPlanPage 点击"创建报关"
   DomesticCustomsRecord(containerNo=TRLU1234567, productCode=商品X, factoryId=工厂甲)
   DomesticCustomsRecord(containerNo=TRLU1234567, productCode=商品Y, factoryId=工厂甲)
 ```
@@ -88,13 +88,13 @@ public enum DomesticCustomsStatus {
 
 ## 4. 触发规则（v1.3.0 修正）
 
-**规则**：由用户在 LogisticsPage 手动发起，不自动创建。
+**规则**：由用户在 LogisticsPlanPage 手动发起，不自动创建。
 
 **操作路径**：
 ```
-LogisticsPage → 选中某货柜号下的计划 → 点击"创建报关"
-    → 跳转 /procurement/customs?containerNo=TRLU1234567
-    → CustomsPage 自动填入货柜号 + 显示该货柜下已有报关记录
+LogisticsPlanPage → 选中某货柜号下的计划 → 点击"创建报关"
+    → 跳转 /procurement/domestic-customs?containerNo=TRLU1234567
+    → DomesticCustomsPage 自动填入货柜号 + 显示该货柜下已有报关记录
     → 用户按商品+工厂分别创建报关单
 ```
 
@@ -144,8 +144,8 @@ DELETE /api/v1/customs/{id}
 - [x] ✅ `CustomsUseCase` 用例服务
 - [x] ✅ `CustomsController` REST 控制器
 - [x] ✅ `@/api/customs.ts` 前端 API 客户端
-- [x] ✅ `CustomsPage.vue` 前端页面（`apps/web/src/pages/customs/CustomsPage.vue`）
-- [x] ✅ `LogisticsPage.vue` 增加"创建报关"按钮（v1.3.0）
+- [x] ✅ `DomesticCustomsPage.vue` 前端页面（`apps/web/src/pages/customs/DomesticCustomsPage.vue`）
+- [x] ✅ `LogisticsPlanPage.vue` 增加"创建报关"按钮（v1.3.0）
 - [ ] 🔴 `CustomsUseCaseTest` 单元测试
 - [x] ✅ DB迁移脚本 `V17__domestic_customs_record_table.sql`
 - [ ] 🔴 V36 迁移：`domestic_customs_record` 增加 `container_no` 字段

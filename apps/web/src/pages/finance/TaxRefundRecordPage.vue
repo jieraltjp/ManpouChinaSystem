@@ -443,7 +443,7 @@ async function onFormSubmit() {
     formDialogVisible.value = false
     loadData()
   } catch (e) {
-    console.error('[TaxRefundPage] submit failed', e)
+    console.error('[TaxRefundRecordPage] submit failed', e)
     ElMessage.error(t('taxRefund.message.actionFailed'))
   } finally {
     formSubmitting.value = false
@@ -511,7 +511,7 @@ async function loadData() {
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {
-    console.error('[TaxRefundPage] loadData failed', e)
+    console.error('[TaxRefundRecordPage] loadData failed', e)
     ElMessage.error(t('taxRefund.message.loadFailed'))
   } finally {
     loading.value = false
@@ -558,7 +558,7 @@ async function onCompleteConfirm() {
     completeDialogVisible.value = false
     loadData()
   } catch (e) {
-    console.error('[TaxRefundPage] complete failed', e)
+    console.error('[TaxRefundRecordPage] complete failed', e)
     ElMessage.error(t('taxRefund.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -573,7 +573,7 @@ async function onNoRefund(row: TaxRefundVO) {
     ElMessage.success(t('taxRefund.message.noRefundSuccess'))
     loadData()
   } catch (e) {
-    console.error('[TaxRefundPage] noRefund failed', e)
+    console.error('[TaxRefundRecordPage] noRefund failed', e)
     ElMessage.error(t('taxRefund.message.actionFailed'))
   } finally {
     actionLoading.value = ''

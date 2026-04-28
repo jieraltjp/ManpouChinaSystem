@@ -211,10 +211,10 @@ graph TB
         DASH["dashboard/DashboardPage.vue\n/dashboard"]
         EXAMPLES["dashboard/ExamplesPage.vue\n/examples"]
         DEMAND["procurement/DemandPage.vue\n/procurement/demand"]
-        ORDER["procurement/OrderPage.vue\n/procurement/order"]
-        INSPECTION["procurement/InspectionPage.vue\n/procurement/inspection"]
-        LOGISTICS["procurement/LogisticsPage.vue\n/procurement/logistics"]
-        FACTORY["工厂内嵌于 OrderPage.vue\n（无独立页面）"]
+        ORDER["procurement/ProcurementPage.vue\n/procurement/procurement"]
+        INSPECTION["procurement/QcRecordPage.vue\n/procurement/qc-record"]
+        LOGISTICS["procurement/LogisticsPlanPage.vue\n/procurement/logistics-plan"]
+        FACTORY["工厂内嵌于 ProcurementPage.vue\n（无独立页面）"]
     end
 
     subgraph Layout["布局层 layouts/"]

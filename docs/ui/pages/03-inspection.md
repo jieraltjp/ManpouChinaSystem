@@ -3,8 +3,8 @@
 > **版本**: 1.1.1
 > **创建**: 2026-04-22
 > **更新**: 2026-04-27（v1.1.1：移除 taxRefund 字段；移除 defectiveCount 输入框（后端自动计算）；新规默认值 qcType=ONSITE/qcDate=今天；弹窗宽度 680→820px；布局优化）
-> **路由**: `/procurement/inspection`
-> **组件**: `InspectionPage.vue`
+> **路由**: `/procurement/qc-record`
+> **组件**: `QcRecordPage.vue`
 > **对应后端**: `QcRecord` 聚合根
 > **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B03-验货记录-步骤3.md`
 > **前置步骤**: 步骤2（发注单 Procurement 已下单）
@@ -176,7 +176,7 @@
 | 统计卡增加状态筛选 | ✅ | ✅ 已实现 |
 | 序列号输入 | P2 | 暂不规划；QcRecord 无此字段 |
 | 缺陷照片上传 | P2 | MinIO 文件上传，显示缩略图 |
-| 创建调配预填充 | P1 | LogisticsPage.vue 解析 `fromQc` query 参数 |
+| 创建调配预填充 | P1 | LogisticsPlanPage.vue 解析 `fromQc` query 参数 |
 
 ---
 
@@ -184,7 +184,7 @@
 
 | 组件 | 职责 |
 |------|------|
-| `InspectionPage.vue` | 容器：列表 + 筛选 + 统计卡 |
+| `QcRecordPage.vue` | 容器：列表 + 筛选 + 统计卡 |
 | `InspectionFilters.vue` | 筛选栏 |
 | `InspectionTable.vue` | 表格 + 分页 |
 | `InspectionFormDialog.vue` | 新规/编辑验货表单 |

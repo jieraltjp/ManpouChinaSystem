@@ -1,7 +1,7 @@
 # 页面文档：发注单管理
 
-> **页面路径**：`/procurement/order`
-> **组件文件**：`apps/web/src/pages/procurement/OrderPage.vue`
+> **页面路径**：`/procurement/procurement`
+> **组件文件**：`apps/web/src/pages/procurement/ProcurementPage.vue`
 > **路由定义**：`apps/web/src/router/index.ts`
 > **认证要求**：需要认证（`requiresAuth: true`）
 > **数据状态**：✅ 已对接 manpou-allinone 真实 API（发注单 CRUD + 需求带入 + 工厂联动）
@@ -134,7 +134,7 @@ estimatedPriceJpy = (priceRmb / taxPoint × 1.02 × 1.2) × exchangeRate × 1.05
 ## 6. 组件结构
 
 ```
-OrderPage.vue
+ProcurementPage.vue
 ├── 页面头部
 │   ├── 标题 "发注单管理"
 │   └── "新规发注" 按钮
@@ -240,7 +240,7 @@ OrderPage.vue
 
 | 文件 | 作用 |
 |------|------|
-| `apps/web/src/pages/procurement/OrderPage.vue` | 发注单管理组件（v1.3.0，含需求带入+工厂内嵌） |
+| `apps/web/src/pages/procurement/ProcurementPage.vue` | 发注单管理组件（v1.3.0，含需求带入+工厂内嵌） |
 | `apps/web/src/api/procurement.ts` | API 类型与请求封装 |
 | `apps/manpou-allinone/.../ProcurementController.java` | 后端 REST 接口 |
 | `apps/manpou-allinone/.../ShipmentStatus.java` | 状态枚举 + FSM 规则 |

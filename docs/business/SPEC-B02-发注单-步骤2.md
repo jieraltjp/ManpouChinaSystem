@@ -247,5 +247,5 @@ DELETE /api/v1/procurements/{id}
 - [x] ✅ `FactoryUseCaseTest` 单元测试（8个用例，全部通过）
 - [x] ✅ ~~`FactorySynergyPort`~~ （v1.8.0 已移除，强耦合，已改用 DB 直传）
 - [x] ✅ `@/api/order.ts` 前端 API 客户端
-- [x] ✅ `OrderPage.vue` 页面（已对接真实 API）
+- [x] ✅ `ProcurementPage.vue` 页面（已对接真实 API）
 - [x] ✅ 工厂内嵌选择器（新建/编辑）

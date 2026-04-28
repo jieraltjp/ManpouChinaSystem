@@ -1,7 +1,7 @@
 # LESSON 58 — el-input-number 按钮截断：列宽计算未扣 padding
 
 > **日期**: 2026-04-27
-> **触发**: LogisticsPage.vue 新规调配弹窗，货物长/宽/高三列，`el-input-number` 按钮截断
+> **触发**: LogisticsPlanPage.vue 新规调配弹窗，货物长/宽/高三列，`el-input-number` 按钮截断
 > **根因**: 列宽计算仅扣了 label 和 gutter，漏扣了 `el-form-item` 上下 padding + `el-col` 侧 padding，内容区实际宽度 < 最小可用值 150px
 
 ---
@@ -74,7 +74,7 @@ el-input-number 最小可用 content 宽度 = 150px（按钮不截断）
 
 ## 手术（本次）
 
-LogisticsPage.vue 新规调配弹窗：
+LogisticsPlanPage.vue 新规调配弹窗：
 
 | 项目 | 旧值 | 新值 |
 |------|------|------|
@@ -87,7 +87,7 @@ LogisticsPage.vue 新规调配弹窗：
 
 ## 溯源
 
-- **EV-058**: LogisticsPage el-input-number 按钮截断 → Lesson 58
+- **EV-058**: LogisticsPlanPage el-input-number 按钮截断 → Lesson 58
 
 ---
 

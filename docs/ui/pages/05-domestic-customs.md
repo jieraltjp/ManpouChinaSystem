@@ -3,8 +3,8 @@
 > **版本**: 1.0.0
 > **创建**: 2026-04-22
 > **更新**: 2026-04-22 — 前端页面已实现
-> **路由**: `/procurement/customs`
-> **组件**: `CustomsPage.vue`（`apps/web/src/pages/customs/CustomsPage.vue`）
+> **路由**: `/procurement/domestic-customs`
+> **组件**: `DomesticCustomsPage.vue`（`apps/web/src/pages/customs/DomesticCustomsPage.vue`）
 > **对应后端**: `DomesticCustomsRecord` 聚合根（✅ 已实现）
 > **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B05-国内报关-步骤5.md`
 > **前置步骤**: 步骤4（调配计划已发货 LogisticsPlan.status = IN_TRANSIT）

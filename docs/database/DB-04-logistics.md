@@ -145,7 +145,7 @@ CREATE TABLE consolidation_pool (
 - [x] ✅ `LogisticsPlanAssembler` DTO 转换器（v1.2.0 新增 qcRecordId 映射）
 - [x] ✅ `LogisticsPlanUseCaseTest` 单元测试（12 个用例，全部通过）
 - [x] ✅ `@/api/logistics.ts` 前端 API 客户端（v1.2.0 qcRecordId 类型）
-- [x] ✅ `LogisticsPage.vue` 页面（v1.2.0 验货记录下拉替代采购单下拉）
+- [x] ✅ `LogisticsPlanPage.vue` 页面（v1.2.0 验货记录下拉替代采购单下拉）
 - [ ] 🔴 `Container` 聚合根实体
 - [ ] 🔴 `ConsolidationPool` 聚合根实体
 - [ ] 🔴 `ConsolidationPoolItem` 聚合根实体

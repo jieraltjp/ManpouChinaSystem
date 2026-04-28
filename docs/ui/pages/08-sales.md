@@ -4,8 +4,8 @@
 > **创建**: 2026-04-22
 > **实现**: 2026-04-22
 > **状态**: ✅ 已实现
-> **路由**: `/sales/operations`
-> **组件**: `SalesOperationsPage.vue`（`apps/web/src/pages/sales/SalesOperationsPage.vue`）
+> **路由**: `/sales/sales-record`
+> **组件**: `SalesRecordPage.vue`（`apps/web/src/pages/sales/SalesRecordPage.vue`）
 > **后端**: `SalesRecordController` at `/api/v1/sales-records`
 > **前置步骤**: 步骤7（退税 TaxRefundRecord 已完成）/ 步骤6（日本清关完成后直接上架）
 > **反馈**: 步骤8 → 步骤1（补货需求 / 新品立项）
@@ -201,7 +201,7 @@
 
 | 组件 | 职责 |
 |------|------|
-| `SalesOperationsPage.vue` | 容器：列表 + 筛选 + 统计卡 |
+| `SalesRecordPage.vue` | 容器：列表 + 筛选 + 统计卡 |
 | `SalesTable.vue` | 表格 + 分页 |
 | `SalesFilters.vue` | 筛选栏 |
 | `SalesFormDialog.vue` | 新规上架表单 |

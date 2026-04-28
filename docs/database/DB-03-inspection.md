@@ -119,4 +119,4 @@ CREATE TABLE qc_record (
 - [x] ✅ `QcRecordAssembler` DTO 转换器
 - [x] ✅ `QcRecordUseCaseTest` 单元测试（10 个用例，全部通过）
 - [x] ✅ `@/api/inspection.ts` 前端 API 客户端
-- [x] ✅ `InspectionPage.vue` 页面（已对接真实 API）
+- [x] ✅ `QcRecordPage.vue` 页面（已对接真实 API）

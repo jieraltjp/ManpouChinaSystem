@@ -279,7 +279,7 @@ async function loadData() {
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {
-    console.error('[JapanCustomsPage] loadData failed', e)
+    console.error('[JapanCustomsRecordPage] loadData failed', e)
     ElMessage.error(t('japanCustoms.message.loadFailed'))
   } finally {
     loading.value = false
@@ -309,7 +309,7 @@ async function onStart(row: JapanCustomsVO) {
     ElMessage.success(t('japanCustoms.message.startSuccess'))
     loadData()
   } catch (e) {
-    console.error('[JapanCustomsPage] start failed', e)
+    console.error('[JapanCustomsRecordPage] start failed', e)
     ElMessage.error(t('japanCustoms.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -337,7 +337,7 @@ async function onCompleteConfirm() {
     completeDialogVisible.value = false
     loadData()
   } catch (e) {
-    console.error('[JapanCustomsPage] complete failed', e)
+    console.error('[JapanCustomsRecordPage] complete failed', e)
     ElMessage.error(t('japanCustoms.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -360,7 +360,7 @@ async function onFailConfirm() {
     failDialogVisible.value = false
     loadData()
   } catch (e) {
-    console.error('[JapanCustomsPage] fail failed', e)
+    console.error('[JapanCustomsRecordPage] fail failed', e)
     ElMessage.error(t('japanCustoms.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -382,7 +382,7 @@ async function onDelete(row: JapanCustomsVO) {
     ElMessage.success(t('japanCustoms.message.deleteSuccess'))
     loadData()
   } catch (e) {
-    console.error('[JapanCustomsPage] delete failed', e)
+    console.error('[JapanCustomsRecordPage] delete failed', e)
     ElMessage.error(t('japanCustoms.message.actionFailed'))
   } finally {
     actionLoading.value = ''
