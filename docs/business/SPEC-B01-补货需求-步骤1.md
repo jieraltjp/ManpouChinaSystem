@@ -1,8 +1,8 @@
 # SPEC-B01 — 补货需求业务规格（步骤1）
 
-> **版本**: 2.0.0
+> **版本**: 2.1.0
+> **更新**: 2026-04-28（v2.1.0：DemandStatus 新增 CONFIRMED 状态 + toggle-confirm 接口 PENDING↔CONFIRMED 切换）
 > **更新**: 2026-04-24（v2.0.0：每条 Demand = 一个子货号（主货号+子货号 = 商品唯一标识））
-> **更新**: 2026-04-24（v1.6.0：子货号明细表单 — 每个子货号独立数量+目的地；转采购改为批量模式）
 > **创建**: 2026-04-22
 > **状态**: ✅ 已实现
 > **业务步号**: 01（补货需求/新品采购）
@@ -63,6 +63,7 @@ public enum DemandType {
 
 public enum DemandStatus {
     PENDING,     // 待确认（录入后默认）
+    CONFIRMED,   // 已确认（补货人员确认，可切换回 PENDING）
     CONVERTED,  // 已转采购（生成 Procurement 后推进至此）
     CANCELLED   // 已取消
 }
@@ -73,10 +74,17 @@ public enum DemandStatus {
 ## 4. 状态流转
 
 ```
-  PENDING ──[转采购]──▶ CONVERTED
+  PENDING ⇄ CONFIRMED（补货人员点击状态标签切换）
+     │
+     └──[转采购]──▶ CONVERTED
      │
      └──[取消]──▶ CANCELLED
 ```
+
+### 状态切换语义（v2.1.0）
+
+- **PENDING ↔ CONFIRMED**：补货人员在列表页点击状态标签即可切换，无需编辑表单
+- 仅 PENDING/CONFIRMED 可切换，CONVERTED/CANCELLED 为终态
 
 ### 转采购语义（v2.0.0）
 
@@ -95,10 +103,11 @@ GET    /api/v1/demands?page=&pageSize=&demandType=&productCode=&status=
 GET    /api/v1/demands/{id}
 POST   /api/v1/demands
 PATCH  /api/v1/demands/{id}
-POST   /api/v1/demands/{id}/convert    # 转采购（1:1）
-POST   /api/v1/demands/{id}/revert     # 撤销转换
+POST   /api/v1/demands/{id}/convert          # 转采购（1:1）
+POST   /api/v1/demands/{id}/revert           # 撤销转换
+POST   /api/v1/demands/{id}/toggle-confirm   # PENDING ↔ CONFIRMED 切换（v2.1.0）
 DELETE /api/v1/demands/{id}
-GET    /api/v1/demands/{id}/procurement # 查看关联的采购单
+GET    /api/v1/demands/{id}/procurement      # 查看关联的采购单
 ```
 
 ### 5.2 创建请求体（v2.0.0）

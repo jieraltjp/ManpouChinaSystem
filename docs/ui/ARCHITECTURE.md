@@ -314,7 +314,7 @@ graph TB
 
 ---
 
-*相关文档：[docs/ui/README.md](README.md) · [docs/lessons/Lombok-Decoupling-DI-Lessons.md#Lesson-46]*
+*相关文档：[docs/ui/README.md](README.md) · [docs/lessons/LESSONS-FRONTEND.md#lesson-46]*
 
 ---
 

@@ -1,7 +1,7 @@
 # 发注管理 — 领域模型
 
-> **版本**: 1.5.0
-> **更新**: 2026-04-22
+> **版本**: 1.6.0
+> **更新**: 2026-04-28（DemandStatus 新增 CONFIRMED）
 > **依据**: 业务流分析（8步全链路） + `SPEC-B02-发注单-步骤2.md`
 
 > **代码实现进度**:
@@ -43,7 +43,7 @@ ReplenishmentDemand（聚合根）
 ├── quantity: Integer               # 需求量
 ├── destination: String             # 目的地
 ├── japanLead: String               # 日本担当
-├── status: DemandStatus            # PENDING(待确认) | CONVERTED(已转采购) | CANCELLED(取消)
+├── status: DemandStatus            # PENDING(待确认) | CONFIRMED(已确认) | CONVERTED(已转采购) | CANCELLED(取消)
 ├── linkedProcurementId: Long        # 关联的采购单ID（status=CONVERTED 时赋值）
 ├── createdBy: String
 ├── createdAt: LocalDateTime

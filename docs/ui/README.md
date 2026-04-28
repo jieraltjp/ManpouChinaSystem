@@ -29,6 +29,10 @@
 | UI-10 | [pages/07-tax-refund.md](pages/07-tax-refund.md) | `/finance/tax-refund` | 07 | ✅ |
 | UI-11 | [pages/08-sales.md](pages/08-sales.md) | `/sales/operations` | 08 | ✅ |
 | UI-12 | [pages/09-order-overview.md](pages/09-order-overview.md) | `/base/overview` | 09 | ✅ |
+| UI-13 | [pages/10-product.md](pages/10-product.md) | `/base/product` | — | ✅ |
+| UI-14 | [pages/11-factory.md](pages/11-factory.md) | `/base/factory` | — | ✅ |
+| UI-15 | [pages/12-demand-overview.md](pages/12-demand-overview.md) | `/base/overview/demand/:id` | — | ✅ |
+| UI-16 | [pages/13-procurement-overview.md](pages/13-procurement-overview.md) | `/base/overview/order/:id` | — | ✅ |
 | — | [05-UI改版方案-橙色商业主题.md](05-UI改版方案-橙色商业主题.md) | — | — | ✅ |
 | — | [ARCHITECTURE.md](ARCHITECTURE.md) | — | — | ✅ |
 
