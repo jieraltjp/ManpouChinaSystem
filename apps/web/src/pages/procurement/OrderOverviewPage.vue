@@ -57,11 +57,9 @@
           </template>
         </el-table-column>
         <!-- 操作 -->
-        <el-table-column :label="$t('orderOverview.column.action')" min-width="260" align="center">
+        <el-table-column :label="$t('orderOverview.column.action')" min-width="80" align="center">
           <template #default="{ row }">
-            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('common.view') }}</el-button>
-            <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('demand.action.edit') }}</el-button>
-            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
+            <el-button link type="primary" size="small" @click.stop="onView(row)">{{ $t('orderOverview.action.view') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -80,28 +78,70 @@
 
     <!-- 详情抽屉 -->
     <el-drawer v-model="drawerVisible" :title="$t('orderOverview.drawerTitle')" direction="rtl" size="auto">
-      <div v-if="currentRow" class="drawer-content">
-        <el-descriptions :column="1" border>
-          <el-descriptions-item :label="$t('orderOverview.column.demandCode')">{{ currentRow.demandCode || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.productCode')">{{ currentRow.demandProductCode || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.subProductCode')">{{ currentRow.demandSubProductCode || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.demandType')">{{ currentRow.demandType || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.quantity')">{{ currentRow.demandQuantity ?? '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.destination')">{{ currentRow.demandDestination || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.japanLead')">{{ currentRow.demandJapanLead || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.factoryName')">{{ currentRow.snapshot?.factoryName || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.factoryProvince')">{{ currentRow.snapshot?.factoryProvince || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.factoryCity')">{{ currentRow.snapshot?.factoryCity || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.productNameZh')">{{ currentRow.snapshot?.productNameZh || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.productNameJa')">{{ currentRow.snapshot?.productNameJa || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.productCategory')">{{ currentRow.snapshot?.productCategory || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.demandStatus')">{{ currentRow.demandStatus || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.linkedProcurementId')">{{ currentRow.linkedProcurementId ?? '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.demandCreateTime')">{{ currentRow.demandCreateTime || '-' }}</el-descriptions-item>
+      <div v-if="detailLoading" class="detail-loading">
+        <el-icon class="is-loading" :size="24"><Loading /></el-icon>
+      </div>
+      <div v-else-if="detailData" class="drawer-content">
+        <!-- 步骤1：补货需求 -->
+        <div class="drawer-section-title">{{ $t('orderOverview.step1.title') }}</div>
+        <el-descriptions :column="2" border size="small">
+          <el-descriptions-item :label="$t('orderOverview.column.demandCode')">{{ detailData.demand?.demandCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.demandType')">{{ detailData.demand?.demandType || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.productCode')">{{ detailData.demand?.productCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.subProductCode')">{{ detailData.demand?.subProductCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.quantity')">{{ detailData.demand?.quantity ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.destination')">{{ detailData.demand?.destination || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.japanLead')">{{ detailData.demand?.japanLead || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.demandStatus')">{{ detailData.demand?.status || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.createTime')">{{ detailData.demand?.createTime || '-' }}</el-descriptions-item>
         </el-descriptions>
+
+        <!-- 步骤2：发注单 -->
+        <div class="drawer-section-title">{{ $t('orderOverview.step2.title') }}</div>
+        <el-descriptions v-if="detailData.procurement" :column="2" border size="small">
+          <el-descriptions-item :label="$t('orderOverview.step2.procurementCode')">{{ detailData.procurement.procurementCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.factoryName')">{{ detailData.factory?.factoryName || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.productCode')">{{ detailData.procurement.productCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.subProductCode')">{{ detailData.procurement.subProductCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.quantity')">{{ detailData.procurement.quantity ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.priceRmb')">{{ detailData.procurement.priceRmb ? $t('common.currency.cny') + Number(detailData.procurement.priceRmb).toFixed(2) : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.taxPoint')">{{ detailData.procurement.taxPoint ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.billingType')">{{ detailData.procurement.billingType || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.orderDate')">{{ detailData.procurement.orderDate || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.plannedShipDate')">{{ detailData.procurement.plannedShipDate || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.actualShipDate')">{{ detailData.procurement.actualShipDate || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.status')">{{ detailData.procurement.status || '-' }}</el-descriptions-item>
+        </el-descriptions>
+        <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
+
+        <!-- 步骤3：验货记录 -->
+        <div class="drawer-section-title">{{ $t('orderOverview.step3.title') }}</div>
+        <el-descriptions v-if="detailData.qcRecord" :column="2" border size="small">
+          <el-descriptions-item :label="$t('orderOverview.step3.qcCode')">{{ detailData.qcRecord.qcCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step3.result')">{{ detailData.qcRecord.result || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step3.inspectionCount')">{{ detailData.qcRecord.inspectionCount ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step3.passedCount')">{{ detailData.qcRecord.passedCount ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step3.defectiveCount')">{{ detailData.qcRecord.defectiveCount ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step3.qcDate')">{{ detailData.qcRecord.qcDate || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step3.status')">{{ detailData.qcRecord.status || '-' }}</el-descriptions-item>
+        </el-descriptions>
+        <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
+
+        <!-- 步骤4：调配计划 -->
+        <div class="drawer-section-title">{{ $t('orderOverview.step4.title') }}</div>
+        <el-descriptions v-if="detailData.logisticsPlan" :column="2" border size="small">
+          <el-descriptions-item :label="$t('orderOverview.step4.planCode')">{{ detailData.logisticsPlan.planCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step4.planType')">{{ detailData.logisticsPlan.planType || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step4.cargoVolume')">{{ detailData.logisticsPlan.cargoVolumeCbm ? detailData.logisticsPlan.cargoVolumeCbm + ' CBM' : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step4.cargoWeight')">{{ detailData.logisticsPlan.cargoWeightKg ? detailData.logisticsPlan.cargoWeightKg + ' kg' : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step4.estimatedShipDate')">{{ detailData.logisticsPlan.estimatedShipDate || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step4.actualShipDate')">{{ detailData.logisticsPlan.actualShipDate || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step4.status')">{{ detailData.logisticsPlan.status || '-' }}</el-descriptions-item>
+        </el-descriptions>
+        <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
+
         <div class="drawer-footer">
-          <el-button @click="drawerVisible = false">{{ $t('common.close') }}</el-button>
-          <el-button type="primary" @click="drawerVisible = false; currentRow && onEdit(currentRow)">{{ $t('demand.action.edit') }}</el-button>
+          <el-button type="primary" @click="drawerVisible = false; router.push('/base/overview/demand/' + currentRow!.demandId)">{{ $t('orderOverview.action.viewDetail') }}</el-button>
         </div>
       </div>
     </el-drawer>
@@ -111,8 +151,8 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { orderChainApi, type OrderChainVO } from '@/api/orderChain'
+import { Loading } from '@element-plus/icons-vue'
+import { orderChainApi, type OrderChainVO, type OrderChainDetailVO } from '@/api/orderChain'
 
 const router = useRouter()
 
@@ -124,6 +164,8 @@ const total = ref(0)
 const filter = reactive({ status: '', keyword: '' })
 const drawerVisible = ref(false)
 const currentRow = ref<OrderChainVO | null>(null)
+const detailLoading = ref(false)
+const detailData = ref<OrderChainDetailVO | null>(null)
 
 async function loadChainList() {
   loading.value = true
@@ -157,26 +199,19 @@ function onRowClick(row: OrderChainVO) {
   router.push('/base/overview/demand/' + row.demandId)
 }
 
-function onView(row: OrderChainVO) {
+async function onView(row: OrderChainVO) {
   currentRow.value = row
   drawerVisible.value = true
-}
-
-function onEdit(row: OrderChainVO) {
-  router.push('/procurement/demand/edit/' + row.demandId)
-}
-
-async function onDelete(row: OrderChainVO) {
+  detailData.value = null
+  detailLoading.value = true
   try {
-    await ElMessageBox.confirm(
-      `当前行号：${row.demandCode}，确定删除？`,
-      `删除确认`,
-      { type: 'warning' },
-    )
+    const res = await orderChainApi.getChainDetail(row.demandId)
+    detailData.value = res.data.data
   } catch {
-    return
+    detailData.value = null
+  } finally {
+    detailLoading.value = false
   }
-  ElMessage.success('删除功能未实现，请到发注页面操作')
 }
 
 onMounted(() => {
@@ -196,5 +231,14 @@ onMounted(() => {
 .text-muted { color: #999; }
 .drawer-content { padding: 0 20px; }
 .drawer-footer { padding: 20px 0 0; border-top: 1px solid var(--border-color); margin-top: 20px; display: flex; gap: 8px; }
-.btn-blue { color: #409EFF !important; }
+.drawer-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #303133;
+  margin: 20px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #EBEEF5;
+}
+.step-empty { color: #c0c4cc; font-size: 13px; padding: 8px 0; }
+.detail-loading { display: flex; justify-content: center; align-items: center; min-height: 200px; }
 </style>
