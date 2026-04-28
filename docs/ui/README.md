@@ -45,13 +45,13 @@
 | — | `/login` | LoginPage.vue | UI-01 |
 | — | `/dashboard` | DashboardPage.vue | UI-02 |
 | 01 | `/procurement/demand` | DemandPage.vue | UI-04 |
-| 02 | `/procurement/order` | OrderPage.vue | UI-05 |
-| 03 | `/procurement/inspection` | InspectionPage.vue | UI-06 |
-| 04 | `/procurement/logistics` | LogisticsPage.vue | UI-07 ✅ |
-| 05 | `/procurement/customs` | CustomsPage.vue | UI-08 ✅ |
-| 06 | `/procurement/japan-customs` | JapanCustomsPage.vue | UI-09 ✅ |
-| — | `/finance/tax-refund` | TaxRefundPage.vue | UI-10 ✅ |
-| — | `/sales/operations` | SalesOperationsPage.vue | UI-11 ✅ |
+| 02 | `/procurement/procurement` | ProcurementPage.vue | UI-05 |
+| 03 | `/procurement/qc-record` | QcRecordPage.vue | UI-06 |
+| 04 | `/procurement/logistics-plan` | LogisticsPlanPage.vue | UI-07 ✅ |
+| 05 | `/procurement/domestic-customs` | DomesticCustomsPage.vue | UI-08 ✅ |
+| 06 | `/procurement/japan-customs` | JapanCustomsRecordPage.vue | UI-09 ✅ |
+| — | `/finance/tax-refund-record` | TaxRefundRecordPage.vue | UI-10 ✅ |
+| — | `/sales/sales-record` | SalesRecordPage.vue | UI-11 ✅ |
 | — | `/base/factory` | FactoryPage.vue | — |
 | — | `/base/product` | ProductPage.vue | — |
 | 09 | `/base/overview` | OrderOverviewPage.vue | UI-12 ✅ |

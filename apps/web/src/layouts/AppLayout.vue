@@ -29,25 +29,25 @@
             <el-icon><FolderOpened /></el-icon>
             <template #title>{{ $t('menu.demand') }}</template>
           </el-menu-item>
-          <el-menu-item index="/procurement/order">
+          <el-menu-item index="/procurement/procurement">
             <el-icon><ShoppingCart /></el-icon>
-            <template #title>{{ $t('menu.order') }}</template>
+            <template #title>{{ $t('menu.procurement') }}</template>
           </el-menu-item>
-          <el-menu-item index="/procurement/inspection">
+          <el-menu-item index="/procurement/qc-record">
             <el-icon><CircleCheck /></el-icon>
-            <template #title>{{ $t('menu.inspection') }}</template>
+            <template #title>{{ $t('menu.qcRecord') }}</template>
           </el-menu-item>
-          <el-menu-item index="/procurement/logistics">
+          <el-menu-item index="/procurement/logistics-plan">
             <el-icon><Van /></el-icon>
-            <template #title>{{ $t('menu.logistics') }}</template>
+            <template #title>{{ $t('menu.logisticsPlan') }}</template>
           </el-menu-item>
-          <el-menu-item index="/procurement/customs">
+          <el-menu-item index="/procurement/domestic-customs">
             <el-icon><DocumentCopy /></el-icon>
-            <template #title>{{ $t('menu.customs') }}</template>
+            <template #title>{{ $t('menu.domesticCustoms') }}</template>
           </el-menu-item>
           <el-menu-item index="/procurement/japan-customs">
             <el-icon><Box /></el-icon>
-            <template #title>{{ $t('menu.japanCustoms') }}</template>
+            <template #title>{{ $t('menu.japanCustomsRecord') }}</template>
           </el-menu-item>
         </el-sub-menu>
 
@@ -57,9 +57,9 @@
             <el-icon><Money /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.finance') }}</span>
           </template>
-          <el-menu-item index="/finance/tax-refund">
+          <el-menu-item index="/finance/tax-refund-record">
             <el-icon><Tickets /></el-icon>
-            <template #title>{{ $t('menu.taxRefund') }}</template>
+            <template #title>{{ $t('menu.taxRefundRecord') }}</template>
           </el-menu-item>
         </el-sub-menu>
 
@@ -69,9 +69,9 @@
             <el-icon><TrendCharts /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.sales') }}</span>
           </template>
-          <el-menu-item index="/sales/operations">
+          <el-menu-item index="/sales/sales-record">
             <el-icon><Goods /></el-icon>
-            <template #title>{{ $t('menu.salesOperations') }}</template>
+            <template #title>{{ $t('menu.salesRecord') }}</template>
           </el-menu-item>
         </el-sub-menu>
 
