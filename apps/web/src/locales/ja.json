@@ -7,8 +7,9 @@
   },
   "menu": {
     "dashboard": "ダッシュボード",
-    "procurement": "発注管理",
+    "procurement-all": "発注管理",
     "demand": "01 補充需要",
+    "procurement": "02 発注書",
     "qcRecord": "03 検品記録",
     "logisticsPlan": "04 配送計画",
     "domesticCustoms": "05 国内通関",

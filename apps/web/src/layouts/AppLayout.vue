@@ -23,7 +23,7 @@
         <el-sub-menu index="procurement" :popper-class="'sidebar-popper'">
           <template #title>
             <el-icon><ShoppingCart /></el-icon>
-            <span v-if="!isCollapsed">{{ $t('menu.procurement') }}</span>
+            <span v-if="!isCollapsed">{{ $t('menu.procurement-all') }}</span>
           </template>
           <el-menu-item index="/procurement/demand">
             <el-icon><FolderOpened /></el-icon>
