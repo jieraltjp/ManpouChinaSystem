@@ -979,6 +979,7 @@
       "procurementCode": "発注番号",
       "factoryName": "工場",
       "productCode": "品番",
+      "subProductCode": "サブ品番",
       "quantity": "数量",
       "priceRmb": "単価(CNY)",
       "taxPoint": "インボイス係数",
@@ -1000,7 +1001,8 @@
       "inspectionCount": "検品数",
       "passedCount": "合格数",
       "defectiveCount": "不良数",
-      "qcDate": "検品日"
+      "qcDate": "検品日",
+      "status": "ステータス"
     },
     "step4": {
       "title": "ステップ4：配送計画",

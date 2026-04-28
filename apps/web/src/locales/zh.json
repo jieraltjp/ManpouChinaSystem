@@ -1008,6 +1008,7 @@
       "procurementCode": "发注编号",
       "factoryName": "工厂",
       "productCode": "货号",
+      "subProductCode": "子货号",
       "quantity": "数量",
       "priceRmb": "单价(CNY)",
       "taxPoint": "票点",
@@ -1029,7 +1030,8 @@
       "inspectionCount": "检品数",
       "passedCount": "合格数",
       "defectiveCount": "不良数",
-      "qcDate": "验货日期"
+      "qcDate": "验货日期",
+      "status": "状态"
     },
     "step4": {
       "title": "步骤4：调配计划",
