@@ -70,10 +70,5 @@ public class ReplenishmentDemandAssembler {
         if (cmd.getDestination() != null) entity.setDestination(cmd.getDestination());
         if (cmd.getJapanLead() != null) entity.setJapanLead(cmd.getJapanLead());
         if (cmd.getRemarks() != null) entity.setRemarks(cmd.getRemarks());
-        if (cmd.getStatus() != null) {
-            if (cmd.getStatus() == com.manpou.allinone.replenishment.domain.model.DemandStatus.CANCELLED) {
-                entity.cancel();
-            }
-        }
     }
 }

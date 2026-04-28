@@ -71,7 +71,7 @@ public class DevTestDataInitializer implements CommandLineRunner {
                 "佐藤花子", DemandStatus.PENDING, null, "cpn101 大货补货");
         ReplenishmentDemand d5 = demandOf("DM-20260421-005", DemandType.NEW_PURCHASE,
                 "odn088", "odn088-bk", 50, "福冈",
-                "山本健一", DemandStatus.CANCELLED, null, "需求取消，无需采购");
+                "山本健一", DemandStatus.PENDING, null, "需求待确认");
 
         demandRepository.save(d1);
         demandRepository.save(d2);
