@@ -290,6 +290,8 @@
       "productCodePlaceholder": "如 de077",
       "subProductCode": "子货号",
       "subProductCodePlaceholder": "如 re/wh/bk（颜色）",
+      "category": "商品分类",
+      "categoryPlaceholder": "（自动填入）",
       "quantity": "数量",
       "material": "材质",
       "materialPlaceholder": "如 plastic/metal",

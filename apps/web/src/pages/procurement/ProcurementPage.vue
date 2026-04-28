@@ -238,14 +238,19 @@
 
         <!-- 商品信息 -->
         <el-row :gutter="16">
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item :label="$t('order.dialog.productCode')" prop="productCode">
               <el-input v-model="formData.productCode" :placeholder="$t('order.dialog.productCodePlaceholder')" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item :label="$t('order.dialog.subProductCode')">
               <el-input v-model="formData.subProductCode" :placeholder="$t('order.dialog.subProductCodePlaceholder')" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('order.dialog.category')">
+              <el-input v-model="formData.category" :placeholder="$t('order.dialog.categoryPlaceholder')" readonly />
             </el-form-item>
           </el-col>
         </el-row>
@@ -542,6 +547,22 @@ function getCategoryLabel(code: string): string {
   if (!category || category === '-') return '-'
   return t('product.category.' + category) ?? category
 }
+/** 根据 productCode 拉取商品分类，填入 formData.category（关联需求时自动填入） */
+async function fetchCategory(productCode: string) {
+  if (!productCode) { formData.category = ''; return }
+  if (productCategoryMap.value[productCode]) {
+    formData.category = getCategoryLabel(productCode)
+    return
+  }
+  try {
+    const res = await productApi.getByCode(productCode)
+    const cat = res.data.data?.category || '-'
+    productCategoryMap.value = { ...productCategoryMap.value, [productCode]: cat }
+    formData.category = getCategoryLabel(productCode)
+  } catch {
+    formData.category = ''
+  }
+}
 async function fetchProductCategories(rows: ProcurementPageVO[]) {
   const codes = [...new Set(rows.map(r => r.productCode).filter(Boolean))]
   if (!codes.length) return
@@ -557,7 +578,7 @@ async function fetchProductCategories(rows: ProcurementPageVO[]) {
   productCategoryMap.value = { ...productCategoryMap.value, ...map }
 }
 
-/** 选中需求 → 自动带入 productCode / subProductCode / destination / japanLead / quantity */
+/** 选中需求 → 自动带入 productCode / subProductCode / destination / japanLead / quantity + category */
 function onDemandChange(demandId: number | null) {
   if (!demandId) return
   const d = demandOptions.value.find(x => x.id === demandId)
@@ -567,6 +588,7 @@ function onDemandChange(demandId: number | null) {
   formData.destination = d.destination || ''
   formData.japanLead = d.japanLead || ''
   formData.quantity = d.quantity ?? 0
+  fetchCategory(d.productCode)
 }
 
 /**
@@ -582,6 +604,7 @@ function prefillFromDemand(demand: DemandPageVO) {
   formData.destination = demand.destination || ''
   formData.japanLead = demand.japanLead || ''
   formData.quantity = demand.quantity ?? 0
+  fetchCategory(demand.productCode)
   dialogVisible.value = true
 }
 
@@ -689,7 +712,7 @@ const previewPriceJpy = computed(() => {
   return Math.round(base * 100) / 100
 })
 
-const defaultFormData = (): CreateProcurementRequest & { status?: string } => ({
+const defaultFormData = (): CreateProcurementRequest & { status?: string; category?: string } => ({
   factoryId: undefined,
   productCode: '',
   subProductCode: '',
@@ -714,9 +737,10 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string } => ({
   chinaLead: '',
   destination: '',
   status: '未定',
+  category: '',
 })
 
-const formData = reactive<CreateProcurementRequest & { status?: string }>(defaultFormData())
+const formData = reactive<CreateProcurementRequest & { status?: string; category?: string }>(defaultFormData())
 
 const formRules = {
   factoryId: [{ required: true, message: () => t('order.validation.factoryRequired'), trigger: 'change' }],
@@ -976,11 +1000,13 @@ onMounted(() => {
     convertingDemandId.value = Number(route.query.demandId)
     dialogMode.value = 'create'
     Object.assign(formData, defaultFormData())
-    formData.productCode = (route.query.productCode as string) || ''
+    const pc = (route.query.productCode as string) || ''
+    formData.productCode = pc
     formData.subProductCode = (route.query.subProductCode as string) || ''
     formData.destination = (route.query.destination as string) || ''
     formData.japanLead = (route.query.japanLead as string) || ''
     formData.quantity = Number(route.query.quantity) || 1
+    if (pc) fetchCategory(pc)
     dialogVisible.value = true
     router.replace({ path: '/procurement/procurement' })
   }

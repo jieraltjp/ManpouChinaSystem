@@ -298,6 +298,8 @@
       "productCodePlaceholder": "例：de077",
       "subProductCode": "子品番",
       "subProductCodePlaceholder": "例：re/wh/bk（カラー）",
+      "category": "商品分類",
+      "categoryPlaceholder": "（自動入力）",
       "quantity": "数量",
       "material": "材質",
       "materialPlaceholder": "例：plastic/metal",
