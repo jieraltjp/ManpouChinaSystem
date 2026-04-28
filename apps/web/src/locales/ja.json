@@ -152,16 +152,6 @@
         "destination": "出荷先",
         "action": "操作"
       },
-      "convertDialog": {
-        "title": "発注へ変換 — 工場選択",
-        "factory": "対象工場",
-        "factoryPlaceholder": "工場名を検索",
-        "factoryRequired": "工場を選択してください",
-        "preview": "プレビュー",
-        "confirm": "発注へ変換",
-        "willCreate": "{n}件の発注書を生成します",
-        "willCreateOne": "1件の発注書を生成します"
-      },
       "linkedDialog": {
         "title": "関連発注書リスト",
         "column": {
@@ -1363,6 +1353,14 @@
       "deleteConfirm": "この退税記録を削除してもよろしいですか？",
       "deleteConfirmTitle": "削除確認",
       "actionFailed": "操作に失敗しました"
+    },
+    "enum": {
+      "billingType": {
+        "ZHE_LU_KAI_PIAO": "浙魯開票",
+        "CHAO_HUI_TUI_SHUI": "超慧退税",
+        "NO_REFUND": "退税なし",
+        "OTHER": "その他"
+      }
     }
   },
   "sales": {
