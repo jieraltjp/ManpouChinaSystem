@@ -5,7 +5,6 @@
         <el-button :icon="ArrowLeft" text @click="router.push('/base/overview')">
           {{ $t('common.action.back') }}
         </el-button>
-        <h2 class="page-title">{{ $t('orderOverview.title') }}</h2>
       </div>
     </div>
 

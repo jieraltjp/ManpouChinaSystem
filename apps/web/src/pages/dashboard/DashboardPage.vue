@@ -1,7 +1,5 @@
 <template>
   <div class="dashboard">
-    <h2 class="page-title">{{ $t('dashboard.title') }}</h2>
-
     <!-- 欢迎卡片 -->
     <el-row :gutter="16" class="stat-row">
       <el-col :span="6">

@@ -1,7 +1,6 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2 class="page-title">{{ $t('orderOverview.title') }}</h2>
     </div>
 
     <!-- Tab 切换：需求单 / 发注单 -->

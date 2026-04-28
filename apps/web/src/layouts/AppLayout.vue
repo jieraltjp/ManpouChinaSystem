@@ -105,6 +105,7 @@
             <Fold v-if="!isCollapsed" />
             <Expand v-else />
           </el-icon>
+          <span class="header-title">{{ currentPageTitle }}</span>
         </div>
 
         <div class="header-right">
@@ -178,12 +179,32 @@ import type { Locale } from '@/locales'
 const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const isCollapsed = ref(false)
 const activeMenu = computed(() => route.path)
 const currentLocale = ref<Locale>((localStorage.getItem('locale') as Locale) || 'zh')
 const currentTimezone = ref(localStorage.getItem('timezone') || 'CST')
+
+/** 当前页面标题（根据路由匹配 menu i18n key） */
+const routeTitleMap: Record<string, string> = {
+  '/dashboard': 'dashboard.title',
+  '/procurement/demand': 'demand.title',
+  '/procurement/procurement': 'order.title',
+  '/procurement/qc-record': 'inspection.title',
+  '/procurement/logistics-plan': 'logistics.title',
+  '/procurement/domestic-customs': 'customs.title',
+  '/procurement/japan-customs': 'japanCustoms.title',
+  '/finance/tax-refund-record': 'taxRefund.title',
+  '/sales/sales-record': 'sales.title',
+  '/base/factory': 'factory.title',
+  '/base/product': 'product.title',
+  '/base/overview': 'orderOverview.title',
+}
+const currentPageTitle = computed(() => {
+  const key = routeTitleMap[route.path]
+  return key ? t(key) : ''
+})
 
 function onLocaleChange(newLocale: Locale) {
   locale.value = newLocale
@@ -312,6 +333,19 @@ function onLogout() {
   padding: 0 20px;
   border-bottom: 1px solid var(--border-color);
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .collapse-btn {

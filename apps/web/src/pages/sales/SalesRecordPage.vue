@@ -1,7 +1,6 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2 class="page-title">{{ $t('sales.title') }}</h2>
       <div class="header-actions">
         <el-button type="warning" @click="onShowAlerts">
           <el-icon><Warning /></el-icon>

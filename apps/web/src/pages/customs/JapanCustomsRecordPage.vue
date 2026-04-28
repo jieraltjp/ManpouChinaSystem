@@ -1,7 +1,6 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2 class="page-title">{{ $t('japanCustoms.title') }}</h2>
     </div>
 
     <!-- 统计卡片 -->

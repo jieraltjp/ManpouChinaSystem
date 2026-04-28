@@ -1,7 +1,6 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2 class="page-title">{{ $t('inspection.title') }}</h2>
       <div class="header-actions">
         <el-button type="primary" @click="onNew">
           <el-icon><Plus /></el-icon> {{ $t('inspection.newButton') }}
@@ -137,7 +136,7 @@
     </el-card>
 
     <!-- 新规验货弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="$t('inspection.newDialogTitle')" width="820px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="$t('inspection.newDialogTitle')" width="920px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="formRules" label-width="86px">
         <!-- Row 1: 关联采购单 + 卖家名称 -->
         <el-row :gutter="10">

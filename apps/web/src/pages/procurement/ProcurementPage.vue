@@ -1,7 +1,6 @@
 <template>
   <div class="test-page">
     <div class="page-header">
-      <h2 class="page-title">{{ $t('order.title') }}</h2>
       <div class="header-actions">
         <el-button type="primary" @click="onNew">
           <el-icon><Plus /></el-icon>
