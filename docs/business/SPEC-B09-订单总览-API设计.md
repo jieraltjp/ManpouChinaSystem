@@ -275,12 +275,12 @@ export const orderChainApi = {
 
 | 项目 | 状态 | 说明 |
 |------|------|------|
-| `v_order_chain_v1` MySQL VIEW | 🔲 待建 | 视图包含 Demand/Procurement/Factory/QcRecord/LogisticsPlan |
-| `OrderChainView` JPA Entity | 🔲 待建 | 映射 `v_order_chain_v1` |
-| `OrderChainRepository` | 🔲 待建 | JPA Repository |
-| `GET /api/v1/orders/chain` 列表接口 | 🔲 待建 | 分页 + 筛选 |
-| `GET /api/v1/orders/chain/{demandId}` 详情接口 | 🔲 待建 | 步骤1~4数据 |
-| `OrderChainVO` / `OrderChainDetailVO` | 🔲 待建 | 响应对象 |
+| `v_order_chain_v1` MySQL VIEW | ✅ 已建 | 视图包含 Demand/Procurement/Factory/QcRecord/LogisticsPlan |
+| `OrderChainView` JPA Entity | ✅ 已建 | 映射 `v_order_chain_v1` |
+| `OrderChainRepository` | ✅ 已建 | JPA Repository |
+| `GET /api/v1/orders/chain` 列表接口 | ✅ 已建 | 分页 + 筛选 |
+| `GET /api/v1/orders/chain/{demandId}` 详情接口 | ✅ 已建 | 步骤1~4数据 |
+| `OrderChainVO` / `OrderChainDetailVO` | ✅ 已建 | 响应对象 |
 | 前端 API 层 `orderChain.ts` | 🔲 待建 | |
 | 前端 `OrderOverviewPage.vue` 单列表 | 🔲 待改 | 移除双 Tab，改为单列表 |
 
