@@ -27,7 +27,7 @@ public class OrderChainDetailVO {
     // 步骤2
     private ProcurementVO procurement;
 
-    // 步骤2 关联工厂
+    // 步骤2 工厂快照（来自 procurement_snapshot，下单时刻数据）
     private FactoryVO factory;
 
     // 步骤3

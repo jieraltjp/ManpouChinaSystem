@@ -123,8 +123,12 @@ public class ProcurementUseCase {
             entity.calculateEstimatedPriceJpy();
         }
         procurementRepository.save(entity);
-        log.info("[Procurement] updated, traceId={}, id={}, status={}",
-                MDC.get(TraceFilter.TRACE_ID_KEY), id, entity.getStatus());
+
+        // productCode/factoryId 变更后刷新快照
+        createSnapshot(entity);
+
+        log.info("[Procurement] updated, traceId={}, id={}, productCode={}, status={}",
+                MDC.get(TraceFilter.TRACE_ID_KEY), id, entity.getProductCode(), entity.getStatus());
     }
 
     /**

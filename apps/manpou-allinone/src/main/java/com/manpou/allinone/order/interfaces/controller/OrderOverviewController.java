@@ -87,6 +87,7 @@ public class OrderOverviewController {
 
     /**
      * 订单总览列表（一行 = 一个 Demand，左 JOIN 串联步骤1~4）。
+     * 排序由 OrderChainUseCase 在内存中按 demandCreateTime DESC 实现。
      */
     @GetMapping("/chain")
     public Result<Page<OrderChainVO>> listChain(
@@ -94,11 +95,7 @@ public class OrderOverviewController {
             @RequestParam(defaultValue = "20") int pageSize,
             @RequestParam(required = false) String demandStatus,
             @RequestParam(required = false) String keyword) {
-        PageRequest pageRequest = PageRequest.of(
-                page,
-                Math.min(pageSize, 100),
-                Sort.by(Sort.Direction.DESC, "demandCreateTime")
-        );
+        PageRequest pageRequest = PageRequest.of(page, Math.min(pageSize, 100));
         return Result.ok(orderChainUseCase.getChainList(demandStatus, keyword, pageRequest));
     }
 
