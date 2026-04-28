@@ -86,13 +86,13 @@
         <div class="drawer-section-title">{{ $t('orderOverview.step1.title') }}</div>
         <el-descriptions :column="2" border size="small">
           <el-descriptions-item :label="$t('orderOverview.column.demandCode')">{{ detailData.demand?.demandCode || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.demandType')">{{ detailData.demand?.demandType || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.demandType')">{{ demandTypeLabel(detailData.demand?.demandType) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.column.productCode')">{{ detailData.demand?.productCode || '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.column.subProductCode')">{{ detailData.demand?.subProductCode || '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.column.quantity')">{{ detailData.demand?.quantity ?? '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.column.destination')">{{ detailData.demand?.destination || '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.column.japanLead')">{{ detailData.demand?.japanLead || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.demandStatus')">{{ detailData.demand?.status || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.demandStatus')">{{ demandStatusLabel(detailData.demand?.status) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.column.createTime')">{{ formatDate(detailData.demand?.createTime) }}</el-descriptions-item>
         </el-descriptions>
 
@@ -106,11 +106,11 @@
           <el-descriptions-item :label="$t('orderOverview.step2.quantity')">{{ detailData.procurement.quantity ?? '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.priceRmb')">{{ detailData.procurement.priceRmb ? $t('common.currency.cny') + Number(detailData.procurement.priceRmb).toFixed(2) : '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.taxPoint')">{{ detailData.procurement.taxPoint ?? '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step2.billingType')">{{ detailData.procurement.billingType || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.billingType')">{{ billingTypeLabel(detailData.procurement.billingType) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.orderDate')">{{ formatDate(detailData.procurement.orderDate) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.plannedShipDate')">{{ formatDate(detailData.procurement.plannedShipDate) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.actualShipDate')">{{ formatDate(detailData.procurement.actualShipDate) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step2.status')">{{ detailData.procurement.status || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.status')">{{ statusLabelByValue(detailData.procurement.status) }}</el-descriptions-item>
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
 
@@ -118,12 +118,12 @@
         <div class="drawer-section-title">{{ $t('orderOverview.step3.title') }}</div>
         <el-descriptions v-if="detailData.qcRecord" :column="2" border size="small">
           <el-descriptions-item :label="$t('orderOverview.step3.qcCode')">{{ detailData.qcRecord.qcCode || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step3.result')">{{ detailData.qcRecord.result || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step3.result')">{{ qcResultLabel(detailData.qcRecord.result) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step3.inspectionCount')">{{ detailData.qcRecord.inspectionCount ?? '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step3.passedCount')">{{ detailData.qcRecord.passedCount ?? '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step3.defectiveCount')">{{ detailData.qcRecord.defectiveCount ?? '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step3.qcDate')">{{ formatDate(detailData.qcRecord.qcDate) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step3.status')">{{ detailData.qcRecord.status || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step3.status')">{{ qcStatusLabel(detailData.qcRecord.status) }}</el-descriptions-item>
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
 
@@ -131,12 +131,12 @@
         <div class="drawer-section-title">{{ $t('orderOverview.step4.title') }}</div>
         <el-descriptions v-if="detailData.logisticsPlan" :column="2" border size="small">
           <el-descriptions-item :label="$t('orderOverview.step4.planCode')">{{ detailData.logisticsPlan.planCode || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step4.planType')">{{ detailData.logisticsPlan.planType || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step4.planType')">{{ planTypeLabel(detailData.logisticsPlan.planType) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step4.cargoVolume')">{{ detailData.logisticsPlan.cargoVolumeCbm ? detailData.logisticsPlan.cargoVolumeCbm + ' CBM' : '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step4.cargoWeight')">{{ detailData.logisticsPlan.cargoWeightKg ? detailData.logisticsPlan.cargoWeightKg + ' kg' : '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step4.estimatedShipDate')">{{ formatDate(detailData.logisticsPlan.estimatedShipDate) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step4.actualShipDate')">{{ formatDate(detailData.logisticsPlan.actualShipDate) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step4.status')">{{ detailData.logisticsPlan.status || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step4.status')">{{ logisticsStatusLabel(detailData.logisticsPlan.status) }}</el-descriptions-item>
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
 
@@ -156,7 +156,7 @@ import { Loading } from '@element-plus/icons-vue'
 import { orderChainApi, type OrderChainVO, type OrderChainDetailVO } from '@/api/orderChain'
 
 const router = useRouter()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const loading = ref(false)
 const chainData = ref<OrderChainVO[]>([])
@@ -172,6 +172,45 @@ const detailData = ref<OrderChainDetailVO | null>(null)
 function formatDate(val: string | undefined | null): string {
   if (!val) return '-'
   return new Date(val).toLocaleString(locale.value === 'ja' ? 'ja-JP' : 'zh-CN')
+}
+
+function demandStatusLabel(val: string | undefined): string {
+  if (!val) return '-'
+  return t(`demand.status.${val}` as any, { default: val })
+}
+
+function demandTypeLabel(val: string | undefined): string {
+  if (!val) return '-'
+  return t(`demand.type.${val}` as any, { default: val })
+}
+
+function billingTypeLabel(val: string | undefined): string {
+  if (!val) return '-'
+  return t(`order.billingType.${val}` as any, { default: val })
+}
+
+function statusLabelByValue(val: string | undefined): string {
+  if (!val) return '-'
+  return t(`order.status.${val}` as any, { default: val })
+}
+
+function qcResultLabel(val: string | undefined): string {
+  if (!val) return '-'
+  return t(`orderOverview.step3.qcResult.${val}` as any, { default: val })
+}
+
+function qcStatusLabel(val: string | undefined): string {
+  return { PENDING: t('inspection.qcStatus.pending'), COMPLETED: t('inspection.qcStatus.completed'), RETURN_REQUESTED: t('inspection.qcStatus.returnRequested') }[val ?? ''] ?? val ?? '-'
+}
+
+function planTypeLabel(val: string | undefined): string {
+  if (!val) return '-'
+  return t(`logistics.planType.${val}` as any, { default: val })
+}
+
+function logisticsStatusLabel(val: string | undefined): string {
+  if (!val) return '-'
+  return t(`logistics.status.${val}` as any, { default: val })
 }
 
 async function loadChainList() {
