@@ -275,6 +275,7 @@
       "actualShipDate": "実際出荷日",
       "leadTimeDays": "リードタイム(日)",
       "cartonNotes": "カートン備考",
+      "afterSalesDeadline": "售后截止日",
       "productLead": "商品担当",
       "japanLead": "日本担当",
       "chinaLead": "中国担当",
@@ -332,6 +333,7 @@
       "leadTimeDaysPlaceholder": "30/45/60",
       "cartonNotes": "カートン備考",
       "cartonNotesPlaceholder": "カートン備考情報",
+      "afterSalesDeadline": "售后截止日",
       "status": "ステータス",
       "cancel": "キャンセル",
       "save": "保存"

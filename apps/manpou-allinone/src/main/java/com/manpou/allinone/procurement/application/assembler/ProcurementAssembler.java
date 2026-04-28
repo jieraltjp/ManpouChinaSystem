@@ -51,6 +51,7 @@ public class ProcurementAssembler {
                 .actualShipDate(entity.getActualShipDate())
                 .leadTimeDays(entity.getLeadTimeDays())
                 .cartonNotes(entity.getCartonNotes())
+                .afterSalesDeadline(entity.getAfterSalesDeadline())
                 .productLead(entity.getProductLead())
                 .japanLead(entity.getJapanLead())
                 .chinaLead(entity.getChinaLead())
@@ -120,6 +121,7 @@ public class ProcurementAssembler {
         if (cmd.getActualShipDate() != null) entity.setActualShipDate(cmd.getActualShipDate());
         if (cmd.getLeadTimeDays() != null) entity.setLeadTimeDays(cmd.getLeadTimeDays());
         if (cmd.getCartonNotes() != null) entity.setCartonNotes(cmd.getCartonNotes());
+        if (cmd.getAfterSalesDeadline() != null) entity.setAfterSalesDeadline(cmd.getAfterSalesDeadline());
         if (cmd.getProductLead() != null) entity.setProductLead(cmd.getProductLead());
         if (cmd.getJapanLead() != null) entity.setJapanLead(cmd.getJapanLead());
         if (cmd.getChinaLead() != null) entity.setChinaLead(cmd.getChinaLead());
@@ -147,6 +149,7 @@ public class ProcurementAssembler {
         if (cmd.getActualShipDate() != null) entity.setActualShipDate(cmd.getActualShipDate());
         if (cmd.getLeadTimeDays() != null) entity.setLeadTimeDays(cmd.getLeadTimeDays());
         if (cmd.getCartonNotes() != null) entity.setCartonNotes(cmd.getCartonNotes());
+        if (cmd.getAfterSalesDeadline() != null) entity.setAfterSalesDeadline(cmd.getAfterSalesDeadline());
         if (cmd.getProductLead() != null) entity.setProductLead(cmd.getProductLead());
         if (cmd.getJapanLead() != null) entity.setJapanLead(cmd.getJapanLead());
         if (cmd.getChinaLead() != null) entity.setChinaLead(cmd.getChinaLead());

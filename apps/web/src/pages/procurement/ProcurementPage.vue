@@ -194,6 +194,7 @@
         <el-descriptions-item :label="$t('order.drawer.actualShipDate')">{{ currentRow.actualShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.leadTimeDays')">{{ currentRow.leadTimeDays ? `${currentRow.leadTimeDays}天` : '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.cartonNotes')">{{ currentRow.cartonNotes || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.afterSalesDeadline')">{{ currentRow.afterSalesDeadline || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.productLead')">{{ currentRow.productLead || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.japanLead')">{{ currentRow.japanLead || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.chinaLead')">{{ currentRow.chinaLead || '-' }}</el-descriptions-item>
@@ -373,7 +374,7 @@
           </el-col>
         </el-row>
         <el-row :gutter="16">
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item :label="$t('order.dialog.leadTimeDays')">
               <el-select v-model="formData.leadTimeDays" style="width: 100%" clearable>
                 <el-option :value="30" label="30天" />
@@ -382,9 +383,14 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item :label="$t('order.dialog.cartonNotes')">
               <el-input v-model="formData.cartonNotes" :placeholder="$t('order.dialog.cartonNotesPlaceholder')" maxlength="512" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('order.dialog.afterSalesDeadline')">
+              <el-date-picker v-model="formData.afterSalesDeadline" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -732,6 +738,7 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string; catego
   plannedShipDate: '',
   leadTimeDays: undefined as number | undefined,
   cartonNotes: '',
+  afterSalesDeadline: '',
   customerCompany: '',
   productLead: '',
   japanLead: '',
@@ -842,6 +849,7 @@ function onEdit(row: ProcurementPageVO | null) {
     plannedShipDate: row?.plannedShipDate ?? '',
     leadTimeDays: row?.leadTimeDays ?? undefined,
     cartonNotes: row?.cartonNotes ?? '',
+    afterSalesDeadline: row?.afterSalesDeadline ?? '',
     customerCompany: row?.customerCompany ?? '',
     productLead: row?.productLead ?? '',
     japanLead: row?.japanLead ?? '',
@@ -899,6 +907,7 @@ async function onSubmit() {
           plannedShipDate: formData.plannedShipDate || undefined,
           leadTimeDays: formData.leadTimeDays ?? undefined,
           cartonNotes: formData.cartonNotes || undefined,
+          afterSalesDeadline: formData.afterSalesDeadline || undefined,
           customerCompany: formData.customerCompany || undefined,
           productLead: formData.productLead || undefined,
           japanLead: formData.japanLead || undefined,
@@ -936,6 +945,7 @@ async function onSubmit() {
           plannedShipDate: formData.plannedShipDate || undefined,
           leadTimeDays: formData.leadTimeDays ?? undefined,
           cartonNotes: formData.cartonNotes || undefined,
+          afterSalesDeadline: formData.afterSalesDeadline || undefined,
           customerCompany: formData.customerCompany || undefined,
           productLead: formData.productLead || undefined,
           japanLead: formData.japanLead || undefined,

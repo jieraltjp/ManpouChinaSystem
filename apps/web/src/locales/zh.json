@@ -267,6 +267,7 @@
       "actualShipDate": "实际出货日",
       "leadTimeDays": "交货周期(天)",
       "cartonNotes": "纸箱备注",
+      "afterSalesDeadline": "售后截止日",
       "productLead": "商品担当",
       "japanLead": "日本担当",
       "chinaLead": "中国担当",
@@ -324,6 +325,7 @@
       "leadTimeDaysPlaceholder": "30/45/60",
       "cartonNotes": "纸箱备注",
       "cartonNotesPlaceholder": "纸箱备注信息",
+      "afterSalesDeadline": "售后截止日",
       "status": "状态",
       "cancel": "取消",
       "save": "保存"

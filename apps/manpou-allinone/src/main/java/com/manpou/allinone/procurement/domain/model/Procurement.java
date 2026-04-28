@@ -92,6 +92,9 @@ public class Procurement extends BaseEntity {
     @Column(name = "carton_notes", length = 512)
     private String cartonNotes;     // 纸箱备注（v1.9.0 新增）
 
+    @Column(name = "after_sales_deadline")
+    private java.time.LocalDate afterSalesDeadline; // 售后截止日（v1.10.0 新增）
+
     // ===== 担当 =====
     @Column(name = "product_lead", length = 64)
     private String productLead;        // 商品担当
