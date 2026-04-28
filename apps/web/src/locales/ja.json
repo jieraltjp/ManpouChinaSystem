@@ -944,7 +944,15 @@
       "quantity": "数量",
       "subProductItems": "サブ品番明細",
       "japanLead": "担当者",
-      "stepStatus": "ステップ進捗"
+      "stepStatus": "ステップ進捗",
+      "factoryProvince": "工場省份",
+      "factoryCity": "工場都市",
+      "productNameZh": "商品名（中国語）",
+      "productNameJa": "商品名（日本語）",
+      "productCategory": "商品カテゴリ",
+      "demandStatus": "需要ステータス",
+      "linkedProcurementId": "関連発注書",
+      "demandCreateTime": "作成日時"
     },
     "step": {
       "1": "需要",
@@ -953,8 +961,10 @@
       "4": "配車"
     },
     "action": {
-      "view": "一覧"
+      "view": "詳細",
+      "viewDetail": "完全総览を見る"
     },
+    "drawerTitle": "需要詳細",
     "step1": {
       "title": "ステップ1：補充需要",
       "demandCode": "需要番号",

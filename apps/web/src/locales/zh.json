@@ -973,7 +973,15 @@
       "quantity": "数量",
       "subProductItems": "子货号明细",
       "japanLead": "担当",
-      "stepStatus": "步骤进度"
+      "stepStatus": "步骤进度",
+      "factoryProvince": "工厂省份",
+      "factoryCity": "工厂城市",
+      "productNameZh": "商品中文名",
+      "productNameJa": "商品日文名",
+      "productCategory": "商品分类",
+      "demandStatus": "需求状态",
+      "linkedProcurementId": "关联发注单",
+      "demandCreateTime": "创建时间"
     },
     "step": {
       "1": "需求",
@@ -982,8 +990,10 @@
       "4": "调配"
     },
     "action": {
-      "view": "总览"
+      "view": "详情",
+      "viewDetail": "查看完整总览"
     },
+    "drawerTitle": "需求详情",
     "step1": {
       "title": "步骤1：补货需求",
       "demandCode": "需求编号",

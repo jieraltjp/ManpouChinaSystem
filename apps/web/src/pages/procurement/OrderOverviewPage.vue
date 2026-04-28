@@ -23,13 +23,10 @@
     <el-card class="table-card" shadow="never">
       <div class="table-scroll-wrap">
         <el-table v-loading="loading" :data="chainData" stripe @row-click="onRowClick" table-layout="fixed" min-height="200">
-        <!-- 需求编号 -->
-        <el-table-column prop="demandCode" :label="$t('orderOverview.column.demandCode')" min-width="160" />
-        <!-- 商品名称（快照） -->
-        <el-table-column :label="$t('orderOverview.column.productCode')" min-width="140">
+        <!-- 主货号 -->
+        <el-table-column prop="demandProductCode" :label="$t('orderOverview.column.productCode')" min-width="140">
           <template #default="{ row }">
-            <span v-if="row.snapshot?.productNameZh">{{ row.snapshot.productNameZh }}</span>
-            <span v-else class="text-muted">{{ row.demandProductCode || '—' }}</span>
+            <span class="product-code">{{ row.demandProductCode || '—' }}</span>
           </template>
         </el-table-column>
         <!-- 子货号 -->
@@ -60,11 +57,11 @@
           </template>
         </el-table-column>
         <!-- 操作 -->
-        <el-table-column :label="$t('orderOverview.column.action')" min-width="80" align="center">
+        <el-table-column :label="$t('orderOverview.column.action')" min-width="260" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click.stop="router.push('/base/overview/demand/' + row.demandId)">
-              {{ $t('orderOverview.action.view') }}
-            </el-button>
+            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('common.view') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('demand.action.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -80,6 +77,33 @@
         />
       </div>
     </el-card>
+
+    <!-- 详情抽屉 -->
+    <el-drawer v-model="drawerVisible" :title="$t('orderOverview.drawerTitle')" direction="rtl" size="auto">
+      <div v-if="currentRow" class="drawer-content">
+        <el-descriptions :column="1" border>
+          <el-descriptions-item :label="$t('orderOverview.column.demandCode')">{{ currentRow.demandCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.productCode')">{{ currentRow.demandProductCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.subProductCode')">{{ currentRow.demandSubProductCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.demandType')">{{ currentRow.demandType || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.quantity')">{{ currentRow.demandQuantity ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.destination')">{{ currentRow.demandDestination || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.japanLead')">{{ currentRow.demandJapanLead || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.factoryName')">{{ currentRow.snapshot?.factoryName || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.factoryProvince')">{{ currentRow.snapshot?.factoryProvince || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.factoryCity')">{{ currentRow.snapshot?.factoryCity || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.productNameZh')">{{ currentRow.snapshot?.productNameZh || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.productNameJa')">{{ currentRow.snapshot?.productNameJa || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.productCategory')">{{ currentRow.snapshot?.productCategory || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.demandStatus')">{{ currentRow.demandStatus || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.linkedProcurementId')">{{ currentRow.linkedProcurementId ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.demandCreateTime')">{{ currentRow.demandCreateTime || '-' }}</el-descriptions-item>
+        </el-descriptions>
+        <div class="drawer-footer">
+          <el-button type="primary" @click="router.push('/base/overview/demand/' + currentRow.demandId)">{{ $t('orderOverview.action.viewDetail') }}</el-button>
+        </div>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
@@ -96,6 +120,8 @@ const page = ref(1)
 const pageSize = ref(20)
 const total = ref(0)
 const filter = reactive({ status: '', keyword: '' })
+const drawerVisible = ref(false)
+const currentRow = ref<OrderChainVO | null>(null)
 
 async function loadChainList() {
   loading.value = true
@@ -129,6 +155,11 @@ function onRowClick(row: OrderChainVO) {
   router.push('/base/overview/demand/' + row.demandId)
 }
 
+function onView(row: OrderChainVO) {
+  currentRow.value = row
+  drawerVisible.value = true
+}
+
 onMounted(() => {
   loadChainList()
 })
@@ -144,4 +175,6 @@ onMounted(() => {
 .product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
 .qty-value { color: #D97706; font-weight: 600; }
 .text-muted { color: #999; }
+.drawer-content { padding: 0 20px; }
+.drawer-footer { padding: 20px 0 0; border-top: 1px solid var(--border-color); margin-top: 20px; display: flex; gap: 8px; }
 </style>
