@@ -21,7 +21,8 @@
     </el-card>
 
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="chainData" stripe @row-click="onRowClick" min-height="200">
+      <div class="table-scroll-wrap">
+        <el-table v-loading="loading" :data="chainData" stripe @row-click="onRowClick" table-layout="fixed" min-height="200">
         <!-- 需求编号 -->
         <el-table-column prop="demandCode" :label="$t('orderOverview.column.demandCode')" min-width="160" />
         <!-- 商品名称（快照） -->
@@ -58,20 +59,6 @@
             {{ row.demandDestination || '—' }}
           </template>
         </el-table-column>
-        <!-- 4步状态进度 -->
-        <el-table-column :label="$t('orderOverview.column.stepStatus')" min-width="200" align="center">
-          <template #default="{ row }">
-            <div class="step-status">
-              <span class="step-badge" :class="row.step1Status">{{ $t('orderOverview.step.1') }}</span>
-              <span class="step-arrow">→</span>
-              <span class="step-badge" :class="row.step2Status">{{ $t('orderOverview.step.2') }}</span>
-              <span class="step-arrow">→</span>
-              <span class="step-badge" :class="row.step3Status">{{ $t('orderOverview.step.3') }}</span>
-              <span class="step-arrow">→</span>
-              <span class="step-badge" :class="row.step4Status">{{ $t('orderOverview.step.4') }}</span>
-            </div>
-          </template>
-        </el-table-column>
         <!-- 操作 -->
         <el-table-column :label="$t('orderOverview.column.action')" min-width="80" align="center">
           <template #default="{ row }">
@@ -81,6 +68,7 @@
           </template>
         </el-table-column>
       </el-table>
+      </div>
       <div class="pagination-wrap">
         <el-pagination
           background
@@ -152,19 +140,8 @@ onMounted(() => {
 .filter-card { margin-bottom: 12px; }
 .table-card { margin-top: 0; }
 .pagination-wrap { display: flex; justify-content: flex-end; margin-top: 12px; }
+.table-scroll-wrap { overflow-x: auto; }
 .product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
 .qty-value { color: #D97706; font-weight: 600; }
 .text-muted { color: #999; }
-.step-status { display: flex; align-items: center; justify-content: center; gap: 2px; font-size: 12px; }
-.step-badge {
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-size: 11px;
-  font-weight: 600;
-}
-.step-badge.NOT_STARTED { background: #f5f5f5; color: #999; }
-.step-badge.COMPLETED { background: #d4edda; color: #155724; }
-.step-badge.IN_PROGRESS { background: #fff3cd; color: #856404; }
-.step-arrow { color: #ccc; margin: 0 1px; }
 </style>
