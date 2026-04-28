@@ -631,6 +631,10 @@ loadData()
 </script>
 
 <style scoped>
+.page { display: flex; flex-direction: column; gap: 16px; }
+.filter-card :deep(.el-card__body) { padding-bottom: 0; }
+.table-card :deep(.el-card__body) { padding: 16px; }
+.stats-row { margin-bottom: 4px; }
 .drawer-content {
   padding: 0 16px;
 }
