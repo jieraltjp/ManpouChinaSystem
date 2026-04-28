@@ -251,6 +251,28 @@ function onCommand(cmd: string) {
   color: var(--color-primary-light) !important;
 }
 
+/* inline 子菜单（二级展开项）：覆盖白底 + 灰字 */
+.sidebar-menu :deep(.el-menu--inline) {
+  background: transparent !important;
+}
+.sidebar-menu :deep(.el-menu--inline .el-menu-item) {
+  color: #C0C4CC;
+  background: transparent;
+  border-radius: 0 8px 8px 0;
+  margin: 2px 8px;
+  width: calc(100% - 16px);
+  padding-left: 48px !important;
+}
+.sidebar-menu :deep(.el-menu--inline .el-menu-item:hover) {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+.sidebar-menu :deep(.el-menu--inline .el-menu-item.is-active) {
+  background: rgba(232,101,10,0.15) !important;
+  border-left: 3px solid var(--color-primary);
+  color: var(--color-primary-light) !important;
+}
+
 /* ── 顶栏 ── */
 .header {
   background: var(--bg-header);
