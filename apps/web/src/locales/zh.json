@@ -1068,7 +1068,7 @@
       "sellingPriceJpy": "销售价(JPY)",
       "status": "状态"
     },
-    "step": {
+    "stepStatusUI": {
       "notStarted": "暂无记录",
       "placeholder": "待实现",
       "status": {

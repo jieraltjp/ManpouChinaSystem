@@ -1039,7 +1039,7 @@
       "sellingPriceJpy": "販売価格(JPY)",
       "status": "ステータス"
     },
-    "step": {
+    "stepStatusUI": {
       "notStarted": "記録なし",
       "placeholder": "未実装",
       "status": {

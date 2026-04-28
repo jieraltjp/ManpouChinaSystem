@@ -31,7 +31,7 @@
           </div>
         </template>
         <template v-else>
-          <div class="step-empty">{{ $t('orderOverview.step.notStarted') }}</div>
+          <div class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
         </template>
       </StepCard>
 
@@ -68,7 +68,7 @@
           </div>
         </template>
         <template v-else>
-          <div class="step-empty">{{ $t('orderOverview.step.notStarted') }}</div>
+          <div class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
         </template>
       </StepCard>
 
@@ -86,7 +86,7 @@
           </div>
         </template>
         <template v-else>
-          <div class="step-empty">{{ $t('orderOverview.step.notStarted') }}</div>
+          <div class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
         </template>
       </StepCard>
 
@@ -101,7 +101,7 @@
           </div>
         </template>
         <template v-else>
-          <div class="step-empty">{{ $t('orderOverview.step.notStarted') }}</div>
+          <div class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
         </template>
       </StepCard>
 
@@ -120,7 +120,7 @@
           </div>
         </template>
         <template v-else>
-          <div class="step-empty">{{ $t('orderOverview.step.notStarted') }}</div>
+          <div class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
         </template>
       </StepCard>
 
@@ -136,7 +136,7 @@
           </div>
         </template>
         <template v-else>
-          <div class="step-empty">{{ $t('orderOverview.step.notStarted') }}</div>
+          <div class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
         </template>
       </StepCard>
 
@@ -155,7 +155,7 @@
           </div>
         </template>
         <template v-else>
-          <div class="step-empty">{{ $t('orderOverview.step.notStarted') }}</div>
+          <div class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
         </template>
       </StepCard>
     </div>

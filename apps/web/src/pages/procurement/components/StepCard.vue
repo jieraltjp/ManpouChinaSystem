@@ -7,8 +7,8 @@
           <span>{{ title }}</span>
         </div>
         <div class="step-card__actions">
-          <el-tag v-if="status === 'COMPLETED'" type="success" size="small">{{ $t('orderOverview.step.status.completed') }}</el-tag>
-          <el-tag v-else-if="status === 'IN_PROGRESS'" type="warning" size="small">{{ $t('orderOverview.step.status.inProgress') }}</el-tag>
+          <el-tag v-if="status === 'COMPLETED'" type="success" size="small">{{ $t('orderOverview.stepStatusUI.status.completed') }}</el-tag>
+          <el-tag v-else-if="status === 'IN_PROGRESS'" type="warning" size="small">{{ $t('orderOverview.stepStatusUI.status.inProgress') }}</el-tag>
         </div>
       </div>
     </template>

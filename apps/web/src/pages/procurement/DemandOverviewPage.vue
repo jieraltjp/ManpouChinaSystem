@@ -31,13 +31,13 @@
           <!-- 转采购按钮（v2.2.0 已移除） -->
         </template>
         <template v-else>
-          <div class="step-empty">{{ $t('orderOverview.step.notStarted') }}</div>
+          <div class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
         </template>
       </StepCard>
 
       <!-- 步骤2-8：全部未开始 -->
       <StepCard v-for="step in remainingSteps" :key="step.num" :step-number="step.num" :title="step.title" :status="'NOT_STARTED'">
-        <div class="step-empty">{{ $t('orderOverview.step.notStarted') }}</div>
+        <div class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
       </StepCard>
     </div>
 
