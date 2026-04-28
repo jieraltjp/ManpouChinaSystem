@@ -1137,6 +1137,11 @@
       "zh": "中文",
       "ja": "日本語"
     },
+    "timezone": {
+      "label": "时区",
+      "CST": "中国时区 (UTC+8)",
+      "JST": "日本时区 (UTC+9)"
+    },
     "user": "User",
     "error": {
       "network": "网络异常，请重试",

@@ -1092,6 +1092,11 @@
       "zh": "中文",
       "ja": "日本語"
     },
+    "timezone": {
+      "label": "タイムゾーン",
+      "CST": "中国標準時 (UTC+8)",
+      "JST": "日本標準時 (UTC+9)"
+    },
     "user": "User",
     "units": {
       "kg": "kg",

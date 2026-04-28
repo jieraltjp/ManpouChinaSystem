@@ -108,25 +108,52 @@
         </div>
 
         <div class="header-right">
-          <!-- 语言切换 -->
-          <el-select v-model="currentLocale" size="small" style="margin-right: 12px; width: 80px;" @change="onLocaleChange">
-            <el-option value="zh" :label="$t('common.locale.zh')" />
-            <el-option value="ja" :label="$t('common.locale.ja')" />
-          </el-select>
-
-          <el-dropdown @command="onCommand">
+          <!-- 用户设置面板 -->
+          <el-dropdown trigger="click" placement="bottom-end">
             <span class="user-info">
               <el-avatar :size="32" icon="UserFilled" />
               <span class="username">{{ auth.claims?.username || $t('common.user') }}</span>
               <el-icon><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="logout">
+              <div class="user-panel">
+                <!-- 用户信息区 -->
+                <div class="panel-user-info">
+                  <el-avatar :size="40" icon="UserFilled" />
+                  <div class="panel-user-text">
+                    <div class="panel-username">{{ auth.claims?.username || $t('common.user') }}</div>
+                    <div class="panel-role">{{ auth.claims?.roles?.[0] || '—' }}</div>
+                  </div>
+                </div>
+
+                <el-divider style="margin: 8px 0" />
+
+                <!-- 语言设置 -->
+                <div class="panel-setting-row">
+                  <div class="panel-setting-label">{{ $t('common.locale.zh') }} / {{ $t('common.locale.ja') }}</div>
+                  <el-radio-group v-model="currentLocale" size="small" @change="onLocaleChange">
+                    <el-radio-button value="zh">{{ $t('common.locale.zh') }}</el-radio-button>
+                    <el-radio-button value="ja">{{ $t('common.locale.ja') }}</el-radio-button>
+                  </el-radio-group>
+                </div>
+
+                <!-- 时区设置 -->
+                <div class="panel-setting-row">
+                  <div class="panel-setting-label">{{ $t('common.timezone.label') }}</div>
+                  <el-select v-model="currentTimezone" size="small" style="width: 140px;" @change="onTimezoneChange">
+                    <el-option value="CST" :label="$t('common.timezone.CST')" />
+                    <el-option value="JST" :label="$t('common.timezone.JST')" />
+                  </el-select>
+                </div>
+
+                <el-divider style="margin: 8px 0" />
+
+                <!-- 退出登录 -->
+                <div class="panel-logout" @click="onLogout">
                   <el-icon><SwitchButton /></el-icon>
                   {{ $t('app.logout') }}
-                </el-dropdown-item>
-              </el-dropdown-menu>
+                </div>
+              </div>
             </template>
           </el-dropdown>
         </div>
@@ -155,18 +182,21 @@ const { locale } = useI18n()
 
 const isCollapsed = ref(false)
 const activeMenu = computed(() => route.path)
-const currentLocale = computed(() => locale.value as Locale)
+const currentLocale = ref<Locale>((localStorage.getItem('locale') as Locale) || 'zh')
+const currentTimezone = ref(localStorage.getItem('timezone') || 'CST')
 
 function onLocaleChange(newLocale: Locale) {
   locale.value = newLocale
   localStorage.setItem('locale', newLocale)
 }
 
-function onCommand(cmd: string) {
-  if (cmd === 'logout') {
-    auth.logout()
-    router.push('/login')
-  }
+function onTimezoneChange(tz: string) {
+  localStorage.setItem('timezone', tz)
+}
+
+function onLogout() {
+  auth.logout()
+  router.push('/login')
 }
 </script>
 
@@ -319,5 +349,65 @@ function onCommand(cmd: string) {
 .main-content {
   background: var(--bg-page);
   padding: 20px;
+}
+
+/* ── 用户设置面板 ── */
+.user-panel {
+  width: 240px;
+  padding: 12px;
+  background: var(--bg-header);
+}
+
+.panel-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0 8px;
+}
+
+.panel-user-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.panel-username {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.panel-role {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.panel-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  gap: 8px;
+}
+
+.panel-setting-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.panel-logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  cursor: pointer;
+  color: var(--color-danger, #dc2626);
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+.panel-logout:hover {
+  background: rgba(220, 38, 38, 0.08);
 }
 </style>
