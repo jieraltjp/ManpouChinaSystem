@@ -101,7 +101,7 @@
         </el-table-column>
         <el-table-column :label="$t('logistics.column.action')" min-width="220" align="center">
           <template #default="{ row }">
-            <!-- <el-button link type="success" size="small" @click.stop="onCreateCustoms(row)">{{ $t('logistics.action.createCustoms') }}</el-button> -->
+            <el-button link type="success" size="small" @click.stop="onCreateCustoms(row)">{{ $t('logistics.action.createCustoms') }}</el-button>
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('logistics.action.detail') }}</el-button>
             <el-button link type="warning" size="small" @click.stop="onEdit(row)" :disabled="row.status === 'DELIVERED'">{{ $t('logistics.action.edit') }}</el-button>
             <el-button v-if="row.qcRecordId" link type="info" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
@@ -512,6 +512,14 @@ async function onSubmit() {
 function onView(row: LogisticsPlanVO) {
   currentRow.value = row
   drawerVisible.value = true
+}
+
+function onCreateCustoms(row: LogisticsPlanVO) {
+  if (!row.containerNo) {
+    ElMessage.warning(t('logistics.message.containerNoRequiredForCustoms'))
+    return
+  }
+  router.push('/procurement/domestic-customs?containerNo=' + encodeURIComponent(row.containerNo))
 }
 
 
