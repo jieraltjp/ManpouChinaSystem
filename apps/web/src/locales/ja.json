@@ -27,6 +27,14 @@
     "login": "ログイン",
     "title": "マンプ（中国）管理システム",
     "subtitle": "Manpou China System",
+    "welcomeTitle": "跨境貿易発注管理",
+    "welcomeDesc": "発注・倉庫・通関・物流・退税の全过程をカバーし、効率的な運営を実現。",
+    "features": [
+      "発注管理 — 注文の全工程を追跡",
+      "スマート倉庫 — リアルタイム在庫同期",
+      "通関物流 — 一体化した合规通関"
+    ],
+    "language": "言語",
     "username": "ユーザー名",
     "password": "パスワード",
     "usernamePlaceholder": "ユーザー名を入力",
@@ -244,7 +252,9 @@
       "日本通関完了": "日本通関完了",
       "会計": "会計",
       "完了": "完了",
-      "退货": "退货"
+      "退货": "退货",
+      "已下单": "出荷済み",
+      "已出货": "出荷済"
     },
     "billingType": {
       "ZHE_LU_KAI_PIAO": "浙魯開票",
@@ -395,7 +405,10 @@
       "deleteConfirm": "発注書「{productCode}」（{quantity}個）を削除しますか？",
       "deleteConfirmTitle": "削除確認",
       "factoryCreateSuccess": "工場の作成が完了しました",
-      "detail": "詳細"
+      "detail": "詳細",
+      "statusUpdated": "ステータスが更新されました",
+      "statusUpdateFailed": "ステータスの更新に失敗しました",
+      "qcRecordLinked": "QC記録が既にリンクされています。ステータスを変更できません"
     },
     "common": {
       "yes": "はい",
@@ -952,7 +965,8 @@
       "productCategory": "商品カテゴリ",
       "demandStatus": "需要ステータス",
       "linkedProcurementId": "関連発注書",
-      "demandCreateTime": "作成日時"
+      "demandCreateTime": "作成日時",
+      "createTime": "作成日時"
     },
     "step": {
       "1": "需要",

@@ -27,6 +27,14 @@
     "login": "登录",
     "title": "漫普中国管理系统",
     "subtitle": "Manpou China System",
+    "welcomeTitle": "跨境贸易发注管理",
+    "welcomeDesc": "覆盖发注、仓储、报关、物流、退税全链路，助您高效运营。",
+    "features": [
+      "发注管理 — 订单全流程追踪",
+      "智能仓储 — 实时库存同步",
+      "报关物流 — 一体化合规通关"
+    ],
+    "language": "语言",
     "username": "用户名",
     "password": "密码",
     "usernamePlaceholder": "请输入用户名",
@@ -236,7 +244,9 @@
       "日本通関完了": "日本通関完了",
       "会計": "会計",
       "完了": "完了",
-      "退货": "退货"
+      "退货": "退货",
+      "已下单": "已下单",
+      "已出货": "已出货"
     },
     "billingType": {
       "ZHE_LU_KAI_PIAO": "浙鲁开票",
@@ -387,7 +397,10 @@
       "deleteConfirm": "确认删除发注单「{productCode}」（{quantity}件）？",
       "deleteConfirmTitle": "删除确认",
       "factoryCreateSuccess": "工厂创建成功",
-      "detail": "详情"
+      "detail": "详情",
+      "statusUpdated": "状态更新成功",
+      "statusUpdateFailed": "状态更新失败",
+      "qcRecordLinked": "已有 QC 记录，无法切换状态"
     },
     "common": {
       "yes": "是",
@@ -981,7 +994,8 @@
       "productCategory": "商品分类",
       "demandStatus": "需求状态",
       "linkedProcurementId": "关联发注单",
-      "demandCreateTime": "创建时间"
+      "demandCreateTime": "创建时间",
+      "createTime": "创建时间"
     },
     "step": {
       "1": "需求",

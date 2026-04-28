@@ -93,7 +93,7 @@
           <el-descriptions-item :label="$t('orderOverview.column.destination')">{{ detailData.demand?.destination || '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.column.japanLead')">{{ detailData.demand?.japanLead || '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.column.demandStatus')">{{ detailData.demand?.status || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.column.createTime')">{{ detailData.demand?.createTime || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.column.createTime')">{{ formatDate(detailData.demand?.createTime) }}</el-descriptions-item>
         </el-descriptions>
 
         <!-- 步骤2：发注单 -->
@@ -107,9 +107,9 @@
           <el-descriptions-item :label="$t('orderOverview.step2.priceRmb')">{{ detailData.procurement.priceRmb ? $t('common.currency.cny') + Number(detailData.procurement.priceRmb).toFixed(2) : '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.taxPoint')">{{ detailData.procurement.taxPoint ?? '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.billingType')">{{ detailData.procurement.billingType || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step2.orderDate')">{{ detailData.procurement.orderDate || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step2.plannedShipDate')">{{ detailData.procurement.plannedShipDate || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step2.actualShipDate')">{{ detailData.procurement.actualShipDate || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.orderDate')">{{ formatDate(detailData.procurement.orderDate) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.plannedShipDate')">{{ formatDate(detailData.procurement.plannedShipDate) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.actualShipDate')">{{ formatDate(detailData.procurement.actualShipDate) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.status')">{{ detailData.procurement.status || '-' }}</el-descriptions-item>
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
@@ -122,7 +122,7 @@
           <el-descriptions-item :label="$t('orderOverview.step3.inspectionCount')">{{ detailData.qcRecord.inspectionCount ?? '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step3.passedCount')">{{ detailData.qcRecord.passedCount ?? '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step3.defectiveCount')">{{ detailData.qcRecord.defectiveCount ?? '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step3.qcDate')">{{ detailData.qcRecord.qcDate || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step3.qcDate')">{{ formatDate(detailData.qcRecord.qcDate) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step3.status')">{{ detailData.qcRecord.status || '-' }}</el-descriptions-item>
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
@@ -134,8 +134,8 @@
           <el-descriptions-item :label="$t('orderOverview.step4.planType')">{{ detailData.logisticsPlan.planType || '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step4.cargoVolume')">{{ detailData.logisticsPlan.cargoVolumeCbm ? detailData.logisticsPlan.cargoVolumeCbm + ' CBM' : '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step4.cargoWeight')">{{ detailData.logisticsPlan.cargoWeightKg ? detailData.logisticsPlan.cargoWeightKg + ' kg' : '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step4.estimatedShipDate')">{{ detailData.logisticsPlan.estimatedShipDate || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step4.actualShipDate')">{{ detailData.logisticsPlan.actualShipDate || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step4.estimatedShipDate')">{{ formatDate(detailData.logisticsPlan.estimatedShipDate) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step4.actualShipDate')">{{ formatDate(detailData.logisticsPlan.actualShipDate) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step4.status')">{{ detailData.logisticsPlan.status || '-' }}</el-descriptions-item>
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
@@ -151,10 +151,12 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { Loading } from '@element-plus/icons-vue'
 import { orderChainApi, type OrderChainVO, type OrderChainDetailVO } from '@/api/orderChain'
 
 const router = useRouter()
+const { locale } = useI18n()
 
 const loading = ref(false)
 const chainData = ref<OrderChainVO[]>([])
@@ -166,6 +168,11 @@ const drawerVisible = ref(false)
 const currentRow = ref<OrderChainVO | null>(null)
 const detailLoading = ref(false)
 const detailData = ref<OrderChainDetailVO | null>(null)
+
+function formatDate(val: string | undefined | null): string {
+  if (!val) return '-'
+  return new Date(val).toLocaleString(locale.value === 'ja' ? 'ja-JP' : 'zh-CN')
+}
 
 async function loadChainList() {
   loading.value = true
