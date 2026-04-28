@@ -1,7 +1,7 @@
 # DB-09 — 订单总览数据库设计
 
-> **版本**: 2.1.0
-> **更新**: 2026-04-28（v2.1.0：明确分阶段实现——Phase1=步骤1~4，Phase2=步骤5~8）
+> **版本**: 2.2.0
+> **更新**: 2026-04-28（v2.2.0：procurement_snapshot 补全——Factory/Product 快照字段补全至完整清单；新增 V40 迁移计划）
 > **创建**: 2026-04-22
 > **状态**: 🔄 Phase1 开发中
 > **业务步号**: 09（订单总览 — 核心视图）
@@ -215,7 +215,119 @@ WHERE d.is_deleted = FALSE;
 
 ---
 
-## 4. 索引建议
+## 4. procurement_snapshot 表（发注单快照）
+
+> **v2.2.0 新增**：记录下单时刻的工厂和商品信息，保证历史订单数据不变。
+> 由 `ProcurementUseCase` 在创建发注单时自动写入，允许事后修改。
+> Entity: `com.manpou.allinone.order.domain.model.ProcurementSnapshot`
+
+### 4.1 完整字段清单
+
+| 分类 | 字段名 | 类型 | 说明 | 状态 |
+|------|--------|------|------|------|
+| **主键** | `id` | BIGINT | 自增主键 | ✅ 已有 |
+| **关联** | `procurement_id` | BIGINT | 发注单ID（唯一） | ✅ 已有 |
+| **工厂-基本信息** | `factory_id` | BIGINT | 工厂ID | ✅ 已有 |
+| | `factory_code` | VARCHAR(32) | 工厂编号 | ✅ 已有 |
+| | `factory_name` | VARCHAR(128) | 工厂名称 | ✅ 已有 |
+| **工厂-地理** | `factory_province` | VARCHAR(64) | 省 | ✅ 已有 |
+| | `factory_city` | VARCHAR(64) | 市 | ⚠️ 缺 |
+| | `factory_county` | VARCHAR(64) | 县/区 | ⚠️ 缺 |
+| | `factory_rough_location` | VARCHAR(500) | 详细地址 | ⚠️ 缺 |
+| | `factory_longitude` | DECIMAL(11,8) | 经度 | ⚠️ 缺 |
+| | `factory_latitude` | DECIMAL(11,8) | 纬度 | ⚠️ 缺 |
+| **工厂-联系** | `factory_contact_name` | VARCHAR(64) | 联系人 | ✅ 已有 |
+| | `factory_contact_phone` | VARCHAR(32) | 手机号 | ✅ 已有 |
+| | `factory_contact_wechat` | VARCHAR(64) | 微信号 | ⚠️ 缺 |
+| | `factory_contact_qq` | VARCHAR(32) | QQ号 | ⚠️ 缺 |
+| **工厂-合作** | `factory_category` | VARCHAR(32) | 分类（枚举） | ⚠️ 缺 |
+| | `factory_cooperation_status` | VARCHAR(32) | 合作状态 | ⚠️ 缺 |
+| | `factory_payment_terms` | VARCHAR(64) | 账期 | ⚠️ 缺 |
+| **商品-基本信息** | `product_master_code` | VARCHAR(32) | 主货号 | ⚠️ 缺 |
+| | `product_sub_code` | VARCHAR(64) | 子货号 | ⚠️ 缺 |
+| | `product_jan_code` | VARCHAR(64) | JAN码 | ⚠️ 缺 |
+| | `product_name_zh` | VARCHAR(255) | 中文名称 | ✅ 已有 |
+| | `product_name_ja` | VARCHAR(128) | 日文名称 | ✅ 已有 |
+| | `product_name_en` | VARCHAR(255) | 英文名称 | ⚠️ 缺 |
+| **商品-属性** | `product_category` | VARCHAR(32) | 分类 | ✅ 已有 |
+| | `product_origin` | VARCHAR(100) | 原产国 | ⚠️ 缺 |
+| | `product_material` | VARCHAR(64) | 材质 | ⚠️ 缺 |
+| | `product_unit` | VARCHAR(50) | 计量单位 | ⚠️ 缺 |
+| **商品-报关** | `product_hs_code` | VARCHAR(20) | 中国HS编码 | ⚠️ 缺 |
+| | `product_hs_code_jp` | VARCHAR(20) | 日本HS编码 | ⚠️ 缺 |
+| **商品-价格** | `product_unit_price_rmb` | DECIMAL(12,4) | 单价(CNY) | ⚠️ 缺 |
+| | `product_tax_point` | DECIMAL(5,4) | 票点 | ⚠️ 缺 |
+| **商品-图片** | `product_image_url` | VARCHAR(512) | 商品图片URL | ⚠️ 缺 |
+
+> **图例**: ✅ = 已有字段，⚠️ = 缺失字段（需 V40 迁移添加）
+
+### 4.2 迁移计划（V40）
+
+```sql
+-- V40：procurement_snapshot 补全 Factory/Product 快照字段
+ALTER TABLE procurement_snapshot
+  ADD COLUMN factory_city            VARCHAR(64)  DEFAULT '' COMMENT '市',
+  ADD COLUMN factory_county         VARCHAR(64)  DEFAULT '' COMMENT '县/区',
+  ADD COLUMN factory_rough_location VARCHAR(500) COMMENT '详细地址',
+  ADD COLUMN factory_longitude      DECIMAL(11,8) COMMENT '经度',
+  ADD COLUMN factory_latitude      DECIMAL(11,8) COMMENT '纬度',
+  ADD COLUMN factory_contact_wechat VARCHAR(64)   DEFAULT '' COMMENT '微信号',
+  ADD COLUMN factory_contact_qq    VARCHAR(32)   DEFAULT '' COMMENT 'QQ号',
+  ADD COLUMN factory_category       VARCHAR(32)   DEFAULT '' COMMENT '分类',
+  ADD COLUMN factory_cooperation_status VARCHAR(32) DEFAULT 'POTENTIAL' COMMENT '合作状态',
+  ADD COLUMN factory_payment_terms VARCHAR(64)   DEFAULT 'NET_30' COMMENT '账期',
+  ADD COLUMN product_master_code   VARCHAR(32)   DEFAULT '' COMMENT '主货号',
+  ADD COLUMN product_sub_code       VARCHAR(64)   DEFAULT '' COMMENT '子货号',
+  ADD COLUMN product_jan_code       VARCHAR(64)   DEFAULT '' COMMENT 'JAN码',
+  ADD COLUMN product_name_en        VARCHAR(255)  DEFAULT '' COMMENT '英文名称',
+  ADD COLUMN product_origin        VARCHAR(100)  DEFAULT '' COMMENT '原产国',
+  ADD COLUMN product_material      VARCHAR(64)   DEFAULT '' COMMENT '材质',
+  ADD COLUMN product_unit          VARCHAR(50)   DEFAULT '' COMMENT '计量单位',
+  ADD COLUMN product_hs_code      VARCHAR(20)   DEFAULT '' COMMENT '中国HS编码',
+  ADD COLUMN product_hs_code_jp   VARCHAR(20)   DEFAULT '' COMMENT '日本HS编码',
+  ADD COLUMN product_unit_price_rmb DECIMAL(12,4) COMMENT '单价(CNY)',
+  ADD COLUMN product_tax_point     DECIMAL(5,4) COMMENT '票点',
+  ADD COLUMN product_image_url     VARCHAR(512)  DEFAULT '' COMMENT '商品图片URL';
+
+-- 回填历史数据（基于 procurement.id 关联 factory/product 表）
+UPDATE procurement_snapshot sn
+  INNER JOIN procurement p ON p.id = sn.procurement_id
+  INNER JOIN factory f ON f.id = p.factory_id
+  INNER JOIN product prd ON prd.master_code = p.product_code
+    AND (prd.sub_code IS NULL OR prd.sub_code = p.sub_product_code)
+SET
+  sn.factory_city = f.city,
+  sn.factory_county = f.county,
+  sn.factory_rough_location = f.rough_location,
+  sn.factory_longitude = f.longitude,
+  sn.factory_latitude = f.latitude,
+  sn.factory_contact_wechat = f.contact_wechat,
+  sn.factory_contact_qq = f.contact_qq,
+  sn.factory_category = f.category,
+  sn.factory_cooperation_status = f.cooperation_status,
+  sn.factory_payment_terms = f.payment_terms,
+  sn.product_master_code = prd.master_code,
+  sn.product_sub_code = prd.sub_code,
+  sn.product_jan_code = prd.jan_code,
+  sn.product_name_en = prd.name_en,
+  sn.product_origin = prd.origin,
+  sn.product_material = prd.material,
+  sn.product_unit = prd.unit,
+  sn.product_hs_code = prd.hs_code,
+  sn.product_hs_code_jp = prd.hs_code_jp,
+  sn.product_unit_price_rmb = prd.unit_price_rmb,
+  sn.product_tax_point = prd.tax_point,
+  sn.product_image_url = prd.image_url
+WHERE sn.factory_id IS NOT NULL;
+
+-- 同步更新 ProcurementSnapshot.java 实体补全所有字段
+-- 同步更新 ProcurementUseCase.java 填充新字段
+-- 同步更新 OrderChainView.java / OrderChainDetailVO.java
+```
+
+---
+
+## 5. 索引建议
 
 ```sql
 -- 核心查询索引（Demand 列表 + 8步状态）
@@ -234,7 +346,7 @@ CREATE INDEX idx_chain_sales_proc ON sales_record(procurement_id, is_deleted);
 
 ---
 
-## 5. 前端使用方式
+## 6. 前端使用方式
 
 ### 5.1 列表页（单一表格，一行 = 一个 Demand）
 
@@ -255,7 +367,7 @@ GET /api/v1/orders/chain/{demandId}
 
 ---
 
-## 6. 分阶段实现计划
+## 7. 分阶段实现计划
 
 ### Phase 1：步骤 1~4（补货 → 发注 → 验货 → 调配）
 
@@ -284,7 +396,7 @@ GET /api/v1/orders/chain/{demandId}
 
 ---
 
-## 7. Phase 1 视图 SQL（步骤 1~4 + 快照工厂/商品）
+## 8. Phase 1 视图 SQL（步骤 1~4 + 快照工厂/商品）
 
 > **v2.0.0 变更（2026-04-28）**：`factory` / `product` 表 JOIN 改为 `procurement_snapshot`（下单时刻快照，历史数据不变）
 
@@ -389,43 +501,15 @@ SELECT
   NULL AS step7_status,
   NULL AS step8_status,
 
-  -- ====== Phase1 步骤5~8 字段占位 ======
+  -- ====== Phase1 步骤5~8 字段占位（与 OrderChainView.entity 对齐）======
   NULL AS domestic_customs_id,
-  NULL AS domestic_customs_no,
-  NULL AS domestic_hs_code,
-  NULL AS domestic_declaration_date,
-  NULL AS domestic_export_port,
-  NULL AS domestic_declared_value_rmb,
   NULL AS domestic_customs_status,
-  NULL AS domestic_create_time,
   NULL AS japan_customs_id,
-  NULL AS japan_customs_entry_no,
-  NULL AS japan_arrival_date,
-  NULL AS japan_customs_broker,
-  NULL AS japan_broker_phone,
-  NULL AS japan_import_duty_paid,
-  NULL AS japan_consumption_tax_paid,
-  NULL AS japan_clearance_date,
   NULL AS japan_customs_status,
-  NULL AS japan_create_time,
   NULL AS tax_refund_id,
-  NULL AS tax_refund_amount,
-  NULL AS tax_refund_date,
   NULL AS tax_refund_status,
-  NULL AS tax_refund_create_time,
   NULL AS sales_record_id,
-  NULL AS sales_record_code,
-  NULL AS sales_channel,
-  NULL AS sales_listing_date,
-  NULL AS sales_initial_stock,
-  NULL AS sales_current_stock,
-  NULL AS sales_safety_stock,
-  NULL AS sales_sales_quantity,
-  NULL AS sales_returned_quantity,
-  NULL AS sales_return_rate,
-  NULL AS sales_selling_price_jpy,
-  NULL AS sales_status,
-  NULL AS sales_create_time
+  NULL AS sales_status
 
 FROM replenishment_demand d
   LEFT JOIN procurement p ON p.id = d.linked_procurement_id AND p.is_deleted = b'0'
