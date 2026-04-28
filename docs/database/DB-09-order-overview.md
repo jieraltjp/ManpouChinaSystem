@@ -43,10 +43,10 @@ replenishment_demand (锚点)
 
 ---
 
-## 3. MySQL VIEW — v_order_chain
+## 3. MySQL VIEW — v_order_chain_v1
 
 ```sql
-CREATE OR REPLACE VIEW v_order_chain AS
+CREATE OR REPLACE VIEW v_order_chain_v1 AS
 SELECT
   -- ====== 锚点：Demand（步骤1）======
   d.id                        AS demand_id,
@@ -128,8 +128,6 @@ SELECT
   l.requires_qc            AS logistics_requires_qc,
   l.estimated_ship_date     AS logistics_estimated_ship_date,
   l.actual_ship_date        AS logistics_actual_ship_date,
-  l.departure_port         AS logistics_departure_port,
-  l.arrival_port           AS logistics_arrival_port,
   l.status                 AS logistics_status,
   l.create_time            AS logistics_create_time,
 
@@ -263,12 +261,12 @@ GET /api/v1/orders/chain/{demandId}
 
 | # | 项目 | 状态 | 说明 |
 |---|------|------|------|
-| 1 | `v_order_chain_v1` MySQL VIEW（仅前4步+工厂） | 🔲 待建 | 视图包含 Demand/Procurement/Factory/QcRecord/LogisticsPlan |
-| 2 | `OrderChainView` JPA Entity | 🔲 待建 | 映射 `v_order_chain_v1` 视图 |
-| 3 | `OrderChainRepository` | 🔲 待建 | 分页查询 + 详情查询 |
-| 4 | `OrderChainUseCase` | 🔲 待建 | 业务逻辑 |
-| 5 | `OrderChainController` | 🔲 待建 | `/api/v1/orders/chain` |
-| 6 | `OrderChainVO` / `OrderChainDetailVO` | 🔲 待建 | 响应对象 |
+| 1 | `v_order_chain_v1` MySQL VIEW（仅前4步+工厂） | ✅ 已建 | 视图包含 Demand/Procurement/Factory/QcRecord/LogisticsPlan |
+| 2 | `OrderChainView` JPA Entity | ✅ 已建 | 映射 `v_order_chain_v1` 视图 |
+| 3 | `OrderChainRepository` | ✅ 已建 | 分页查询 + 详情查询 |
+| 4 | `OrderChainUseCase` | ✅ 已建 | 业务逻辑 |
+| 5 | `OrderChainController` | ✅ 已建 | `/api/v1/orders/chain` |
+| 6 | `OrderChainVO` / `OrderChainDetailVO` | ✅ 已建 | 响应对象 |
 | 7 | 前端 API 层 `orderChain.ts` | 🔲 待建 | |
 | 8 | 前端 `OrderOverviewPage.vue` 单列表 | 🔲 待改 | 移除双 Tab，改为单列表 |
 
@@ -308,7 +306,7 @@ SELECT
 
   -- ====== 步骤2：Procurement ======
   p.id                        AS procurement_id,
-  p.procurement_code         AS procurement_code,
+  CONCAT('P-', CAST(p.id AS CHAR)) AS procurement_code,
   p.factory_id               AS procurement_factory_id,
   p.product_code             AS procurement_product_code,
   p.sub_product_code         AS procurement_sub_product_code,
@@ -371,8 +369,6 @@ SELECT
   l.requires_qc            AS logistics_requires_qc,
   l.estimated_ship_date     AS logistics_estimated_ship_date,
   l.actual_ship_date        AS logistics_actual_ship_date,
-  l.departure_port         AS logistics_departure_port,
-  l.arrival_port           AS logistics_arrival_port,
   l.status                 AS logistics_status,
   l.create_time            AS logistics_create_time,
 
@@ -431,13 +427,13 @@ SELECT
   NULL AS sales_create_time
 
 FROM replenishment_demand d
-  LEFT JOIN procurement p ON p.id = d.linked_procurement_id AND p.is_deleted = FALSE
-  LEFT JOIN factory f ON f.id = p.factory_id AND f.is_deleted = FALSE
-  LEFT JOIN qc_record q ON q.procurement_id = p.id AND q.is_deleted = FALSE
-  LEFT JOIN logistics_plan l ON l.qc_record_id = q.id AND l.is_deleted = FALSE
-  LEFT JOIN product prd ON prd.master_code = d.product_code AND prd.sub_code IS NULL AND prd.is_deleted = FALSE
+  LEFT JOIN procurement p ON p.id = d.linked_procurement_id AND p.is_deleted = b'0'
+  LEFT JOIN factory f ON f.id = p.factory_id AND f.is_deleted = b'0'
+  LEFT JOIN qc_record q ON q.procurement_id = p.id AND q.is_deleted = b'0'
+  LEFT JOIN logistics_plan l ON l.qc_record_id = q.id AND l.is_deleted = b'0'
+  LEFT JOIN product prd ON prd.master_code = d.product_code COLLATE utf8mb4_unicode_ci AND prd.sub_code IS NULL AND prd.is_deleted = b'0'
 
-WHERE d.is_deleted = FALSE;
+WHERE d.is_deleted = b'0';
 ```
 
 ### Phase 1 索引
