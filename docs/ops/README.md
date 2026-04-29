@@ -52,12 +52,53 @@ git pull origin main && ./scripts/start-all.sh
 
 ## 4. 新机器首次配置（一次性）
 
+### Windows（已有 Docker Desktop）
+
 ```bash
 ./scripts/init-config.sh dev
 ```
 
+### Ubuntu 22.04 Server（新装机）
+
+**第一步：安装基础依赖（一键）**
+
+```bash
+# 连接到服务器后，以 root 身份执行以下命令
+apt update && apt install -y openjdk-21-jdk curl wget git unzip
+
+# 安装 Node.js 20.x
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt install -y nodejs
+
+# 安装 Docker 和 docker-compose
+apt install -y docker.io docker-compose
+systemctl start docker
+systemctl enable docker
+```
+
+**第二步：克隆代码**
+
+```bash
+cd /opt
+git clone <你的仓库地址> ManpouChinaSystem
+cd ManpouChinaSystem
+```
+
+**第三步：初始化并启动**
+
+```bash
+cd /opt/ManpouChinaSystem
+./scripts/init-config.sh dev
+./scripts/start-all.sh
+```
+
+> **资源注意**：完整 docker-compose 基础设施（TiDB + Kafka + Nacos + Redis + MinIO + Prometheus + Grafana + OTel）约需 4–8GB 内存。2GB 机器上请先只启动后端，Docker 容器按需启动：
+> ```bash
+> docker compose -f docker/compose.yaml up -d nacos redis   # 最少依赖
+> ```
+
 执行内容：
-1. 检查 Docker Desktop 是否运行
+1. 检查 Docker 是否运行
 2. 创建 `.env.local`（若不存在）
 3. 启动 `docker/compose.yaml` 中的基础设施容器
 4. 等待 Nacos 就绪

@@ -248,7 +248,13 @@
       "Bash(taskkill //F //PID 185132)",
       "Bash(echo \"Started PID=$!\")",
       "Bash(tasklist /FI \"PID eq 258700\")",
-      "Bash(taskkill *)"
+      "Bash(taskkill *)",
+      "Bash(echo \"started PID=$!\")",
+      "Bash(xargs -I{} taskkill //F //PID {})",
+      "Bash(echo \"New PID: $!\")",
+      "Bash(export SSH_ASKPASS=\"/tmp/askpass.sh\")",
+      "Bash(export SSH_ASKPASS_REQUIRE=force)",
+      "Bash(export DISPLAY=:0)"
     ]
   }
 }

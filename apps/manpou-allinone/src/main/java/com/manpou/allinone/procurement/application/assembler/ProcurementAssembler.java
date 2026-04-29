@@ -2,10 +2,12 @@ package com.manpou.allinone.procurement.application.assembler;
 
 import com.manpou.allinone.common.port.FactoryQueryPort;
 import com.manpou.allinone.order.application.dto.OrderProcurementSelectorDTO;
+import com.manpou.allinone.qc.domain.repository.QcRecordRepository;
 import com.manpou.allinone.procurement.application.dto.ProcurementCreateCmd;
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
 import com.manpou.allinone.procurement.application.dto.ProcurementUpdateCmd;
 import com.manpou.allinone.procurement.domain.model.Procurement;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,9 +18,11 @@ import org.springframework.stereotype.Component;
 public class ProcurementAssembler {
 
     private final FactoryQueryPort factoryQueryPort;
+    private final QcRecordRepository qcRecordRepository;
 
-    public ProcurementAssembler(FactoryQueryPort factoryQueryPort) {
+    public ProcurementAssembler(FactoryQueryPort factoryQueryPort, QcRecordRepository qcRecordRepository) {
         this.factoryQueryPort = factoryQueryPort;
+        this.qcRecordRepository = qcRecordRepository;
     }
 
     public ProcurementPageQuery toDto(Procurement entity) {
@@ -29,10 +33,18 @@ public class ProcurementAssembler {
                     .map(f -> f.getFactoryName())
                     .orElse(null);
         }
+        // 检查是否有 QC 记录（Phase2：状态联动）
+        Long qcRecordId = qcRecordRepository
+                .findByProcurementIdAndDeletedIsFalse(entity.getId(), Pageable.unpaged())
+                .stream()
+                .findFirst()
+                .map(r -> r.getId())
+                .orElse(null);
         return ProcurementPageQuery.builder()
                 .id(entity.getId())
                 .factoryId(entity.getFactoryId())
                 .factoryName(factoryName)
+                .qcRecordId(qcRecordId)
                 .productCode(entity.getProductCode())
                 .subProductCode(entity.getSubProductCode())
                 .material(entity.getMaterial())

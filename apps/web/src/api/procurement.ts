@@ -20,6 +20,7 @@ export interface ProcurementPageVO {
   id: number
   factoryId?: number            // 关联工厂ID
   factoryName?: string          // 关联工厂名称（来自 DB-10 Factory 表，Assembler 查库填充）
+  qcRecordId?: number          // 关联 QC 记录 ID（Phase2：状态联动）
   productCode: string          // 主货号
   subProductCode?: string     // 子货号/枝番（颜色）
   material?: string            // 材质

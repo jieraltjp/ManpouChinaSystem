@@ -69,6 +69,16 @@ docker compose -f docker/compose.yaml up -d --build
 
 ## 首次配置（新机器）
 
+### Windows
+
 ```bash
 ./scripts/init-config.sh dev
+```
+
+### Ubuntu（已通过 SSH 安装依赖后）
+
+```bash
+cd /opt/ManpouChinaSystem
+./scripts/init-config.sh dev
+./scripts/start-all.sh
 ```

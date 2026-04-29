@@ -27,6 +27,7 @@ public class ProcurementPageQuery {
     private Long id;
     private Long factoryId;              // 关联工厂ID
     private String factoryName;          // 关联工厂名称（只读，来自 factory 表 JOIN）
+    private Long qcRecordId;             // 关联 QC 记录 ID（Phase2：状态联动）
 
     // ===== 商品信息 =====
     private String productCode;         // 主货号

@@ -126,7 +126,7 @@ git stash pop      # 手动解决冲突后保留
 
 | 症状 | 解决方法 |
 |---|---|
-| 脚本无法执行 | 用 **Git Bash** 或 **WSL**，不要用 CMD / PowerShell 直接运行 |
+| 脚本无法执行 | Windows 用 **Git Bash** 或 **WSL**，不要用 CMD / PowerShell 直接运行 |
 | `mvn` 命令找不到 | 使用项目自带的 `./mvnw` 包装器 |
 | 文件路径问题 | 确保项目路径无中文、无空格 |
 
@@ -140,7 +140,13 @@ git stash pop      # 手动解决冲突后保留
 ```bash
 #!/usr/bin/env bash
 is_port_used() {
-    powershell -Command "Get-NetTCPConnection -LocalPort $1 -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty LocalPort" 2>/dev/null | grep -q "$1"
+    if command -v ss &>/dev/null; then
+        ss -tlnp 2>/dev/null | grep -q ":${1} "
+    elif command -v netstat &>/dev/null; then
+        netstat -tlnp 2>/dev/null | grep -q ":${1} "
+    else
+        lsof -i ":${1}" &>/dev/null
+    fi
 }
 
 for port in 18090 18081 13000; do

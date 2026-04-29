@@ -127,8 +127,15 @@
         </el-table-column>
         <el-table-column prop="status" :label="$t('order.column.status')" min-width="110" align="center">
           <template #default="{ row }">
-            <el-tag :type="statusType(row.status)" size="small">
-              {{ statusLabel(row.status) }}
+            <el-tag
+              :type="statusType(row)"
+              size="small"
+              :disable-transitions="false"
+              class="status-toggle"
+              :class="{ 'is-link': !row.qcRecordId }"
+              @click.stop="onToggleStatus(row)"
+            >
+              {{ statusLabel(row) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -176,8 +183,8 @@
         <el-descriptions-item :label="$t('order.drawer.customsRemarks')" :span="2">{{ currentRow.customsRemarks || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.instructionManual')" :span="2">{{ currentRow.instructionManual || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.status')">
-          <el-tag :type="statusType(currentRow.status)" size="small">
-            {{ statusLabel(currentRow.status) }}
+          <el-tag :type="statusType(currentRow)" size="small">
+            {{ statusLabel(currentRow) }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.customerCompany')">{{ currentRow.customerCompany || '-' }}</el-descriptions-item>
@@ -493,17 +500,14 @@ const router = useRouter()
 const { t, locale: localeRef } = useI18n()
 const currentLocale = computed(() => localeRef.value)
 
-const COMPLETED_STATUS = '完了'
+const COMPLETED_STATUS = '已出货'
 const RETURNED_STATUS = '退货'
-const deletableStatuses = ['未定', '発注待']
+const deletableStatuses = ['已下单']
 
-const ORDER_STATUSES = [
-  '未定', '予定', 'OEM', '発注待', '永康', '直送', '倉庫着', '検品', '現地検品',
-  'エア便', 'メーカー直送', '輸出', '国内通関', '通関', '日本着', '日本通関完了', '会計', COMPLETED_STATUS, RETURNED_STATUS,
-]
+const ORDER_STATUSES = ['已下单', '已出货']
 
 const statusOptionsWithI18n = computed(() =>
-  ORDER_STATUSES.map(value => ({ value, label: statusLabel(value) })),
+  ORDER_STATUSES.map(value => ({ value, label: statusLabelByValue(value) })),
 )
 
 const filterForm = reactive({
@@ -737,10 +741,9 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string; catego
   japanLead: '',
   chinaLead: '',
   destination: '',
-  status: '未定',
+  status: '已下单',
   category: '',
 })
-
 const formData = reactive<CreateProcurementRequest & { status?: string; category?: string }>(defaultFormData())
 
 const formRules = {
@@ -848,7 +851,7 @@ function onEdit(row: ProcurementPageVO | null) {
     japanLead: row?.japanLead ?? '',
     chinaLead: row?.chinaLead ?? '',
     destination: row?.destination ?? '',
-    status: row?.status ?? '未定',
+    status: row?.status ?? '已下单',
   })
   dialogVisible.value = true
 }
@@ -964,31 +967,37 @@ async function onSubmit() {
   })
 }
 
-function statusLabel(status: string): string {
+function statusLabel(row: ProcurementPageVO): string {
+  // Phase2：根据 QC 记录联动显示状态
+  if (row.qcRecordId) return t('order.status.已出货')
+  return t('order.status.已下单')
+}
+
+function statusLabelByValue(status: string): string {
+  // 下拉选项用字符串映射
   return t(`order.status.${status}` as any, { default: status })
 }
 
-function statusType(status: string): string {
-  const statusTypeMap: Record<string, string> = {
-    '未定': 'info',
-    '発注待': 'warning',
-    '永康': 'warning',
-    '直送': 'warning',
-    '倉庫着': 'primary',
-    '現地検品': 'primary',
-    '検品': 'primary',
-    'エア便': 'success',
-    'メーカー直送': 'success',
-    '輸出': 'success',
-    '国内通関': 'success',
-    '通関': 'success',
-    '日本着': 'success',
-    '日本通関完了': 'success',
-    '会計': 'warning',
-    '完了': 'info',
-    '退货': 'danger',
+function statusType(row: ProcurementPageVO): string {
+  // 有 QC 记录 → 已出货（绿色）；无 → 已下单（橙色）
+  return row.qcRecordId ? 'success' : 'warning'
+}
+
+async function onToggleStatus(row: ProcurementPageVO) {
+  // 有 QC 记录 → 无法切换
+  if (row.qcRecordId) {
+    ElMessage.warning(t('order.message.qcRecordLinked'))
+    return
   }
-  return statusTypeMap[status] ?? 'info'
+  // 无 QC 记录 → 在已下单/已出货之间切换
+  const newStatus = row.status === '已下单' ? '已出货' : '已下单'
+  try {
+    await procurementApi.update(row.id, { status: newStatus })
+    ElMessage.success(t('order.message.statusUpdated'))
+    loadData()
+  } catch {
+    ElMessage.error(t('order.message.statusUpdateFailed'))
+  }
 }
 
 function billingTypeLabel(val: string | undefined): string {
@@ -1169,4 +1178,7 @@ defineExpose({ prefillFromDemand })
   align-items: center;
   width: 100%;
 }
+
+.status-toggle { }
+.status-toggle.is-link { cursor: pointer; }
 </style>
