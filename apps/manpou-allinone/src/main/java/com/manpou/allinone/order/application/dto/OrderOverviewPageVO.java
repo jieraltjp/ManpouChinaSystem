@@ -178,10 +178,12 @@ public class OrderOverviewPageVO {
     public static class DomesticCustomsVO {
         private Long id;
         private String customsCode;
+        private String containerNo;
         private Long procurementId;
         private String productCode;
         private String status;
         private java.math.BigDecimal estimatedValueCny;
+        private java.time.LocalDateTime createTime;
         private String remarks;
     }
 
@@ -191,6 +193,7 @@ public class OrderOverviewPageVO {
     @AllArgsConstructor
     public static class JapanCustomsVO {
         private Long id;
+        private String containerNo;
         private Long procurementId;
         private Long domesticCustomsId;
         private Long logisticsPlanId;

@@ -99,8 +99,9 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('logistics.column.action')" min-width="150" align="center">
+        <el-table-column :label="$t('logistics.column.action')" min-width="220" align="center">
           <template #default="{ row }">
+            <el-button link type="primary" size="small" @click.stop="onCreateCustoms(row)">{{ $t('logistics.action.createCustoms') }}</el-button>
             <el-button link type="warning" size="small" @click.stop="onEdit(row)" :disabled="row.status === 'DELIVERED'">{{ $t('logistics.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('logistics.action.delete') }}</el-button>
           </template>
@@ -242,6 +243,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Van, Top, Loading } from '@element-plus/icons-vue'
 import { logisticsApi, type LogisticsPlanVO, type LogisticsStatus, type PlanType } from '@/api/logistics'
@@ -265,6 +267,7 @@ const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const tableData = ref<LogisticsPlanVO[]>([])
 
 const formRef = ref<FormInstance>()
+const router = useRouter()
 const { t } = useI18n()
 
 const form = reactive({
@@ -379,6 +382,14 @@ function onQcRecordSelected(id: number) {
   if (!form.cargoWidthCm && r.boxWidthCm) form.cargoWidthCm = r.boxWidthCm
   if (!form.cargoHeightCm && r.boxHeightCm) form.cargoHeightCm = r.boxHeightCm
   if (!form.cargoWeightKg && r.grossWeight) form.cargoWeightKg = r.grossWeight
+}
+
+function onCreateCustoms(row: LogisticsPlanVO) {
+  if (!row.containerNo) {
+    ElMessage.warning(t('logistics.message.containerNoRequiredForCustoms'))
+    return
+  }
+  router.push(`/procurement/domestic-customs?containerNo=${encodeURIComponent(row.containerNo)}`)
 }
 
 function onNew() {

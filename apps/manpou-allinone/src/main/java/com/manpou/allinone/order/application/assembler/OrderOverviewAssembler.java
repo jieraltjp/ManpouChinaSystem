@@ -143,10 +143,12 @@ public class OrderOverviewAssembler {
         return DomesticCustomsVO.builder()
                 .id(entity.getId())
                 .customsCode(entity.getCustomsCode())
+                .containerNo(entity.getContainerNo())
                 .procurementId(entity.getProcurementId())
                 .productCode(entity.getProductCode())
                 .status(entity.getStatus() != null ? entity.getStatus().name() : null)
                 .estimatedValueCny(entity.getEstimatedValueCny())
+                .createTime(entity.getCreateTime())
                 .remarks(entity.getRemarks())
                 .build();
     }
@@ -154,6 +156,7 @@ public class OrderOverviewAssembler {
     public JapanCustomsVO toJapanCustomsVO(JapanCustomsRecord entity) {
         return JapanCustomsVO.builder()
                 .id(entity.getId())
+                .containerNo(entity.getContainerNo())
                 .procurementId(entity.getProcurementId())
                 .domesticCustomsId(entity.getDomesticCustomsId())
                 .logisticsPlanId(entity.getLogisticsPlanId())

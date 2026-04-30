@@ -1081,12 +1081,15 @@
     "step5": {
       "title": "ステップ5：国内通関",
       "customsCode": "通関番号",
+      "containerNo": "コンテナ番号",
       "productCode": "品番",
-      "status": "ステータス",
-      "estimatedValue": "申告価格"
+      "estimatedValueCny": "申告価格(CNY)",
+      "createTime": "作成日時",
+      "status": "ステータス"
     },
     "step6": {
       "title": "ステップ6：日本通関",
+      "containerNo": "コンテナ番号",
       "customsEntryNo": "入境通関番号",
       "arrivalDate": "到着日",
       "clearanceDate": "通関完了日",
@@ -1099,6 +1102,7 @@
     "step7": {
       "title": "ステップ7：退税",
       "refundCode": "退税番号",
+      "billingType": "通関タイプ",
       "estimatedRefundRmb": "理論退税額",
       "actualRefundRmb": "実際退税額",
       "refundDate": "退税日",
@@ -1109,6 +1113,7 @@
       "recordCode": "販売番号",
       "salesChannel": "販売チャネル",
       "listingDate": "上架日",
+      "initialStock": "初期在庫",
       "currentStock": "現在庫",
       "salesQuantity": "累計販売数",
       "returnRate": "退货率",

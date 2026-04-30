@@ -1114,12 +1114,15 @@
     "step5": {
       "title": "步骤5：国内报关",
       "customsCode": "报关单号",
+      "containerNo": "货柜号",
       "productCode": "货号",
-      "status": "状态",
-      "estimatedValue": "申报价值"
+      "estimatedValueCny": "申报价值(CNY)",
+      "createTime": "创建时间",
+      "status": "状态"
     },
     "step6": {
       "title": "步骤6：日本清关",
+      "containerNo": "货柜号",
       "customsEntryNo": "入境报关号",
       "arrivalDate": "到达日期",
       "clearanceDate": "清关完成日",
@@ -1132,6 +1135,7 @@
     "step7": {
       "title": "步骤7：退税",
       "refundCode": "退税编号",
+      "billingType": "报关类型",
       "estimatedRefundRmb": "理论退税额",
       "actualRefundRmb": "实际退税额",
       "refundDate": "退税日期",
@@ -1142,6 +1146,7 @@
       "recordCode": "销售编号",
       "salesChannel": "销售渠道",
       "listingDate": "上架日期",
+      "initialStock": "初始库存",
       "currentStock": "当前库存",
       "salesQuantity": "累计销量",
       "returnRate": "退货率",

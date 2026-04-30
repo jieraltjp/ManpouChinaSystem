@@ -171,15 +171,18 @@ export interface LogisticsPlanVO {
 export interface DomesticCustomsVO {
   id: number
   customsCode: string
+  containerNo?: string
   procurementId?: number
   productCode: string
   status?: string
   estimatedValueCny?: number
+  createTime?: string
   remarks?: string
 }
 
 export interface JapanCustomsVO {
   id: number
+  containerNo?: string
   procurementId?: number
   domesticCustomsId?: number
   logisticsPlanId?: number

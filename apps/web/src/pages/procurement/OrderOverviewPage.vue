@@ -148,6 +148,53 @@
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
 
+        <!-- 步骤5：国内报关 -->
+        <div class="drawer-section-title">{{ $t('orderOverview.step5.title') }}</div>
+        <el-descriptions v-if="detailData.domesticCustoms" :column="2" border size="small">
+          <el-descriptions-item :label="$t('orderOverview.step5.customsCode')">{{ detailData.domesticCustoms.customsCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step5.containerNo')">{{ detailData.domesticCustoms.containerNo || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step5.productCode')">{{ detailData.domesticCustoms.productCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step5.estimatedValueCny')">{{ detailData.domesticCustoms.estimatedValueCny ? $t('common.currency.cny') + Number(detailData.domesticCustoms.estimatedValueCny).toFixed(2) : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step5.status')">{{ domesticCustomsStatusLabel(detailData.domesticCustoms.status) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step5.createTime')">{{ formatDate(detailData.domesticCustoms.createTime) }}</el-descriptions-item>
+        </el-descriptions>
+        <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
+
+        <!-- 步骤6：日本清关 -->
+        <div class="drawer-section-title">{{ $t('orderOverview.step6.title') }}</div>
+        <el-descriptions v-if="detailData.japanCustoms" :column="2" border size="small">
+          <el-descriptions-item :label="$t('orderOverview.step6.containerNo')">{{ detailData.japanCustoms.containerNo || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step6.importDutyPaid')">{{ detailData.japanCustoms.importDutyPaid ? $t('common.currency.jpy') + Number(detailData.japanCustoms.importDutyPaid).toLocaleString() : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step6.consumptionTaxPaid')">{{ detailData.japanCustoms.consumptionTaxPaid ? $t('common.currency.jpy') + Number(detailData.japanCustoms.consumptionTaxPaid).toLocaleString() : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step6.arrivalDate')">{{ formatDate(detailData.japanCustoms.arrivalDate) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step6.clearanceDate')">{{ formatDate(detailData.japanCustoms.clearanceDate) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step6.status')">{{ japanCustomsStatusLabel(detailData.japanCustoms.status) }}</el-descriptions-item>
+        </el-descriptions>
+        <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
+
+        <!-- 步骤7：退税 -->
+        <div class="drawer-section-title">{{ $t('orderOverview.step7.title') }}</div>
+        <el-descriptions v-if="detailData.taxRefund" :column="2" border size="small">
+          <el-descriptions-item :label="$t('orderOverview.step7.refundCode')">{{ detailData.taxRefund.refundCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step7.billingType')">{{ billingTypeLabel(detailData.taxRefund.billingType) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step7.estimatedRefundRmb')">{{ detailData.taxRefund.estimatedRefundRmb ? $t('common.currency.cny') + Number(detailData.taxRefund.estimatedRefundRmb).toFixed(2) : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step7.refundDate')">{{ formatDate(detailData.taxRefund.refundDate) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step7.status')">{{ taxRefundStatusLabel(detailData.taxRefund.status) }}</el-descriptions-item>
+        </el-descriptions>
+        <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
+
+        <!-- 步骤8：运营销售 -->
+        <div class="drawer-section-title">{{ $t('orderOverview.step8.title') }}</div>
+        <el-descriptions v-if="detailData.salesRecord" :column="2" border size="small">
+          <el-descriptions-item :label="$t('orderOverview.step8.recordCode')">{{ detailData.salesRecord.recordCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step8.salesChannel')">{{ salesChannelLabel(detailData.salesRecord.salesChannel) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step8.initialStock')">{{ detailData.salesRecord.initialStock ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step8.currentStock')">{{ detailData.salesRecord.currentStock ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step8.salesQuantity')">{{ detailData.salesRecord.salesQuantity ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step8.status')">{{ salesStatusLabel(detailData.salesRecord.status) }}</el-descriptions-item>
+        </el-descriptions>
+        <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
+
         <div class="drawer-footer">
           <el-button type="primary" @click="drawerVisible = false; router.push('/base/overview/demand/' + currentRow!.demandId)">{{ $t('orderOverview.action.viewDetail') }}</el-button>
         </div>
@@ -219,6 +266,34 @@ function planTypeLabel(val: string | undefined): string {
 function logisticsStatusLabel(val: string | undefined): string {
   if (!val) return '-'
   return t(`logistics.status.${val}` as any, { default: val })
+}
+
+function domesticCustomsStatusLabel(val: string | undefined): string {
+  if (!val) return '-'
+  return t(`orderOverview.enum.domesticCustoms.${val}` as any, { default: val })
+}
+
+function japanCustomsStatusLabel(val: string | undefined): string {
+  if (!val) return '-'
+  return t(`orderOverview.enum.japanCustoms.${val}` as any, { default: val })
+}
+
+function taxRefundStatusLabel(val: string | undefined): string {
+  if (!val) return '-'
+  return t(`orderOverview.enum.taxRefund.${val}` as any, { default: val })
+}
+
+function salesChannelLabel(val: string | undefined): string {
+  if (!val) return '-'
+  return t(`sales.channel.${val.toLowerCase()}` as any, { default: val })
+}
+
+function salesStatusLabel(val: string | undefined): string {
+  if (!val) return '-'
+  const map: Record<string, string> = {
+    LISTED: 'listed', LOW_STOCK: 'lowStock', OUT_OF_STOCK: 'outOfStock', DISCONTINUED: 'discontinued',
+  }
+  return t(`sales.status.${map[val] ?? val.toLowerCase()}` as any, { default: val })
 }
 
 function chainStatusType(row: OrderChainVO): string {

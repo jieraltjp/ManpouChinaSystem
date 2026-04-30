@@ -138,12 +138,27 @@
     <el-dialog v-model="dialogVisible" :title="$t('customs.newDialogTitle')" width="640px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="formRules" label-width="110px">
         <el-form-item :label="$t('customs.dialog.containerNo')" prop="containerNo">
-          <el-input
+          <el-select
             v-model="form.containerNo"
+            filterable
+            remote
+            reserve-keyword
             :placeholder="$t('customs.dialog.containerNoPlaceholder')"
-            maxlength="32"
-            @change="onContainerNoChange"
-          />
+            :remote-method="searchContainers"
+            :loading="containerLoading"
+            style="width:100%"
+            @change="onContainerSelect"
+          >
+            <el-option
+              v-for="item in containerOptions"
+              :key="item.containerNo"
+              :label="item.containerNo"
+              :value="item.containerNo"
+            >
+              <span style="font-weight:600">{{ item.containerNo }}</span>
+              <span style="color:#999;font-size:12px;margin-left:8px">{{ item.productCode }} / {{ item.factoryName || ('ID:' + item.factoryId) }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item :label="$t('customs.dialog.procurementId')">
           <el-input-number v-model="form.procurementId" :min="1" :placeholder="$t('customs.dialog.procurementIdPlaceholder')" style="width:100%" />
@@ -234,7 +249,7 @@ import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Document, Clock, Top, CircleCheck } from '@element-plus/icons-vue'
 import { customsApi, type CustomsVO, type DomesticCustomsStatus, type CustomsCreateRequest } from '@/api/customs'
-import { logisticsApi } from '@/api/logistics'
+import { logisticsApi, type LogisticsPlanVO } from '@/api/logistics'
 import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
@@ -245,6 +260,9 @@ const rejectDialogVisible = ref(false)
 const actionLoading = ref('')
 const rejectReason = ref('')
 const rejectingRowId = ref<number | null>(null)
+
+const containerOptions = ref<LogisticsPlanVO[]>([])
+const containerLoading = ref(false)
 
 const currentRow = ref<CustomsVO | null>(null)
 const filterForm = reactive({
@@ -336,8 +354,37 @@ function onReset() {
   loadData()
 }
 
+async function searchContainers(query: string) {
+  if (!query || query.length < 2) {
+    containerOptions.value = []
+    return
+  }
+  containerLoading.value = true
+  try {
+    const res = await logisticsApi.list({ containerNo: query, pageSize: 20, status: 'IN_TRANSIT' })
+    containerOptions.value = res.data.data?.content ?? []
+  } catch {
+    containerOptions.value = []
+  } finally {
+    containerLoading.value = false
+  }
+}
+
+function onContainerSelect(containerNo: string) {
+  if (!containerNo) return
+  const plan = containerOptions.value.find(p => p.containerNo === containerNo)
+  if (plan) {
+    form.procurementId = plan.procurementId
+    form.factoryId = plan.factoryId
+    form.productCode = plan.productCode
+    form.subProductCode = plan.subProductCode ?? undefined
+    form.quantity = plan.quantity ?? undefined
+  }
+}
+
 function onNew() {
   formRef.value?.resetFields()
+  containerOptions.value = []
   // v1.3.0: 优先使用 URL 参数中的货柜号，否则清空
   const urlContainerNo = route.query.containerNo as string | undefined
   Object.assign(form, {
@@ -350,33 +397,13 @@ function onNew() {
     estimatedValueCny: undefined,
     remarks: undefined,
   })
-  // URL 参数有货柜号时自动填入 LogisticsPlan 信息
+  // URL 参数有货柜号时自动查并选填
   if (urlContainerNo) {
-    fillFromLogisticsPlan(urlContainerNo)
+    searchContainers(urlContainerNo)
+    containerOptions.value = [{ containerNo: urlContainerNo } as LogisticsPlanVO]
+    onContainerSelect(urlContainerNo)
   }
   dialogVisible.value = true
-}
-
-async function onContainerNoChange() {
-  if (!form.containerNo) return
-  await fillFromLogisticsPlan(form.containerNo)
-}
-
-async function fillFromLogisticsPlan(containerNo: string) {
-  try {
-    const res = await logisticsApi.list({ containerNo, pageSize: 1 })
-    const list = res.data.data?.content ?? []
-    if (list.length > 0) {
-      const plan = list[0]
-      form.procurementId = plan.procurementId
-      form.factoryId = plan.factoryId
-      form.productCode = plan.productCode
-      form.subProductCode = plan.subProductCode ?? undefined
-      form.quantity = plan.quantity ?? undefined
-    }
-  } catch (e) {
-    // 查不到也没关系，用户手动填
-  }
 }
 
 async function onSubmitForm() {

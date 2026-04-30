@@ -138,8 +138,10 @@ export interface QcRecordVO {
 export interface LogisticsPlanVO {
   id: number
   planCode: string
+  containerNo?: string
   procurementId?: number
   factoryId?: number
+  factoryName?: string
   productCode: string
   subProductCode?: string
   planType?: string
@@ -149,6 +151,7 @@ export interface LogisticsPlanVO {
   cargoHeightCm?: number
   cargoVolumeCbm?: number
   cargoWeightKg?: number
+  qcPassedCount?: number
   quantity?: number
   requiresQc?: boolean
   estimatedShipDate?: string
@@ -158,19 +161,26 @@ export interface LogisticsPlanVO {
 export interface DomesticCustomsVO {
   id: number
   customsCode: string
+  containerNo?: string
   procurementId?: number
   productCode: string
+  subProductCode?: string
   status?: string
   estimatedValueCny?: number
   remarks?: string
+  createTime?: string
+  updateTime?: string
 }
 
 export interface JapanCustomsVO {
   id?: number
-  procurementId?: number
-  domesticCustomsId?: number
-  logisticsPlanId?: number
   customsEntryNo?: string
+  containerNo?: string
+  domesticCustomsId?: number
+  procurementId?: number
+  logisticsPlanId?: number
+  productCode?: string
+  subProductCode?: string
   status?: string
   arrivalDate?: string
   clearanceDate?: string
@@ -183,6 +193,9 @@ export interface JapanCustomsVO {
   declaredWeightKg?: number
   declaredVolumeCbm?: number
   remarks?: string
+  createBy?: string
+  createTime?: string
+  updateTime?: string
 }
 
 export interface TaxRefundVO {
