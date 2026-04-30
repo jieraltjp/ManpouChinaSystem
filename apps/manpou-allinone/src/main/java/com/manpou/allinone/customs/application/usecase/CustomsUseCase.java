@@ -1,5 +1,6 @@
 package com.manpou.allinone.customs.application.usecase;
 
+import com.manpou.allinone.customs.application.dto.CustomsBatchCreateCmd;
 import com.manpou.allinone.customs.application.dto.CustomsCreateCmd;
 import com.manpou.allinone.customs.application.dto.CustomsPageQuery;
 import com.manpou.allinone.customs.application.dto.CustomsQuery;
@@ -9,6 +10,8 @@ import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.common.filter.TraceFilter;
 import com.manpou.allinone.customs.domain.model.DomesticCustomsRecord;
 import com.manpou.allinone.customs.domain.repository.DomesticCustomsRepository;
+import com.manpou.allinone.logistics.domain.model.LogisticsPlan;
+import com.manpou.allinone.logistics.domain.repository.LogisticsPlanRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -17,6 +20,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 国内报关用例服务。
@@ -27,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomsUseCase {
 
     private final DomesticCustomsRepository customsRepository;
+    private final LogisticsPlanRepository logisticsPlanRepository;
     private final CustomsAssembler customsAssembler;
 
     @Transactional(readOnly = true)
@@ -61,6 +68,36 @@ public class CustomsUseCase {
         log.info("[DomesticCustomsRecord] created, traceId={}, id={}, customsCode={}",
                 MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId(), saved.getCustomsCode());
         return saved.getId();
+    }
+
+    /**
+     * 批量创建国内报关记录（v1.4.0）。
+     * 根据 logisticsPlanIds 查询 LogisticsPlan 实体，自动填充 productCode/subProductCode/factoryId/quantity 等字段。
+     * 一个 LogisticsPlan 对应一条 DomesticCustomsRecord。
+     */
+    @Transactional
+    public List<Long> batchCreate(CustomsBatchCreateCmd cmd) {
+        List<Long> createdIds = new ArrayList<>();
+        for (Long logisticsPlanId : cmd.getLogisticsPlanIds()) {
+            LogisticsPlan plan = logisticsPlanRepository.findById(logisticsPlanId)
+                    .orElseThrow(() -> BusinessException.notFound("LogisticsPlan", logisticsPlanId));
+            CustomsCreateCmd single = new CustomsCreateCmd();
+            single.setContainerNo(cmd.getContainerNo());
+            single.setLogisticsPlanId(logisticsPlanId);
+            single.setProcurementId(plan.getProcurementId());
+            single.setFactoryId(plan.getFactoryId());
+            single.setProductCode(plan.getProductCode());
+            single.setSubProductCode(plan.getSubProductCode());
+            single.setQuantity(cmd.getQuantity() != null ? cmd.getQuantity() : plan.getQuantity());
+            single.setEstimatedValueCny(cmd.getEstimatedValueCny());
+            single.setRemarks(cmd.getRemarks());
+            DomesticCustomsRecord entity = customsAssembler.toEntity(single);
+            DomesticCustomsRecord saved = customsRepository.save(entity);
+            createdIds.add(saved.getId());
+            log.info("[DomesticCustomsRecord] batch-created, traceId={}, id={}, logisticsPlanId={}",
+                    MDC.get(TraceFilter.TRACE_ID_KEY), saved.getId(), logisticsPlanId);
+        }
+        return createdIds;
     }
 
     @Transactional

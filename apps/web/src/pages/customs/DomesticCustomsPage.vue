@@ -60,7 +60,7 @@
           <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
           <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
           <el-button type="primary" @click="onNew">
-            <el-icon><Plus /></el-icon>{{ $t('customs.newButton') }}
+            <el-icon><Plus /></el-icon>{{ $t('customs.batchButton') }}
           </el-button>
         </el-form-item>
       </el-form>
@@ -95,7 +95,7 @@
         </el-table-column>
         <el-table-column prop="estimatedValueCny" :label="$t('customs.column.estimatedValueCny')" min-width="130" align="right">
           <template #default="{ row }">
-            <span v-if="row.estimatedValueCny !== null" class="money">{{ $t('common.currency.cny') }}{{ row.estimatedValueCny.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
+            <span v-if="row.estimatedValueCny != null" class="money">{{ $t('common.currency.cny') }}{{ row.estimatedValueCny?.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -134,69 +134,111 @@
       </div>
     </el-card>
 
-    <!-- 新规创建弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="$t('customs.newDialogTitle')" width="640px" destroy-on-close>
-      <el-form ref="formRef" :model="form" :rules="formRules" label-width="110px">
-        <el-form-item :label="$t('customs.dialog.containerNo')" prop="containerNo">
-          <el-select
-            v-model="form.containerNo"
-            filterable
-            remote
-            reserve-keyword
-            :placeholder="$t('customs.dialog.containerNoPlaceholder')"
-            :remote-method="searchContainers"
-            :loading="containerLoading"
-            style="width:100%"
-            @change="onContainerSelect"
+    <!-- 新规创建弹窗（v1.4.0 批量模式） -->
+    <el-dialog v-model="dialogVisible" :title="$t('customs.newDialogTitle')" width="720px" destroy-on-close>
+      <!-- 第一行：货柜号搜索 -->
+      <div class="batch-header">
+        <span class="batch-label">{{ $t('customs.dialog.containerNo') }}：</span>
+        <el-select
+          v-model="batchForm.containerNo"
+          filterable
+          remote
+          reserve-keyword
+          :placeholder="$t('customs.dialog.containerNoPlaceholder')"
+          :remote-method="searchContainers"
+          :loading="containerLoading"
+          style="flex:1; min-width:200px"
+          @change="onBatchContainerSelect"
+          clearable
+        >
+          <el-option
+            v-for="item in containerOptions"
+            :key="item.containerNo"
+            :label="item.containerNo"
+            :value="item.containerNo"
           >
-            <el-option
-              v-for="item in containerOptions"
-              :key="item.containerNo"
-              :label="item.containerNo"
-              :value="item.containerNo"
-            >
-              <span style="font-weight:600">{{ item.containerNo }}</span>
-              <span style="color:#999;font-size:12px;margin-left:8px">{{ item.productCode }} / {{ item.factoryName || ('ID:' + item.factoryId) }}</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('customs.dialog.procurementId')">
-          <el-input-number v-model="form.procurementId" :min="1" :placeholder="$t('customs.dialog.procurementIdPlaceholder')" style="width:100%" />
-        </el-form-item>
-        <el-form-item :label="$t('customs.dialog.productCode')" prop="productCode">
-          <el-input v-model="form.productCode" :placeholder="$t('customs.dialog.productCodePlaceholder')" />
-        </el-form-item>
+            <span style="font-weight:600">{{ item.containerNo }}</span>
+            <span style="color:#999;font-size:12px;margin-left:8px">{{ item.productCode }} / {{ item.factoryName || ('ID:' + item.factoryId) }}</span>
+          </el-option>
+        </el-select>
+        <span v-if="batchForm.containerNo" class="batch-hint">
+          {{ $t('customs.batch.selectedCount', { n: selectedPlanIds.length }) }}
+        </span>
+      </div>
+
+      <!-- 第二行：调配计划表格（选中要创建报关的记录） -->
+      <div v-if="batchForm.containerNo" class="batch-plan-table">
+        <el-table
+          :data="batchPlanList"
+          max-height="280"
+          stripe
+          @selection-change="onBatchSelectionChange"
+        >
+          <el-table-column type="selection" width="40" />
+          <el-table-column :label="$t('customs.column.productCode')" min-width="130">
+            <template #default="{ row }">
+              <span class="product-code">{{ row.productCode }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('customs.column.subProductCode')" prop="subProductCode" min-width="110" />
+          <el-table-column :label="$t('customs.column.factoryId')" prop="factoryId" min-width="80" align="center" />
+          <el-table-column :label="$t('customs.column.quantity')" prop="quantity" min-width="70" align="right" />
+          <el-table-column :label="$t('customs.column.estimatedValueCny')" min-width="120" align="right">
+            <template #default="{ row }">
+              <el-input-number
+                v-model="row.overrideValueCny"
+                :min="0"
+                :precision="2"
+                size="small"
+                style="width:110px"
+                :placeholder="$t('customs.dialog.estimatedValueCnyPlaceholder')"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('customs.column.status')" width="80" align="center">
+            <template #default="{ row }">
+              <el-tag v-if="row.customsCreated" type="success" size="small">{{ $t('customs.status.created') }}</el-tag>
+              <el-tag v-else type="info" size="small">{{ $t('customs.status.notCreated') }}</el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
+      <!-- 第三行：批量字段（备注等） -->
+      <div v-if="selectedPlanIds.length > 0" class="batch-footer">
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item :label="$t('customs.dialog.subProductCode')">
-              <el-input v-model="form.subProductCode" :placeholder="$t('customs.dialog.subProductCodePlaceholder')" />
+            <el-form-item :label="$t('customs.dialog.remarks')" style="margin-bottom:0">
+              <el-input v-model="batchForm.remarks" type="textarea" :rows="2" :placeholder="$t('customs.dialog.remarksPlaceholder')" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('customs.dialog.quantity')">
-              <el-input-number v-model="form.quantity" :min="0" style="width:100%" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="16">
-          <el-col :span="12">
-            <el-form-item :label="$t('customs.dialog.estimatedValueCny')">
-              <el-input-number v-model="form.estimatedValueCny" :min="0" :precision="2" style="width:100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('customs.dialog.factoryId')">
-              <el-input-number v-model="form.factoryId" :min="1" :placeholder="$t('customs.dialog.factoryIdPlaceholder')" style="width:100%" />
-            </el-form-item>
+          <el-col :span="12" style="display:flex;align-items:center;justify-content:center">
+            <div class="batch-summary">
+              <div class="batch-summary-item">
+                <span class="batch-summary-label">{{ $t('customs.batch.selectedPlans') }}</span>
+                <span class="batch-summary-value">{{ selectedPlanIds.length }}</span>
+              </div>
+              <div class="batch-summary-item">
+                <span class="batch-summary-label">{{ $t('customs.batch.totalValue') }}</span>
+                <span class="batch-summary-value money">
+                  {{ $t('common.currency.cny') }}{{ batchTotalValueCny?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '0.00' }}
+                </span>
+              </div>
+            </div>
           </el-col>
         </el-row>
-        <el-form-item :label="$t('customs.dialog.remarks')">
-          <el-input v-model="form.remarks" type="textarea" :rows="3" :placeholder="$t('customs.dialog.remarksPlaceholder')" />
-        </el-form-item>
-      </el-form>
+      </div>
+
       <template #footer>
         <el-button @click="dialogVisible = false">{{ $t('common.cancel') }}</el-button>
-        <el-button type="primary" :loading="submitting" @click="onSubmitForm">{{ $t('common.save') }}</el-button>
+        <el-button
+          type="primary"
+          :loading="submitting"
+          :disabled="selectedPlanIds.length === 0"
+          @click="onBatchSubmit"
+        >
+          {{ $t('customs.batch.createButton', { n: selectedPlanIds.length }) }}
+        </el-button>
       </template>
     </el-dialog>
 
@@ -246,9 +288,9 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Document, Clock, Top, CircleCheck } from '@element-plus/icons-vue'
-import { customsApi, type CustomsVO, type DomesticCustomsStatus, type CustomsCreateRequest } from '@/api/customs'
+import { customsApi, type CustomsVO, type DomesticCustomsStatus, type CustomsCreateRequest, type CustomsBatchCreateRequest } from '@/api/customs'
 import { logisticsApi, type LogisticsPlanVO } from '@/api/logistics'
 import { useI18n } from 'vue-i18n'
 
@@ -274,10 +316,10 @@ const filterForm = reactive({
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const tableData = ref<CustomsVO[]>([])
 
-const formRef = ref<FormInstance>()
 const route = useRoute()
 const { t } = useI18n()
 
+// 单记录表单（保留备用；当前主模式为批量）
 const form = reactive<CustomsCreateRequest>({
   containerNo: '',
   procurementId: undefined,
@@ -289,10 +331,17 @@ const form = reactive<CustomsCreateRequest>({
   remarks: undefined,
 })
 
-const formRules: FormRules = {
-  containerNo: [{ required: true, message: () => t('customs.validation.containerNoRequired'), trigger: 'blur' }],
-  productCode: [{ required: true, message: () => t('customs.validation.productCodeRequired'), trigger: 'blur' }],
-}
+// 批量创建表单（v1.4.0）
+const batchForm = reactive({
+  containerNo: '',
+  remarks: '',
+})
+const batchPlanList = ref<(LogisticsPlanVO & { overrideValueCny?: number; customsCreated?: boolean })[]>([])
+const batchSelectedRows = ref<(LogisticsPlanVO & { overrideValueCny?: number; customsCreated?: boolean })[]>([])
+const selectedPlanIds = computed(() => batchSelectedRows.value.map(r => r.id!))
+const batchTotalValueCny = computed(() =>
+  batchSelectedRows.value.reduce((sum, r) => sum + (r.overrideValueCny ?? 0), 0)
+)
 
 const statusCount = computed(() => {
   const counts: Record<string, number> = { PENDING: 0, SUBMITTED: 0, CLEARED: 0, REJECTED: 0 }
@@ -370,25 +419,49 @@ async function searchContainers(query: string) {
   }
 }
 
-function onContainerSelect(containerNo: string) {
-  if (!containerNo) return
-  const plan = containerOptions.value.find(p => p.containerNo === containerNo)
-  if (plan) {
-    form.procurementId = plan.procurementId
-    form.factoryId = plan.factoryId
-    form.productCode = plan.productCode
-    form.subProductCode = plan.subProductCode ?? undefined
-    form.quantity = plan.quantity ?? undefined
+async function onBatchContainerSelect(containerNo: string) {
+  if (!containerNo) {
+    batchPlanList.value = []
+    batchSelectedRows.value = []
+    return
+  }
+  containerLoading.value = true
+  try {
+    const res = await logisticsApi.list({ containerNo, pageSize: 100 })
+    const plans: LogisticsPlanVO[] = res.data.data?.content ?? []
+    // 检查每个 plan 是否已有报关记录（通过表格数据中的 customsCode 推断）
+    const existingContainerNos = new Set(
+      tableData.value.filter(r => r.containerNo === containerNo).map(r => r.productCode + '-' + r.subProductCode)
+    )
+    batchPlanList.value = plans.map(p => ({
+      ...p,
+      overrideValueCny: undefined,
+      customsCreated: existingContainerNos.has(p.productCode + '-' + (p.subProductCode ?? '')),
+    }))
+    batchSelectedRows.value = []
+  } catch {
+    batchPlanList.value = []
+  } finally {
+    containerLoading.value = false
   }
 }
 
+function onBatchSelectionChange(rows: (LogisticsPlanVO & { overrideValueCny?: number; customsCreated?: boolean })[]) {
+  batchSelectedRows.value = rows
+}
+
 function onNew() {
-  formRef.value?.resetFields()
   containerOptions.value = []
-  // v1.3.0: 优先使用 URL 参数中的货柜号，否则清空
+  batchPlanList.value = []
+  batchSelectedRows.value = []
+  // v1.4.0: URL 参数货柜号直接代入批量表单
   const urlContainerNo = route.query.containerNo as string | undefined
-  Object.assign(form, {
+  Object.assign(batchForm, {
     containerNo: urlContainerNo ?? '',
+    remarks: '',
+  })
+  Object.assign(form, {
+    containerNo: '',
     procurementId: undefined,
     factoryId: undefined,
     productCode: '',
@@ -397,26 +470,35 @@ function onNew() {
     estimatedValueCny: undefined,
     remarks: undefined,
   })
-  // URL 参数有货柜号时自动查并选填
+  // URL 参数有货柜号时自动加载调配计划列表
   if (urlContainerNo) {
     searchContainers(urlContainerNo)
     containerOptions.value = [{ containerNo: urlContainerNo } as LogisticsPlanVO]
-    onContainerSelect(urlContainerNo)
+    // 延迟加载 batch 计划列表
+    setTimeout(() => onBatchContainerSelect(urlContainerNo!), 100)
   }
   dialogVisible.value = true
 }
 
-async function onSubmitForm() {
-  const valid = await formRef.value?.validate().catch(() => false)
-  if (!valid) return
+async function onBatchSubmit() {
+  if (selectedPlanIds.value.length === 0) {
+    ElMessage.warning(t('customs.validation.selectAtLeastOne'))
+    return
+  }
   submitting.value = true
   try {
-    await customsApi.create(form)
-    ElMessage.success(t('customs.message.createSuccess'))
+    const req: CustomsBatchCreateRequest = {
+      containerNo: batchForm.containerNo,
+      logisticsPlanIds: selectedPlanIds.value,
+      remarks: batchForm.remarks || undefined,
+    }
+    const res = await customsApi.batchCreate(req)
+    const ids: number[] = res.data.data ?? []
+    ElMessage.success(t('customs.message.batchCreateSuccess', { n: ids.length }))
     dialogVisible.value = false
     loadData()
   } catch (e) {
-    console.error('[DomesticCustomsPage] onSubmitForm failed', e)
+    console.error('[DomesticCustomsPage] onBatchSubmit failed', e)
     ElMessage.error(t('customs.message.createFailed'))
   } finally {
     submitting.value = false
@@ -539,4 +621,14 @@ watch(tableData, () => {
 .product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
 .money { color: #16A34A; font-weight: 600; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
+/* 批量创建样式 */
+.batch-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.batch-label { font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+.batch-hint { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
+.batch-plan-table { margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; }
+.batch-footer { background: var(--bg-page); border-radius: var(--radius-sm); padding: 12px 4px; }
+.batch-summary { display: flex; flex-direction: column; gap: 8px; }
+.batch-summary-item { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.batch-summary-label { font-size: 13px; color: var(--text-secondary); }
+.batch-summary-value { font-size: 20px; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 </style>

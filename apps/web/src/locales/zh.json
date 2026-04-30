@@ -621,6 +621,9 @@
       "delete": "删除",
       "createCustoms": "创建报关"
     },
+    "message": {
+      "containerNoRequired": "货柜号为空，无法创建报关，请先填写货柜号"
+    },
     "requiresQc": {
       "yes": "需检测",
       "no": "无需"
@@ -1254,7 +1257,8 @@
   "customs": {
     "title": "国内报关",
     "newButton": "新规报关",
-    "newDialogTitle": "创建报关单",
+    "batchButton": "按货柜批量创建",
+    "newDialogTitle": "按货柜批量创建报关单",
     "drawerTitle": "报关单详情",
     "rejectDialogTitle": "驳回报关单",
     "stat": {
@@ -1289,7 +1293,9 @@
       "pending": "待提交",
       "submitted": "已提交",
       "cleared": "已放行",
-      "rejected": "已驳回"
+      "rejected": "已驳回",
+      "created": "已报关",
+      "notCreated": "未报关"
     },
     "action": {
       "detail": "详情",
@@ -1322,11 +1328,19 @@
     },
     "validation": {
       "containerNoRequired": "货柜号不能为空",
-      "productCodeRequired": "请输入货号"
+      "productCodeRequired": "请输入货号",
+      "selectAtLeastOne": "请至少选择一个调配计划"
+    },
+    "batch": {
+      "selectedCount": "已选 {n} 条",
+      "selectedPlans": "已选计划",
+      "totalValue": "合计货值",
+      "createButton": "批量创建 ({n})"
     },
     "message": {
       "loadFailed": "加载报关单列表失败",
       "createSuccess": "报关单创建成功",
+      "batchCreateSuccess": "批量创建成功，共 {n} 条报关单",
       "createFailed": "报关单创建失败",
       "submitSuccess": "报关单提交成功",
       "clearSuccess": "报关单放行成功",

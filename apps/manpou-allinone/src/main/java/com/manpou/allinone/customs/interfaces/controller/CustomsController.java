@@ -1,5 +1,6 @@
 package com.manpou.allinone.customs.interfaces.controller;
 
+import com.manpou.allinone.customs.application.dto.CustomsBatchCreateCmd;
 import com.manpou.allinone.customs.application.dto.CustomsCreateCmd;
 import com.manpou.allinone.customs.application.dto.CustomsPageQuery;
 import com.manpou.allinone.customs.application.dto.CustomsQuery;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,6 +41,17 @@ public class CustomsController {
     public Result<Long> create(@Valid @RequestBody CustomsCreateCmd cmd) {
         Long id = customsUseCase.create(cmd);
         return Result.ok("创建成功", id);
+    }
+
+    /**
+     * 批量创建国内报关记录（v1.4.0）。
+     * 根据 logisticsPlanIds 查询 LogisticsPlan 实体，自动填充 productCode/subProductCode 等字段。
+     * 一个 LogisticsPlan 对应一条 DomesticCustomsRecord。
+     */
+    @PostMapping("/batch")
+    public Result<List<Long>> batchCreate(@Valid @RequestBody CustomsBatchCreateCmd cmd) {
+        List<Long> ids = customsUseCase.batchCreate(cmd);
+        return Result.ok("批量创建成功，共 " + ids.size() + " 条", ids);
     }
 
     @PutMapping("/{id}")

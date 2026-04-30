@@ -58,6 +58,15 @@ export interface CustomsCreateRequest {
   remarks?: string
 }
 
+/** 批量创建请求（v1.4.0） */
+export interface CustomsBatchCreateRequest {
+  containerNo: string
+  logisticsPlanIds: number[]
+  quantity?: number
+  estimatedValueCny?: number
+  remarks?: string
+}
+
 export interface CustomsUpdateRequest {
   containerNo?: string   // 货柜号（v1.3.0）
   factoryId?: number
@@ -81,6 +90,9 @@ export const customsApi = {
   },
   create(data: CustomsCreateRequest) {
     return client.post<{ code: string; data: number }>('/customs', data)
+  },
+  batchCreate(data: CustomsBatchCreateRequest) {
+    return client.post<{ code: string; data: number[] }>('/customs/batch', data)
   },
   update(id: number, data: CustomsUpdateRequest) {
     return client.put<{ code: string }>(`/customs/${id}`, data)

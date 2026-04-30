@@ -636,7 +636,8 @@
       "updateFailed": "配送計画の更新に失敗しました",
       "deleteConfirm": "配送計画「{code}」を削除しますか？",
       "deleteSuccess": "配送計画の削除が完了しました",
-      "deleteFailed": "配送計画の削除に失敗しました"
+      "deleteFailed": "配送計画の削除に失敗しました",
+      "containerNoRequired": "コンテナ番号が空のため通関を作成できません"
     },
     "requiresQc": {
       "yes": "検品要",
@@ -1257,7 +1258,8 @@
   "customs": {
     "title": "国内通関",
     "newButton": "新規通関",
-    "newDialogTitle": "通関書類作成",
+    "batchButton": "コンテナ一括作成",
+    "newDialogTitle": "コンテナ一括通関書類作成",
     "drawerTitle": "通関書類詳細",
     "rejectDialogTitle": "通関書類却下",
     "stat": {
@@ -1292,7 +1294,9 @@
       "pending": "未提出",
       "submitted": "提出済",
       "cleared": "通関済",
-      "rejected": "却下済"
+      "rejected": "却下済",
+      "created": "通関済",
+      "notCreated": "未通関"
     },
     "action": {
       "detail": "詳細",
@@ -1325,11 +1329,19 @@
     },
     "validation": {
       "productCodeRequired": "商品コードは必須です",
-      "containerNoRequired": "コンテナ番号は必須です"
+      "containerNoRequired": "コンテナ番号は必須です",
+      "selectAtLeastOne": "少なくとも1つの配送計画を選択してください"
+    },
+    "batch": {
+      "selectedCount": "{n}件選択済",
+      "selectedPlans": "選択した計画",
+      "totalValue": "合計金額",
+      "createButton": "一括作成 ({n})"
     },
     "message": {
       "loadFailed": "通関書類一覧の読み込みに失敗しました",
       "createSuccess": "通関書類を作成しました",
+      "batchCreateSuccess": "一括作成成功、{n}件の通関書類を作成しました",
       "createFailed": "通関書類の作成に失敗しました",
       "submitSuccess": "通関書類を提出しました",
       "clearSuccess": "通関書類を通関しました",
