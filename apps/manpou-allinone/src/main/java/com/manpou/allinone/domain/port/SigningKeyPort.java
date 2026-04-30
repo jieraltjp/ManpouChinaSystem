@@ -10,18 +10,20 @@ package com.manpou.allinone.domain.port;
  * Infrastructure 层（JwtKeyManager）实现此接口，
  * Application 层（KeyManagementService）通过此接口与 Infrastructure 解耦。</p>
  *
+ * <p>只读模式（方案B）：allinone 仅从 user-service 拉取公钥验证，不签发。</p>
+ *
  * @see com.manpou.allinone.infrastructure.security.JwtKeyManager
  */
 public interface SigningKeyPort {
 
     /**
-     * 热加载密钥（轮换后由 KeyManagementService 调用）。
+     * 热加载公钥（从 user-service 拉取最新活跃公钥）。
      */
     void reloadActiveKey();
 
-    /** 当前签发密钥 ID。 */
+    /** 当前 kid（从缓存获取）。 */
     String getCurrentKid();
 
-    /** 当前公钥 PEM（给前端/其他服务验签用）。 */
-    String getPublicKeyPem();
+    /** 当前活跃公钥 PEM。 */
+    String getActivePublicKeyPem();
 }

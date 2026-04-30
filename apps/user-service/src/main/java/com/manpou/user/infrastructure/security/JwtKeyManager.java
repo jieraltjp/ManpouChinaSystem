@@ -116,6 +116,15 @@ public class JwtKeyManager implements SigningKeyPort {
     }
 
     /**
+     * 根据 kid 获取公钥 PEM（供 allinone 跨服务验证调用）。
+     */
+    public String getPublicKeyPemByKid(String kid) {
+        return signingKeyRepository.findByKid(kid)
+            .map(SigningKey::getPublicKeyPem)
+            .orElseThrow(() -> new SecurityException("Signing key not found: kid=" + kid));
+    }
+
+    /**
      * 热加载密钥（轮换后由 KeyManagementService 调用）。
      */
     public void reloadActiveKey() {

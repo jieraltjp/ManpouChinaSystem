@@ -31,11 +31,32 @@ public class AuthController {
     private final JwtKeyManager jwtKeyManager;
 
     /**
-     * 获取 RSA 公钥（前端用于验签 RS256 Token）。
-     * 详见 docs/pro/02-user-service.md §认证授权.2
+     * 获取当前活跃公钥（前端用于验签 RS256 Token）。
      */
     @GetMapping("/public-key")
     public Result<PublicKeyVO> publicKey() {
+        return Result.ok(new PublicKeyVO(
+            jwtKeyManager.getCurrentKid(),
+            TokenConstants.ALGORITHM_RS256,
+            jwtKeyManager.getPublicKeyPem()
+        ));
+    }
+
+    /**
+     * 根据 kid 获取指定公钥（allinone 跨服务验证调用）。
+     * 详见 SPEC-B11 §1.5 JWT 跨服务验证架构
+     */
+    @GetMapping("/keys/{kid}/public-key")
+    public Result<PublicKeyVO> publicKeyByKid(@PathVariable String kid) {
+        String pem = jwtKeyManager.getPublicKeyPemByKid(kid);
+        return Result.ok(new PublicKeyVO(kid, TokenConstants.ALGORITHM_RS256, pem));
+    }
+
+    /**
+     * 获取当前活跃公钥（兼容 allinone 调用）。
+     */
+    @GetMapping("/keys/active/public-key")
+    public Result<PublicKeyVO> activePublicKey() {
         return Result.ok(new PublicKeyVO(
             jwtKeyManager.getCurrentKid(),
             TokenConstants.ALGORITHM_RS256,

@@ -13,13 +13,12 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * JWT Token 服务（RS256）。
+ * JWT Token 服务（只读验证模式）。
  *
- * 使用 RSA-SHA256 非对称签名：
- * - 私钥：服务端签发 Token
- * - 公钥：其他服务 / 前端验签
+ * 仅验证 Token，不签发（签发由 user-service 负责）。
+ * 从 token header 的 kid 定位公钥。
  *
- * 详见 docs/pro/19-manpou-allinone.md §认证授权
+ * 详见 SPEC-B11 §1.5 JWT 跨服务验证架构（方案B）
  */
 @Slf4j
 @Component
@@ -40,29 +39,8 @@ public class JwtService {
     }
 
     /**
-     * 签发 Access Token（RS256）。
-     *
-     * @param kid 密钥 ID（写入 JWT header "kid"，供验签方定位公钥）
-     */
-    public String generateAccessToken(String userId, String username,
-                                      List<String> roles, List<String> permissions,
-                                      String tenantId, String kid) {
-        Instant now = Instant.now();
-        return Jwts.builder()
-            .subject(userId)
-            .header().add("kid", kid).and()
-            .claim(CLAIM_USERNAME, username)
-            .claim(CLAIM_ROLES, roles)
-            .claim(CLAIM_PERMISSIONS, permissions)
-            .claim(CLAIM_TENANT_ID, tenantId)
-            .issuedAt(Date.from(now))
-            .expiration(Date.from(now.plusSeconds(accessTokenTtlSeconds)))
-            .signWith(keyManager.getPrivateKey(), Jwts.SIG.RS256)
-            .compact();
-    }
-
-    /**
-     * 验证 Token 有效性（RS256 公钥验签）。
+     * 验证 Token 有效性（从 token header 提取 kid，定位公钥验签）。
+     * allinone 只读验证，不签发 token。
      */
     public boolean validateToken(String token) {
         try {
@@ -96,8 +74,15 @@ public class JwtService {
     }
 
     private Claims parseToken(String token) {
+        // 从 token header 提取 kid，定位对应公钥
+        String kid = Jwts.parser()
+            .build()
+            .parseSignedClaims(token)
+            .getHeader()
+            .getKeyId();
+
         return Jwts.parser()
-            .verifyWith(keyManager.getPublicKey())
+            .verifyWith(keyManager.getPublicKey(kid))
             .build()
             .parseSignedClaims(token)
             .getPayload();

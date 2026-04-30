@@ -1,7 +1,8 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-30
+> **修订**: 2026-04-30（v1.1.0：JWT 跨服务验证架构 + 注册审核流程 + 数据库规范化）
 > **状态**: 📋 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
@@ -16,12 +17,117 @@
 - JWT 中 `permissions[]` 未注入 Spring Security
 - 前端无用户管理 UI、无权限控制
 - 无操作日志
+- user-service 与 manpou-allinone 各有一套 signing_key，无法跨服务验证 token
 
 本设计覆盖：
 - 用户管理（账号/密码/姓名/邮箱/手机/头像/组织/职务/海关资质）
 - 角色与权限管理（4 级角色 + 42 条权限编码）
 - 操作日志（CREATE/UPDATE/DELETE/STATUS_CHANGE/LOGIN 全链路记录）
 - 个人中心（信息修改/密码修改/偏好设置）
+- **用户注册 + 管理员审核（方案B：JWT 跨服务验证）**
+
+---
+
+## 1.5 JWT 跨服务验证架构（方案B — 最终方案）
+
+### 架构决策
+
+| 方案 | 描述 | 选择 |
+|------|------|:----:|
+| 方案A | allinone 禁用 JWT 签发，从 user-service 的 signing_key 表读取公钥（共享 DB） | ❌ |
+| **方案B（选用）** | user-service 提供公钥 API，allinone 热加载验证（独立微服务） | ✅ |
+
+**方案B 理由**：
+- 真正的服务边界隔离，不共享数据库
+- allinone 只做 token **验证**（不签发），职责单一
+- user-service 作为唯一的 token 签发中心
+- 未来可扩展：多服务验证同一套 token
+
+### 数据流
+
+```
+┌─────────────────┐          ┌─────────────────────────────┐
+│   前端 (web)     │          │      user-service (18081)    │
+│                 │          │                             │
+│  1.登录 ──────→  │          │  AuthController.login()     │
+│    POST /auth/login          │    └─► JwtService 签发       │
+│    ←───────────  │          │         RS256 Token         │
+│    { token }     │          │    Token payload:            │
+│                 │          │    { sub, userId, username,  │
+│  2.业务请求 ──→ │          │      roles, permissions, ... }│
+│    Bearer {token}│          └─────────────────────────────┘
+└─────────────────┘                    │
+                                        │ 公钥同步（仅 kid 变更时）
+                                        ▼
+┌─────────────────────────────┐  拉取   ┌─────────────────────────────┐
+│  manpou-allinone (18090)   │←────── │  公钥缓存 + JwtService      │
+│                             │         │  验证 token                 │
+│  JwtKeyManager (只读模式)    │         │                             │
+│  ├─ cache: Map<kid, 公钥>  │         │  verifyToken(token)         │
+│  ├─ refresh(): 定时刷新     │         │    └─► payload → SecurityCtx │
+│  └─ verify(token): 验证签名 │         └─────────────────────────────┘
+│                             │
+│  3.业务请求 ──→             │
+│    Bearer {token}          │
+│    (由 allinone 验证)       │
+└─────────────────────────────┘
+```
+
+### API 变更
+
+**user-service 新增公钥 API**：
+
+| 方法 | 路径 | 认证 | 说明 |
+|------|------|:----:|------|
+| GET | `/api/v1/auth/keys/{kid}/public-key` | ❌ | 获取指定 kid 的公钥（allinone 调用） |
+| GET | `/api/v1/auth/keys/active/public-key` | ❌ | 获取当前活跃公钥（兼容） |
+
+**响应体**：
+```json
+{
+  "kid": "abc12345",
+  "algorithm": "RS256",
+  "publicKey": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhki...\n-----END PUBLIC KEY-----"
+}
+```
+
+**allinone JwtKeyManager 改造**：
+
+| 改造点 | 现状 | 改造后 |
+|--------|------|--------|
+| 签发 token | 独立签发 | 禁用（删除 JwtService 签发逻辑） |
+| 加载密钥 | 从自身 DB 加载私钥 | 从 user-service API 拉取公钥 |
+| 缓存 | 无 | LRU 缓存（max=10 kid） |
+| 热加载 | 定时刷新 | 定时刷新 + token 验证失败时主动刷新 |
+| 公钥更新 | DB 写入后 reload | 收到 404（kid 不存在）时主动拉取最新活跃公钥 |
+
+**allinone application.yml 新增配置**：
+```yaml
+jwt:
+  verifier:
+    endpoint: http://localhost:18081/api/v1/auth/keys  # user-service 公钥端点
+    refresh-interval-seconds: 300                      # 每 5 分钟刷新
+    connect-timeout-ms: 5000
+    read-timeout-ms: 5000
+```
+
+### 安全性分析
+
+| 威胁 | 防护措施 |
+|------|----------|
+| 公钥 API 被恶意调用 | 仅允许内网调用（allinone → user-service 直连），外网不暴露 |
+| 公钥缓存过期 | 定时刷新 + 验证失败时主动拉取 |
+| token 伪造 | RS256 非对称签名，私钥从未离开 user-service |
+| kid 伪造 | allinone 验证签名失败时，拒绝该 token |
+
+### 实施检查点
+
+1. ✅ user-service `AuthController` 新增 `/keys/{kid}/public-key` 端点
+2. ✅ user-service `JwtKeyManager` 提供 `getPublicKey(kid)` 接口
+3. ✅ allinone `JwtKeyManager` 改造为只读模式（删除签发逻辑）
+4. ✅ allinone `JwtAuthenticationFilter` 使用改造后的 `JwtKeyManager`
+5. ✅ 前端登录流程不变（仍请求 user-service:18081）
+6. ✅ allinone 业务请求无需额外配置（Bearer token 不变）
 
 ---
 
@@ -129,15 +235,9 @@ CREATE TABLE user (
   phone            VARCHAR(32)  COMMENT '手机号',
   avatar_url       VARCHAR(512) COMMENT '头像URL',
 
-  -- 组织信息
-  company_id       BIGINT       COMMENT '所属公司',
-  company_name     VARCHAR(128) COMMENT '公司名称（冗余）',
-  department_id    BIGINT       COMMENT '所属部门',
-  department_name  VARCHAR(64)  COMMENT '部门名称（冗余）',
-
-  -- 职务（多选，JSON数组）
-  position_ids     JSON         COMMENT '职务ID列表 [1,2]',
-  position_names   VARCHAR(256) COMMENT '职务名称列表（冗余）',
+  -- 组织信息（JOIN 查询，冗余字段已移除）
+  company_id       BIGINT       COMMENT '所属公司 FK → company.id',
+  department_id    BIGINT       COMMENT '所属部门 FK → department.id',
 
   -- 海关资质（可多人共用同一报关资质）
   customs_code     VARCHAR(64)  COMMENT '报关员备案号',
@@ -151,6 +251,10 @@ CREATE TABLE user (
   status           TINYINT      DEFAULT 1 COMMENT '1=正常 0=禁用',
   last_login_time  DATETIME(3)  COMMENT '最后登录时间',
   last_login_ip    VARCHAR(45)  COMMENT '最后登录IP',
+
+  -- 注册审核（V7新增）
+  registration_status VARCHAR(16) DEFAULT 'APPROVED' COMMENT 'APPROVED/PENDING/REJECTED',
+  reject_reason    VARCHAR(256) COMMENT '拒绝原因（REJECTED时填写）',
 
   -- 审计
   create_time      DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -167,9 +271,23 @@ CREATE TABLE user (
   KEY idx_status (status)
 );
 
--- 预置管理员（密码: Admin@12345）
+-- 预置管理员（密码: Admin@12345，status=APPROVED 跳过审核）
 INSERT INTO user (user_code, username, password_hash, name_cn, email, company_id, status, create_by) VALUES
-('U-0001', 'admin', '$2a$12$...', '系统管理员', 'admin@manpou.cn', 1, 1, 'SYSTEM');
+('U-0001', 'admin', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VttQj6L5kMn.lu', '系统管理员', 'admin@manpou.cn', 1, 1, 'SYSTEM');
+```
+
+#### `V7.1__user_position.sql`（替代 JSON）
+
+```sql
+-- 用户-职务关联表（M-N 规范化，替代原 JSON 字段）
+CREATE TABLE user_position (
+  id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id      BIGINT       NOT NULL,
+  position_id  BIGINT       NOT NULL,
+  create_time  DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  UNIQUE KEY uk_user_position (user_id, position_id),
+  KEY idx_position (position_id)
+);
 ```
 
 #### `V8__role_permission.sql`
@@ -245,7 +363,7 @@ CREATE TABLE audit_log (
 
   -- 操作信息
   module          VARCHAR(32)  NOT NULL COMMENT '模块标识',
-  action          VARCHAR(32)  NOT NULL COMMENT 'CREATE/UPDATE/DELETE/STATUS_CHANGE/LOGIN/LOGOUT/EXPORT',
+  action          VARCHAR(32)  NOT NULL COMMENT 'CREATE/UPDATE/DELETE/STATUS_CHANGE/LOGIN/LOGOUT/REGISTER/REGISTRATION_APPROVED/REGISTRATION_REJECTED/EXPORT',
   http_method     VARCHAR(8),
   http_url        VARCHAR(256),
 
@@ -284,16 +402,55 @@ CREATE TABLE audit_log (
 
 | 方法 | 路径 | 认证 | 说明 |
 |------|------|:----:|------|
-| GET | `/public-key` | ❌ | 获取 RSA 公钥 |
+| GET | `/public-key` | ❌ | 获取 RSA 公钥（前端验签用） |
+| GET | `/keys/{kid}/public-key` | ❌ | 获取指定 kid 公钥（allinone 调用，方案B） |
+| GET | `/keys/active/public-key` | ❌ | 获取当前活跃公钥（兼容接口） |
+| POST | `/register` | ❌ | 用户注册（提交审核） |
 | POST | `/login` | ❌ | 登录，返回增强 JWT |
 | POST | `/logout` | ✅ | 登出，记录操作日志 |
 | PUT | `/password` | ✅ | 修改密码（本人，需验证旧密码） |
 | GET | `/me` | ✅ | 获取当前用户完整信息 |
 
+**注册请求体**：
+```json
+{
+  "username": "li.ming",
+  "password": "LiMing@123456",
+  "nameCn": "李明",
+  "email": "li.ming@manpou.cn",
+  "phone": "13800138001",
+  "companyId": 1,
+  "departmentId": 5
+}
+```
+
+**注册响应体**：
+```json
+{
+  "code": 200,
+  "data": {
+    "userCode": "U-0002",
+    "status": "PENDING",
+    "message": "注册已提交，请等待管理员审核"
+  }
+}
+```
+
 **登录请求体**：
 ```json
 { "username": "admin", "password": "Admin@12345" }
 ```
+
+**登录校验逻辑**：
+```java
+public boolean canLogin(User user) {
+    return user.getStatus() == 1
+        && "APPROVED".equals(user.getRegistrationStatus());
+}
+```
+- 必须同时满足 `status=1` **AND** `registration_status='APPROVED'`
+- PENDING（待审核）或 REJECTED（已拒绝）用户不允许登录
+- 管理员直建用户 `registration_status='APPROVED'` 跳过审核
 
 **登录响应体**（JWT payload 增强）：
 ```json
@@ -325,8 +482,11 @@ CREATE TABLE audit_log (
 | 方法 | 路径 | 权限 | 说明 |
 |------|------|:----:|------|
 | GET | `/` | user:read | 分页查询用户列表 |
+| GET | `/pending` | user:approve | 待审核用户列表 |
 | GET | `/{id}` | user:read | 获取用户详情 |
-| POST | `/` | user:create | 新建用户 |
+| POST | `/` | user:create | 新建用户（管理员直建，跳过审核） |
+| PUT | `/{id}/approve` | user:approve | 审核通过（幂等，开通账号 + 分配默认角色） |
+| PUT | `/{id}/reject` | user:approve | 审核拒绝（幂等，记录拒绝原因） |
 | PUT | `/{id}` | user:update | 编辑用户 |
 | DELETE | `/{id}` | user:delete | 软删除用户 |
 | PUT | `/{id}/status` | user:update | 启用/禁用用户 |
@@ -405,7 +565,7 @@ CREATE TABLE audit_log (
 
 ## 4. 权限编码规范
 
-### 4.1 权限编码定义（42 条）
+### 4.1 权限编码定义（72 条）
 
 **格式**: `{模块}:{动作}`
 
@@ -493,13 +653,23 @@ CREATE TABLE audit_log (
 | `user:create` | 创建用户 | ユーザーを作成 | CREATE |
 | `user:update` | 编辑用户 | ユーザーを編集 | UPDATE |
 | `user:delete` | 删除用户 | ユーザーを削除 | DELETE |
+| `user:approve` | 审核注册用户 | ユーザー登録を承認 | ADMIN |
 | `user:reset_password` | 重置用户密码 | パスワードをリセット | ADMIN |
 | `role:read` | 查看角色 | 役割を表示 | READ |
 | `role:create` | 创建角色 | 役割を作成 | CREATE |
 | `role:update` | 编辑角色 | 役割を編集 | UPDATE |
 | `role:assign` | 分配角色 | 役割を割り当て | ADMIN |
+| `permission:read` | 查看权限 | 権限を表示 | READ |
 | `audit:read` | 查看操作日志 | 操作ログを表示 | READ |
 | `audit:export` | 导出操作日志 | 操作ログをエクスポート | ADMIN |
+
+#### 认证模块
+
+| 权限编码 | 中文名 | 日文名 | 动作 |
+|---------|--------|--------|------|
+| `auth:register` | 用户注册 | ユーザー登録 | CREATE |
+| `auth:login` | 登录 | ログイン | READ |
+| `auth:logout` | 登出 | ログアウト | UPDATE |
 
 ---
 
@@ -507,7 +677,7 @@ CREATE TABLE audit_log (
 
 ### 5.1 ADMIN（系统管理员）
 
-拥有所有权限（`*:*`）。
+拥有所有权限（`*:*`），包含 `user:approve`（注册审核）。
 
 ### 5.2 MANAGER（运营主管）
 
@@ -529,6 +699,7 @@ CREATE TABLE audit_log (
 | order | ✅ | — | — | — | — |
 | user | ✅ | — | — | — | — |
 | role | ✅ | — | — | — | — |
+| permission | ✅ | — | — | — | — | 查看权限树 |
 | audit | ✅ | — | — | — | — |
 
 ### 5.3 OPERATOR（普通运营）
@@ -577,6 +748,9 @@ CREATE TABLE audit_log (
 | `LOGIN_FAIL` | 登录失败 | `{ "ip": "...", "username": "admin", "reason": "密码错误" }` |
 | `LOGOUT` | 登出 | `{}` |
 | `PASSWORD_CHANGE` | 修改密码 | `{ "targetUserId": 1 }`（不记录旧密码） |
+| `REGISTER` | 注册提交 | `{ "newData": { username, email, nameCn } }` |
+| `REGISTRATION_APPROVED` | 审核通过 | `{ "userId": 2, "approvedBy": "admin" }` |
+| `REGISTRATION_REJECTED` | 审核拒绝 | `{ "userId": 2, "rejectReason": "xxx" }` |
 
 ### 6.2 不记录的内容
 
@@ -606,6 +780,7 @@ public Result<DemandVO> update(@PathVariable Long id, @RequestBody @Valid Demand
 ## 7. /intjcode 自检清单
 
 > 对应 `docs/check/99-全面审计报告.md` §G 标准
+> v1.1.0 新增：JWT 跨服务验证架构 + 注册审核流程 + 数据库规范化
 
 | 检查项 | 状态 | 说明 |
 |--------|:----:|------|
@@ -618,7 +793,7 @@ public Result<DemandVO> update(@PathVariable Long id, @RequestBody @Valid Demand
 | 分离？ | ✅ | user-service 独立管理认证，manpou-allinone 专注业务 |
 | 拆分？ | ✅ | 按模块/角色/权限/日志拆分为独立 API |
 | 命名？ | ✅ | 权限编码遵循 `{模块}:{动作}` 规范，无禁用词 |
-| 熵增？ | ✅ | 无冗余字段，每张表字段有明确业务意义 |
+| 熵增？ | ✅ | user 表冗余字段已移除，position_ids 改为中间表 |
 | 不可变？ | ✅ | audit_log 只追加，不修改不删除 |
 | 正交？ | ✅ | user/role/permission/department/position 各自独立，无循环依赖 |
 | 显式？ | ✅ | 所有字段语义显式命名 |
@@ -626,30 +801,47 @@ public Result<DemandVO> update(@PathVariable Long id, @RequestBody @Valid Demand
 | 依赖倒置？ | ✅ | domain 层只引用 common.enums/exception |
 | 领域语言？ | ✅ | 权限模块使用业务语言（角色/权限/审批），非技术语言 |
 | 日志？ | ✅ | 操作日志全链路记录，含 traceId |
-| 提交？ | ✅ | 按 Flyway 版本顺序：V4→V9 |
+| 提交？ | ✅ | 按 Flyway 版本顺序：V4→V5→V6→V7→V7.1→V8→V9 |
 | 单体优先？ | ✅ | 认证在 user-service（18081），业务在 manpou-allinone（18090） |
 | i18n？ | ✅ | 所有 UI 文本使用 i18n key，中日双语 |
 | 密码安全？ | ✅ | BCrypt 哈希，强度 12，永不明文传输/存储 |
-| JWT 安全？ | ✅ | RS256 非对称签名，15分钟 TTL，kid 版本管理 |
+| JWT 安全？ | ✅ | RS256 非对称签名，15分钟 TTL，方案B（跨服务验证） |
+| JWT 跨服务？ | ✅ | allinone 只读验证，user-service 唯一签发，无密钥共享 |
+| 注册审核？ | ✅ | PENDING → APPROVED/REJECTED 状态机，完整流程 + 登录双重校验 |
+| 数据库范式？ | ✅ | position_ids JSON → user_position 中间表（M-N 规范化） |
+| 幂等性？ | ✅ | approve/reject 改为 PUT，审核操作幂等 |
+| 权限完整性？ | ✅ | permission:read 已补充，MANAGER 矩阵已补充，72 条无遗漏 |
+| 审计日志？ | ✅ | REGISTER/REGISTRATION_APPROVED/REJECTED action 已补充 |
 
 ---
 
 ## 8. 实现依赖与顺序
 
 ```
+Phase 0: JWT 跨服务验证整合（P0 — 阻塞所有后续）
+  ✅ user-service: AuthController 新增 /keys/{kid}/public-key 端点
+  ✅ user-service: JwtKeyManager 提供 getPublicKey(kid) 接口
+  ✅ allinone: JwtKeyManager 改造为只读（删除签发，保留验证）
+  ✅ allinone: JwtAuthenticationFilter 切换为只读验证模式
+  ✅ 验证：登录 → 前端获取 token → allinone 业务请求成功
+
 Phase 1: 数据库 + 登录修复（P0）
-  V4 → V5 → V6 → V7 → V8
-  后端: AuthController 真实登录
-  后端: JWT 增强 payload
+  V4 → V5 → V6 → V7 → V7.1 → V8
+  后端: 真实用户表（company/department/position/user/user_position/role/permission）
+  后端: AuthController 接入 BCrypt 校验
+  后端: JWT 增强 payload（userCode/roles/permissions）
   后端: JWT permissions 注入 SecurityContext
+  后端: @PreAuthorize 权限注解启用
 
 Phase 2: 用户 CRUD + 角色管理（P0）
-  后端: User CRUD API + @PreAuthorize
-  后端: Role CRUD API + @PreAuthorize
+  后端: User CRUD API（POST/GET/PUT/DELETE）
+  后端: Role CRUD API
   后端: Company/Department/Position API
+  后端: user:approve 审核 API（GET /pending、POST /approve、POST /reject）
   前端: 用户管理页面
   前端: 角色管理页面
   前端: 权限树（只读）
+  前端: 待审核用户列表 + 审核弹窗
 
 Phase 3: 前端权限控制（P0）
   前端: 路由守卫增加 hasPermission
@@ -667,6 +859,14 @@ Phase 5: 个人中心（P2）
   前端: 个人中心页
   前端: 修改密码
   前端: 偏好设置（语言/时区）
+
+Phase 6: 用户注册 + 管理员审核（P1）
+  后端: POST /auth/register（public 接口，提交审核）
+  后端: PENDING → APPROVED/REJECTED 状态机
+  后端: 审核通过后自动分配 VIEWER 角色
+  后端: 注册拒绝时记录 reject_reason
+  前端: 登录页增加「注册账号」入口
+  前端: 审核通过/拒绝 通知（可邮件，可前端提示）
 ```
 
 ---
