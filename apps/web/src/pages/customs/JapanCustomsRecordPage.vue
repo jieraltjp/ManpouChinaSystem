@@ -67,12 +67,17 @@
     <el-card class="table-card" shadow="never">
       <template #header>
         <div class="table-header">
-          <span />
+          <el-radio-group v-model="viewMode" size="small">
+            <el-radio-button value="list">{{ $t('japanCustoms.viewMode.list') }}</el-radio-button>
+            <el-radio-button value="group">{{ $t('japanCustoms.viewMode.byContainer') }}</el-radio-button>
+          </el-radio-group>
           <el-button type="primary" size="small" @click="onNew">
             <el-icon><Plus /></el-icon> {{ $t('japanCustoms.action.newCustoms') }}
           </el-button>
         </div>
       </template>
+
+      <!-- 列表视图 -->
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="containerNo" :label="$t('japanCustoms.column.containerNo')" min-width="160">
           <template #default="{ row }">
@@ -145,7 +150,83 @@
         </el-table-column>
       </el-table>
 
-      <div class="pagination-wrap">
+      <!-- 分组视图 -->
+      <el-collapse v-loading="loading" v-if="viewMode === 'group'" class="container-group-collapse">
+        <el-collapse-item v-for="group in groupedData" :key="group.containerNo">
+          <template #title>
+            <div class="group-header">
+              <el-icon class="group-icon"><Box /></el-icon>
+              <span class="group-title">
+                {{ group.containerNo || $t('japanCustoms.group.ungrouped') }}
+              </span>
+              <el-tag size="small" type="info" class="group-count">{{ group.records.length }} {{ $t('japanCustoms.group.records') }}</el-tag>
+              <el-tag v-if="group.statusCount.PENDING" size="small" type="warning" class="group-badge">{{ group.statusCount.PENDING }} {{ $t('japanCustoms.status.pending') }}</el-tag>
+              <el-tag v-if="group.statusCount.IN_PROGRESS" size="small" type="primary" class="group-badge">{{ group.statusCount.IN_PROGRESS }} {{ $t('japanCustoms.status.inProgress') }}</el-tag>
+              <el-tag v-if="group.statusCount.CLEARED" size="small" type="success" class="group-badge">{{ group.statusCount.CLEARED }} {{ $t('japanCustoms.status.cleared') }}</el-tag>
+              <el-tag v-if="group.statusCount.FAILED" size="small" type="danger" class="group-badge">{{ group.statusCount.FAILED }} {{ $t('japanCustoms.status.failed') }}</el-tag>
+            </div>
+          </template>
+          <el-table :data="group.records" stripe>
+            <el-table-column prop="containerNo" :label="$t('japanCustoms.column.containerNo')" min-width="160">
+              <template #default="{ row }">
+                <el-link v-if="row.containerNo" type="primary" @click.stop="onJumpToDomestic(row)">{{ row.containerNo }}</el-link>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="customsEntryNo" :label="$t('japanCustoms.column.entryNo')" min-width="180">
+              <template #default="{ row }">
+                <span class="code-badge">{{ row.customsEntryNo }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="domesticCustomsId" :label="$t('japanCustoms.column.domesticCustomsId')" min-width="100" align="center">
+              <template #default="{ row }">
+                <span v-if="row.domesticCustomsId">{{ row.domesticCustomsId }}</span>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="productCode" :label="$t('japanCustoms.column.productCode')" min-width="80" align="center">
+              <template #default="{ row }">
+                <span v-if="row.productCode">{{ row.productCode }}</span>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="subProductCode" :label="$t('japanCustoms.column.subProductCode')" min-width="80" align="center">
+              <template #default="{ row }">
+                <span v-if="row.subProductCode">{{ row.subProductCode }}</span>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="arrivalPort" :label="$t('japanCustoms.column.arrivalPort')" min-width="90" />
+            <el-table-column prop="arrivalDate" :label="$t('japanCustoms.column.arrivalDate')" min-width="120" />
+            <el-table-column prop="importDutyPaid" :label="$t('japanCustoms.column.importDuty')" min-width="120" align="right">
+              <template #default="{ row }">
+                <span v-if="row.importDutyPaid != null" class="money">{{ row.importDutyPaid?.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="status" :label="$t('japanCustoms.column.status')" min-width="110" align="center">
+              <template #default="{ row }">
+                <el-tag :type="statusTagType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column :label="$t('japanCustoms.column.action')" min-width="200" align="center">
+              <template #default="{ row }">
+                <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('japanCustoms.action.detail') }}</el-button>
+                <template v-if="row.status === 'PENDING'">
+                  <el-button link type="success" size="small" :loading="actionLoading === row.id + '-start'" @click.stop="onStart(row)">{{ $t('japanCustoms.action.start') }}</el-button>
+                  <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
+                </template>
+                <template v-else-if="row.status === 'IN_PROGRESS'">
+                  <el-button link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('japanCustoms.action.complete') }}</el-button>
+                  <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-fail'" @click.stop="onFail(row)">{{ $t('japanCustoms.action.fail') }}</el-button>
+                </template>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-collapse-item>
+      </el-collapse>
+
+      <div v-if="viewMode === 'list'" class="pagination-wrap">
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.pageSize"
@@ -280,7 +361,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Document, Clock, Loading, CircleCheck, Plus } from '@element-plus/icons-vue'
+import { Document, Clock, Loading, CircleCheck, Plus, Box } from '@element-plus/icons-vue'
 import { japanCustomsApi, type JapanCustomsVO, type JapanCustomsStatus } from '@/api/japanCustoms'
 import { useI18n } from 'vue-i18n'
 
@@ -295,6 +376,7 @@ const actionLoading = ref('')
 const failReason = ref('')
 const completingRowId = ref<number | null>(null)
 const failingRowId = ref<number | null>(null)
+const viewMode = ref<'list' | 'group'>('list')
 
 const currentRow = ref<JapanCustomsVO | null>(null)
 const filterForm = reactive({
@@ -336,6 +418,24 @@ const statusCount = computed(() => {
   const counts: Record<string, number> = { PENDING: 0, IN_PROGRESS: 0, CLEARED: 0, FAILED: 0 }
   tableData.value.forEach(r => { if (r.status in counts) counts[r.status]++ })
   return counts
+})
+
+const groupedData = computed(() => {
+  const groups = new Map<string, { containerNo: string | null; records: JapanCustomsVO[]; statusCount: Record<string, number> }>()
+  tableData.value.forEach(record => {
+    const key = record.containerNo ?? '__UNGROUPED__'
+    if (!groups.has(key)) {
+      groups.set(key, { containerNo: record.containerNo ?? null, records: [], statusCount: { PENDING: 0, IN_PROGRESS: 0, CLEARED: 0, FAILED: 0 } })
+    }
+    const group = groups.get(key)!
+    group.records.push(record)
+    if (record.status in group.statusCount) group.statusCount[record.status]++
+  })
+  return Array.from(groups.values()).sort((a, b) => {
+    if (a.containerNo === null) return 1
+    if (b.containerNo === null) return -1
+    return a.containerNo.localeCompare(b.containerNo)
+  })
 })
 
 function statusLabel(status?: string): string {
@@ -571,5 +671,11 @@ watch(tableData, () => {
 .code-badge { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
 .money { color: #16A34A; font-weight: 600; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
-.table-header { display: flex; align-items: center; justify-content: flex-end; }
+.table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.container-group-collapse { margin-top: 8px; }
+.group-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.group-icon { font-size: 18px; color: var(--color-primary); }
+.group-title { font-weight: 600; font-size: 14px; color: var(--text-primary); }
+.group-count { margin-left: 4px; }
+.group-badge { margin-left: 4px; }
 </style>

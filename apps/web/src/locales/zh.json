@@ -1367,6 +1367,14 @@
       "created": "已报关",
       "notCreated": "未报关"
     },
+    "viewMode": {
+      "list": "列表视图",
+      "byContainer": "按货柜分组"
+    },
+    "group": {
+      "ungrouped": "未分组",
+      "records": "{n} 条记录"
+    },
     "action": {
       "detail": "详情",
       "submit": "提交",
@@ -1496,17 +1504,23 @@
       "reasonPlaceholder": "请输入失败原因"
     },
     "message": {
-      "createSuccess": "创建成功",
-      "createFailed": "创建失败"
-    },
-    "message": {
       "loadFailed": "加载清关列表失败",
+      "createSuccess": "创建成功",
+      "createFailed": "创建失败",
       "startSuccess": "开始清关成功",
       "completeSuccess": "清关完成",
       "failSuccess": "已标记失败",
       "deleteSuccess": "删除成功",
       "actionFailed": "操作失败，请重试",
       "deleteConfirm": "确定删除该清关记录吗？"
+    },
+    "viewMode": {
+      "list": "列表视图",
+      "byContainer": "按货柜分组"
+    },
+    "group": {
+      "ungrouped": "未分组",
+      "records": "{n} 条记录"
     }
   },
   "taxRefund": {

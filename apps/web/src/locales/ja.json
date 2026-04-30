@@ -1368,6 +1368,14 @@
       "created": "通関済",
       "notCreated": "未通関"
     },
+    "viewMode": {
+      "list": "リスト表示",
+      "byContainer": "コンテナ別"
+    },
+    "group": {
+      "ungrouped": "未分類",
+      "records": "{n}件"
+    },
     "action": {
       "detail": "詳細",
       "submit": "提出",
@@ -1471,6 +1479,14 @@
       "inProgress": "通関中",
       "cleared": "通関済",
       "failed": "通関失敗"
+    },
+    "viewMode": {
+      "list": "リスト表示",
+      "byContainer": "コンテナ別"
+    },
+    "group": {
+      "ungrouped": "未分類",
+      "records": "{n}件"
     },
     "action": {
       "newCustoms": "新規通関",

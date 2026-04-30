@@ -68,6 +68,19 @@
 
     <!-- 数据表 -->
     <el-card class="table-card" shadow="never">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="viewMode" size="small">
+            <el-radio-button value="list">{{ $t('customs.viewMode.list') }}</el-radio-button>
+            <el-radio-button value="group">{{ $t('customs.viewMode.byContainer') }}</el-radio-button>
+          </el-radio-group>
+          <el-button type="primary" size="small" @click="onNew">
+            <el-icon><Plus /></el-icon> {{ $t('customs.batchButton') }}
+          </el-button>
+        </div>
+      </template>
+
+      <!-- 列表视图 -->
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="customsCode" :label="$t('customs.column.customsCode')" min-width="180">
           <template #default="{ row }">
@@ -120,7 +133,70 @@
         </el-table-column>
       </el-table>
 
-      <div class="pagination-wrap">
+      <!-- 分组视图 -->
+      <el-collapse v-loading="loading" v-if="viewMode === 'group'" class="container-group-collapse">
+        <el-collapse-item v-for="group in groupedData" :key="group.containerNo">
+          <template #title>
+            <div class="group-header">
+              <el-icon class="group-icon"><Box /></el-icon>
+              <span class="group-title">
+                {{ group.containerNo || $t('customs.group.ungrouped') }}
+              </span>
+              <el-tag size="small" type="info" class="group-count">{{ group.records.length }} {{ $t('customs.group.records') }}</el-tag>
+              <el-tag v-if="group.statusCount.PENDING" size="small" type="warning" class="group-badge">{{ group.statusCount.PENDING }} {{ $t('customs.status.pending') }}</el-tag>
+              <el-tag v-if="group.statusCount.SUBMITTED" size="small" type="primary" class="group-badge">{{ group.statusCount.SUBMITTED }} {{ $t('customs.status.submitted') }}</el-tag>
+              <el-tag v-if="group.statusCount.CLEARED" size="small" type="success" class="group-badge">{{ group.statusCount.CLEARED }} {{ $t('customs.status.cleared') }}</el-tag>
+              <el-tag v-if="group.statusCount.REJECTED" size="small" type="danger" class="group-badge">{{ group.statusCount.REJECTED }} {{ $t('customs.status.rejected') }}</el-tag>
+            </div>
+          </template>
+          <el-table :data="group.records" stripe>
+            <el-table-column prop="customsCode" :label="$t('customs.column.customsCode')" min-width="180">
+              <template #default="{ row }">
+                <span class="code-badge">{{ row.customsCode }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="productCode" :label="$t('customs.column.productCode')" min-width="120">
+              <template #default="{ row }">
+                <span class="product-code">{{ row.productCode }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="subProductCode" :label="$t('customs.column.subProductCode')" min-width="100" />
+            <el-table-column prop="quantity" :label="$t('customs.column.quantity')" min-width="80" align="right">
+              <template #default="{ row }">
+                <span v-if="row.quantity !== null">{{ row.quantity }}</span>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="estimatedValueCny" :label="$t('customs.column.estimatedValueCny')" min-width="130" align="right">
+              <template #default="{ row }">
+                <span v-if="row.estimatedValueCny != null" class="money">{{ $t('common.currency.cny') }}{{ row.estimatedValueCny?.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="status" :label="$t('customs.column.status')" min-width="100" align="center">
+              <template #default="{ row }">
+                <el-tag :type="statusTagType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="createTime" :label="$t('customs.column.createTime')" min-width="160" />
+            <el-table-column :label="$t('customs.column.action')" min-width="180" align="center">
+              <template #default="{ row }">
+                <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
+                <template v-if="row.status === 'PENDING'">
+                  <el-button link type="success" size="small" :loading="actionLoading === row.id + '-submit'" @click.stop="onSubmit(row)">{{ $t('customs.action.submit') }}</el-button>
+                  <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
+                </template>
+                <template v-else-if="row.status === 'SUBMITTED'">
+                  <el-button link type="success" size="small" :loading="actionLoading === row.id + '-clear'" @click.stop="onClear(row)">{{ $t('customs.action.clear') }}</el-button>
+                  <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-reject'" @click.stop="onReject(row)">{{ $t('customs.action.reject') }}</el-button>
+                </template>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-collapse-item>
+      </el-collapse>
+
+      <div v-if="viewMode === 'list'" class="pagination-wrap">
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.pageSize"
@@ -273,7 +349,7 @@
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Document, Clock, Top, CircleCheck } from '@element-plus/icons-vue'
+import { Plus, Document, Clock, Top, CircleCheck, Box } from '@element-plus/icons-vue'
 import { customsApi, type CustomsVO, type DomesticCustomsStatus, type CustomsCreateRequest, type CustomsBatchCreateRequest } from '@/api/customs'
 import { logisticsApi, type LogisticsPlanVO } from '@/api/logistics'
 import { useI18n } from 'vue-i18n'
@@ -286,6 +362,7 @@ const rejectDialogVisible = ref(false)
 const actionLoading = ref('')
 const rejectReason = ref('')
 const rejectingRowId = ref<number | null>(null)
+const viewMode = ref<'list' | 'group'>('list')
 
 const containerOptions = ref<LogisticsPlanVO[]>([])
 const containerLoading = ref(false)
@@ -329,6 +406,24 @@ const statusCount = computed(() => {
   const counts: Record<string, number> = { PENDING: 0, SUBMITTED: 0, CLEARED: 0, REJECTED: 0 }
   tableData.value.forEach(r => { if (r.status in counts) counts[r.status]++ })
   return counts
+})
+
+const groupedData = computed(() => {
+  const groups = new Map<string, { containerNo: string | null; records: CustomsVO[]; statusCount: Record<string, number> }>()
+  tableData.value.forEach(record => {
+    const key = record.containerNo ?? '__UNGROUPED__'
+    if (!groups.has(key)) {
+      groups.set(key, { containerNo: record.containerNo ?? null, records: [], statusCount: { PENDING: 0, SUBMITTED: 0, CLEARED: 0, REJECTED: 0 } })
+    }
+    const group = groups.get(key)!
+    group.records.push(record)
+    if (record.status in group.statusCount) group.statusCount[record.status]++
+  })
+  return Array.from(groups.values()).sort((a, b) => {
+    if (a.containerNo === null) return 1
+    if (b.containerNo === null) return -1
+    return a.containerNo.localeCompare(b.containerNo)
+  })
 })
 
 function statusLabel(status?: string): string {
@@ -604,6 +699,13 @@ watch(tableData, () => {
 .product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
 .money { color: #16A34A; font-weight: 600; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
+.table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.container-group-collapse { margin-top: 8px; }
+.group-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.group-icon { font-size: 18px; color: var(--color-primary); }
+.group-title { font-weight: 600; font-size: 14px; color: var(--text-primary); }
+.group-count { margin-left: 4px; }
+.group-badge { margin-left: 4px; }
 /* 批量创建样式 */
 .batch-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 .batch-label { font-weight: 600; color: var(--text-primary); white-space: nowrap; }
