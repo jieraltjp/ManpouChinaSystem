@@ -114,13 +114,13 @@
         <el-table-column prop="customsBroker" :label="$t('japanCustoms.column.broker')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="importDutyPaid" :label="$t('japanCustoms.column.importDuty')" min-width="120" align="right">
           <template #default="{ row }">
-            <span v-if="row.importDutyPaid !== null" class="money">{{ row.importDutyPaid.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
+            <span v-if="row.importDutyPaid != null" class="money">{{ row.importDutyPaid?.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column prop="consumptionTaxPaid" :label="$t('japanCustoms.column.consumptionTax')" min-width="120" align="right">
           <template #default="{ row }">
-            <span v-if="row.consumptionTaxPaid !== null" class="money">{{ row.consumptionTaxPaid.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
+            <span v-if="row.consumptionTaxPaid != null" class="money">{{ row.consumptionTaxPaid?.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -186,11 +186,11 @@
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.importDuty')">
-          <span v-if="currentRow.importDutyPaid !== null" class="money">{{ currentRow.importDutyPaid.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
+          <span v-if="currentRow.importDutyPaid != null" class="money">{{ currentRow.importDutyPaid?.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.consumptionTax')">
-          <span v-if="currentRow.consumptionTaxPaid !== null" class="money">{{ currentRow.consumptionTaxPaid.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
+          <span v-if="currentRow.consumptionTaxPaid != null" class="money">{{ currentRow.consumptionTaxPaid?.toLocaleString('ja-JP') }} {{ $t('common.units.jpy') }}</span>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.clearanceDate')">{{ currentRow.clearanceDate ?? '-' }}</el-descriptions-item>
