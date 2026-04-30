@@ -1,10 +1,10 @@
 # DB-06 — 日本清关数据库设计
 
-> **版本**: 1.3.0
+> **版本**: 1.4.0
 > **创建**: 2026-04-22
 > **更新**: 2026-04-24（v1.2.0：补充 sub_product_code 列，全链路子货号追踪完整）
-> **更新**: 2026-04-30（v1.3.0：**container_no 为主键字段 + product_code 列，V44 迁移待执行**）
-> **状态**: 🔧 改造中（v1.3.0 新增 container_no + product_code）
+> **更新**: 2026-04-30（v1.4.0：**container_no 为主键字段 + product_code + factory_id 列，V44 已创建**）
+> **状态**: ✅ 已实现（v1.4.0 container_no + product_code + factory_id 已实现，V44 迁移待执行）
 > **业务步号**: 06（日本清关）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B06-日本清关-步骤6.md`
 > **对应 UI 文档**: `docs/ui/pages/06-japan-customs.md`
@@ -105,20 +105,16 @@ CREATE TABLE japan_customs_record (
 
 ## 代码实现状态
 
-- [x] ✅ `JapanCustomsRecord` 聚合根实体
+- [x] ✅ `JapanCustomsRecord` 聚合根实体（含 containerNo + productCode + factoryId v1.4.0）
 - [x] ✅ `JapanCustomsStatus` 枚举（含 `isTerminal()`）
 - [x] ✅ `JapanCustomsRepository` 领域接口
-- [x] ✅ `JapanCustomsAssembler` DTO 转换器
-- [x] ✅ `JapanCustomsUseCase` 用例服务
+- [x] ✅ `JapanCustomsAssembler` DTO 转换器（含 containerNo 映射 v1.4.0）
+- [x] ✅ `JapanCustomsUseCase` 用例服务（含 containerNo 过滤 v1.4.0）
 - [x] ✅ `JapanCustomsController` REST 控制器
-- [x] ✅ `@/api/japanCustoms.ts` 前端 API 客户端
-- [x] ✅ `JapanCustomsRecordPage.vue` 前端页面
+- [x] ✅ `@/api/japanCustoms.ts` 前端 API 客户端（含 containerNo v1.4.0）
+- [x] ✅ `JapanCustomsRecordPage.vue` 前端页面（含 containerNo 筛选/列/新建 v1.4.0）
 - [x] ✅ `OrderOverviewUseCase` 已集成 JapanCustomsRecord（步骤6）
 - [x] ✅ DB迁移脚本 `V12__japan_customs_record_table.sql`
 - [x] ✅ DB迁移脚本 `V29__japan_customs_sub_product_code.sql`（v1.6.1 新增 sub_product_code 列）
-- [ ] 🔧 `JapanCustomsRecord` 增加 `containerNo` 字段（v1.4.0）
-- [ ] 🔧 `JapanCustomsAssembler` 增加 containerNo 映射（v1.4.0）
-- [ ] 🔧 `JapanCustomsCreateCmd` 增加 `containerNo` 字段（v1.4.0）
-- [ ] 🔧 `JapanCustomsQuery` 增加 `containerNo` 筛选（v1.4.0）
-- [ ] 🔴 V44 迁移：`japan_customs_record` 增加 `container_no` + `product_code` + `factory_id` 列
+- [x] ✅ DB迁移脚本 `V44__japan_customs_container_no.sql`（v1.4.0 新增 container_no + product_code + factory_id 列 + 索引）
 - [ ] 🔴 `JapanCustomsUseCaseTest` 单元测试

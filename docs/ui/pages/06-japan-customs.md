@@ -1,10 +1,10 @@
 # 页面规格 — 步骤6：日本清关
 
-> **版本**: 1.3.0
+> **版本**: 1.4.0
 > **创建**: 2026-04-22
 > **更新**: 2026-04-27（v1.2.0：移除骨架状态标注，补全统计卡/筛选栏/表格列/表单完整字段）
-> **更新**: 2026-04-30（v1.3.0：**containerNo 为主键字段 + domesticCustomsId 列 + 前端筛选改造**）
-> **状态**: 🔧 改造中（v1.3.0 前端改造）
+> **更新**: 2026-04-30（v1.4.0：**containerNo 为主键字段 + domesticCustomsId 列 + productCode 列 + 新规清关弹窗**）
+> **状态**: ✅ 已实现（v1.4.0 前端改造完成）
 > **路由**: `/procurement/japan-customs`
 > **组件**: `JapanCustomsRecordPage.vue`（`apps/web/src/pages/customs/JapanCustomsRecordPage.vue`）
 > **后端**: `JapanCustomsController` at `/api/v1/japan-customs`
@@ -91,12 +91,14 @@
 
 ---
 
-## 5. v1.3.0 改造清单
+## 5. v1.4.0 改造清单
 
 | 改造项 | 当前 | 目标 |
 |--------|------|------|
-| 列表页主筛选 | procurementId | containerNo |
-| containerNo 列 | 无 | 有（可点击跳转 DomesticCustomsPage） |
-| domesticCustomsId 列 | 无 | 有（展示国内报关单状态） |
-| 新建弹窗 containerNo | 无 | **必填 el-input（第一位）** |
-| 新建弹窗 domesticCustomsId | 无 | **必填 el-input-number** |
+| 列表页主筛选 | procurementId | containerNo ✅ |
+| containerNo 列 | 无 | 有（可点击跳转 DomesticCustomsPage）✅ |
+| domesticCustomsId 列 | 无 | 有（展示国内报关单状态）✅ |
+| productCode 列 | 无 | 有 ✅ |
+| 新建弹窗 | 无 | 有 ✅ |
+| 新建弹窗 containerNo | 无 | **必填 el-input（第一位）**✅ |
+| 新建弹窗 domesticCustomsId | 无 | **必填 el-input-number**✅ |

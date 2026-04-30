@@ -2,11 +2,11 @@
 
 > **版本**: 1.4.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-30（v1.4.0：V36 已存在于 repo，containerNo 字段已通过 JPA ddl-auto 添加；前端改为 containerNo 必填 + procurementId 可选）
+> **更新**: 2026-04-30（v1.4.0：containerNo 全面实现，前端/后端/DB 层全部完成）
 > **更新**: 2026-04-24（v1.3.0：全量实现已确认，修正为 ✅ 已实现；修正代码文件名DomesticCustomsRepository/customs.ts/DomesticCustomsPage.vue）
 > **更新**: 2026-04-24（修正状态：仅聚合根+枚举已实现，UseCase/Controller/前端均未实现，修正为🔴未实现）
 > **更新**: 2026-04-23（对齐 V17 迁移 + 实体实现）
-> **状态**: ✅ 已实现（含 v1.3.0 container_no 字段待迁移）
+> **状态**: ✅ 已实现（v1.4.0 containerNo 全链路实现完成，V36 已存在）
 > **业务步号**: 05（国内报关）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B05-国内报关-步骤5.md`
 > **对应 UI 文档**: `docs/ui/pages/05-domestic-customs.md`

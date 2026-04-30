@@ -645,13 +645,13 @@ LogisticsPlanUseCase.update(IN_TRANSIT)
 | 0 商品 | Product + ProductFactory | ✅ | — | ✅ | SPEC-B10 |
 | 1 补货 | ReplenishmentDemand | ✅ | — | ✅ | SPEC-B01 v2.2.0 |
 | 2 采购 | Procurement + Factory | ✅ | — | ✅ | SPEC-B02 |
-| 2.5 出货批次 | ShipmentBatch | 🔴 | — | 🔴 | SPEC-B11 |
-| 3 验货 | QcRecord | ✅ | 🔧修复中 | ✅ | SPEC-B03 |
+| 2.5 出货批次 | ShipmentBatch + DemandProcurementMapping | ✅ | 🔧实施中 | ✅ | SPEC-B11 v1.5.0 |
+| 3 验货 | QcRecord | ✅ | ✅ | ✅ | SPEC-B03 |
 | 4 调配 | LogisticsPlan | ✅ | 🔧修复中 | ✅ | SPEC-B04 |
 | 4 拼柜 | ConsolidationPool | 🔴 | — | 🔴 | SPEC-B04 |
 | 4 货柜 | Container | 🔴 | — | 🔴 | SPEC-B04 |
-| 5 国内报关 | DomesticCustomsRecord | ✅ | — | 🔧改造中 | SPEC-B05 v1.4.0 |
-| 6 日本清关 | JapanCustomsRecord | ✅ | ✅ | 🔧改造中 | SPEC-B06 v1.3.0 |
+| 5 国内报关 | DomesticCustomsRecord | ✅ | — | ✅ | SPEC-B05 v1.4.0 |
+| 6 日本清关 | JapanCustomsRecord | ✅ | ✅ | ✅ | SPEC-B06 v1.4.0 |
 | 7 退税 | TaxRefundRecord | ✅ | — | ✅ | SPEC-B07 |
 | 8 运营销售 | SalesRecord | ✅ | ✅ | ✅ | SPEC-B08 |
 
@@ -666,11 +666,11 @@ LogisticsPlanUseCase.update(IN_TRANSIT)
 | 1 | ~~Chain 3：验货完成不推进发注单状态~~ | ✅ 已修复（2026-04-29） | — |
 | 2 | ~~Chain 4：物流在途不自动创建报关~~ | ✅ 已修复（2026-04-29） | — |
 | 3 | SalesRecord.initialStock = procurement.quantity | 初始库存错误（应为 passedCount 聚合） | P0 |
-| 4 | ShipmentBatch + DemandProcurementMapping 未实现 | 出货批次追踪缺失 | P1 |
-| 5 | DomesticCustoms 新建表单 procurementId 必填，containerNo 可选 | 报关维度错误，应以货柜为主 | **P0（2026-04-30）** |
-| 6 | JapanCustomsRecord 缺少 containerNo 字段和货柜级入口 | 清关无法按货柜维度追踪 | **P1（2026-04-30）** |
-| 7 | LogisticsPlanPage 缺少"创建报关"批量按钮 | 无法从物流计划直接发起报关 | **P1（2026-04-30）** |
-| 5 | ConsolidationPool + Container 未实现 | 拼柜路径无法执行 | P1 |
-| 6 | OrderOverview 步骤5-8 未展示 | 运营看不到全链路 | P2 |
-| 7 | LogisticsPlan.quantity 来源错误 | 调配数量非实际验货量 | P2 |
-| 8 | ReplenishmentDemand 无自动触发来源 | 低库存触发链路存在，但新品需求仍需手动 | P3 |
+| 4 | ~~ShipmentBatch + DemandProcurementMapping 未实现~~ | ✅ 已实现（2026-04-30）：V40-V43 DB迁移、实体、Repository、UseCase、前端 ShipmentBatchPage | — |
+| 5 | ~~DomesticCustoms 新建表单 procurementId 必填，containerNo 可选~~ | ✅ 已修复（2026-04-30）：containerNo 已在 DB/Entity/UI 层实现 | — |
+| 6 | ~~JapanCustomsRecord 缺少 containerNo 字段和货柜级入口~~ | ✅ 已修复（2026-04-30）：v1.4.0 后端+前端全部实现，V44 迁移待执行 | — |
+| 7 | LogisticsPlanPage 缺少"创建报关"批量按钮 | 无法从物流计划直接发起报关 | P1（2026-04-30） |
+| 8 | ConsolidationPool + Container 未实现 | 拼柜路径无法执行 | P1 |
+| 9 | OrderOverview 步骤5-8 未展示 | 运营看不到全链路 | P2 |
+| 10 | LogisticsPlan.quantity 来源错误 | 调配数量非实际验货量 | P2 |
+| 11 | ReplenishmentDemand 无自动触发来源 | 低库存触发链路存在，但新品需求仍需手动 | P3 |
