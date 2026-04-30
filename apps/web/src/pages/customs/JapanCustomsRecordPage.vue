@@ -59,6 +59,9 @@
         <el-form-item>
           <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
           <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
+          <el-button type="primary" @click="onNew">
+            <el-icon><Plus /></el-icon> {{ $t('japanCustoms.action.newCustoms') }}
+          </el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -71,9 +74,6 @@
             <el-radio-button value="list">{{ $t('japanCustoms.viewMode.list') }}</el-radio-button>
             <el-radio-button value="group">{{ $t('japanCustoms.viewMode.byContainer') }}</el-radio-button>
           </el-radio-group>
-          <el-button type="primary" size="small" @click="onNew">
-            <el-icon><Plus /></el-icon> {{ $t('japanCustoms.action.newCustoms') }}
-          </el-button>
         </div>
       </template>
 
