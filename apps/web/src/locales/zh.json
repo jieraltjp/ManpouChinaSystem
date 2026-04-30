@@ -463,6 +463,9 @@
       "yes": "是",
       "no": "否",
       "RMB": "RMB"
+    },
+    "action": {
+      "shipmentBatch": "出货批次"
     }
   },
   "inspection": {
@@ -1286,6 +1289,7 @@
     "close": "关闭",
     "loading": "加载中...",
     "noData": "暂无数据",
+    "back": "返回",
     "units": {
       "kg": "kg",
       "cm": "cm",
