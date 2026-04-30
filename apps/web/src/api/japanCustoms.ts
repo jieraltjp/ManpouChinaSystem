@@ -14,9 +14,11 @@ export type JapanCustomsStatus = 'PENDING' | 'IN_PROGRESS' | 'CLEARED' | 'FAILED
 export interface JapanCustomsVO {
   id: number
   customsEntryNo: string
-  procurementId: number | null
+  containerNo: string | null   // 货柜号（v1.4.0 核心字段）
   domesticCustomsId: number | null
+  procurementId: number | null   // v1.4.0 可选参考
   logisticsPlanId: number | null
+  productCode: string | null    // 货号（v1.4.0 新增）
   subProductCode: string | null  // 子货号/颜色（v1.6.1 全链路追踪）
   status: JapanCustomsStatus
   arrivalDate: string | null
@@ -46,14 +48,18 @@ export interface JapanCustomsQuery {
   page?: number
   pageSize?: number
   status?: JapanCustomsStatus
+  containerNo?: string   // 货柜号（v1.4.0 GET 筛选优先字段）
   procurementId?: number
   domesticCustomsId?: number
 }
 
 export interface JapanCustomsCreateRequest {
-  procurementId?: number
+  containerNo: string    // 货柜号（v1.4.0 必填，第一位）
   domesticCustomsId?: number
   logisticsPlanId?: number
+  procurementId?: number  // v1.4.0 可选参考
+  factoryId?: number      // v1.4.0 新增
+  productCode?: string    // 货号（v1.4.0 新增）
   subProductCode?: string  // 子货号/颜色（v1.6.1 全链路追踪）
   arrivalDate?: string
   customsBroker?: string

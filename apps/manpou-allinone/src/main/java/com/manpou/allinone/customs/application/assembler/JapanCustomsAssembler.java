@@ -20,9 +20,12 @@ public class JapanCustomsAssembler {
     }
 
     public void copyCreate(JapanCustomsCreateCmd cmd, JapanCustomsRecord entity) {
-        if (cmd.getProcurementId() != null) entity.setProcurementId(cmd.getProcurementId());
+        if (cmd.getContainerNo() != null) entity.setContainerNo(cmd.getContainerNo());
         if (cmd.getDomesticCustomsId() != null) entity.setDomesticCustomsId(cmd.getDomesticCustomsId());
         if (cmd.getLogisticsPlanId() != null) entity.setLogisticsPlanId(cmd.getLogisticsPlanId());
+        if (cmd.getProcurementId() != null) entity.setProcurementId(cmd.getProcurementId());
+        if (cmd.getFactoryId() != null) entity.setFactoryId(cmd.getFactoryId());
+        if (cmd.getProductCode() != null) entity.setProductCode(cmd.getProductCode());
         if (cmd.getSubProductCode() != null) entity.setSubProductCode(cmd.getSubProductCode());
         if (cmd.getArrivalDate() != null) entity.setArrivalDate(cmd.getArrivalDate());
         if (cmd.getCustomsBroker() != null) entity.setCustomsBroker(cmd.getCustomsBroker());
@@ -50,9 +53,11 @@ public class JapanCustomsAssembler {
         return JapanCustomsPageQuery.builder()
                 .id(entity.getId())
                 .customsEntryNo(entity.getCustomsEntryNo())
-                .procurementId(entity.getProcurementId())
+                .containerNo(entity.getContainerNo())
                 .domesticCustomsId(entity.getDomesticCustomsId())
+                .procurementId(entity.getProcurementId())
                 .logisticsPlanId(entity.getLogisticsPlanId())
+                .productCode(entity.getProductCode())
                 .subProductCode(entity.getSubProductCode())
                 .status(entity.getStatus() != null ? entity.getStatus().name() : null)
                 .arrivalDate(entity.getArrivalDate())

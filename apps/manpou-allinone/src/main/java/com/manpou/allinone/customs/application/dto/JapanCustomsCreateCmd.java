@@ -10,10 +10,15 @@ import java.time.LocalDate;
 @Data
 public class JapanCustomsCreateCmd {
 
-    private Long procurementId;
+    @NotBlank(message = "货柜号不能为空")
+    private String containerNo;      // 货柜号（v1.4.0 必填，第一位）
+
     private Long domesticCustomsId;
     private Long logisticsPlanId;
-    private String subProductCode;  // 子货号/颜色（来自 Procurement，全链路追踪）
+    private Long procurementId;     // v1.4.0 改为可选参考
+    private Long factoryId;         // v1.4.0 新增
+    private String productCode;     // 货号（v1.4.0 新增）
+    private String subProductCode;  // 子货号/颜色（v1.6.1 全链路追踪）
 
     private LocalDate arrivalDate;
 

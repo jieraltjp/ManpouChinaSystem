@@ -408,7 +408,60 @@
       "detail": "詳細",
       "statusUpdated": "ステータスが更新されました",
       "statusUpdateFailed": "ステータスの更新に失敗しました",
-      "qcRecordLinked": "QC記録が既にリンクされています。ステータスを変更できません"
+      "qcRecordLinked": "QC記録が既にリンクされています。ステータスを変更できません",
+      "batchLinked": "出荷バッチが既に存在するため、ステータスを変更できません",
+      "action": {
+        "shipmentBatch": "出荷バッチ"
+      }
+    },
+    "shipmentBatch": {
+      "title": "出荷バッチ管理",
+      "action": {
+        "create": "新規出荷バッチ"
+      },
+      "filter": {
+        "status": "ステータス"
+      },
+      "column": {
+        "batchCode": "バッチ番号",
+        "shipmentQuantity": "出荷数量",
+        "factoryShipDate": "工場出荷日",
+        "actualShipDate": "実際倉庫到着日",
+        "status": "ステータス",
+        "remarks": "備考",
+        "createBy": "作成者",
+        "createTime": "作成日時"
+      },
+      "status": {
+        "待验货": "検査待ち",
+        "验货中": "検査中",
+        "已验货": "検査済",
+        "已取消": "キャンセル済"
+      },
+      "dialog": {
+        "createTitle": "新規出荷バッチ",
+        "editTitle": "出荷バッチ編集",
+        "procurementId": "発注番号",
+        "batchCode": "バッチ番号",
+        "batchCodePlaceholder": "SB-20260501-001",
+        "shipmentQuantity": "出荷数量",
+        "factoryShipDate": "工場出荷日",
+        "actualShipDate": "実際倉庫到着日",
+        "status": "ステータス",
+        "remarks": "備考",
+        "cancel": "キャンセル",
+        "save": "保存"
+      },
+      "validation": {
+        "batchCodeRequired": "バッチ番号は必須です",
+        "quantityRequired": "出荷数量は必須です"
+      },
+      "message": {
+        "createSuccess": "出荷バッチを作成しました",
+        "deleteSuccess": "出荷バッチを削除しました",
+        "deleteConfirm": "出荷バッチ「{batchCode}」を削除しますか？",
+        "deleteConfirmTitle": "削除確認"
+      }
     },
     "common": {
       "yes": "はい",
@@ -1262,16 +1315,20 @@
       "failed": "通関失敗"
     },
     "filter": {
+      "containerNo": "コンテナ番号",
+      "containerNoPlaceholder": "コンテナ番号を入力",
       "entryNo": "入境通関番号",
       "entryNoPlaceholder": "入境通関番号を入力",
-      "procurementId": "仕入書類番号",
+      "domesticCustomsId": "国内通関",
       "status": "ステータス"
     },
     "column": {
+      "containerNo": "コンテナ番号",
       "entryNo": "入境通関番号",
+      "domesticCustomsId": "国内通関",
       "procurementId": "仕入書類番号",
+      "productCode": "品番",
       "subProductCode": "子品番",
-      "domesticCustomsId": "国内通関番号",
       "arrivalPort": "到着港",
       "arrivalDate": "到着日",
       "broker": "通関業者",
@@ -1295,10 +1352,19 @@
       "failed": "通関失敗"
     },
     "action": {
+      "newCustoms": "新規通関",
       "detail": "詳細",
       "start": "開始",
       "complete": "完了",
       "fail": "失敗"
+    },
+    "newDialogTitle": "新規通関",
+    "placeholder": {
+      "containerNo": "コンテナ番号を入力"
+    },
+    "validation": {
+      "containerNoRequired": "コンテナ番号は必須です",
+      "domesticCustomsIdRequired": "国内通関番号は必須です"
     },
     "completeDialog": {
       "importDuty": "輸入関税（JPY）",
@@ -1316,7 +1382,9 @@
       "failSuccess": "失敗をマークしました",
       "deleteSuccess": "削除しました",
       "actionFailed": "操作に失敗しました",
-      "deleteConfirm": "この通関記録を削除しますか？"
+      "deleteConfirm": "この通関記録を削除しますか？",
+      "createSuccess": "作成しました",
+      "createFailed": "作成に失敗しました"
     }
   },
   "taxRefund": {

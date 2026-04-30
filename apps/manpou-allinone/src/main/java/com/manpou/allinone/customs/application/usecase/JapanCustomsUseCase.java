@@ -29,6 +29,7 @@ public class JapanCustomsUseCase {
     public Page<JapanCustomsPageQuery> pageQuery(JapanCustomsQuery query) {
         List<JapanCustomsRecord> all = japanCustomsRepository.findByDeletedFalseOrderByCreateTimeDesc();
         List<JapanCustomsPageQuery> filtered = all.stream()
+                .filter(r -> query.getContainerNo() == null || query.getContainerNo().equals(r.getContainerNo()))
                 .filter(r -> query.getProcurementId() == null || query.getProcurementId().equals(r.getProcurementId()))
                 .filter(r -> query.getDomesticCustomsId() == null || query.getDomesticCustomsId().equals(r.getDomesticCustomsId()))
                 .filter(r -> query.getStatus() == null || query.getStatus().equals(r.getStatus().name()))

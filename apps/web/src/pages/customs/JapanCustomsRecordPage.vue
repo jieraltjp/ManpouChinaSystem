@@ -39,11 +39,14 @@
     <!-- 筛选栏 -->
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filterForm">
-        <el-form-item :label="$t('japanCustoms.filter.entryNo')">
-          <el-input v-model="filterForm.keyword" :placeholder="$t('japanCustoms.filter.entryNoPlaceholder')" clearable style="width:180px" />
+        <el-form-item :label="$t('japanCustoms.filter.containerNo')">
+          <el-input v-model="filterForm.containerNo" :placeholder="$t('japanCustoms.filter.containerNoPlaceholder')" clearable style="width:170px" />
         </el-form-item>
-        <el-form-item :label="$t('japanCustoms.filter.procurementId')">
-          <el-input-number v-model="filterForm.procurementId" :min="1" style="width:130px" clearable />
+        <el-form-item :label="$t('japanCustoms.filter.entryNo')">
+          <el-input v-model="filterForm.keyword" :placeholder="$t('japanCustoms.filter.entryNoPlaceholder')" clearable style="width:170px" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.filter.domesticCustomsId')">
+          <el-input-number v-model="filterForm.domesticCustomsId" :min="1" style="width:130px" clearable />
         </el-form-item>
         <el-form-item :label="$t('japanCustoms.filter.status')">
           <el-select v-model="filterForm.status" :placeholder="$t('common.all')" clearable style="width:140px">
@@ -62,15 +65,41 @@
 
     <!-- 数据表 -->
     <el-card class="table-card" shadow="never">
+      <template #header>
+        <div class="table-header">
+          <span />
+          <el-button type="primary" size="small" @click="onNew">
+            <el-icon><Plus /></el-icon> {{ $t('japanCustoms.action.newCustoms') }}
+          </el-button>
+        </div>
+      </template>
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+        <el-table-column prop="containerNo" :label="$t('japanCustoms.column.containerNo')" min-width="160">
+          <template #default="{ row }">
+            <el-link v-if="row.containerNo" type="primary" @click.stop="onJumpToDomestic(row)">{{ row.containerNo }}</el-link>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="customsEntryNo" :label="$t('japanCustoms.column.entryNo')" min-width="180">
           <template #default="{ row }">
             <span class="code-badge">{{ row.customsEntryNo }}</span>
           </template>
         </el-table-column>
+        <el-table-column prop="domesticCustomsId" :label="$t('japanCustoms.column.domesticCustomsId')" min-width="100" align="center">
+          <template #default="{ row }">
+            <span v-if="row.domesticCustomsId">{{ row.domesticCustomsId }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="procurementId" :label="$t('japanCustoms.column.procurementId')" min-width="80" align="center">
           <template #default="{ row }">
             <span v-if="row.procurementId">{{ row.procurementId }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="productCode" :label="$t('japanCustoms.column.productCode')" min-width="80" align="center">
+          <template #default="{ row }">
+            <span v-if="row.productCode">{{ row.productCode }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -133,15 +162,16 @@
     <!-- 详情抽屉 -->
     <el-drawer v-model="drawerVisible" :title="$t('japanCustoms.drawerTitle')" size="600px" direction="rtl">
       <el-descriptions :column="2" border v-if="currentRow">
+        <el-descriptions-item :label="$t('japanCustoms.column.containerNo')">{{ currentRow.containerNo ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.entryNo')">
           <span class="code-badge">{{ currentRow.customsEntryNo }}</span>
         </el-descriptions-item>
+        <el-descriptions-item :label="$t('japanCustoms.column.domesticCustomsId')">{{ currentRow.domesticCustomsId ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('japanCustoms.column.productCode')">{{ currentRow.productCode ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.status')">
           <el-tag :type="statusTagType(currentRow.status)" size="small">{{ statusLabel(currentRow.status) }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('japanCustoms.column.procurementId')">{{ currentRow.procurementId ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.subProductCode')">{{ currentRow.subProductCode ?? '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('japanCustoms.column.domesticCustomsId')">{{ currentRow.domesticCustomsId ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.arrivalPort')">{{ currentRow.arrivalPort ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.arrivalDate')">{{ currentRow.arrivalDate ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.broker')">{{ currentRow.customsBroker ?? '-' }}</el-descriptions-item>
@@ -201,13 +231,56 @@
         <el-button type="danger" :loading="actionLoading.startsWith('fail-')" @click="onFailConfirm">{{ $t('common.confirm') }}</el-button>
       </template>
     </el-dialog>
+
+    <!-- 新规清关弹窗 -->
+    <el-dialog v-model="createDialogVisible" :title="$t('japanCustoms.newDialogTitle')" width="560px" destroy-on-close>
+      <el-form ref="createFormRef" :model="createForm" :rules="createRules" label-width="130px">
+        <el-form-item :label="$t('japanCustoms.column.containerNo')" prop="containerNo">
+          <el-input v-model="createForm.containerNo" :placeholder="$t('japanCustoms.placeholder.containerNo')" maxlength="32" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.domesticCustomsId')" prop="domesticCustomsId">
+          <el-input-number v-model="createForm.domesticCustomsId" :min="1" style="width:100%" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.procurementId')">
+          <el-input-number v-model="createForm.procurementId" :min="1" style="width:100%" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.productCode')">
+          <el-input v-model="createForm.productCode" maxlength="32" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.subProductCode')">
+          <el-input v-model="createForm.subProductCode" maxlength="64" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.arrivalDate')">
+          <el-date-picker v-model="createForm.arrivalDate" type="date" value-format="YYYY-MM-DD" style="width:100%" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.arrivalPort')">
+          <el-input v-model="createForm.arrivalPort" maxlength="64" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.broker')">
+          <el-input v-model="createForm.customsBroker" maxlength="128" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.weight')">
+          <el-input-number v-model="createForm.declaredWeightKg" :min="0" :precision="3" style="width:100%" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.volume')">
+          <el-input-number v-model="createForm.declaredVolumeCbm" :min="0" :precision="4" style="width:100%" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.remarks')">
+          <el-input v-model="createForm.remarks" type="textarea" :rows="2" maxlength="512" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="createDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="createSubmitting" @click="onCreate">{{ $t('common.confirm') }}</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Document, Clock, Loading, CircleCheck } from '@element-plus/icons-vue'
+import { Document, Clock, Loading, CircleCheck, Plus } from '@element-plus/icons-vue'
 import { japanCustomsApi, type JapanCustomsVO, type JapanCustomsStatus } from '@/api/japanCustoms'
 import { useI18n } from 'vue-i18n'
 
@@ -215,6 +288,9 @@ const loading = ref(false)
 const drawerVisible = ref(false)
 const completeDialogVisible = ref(false)
 const failDialogVisible = ref(false)
+const createDialogVisible = ref(false)
+const createSubmitting = ref(false)
+const createFormRef = ref()
 const actionLoading = ref('')
 const failReason = ref('')
 const completingRowId = ref<number | null>(null)
@@ -222,8 +298,9 @@ const failingRowId = ref<number | null>(null)
 
 const currentRow = ref<JapanCustomsVO | null>(null)
 const filterForm = reactive({
+  containerNo: '',
   keyword: '',
-  procurementId: undefined as number | undefined,
+  domesticCustomsId: undefined as number | undefined,
   status: '' as JapanCustomsStatus | '',
 })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
@@ -233,6 +310,25 @@ const completeForm = reactive({
   consumptionTaxPaid: 0,
   clearanceDate: '',
 })
+
+const createForm = reactive({
+  containerNo: '',
+  domesticCustomsId: undefined as number | undefined,
+  procurementId: undefined as number | undefined,
+  productCode: '',
+  subProductCode: '',
+  arrivalDate: '',
+  arrivalPort: '',
+  customsBroker: '',
+  declaredWeightKg: undefined as number | undefined,
+  declaredVolumeCbm: undefined as number | undefined,
+  remarks: '',
+})
+
+const createRules = computed(() => ({
+  containerNo: [{ required: true, message: t('japanCustoms.validation.containerNoRequired'), trigger: 'blur' }],
+  domesticCustomsId: [{ required: true, message: t('japanCustoms.validation.domesticCustomsIdRequired'), trigger: 'blur' }],
+}))
 
 const { t } = useI18n()
 
@@ -262,6 +358,61 @@ function statusTagType(status?: string): string {
   return map[status ?? ''] ?? 'info'
 }
 
+function onNew() {
+  createFormRef.value?.resetFields()
+  createForm.containerNo = ''
+  createForm.domesticCustomsId = undefined
+  createForm.procurementId = undefined
+  createForm.productCode = ''
+  createForm.subProductCode = ''
+  createForm.arrivalDate = ''
+  createForm.arrivalPort = ''
+  createForm.customsBroker = ''
+  createForm.declaredWeightKg = undefined
+  createForm.declaredVolumeCbm = undefined
+  createForm.remarks = ''
+  createDialogVisible.value = true
+}
+
+async function onCreate() {
+  if (!createFormRef.value) return
+  try {
+    await createFormRef.value.validate()
+  } catch {
+    return
+  }
+  createSubmitting.value = true
+  try {
+    await japanCustomsApi.create({
+      containerNo: createForm.containerNo,
+      domesticCustomsId: createForm.domesticCustomsId,
+      procurementId: createForm.procurementId,
+      productCode: createForm.productCode || undefined,
+      subProductCode: createForm.subProductCode || undefined,
+      arrivalDate: createForm.arrivalDate || undefined,
+      arrivalPort: createForm.arrivalPort || undefined,
+      customsBroker: createForm.customsBroker || undefined,
+      declaredWeightKg: createForm.declaredWeightKg,
+      declaredVolumeCbm: createForm.declaredVolumeCbm,
+      remarks: createForm.remarks || undefined,
+    })
+    ElMessage.success(t('japanCustoms.message.createSuccess'))
+    createDialogVisible.value = false
+    loadData()
+  } catch (e) {
+    console.error('[JapanCustomsRecordPage] create failed', e)
+    ElMessage.error(t('japanCustoms.message.createFailed'))
+  } finally {
+    createSubmitting.value = false
+  }
+}
+
+function onJumpToDomestic(row: JapanCustomsVO) {
+  if (row.domesticCustomsId) {
+    window.location.hash = `#/procurement/domestic-customs?id=${row.domesticCustomsId}`
+  }
+}
+
 async function loadData() {
   loading.value = true
   try {
@@ -269,7 +420,8 @@ async function loadData() {
       page: pagination.page - 1,
       pageSize: pagination.pageSize,
       status: filterForm.status || undefined,
-      procurementId: filterForm.procurementId,
+      containerNo: filterForm.containerNo || undefined,
+      domesticCustomsId: filterForm.domesticCustomsId,
     })
     const data = res.data.data
     tableData.value = data?.content ?? []
@@ -286,8 +438,9 @@ function onSearch() { loadData() }
 function onSearchFromButton() { pagination.page = 1; loadData() }
 
 function onReset() {
+  filterForm.containerNo = ''
   filterForm.keyword = ''
-  filterForm.procurementId = undefined
+  filterForm.domesticCustomsId = undefined
   filterForm.status = ''
   pagination.page = 1
   loadData()
@@ -418,4 +571,5 @@ watch(tableData, () => {
 .code-badge { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
 .money { color: #16A34A; font-weight: 600; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
+.table-header { display: flex; align-items: center; justify-content: flex-end; }
 </style>

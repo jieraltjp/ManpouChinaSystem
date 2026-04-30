@@ -12,10 +12,12 @@ public class JapanCustomsPageQuery {
 
     private Long id;
     private String customsEntryNo;
-    private Long procurementId;
+    private String containerNo;    // 货柜号（v1.4.0 核心字段）
     private Long domesticCustomsId;
+    private Long procurementId;    // v1.4.0 可选参考
     private Long logisticsPlanId;
-    private String subProductCode;  // 子货号/颜色（v1.6.1 全链路追踪）
+    private String productCode;    // 货号（v1.4.0 新增）
+    private String subProductCode; // 子货号/颜色（v1.6.1 全链路追踪）
     private String status;
     private LocalDate arrivalDate;
     private String customsBroker;

@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
  */
 @Entity
 @Table(name = "japan_customs_record", indexes = {
+        @Index(name = "idx_jp_container_no", columnList = "container_no"),
         @Index(name = "idx_jp_procurement_id", columnList = "procurement_id"),
         @Index(name = "idx_jp_domestic_customs_id", columnList = "domestic_customs_id"),
         @Index(name = "idx_jp_logistics_plan_id", columnList = "logistics_plan_id"),
@@ -34,14 +35,23 @@ public class JapanCustomsRecord extends BaseEntity {
     @Column(name = "customs_entry_no", length = 64)
     private String customsEntryNo;  // 入境报关号（格式：JC-YYYYMMDD-NNN）
 
-    @Column(name = "procurement_id")
-    private Long procurementId;     // 关联采购单
+    @Column(name = "container_no", length = 32)
+    private String containerNo;     // 货柜号（v1.4.0 必填，与国内报关一致）
 
     @Column(name = "domestic_customs_id")
     private Long domesticCustomsId; // 关联国内报关单
 
     @Column(name = "logistics_plan_id")
     private Long logisticsPlanId;   // 关联调配计划
+
+    @Column(name = "procurement_id")
+    private Long procurementId;     // 关联采购单（v1.4.0 改为可选参考）
+
+    @Column(name = "factory_id")
+    private Long factoryId;        // 关联工厂（v1.4.0 新增）
+
+    @Column(name = "product_code", length = 32)
+    private String productCode;    // 货号（v1.4.0 新增）
 
     @Column(name = "sub_product_code", length = 64)
     private String subProductCode;  // 子货号/颜色（来自 Procurement，全链路追踪）
