@@ -45,6 +45,12 @@ const routes: RouteRecordRaw[] = [
             meta: { titleKey: 'menu.procurement', requiresAuth: true },
           },
           {
+            path: 'shipment-batch',
+            name: 'ShipmentBatch',
+            component: () => import('@/pages/procurement/ShipmentBatchPage.vue'),
+            meta: { titleKey: 'menu.shipmentBatch', requiresAuth: true },
+          },
+          {
             path: 'qc-record',
             name: 'QcRecord',
             component: () => import('@/pages/procurement/QcRecordPage.vue'),

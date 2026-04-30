@@ -132,16 +132,17 @@
               size="small"
               :disable-transitions="false"
               class="status-toggle"
-              :class="{ 'is-link': !row.qcRecordId }"
+              :class="{ 'is-link': !(row.batchCount ?? 0) }"
               @click.stop="onToggleStatus(row)"
             >
               {{ statusLabel(row) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('order.column.action')" min-width="220" align="center">
+        <el-table-column :label="$t('order.column.action')" min-width="300" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('order.message.detail') }}</el-button>
+            <el-button link type="success" size="small" @click.stop="onOpenShipmentBatches(row)">{{ $t('order.action.shipmentBatch') }}</el-button>
             <el-button link type="warning" size="small" @click.stop="onEdit(row)"
               :disabled="row.status === COMPLETED_STATUS">{{ $t('demand.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)"
@@ -964,28 +965,25 @@ async function onSubmit() {
 }
 
 function statusLabel(row: ProcurementPageVO): string {
-  // Phase2：根据 QC 记录联动显示状态
-  if (row.qcRecordId) return t('order.status.已出货')
+  // Phase2：根据批次数量派生（batchCount>0 → 已出货，SPEC-B11 §7.1）
+  if ((row.batchCount ?? 0) > 0) return t('order.status.已出货')
   return t('order.status.已下单')
 }
 
 function statusLabelByValue(status: string): string {
-  // 下拉选项用字符串映射
   return t(`order.status.${status}` as any, { default: status })
 }
 
 function statusType(row: ProcurementPageVO): string {
-  // 有 QC 记录 → 已出货（绿色）；无 → 已下单（橙色）
-  return row.qcRecordId ? 'success' : 'warning'
+  return (row.batchCount ?? 0) > 0 ? 'success' : 'warning'
 }
 
 async function onToggleStatus(row: ProcurementPageVO) {
-  // 有 QC 记录 → 无法切换
-  if (row.qcRecordId) {
-    ElMessage.warning(t('order.message.qcRecordLinked'))
+  // 有批次 → 无法切换
+  if ((row.batchCount ?? 0) > 0) {
+    ElMessage.warning(t('order.message.batchLinked'))
     return
   }
-  // 无 QC 记录 → 在已下单/已出货之间切换
   const newStatus = row.status === '已下单' ? '已出货' : '已下单'
   try {
     await procurementApi.update(row.id, { status: newStatus })
@@ -994,6 +992,10 @@ async function onToggleStatus(row: ProcurementPageVO) {
   } catch {
     ElMessage.error(t('order.message.statusUpdateFailed'))
   }
+}
+
+function onOpenShipmentBatches(row: ProcurementPageVO) {
+  router.push({ path: '/procurement/shipment-batch', query: { procurementId: String(row.id) } })
 }
 
 function billingTypeLabel(val: string | undefined): string {

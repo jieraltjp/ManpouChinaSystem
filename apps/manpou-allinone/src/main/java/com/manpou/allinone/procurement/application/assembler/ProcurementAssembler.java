@@ -2,27 +2,29 @@ package com.manpou.allinone.procurement.application.assembler;
 
 import com.manpou.allinone.common.port.FactoryQueryPort;
 import com.manpou.allinone.order.application.dto.OrderProcurementSelectorDTO;
-import com.manpou.allinone.qc.domain.repository.QcRecordRepository;
 import com.manpou.allinone.procurement.application.dto.ProcurementCreateCmd;
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
 import com.manpou.allinone.procurement.application.dto.ProcurementUpdateCmd;
 import com.manpou.allinone.procurement.domain.model.Procurement;
-import org.springframework.data.domain.Pageable;
+import com.manpou.allinone.procurement.domain.repository.ShipmentBatchRepository;
 import org.springframework.stereotype.Component;
 
 /**
  * DTO ↔ Entity 转换器。
  * 与 docs/business/SPEC-B02-发注单-步骤2.md §API设计 完全对齐。
+ * EV-107/SPEC-B11：移除了跨模块 QcRecordRepository 依赖，改为同模块 ShipmentBatchRepository。
  */
 @Component
 public class ProcurementAssembler {
 
     private final FactoryQueryPort factoryQueryPort;
-    private final QcRecordRepository qcRecordRepository;
+    private final ShipmentBatchRepository shipmentBatchRepository;
 
-    public ProcurementAssembler(FactoryQueryPort factoryQueryPort, QcRecordRepository qcRecordRepository) {
+    public ProcurementAssembler(FactoryQueryPort factoryQueryPort,
+                               @org.springframework.beans.factory.annotation.Qualifier("jpaShipmentBatchRepository")
+                               ShipmentBatchRepository shipmentBatchRepository) {
         this.factoryQueryPort = factoryQueryPort;
-        this.qcRecordRepository = qcRecordRepository;
+        this.shipmentBatchRepository = shipmentBatchRepository;
     }
 
     public ProcurementPageQuery toDto(Procurement entity) {
@@ -33,18 +35,13 @@ public class ProcurementAssembler {
                     .map(f -> f.getFactoryName())
                     .orElse(null);
         }
-        // 检查是否有 QC 记录（Phase2：状态联动）
-        Long qcRecordId = qcRecordRepository
-                .findByProcurementIdAndDeletedIsFalse(entity.getId(), Pageable.unpaged())
-                .stream()
-                .findFirst()
-                .map(r -> r.getId())
-                .orElse(null);
+        // 批次数量（Phase2：batchCount>0 → 已出货）
+        long batchCount = shipmentBatchRepository.countByProcurementIdAndDeletedIsFalse(entity.getId());
         return ProcurementPageQuery.builder()
                 .id(entity.getId())
                 .factoryId(entity.getFactoryId())
                 .factoryName(factoryName)
-                .qcRecordId(qcRecordId)
+                .batchCount(Long.valueOf(batchCount))
                 .productCode(entity.getProductCode())
                 .subProductCode(entity.getSubProductCode())
                 .material(entity.getMaterial())

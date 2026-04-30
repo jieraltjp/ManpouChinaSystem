@@ -15,12 +15,12 @@ export const BILLING_TYPE_OPTIONS: { value: BillingType; label: string }[] = [
   { value: 'OTHER', label: '其他' },
 ]
 
-/** 发注单分页查询响应（v1.3.0 扩展字段） */
+/** 发注单分页查询响应（v1.3.0 扩展字段，SPEC-B11 batchCount） */
 export interface ProcurementPageVO {
   id: number
   factoryId?: number            // 关联工厂ID
   factoryName?: string          // 关联工厂名称（来自 DB-10 Factory 表，Assembler 查库填充）
-  qcRecordId?: number          // 关联 QC 记录 ID（Phase2：状态联动）
+  batchCount?: number         // 出货批次数量（Phase2：batchCount>0 → 已出货，SPEC-B11）
   productCode: string          // 主货号
   subProductCode?: string     // 子货号/枝番（颜色）
   material?: string            // 材质
@@ -133,5 +133,71 @@ export const procurementApi = {
   },
   delete(id: number) {
     return client.delete<{ code: string }>(`/procurements/${id}`)
+  },
+}
+
+// ===== 出货批次 API（SPEC-B11） =====
+export type ShipmentBatchStatus = '待验货' | '验货中' | '已验货' | '已取消'
+
+/** 出货批次分页查询响应 */
+export interface ShipmentBatchVO {
+  id: number
+  procurementId: number
+  batchCode: string
+  shipmentQuantity: number
+  factoryShipDate?: string
+  actualShipDate?: string
+  status: ShipmentBatchStatus
+  remarks?: string
+  qcRecordCount?: number
+  totalPassedCount?: number
+  createBy?: string
+  createTime?: string
+  updateBy?: string
+  updateTime?: string
+}
+
+export interface ShipmentBatchPageResponse {
+  content: ShipmentBatchVO[]
+  totalElements: number
+  totalPages: number
+  pageNumber: number
+}
+
+export interface CreateShipmentBatchRequest {
+  procurementId: number
+  batchCode: string
+  shipmentQuantity: number
+  factoryShipDate?: string
+  remarks?: string
+}
+
+export interface UpdateShipmentBatchRequest {
+  batchCode?: string
+  shipmentQuantity?: number
+  factoryShipDate?: string
+  actualShipDate?: string
+  status?: ShipmentBatchStatus
+  remarks?: string
+}
+
+export const shipmentBatchApi = {
+  list(params: { page?: number; pageSize?: number; procurementId?: number; status?: ShipmentBatchStatus }) {
+    return client.get<{ code: string; data: ShipmentBatchPageResponse }>('/shipment-batches', { params })
+  },
+  get(id: number) {
+    return client.get<{ code: string; data: ShipmentBatchVO }>(`/shipment-batches/${id}`)
+  },
+  create(data: CreateShipmentBatchRequest) {
+    return client.post<{ code: string; data: number }>('/shipment-batches', data)
+  },
+  update(id: number, data: UpdateShipmentBatchRequest) {
+    return client.patch<{ code: string }>(`/shipment-batches/${id}`, data)
+  },
+  delete(id: number) {
+    return client.delete<{ code: string }>(`/shipment-batches/${id}`)
+  },
+  linkQc(batchId: number, qcRecordId: number) {
+    return client.post<{ code: string }>(`/shipment-batches/${batchId}/link-qc`, { qcRecordId })
   },
 }
