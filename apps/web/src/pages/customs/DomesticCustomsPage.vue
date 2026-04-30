@@ -361,7 +361,7 @@ async function searchContainers(query: string) {
   }
   containerLoading.value = true
   try {
-    const res = await logisticsApi.list({ containerNo: query, pageSize: 20, status: 'IN_TRANSIT' })
+    const res = await logisticsApi.list({ containerNo: query, pageSize: 20 })
     containerOptions.value = res.data.data?.content ?? []
   } catch {
     containerOptions.value = []
