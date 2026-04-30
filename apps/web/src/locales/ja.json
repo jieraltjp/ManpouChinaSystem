@@ -412,59 +412,7 @@
       "statusUpdated": "ステータスが更新されました",
       "statusUpdateFailed": "ステータスの更新に失敗しました",
       "qcRecordLinked": "QC記録が既にリンクされています。ステータスを変更できません",
-      "batchLinked": "出荷バッチが既に存在するため、ステータスを変更できません",
-      "action": {
-        "shipmentBatch": "出荷バッチ"
-      }
-    },
-    "shipmentBatch": {
-      "title": "出荷バッチ管理",
-      "action": {
-        "create": "新規出荷バッチ"
-      },
-      "filter": {
-        "status": "ステータス"
-      },
-      "column": {
-        "batchCode": "バッチ番号",
-        "shipmentQuantity": "出荷数量",
-        "factoryShipDate": "工場出荷日",
-        "actualShipDate": "実際倉庫到着日",
-        "status": "ステータス",
-        "remarks": "備考",
-        "createBy": "作成者",
-        "createTime": "作成日時"
-      },
-      "status": {
-        "待验货": "検査待ち",
-        "验货中": "検査中",
-        "已验货": "検査済",
-        "已取消": "キャンセル済"
-      },
-      "dialog": {
-        "createTitle": "新規出荷バッチ",
-        "editTitle": "出荷バッチ編集",
-        "procurementId": "発注番号",
-        "batchCode": "バッチ番号",
-        "batchCodePlaceholder": "SB-20260501-001",
-        "shipmentQuantity": "出荷数量",
-        "factoryShipDate": "工場出荷日",
-        "actualShipDate": "実際倉庫到着日",
-        "status": "ステータス",
-        "remarks": "備考",
-        "cancel": "キャンセル",
-        "save": "保存"
-      },
-      "validation": {
-        "batchCodeRequired": "バッチ番号は必須です",
-        "quantityRequired": "出荷数量は必須です"
-      },
-      "message": {
-        "createSuccess": "出荷バッチを作成しました",
-        "deleteSuccess": "出荷バッチを削除しました",
-        "deleteConfirm": "出荷バッチ「{batchCode}」を削除しますか？",
-        "deleteConfirmTitle": "削除確認"
-      }
+      "batchLinked": "出荷バッチが既に存在するため、ステータスを変更できません"
     },
     "common": {
       "yes": "はい",
@@ -1062,7 +1010,16 @@
       "reset": "リセット",
       "status": "ステータス"
     },
-    "stepNames": ["補充", "発注", "検品", "调配", "国報", "日報", "退税", "運営"],
+    "stepNames": [
+      "補充",
+      "発注",
+      "検品",
+      "调配",
+      "国報",
+      "日報",
+      "退税",
+      "運営"
+    ],
     "status": {
       "all": "すべて",
       "pending": "未処理",
@@ -1497,12 +1454,14 @@
     },
     "action": {
       "newCustoms": "新規通関",
+      "batchImport": "一括インポート",
       "detail": "詳細",
       "start": "開始",
       "complete": "完了",
       "fail": "失敗"
     },
     "newDialogTitle": "新規通関",
+    "batchDialogTitle": "コンテナ一括通関作成",
     "placeholder": {
       "containerNo": "コンテナ番号を入力"
     },
@@ -1513,8 +1472,16 @@
       "selectedDomestic": "選択した国内通関",
       "changeDomestic": "再選択"
     },
+    "batchDialog": {
+      "containerNo": "コンテナ番号",
+      "containerNoPlaceholder": "コンテナ番号で検索...",
+      "selectedCount": "{n}件選択済",
+      "noDataTip": "このコンテナには通関済の国内通関記録がありません",
+      "createButton": "一括作成 ({n})",
+      "createSuccess": "一括作成完了、{n}件の通関記録を作成しました"
+    },
     "validation": {
-      "containerNoRequired": "コンテナ番号回はsa",
+      "containerNoRequired": "コンテナ番号は必須です",
       "domesticCustomsIdRequired": "国内通関番号は必須です"
     },
     "completeDialog": {
@@ -1718,6 +1685,55 @@
     },
     "validation": {
       "salesChannelRequired": "販売チャネルを選択してください"
+    }
+  },
+  "shipmentBatch": {
+    "title": "出荷バッチ管理",
+    "action": {
+      "create": "新規出荷バッチ"
+    },
+    "filter": {
+      "status": "ステータス"
+    },
+    "column": {
+      "batchCode": "バッチ番号",
+      "shipmentQuantity": "出荷数量",
+      "factoryShipDate": "工場出荷日",
+      "actualShipDate": "実際倉庫到着日",
+      "status": "ステータス",
+      "remarks": "備考",
+      "createBy": "作成者",
+      "createTime": "作成日時"
+    },
+    "status": {
+      "待验货": "検査待ち",
+      "验货中": "検査中",
+      "已验货": "検査済",
+      "已取消": "キャンセル済"
+    },
+    "dialog": {
+      "createTitle": "新規出荷バッチ",
+      "editTitle": "出荷バッチ編集",
+      "procurementId": "発注番号",
+      "batchCode": "バッチ番号",
+      "batchCodePlaceholder": "SB-20260501-001",
+      "shipmentQuantity": "出荷数量",
+      "factoryShipDate": "工場出荷日",
+      "actualShipDate": "実際倉庫到着日",
+      "status": "ステータス",
+      "remarks": "備考",
+      "cancel": "キャンセル",
+      "save": "保存"
+    },
+    "validation": {
+      "batchCodeRequired": "バッチ番号は必須です",
+      "quantityRequired": "出荷数量は必須です"
+    },
+    "message": {
+      "createSuccess": "出荷バッチを作成しました",
+      "deleteSuccess": "出荷バッチを削除しました",
+      "deleteConfirm": "出荷バッチ「{batchCode}」を削除しますか？",
+      "deleteConfirmTitle": "削除確認"
     }
   }
 }

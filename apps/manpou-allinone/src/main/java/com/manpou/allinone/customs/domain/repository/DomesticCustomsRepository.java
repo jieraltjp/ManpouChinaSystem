@@ -25,4 +25,6 @@ public interface DomesticCustomsRepository extends JpaRepository<DomesticCustoms
     Page<DomesticCustomsRecord> findByContainerNoContainingAndDeletedIsFalse(String containerNo, Pageable pageable);
 
     Page<DomesticCustomsRecord> findAllByDeletedIsFalse(Pageable pageable);
+
+    List<DomesticCustomsRecord> findByIdInAndDeletedIsFalse(List<Long> ids);
 }

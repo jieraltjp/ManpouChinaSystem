@@ -93,6 +93,11 @@ export interface JapanCustomsFailRequest {
   reason: string
 }
 
+export interface JapanCustomsBatchCreateRequest {
+  containerNo: string
+  domesticCustomsIds: number[]
+}
+
 export const japanCustomsApi = {
   list(params: JapanCustomsQuery) {
     return client.get<{ code: string; data: JapanCustomsPageResponse }>('/japan-customs', { params })
@@ -102,6 +107,9 @@ export const japanCustomsApi = {
   },
   create(data: JapanCustomsCreateRequest) {
     return client.post<{ code: string; data: number }>('/japan-customs', data)
+  },
+  batchCreate(data: JapanCustomsBatchCreateRequest) {
+    return client.post<{ code: string; data: number[] }>('/japan-customs/batch', data)
   },
   update(id: number, data: JapanCustomsUpdateRequest) {
     return client.put<{ code: string }>(`/japan-customs/${id}`, data)

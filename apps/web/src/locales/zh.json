@@ -405,59 +405,7 @@
       "statusUpdated": "状态更新成功",
       "statusUpdateFailed": "状态更新失败",
       "qcRecordLinked": "已有 QC 记录，无法切换状态",
-      "batchLinked": "已有出货批次，无法切换状态",
-      "action": {
-        "shipmentBatch": "出货批次"
-      }
-    },
-    "shipmentBatch": {
-      "title": "出货批次管理",
-      "action": {
-        "create": "新规出货批次"
-      },
-      "filter": {
-        "status": "状态"
-      },
-      "column": {
-        "batchCode": "批次编号",
-        "shipmentQuantity": "出货数量",
-        "factoryShipDate": "厂家发货日",
-        "actualShipDate": "实际到仓日",
-        "status": "状态",
-        "remarks": "备注",
-        "createBy": "创建人",
-        "createTime": "创建时间"
-      },
-      "status": {
-        "待验货": "待验货",
-        "验货中": "验货中",
-        "已验货": "已验货",
-        "已取消": "已取消"
-      },
-      "dialog": {
-        "createTitle": "新规出货批次",
-        "editTitle": "编辑出货批次",
-        "procurementId": "采购单号",
-        "batchCode": "批次编号",
-        "batchCodePlaceholder": "如 SB-20260501-001",
-        "shipmentQuantity": "出货数量",
-        "factoryShipDate": "厂家发货日",
-        "actualShipDate": "实际到仓日",
-        "status": "状态",
-        "remarks": "备注",
-        "cancel": "取消",
-        "save": "保存"
-      },
-      "validation": {
-        "batchCodeRequired": "批次编号不能为空",
-        "quantityRequired": "出货数量不能为空"
-      },
-      "message": {
-        "createSuccess": "出货批次创建成功",
-        "deleteSuccess": "出货批次删除成功",
-        "deleteConfirm": "确认删除出货批次「{batchCode}」？",
-        "deleteConfirmTitle": "删除确认"
-      }
+      "batchLinked": "已有出货批次，无法切换状态"
     },
     "common": {
       "yes": "是",
@@ -466,6 +414,55 @@
     },
     "action": {
       "shipmentBatch": "出货批次"
+    }
+  },
+  "shipmentBatch": {
+    "title": "出货批次管理",
+    "action": {
+      "create": "新规出货批次"
+    },
+    "filter": {
+      "status": "状态"
+    },
+    "column": {
+      "batchCode": "批次编号",
+      "shipmentQuantity": "出货数量",
+      "factoryShipDate": "厂家发货日",
+      "actualShipDate": "实际到仓日",
+      "status": "状态",
+      "remarks": "备注",
+      "createBy": "创建人",
+      "createTime": "创建时间"
+    },
+    "status": {
+      "待验货": "待验货",
+      "验货中": "验货中",
+      "已验货": "已验货",
+      "已取消": "已取消"
+    },
+    "dialog": {
+      "createTitle": "新规出货批次",
+      "editTitle": "编辑出货批次",
+      "procurementId": "采购单号",
+      "batchCode": "批次编号",
+      "batchCodePlaceholder": "如 SB-20260501-001",
+      "shipmentQuantity": "出货数量",
+      "factoryShipDate": "厂家发货日",
+      "actualShipDate": "实际到仓日",
+      "status": "状态",
+      "remarks": "备注",
+      "cancel": "取消",
+      "save": "保存"
+    },
+    "validation": {
+      "batchCodeRequired": "批次编号不能为空",
+      "quantityRequired": "出货数量不能为空"
+    },
+    "message": {
+      "createSuccess": "出货批次创建成功",
+      "deleteSuccess": "出货批次删除成功",
+      "deleteConfirm": "确认删除出货批次「{batchCode}」？",
+      "deleteConfirmTitle": "删除确认"
     }
   },
   "inspection": {
@@ -1488,12 +1485,14 @@
     },
     "action": {
       "newCustoms": "新规清关",
+      "batchImport": "批量导入",
       "detail": "详情",
       "start": "开始",
       "complete": "完成",
       "fail": "失败"
     },
     "newDialogTitle": "新规清关",
+    "batchDialogTitle": "按货柜批量创建清关单",
     "placeholder": {
       "containerNo": "请输入货柜号"
     },
@@ -1503,6 +1502,14 @@
       "noDomesticTip": "暂无可用国内报关记录",
       "selectedDomestic": "已选国内报关",
       "changeDomestic": "重新选择"
+    },
+    "batchDialog": {
+      "containerNo": "货柜号",
+      "containerNoPlaceholder": "搜索货柜号...",
+      "selectedCount": "已选 {n} 条",
+      "noDataTip": "该货柜下暂无已放行的国内报关记录",
+      "createButton": "批量创建 ({n})",
+      "createSuccess": "批量创建成功，共 {n} 条清关单"
     },
     "validation": {
       "containerNoRequired": "货柜号不能为空",

@@ -2,6 +2,8 @@ package com.manpou.allinone.customs.interfaces.controller;
 
 import com.manpou.allinone.customs.application.dto.*;
 import com.manpou.allinone.customs.application.usecase.JapanCustomsUseCase;
+
+import java.util.List;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
 import jakarta.validation.Valid;
@@ -38,6 +40,12 @@ public class JapanCustomsController {
     @Idempotent(ttl = 24 * 60 * 60)
     public Result<Long> create(@Valid @RequestBody JapanCustomsCreateCmd cmd) {
         return Result.ok("创建成功", japanCustomsUseCase.create(cmd));
+    }
+
+    @PostMapping("/batch")
+    @Idempotent(ttl = 24 * 60 * 60)
+    public Result<List<Long>> batchCreate(@Valid @RequestBody JapanCustomsBatchCreateCmd cmd) {
+        return Result.ok("批量创建成功", japanCustomsUseCase.batchCreate(cmd));
     }
 
     @PutMapping("/{id}")

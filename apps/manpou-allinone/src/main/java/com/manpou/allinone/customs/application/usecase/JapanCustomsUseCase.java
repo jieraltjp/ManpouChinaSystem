@@ -4,7 +4,9 @@ import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.customs.application.assembler.JapanCustomsAssembler;
 import com.manpou.allinone.customs.application.dto.*;
 import com.manpou.allinone.customs.domain.event.JapanCustomsClearedEvent;
+import com.manpou.allinone.customs.domain.model.DomesticCustomsRecord;
 import com.manpou.allinone.customs.domain.model.JapanCustomsRecord;
+import com.manpou.allinone.customs.domain.repository.DomesticCustomsRepository;
 import com.manpou.allinone.customs.domain.repository.JapanCustomsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import java.util.List;
 public class JapanCustomsUseCase {
 
     private final JapanCustomsRepository japanCustomsRepository;
+    private final DomesticCustomsRepository domesticCustomsRepository;
     private final JapanCustomsAssembler assembler;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -59,6 +62,26 @@ public class JapanCustomsUseCase {
         JapanCustomsRecord saved = japanCustomsRepository.save(entity);
         log.info("[JapanCustoms] created, id={}, entryNo={}", saved.getId(), saved.getCustomsEntryNo());
         return saved.getId();
+    }
+
+    @Transactional
+    public List<Long> batchCreate(JapanCustomsBatchCreateCmd cmd) {
+        log.info("[JapanCustoms] batchCreate, containerNo={}, domesticCustomsIds={}", cmd.getContainerNo(), cmd.getDomesticCustomsIds());
+        List<DomesticCustomsRecord> domestics = domesticCustomsRepository.findByIdInAndDeletedIsFalse(cmd.getDomesticCustomsIds());
+        if (domestics.isEmpty()) {
+            throw new BusinessException("japan_customs.no_domestic_found", "未找到对应的国内报关记录");
+        }
+        List<Long> createdIds = domestics.stream().map(domestic -> {
+            JapanCustomsCreateCmd single = new JapanCustomsCreateCmd();
+            single.setContainerNo(domestic.getContainerNo());
+            single.setDomesticCustomsId(domestic.getId());
+            single.setProcurementId(domestic.getProcurementId());
+            single.setProductCode(domestic.getProductCode());
+            single.setSubProductCode(domestic.getSubProductCode());
+            return create(single);
+        }).toList();
+        log.info("[JapanCustoms] batchCreated, count={}", createdIds.size());
+        return createdIds;
     }
 
     @Transactional
