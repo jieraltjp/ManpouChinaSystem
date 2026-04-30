@@ -1,103 +1,94 @@
 <template>
   <div class="login-layout">
-    <!-- 全屏背景图 -->
-    <div class="fullscreen-bg" aria-hidden="true"/>
 
-    <!-- 弧形遮罩 + 内容层 -->
-    <div class="scene">
-      <!-- 左：品牌内容（弧形遮罩内嵌文字） -->
-      <div class="brand-panel">
-        <div class="brand-content">
-          <!-- Logo -->
-          <div class="brand-logo">
-            <img :src="logoImg" alt="Hill Stone" class="logo-img"/>
-          </div>
+    <!-- 左：品牌面板 -->
+    <div class="brand-panel">
+      <div class="brand-bg" aria-hidden="true"/>
+      <div class="brand-overlay" aria-hidden="true"/>
+      <div class="brand-content">
+        <div class="brand-logo">
+          <img :src="logoImg" alt="Hill Stone" class="logo-img"/>
+        </div>
 
-          <!-- 标语 -->
-          <div class="brand-headline">
-            <h1>{{ $t('auth.welcomeTitle') }}</h1>
-            <p>{{ $t('auth.welcomeDesc') }}</p>
-          </div>
+        <div class="brand-headline">
+          <h1>{{ $t('auth.welcomeTitle') }}</h1>
+          <p>{{ $t('auth.welcomeDesc') }}</p>
+        </div>
 
-          <!-- 功能亮点 -->
-          <ul class="feature-list">
-            <li v-for="(feature, i) in $tm('auth.features')" :key="i">
-              <span class="feature-dot"/>
-              <span>{{ feature }}</span>
-            </li>
-          </ul>
+        <ul class="feature-list">
+          <li v-for="(feature, i) in $tm('auth.features')" :key="i">
+            <span class="feature-dot"/>
+            <span>{{ feature }}</span>
+          </li>
+        </ul>
 
-          <!-- 底部 -->
-          <div class="brand-footer">
-            <span class="footer-line"/>
-            <span class="footer-text">MANPOU China System · Enterprise Edition</span>
-          </div>
+        <div class="brand-footer">
+          <span class="footer-line"/>
+          <span class="footer-text">MANPOU China System · Enterprise Edition</span>
         </div>
       </div>
+    </div>
 
-      <!-- 右：登录表单（SVG 弧形曲线切割） -->
-      <div class="form-panel">
-        <!-- 语言切换 -->
-        <div class="lang-switcher">
-          <span class="lang-label">{{ $t('auth.language') }}</span>
-          <el-radio-group v-model="currentLocale" size="small">
-            <el-radio-button value="zh">{{ $t('auth.languageZh') }}</el-radio-button>
-            <el-radio-button value="ja">{{ $t('auth.languageJa') }}</el-radio-button>
-          </el-radio-group>
-        </div>
-
-        <!-- 登录卡片 -->
-        <div class="form-card">
-          <div class="form-header">
-            <h2>{{ $t('auth.title') }}</h2>
-            <p class="form-subtitle">{{ $t('auth.subtitle') }}</p>
-          </div>
-
-          <el-form
-            ref="formRef"
-            :model="form"
-            :rules="rules"
-            label-position="top"
-            @submit.prevent="submitLogin"
-          >
-            <el-form-item :label="$t('auth.username')" prop="username">
-              <el-input
-                v-model="form.username"
-                :placeholder="$t('auth.usernamePlaceholder')"
-                :prefix-icon="User"
-                autocomplete="username"
-                size="large"
-              />
-            </el-form-item>
-
-            <el-form-item :label="$t('auth.password')" prop="password">
-              <el-input
-                v-model="form.password"
-                type="password"
-                :placeholder="$t('auth.passwordPlaceholder')"
-                :prefix-icon="Lock"
-                autocomplete="current-password"
-                show-password
-                size="large"
-                @keyup.enter="submitLogin"
-              />
-            </el-form-item>
-
-            <el-form-item style="margin-top: 8px;">
-              <el-button
-                type="primary"
-                class="login-btn"
-                :loading="loading"
-                @click="submitLogin"
-              >
-                {{ $t('auth.login') }}
-              </el-button>
-            </el-form-item>
-          </el-form>
-        </div>
-
-        <p class="copyright">&copy; 2024–{{ new Date().getFullYear() }} MANPOU China. All rights reserved.</p>
+    <!-- 右：登录表单 -->
+    <div class="form-panel">
+      <div class="lang-switcher">
+        <span class="lang-label">{{ $t('auth.language') }}</span>
+        <el-radio-group v-model="currentLocale" size="small">
+          <el-radio-button value="zh">{{ $t('auth.languageZh') }}</el-radio-button>
+          <el-radio-button value="ja">{{ $t('auth.languageJa') }}</el-radio-button>
+        </el-radio-group>
       </div>
+
+      <div class="form-card">
+        <div class="form-header">
+          <h2>{{ $t('auth.title') }}</h2>
+          <p class="form-subtitle">{{ $t('auth.subtitle') }}</p>
+        </div>
+
+        <el-form
+          ref="formRef"
+          :model="form"
+          :rules="rules"
+          label-position="top"
+          @submit.prevent="submitLogin"
+        >
+          <el-form-item :label="$t('auth.username')" prop="username">
+            <el-input
+              v-model="form.username"
+              :placeholder="$t('auth.usernamePlaceholder')"
+              :prefix-icon="User"
+              autocomplete="username"
+              size="large"
+            />
+          </el-form-item>
+
+          <el-form-item :label="$t('auth.password')" prop="password">
+            <el-input
+              v-model="form.password"
+              type="password"
+              :placeholder="$t('auth.passwordPlaceholder')"
+              :prefix-icon="Lock"
+              autocomplete="current-password"
+              show-password
+              size="large"
+              @keyup.enter="submitLogin"
+            />
+          </el-form-item>
+
+          <el-form-item style="margin-top: 8px;">
+            <el-button
+              type="primary"
+              class="login-btn"
+              :loading="loading"
+              @click="submitLogin"
+            >
+              {{ $t('auth.login') }}
+            </el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+
+      <p class="copyright">&copy; 2024–{{ new Date().getFullYear() }} MANPOU China. All rights reserved.</p>
     </div>
   </div>
 </template>
@@ -155,16 +146,25 @@ async function submitLogin() {
 </script>
 
 <style scoped>
-/* ── 全屏背景 ── */
+/* ── 整体布局 ── */
 .login-layout {
-  position: relative;
-  width: 100%;
+  display: flex;
   min-height: 100vh;
-  overflow: hidden;
+  width: 100%;
 }
 
-.fullscreen-bg {
-  position: fixed;
+/* ── 左品牌面板 ── */
+.brand-panel {
+  position: relative;
+  flex: 0 0 55%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 背景图 */
+.brand-bg {
+  position: absolute;
   inset: 0;
   z-index: 0;
   background-image: url('@/assets/images/back.png');
@@ -173,58 +173,28 @@ async function submitLogin() {
   background-repeat: no-repeat;
 }
 
-/* ── 场景层 ── */
-.scene {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  min-height: 100vh;
-  width: 100%;
-}
-
-/* ── 左品牌面板：弧形曲线遮罩 ── */
-.brand-panel {
-  position: relative;
-  flex: 1;
-  display: flex;
-  /* 弧形 SVG clip-path：右侧向内凹陷 */
-  clip-path: path('M 0,0 L 65%,0 C 58%,18 52%,40 56%,62 C 60%,84 67%,100 72%,100 L 0,100 Z');
-}
-
-.brand-panel::before {
-  content: '';
+/* 暗色遮罩 */
+.brand-overlay {
   position: absolute;
   inset: 0;
+  z-index: 1;
   background: linear-gradient(
     135deg,
-    rgba(0, 0, 0, 0.60) 0%,
-    rgba(0, 0, 0, 0.40) 50%,
-    rgba(0, 0, 0, 0.20) 100%
+    rgba(0, 0, 0, 0.58) 0%,
+    rgba(0, 0, 0, 0.32) 60%,
+    rgba(0, 0, 0, 0.18) 100%
   );
-  z-index: 0;
 }
 
-.brand-panel::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to right,
-    rgba(232, 101, 10, 0.08) 0%,
-    transparent 60%
-  );
-  z-index: 0;
-}
-
+/* 品牌内容 */
 .brand-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 100%;
   height: 100%;
-  padding: 56px 48px 56px 64px;
+  padding: 52px 56px;
   color: #fff;
 }
 
@@ -234,19 +204,19 @@ async function submitLogin() {
   align-items: center;
 }
 .logo-img {
-  height: 48px;
+  height: 52px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+  filter: drop-shadow(0 3px 10px rgba(0,0,0,0.5));
 }
 
 /* 标语 */
 .brand-headline {
-  max-width: 380px;
+  max-width: 460px;
 }
 .brand-headline h1 {
   margin: 0 0 14px;
-  font-size: 36px;
+  font-size: 38px;
   font-weight: 800;
   line-height: 1.2;
   color: #fff;
@@ -279,7 +249,7 @@ async function submitLogin() {
   flex-shrink: 0;
   width: 7px;
   height: 7px;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.90);
   border-radius: 50%;
   box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
 }
@@ -303,20 +273,16 @@ async function submitLogin() {
   letter-spacing: 1px;
 }
 
-/* ── 右登录面板：白色表单区，弧形左边缘 ── */
+/* ── 右登录面板 ── */
 .form-panel {
-  position: relative;
-  flex: 0 0 42%;
+  flex: 0 0 45%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 48px;
-  background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(12px);
-  /* 弧形 SVG clip-path：左侧向外凸出，形成与左面板互补的弧线 */
-  clip-path: path('M 14%,100 C 9%,84 4%,62 8%,40 C 12%,18 18%,0 22%,0 L 100%,0 L 100%,100 Z');
-  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.12);
+  padding: 40px 52px;
+  background: #fff;
+  position: relative;
 }
 
 /* 语言切换 */
@@ -336,12 +302,12 @@ async function submitLogin() {
 /* 登录卡片 */
 .form-card {
   width: 100%;
-  max-width: 380px;
+  max-width: 400px;
 }
 
 .form-header {
-  margin-bottom: 28px;
-  padding-bottom: 20px;
+  margin-bottom: 30px;
+  padding-bottom: 22px;
   border-bottom: 1px solid var(--border-color);
 }
 .form-header h2 {
@@ -394,30 +360,22 @@ async function submitLogin() {
 
 /* ── 响应式 ── */
 @media (max-width: 900px) {
-  .fullscreen-bg {
-    background-size: auto 100%;
-    background-position: center;
-  }
-  .scene {
+  .login-layout {
     flex-direction: column;
   }
   .brand-panel {
-    clip-path: none;
     flex: 0 0 auto;
-    min-height: 220px;
-  }
-  .brand-panel::before {
-    background: linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.35));
-  }
-  .brand-panel::after {
-    display: none;
+    height: 240px;
+    min-height: 240px;
   }
   .brand-content {
-    padding: 32px 28px;
-    gap: 24px;
+    padding: 28px 28px;
   }
   .brand-headline h1 {
     font-size: 26px;
+  }
+  .brand-headline p {
+    font-size: 13px;
   }
   .feature-list {
     display: none;
@@ -427,9 +385,7 @@ async function submitLogin() {
   }
   .form-panel {
     flex: 1;
-    clip-path: none;
     padding: 32px 24px;
-    box-shadow: none;
   }
 }
 </style>

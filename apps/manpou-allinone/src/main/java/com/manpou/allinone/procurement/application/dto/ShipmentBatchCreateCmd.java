@@ -1,6 +1,5 @@
 package com.manpou.allinone.procurement.application.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,7 @@ public class ShipmentBatchCreateCmd {
     @NotNull(message = "采购单ID不能为空")
     private Long procurementId;
 
-    @NotBlank(message = "批次编号不能为空")
+    /** 批次编号由 Assembler 自动生成。 */
     private String batchCode;
 
     @NotNull(message = "出货数量不能为空")

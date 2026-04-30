@@ -35,8 +35,13 @@ public class ProcurementAssembler {
                     .map(f -> f.getFactoryName())
                     .orElse(null);
         }
-        // 批次数量（Phase2：batchCount>0 → 已出货）
+        // 批次数量 + 出货数量（Phase2：batchCount>0 → 已出货）
         long batchCount = shipmentBatchRepository.countByProcurementIdAndDeletedIsFalse(entity.getId());
+        int shipmentQuantity = shipmentBatchRepository
+                .findByProcurementIdAndDeletedIsFalse(entity.getId())
+                .stream()
+                .mapToInt(com.manpou.allinone.procurement.domain.model.ShipmentBatch::getShipmentQuantity)
+                .sum();
         return ProcurementPageQuery.builder()
                 .id(entity.getId())
                 .factoryId(entity.getFactoryId())
@@ -47,6 +52,7 @@ public class ProcurementAssembler {
                 .material(entity.getMaterial())
                 .requiresQc(entity.getRequiresQc())
                 .quantity(entity.getQuantity())
+                .shipmentQuantity(shipmentQuantity)
                 .priceRmb(entity.getPriceRmb())
                 .exchangeRate(entity.getExchangeRate())
                 .taxPoint(entity.getTaxPoint())

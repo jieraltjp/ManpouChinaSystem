@@ -218,6 +218,7 @@
       "exchangeRate": "汇率",
       "taxPoint": "票点",
       "quantity": "数量",
+      "shipmentQuantity": "出货数量",
       "estimatedPriceJpy": "估算批发价(JPY)",
       "billingType": "报关类型",
       "customerCompany": "客户公司",

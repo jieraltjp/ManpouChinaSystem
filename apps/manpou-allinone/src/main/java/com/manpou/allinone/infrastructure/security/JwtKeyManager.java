@@ -1,5 +1,7 @@
 package com.manpou.allinone.infrastructure.security;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manpou.allinone.domain.port.SigningKeyPort;
 import com.manpou.common.security.PemParser;
 import jakarta.annotation.PostConstruct;
@@ -13,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.security.PublicKey;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -22,6 +25,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * 不持有私钥，不签发 token。
  *
  * 详见 SPEC-B11 §1.5 JWT 跨服务验证架构（方案B）
+ *
+ * Lesson 68: RestTemplate + ParameterizedTypeReference + 内部类泛型反序列化
+ * 可能因类型擦除失败（kid=null → 缓存失效 → 401）。
+ * 改用 Map<String,Object> 手动提取字段，消除泛型歧义。
  */
 @Slf4j
 @Component
@@ -29,8 +36,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JwtKeyManager implements SigningKeyPort {
 
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
-    @Value("${jwt.verifier.endpoint:http://localhost:18081/api/v1/auth/keys}")
+    @Value("${jwt.verifier.endpoint:http://127.0.0.1:18081/api/v1/auth/keys}")
     private String verifierEndpoint;
 
     private static final int MAX_CACHE_SIZE = 10;
@@ -60,10 +68,12 @@ public class JwtKeyManager implements SigningKeyPort {
     public void refreshActiveKey() {
         try {
             String url = verifierEndpoint + "/active/public-key";
-            PublicKeyVO vo = restTemplate.getForObject(url, PublicKeyVO.class);
-            if (vo != null) {
-                cacheKey(vo.kid, vo.publicKey);
-                log.info("Refreshed active public key: kid={}", vo.kid);
+            Map<String, Object> data = fetchKeyData(url);
+            if (data != null) {
+                String kid = Objects.toString(data.get("kid"), null);
+                String pem = Objects.toString(data.get("publicKey"), null);
+                cacheKey(kid, pem);
+                log.info("Refreshed active public key: kid={}", kid);
             }
         } catch (Exception ex) {
             log.warn("Failed to refresh active public key: {}", ex.getMessage());
@@ -81,10 +91,12 @@ public class JwtKeyManager implements SigningKeyPort {
 
         try {
             String url = verifierEndpoint + "/" + kid + "/public-key";
-            PublicKeyVO vo = restTemplate.getForObject(url, PublicKeyVO.class);
-            if (vo != null) {
-                cacheKey(vo.kid, vo.publicKey);
-                return PemParser.parsePublicKey(vo.publicKey);
+            Map<String, Object> data = fetchKeyData(url);
+            if (data != null) {
+                String fetchedKid = Objects.toString(data.get("kid"), null);
+                String pem = Objects.toString(data.get("publicKey"), null);
+                cacheKey(fetchedKid, pem);
+                return PemParser.parsePublicKey(pem);
             }
         } catch (Exception ex) {
             log.warn("Failed to fetch public key for kid={}: {}", kid, ex.getMessage());
@@ -115,9 +127,35 @@ public class JwtKeyManager implements SigningKeyPort {
         return cached != null ? cached.pem : null;
     }
 
+    // ===== Map-based JSON 拉取（避免泛型类型擦除导致反序列化失败） =====
+
+    /**
+     * 从 user-service 拉取公钥数据，解析为 Map。
+     * user-service 返回格式：{ "code": "ok", "data": { "kid": "...", "publicKey": "..." } }
+     */
+    private Map<String, Object> fetchKeyData(String url) throws java.io.IOException {
+        String json = restTemplate.getForObject(url, String.class);
+        if (json == null) {
+            return null;
+        }
+        Map<String, Object> root = objectMapper.readValue(json,
+                new TypeReference<Map<String, Object>>() {});
+        // Result<T> 的 payload 在 JSON 中序列化为 "data"
+        Object payload = root.get("data");
+        if (payload instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = (Map<String, Object>) payload;
+            return data;
+        }
+        return null;
+    }
+
     // ===== 缓存管理 =====
 
     private void cacheKey(String kid, String pem) {
+        if (kid == null || pem == null) {
+            return;
+        }
         if (cache.size() >= MAX_CACHE_SIZE && !cache.containsKey(kid)) {
             // LRU 淘汰：移除最旧的 entry
             String oldest = cache.entrySet().stream()
@@ -134,20 +172,6 @@ public class JwtKeyManager implements SigningKeyPort {
     }
 
     // ===== 内部类 =====
-
-    public static class PublicKeyVO {
-        public String kid;
-        public String algorithm;
-        public String publicKey;
-
-        public PublicKeyVO() {}
-
-        public PublicKeyVO(String kid, String algorithm, String publicKey) {
-            this.kid = kid;
-            this.algorithm = algorithm;
-            this.publicKey = publicKey;
-        }
-    }
 
     private static class CachedPublicKey {
         final PublicKey publicKey;

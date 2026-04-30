@@ -225,6 +225,7 @@
       "exchangeRate": "為替レート",
       "taxPoint": "インボイス係数",
       "quantity": "数量",
+      "shipmentQuantity": "出荷数量",
       "estimatedPriceJpy": "見積もり卸値(JPY)",
       "billingType": "通関タイプ",
       "customerCompany": "顧客会社名",

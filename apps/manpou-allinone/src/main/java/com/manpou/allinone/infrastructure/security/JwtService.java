@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JWT Token 服务（只读验证模式）。
@@ -74,18 +75,37 @@ public class JwtService {
     }
 
     private Claims parseToken(String token) {
-        // 从 token header 提取 kid，定位对应公钥
-        String kid = Jwts.parser()
-            .build()
-            .parseSignedClaims(token)
-            .getHeader()
-            .getKeyId();
-
+        // RS256: header 是 base64url 编码，可直接解码提取 kid（无需验签）
+        String kid = extractKidFromHeader(token);
         return Jwts.parser()
             .verifyWith(keyManager.getPublicKey(kid))
             .build()
             .parseSignedClaims(token)
             .getPayload();
+    }
+
+    /**
+     * 从 JWT token 直接解码 header，提取 kid。
+     * RS256 token header 不需要签名验证即可解码（JWT 标准）。
+     */
+    private static String extractKidFromHeader(String token) {
+        try {
+            String[] parts = token.split("\\.");
+            if (parts.length < 1) {
+                throw new SecurityException("Invalid JWT format");
+            }
+            String headerJson = new String(java.util.Base64.getUrlDecoder().decode(parts[0]));
+            @SuppressWarnings("unchecked")
+            Map<String, Object> header = new com.fasterxml.jackson.databind.ObjectMapper()
+                .readValue(headerJson, java.util.Map.class);
+            Object kidValue = header.get("kid");
+            if (kidValue == null) {
+                throw new SecurityException("JWT header missing 'kid' field");
+            }
+            return kidValue.toString();
+        } catch (Exception ex) {
+            throw new SecurityException("Failed to extract kid from JWT header", ex);
+        }
     }
 
     // ==================== JwtClaims — 领域 UserContext 实现 ====================

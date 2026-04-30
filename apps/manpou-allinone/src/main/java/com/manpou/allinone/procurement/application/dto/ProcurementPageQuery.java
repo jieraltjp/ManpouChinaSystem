@@ -35,6 +35,7 @@ public class ProcurementPageQuery {
     private String material;            // 材质
     private Boolean requiresQc;        // 是否需要检测
     private Integer quantity;          // 订购数量
+    private Integer shipmentQuantity;  // 出货数量（所有批次之和，SPEC-B11 §7.1）
 
     // ===== 价格信息 =====
     private BigDecimal priceRmb;       // 人民币单价

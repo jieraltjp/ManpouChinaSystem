@@ -80,9 +80,6 @@
         <el-form-item :label="$t('shipmentBatch.dialog.procurementId')" v-if="dialogMode === 'create'">
           <el-input-number v-model="formData.procurementId" :min="1" style="width: 100%" />
         </el-form-item>
-        <el-form-item :label="$t('shipmentBatch.dialog.batchCode')" prop="batchCode">
-          <el-input v-model="formData.batchCode" :placeholder="$t('shipmentBatch.dialog.batchCodePlaceholder')" />
-        </el-form-item>
         <el-form-item :label="$t('shipmentBatch.dialog.shipmentQuantity')" prop="shipmentQuantity">
           <el-input-number v-model="formData.shipmentQuantity" :min="1" style="width: 100%" />
         </el-form-item>
@@ -218,7 +215,6 @@ function onEdit(row: ShipmentBatchVO) {
   currentRow.value = row
   Object.assign(formData, {
     procurementId: row.procurementId,
-    batchCode: row.batchCode,
     shipmentQuantity: row.shipmentQuantity,
     factoryShipDate: row.factoryShipDate || '',
     actualShipDate: row.actualShipDate || '',
@@ -245,7 +241,6 @@ async function onDelete(row: ShipmentBatchVO) {
 
 const defaultFormData = () => ({
   procurementId: procurementId.value ?? 0,
-  batchCode: '',
   shipmentQuantity: 1,
   factoryShipDate: '',
   actualShipDate: '',
@@ -256,7 +251,6 @@ const defaultFormData = () => ({
 const formData = reactive(defaultFormData())
 
 const formRules = {
-  batchCode: [{ required: true, message: () => t('shipmentBatch.validation.batchCodeRequired'), trigger: 'blur' }],
   shipmentQuantity: [{ required: true, message: () => t('shipmentBatch.validation.quantityRequired'), trigger: 'blur' }],
 }
 
@@ -269,7 +263,6 @@ async function onSubmit() {
       if (dialogMode.value === 'create') {
         await shipmentBatchApi.create({
           procurementId: formData.procurementId,
-          batchCode: formData.batchCode,
           shipmentQuantity: formData.shipmentQuantity,
           factoryShipDate: formData.factoryShipDate || undefined,
           remarks: formData.remarks || undefined,
@@ -277,7 +270,6 @@ async function onSubmit() {
         ElMessage.success(t('shipmentBatch.message.createSuccess'))
       } else if (currentRow.value) {
         await shipmentBatchApi.update(currentRow.value.id, {
-          batchCode: formData.batchCode,
           shipmentQuantity: formData.shipmentQuantity,
           factoryShipDate: formData.factoryShipDate || undefined,
           actualShipDate: formData.actualShipDate || undefined,

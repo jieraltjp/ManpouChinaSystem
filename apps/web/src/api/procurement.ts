@@ -26,6 +26,7 @@ export interface ProcurementPageVO {
   material?: string            // 材质
   requiresQc?: boolean        // 是否需要检测
   quantity: number
+  shipmentQuantity?: number  // 出货数量（所有批次之和，SPEC-B11 §7.1）
   priceRmb: number
   exchangeRate: number
   taxPoint: number
@@ -166,7 +167,6 @@ export interface ShipmentBatchPageResponse {
 
 export interface CreateShipmentBatchRequest {
   procurementId: number
-  batchCode: string
   shipmentQuantity: number
   factoryShipDate?: string
   remarks?: string

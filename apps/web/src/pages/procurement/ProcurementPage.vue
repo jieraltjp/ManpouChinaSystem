@@ -96,7 +96,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="factoryName" :label="$t('order.column.factoryName')" min-width="140" show-overflow-tooltip />
-        <el-table-column :label="$t('order.column.priceRmb')" min-width="110" align="right">
+        <el-table-column :label="$t('order.column.priceRmb')" min-width="90" align="right">
           <template #default="{ row }">
             {{ row.priceRmb != null ? row.priceRmb.toLocaleString() : '-' }}
           </template>
@@ -112,7 +112,12 @@
           </template>
         </el-table-column>
         <el-table-column prop="quantity" :label="$t('order.column.quantity')" min-width="80" align="right" />
-        <el-table-column :label="$t('order.column.estimatedPriceJpy')" min-width="150" align="right">
+        <el-table-column :label="$t('order.column.shipmentQuantity')" min-width="80" align="right">
+          <template #default="{ row }">
+            {{ row.shipmentQuantity != null && row.shipmentQuantity > 0 ? row.shipmentQuantity : '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('order.column.estimatedPriceJpy')" min-width="100" align="right">
           <template #default="{ row }">
             {{ row.estimatedPriceJpy ? row.estimatedPriceJpy.toLocaleString() : '-' }}
           </template>
