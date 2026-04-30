@@ -22,7 +22,7 @@
 
     <el-card class="table-card" shadow="never">
       <div class="table-scroll-wrap">
-        <el-table v-loading="loading" :data="chainData" stripe @row-click="onRowClick" table-layout="fixed" min-height="200">
+        <el-table v-loading="loading" :data="chainData" stripe table-layout="fixed" min-height="200">
         <!-- 主货号 -->
         <el-table-column prop="demandProductCode" :label="$t('orderOverview.column.productCode')" min-width="140">
           <template #default="{ row }">
@@ -54,6 +54,14 @@
         <el-table-column prop="demandDestination" :label="$t('orderOverview.column.destination')" min-width="110">
           <template #default="{ row }">
             {{ row.demandDestination || '—' }}
+          </template>
+        </el-table-column>
+        <!-- 状态 -->
+        <el-table-column :label="$t('orderOverview.column.status')" min-width="100" align="center">
+          <template #default="{ row }">
+            <el-tag :type="chainStatusType(row)" size="small">
+              {{ chainStatusLabel(row) }}
+            </el-tag>
           </template>
         </el-table-column>
         <!-- 操作 -->
@@ -213,6 +221,31 @@ function logisticsStatusLabel(val: string | undefined): string {
   return t(`logistics.status.${val}` as any, { default: val })
 }
 
+function chainStatusType(row: OrderChainVO): string {
+  if (row.step4Status === 'COMPLETED') return 'success'
+  if (row.step4Status === 'IN_PROGRESS') return 'warning'
+  if (row.step3Status === 'COMPLETED') return 'success'
+  if (row.step3Status === 'IN_PROGRESS') return 'warning'
+  if (row.step2Status === 'COMPLETED') return 'success'
+  if (row.step2Status === 'IN_PROGRESS') return 'warning'
+  if (row.step1Status === 'COMPLETED') return 'success'
+  return 'info'
+}
+
+function chainStatusLabel(row: OrderChainVO): string {
+  const steps = [
+    { status: row.step4Status, label: t('orderOverview.step.4') },
+    { status: row.step3Status, label: t('orderOverview.step.3') },
+    { status: row.step2Status, label: t('orderOverview.step.2') },
+    { status: row.step1Status, label: t('orderOverview.step.1') },
+  ]
+  for (const s of steps) {
+    if (s.status === 'COMPLETED') return s.label + ' ' + t('orderOverview.stepStatusUI.status.completed')
+    if (s.status === 'IN_PROGRESS') return s.label + ' ' + t('orderOverview.stepStatusUI.status.inProgress')
+  }
+  return t('orderOverview.stepStatusUI.notStarted')
+}
+
 async function loadChainList() {
   loading.value = true
   try {
@@ -239,10 +272,6 @@ function resetFilter() {
 function onPage(p: number) {
   page.value = p
   loadChainList()
-}
-
-function onRowClick(row: OrderChainVO) {
-  router.push('/base/overview/demand/' + row.demandId)
 }
 
 async function onView(row: OrderChainVO) {

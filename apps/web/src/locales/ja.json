@@ -193,9 +193,9 @@
   },
   "order": {
     "title": "発注書管理",
-    "newButton": "新規発注",
-    "newDialogTitle": "新規発注",
-    "editDialogTitle": "発注書編集",
+    "newButton": "新規購入",
+    "newDialogTitle": "新規購入",
+    "editDialogTitle": "購入編集",
     "drawerTitle": "発注書詳細",
     "stat": {
       "total": "発注書総数",
@@ -975,6 +975,7 @@
       "4": "配車"
     },
     "action": {
+      "overview": "総览",
       "view": "詳細",
       "viewDetail": "完全総览を見る"
     },
@@ -1069,6 +1070,7 @@
       "notStarted": "記録なし",
       "placeholder": "未実装",
       "status": {
+        "notStarted": "未着手",
         "completed": "完了",
         "inProgress": "進行中"
       }

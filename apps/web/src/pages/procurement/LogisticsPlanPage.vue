@@ -99,12 +99,9 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('logistics.column.action')" min-width="220" align="center">
+        <el-table-column :label="$t('logistics.column.action')" min-width="150" align="center">
           <template #default="{ row }">
-            <el-button link type="success" size="small" @click.stop="onCreateCustoms(row)">{{ $t('logistics.action.createCustoms') }}</el-button>
-            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('logistics.action.detail') }}</el-button>
             <el-button link type="warning" size="small" @click.stop="onEdit(row)" :disabled="row.status === 'DELIVERED'">{{ $t('logistics.action.edit') }}</el-button>
-            <el-button v-if="row.qcRecordId" link type="info" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('logistics.action.delete') }}</el-button>
           </template>
         </el-table-column>
@@ -240,52 +237,11 @@
         <el-button type="primary" :loading="submitting" @click="onSubmit">{{ $t('logistics.dialog.save') }}</el-button>
       </template>
     </el-dialog>
-
-    <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" :title="$t('logistics.drawerTitle')" size="560px" direction="rtl">
-      <el-descriptions :column="2" border v-if="currentRow">
-        <el-descriptions-item :label="$t('logistics.column.planCode')">{{ currentRow.planCode }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.column.containerNo')">{{ currentRow.containerNo || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.column.planType')">
-          <el-tag :type="planTypeTag(currentRow.planType)" size="small">{{ planTypeLabel(currentRow.planType) }}</el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.column.productCode')">
-          <span class="product-code">{{ currentRow.productCode }}</span>
-        </el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.column.subProductCode')">
-          <span class="product-code">{{ currentRow.subProductCode || '-' }}</span>
-        </el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.column.factoryName')">{{ currentRow.factoryName || (currentRow.factoryId ? `ID:${currentRow.factoryId}` : '-') }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.column.status')">
-          <el-tag :type="logisticsStatusType(currentRow.status)" size="small">{{ logisticsStatusLabel(currentRow.status) }}</el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.dialog.cargoDimension')" :span="2">{{ cargoDimension }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.column.cargoWeightKg')">{{ currentRow.cargoWeightKg ? currentRow.cargoWeightKg + $t('common.units.kg') : '' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.column.cargoVolumeCbm')">{{ currentRow.cargoVolumeCbm ? currentRow.cargoVolumeCbm.toFixed(4) + $t('common.units.m3') : '' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.dialog.quantity')">{{ currentRow.quantity ?? '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.column.requiresQc')">
-          <el-tag :type="currentRow.requiresQc ? 'warning' : 'success'" size="small">
-            {{ currentRow.requiresQc ? $t('logistics.requiresQc.yes') : $t('logistics.requiresQc.no') }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.dialog.estimatedShipDate')">{{ currentRow.estimatedShipDate || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.dialog.actualShipDate')">{{ currentRow.actualShipDate || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.dialog.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.dialog.createTime')">{{ currentRow.createTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('logistics.dialog.updateTime')">{{ currentRow.updateTime || '-' }}</el-descriptions-item>
-      </el-descriptions>
-      <div class="drawer-footer" v-if="currentRow">
-        <el-button type="primary" :disabled="currentRow.status === 'DELIVERED'" @click="onEditFromDrawer">
-          {{ $t('logistics.action.edit') }}
-        </el-button>
-      </div>
-    </el-drawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Van, Top, Loading } from '@element-plus/icons-vue'
 import { logisticsApi, type LogisticsPlanVO, type LogisticsStatus, type PlanType } from '@/api/logistics'
@@ -293,15 +249,12 @@ import { inspectionApi, type QcRecordVO } from '@/api/inspection'
 import { factoryApi, type FactoryPageVO } from '@/api/factory'
 import { useI18n } from 'vue-i18n'
 
-const router = useRouter()
 const loading = ref(false)
 const submitting = ref(false)
 const dialogVisible = ref(false)
-const drawerVisible = ref(false)
 const qcRecordLoading = ref(false)
 const editId = ref<number | null>(null)
 
-const currentRow = ref<LogisticsPlanVO | null>(null)
 const qcRecordOptions = ref<QcRecordVO[]>([])
 const factoryOptions = ref<FactoryPageVO[]>([])
 const filterForm = reactive({
@@ -342,15 +295,6 @@ const formRules: FormRules = {
 const bookedCount = computed(() => tableData.value.filter(r => r.status === 'BOOKED').length)
 const transitCount = computed(() => tableData.value.filter(r => r.status === 'IN_TRANSIT').length)
 
-const cargoDimension = computed(() => {
-  const r = currentRow.value
-  if (!r) return '-'
-  const parts: string[] = []
-  if (r.cargoLengthCm) parts.push(String(r.cargoLengthCm))
-  if (r.cargoWidthCm) parts.push(String(r.cargoWidthCm))
-  if (r.cargoHeightCm) parts.push(String(r.cargoHeightCm))
-  return parts.length ? parts.join(t('common.format.times')) + t('common.units.cm') : '-'
-})
 
 async function loadData() {
   loading.value = true
@@ -509,20 +453,6 @@ async function onSubmit() {
   }
 }
 
-function onView(row: LogisticsPlanVO) {
-  currentRow.value = row
-  drawerVisible.value = true
-}
-
-function onCreateCustoms(row: LogisticsPlanVO) {
-  if (!row.containerNo) {
-    ElMessage.warning(t('logistics.message.containerNoRequiredForCustoms'))
-    return
-  }
-  router.push('/procurement/domestic-customs?containerNo=' + encodeURIComponent(row.containerNo))
-}
-
-
 async function onEdit(row: LogisticsPlanVO) {
   editId.value = row.id
   formRef.value?.resetFields()
@@ -558,21 +488,12 @@ async function onEdit(row: LogisticsPlanVO) {
     actualShipDate: row.actualShipDate || '',
     remarks: row.remarks || '',
   })
-  drawerVisible.value = false
   // 直接设置 qcRecordId，列表加载后 el-select 即可正确显示（列表已包含该记录）
   form.qcRecordId = row.qcRecordId
   await loadQcRecordOptions()
   dialogVisible.value = true
 }
 
-function onEditFromDrawer() {
-  if (!currentRow.value) return
-  onEdit(currentRow.value)
-}
-
-function onOverview(row: LogisticsPlanVO) {
-  router.push('/base/overview/' + row.qcRecordId)
-}
 
 async function onDelete(row: LogisticsPlanVO) {
   try {

@@ -7,10 +7,13 @@ import com.manpou.allinone.logistics.application.dto.LogisticsPlanCreateCmd;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanPageQuery;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanQuery;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanUpdateCmd;
+import com.manpou.allinone.logistics.domain.event.LogisticsPlanInTransitEvent;
 import com.manpou.allinone.logistics.domain.model.LogisticsPlan;
+import com.manpou.allinone.logistics.domain.model.LogisticsStatus;
 import com.manpou.allinone.logistics.domain.repository.LogisticsPlanRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,6 +28,7 @@ public class LogisticsPlanUseCase {
     private final LogisticsPlanRepository logisticsPlanRepository;
     private final LogisticsPlanAssembler logisticsPlanAssembler;
     private final QcQueryPort qcQueryPort;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<LogisticsPlanPageQuery> pageQuery(LogisticsPlanQuery query) {
@@ -87,7 +91,21 @@ public class LogisticsPlanUseCase {
         if (entity.isTerminal()) {
             throw new BusinessException("logistics.cannot_modify_delivered", "调配计划已完成，禁止修改");
         }
+        LogisticsStatus oldStatus = entity.getStatus();
         logisticsPlanAssembler.copyUpdate(cmd, entity);
+        // EV-121: 推进至 IN_TRANSIT 时发布事件，触发国内报关自动创建
+        if (cmd.getStatus() != null && cmd.getStatus() == LogisticsStatus.IN_TRANSIT
+                && oldStatus != LogisticsStatus.IN_TRANSIT) {
+            entity.updateStatus(cmd.getStatus());
+            eventPublisher.publishEvent(new LogisticsPlanInTransitEvent(
+                    entity.getId(),
+                    entity.getPlanCode(),
+                    entity.getProcurementId(),
+                    entity.getFactoryId(),
+                    entity.getProductCode(),
+                    entity.getSubProductCode()
+            ));
+        }
         logisticsPlanRepository.save(entity);
         log.info("[LogisticsPlan] updated, traceId={}, id={}, status={}", null, id, entity.getStatus());
     }

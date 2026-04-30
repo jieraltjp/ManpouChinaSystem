@@ -22,6 +22,9 @@ public interface ProductJpaRepository extends ProductRepository, JpaRepository<P
 
     Optional<Product> findByMasterCodeAndSubCodeAndDeletedIsFalse(String masterCode, String subCode);
 
+    @Override
+    Optional<Product> findByMasterCodeAndDeletedIsFalse(String masterCode);
+
     @Query("SELECT p FROM Product p WHERE p.nameZh LIKE %:keyword% AND p.deleted = false")
     Page<Product> findByNameZhContainingAndDeletedIsFalse(@Param("keyword") String keyword, Pageable pageable);
 

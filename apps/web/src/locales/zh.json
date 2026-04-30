@@ -185,9 +185,9 @@
   },
   "order": {
     "title": "发注单管理",
-    "newButton": "新规发注",
-    "newDialogTitle": "新规发注",
-    "editDialogTitle": "编辑发注单",
+    "newButton": "新建采购",
+    "newDialogTitle": "新建采购",
+    "editDialogTitle": "编辑采购单",
     "drawerTitle": "发注单详情",
     "stat": {
       "total": "发注单总数",
@@ -1004,6 +1004,7 @@
       "4": "调配"
     },
     "action": {
+      "overview": "总览",
       "view": "详情",
       "viewDetail": "查看完整总览"
     },
@@ -1098,6 +1099,7 @@
       "notStarted": "暂无记录",
       "placeholder": "待实现",
       "status": {
+        "notStarted": "未开始",
         "completed": "已完成",
         "inProgress": "进行中"
       }

@@ -63,8 +63,9 @@ public class ProcurementQcPassedEventListener {
                 return;
             }
             ShipmentStatus current = procurement.getStatus();
-            if (current != ShipmentStatus.検品 && current != ShipmentStatus.現地検品) {
-                log.info("[Procurement] QC passed but procurement status={} not in [検品,現地検品], skip, procurementId={}",
+            if (current != ShipmentStatus.検品 && current != ShipmentStatus.現地検品
+                    && current != ShipmentStatus.已出货) {
+                log.info("[Procurement] QC passed but procurement status={} not in [検品,現地検品,已出货], skip, procurementId={}",
                         current, evt.getProcurementId());
                 return;
             }

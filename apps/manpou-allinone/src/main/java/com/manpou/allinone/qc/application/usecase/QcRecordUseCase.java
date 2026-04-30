@@ -8,12 +8,14 @@ import com.manpou.allinone.qc.application.dto.QcRecordCreateCmd;
 import com.manpou.allinone.qc.application.dto.QcRecordPageQuery;
 import com.manpou.allinone.qc.application.dto.QcRecordQuery;
 import com.manpou.allinone.qc.application.dto.QcRecordUpdateCmd;
+import com.manpou.allinone.qc.domain.event.QcRecordCompletedEvent;
 import com.manpou.allinone.qc.domain.model.QcRecord;
 import com.manpou.allinone.qc.domain.model.QcResult;
 import com.manpou.allinone.qc.domain.model.QcStatus;
 import com.manpou.allinone.qc.domain.repository.QcRecordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,6 +31,7 @@ public class QcRecordUseCase {
     private final QcRecordAssembler qcRecordAssembler;
     private final ProcurementRepository procurementRepository;
     private final FactoryQueryPort factoryQueryPort;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<QcRecordPageQuery> pageQuery(QcRecordQuery query) {
@@ -99,10 +102,22 @@ public class QcRecordUseCase {
                 throw new BusinessException("qc.invalid_count", "合格数量不能大于检品数");
             }
         }
+        boolean isCompleting = cmd.getResult() != null && cmd.getStatus() == null;
         qcRecordAssembler.copyUpdate(cmd, entity);
-        // 提交结果时自动推进状态
-        if (cmd.getResult() != null && cmd.getStatus() == null) {
-            entity.setStatus(QcStatus.COMPLETED);
+        if (isCompleting) {
+            // EV-113: PASS 才推进至 COMPLETED；FAIL 直接结束，不触发后续采购链
+            if (entity.getResult() == QcResult.PASS) {
+                entity.updateStatus(QcStatus.COMPLETED);
+                eventPublisher.publishEvent(new QcRecordCompletedEvent(
+                        entity.getId(),
+                        entity.getQcCode(),
+                        entity.getProcurementId(),
+                        entity.getProductCode(),
+                        entity.getSubProductCode()
+                ));
+            } else {
+                entity.updateStatus(QcStatus.RETURN_REQUESTED);
+            }
         }
         qcRecordRepository.save(entity);
         log.info("[QcRecord] updated, traceId={}, id={}, result={}", null, id, entity.getResult());

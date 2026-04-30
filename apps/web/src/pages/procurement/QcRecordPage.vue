@@ -106,12 +106,11 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('inspection.column.action')" min-width="220" align="center">
+        <el-table-column :label="$t('inspection.column.action')" min-width="180" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('inspection.action.detail') }}</el-button>
             <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('inspection.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('inspection.action.delete') }}</el-button>
-            <el-button v-if="row.procurementId" link type="info" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -355,14 +354,12 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules, ElMessageBox } from 'element-plus'
 import { Plus, Document, CircleCheck, Warning } from '@element-plus/icons-vue'
 import { inspectionApi, type QcRecordVO, type QcResult, type QcStatus, type QcType } from '@/api/inspection'
 import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
 
-const router = useRouter()
 const loading = ref(false)
 const submitting = ref(false)
 const dialogVisible = ref(false)
@@ -656,9 +653,6 @@ async function onDelete(row: QcRecordVO) {
   }
 }
 
-function onOverview(row: QcRecordVO) {
-  router.push('/base/overview/' + row.procurementId)
-}
 
 function qcTypeLabel(qcType?: string): string {
   return { ONSITE: t('inspection.qcType.onsite'), REMOTE: t('inspection.qcType.remote') }[qcType ?? ''] ?? '-'

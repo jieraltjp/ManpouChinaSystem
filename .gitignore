@@ -28,6 +28,9 @@ apps/*/*/target/
 # =============================================
 # Spring Boot
 # =============================================
+# 本地/开发环境配置文件（含密码/内网IP，不提交）
+apps/manpou-allinone/src/main/resources/application-*.yml
+apps/manpou-allinone/src/main/resources/application-*.yaml
 *.class
 *.log
 *.jar
@@ -132,12 +135,9 @@ docker-compose.override.yml
 # =============================================
 # Config & Secrets (local overrides)
 # =============================================
-application-local.yml
 application-local.yaml
 application-local*.yml
 application-local*.yaml
-application-dev*.yml
-application-dev*.yaml
 *.env.local
 *.env.*.local
 secret*.yml

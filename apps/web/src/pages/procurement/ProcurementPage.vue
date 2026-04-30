@@ -144,7 +144,6 @@
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('order.message.detail') }}</el-button>
             <el-button link type="warning" size="small" @click.stop="onEdit(row)"
               :disabled="row.status === COMPLETED_STATUS">{{ $t('demand.action.edit') }}</el-button>
-            <el-button link type="info" size="small" @click.stop="onOverview(row)">{{ $t('orderOverview.action.view') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)"
               :disabled="!deletableStatuses.includes(row.status)">{{ $t('common.delete') }}</el-button>
           </template>
@@ -818,9 +817,6 @@ function onView(row: ProcurementPageVO) {
   drawerVisible.value = true
 }
 
-function onOverview(row: ProcurementPageVO) {
-  router.push('/base/overview/' + row.id)
-}
 
 function onEdit(row: ProcurementPageVO | null) {
   dialogMode.value = 'update'
