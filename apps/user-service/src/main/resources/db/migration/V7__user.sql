@@ -34,5 +34,5 @@ CREATE TABLE user (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 预置管理员（admin/admin123，BCrypt strength=12）
-INSERT INTO user (user_code, username, password_hash, name_cn, email, company_id, department_id, status, registration_status, create_by)
-VALUES ('U-0001', 'admin', '$2a$12$7h/vq53JivkyCYK7SjBU1Oai0DSxhnIf3iY12BAE64XK4EO3rjsCa', '系统管理员', 'admin@manpou.cn', 1, 1, 1, 'APPROVED', 'SYSTEM');
+INSERT INTO user (user_code, username, password_hash, name_cn, email, company_id, department_id, status, registration_status, create_by, update_time)
+VALUES ('U-0001', 'admin', '$2a$12$7h/vq53JivkyCYK7SjBU1Oai0DSxhnIf3iY12BAE64XK4EO3rjsCa', '系统管理员', 'admin@manpou.cn', 1, 1, 1, 'APPROVED', 'SYSTEM', NOW(3));

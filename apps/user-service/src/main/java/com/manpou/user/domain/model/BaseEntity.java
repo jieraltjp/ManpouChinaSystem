@@ -55,7 +55,7 @@ public abstract class BaseEntity {
      * 逻辑删除标记：false=未删除，true=已删除。
      * 查询时框架自动过滤已删除记录。
      */
-    @Column(name = "is_deleted", nullable = false)
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean isDeleted = false;
 
     // ===== 领域方法 =====

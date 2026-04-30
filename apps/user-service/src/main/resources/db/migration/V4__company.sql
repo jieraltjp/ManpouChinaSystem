@@ -18,4 +18,4 @@ CREATE TABLE company (
 
 -- 预置公司
 INSERT INTO company (company_code, company_name_cn, company_name_jp, company_type, create_time, update_time)
-VALUES ('HAIT-001', '漫普贸易（中国）有限公司', 'マンプ貿易（中国）有限公司', 'TRADER', NOW(3), NOW(3));
+VALUES ('HAIT-001', '漫普贸易（中国）有限公司', 'マンプ貿易（中国）有限公司', 'TRADER', NOW(3), NOW(3)) ON DUPLICATE KEY UPDATE update_time=NOW(3);
