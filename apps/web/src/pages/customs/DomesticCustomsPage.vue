@@ -427,7 +427,7 @@ async function onBatchContainerSelect(containerNo: string) {
   }
 }
 
-function onBatchSelectionChange(rows: (LogisticsPlanVO & { overrideValueCny?: number; customsCreated?: boolean })[]) {
+function onBatchSelectionChange(rows: (LogisticsPlanVO & { customsCreated?: boolean })[]) {
   batchSelectedRows.value = rows
 }
 
