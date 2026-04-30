@@ -1,7 +1,7 @@
 # 业务文档 — README
 
-> **版本**: 1.0.0
-> **更新**: 2026-04-22
+> **版本**: 1.1.0
+> **更新**: 2026-04-30（新增 B-11 用户中心与权限体系）
 
 ---
 
@@ -33,6 +33,7 @@
 | B-08 | [SPEC-B08-运营销售-步骤8.md](./SPEC-B08-运营销售-步骤8.md) | SalesRecord ⚡占位 |
 | B-09 | [SPEC-B09-订单总览-API设计.md](./SPEC-B09-订单总览-API设计.md) | **核心视图**：聚合接口设计 ✅ |
 | B-10 | [SPEC-B10-商品目录-产品管理.md](./SPEC-B10-商品目录-产品管理.md) | Product + product_factory 多对多设计 🟡 |
+| B-11 | [SPEC-B11-用户中心与权限体系.md](./SPEC-B11-用户中心与权限体系.md) | 用户管理+角色权限+操作日志+个人中心 📋 |
 | B-API | [API-发注管理.md](./API-发注管理.md) | REST 接口契约 |
 | B-DOMAIN | [DOMAIN-发注管理领域模型.md](./DOMAIN-发注管理领域模型.md) | 聚合根、值对象、枚举、仓储接口 |
 | B-PLAN | [SPEC-B04-调配计划-步骤4.md](./SPEC-B04-调配计划-步骤4.md) | LogisticsPlan 状态机（PLANNED→BOOKED→IN_TRANSIT→DELIVERED） |
@@ -54,3 +55,4 @@
 | 07 | B-07 退税 | 07-tax-refund.md | DB-07 tax-refund |
 | 08 | B-08 运营销售 | 08-sales.md | DB-08 sales |
 | 09 | B-09 订单总览 | 09-order-overview.md | DB-09 order-overview |
+| B-11 | B-11 用户中心与权限体系 | UI-17~20 | V4~V9 |

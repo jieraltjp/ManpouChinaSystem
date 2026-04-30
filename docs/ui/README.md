@@ -33,6 +33,10 @@
 | UI-14 | [pages/11-factory.md](pages/11-factory.md) | `/base/factory` | — | ✅ |
 | UI-15 | [pages/12-demand-overview.md](pages/12-demand-overview.md) | `/base/overview/demand/:id` | — | ✅ |
 | UI-16 | [pages/13-procurement-overview.md](pages/13-procurement-overview.md) | `/base/overview/order/:id` | — | ✅ |
+| UI-17 | [pages/14-user-management.md](pages/14-user-management.md) | `/system/user` | B-11 | 📋 待开发 |
+| UI-18 | [pages/15-role-management.md](pages/15-role-management.md) | `/system/role` | B-11 | 📋 待开发 |
+| UI-19 | [pages/16-audit-log.md](pages/16-audit-log.md) | `/system/audit-log` | B-11 | 📋 待开发 |
+| UI-20 | [pages/17-profile.md](pages/17-profile.md) | `/profile` | B-11 | 📋 待开发 |
 | — | [05-UI改版方案-橙色商业主题.md](05-UI改版方案-橙色商业主题.md) | — | — | ✅ |
 | — | [ARCHITECTURE.md](ARCHITECTURE.md) | — | — | ✅ |
 
@@ -55,6 +59,10 @@
 | — | `/base/factory` | FactoryPage.vue | — |
 | — | `/base/product` | ProductPage.vue | — |
 | 09 | `/base/overview` | OrderOverviewPage.vue | UI-12 ✅ |
+| B-11 | `/system/user` | UserPage.vue | UI-17 📋 |
+| B-11 | `/system/role` | RolePage.vue | UI-18 📋 |
+| B-11 | `/system/audit-log` | AuditLogPage.vue | UI-19 📋 |
+| B-11 | `/profile` | ProfilePage.vue | UI-20 📋 |
 
 ---
 
