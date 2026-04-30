@@ -4,8 +4,10 @@ import com.manpou.allinone.common.port.ProductQueryPort;
 import com.manpou.allinone.common.port.QcQueryPort;
 import com.manpou.allinone.product.domain.model.Product;
 import com.manpou.allinone.procurement.domain.model.Procurement;
+import com.manpou.allinone.procurement.domain.model.ShipmentBatch;
 import com.manpou.allinone.procurement.domain.model.ShipmentStatus;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
+import com.manpou.allinone.procurement.domain.repository.ShipmentBatchRepository;
 import com.manpou.allinone.qc.domain.event.QcRecordCompletedEvent;
 import com.manpou.allinone.qc.domain.model.QcRecord;
 import com.manpou.allinone.qc.domain.model.QcType;
@@ -36,6 +38,7 @@ import java.math.BigDecimal;
 public class ProcurementQcPassedEventListener {
 
     private final ProcurementRepository procurementRepository;
+    private final ShipmentBatchRepository shipmentBatchRepository;
     private final ProductQueryPort productQueryPort;
     private final QcQueryPort qcQueryPort;
 
@@ -45,7 +48,21 @@ public class ProcurementQcPassedEventListener {
     }
 
     public void advanceProcurementStatus(QcRecordCompletedEvent evt) {
-        if (evt.getProcurementId() == null) {
+        // V43后：优先用 evt.procurementId；若无，从 qcRecord.shipmentBatchId 反查
+        Long procurementId = evt.getProcurementId();
+        if (procurementId == null) {
+            QcRecord qcRecord = qcQueryPort.findById(evt.getQcRecordId()).orElse(null);
+            if (qcRecord != null && qcRecord.getShipmentBatchId() != null) {
+                ShipmentBatch batch = shipmentBatchRepository
+                        .findByIdAndDeletedIsFalse(qcRecord.getShipmentBatchId())
+                        .orElse(null);
+                if (batch != null) {
+                    procurementId = batch.getProcurementId();
+                }
+            }
+        }
+        if (procurementId == null) {
+            log.info("[Procurement] QC passed but no linked procurement, skip, qcId={}", evt.getQcRecordId());
             return;
         }
         try {
@@ -55,18 +72,18 @@ public class ProcurementQcPassedEventListener {
                 return;
             }
             Procurement procurement = procurementRepository
-                    .findByIdAndDeletedIsFalse(evt.getProcurementId())
+                    .findByIdAndDeletedIsFalse(procurementId)
                     .orElse(null);
             if (procurement == null) {
                 log.info("[Procurement] QC passed but procurement not found, procurementId={}",
-                        evt.getProcurementId());
+                        procurementId);
                 return;
             }
             ShipmentStatus current = procurement.getStatus();
             if (current != ShipmentStatus.検品 && current != ShipmentStatus.現地検品
                     && current != ShipmentStatus.已出货) {
                 log.info("[Procurement] QC passed but procurement status={} not in [検品,現地検品,已出货], skip, procurementId={}",
-                        current, evt.getProcurementId());
+                        current, procurementId);
                 return;
             }
             var product = productQueryPort.findByMasterCode(evt.getProductCode()).orElse(null);
@@ -74,11 +91,11 @@ public class ProcurementQcPassedEventListener {
             procurement.updateStatus(suggested);
             procurementRepository.save(procurement);
             log.info("[Procurement] QC passed → auto-advanced, procurementId={}, {}→{}, qcType={}",
-                    evt.getProcurementId(), current, suggested,
+                    procurementId, current, suggested,
                     qcRecord.getQcType() != null ? qcRecord.getQcType().name() : "null");
         } catch (Exception e) {
             log.error("[Procurement] Failed to auto-advance on QC pass, procurementId={}: {}",
-                    evt.getProcurementId(), e.getMessage(), e);
+                    procurementId, e.getMessage(), e);
         }
     }
 
