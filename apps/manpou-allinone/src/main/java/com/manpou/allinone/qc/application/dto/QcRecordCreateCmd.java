@@ -13,8 +13,10 @@ import java.time.LocalDate;
 @Data
 public class QcRecordCreateCmd {
 
-    @NotNull(message = "关联采购单不能为空")
-    private Long procurementId;           // 关联采购单
+    @NotNull(message = "关联出货批次不能为空")
+    private Long shipmentBatchId;          // 关联出货批次（V43新增，必填）
+
+    private Long procurementId;           // 关联采购单（保留用于审计追溯，V43后不再强制）
 
     @Length(max = 128)
     private String sellerName;              // 卖家名称

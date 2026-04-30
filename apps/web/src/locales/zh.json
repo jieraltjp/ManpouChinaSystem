@@ -479,6 +479,8 @@
       "qcCodePlaceholder": "如 Q-20260421-001",
       "procurementId": "采购单号",
       "procurementIdPlaceholder": "输入采购单号搜索",
+      "shipmentBatchId": "出货批次",
+      "shipmentBatchIdPlaceholder": "选择出货批次",
       "result": "验货结果",
       "status": "状态",
       "all": "全部",
@@ -487,6 +489,7 @@
     },
     "column": {
       "qcCode": "验货编号",
+      "shipmentBatchId": "出货批次",
       "procurementId": "采购单号",
       "productCode": "货号",
       "subProductCode": "子货号",
@@ -520,6 +523,8 @@
       "delete": "删除"
     },
     "dialog": {
+      "shipmentBatch": "出货批次",
+      "shipmentBatchPlaceholder": "选择出货批次",
       "procurement": "关联采购单",
       "procurementPlaceholder": "请选择采购单",
       "inspectionInfo": "验货信息",
@@ -564,7 +569,7 @@
     "no": "否",
     "drawerTitle": "验货详情",
     "validation": {
-      "procurementRequired": "请选择关联采购单",
+      "shipmentBatchRequired": "请选择出货批次",
       "productCodeRequired": "请输入货号",
       "inspectionCountRequired": "请输入检品数",
       "passedCountExceeds": "合格数不能大于检品数"

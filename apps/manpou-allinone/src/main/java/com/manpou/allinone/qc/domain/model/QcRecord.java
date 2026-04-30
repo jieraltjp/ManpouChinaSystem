@@ -18,7 +18,8 @@ import java.math.BigDecimal;
         @Index(name = "idx_qc_procurement", columnList = "procurement_id"),
         @Index(name = "idx_qc_result", columnList = "result"),
         @Index(name = "idx_qc_date", columnList = "qc_date"),
-        @Index(name = "idx_qc_status", columnList = "status")
+        @Index(name = "idx_qc_status", columnList = "status"),
+        @Index(name = "idx_qc_shipment_batch", columnList = "shipment_batch_id")
 })
 @Access(AccessType.FIELD)
 @Getter
@@ -28,8 +29,11 @@ public class QcRecord extends BaseEntity {
     @Column(name = "qc_code", nullable = false, unique = true, length = 32)
     private String qcCode;                 // 系统流水号，如 Q-20260421-001
 
-    @Column(name = "procurement_id", nullable = false)
-    private Long procurementId;            // 关联采购单
+    @Column(name = "procurement_id")
+    private Long procurementId;            // 关联采购单（V43后nullable，审计追溯用）
+
+    @Column(name = "shipment_batch_id")
+    private Long shipmentBatchId;          // 关联出货批次（V43新增，必填）
 
     @Column(name = "seller_name", length = 128)
     private String sellerName;            // 卖家名称（来自工厂名）

@@ -32,6 +32,8 @@ public interface QcRecordRepository {
 
     Page<QcRecord> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
 
+    Page<QcRecord> findByShipmentBatchIdAndDeletedIsFalse(Long shipmentBatchId, Pageable pageable);
+
     /** 按采购单聚合合格数量。 */
     Integer sumPassedCountByProcurementId(Long procurementId);
 }

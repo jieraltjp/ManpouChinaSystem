@@ -11,7 +11,8 @@ export type QcType = 'ONSITE' | 'REMOTE'
 export interface QcRecordVO {
   id: number
   qcCode: string
-  procurementId: number
+  procurementId?: number    // 保留用于审计追溯
+  shipmentBatchId?: number  // V43新增：关联出货批次
   sellerName?: string
   factoryId?: number    // 关联工厂ID（来自 procurement.factoryId，v1.3.0）
   factoryName?: string  // 关联工厂名称（来自 factory 表，v1.3.0）
@@ -53,7 +54,8 @@ export interface QcRecordPageResponse {
 }
 
 export interface CreateQcRecordRequest {
-  procurementId: number
+  shipmentBatchId: number   // V43新增：必填
+  procurementId?: number    // 保留用于审计追溯
   sellerName?: string
   productCode: string
   subProductCode?: string
@@ -104,7 +106,7 @@ export interface UpdateQcRecordRequest {
 }
 
 export const inspectionApi = {
-  list(params: { page?: number; pageSize?: number; qcCode?: string; productCode?: string; result?: QcResult; status?: string; qcDateFrom?: string; qcDateTo?: string; procurementId?: number }) {
+  list(params: { page?: number; pageSize?: number; qcCode?: string; productCode?: string; result?: QcResult; status?: string; qcDateFrom?: string; qcDateTo?: string; procurementId?: number; shipmentBatchId?: number }) {
     return client.get<{ code: string; data: QcRecordPageResponse }>('/qc-records', { params })
   },
   get(id: number) {

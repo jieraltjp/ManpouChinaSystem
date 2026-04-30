@@ -23,4 +23,5 @@ public class QcRecordQuery {
     private LocalDate qcDateTo;
 
     private Long procurementId;
+    private Long shipmentBatchId;          // 按出货批次筛选（V43新增）
 }

@@ -39,7 +39,9 @@ public class QcRecordUseCase {
                 query.getPage(), Math.min(query.getPageSize(), 100),
                 Sort.by(Sort.Direction.DESC, "createTime"));
         Page<QcRecord> page;
-        if (query.getResult() != null) {
+        if (query.getShipmentBatchId() != null) {
+            page = qcRecordRepository.findByShipmentBatchIdAndDeletedIsFalse(query.getShipmentBatchId(), pageRequest);
+        } else if (query.getResult() != null) {
             page = qcRecordRepository.findByResultAndDeletedIsFalse(query.getResult(), pageRequest);
         } else if (query.getProductCode() != null && !query.getProductCode().isBlank()) {
             page = qcRecordRepository.findByProductCodeAndDeletedIsFalse(query.getProductCode(), pageRequest);
@@ -60,7 +62,11 @@ public class QcRecordUseCase {
 
     @Transactional
     public Long create(QcRecordCreateCmd cmd) {
-        log.info("[QcRecord] create called, procurementId={}, productCode={}", cmd.getProcurementId(), cmd.getProductCode());
+        log.info("[QcRecord] create called, shipmentBatchId={}, productCode={}", cmd.getShipmentBatchId(), cmd.getProductCode());
+        // V43: 新建验货必须关联出货批次
+        if (cmd.getShipmentBatchId() == null) {
+            throw new BusinessException("qc.validation.shipmentBatchRequired", "关联出货批次不能为空");
+        }
         if (cmd.getInspectionCount() != null && cmd.getPassedCount() != null) {
             if (cmd.getInspectionCount() < cmd.getPassedCount()) {
                 throw new BusinessException("qc.invalid_count", "合格数量不能大于检品数");
@@ -112,6 +118,7 @@ public class QcRecordUseCase {
                         entity.getId(),
                         entity.getQcCode(),
                         entity.getProcurementId(),
+                        entity.getShipmentBatchId(),
                         entity.getProductCode(),
                         entity.getSubProductCode()
                 ));

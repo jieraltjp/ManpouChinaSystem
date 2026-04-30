@@ -19,6 +19,7 @@ public class QcRecordCompletedEvent {
     private final Long qcRecordId;
     private final String qcCode;
     private final Long procurementId;
+    private final Long shipmentBatchId;        // V43新增
     private final String productCode;
     private final String subProductCode;
 }

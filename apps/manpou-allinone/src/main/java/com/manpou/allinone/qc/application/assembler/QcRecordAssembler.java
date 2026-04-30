@@ -50,6 +50,7 @@ public class QcRecordAssembler {
                 .id(entity.getId())
                 .qcCode(entity.getQcCode())
                 .procurementId(entity.getProcurementId())
+                .shipmentBatchId(entity.getShipmentBatchId())
                 .sellerName(entity.getSellerName())
                 .factoryId(factoryId)
                 .factoryName(factoryName)
@@ -87,6 +88,7 @@ public class QcRecordAssembler {
     public QcRecord toEntity(QcRecordCreateCmd cmd) {
         QcRecord entity = new QcRecord();
         entity.setQcCode(generateQcCode());
+        entity.setShipmentBatchId(cmd.getShipmentBatchId());
         entity.setProcurementId(cmd.getProcurementId());
         entity.setProductCode(cmd.getProductCode());
         copyCreate(cmd, entity);

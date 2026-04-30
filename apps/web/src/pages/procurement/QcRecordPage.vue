@@ -32,8 +32,21 @@
         <el-form-item :label="$t('inspection.filter.qcCode')">
           <el-input v-model="filterForm.qcCode" :placeholder="$t('inspection.filter.qcCodePlaceholder')" clearable style="width:180px" />
         </el-form-item>
-        <el-form-item :label="$t('inspection.filter.procurementId')">
-          <el-input-number v-model="filterForm.procurementId" :min="1" :placeholder="$t('inspection.filter.procurementIdPlaceholder')" style="width:140px" clearable />
+        <el-form-item :label="$t('inspection.filter.shipmentBatchId')">
+          <el-select
+            v-model="filterForm.shipmentBatchId"
+            :placeholder="$t('inspection.filter.shipmentBatchIdPlaceholder')"
+            clearable
+            filterable
+            style="width:180px"
+          >
+            <el-option
+              v-for="b in shipmentBatchList"
+              :key="b.id"
+              :label="`${b.batchCode} / ${b.status}`"
+              :value="b.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item :label="$t('inspection.filter.result')">
           <el-select v-model="filterForm.result" :placeholder="$t('inspection.filter.all')" clearable style="width:120px">
@@ -61,9 +74,9 @@
     <el-card class="table-card" shadow="never">
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="qcCode" :label="$t('inspection.column.qcCode')" min-width="160" />
-        <el-table-column prop="procurementId" :label="$t('inspection.column.procurementId')" min-width="90" align="center">
+        <el-table-column :label="$t('inspection.column.shipmentBatchId')" min-width="120" align="center">
           <template #default="{ row }">
-            <span v-if="row.procurementId">{{ row.procurementId }}</span>
+            <span v-if="row.shipmentBatchId" class="product-code">{{ row.shipmentBatchId }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -132,28 +145,28 @@
     <!-- 新规验货弹窗 -->
     <el-dialog v-model="dialogVisible" :title="$t('inspection.newDialogTitle')" width="920px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="formRules" label-width="86px">
-        <!-- Row 1: 关联采购单 + 卖家名称 -->
+        <!-- Row 1: 出货批次 -->
         <el-row :gutter="10">
-          <el-col :span="14">
-            <el-form-item :label="$t('inspection.dialog.procurement')" prop="procurementId">
+          <el-col :span="16">
+            <el-form-item :label="$t('inspection.dialog.shipmentBatch')" prop="shipmentBatchId">
               <el-select
-                v-model="form.procurementId"
-                :placeholder="$t('inspection.dialog.procurementPlaceholder')"
+                v-model="form.shipmentBatchId"
+                :placeholder="$t('inspection.dialog.shipmentBatchPlaceholder')"
                 filterable
-                :loading="procurementLoading"
+                :loading="shipmentBatchLoading"
                 style="width:100%"
-                @change="onProcurementSelected"
+                @change="onShipmentBatchSelected"
               >
                 <el-option
-                  v-for="p in procurementList"
-                  :key="p.id"
-                  :label="`${p.productCode}${p.subProductCode ? '-' + p.subProductCode : ''} / ${p.customerCompany || ''} / ${p.orderDate || ''}`"
-                  :value="p.id"
+                  v-for="b in shipmentBatchList"
+                  :key="b.id"
+                  :label="`${b.batchCode} / ${b.status}`"
+                  :value="b.id"
                 />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="10">
+          <el-col :span="8">
             <el-form-item :label="$t('inspection.column.sellerName')">
               <el-input v-model="form.sellerName" disabled />
             </el-form-item>
@@ -358,26 +371,28 @@ import { ElMessage, type FormInstance, type FormRules, ElMessageBox } from 'elem
 import { Plus, Document, CircleCheck, Warning } from '@element-plus/icons-vue'
 import { inspectionApi, type QcRecordVO, type QcResult, type QcStatus, type QcType } from '@/api/inspection'
 import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
+import { shipmentBatchApi, type ShipmentBatchVO } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
 const submitting = ref(false)
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
-const procurementLoading = ref(false)
+const shipmentBatchLoading = ref(false)
 
 const currentRow = ref<QcRecordVO | null>(null)
-const filterForm = reactive({ qcCode: '', result: '' as QcResult | '', status: '' as string | '', procurementId: undefined as number | undefined })
+const filterForm = reactive({ qcCode: '', result: '' as QcResult | '', status: '' as string | '', procurementId: undefined as number | undefined, shipmentBatchId: undefined as number | undefined })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const tableData = ref<QcRecordVO[]>([])
-const procurementList = ref<ProcurementPageVO[]>([])
+const shipmentBatchList = ref<ShipmentBatchVO[]>([])
 
 const formRef = ref<FormInstance>()
 const { t, locale: localeRef } = useI18n()
 const currentLocale = computed(() => localeRef.value)
 
 const form = reactive({
-  procurementId: undefined as number | undefined,
+  shipmentBatchId: undefined as number | undefined,  // V43新增：关联出货批次（必填）
+  procurementId: undefined as number | undefined,    // 保留用于审计追溯
   productCode: '',
   subProductCode: '',
   qcUserId: undefined as number | undefined,
@@ -404,23 +419,23 @@ const form = reactive({
   sellerName: '',
 })
 
-// 弹窗打开时预加载采购单（下拉默认有选项）
+// 弹窗打开时预加载出货批次（下拉默认有选项）
 watch(dialogVisible, async (val) => {
   if (val) {
-    procurementLoading.value = true
+    shipmentBatchLoading.value = true
     try {
-      const res = await procurementApi.list({ page: 0, pageSize: 100 })
-      procurementList.value = res.data.data?.content ?? []
+      const res = await shipmentBatchApi.list({ page: 0, pageSize: 200 })
+      shipmentBatchList.value = res.data.data?.content ?? []
     } catch {
-      procurementList.value = []
+      shipmentBatchList.value = []
     } finally {
-      procurementLoading.value = false
+      shipmentBatchLoading.value = false
     }
   }
 })
 
 const formRules: FormRules = {
-  procurementId: [{ required: true, message: () => t('inspection.validation.procurementRequired'), trigger: 'change' }],
+  shipmentBatchId: [{ required: true, message: () => t('inspection.validation.shipmentBatchRequired'), trigger: 'change' }],
   productCode: [{ required: true, message: () => t('inspection.validation.productCodeRequired'), trigger: 'blur' }],
   inspectionCount: [{ required: true, message: () => t('inspection.validation.inspectionCountRequired'), trigger: 'blur' }],
 }
@@ -448,6 +463,7 @@ async function loadData() {
       result: filterForm.result || undefined,
       status: filterForm.status || undefined,
       procurementId: filterForm.procurementId,
+      shipmentBatchId: filterForm.shipmentBatchId,
     })
     const data = res.data.data
     tableData.value = data?.content ?? []
@@ -474,21 +490,31 @@ function onReset() {
   filterForm.result = ''
   filterForm.status = ''
   filterForm.procurementId = undefined
+  filterForm.shipmentBatchId = undefined
   pagination.page = 1
   loadData()
 }
 
-function onProcurementSelected(id: number) {
-  const p = procurementList.value.find(p => p.id === id)
-  if (!p) return
-  form.procurementId = p.id
-  form.productCode = p.productCode
-  form.subProductCode = p.subProductCode || ''
-  form.quantity = p.quantity ?? 0
-  form.material = p.material || ''
-  form.destination = p.destination || ''
-  form.sellerName = p.factoryName || ''
-  form.orderDate = p.orderDate || ''
+function onShipmentBatchSelected(id: number) {
+  const batch = shipmentBatchList.value.find(b => b.id === id)
+  if (!batch) return
+  form.shipmentBatchId = batch.id
+  form.procurementId = batch.procurementId
+  // 通过 procurementId 补充商品信息（productCode, sellerName, material, destination）
+  if (batch.procurementId) {
+    procurementApi.list({ page: 0, pageSize: 200 }).then(res => {
+      const p = (res.data.data?.content ?? []).find((p: ProcurementPageVO) => p.id === batch.procurementId)
+      if (p) {
+        form.productCode = p.productCode || ''
+        form.subProductCode = p.subProductCode || ''
+        form.sellerName = p.factoryName || ''
+        form.material = p.material || ''
+        form.destination = p.destination || ''
+        form.orderDate = p.orderDate || ''
+        form.quantity = p.quantity ?? 0
+      }
+    }).catch(() => {})
+  }
   if (!form.qcDate) {
     form.qcDate = new Date().toISOString().slice(0, 10)
   }
@@ -499,7 +525,8 @@ function onNew() {
   currentRow.value = null  // 必须重置，否则 onSubmit 会误入编辑分支
   const today = new Date().toISOString().slice(0, 10)
   Object.assign(form, {
-    procurementId: undefined, productCode: '', subProductCode: '', qcUserId: undefined,
+    shipmentBatchId: undefined, procurementId: undefined,
+    productCode: '', subProductCode: '', qcUserId: undefined,
     qcType: 'ONSITE', qcDate: today, result: 'PASS', status: 'PENDING',
     inspectionCount: 0, passedCount: 0,
     boxCount: 0, boxLengthCm: 0, boxWidthCm: 0,
@@ -548,7 +575,8 @@ async function onSubmit() {
       // 创建模式
       console.log('[QcRecordPage] CREATE mode')
       await inspectionApi.create({
-        procurementId: form.procurementId!,
+        shipmentBatchId: form.shipmentBatchId!,
+        procurementId: form.procurementId,
         productCode: form.productCode,
         subProductCode: form.subProductCode || undefined,
         qcUserId: form.qcUserId,
@@ -593,6 +621,7 @@ function onView(row: QcRecordVO) {
 function onEdit(row: QcRecordVO) {
   formRef.value?.resetFields()
   Object.assign(form, {
+    shipmentBatchId: row.shipmentBatchId ?? undefined,
     procurementId: row.procurementId ?? undefined,
     productCode: row.productCode || '',
     subProductCode: row.subProductCode || '',
@@ -619,17 +648,13 @@ function onEdit(row: QcRecordVO) {
     orderDate: row.orderDate || '',
     sellerName: row.sellerName || '',
   })
-  // 加载采购单下拉（用于变更关联采购单）
-  if (row.procurementId) {
-    procurementList.value = [{
-      id: row.procurementId,
-      productCode: row.productCode,
-      subProductCode: row.subProductCode || '',
-      factoryName: row.sellerName || '',
-      quantity: row.quantity ?? 0,
-      material: row.material || '',
-      destination: row.destination || '',
-    } as unknown as ProcurementPageVO]
+  // 加载出货批次下拉（编辑时用于参考）
+  if (row.shipmentBatchId) {
+    shipmentBatchApi.get(row.shipmentBatchId).then(res => {
+      if (res.data.data) {
+        shipmentBatchList.value = [res.data.data]
+      }
+    }).catch(() => {})
   }
   currentRow.value = row
   dialogVisible.value = true
@@ -662,7 +687,13 @@ function qcStatusLabel(status?: string): string {
   return { PENDING: t('inspection.qcStatus.pending'), COMPLETED: t('inspection.qcStatus.completed'), RETURN_REQUESTED: t('inspection.qcStatus.returnRequested') }[status ?? ''] ?? status ?? '-'
 }
 
-onMounted(() => loadData())
+onMounted(() => {
+  loadData()
+  // 预加载出货批次下拉（筛选用）
+  shipmentBatchApi.list({ page: 0, pageSize: 200 }).then(res => {
+    shipmentBatchList.value = res.data.data?.content ?? []
+  }).catch(() => {})
+})
 </script>
 
 <style scoped>

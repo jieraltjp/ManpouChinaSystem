@@ -437,6 +437,8 @@
       "qcCodePlaceholder": "例：Q-20260421-001",
       "procurementId": "発注番号",
       "procurementIdPlaceholder": "発注番号で検索",
+      "shipmentBatchId": "出荷ロット",
+      "shipmentBatchIdPlaceholder": "出荷ロットを選択",
       "result": "検品結果",
       "status": "ステータス",
       "all": "すべて",
@@ -445,6 +447,7 @@
     },
     "column": {
       "qcCode": "検品番号",
+      "shipmentBatchId": "出荷ロット",
       "procurementId": "発注番号",
       "productCode": "品番",
       "subProductCode": "子品番",
@@ -478,6 +481,8 @@
       "delete": "削除"
     },
     "dialog": {
+      "shipmentBatch": "出荷ロット",
+      "shipmentBatchPlaceholder": "出荷ロットを選択",
       "procurement": "関連発注書",
       "procurementPlaceholder": "発注書を選択してください",
       "inspectionInfo": "検品情報",
@@ -522,7 +527,7 @@
     "no": "いいえ",
     "drawerTitle": "検品詳細",
     "validation": {
-      "procurementRequired": "関連発注書を選択してください",
+      "shipmentBatchRequired": "出荷ロットを選択してください",
       "productCodeRequired": "品番を入力してください",
       "inspectionCountRequired": "検査数を入力してください",
       "passedCountExceeds": "合格数は検査数を超えることはできません"
