@@ -12,6 +12,8 @@
     "procurement": "02 发注单",
     "qcRecord": "03 验货记录",
     "logisticsPlan": "04 调配计划",
+    "consolidationPool": "05 拼柜池",
+    "container": "06 货柜管理",
     "domesticCustoms": "05 国内报关",
     "japanCustomsRecord": "06 日本清关",
     "finance": "财务管理",
@@ -681,6 +683,74 @@
       "deleteSuccess": "删除调配计划成功",
       "deleteFailed": "删除调配计划失败",
       "containerNoRequiredForCustoms": "请先填写货柜号再创建报关"
+    },
+    "poolStatus": {
+      "OPEN": "开放入库",
+      "PENDING": "待装柜",
+      "LOADED": "已装柜",
+      "SHIPPED": "已出港"
+    },
+    "pool": {
+      "newButton": "新建拼柜池",
+      "editTitle": "编辑拼柜池",
+      "deleteConfirm": "确认删除拼柜池「{code}」？",
+      "createContainer": "创建货柜",
+      "createContainerConfirm": "确定为此拼柜池「{poolCode}」创建货柜？",
+      "containerCreated": "货柜创建成功",
+      "destinationRequired": "目的港不能为空",
+      "destinationPlaceholder": "如 Tokyo, Yokohama",
+      "filter": {
+        "status": "池状态",
+        "destinationPort": "目的港",
+        "destinationHint": "输入目的港"
+      },
+      "column": {
+        "poolCode": "池编号",
+        "destinationPort": "目的港",
+        "totalCbm": "总体积",
+        "totalWeightKg": "总重量",
+        "planCount": "计划数",
+        "threshold": "触发阈值",
+        "status": "状态"
+      },
+      "action": {
+        "createContainer": "创建货柜"
+      }
+    },
+    "containerStatus": {
+      "CREATED": "已创建",
+      "LOADED": "已装柜",
+      "DEPARTED": "已离港",
+      "ARRIVED": "已到港"
+    },
+    "container": {
+      "type": {
+        "GP20": "20尺普柜",
+        "GP40": "40尺普柜",
+        "HC40": "40尺高柜",
+        "HC45": "45尺高柜"
+      },
+      "newButton": "新建货柜",
+      "editTitle": "编辑货柜",
+      "deleteConfirm": "确认删除货柜「{code}」？",
+      "containerNoRequired": "货柜号不能为空",
+      "containerNoPlaceholder": "如 TEMU1234567",
+      "filter": {
+        "status": "货柜状态",
+        "containerNo": "货柜号",
+        "containerNoHint": "输入货柜号"
+      },
+      "column": {
+        "containerNo": "货柜号",
+        "containerType": "柜型",
+        "totalCbm": "已装载体积",
+        "totalWeightKg": "已装载重量",
+        "planCount": "计划数",
+        "status": "状态",
+        "loadDate": "装柜日期",
+        "departureDate": "离港日期",
+        "arrivalDate": "到港日期"
+      }
     }
   },
   "factory": {

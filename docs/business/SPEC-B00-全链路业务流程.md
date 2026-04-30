@@ -648,8 +648,8 @@ LogisticsPlanUseCase.update(IN_TRANSIT)
 | 2.5 出货批次 | ShipmentBatch + DemandProcurementMapping | ✅ | 🔧实施中 | ✅ | SPEC-B11 v1.5.0 |
 | 3 验货 | QcRecord | ✅ | ✅ | ✅ | SPEC-B03 |
 | 4 调配 | LogisticsPlan | ✅ | 🔧修复中 | ✅ | SPEC-B04 |
-| 4 拼柜 | ConsolidationPool | 🔴 | — | 🔴 | SPEC-B04 |
-| 4 货柜 | Container | 🔴 | — | 🔴 | SPEC-B04 |
+| 4 拼柜 | ConsolidationPool | ✅ | ✅ | ✅ | SPEC-B00 v1.5.0 |
+| 4 货柜 | Container | ✅ | ✅ | ✅ | SPEC-B00 v1.5.0 |
 | 5 国内报关 | DomesticCustomsRecord | ✅ | — | ✅ | SPEC-B05 v1.4.0 |
 | 6 日本清关 | JapanCustomsRecord | ✅ | ✅ | ✅ | SPEC-B06 v1.4.0 |
 | 7 退税 | TaxRefundRecord | ✅ | — | ✅ | SPEC-B07 |
@@ -670,7 +670,7 @@ LogisticsPlanUseCase.update(IN_TRANSIT)
 | 5 | ~~DomesticCustoms 新建表单 procurementId 必填，containerNo 可选~~ | ✅ 已修复（2026-04-30）：containerNo 已在 DB/Entity/UI 层实现 | — |
 | 6 | ~~JapanCustomsRecord 缺少 containerNo 字段和货柜级入口~~ | ✅ 已修复（2026-04-30）：v1.4.0 后端+前端全部实现，V44 迁移待执行 | — |
 | 7 | LogisticsPlanPage 缺少"创建报关"批量按钮 | 无法从物流计划直接发起报关 | P1（2026-04-30） |
-| 8 | ConsolidationPool + Container 未实现 | 拼柜路径无法执行 | P1 |
+| 8 | ConsolidationPool + Container 未实现 | 拼柜路径无法执行 | P1 | ✅ 已实现（2026-04-30）：V45/V46 迁移 + Entity/Repository/UseCase/Controller + 前端 CRUD 页面 + i18n，凑满 70m³ 自动触发 PENDING 状态 |
 | 9 | OrderOverview 步骤5-8 未展示 | 运营看不到全链路 | P2 |
 | 10 | LogisticsPlan.quantity 来源错误 | 调配数量非实际验货量 | P2 |
 | 11 | ReplenishmentDemand 无自动触发来源 | 低库存触发链路存在，但新品需求仍需手动 | P3 |

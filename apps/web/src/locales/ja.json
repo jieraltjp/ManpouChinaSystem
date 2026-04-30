@@ -12,6 +12,8 @@
     "procurement": "02 発注書",
     "qcRecord": "03 検品記録",
     "logisticsPlan": "04 配送計画",
+    "consolidationPool": "05 コンソリ池",
+    "container": "06 コンテナ管理",
     "domesticCustoms": "05 国内通関",
     "japanCustomsRecord": "06 日本通関",
     "finance": "財務管理",
@@ -685,6 +687,74 @@
       "procurementRequired": "関連発注書を選択してください",
       "productCodeRequired": "品番を入力してください",
       "planTypeRequired": "配送タイプを選択してください"
+    }
+  },
+  "poolStatus": {
+    "OPEN": "受付中",
+    "PENDING": "積載待ち",
+    "LOADED": "積載済",
+    "SHIPPED": "出荷済"
+  },
+  "pool": {
+    "newButton": "新規コンソリ池",
+    "editTitle": "コンソリ池編集",
+    "deleteConfirm": "コンソリ池「{code}」を削除しますか？",
+    "createContainer": "コンテナ作成",
+    "createContainerConfirm": "コンソリ池「{poolCode}」のコンテナを作成しますか？",
+    "containerCreated": "コンテナ作成成功",
+    "destinationRequired": "寄港地は必須です",
+    "destinationPlaceholder": "例: Tokyo, Yokohama",
+    "filter": {
+      "status": "池ステータス",
+      "destinationPort": "寄港地",
+      "destinationHint": "寄港地を入力"
+    },
+    "column": {
+      "poolCode": "池番号",
+      "destinationPort": "寄港地",
+      "totalCbm": "総容量",
+      "totalWeightKg": "総重量",
+      "planCount": "計画数",
+      "threshold": "トリガー閾値",
+      "status": "ステータス"
+    },
+    "action": {
+      "createContainer": "コンテナ作成"
+    }
+  },
+  "containerStatus": {
+    "CREATED": "作成済",
+    "LOADED": "積載済",
+    "DEPARTED": "出発済",
+    "ARRIVED": "到着済"
+  },
+  "container": {
+    "type": {
+      "GP20": "20GP普通",
+      "GP40": "40GP普通",
+      "HC40": "40HC背高",
+      "HC45": "45HC背高"
+    },
+    "newButton": "新規コンテナ",
+    "editTitle": "コンテナ編集",
+    "deleteConfirm": "コンテナ「{code}」を削除しますか？",
+    "containerNoRequired": "コンテナ番号は必須です",
+    "containerNoPlaceholder": "例: TEMU1234567",
+    "filter": {
+      "status": "コンテナステータス",
+      "containerNo": "コンテナ番号",
+      "containerNoHint": "コンテナ番号を入力"
+    },
+    "column": {
+      "containerNo": "コンテナ番号",
+      "containerType": "柜型",
+      "totalCbm": "積載容量",
+      "totalWeightKg": "積載重量",
+      "planCount": "計画数",
+      "status": "ステータス",
+      "loadDate": "積載日",
+      "departureDate": "出発日",
+      "arrivalDate": "到着日"
     }
   },
   "factory": {

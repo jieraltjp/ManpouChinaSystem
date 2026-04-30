@@ -1,12 +1,50 @@
 /**
- * 调配计划 API 客户端。
- * 与 docs/business/SPEC-B04-调配计划-步骤4.md §API设计 完全对齐。
+ * 物流相关 API 客户端（调配计划 + 拼柜池 + 货柜）。
+ * v1.5.0 SPEC-B00 Issue #8。
  */
 import client from './client'
 
+// ===== 调配计划 =====
 export type LogisticsStatus = 'PLANNED' | 'BOOKED' | 'IN_TRANSIT' | 'DELIVERED'
 export type PlanType = 'SEA' | 'AIR' | 'CONSOLIDATION'
 
+// ===== 拼柜池 =====
+export type ConsolidationPoolStatus = 'OPEN' | 'PENDING' | 'LOADED' | 'SHIPPED'
+
+export interface ConsolidationPoolVO {
+  id: number
+  poolCode: string
+  destinationPort: string
+  totalCbm?: number
+  totalWeightKg?: number
+  planCount?: number
+  containerThresholdCbm?: number
+  status: ConsolidationPoolStatus
+  createTime?: string
+  updateTime?: string
+}
+
+// ===== 货柜 =====
+export type ContainerStatus = 'CREATED' | 'LOADED' | 'DEPARTED' | 'ARRIVED'
+export type ContainerType = 'GP20' | 'GP40' | 'HC40' | 'HC45'
+
+export interface ContainerVO {
+  id: number
+  containerNo: string
+  containerType: ContainerType
+  totalCbm?: number
+  totalWeightKg?: number
+  planCount?: number
+  poolId?: number
+  status: ContainerStatus
+  loadDate?: string
+  departureDate?: string
+  arrivalDate?: string
+  createTime?: string
+  updateTime?: string
+}
+
+// ===== 调配计划 =====
 export interface LogisticsPlanVO {
   id: number
   planCode: string
@@ -97,5 +135,95 @@ export const logisticsApi = {
   },
   delete(id: number) {
     return client.delete<{ code: string }>(`/logistics-plans/${id}`)
+  },
+}
+
+// ===== 拼柜池 API =====
+export interface ConsolidationPoolPageResponse {
+  content: ConsolidationPoolVO[]
+  totalElements: number
+  totalPages: number
+  pageNumber: number
+}
+
+export interface CreateConsolidationPoolRequest {
+  destinationPort: string
+  containerThresholdCbm?: number
+}
+
+export interface UpdateConsolidationPoolRequest {
+  destinationPort?: string
+  containerThresholdCbm?: number
+  status?: ConsolidationPoolStatus
+}
+
+export const consolidationPoolApi = {
+  list(params: { page?: number; pageSize?: number; status?: ConsolidationPoolStatus; destinationPort?: string }) {
+    return client.get<{ code: string; data: ConsolidationPoolPageResponse }>('/consolidation-pools', { params })
+  },
+  get(id: number) {
+    return client.get<{ code: string; data: ConsolidationPoolVO }>(`/consolidation-pools/${id}`)
+  },
+  create(data: CreateConsolidationPoolRequest) {
+    return client.post<{ code: string; data: number }>('/consolidation-pools', data)
+  },
+  update(id: number, data: UpdateConsolidationPoolRequest) {
+    return client.patch<{ code: string }>(`/consolidation-pools/${id}`, data)
+  },
+  delete(id: number) {
+    return client.delete<{ code: string }>(`/consolidation-pools/${id}`)
+  },
+  addPlan(poolId: number, planId: number) {
+    return client.post<{ code: string }>(`/consolidation-pools/${poolId}/plans/${planId}`)
+  },
+  removePlan(poolId: number, planId: number) {
+    return client.delete<{ code: string }>(`/consolidation-pools/${poolId}/plans/${planId}`)
+  },
+}
+
+// ===== 货柜 API =====
+export interface ContainerPageResponse {
+  content: ContainerVO[]
+  totalElements: number
+  totalPages: number
+  pageNumber: number
+}
+
+export interface CreateContainerRequest {
+  containerNo: string
+  containerType: ContainerType
+  poolId?: number
+  loadDate?: string
+  departureDate?: string
+  arrivalDate?: string
+}
+
+export interface UpdateContainerRequest {
+  containerNo?: string
+  containerType?: ContainerType
+  status?: ContainerStatus
+  loadDate?: string
+  departureDate?: string
+  arrivalDate?: string
+}
+
+export const containerApi = {
+  list(params: { page?: number; pageSize?: number; status?: ContainerStatus; poolId?: number }) {
+    return client.get<{ code: string; data: ContainerPageResponse }>('/containers', { params })
+  },
+  get(id: number) {
+    return client.get<{ code: string; data: ContainerVO }>(`/containers/${id}`)
+  },
+  create(data: CreateContainerRequest) {
+    return client.post<{ code: string; data: number }>('/containers', data)
+  },
+  update(id: number, data: UpdateContainerRequest) {
+    return client.patch<{ code: string }>(`/containers/${id}`, data)
+  },
+  delete(id: number) {
+    return client.delete<{ code: string }>(`/containers/${id}`)
+  },
+  addPlan(containerId: number, planId: number) {
+    return client.post<{ code: string }>(`/containers/${containerId}/plans/${planId}`)
   },
 }

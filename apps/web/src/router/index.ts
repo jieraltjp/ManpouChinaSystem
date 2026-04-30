@@ -63,6 +63,18 @@ const routes: RouteRecordRaw[] = [
             meta: { titleKey: 'menu.logisticsPlan', requiresAuth: true },
           },
           {
+            path: 'consolidation-pool',
+            name: 'ConsolidationPool',
+            component: () => import('@/pages/procurement/ConsolidationPoolPage.vue'),
+            meta: { titleKey: 'menu.consolidationPool', requiresAuth: true },
+          },
+          {
+            path: 'container',
+            name: 'Container',
+            component: () => import('@/pages/procurement/ContainerPage.vue'),
+            meta: { titleKey: 'menu.container', requiresAuth: true },
+          },
+          {
             path: 'domestic-customs',
             name: 'DomesticCustoms',
             component: () => import('@/pages/customs/DomesticCustomsPage.vue'),
