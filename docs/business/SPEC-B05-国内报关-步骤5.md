@@ -1,10 +1,10 @@
 # 国内报关 — 业务规格（步骤5）
 
-> **版本**: 1.4.0
+> **版本**: 1.5.0
 > **创建**: 2026-04-22
 > **更新**: 2026-04-27（v1.3.0：货柜级报关，containerNo 字段 + LogisticsPlanPage 发起流程）
-> **更新**: 2026-04-30（v1.4.0：**containerNo 改为必填主键 + LogisticsPlanPage 批量报关入口 + 明确与采购单脱钩**）
-> **状态**: 🔧 改造中（v1.4.0 前端改造 + SPEC 更新）
+> **更新**: 2026-04-30（v1.4.0：containerNo 改为必填主键 + 批量创建对话框 + CustomsBatchCreateCmd）
+> **状态**: ✅ v1.4.0 实施完成
 > **对应前端**: `DomesticCustomsPage.vue`（`apps/web/src/pages/customs/DomesticCustomsPage.vue`）
 > **前置**: LogisticsPlan 已编排货柜号（containerNo）
 > **后续**: JapanCustomsRecord（步骤6）— ✅ 已实现
@@ -140,15 +140,16 @@ DELETE /api/v1/customs/{id}
 
 ---
 
-## 6. 前端改造清单（v1.4.0）
+## 6. 前端改造清单（v1.4.0 → v1.5.0）
 
 ### 6.1 DomesticCustomsPage.vue
 
 | 改造项 | 当前 | 目标 |
 |--------|------|------|
 | 新建弹窗 procurementId | 必填 el-input-number | 可选 el-input-number |
-| 新建弹窗 containerNo | 可选 el-input | **必填 el-input（第一位）** |
-| 新建入口文案 | "新建报关" | "按货柜新建报关" |
+| 新建弹窗 containerNo | 可选 el-input | **必填 remote-select（第一位）** |
+| 新建入口文案 | "新规报关" | **"按货柜批量创建"** |
+| 新建模式 | 单条表单 | **批量对话框（选货柜号→表格展示 LogisticsPlan→多选→批量提交）** |
 | 列表页筛选 | procurementId 优先 | containerNo 优先 |
 | URL 参数 | ?containerNo= | ✅ 已支持 |
 
@@ -156,10 +157,10 @@ DELETE /api/v1/customs/{id}
 
 | 改造项 | 当前 | 目标 |
 |--------|------|------|
-| "创建报关"按钮 | 无 | 有（选中行后出现） |
+| "创建报关"按钮 | 有 | ✅ |
 | containerNo 列 | 有 | ✅ 已支持 |
-| 按货柜号筛选 | 无 | 有（el-select + remote 搜索） |
-| 已有报关状态提示 | 无 | 有（货柜级 CLEARED 提示） |
+| 按货柜号筛选 | 有（el-select + remote） | ✅ |
+| 已有报关状态提示 | 无 | 待实施 |
 
 ---
 
@@ -185,9 +186,10 @@ DELETE /api/v1/customs/{id}
 - [x] ✅ `@/api/customs.ts` 前端 API 客户端
 - [x] ✅ `DomesticCustomsPage.vue` 前端页面（`apps/web/src/pages/customs/DomesticCustomsPage.vue`）
 - [x] ✅ `LogisticsPlanPage.vue` 有 containerNo 列（v1.3.0）
-- [ ] 🔧 LogisticsPlanPage 增加"创建报关"按钮（v1.4.0）
-- [ ] 🔧 DomesticCustomsPage 新建表单 containerNo 改为必填（v1.4.0）
-- [ ] 🔧 `CustomsCreateCmd.containerNo` 增加 `@NotBlank` 校验（v1.4.0）
+- [x] ✅ LogisticsPlanPage 增加"创建报关"按钮（v1.4.0）
+- [x] ✅ DomesticCustomsPage 批量创建表单（v1.4.0）：选货柜号 → 表格展示 LogisticsPlan → 多选 → 批量提交
+- [x] ✅ `CustomsCreateCmd.containerNo` 增加 `@NotBlank` 校验（v1.4.0）
+- [x] ✅ `CustomsBatchCreateCmd` + `POST /batch` 批量创建接口（v1.4.0）
 - [ ] 🔴 `CustomsUseCaseTest` 单元测试
 - [x] ✅ DB迁移脚本 `V17__domestic_customs_record_table.sql`
 - [x] ✅ DB迁移脚本 `V36__domestic_customs_container_no.sql`（`container_no` 列已存在）
