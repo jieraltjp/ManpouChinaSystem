@@ -26,55 +26,63 @@ public class ShipmentBatchMigrationConfig {
     }
 
     private void migrateV40() {
-        if (tableExists("shipment_batch")) {
-            System.out.println("[V40] shipment_batch 表已存在，跳过");
-            return;
+        try {
+            jdbc.execute("""
+                CREATE TABLE IF NOT EXISTS shipment_batch (
+                    id                   BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    procurement_id       BIGINT NOT NULL,
+                    batch_code           VARCHAR(32) NOT NULL,
+                    shipment_quantity    INT NOT NULL,
+                    factory_ship_date    DATE,
+                    actual_ship_date     DATE,
+                    status               VARCHAR(16) NOT NULL DEFAULT '待验货',
+                    remarks              VARCHAR(512),
+                    create_time          DATETIME(3) NOT NULL,
+                    update_time          DATETIME(3) NOT NULL,
+                    create_by            VARCHAR(64) NOT NULL,
+                    update_by            VARCHAR(64) NOT NULL,
+                    is_deleted           TINYINT(1) NOT NULL DEFAULT 0,
+                    INDEX idx_sb_procurement (procurement_id),
+                    INDEX idx_sb_status (status)
+                )
+                """);
+            System.out.println("[V40] shipment_batch 表创建完成");
+        } catch (Exception e) {
+            if (e.getMessage() != null && e.getMessage().contains("already exists")) {
+                System.out.println("[V40] shipment_batch 表已存在，跳过");
+            } else {
+                throw e;
+            }
         }
-        jdbc.execute("""
-            CREATE TABLE shipment_batch (
-                id                   BIGINT AUTO_INCREMENT PRIMARY KEY,
-                procurement_id       BIGINT NOT NULL,
-                batch_code           VARCHAR(32) NOT NULL,
-                shipment_quantity    INT NOT NULL,
-                factory_ship_date    DATE,
-                actual_ship_date     DATE,
-                status               VARCHAR(16) NOT NULL DEFAULT '待验货',
-                remarks              VARCHAR(512),
-                create_time          DATETIME(3) NOT NULL,
-                update_time          DATETIME(3) NOT NULL,
-                create_by            VARCHAR(64) NOT NULL,
-                update_by            VARCHAR(64) NOT NULL,
-                is_deleted           TINYINT(1) NOT NULL DEFAULT 0,
-                INDEX idx_sb_procurement (procurement_id),
-                INDEX idx_sb_status (status)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-            """);
-        System.out.println("[V40] shipment_batch 表创建完成");
     }
 
     private void migrateV41() {
-        if (tableExists("demand_procurement_mapping")) {
-            System.out.println("[V41] demand_procurement_mapping 表已存在，跳过");
-            return;
+        try {
+            jdbc.execute("""
+                CREATE TABLE IF NOT EXISTS demand_procurement_mapping (
+                    id                   BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    demand_id            BIGINT NOT NULL,
+                    procurement_id       BIGINT NOT NULL,
+                    allocated_quantity   INT NOT NULL,
+                    status               VARCHAR(16) NOT NULL DEFAULT '进行中',
+                    create_time          DATETIME(3) NOT NULL,
+                    update_time          DATETIME(3) NOT NULL,
+                    create_by            VARCHAR(64) NOT NULL,
+                    update_by            VARCHAR(64) NOT NULL,
+                    is_deleted           TINYINT(1) NOT NULL DEFAULT 0,
+                    CONSTRAINT uk_demand_procurement UNIQUE (demand_id, procurement_id),
+                    INDEX idx_mapping_demand (demand_id),
+                    INDEX idx_mapping_procurement (procurement_id)
+                )
+                """);
+            System.out.println("[V41] demand_procurement_mapping 表创建完成");
+        } catch (Exception e) {
+            if (e.getMessage() != null && e.getMessage().contains("already exists")) {
+                System.out.println("[V41] demand_procurement_mapping 表已存在，跳过");
+            } else {
+                throw e;
+            }
         }
-        jdbc.execute("""
-            CREATE TABLE demand_procurement_mapping (
-                id                   BIGINT AUTO_INCREMENT PRIMARY KEY,
-                demand_id            BIGINT NOT NULL,
-                procurement_id       BIGINT NOT NULL,
-                allocated_quantity   INT NOT NULL,
-                status               VARCHAR(16) NOT NULL DEFAULT '进行中',
-                create_time          DATETIME(3) NOT NULL,
-                update_time          DATETIME(3) NOT NULL,
-                create_by            VARCHAR(64) NOT NULL,
-                update_by            VARCHAR(64) NOT NULL,
-                is_deleted           TINYINT(1) NOT NULL DEFAULT 0,
-                UNIQUE KEY uk_demand_procurement (demand_id, procurement_id),
-                INDEX idx_mapping_demand (demand_id),
-                INDEX idx_mapping_procurement (procurement_id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-            """);
-        System.out.println("[V41] demand_procurement_mapping 表创建完成");
     }
 
     private void migrateV42() {
@@ -82,7 +90,7 @@ public class ShipmentBatchMigrationConfig {
         Long count = jdbc.queryForObject("""
             SELECT COUNT(*) FROM replenishment_demand
             WHERE linked_procurement_id IS NOT NULL
-              AND deleted = false
+              AND is_deleted = false
               AND NOT EXISTS (
                   SELECT 1 FROM demand_procurement_mapping m
                   WHERE m.demand_id = replenishment_demand.id
@@ -106,7 +114,7 @@ public class ShipmentBatchMigrationConfig {
                 NOW(3), NOW(3), 'SYSTEM', 'SYSTEM', 0
             FROM replenishment_demand d
             WHERE d.linked_procurement_id IS NOT NULL
-              AND d.deleted = false
+              AND d.is_deleted = false
               AND NOT EXISTS (
                   SELECT 1 FROM demand_procurement_mapping m
                   WHERE m.demand_id = d.id
@@ -130,7 +138,7 @@ public class ShipmentBatchMigrationConfig {
         // 回填存量 QcRecord → ShipmentBatch（历史数据批次）
         Long batchCount = jdbc.queryForObject("""
             SELECT COUNT(DISTINCT procurement_id) FROM qc_record
-            WHERE deleted = false AND procurement_id IS NOT NULL
+            WHERE is_deleted = false AND procurement_id IS NOT NULL
               AND NOT EXISTS (
                   SELECT 1 FROM shipment_batch sb
                   WHERE sb.procurement_id = qc_record.procurement_id
@@ -152,7 +160,7 @@ public class ShipmentBatchMigrationConfig {
                     '历史数据迁移（V43）',
                     NOW(3), NOW(3), 'SYSTEM', 'SYSTEM', 0
                 FROM qc_record qc
-                WHERE qc.deleted = false
+                WHERE qc.is_deleted = false
                   AND qc.procurement_id IS NOT NULL
                   AND NOT EXISTS (
                       SELECT 1 FROM shipment_batch sb
@@ -173,7 +181,7 @@ public class ShipmentBatchMigrationConfig {
                 WHERE remarks LIKE '%历史数据迁移%'
                 GROUP BY procurement_id
             ) sb ON sb.procurement_id = qc.procurement_id
-            WHERE qc.deleted = false
+            WHERE qc.is_deleted = false
               AND qc.shipment_batch_id IS NULL
               AND qc.procurement_id IS NOT NULL
             """, Integer.class);
@@ -187,7 +195,7 @@ public class ShipmentBatchMigrationConfig {
                     GROUP BY procurement_id
                 ) sb ON sb.procurement_id = qc.procurement_id
                 SET qc.shipment_batch_id = sb.batch_id
-                WHERE qc.deleted = false
+                WHERE qc.is_deleted = false
                   AND qc.shipment_batch_id IS NULL
                   AND qc.procurement_id IS NOT NULL
                 """);
@@ -206,18 +214,26 @@ public class ShipmentBatchMigrationConfig {
     }
 
     private boolean tableExists(String tableName) {
+        // H2 的 INFORMATION_SCHEMA.TABLES 中表名为大写，同时检查大小写
+        String upper = tableName.toUpperCase();
+        String lower = tableName.toLowerCase();
         Integer count = jdbc.queryForObject(
             "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES " +
-            "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?",
-            Integer.class, tableName);
+            "WHERE TABLE_SCHEMA = DATABASE() AND (TABLE_NAME = ? OR TABLE_NAME = ?)",
+            Integer.class, upper, lower);
         return count != null && count > 0;
     }
 
     private boolean columnExists(String tableName, String columnName) {
+        // H2 的 INFORMATION_SCHEMA.COLUMNS 中表名/列名均为大写，同时检查大小写
+        String upperTable = tableName.toUpperCase();
+        String lowerTable = tableName.toLowerCase();
+        String upperCol = columnName.toUpperCase();
+        String lowerCol = columnName.toLowerCase();
         Integer count = jdbc.queryForObject(
             "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS " +
-            "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?",
-            Integer.class, tableName, columnName);
+            "WHERE TABLE_SCHEMA = DATABASE() AND (TABLE_NAME = ? OR TABLE_NAME = ?) AND (COLUMN_NAME = ? OR COLUMN_NAME = ?)",
+            Integer.class, upperTable, lowerTable, upperCol, lowerCol);
         return count != null && count > 0;
     }
 }
