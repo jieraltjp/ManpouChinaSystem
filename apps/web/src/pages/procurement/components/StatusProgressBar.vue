@@ -11,22 +11,28 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { StepStatus } from '@/api/orderOverview'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   stepStatuses: StepStatus[]
   currentStep?: number
 }>()
 
-const STEP_NAMES = ['补货', '发注', '验货', '调配', '国报', '日报', '退税', '运营']
-
 function stepName(n: number) {
-  return STEP_NAMES[n - 1] ?? ''
+  const names = t('orderOverview.stepNames', { returnObjects: true }) as unknown as string[]
+  return names[n - 1] ?? ''
 }
 
 function stepLabel(n: number, status: StepStatus) {
   const name = stepName(n)
-  const statusText = status === 'COMPLETED' ? '已完成' : status === 'IN_PROGRESS' ? '进行中' : '未开始'
+  const statusText = status === 'COMPLETED'
+    ? t('orderOverview.stepStatusUI.status.completed')
+    : status === 'IN_PROGRESS'
+      ? t('orderOverview.stepStatusUI.status.inProgress')
+      : t('orderOverview.stepStatusUI.status.notStarted')
   return `${name} - ${statusText}`
 }
 

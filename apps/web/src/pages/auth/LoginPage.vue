@@ -113,8 +113,8 @@
       <div class="lang-switcher">
         <span class="lang-label">{{ $t('auth.language') }}</span>
         <el-radio-group v-model="currentLocale" size="small">
-          <el-radio-button value="zh">中文</el-radio-button>
-          <el-radio-button value="ja">日本語</el-radio-button>
+          <el-radio-button value="zh">{{ $t('auth.languageZh') }}</el-radio-button>
+          <el-radio-button value="ja">{{ $t('auth.languageJa') }}</el-radio-button>
         </el-radio-group>
       </div>
 

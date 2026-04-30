@@ -144,7 +144,7 @@
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('order.message.detail') }}</el-button>
             <el-button link type="success" size="small" @click.stop="onOpenShipmentBatches(row)">{{ $t('order.action.shipmentBatch') }}</el-button>
             <el-button link type="warning" size="small" @click.stop="onEdit(row)"
-              :disabled="row.status === COMPLETED_STATUS">{{ $t('demand.action.edit') }}</el-button>
+              :disabled="row.status === ORDER_STATUS_SHIPPED">{{ $t('demand.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)"
               :disabled="!deletableStatuses.includes(row.status)">{{ $t('common.delete') }}</el-button>
           </template>
@@ -500,11 +500,13 @@ const router = useRouter()
 const { t, locale: localeRef } = useI18n()
 const currentLocale = computed(() => localeRef.value)
 
-const COMPLETED_STATUS = '已出货'
-const RETURNED_STATUS = '退货'
-const deletableStatuses = ['已下单']
+// 后端 order_status 枚举值（同时作为 i18n key）
+const ORDER_STATUS_ORDERED = '已下单'
+const ORDER_STATUS_SHIPPED = '已出货'
+const ORDER_STATUS_RETURNED = '退货'
 
-const ORDER_STATUSES = ['已下单', '已出货']
+const deletableStatuses = [ORDER_STATUS_ORDERED]
+const ORDER_STATUSES = [ORDER_STATUS_ORDERED, ORDER_STATUS_SHIPPED]
 
 const statusOptionsWithI18n = computed(() =>
   ORDER_STATUSES.map(value => ({ value, label: statusLabelByValue(value) })),
@@ -700,13 +702,13 @@ async function onFactorySubmit() {
 }
 
 const activeCount = computed(() =>
-  tableRows.value.filter(r => r.status !== COMPLETED_STATUS && r.status !== RETURNED_STATUS).length,
+  tableRows.value.filter(r => r.status !== ORDER_STATUS_SHIPPED && r.status !== ORDER_STATUS_RETURNED).length,
 )
 const completedCount = computed(() =>
-  tableRows.value.filter(r => r.status === COMPLETED_STATUS).length,
+  tableRows.value.filter(r => r.status === ORDER_STATUS_SHIPPED).length,
 )
 const returnedCount = computed(() =>
-  tableRows.value.filter(r => r.status === RETURNED_STATUS).length,
+  tableRows.value.filter(r => r.status === ORDER_STATUS_RETURNED).length,
 )
 
 const previewPriceJpy = computed(() => {
@@ -741,7 +743,7 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string; catego
   japanLead: '',
   chinaLead: '',
   destination: '',
-  status: '已下单',
+  status: ORDER_STATUS_ORDERED,
   category: '',
 })
 const formData = reactive<CreateProcurementRequest & { status?: string; category?: string }>(defaultFormData())
@@ -848,7 +850,7 @@ function onEdit(row: ProcurementPageVO | null) {
     japanLead: row?.japanLead ?? '',
     chinaLead: row?.chinaLead ?? '',
     destination: row?.destination ?? '',
-    status: row?.status ?? '已下单',
+    status: row?.status ?? ORDER_STATUS_ORDERED,
   })
   dialogVisible.value = true
 }
@@ -984,7 +986,7 @@ async function onToggleStatus(row: ProcurementPageVO) {
     ElMessage.warning(t('order.message.batchLinked'))
     return
   }
-  const newStatus = row.status === '已下单' ? '已出货' : '已下单'
+  const newStatus = row.status === ORDER_STATUS_ORDERED ? ORDER_STATUS_SHIPPED : ORDER_STATUS_ORDERED
   try {
     await procurementApi.update(row.id, { status: newStatus })
     ElMessage.success(t('order.message.statusUpdated'))

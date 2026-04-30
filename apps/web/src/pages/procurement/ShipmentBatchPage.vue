@@ -129,10 +129,23 @@ const currentRow = ref<ShipmentBatchVO | null>(null)
 const formRef = ref<FormInstance>()
 const procurementId = computed(() => route.query.procurementId ? Number(route.query.procurementId) : null)
 
-const deletableStatuses: ShipmentBatchStatus[] = ['待验货']
+// 后端 ShipmentBatchStatus 枚举值（同时作为 i18n key）
+const BATCH_STATUS_PENDING = '待验货'
+const BATCH_STATUS_INSPECTING = '验货中'
+const BATCH_STATUS_INSPECTED = '已验货'
+const BATCH_STATUS_CANCELLED = '已取消'
+
+const deletableStatuses: ShipmentBatchStatus[] = [BATCH_STATUS_PENDING]
+
+const ALL_BATCH_STATUSES: ShipmentBatchStatus[] = [
+  BATCH_STATUS_PENDING,
+  BATCH_STATUS_INSPECTING,
+  BATCH_STATUS_INSPECTED,
+  BATCH_STATUS_CANCELLED,
+]
 
 const statusOptions = computed(() =>
-  (['待验货', '验货中', '已验货', '已取消'] as ShipmentBatchStatus[]).map(v => ({
+  ALL_BATCH_STATUSES.map(v => ({
     value: v,
     label: t(`shipmentBatch.status.${v}` as any, { default: v }),
   }))
@@ -157,10 +170,10 @@ function statusLabel(status: ShipmentBatchStatus | undefined): string {
 function statusType(status: ShipmentBatchStatus | undefined): string {
   if (!status) return ''
   const map: Record<ShipmentBatchStatus, string> = {
-    '待验货': 'info',
-    '验货中': 'warning',
-    '已验货': 'success',
-    '已取消': 'danger',
+    [BATCH_STATUS_PENDING]: 'info',
+    [BATCH_STATUS_INSPECTING]: 'warning',
+    [BATCH_STATUS_INSPECTED]: 'success',
+    [BATCH_STATUS_CANCELLED]: 'danger',
   }
   return map[status] ?? ''
 }
@@ -236,7 +249,7 @@ const defaultFormData = () => ({
   shipmentQuantity: 1,
   factoryShipDate: '',
   actualShipDate: '',
-  status: '待验货' as ShipmentBatchStatus,
+  status: BATCH_STATUS_PENDING as ShipmentBatchStatus,
   remarks: '',
 })
 

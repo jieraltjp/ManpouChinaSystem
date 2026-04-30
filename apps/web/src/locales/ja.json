@@ -37,6 +37,8 @@
       "通関物流 — 一体化した合规通関"
     ],
     "language": "言語",
+    "languageZh": "中文",
+    "languageJa": "日本語",
     "username": "ユーザー名",
     "password": "パスワード",
     "usernamePlaceholder": "ユーザー名を入力",
@@ -1057,6 +1059,7 @@
       "reset": "リセット",
       "status": "ステータス"
     },
+    "stepNames": ["補充", "発注", "検品", "调配", "国報", "日報", "退税", "運営"],
     "status": {
       "all": "すべて",
       "pending": "未処理",
@@ -1499,8 +1502,15 @@
     "placeholder": {
       "containerNo": "コンテナ番号を入力"
     },
+    "dialog": {
+      "selectDomesticTip": "国内通関を選択（通関済）：",
+      "containerNoPlaceholder": "コンテナ番号で検索...",
+      "noDomesticTip": "利用可能な国内通関記録がありません",
+      "selectedDomestic": "選択した国内通関",
+      "changeDomestic": "再選択"
+    },
     "validation": {
-      "containerNoRequired": "コンテナ番号は必須です",
+      "containerNoRequired": "コンテナ番号回はsa",
       "domesticCustomsIdRequired": "国内通関番号は必須です"
     },
     "completeDialog": {

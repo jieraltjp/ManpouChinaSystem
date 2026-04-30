@@ -198,7 +198,7 @@ onMounted(loadData)
         </el-form-item>
         <el-form-item :label="$t('logistics.pool.column.threshold')">
           <el-input-number v-model="formData.containerThresholdCbm" :min="1" :max="200" :precision="2" />
-          <span style="margin-left:8px">m³</span>
+          <span style="margin-left:8px">{{ $t('common.units.m3') }}</span>
         </el-form-item>
       </el-form>
       <template #footer>
