@@ -249,7 +249,7 @@ docker run -d --name kafka \
 
 **原因：** Nacos Docker entrypoint 要求 `NACOS_AUTH_TOKEN` 必须是 **base64 编码且解码后 ≥ 32 字节**的字符串。
 
-**解决：** 生成正确长度的 JWT secret 并设置所有必需环境变量：
+**解决：** 生成正确长度的 JWT secret 并设置所有必需环境变量。Nacos 3.x 控制台路径为 `/next/`：
 
 ```bash
 # 生成 32 字节随机 secret（base64 后 44 字符）
@@ -258,7 +258,7 @@ SECRET=$(dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 -w0)
 docker run -d --name nacos \
   --restart unless-stopped \
   --privileged \
-  -p 8848:8848 -p 9848:9848 \
+  -p 8848:8848 -p 9848:9848 -p 8080:8080 \
   -e MODE=standalone \
   -e NACOS_AUTH_ENABLE=false \
   -e NACOS_AUTH_TOKEN="$SECRET" \
@@ -267,6 +267,10 @@ docker run -d --name nacos \
   -e NACOS_AUTH_IDENTITY_KEY=nacos123 \
   -e NACOS_AUTH_IDENTITY_VALUE=nacos456 \
   nacos/nacos-server:latest
+
+# 控制台入口：http://host:8080/next/
+# 默认账号：nacos / manpou（生产环境请修改）
+# 注意：Nacos 3.x 控制台需要带 /next/ 前缀
 ```
 
 ---

@@ -28,7 +28,12 @@ git pull origin main && ./scripts/start-all.sh
 | manpou-allinone | 18090 |
 | user-service | 18081 |
 | web 前端 | 13000 |
-| Nacos（需 Docker） | 8848 |
+| Nacos 注册中心 | 8848（API）、8080（控制台 /next/） |
+| Redis | 6379 |
+| Kafka | 9092 |
+
+**Nacos 控制台：** http://192.168.13.123:8080/next/  
+**默认账号：** `nacos` / `manpou`（生产环境请修改）
 
 ---
 
@@ -89,11 +94,11 @@ docker run -d --name kafka \
   apache/kafka:3.8.0 \
   /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/kraft/server.properties
 
-# Nacos
+# Nacos（控制台: http://host:8080/next/，账号 nacos/manpou）
 SECRET=$(dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 -w0)
 docker run -d --name nacos \
   --restart unless-stopped --privileged \
-  -p 8848:8848 -p 9848:9848 \
+  -p 8848:8848 -p 9848:9848 -p 8080:8080 \
   -e MODE=standalone -e NACOS_AUTH_ENABLE=false \
   -e NACOS_AUTH_TOKEN="$SECRET" \
   -e NACOS_AUTH_PLUGIN_NACOS_TOKEN_SECRET_KEY="$SECRET" \

@@ -18,7 +18,7 @@
 |---|---|---|
 | Redis | `6379` | Docker，密码 `redis123` |
 | Kafka | `9092` | Docker，KRaft 模式 |
-| Nacos | `8848` | Docker，注册/配置中心 |
+| Nacos | `8848`（API）/ `8080`（控制台 /next/） | Docker，注册/配置中心 |
 
 ---
 
@@ -208,7 +208,7 @@ docker run -d --name kafka \
 SECRET=$(dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 -w0)
 docker run -d --name nacos \
   --restart unless-stopped --privileged \
-  -p 8848:8848 -p 9848:9848 \
+  -p 8848:8848 -p 9848:9848 -p 8080:8080 \
   -e MODE=standalone -e NACOS_AUTH_ENABLE=false \
   -e NACOS_AUTH_TOKEN="$SECRET" \
   -e NACOS_AUTH_PLUGIN_NACOS_TOKEN_SECRET_KEY="$SECRET" \
@@ -216,6 +216,10 @@ docker run -d --name nacos \
   -e NACOS_AUTH_IDENTITY_KEY=nacos123 \
   -e NACOS_AUTH_IDENTITY_VALUE=nacos456 \
   nacos/nacos-server:latest
+
+# Nacos 控制台（首次登录后修改密码）：
+# http://192.168.13.123:8080/next/
+# 账号：nacos / manpou
 
 # 验证 Nacos 就绪（可能需要 60-90 秒）
 sleep 60 && curl http://localhost:8848/nacos/v1/ns/operator/metrics
@@ -256,7 +260,8 @@ nohup npm run dev > /opt/ManpouChinaSystem/logs/web.log 2>&1 &
 | 前端页面 | http://localhost:13000 | http://192.168.13.123:13000 |
 | 后端 API | http://localhost:18090 | http://192.168.13.123:18090 |
 | Swagger 文档 | http://localhost:18090/swagger-ui/index.html | http://192.168.13.123:18090/swagger-ui/index.html |
-| Nacos（需 Docker） | http://localhost:8848/nacos | http://192.168.13.123:8848/nacos |
+| Nacos（API） | http://localhost:8848/nacos | http://192.168.13.123:8848/nacos |
+| Nacos（控制台 /next/） | - | http://192.168.13.123:8080/next/（账号：nacos / manpou） |
 
 ---
 
