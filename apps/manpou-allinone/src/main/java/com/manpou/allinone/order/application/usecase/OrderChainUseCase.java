@@ -184,7 +184,7 @@ public class OrderChainUseCase {
                     .cargoHeightCm(v.getLogisticsCargoHeightCm())
                     .cargoVolumeCbm(v.getLogisticsCargoVolumeCbm())
                     .cargoWeightKg(v.getLogisticsCargoWeightKg())
-                    .quantity(v.getProcurementQuantity())
+                    .quantity(v.getQcPassedCount())
                     .requiresQc(v.getLogisticsRequiresQc())
                     .estimatedShipDate(v.getLogisticsEstimatedShipDate())
                     .actualShipDate(v.getLogisticsActualShipDate())

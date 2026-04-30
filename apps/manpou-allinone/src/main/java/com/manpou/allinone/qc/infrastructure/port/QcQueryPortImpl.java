@@ -18,4 +18,9 @@ public class QcQueryPortImpl implements QcQueryPort {
     public Optional<QcRecord> findById(Long id) {
         return qcRecordRepository.findByIdAndDeletedIsFalse(id);
     }
+
+    @Override
+    public Integer sumPassedCountByProcurementId(Long procurementId) {
+        return qcRecordRepository.sumPassedCountByProcurementId(procurementId);
+    }
 }

@@ -1,5 +1,6 @@
 package com.manpou.allinone.sales.application.listener;
 
+import com.manpou.allinone.common.port.QcQueryPort;
 import com.manpou.allinone.customs.domain.event.JapanCustomsClearedEvent;
 import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
@@ -35,6 +36,7 @@ public class JapanCustomsClearedEventListener {
 
     private final ProcurementRepository procurementRepository;
     private final SalesRecordRepository salesRecordRepository;
+    private final QcQueryPort qcQueryPort;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onJapanCustomsCleared(JapanCustomsClearedEvent evt) {
@@ -71,9 +73,11 @@ public class JapanCustomsClearedEventListener {
             record.setProductCode(procurement.getProductCode());
             record.setSubProductCode(procurement.getSubProductCode());
             record.setListingDate(LocalDate.now());
-            int quantity = (procurement.getQuantity() != null ? procurement.getQuantity() : 0);
-            record.setInitialStock(quantity);
-            record.setCurrentStock(quantity);
+            // SPEC-B00 数量等式：initialStock = SUM(QcRecord.passedCount)，非采购量
+            Integer passed = qcQueryPort.sumPassedCountByProcurementId(procurement.getId());
+            int stock = (passed != null) ? passed : 0;
+            record.setInitialStock(stock);
+            record.setCurrentStock(stock);
             record.setSalesQuantity(0);
             record.setReturnedQuantity(0);
             record.setReturnRate(java.math.BigDecimal.ZERO);

@@ -75,6 +75,8 @@ public class LogisticsPlanUseCase {
             if (cmd.getCargoWidthCm() == null && qcRecord.getBoxWidthCm() != null) cmd.setCargoWidthCm(qcRecord.getBoxWidthCm());
             if (cmd.getCargoHeightCm() == null && qcRecord.getBoxHeightCm() != null) cmd.setCargoHeightCm(qcRecord.getBoxHeightCm());
             if (cmd.getCargoWeightKg() == null && qcRecord.getGrossWeight() != null) cmd.setCargoWeightKg(qcRecord.getGrossWeight());
+            // SPEC-B00 数量等式：quantity = passedCount（验货合格量），非采购量
+            if (cmd.getQuantity() == null && qcRecord.getPassedCount() != null) cmd.setQuantity(qcRecord.getPassedCount());
         }
         LogisticsPlan entity = logisticsPlanAssembler.toEntity(cmd);
         entity.calculateVolume();

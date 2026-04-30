@@ -24,4 +24,9 @@ public interface QcRecordJpaRepository extends QcRecordRepository, JpaRepository
     Page<QcRecord> findByProcurementIdAndDeletedIsFalse(Long procurementId, Pageable pageable);
 
     Page<QcRecord> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
+
+    @org.springframework.data.jpa.repository.Query(
+        "SELECT COALESCE(SUM(q.passedCount), 0) FROM QcRecord q " +
+        "WHERE q.procurementId = :procurementId AND q.deleted = false AND q.result = 'PASS'")
+    Integer sumPassedCountByProcurementId(@org.springframework.data.repository.query.Param("procurementId") Long procurementId);
 }

@@ -10,4 +10,7 @@ import java.util.Optional;
 public interface QcQueryPort {
 
     Optional<QcRecord> findById(Long id);
+
+    /** 按采购单聚合合格数量（SPEC-B00 数量等式）。 */
+    Integer sumPassedCountByProcurementId(Long procurementId);
 }
