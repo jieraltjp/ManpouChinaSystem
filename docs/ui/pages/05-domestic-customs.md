@@ -1,160 +1,97 @@
 # 页面规格 — 步骤5：国内报关
 
-> **版本**: 1.0.0
+> **版本**: 1.4.0
 > **创建**: 2026-04-22
 > **更新**: 2026-04-22 — 前端页面已实现
+> **更新**: 2026-04-30（v1.4.0：containerNo 为主键 + LogisticsPlanPage 批量报关入口）
 > **路由**: `/procurement/domestic-customs`
 > **组件**: `DomesticCustomsPage.vue`（`apps/web/src/pages/customs/DomesticCustomsPage.vue`）
 > **对应后端**: `DomesticCustomsRecord` 聚合根（✅ 已实现）
 > **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B05-国内报关-步骤5.md`
 > **前置步骤**: 步骤4（调配计划已发货 LogisticsPlan.status = IN_TRANSIT）
-> **后续步骤**: 步骤6（日本清关 JapanCustomsRecord — 待实现）
+> **后续步骤**: 步骤6（日本清关 JapanCustomsRecord）
 
 ---
 
 ## 1. 页面定位
 
-国内出口报关管理。对应业务流第五步。货物离港后，提交出口报关资料。
+国内出口报关管理。对应业务流第五步。货物离港前，向中国海关提交出口申报，获取放行通知后货物方可装船出运。
 
-> ⚠️ **占位页面** — 字段待业务方确认后补充完整设计。当前仅定义页面骨架。
+**v1.4.0 核心变更**：报关维度从采购单号改为货柜号。
 
 ---
 
-## 2. 布局结构（骨架）
+## 2. 布局结构
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
-│ 页面标题：国内报关                                   [+ 新规报关]  │
+│ 页面标题：国内报关                                   [+ 按货柜新建报关] │
 ├────────────────────────────────────────────────────────────────────┤
 │ 统计卡                                                               │
 │ ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐       │
-│ │ PENDING    │ │ SUBMITTED  │ │ CLEARED    │ │   合计     │       │
-│ │ 待申报     │ │ 已提交     │ │ 已放行     │ │            │       │
+│ │   合计     │ │  PENDING  │ │ SUBMITTED  │ │  CLEARED   │       │
+│ │            │ │  待申报    │ │  已提交    │ │  已放行    │       │
 │ └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
 ├────────────────────────────────────────────────────────────────────┤
 │ 筛选栏                                                               │
-│ 报关单号 [________]  采购单号 [________]  状态 [全部▼]  日期范围   │
-│                                                [搜索]  [重置]       │
+│ 报关单号 [________]  货柜号 [________]  采购单号 [________]  状态  │
+│                                               [搜索]  [重置]       │
 ├────────────────────────────────────────────────────────────────────┤
-│ 表格（占位字段，待确认）                                             │
-│ ┌────────┬──────────┬────────┬────────┬────────┬────────┐         │
-│ │报关单号 │采购单号  │货号    │HS编码  │申报日期│状态    │ 操作  │
-│ └────────┴──────────┴────────┴────────┴────────┴────────┘         │
+│ 表格                                                                 │
+│ ┌────────┬──────────┬────────┬────────┬────────┬────────┬───┐ │
+│ │报关单号 │ 货柜号   │采购单号 │货号    │子货号   │ 状态    │操作│ │
+│ └────────┴──────────┴────────┴────────┴────────┴────────┴───┘ │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. 表格列定义（待确认字段）
+## 3. 表格列定义
 
-> ⚠️ 以下字段来源于 `SPEC-B05-国内报关-步骤5.md`，**待业务方提供真实报关单样本后确认**。
-
-| 列名 | 字段 | 来源 | 说明 |
-|------|------|------|------|
-| 报关单号 | `customsDeclarationNo` | 系统/海关返回 | — |
-| 采购单号 | `procurementId` | 关联 | — |
-| 货号 | `productCode` | 来自 Procurement | — |
-| HS编码 | `hsCode` | 用户输入/自动查询 | — |
-| 申报日期 | `declarationDate` | 用户输入 | — |
-| 申报人 | `declarant` | 用户输入 | — |
-| 出口口岸 | `exportPort` | 用户输入 | — |
-| 申报价值(CNY) | `declaredValueRmb` | 用户输入 | — |
-| 状态 | `status` | 系统 | PENDING / SUBMITTED / CLEARED / FAILED |
-| 操作 | — | — | 详情 / 编辑 |
-
-> **前端表格布局**：列宽用 `min-width`，不写 `table-layout="fixed"`，操作列不写 `fixed="right"`。详见 [docs/ui/ARCHITECTURE.md §8](../ARCHITECTURE.md#8-element-plus-表格布局规范)。
+| 列名 | 字段 | 说明 |
+|------|------|------|
+| 报关单号 | `customsCode` | 系统生成 DC-YYYYMMDD-NNN |
+| 货柜号 | `containerNo` | **v1.4.0 核心字段** |
+| 采购单号 | `procurementId` | 可选参考 |
+| 货号 | `productCode` | 必填 |
+| 子货号 | `subProductCode` | 可选 |
+| 数量 | `quantity` | 报关数量 |
+| 预估货值 | `estimatedValueCny` | 元 |
+| 状态 | `status` | PENDING / SUBMITTED / CLEARED / REJECTED |
+| 操作 | — | 详情 / 提交或放行 / 删除 |
 
 ---
 
-## 4. 新规报关弹窗（骨架）
+## 4. 新规报关弹窗
 
 ### 4.1 触发
 
-点击 `[+ 新规报关]` → 弹出表单弹窗。
+- 点击 `[+ 按货柜新建报关]` → 弹出表单弹窗
+- 从 LogisticsPlanPage 跳转（URL 参数 `?containerNo=TRLU1234567`）
 
-### 4.2 表单字段（占位，待确认）
+### 4.2 表单字段
 
-**关联信息（自动代入）**：
+**v1.4.0 字段优先级**：
 
-| 字段 | 来源 | 说明 |
+| 字段 | 控件 | 说明 |
 |------|------|------|
-| 关联采购单 | 用户选择 | 选择 LogisticsPlan 或 Procurement |
-| 货号 | 自动代入 | — |
-| 商品名称 | 自动代入 | 来自 Product.nameZh |
-| 起运港 | 自动代入 | 来自 Container.departurePort（Container 实体实现后补充） |
-
-**用户填入（待确认）**：
-
-| 字段 | 控件 | 必填 | 说明 |
-|------|------|------|------|
-| 报关单号 | `el-input` | | 系统生成 or 海关返回？ |
-| HS编码 | `el-input` + HS查询 | | 可按 productCode 自动查询 Product.hsCode |
-| 申报日期 | `el-date-picker` | ✅ | — |
-| 申报人 | `el-input` | ✅ | — |
-| 出口口岸 | `el-select` | ✅ | 宁波/上海/其他 |
-| 申报价值(CNY) | `el-input-number` | | — |
-| 商品规格 | `el-input` | | — |
-| 数量 | `el-input-number` | | — |
-| 毛重(kg) | `el-input-number` | | — |
-| 备注 | `el-input`（textarea） | | — |
+| **货柜号** | el-input | **必填，第一位** |
+| 采购单号 | el-input-number | 可选参考 |
+| 货号 | el-input | 必填 |
+| 子货号 | el-input | 可选 |
+| 数量 | el-input-number | 可选 |
+| 预估货值 | el-input-number | 可选 |
+| 工厂 | el-input-number | factoryId |
+| 备注 | el-textarea | 可选 |
 
 ---
 
-## 5. 状态流转（骨架）
+## 5. v1.4.0 改造清单
 
-```
-  PENDING ──[提交]──▶ SUBMITTED ──[放行]──▶ CLEARED
-                                        └──[驳回]──▶ FAILED
-```
-
-| 状态 | 颜色 | 说明 |
-|------|------|------|
-| PENDING | 黄色 | 待申报 |
-| SUBMITTED | 蓝色 | 已提交海关 |
-| CLEARED | 绿色 | 已放行 |
-| FAILED | 红色 | 申报失败/被驳回 |
-
----
-
-## 6. 自动触发规则
-
-建议：**LogisticsPlan.status = IN_TRANSIT 时，自动创建 DomesticCustomsRecord（status = PENDING）**。
-
----
-
-## 7. API 集成（骨架）
-
-| 操作 | Method | Endpoint | 状态 |
-|------|--------|----------|------|
-| 分页查询 | GET | `/api/v1/customs?page=&pageSize=&procurementId=&status=` | ✅已实现 |
-| 详情 | GET | `/api/v1/customs/{id}` | ✅已实现 |
-| 创建 | POST | `/api/v1/customs` | ✅已实现 |
-| 更新 | PUT | `/api/v1/customs/{id}` | ✅已实现 |
-| 提交 | PATCH | `/api/v1/customs/{id}/submit` | ✅已实现 |
-| 放行 | PATCH | `/api/v1/customs/{id}/clear` | ✅已实现 |
-| 驳回 | PATCH | `/api/v1/customs/{id}/reject` | ✅已实现 |
-| 删除 | DELETE | `/api/v1/customs/{id}` | ✅已实现 |
-
----
-
-## 8. 缺口阻塞
-
-| 项目 | 优先级 | 说明 |
-|------|--------|------|
-| 报关单字段确认 | **P0** | 需提供真实报关单样本 |
-| HS编码查询 | P1 | Product 表需新增 hsCode 字段 |
-| 自动触发逻辑 | P1 | IN_TRANSIT → 自动创建 DomesticCustomsRecord |
-| 出口口岸枚举 | P1 | 宁波/上海/大连/天津/其他 |
-
----
-
-## 9. 组件拆分建议
-
-| 组件 | 职责 |
-|------|------|
-| `DomesticCustomsPage.vue` | 容器：列表 + 筛选 + 统计卡 |
-| `DomesticCustomsTable.vue` | 表格 + 分页 |
-| `DomesticCustomsFormDialog.vue` | 新规/编辑表单 |
-| `DomesticCustomsDetailDrawer.vue` | 详情抽屉 |
-| `HsCodeSelect.vue` | HS编码搜索选择器（待实现） |
-| `useDomesticCustoms.ts` | API 调用（composable） |
+| 改造项 | 当前 | 目标 |
+|--------|------|------|
+| 新建弹窗 containerNo | 可选 el-input | **必填 el-input（第一位）** |
+| 新建弹窗 procurementId | 必填 el-input-number | 可选 |
+| 新建入口文案 | "新建报关" | "按货柜新建报关" |
+| 列表页筛选 | procurementId 优先 | containerNo 优先 |
+| URL 参数 | ?containerNo= | ✅ 已支持 |

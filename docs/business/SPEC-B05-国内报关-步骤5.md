@@ -1,12 +1,11 @@
 # 国内报关 — 业务规格（步骤5）
 
-> **版本**: 1.3.0
+> **版本**: 1.4.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-27（v1.3.0：方案C——货柜级报关，containerNo 字段 + LogisticsPlanPage 发起流程）
-> **更新**: 2026-04-24（v1.2.0：全量实现已确认，与 DB-05 v1.3.0 状态对齐）
-> **更新**: 2026-04-22 — 步骤6已实现，同步更新后续状态
-> **状态**: ✅ 已实现（B05 报关单核心 CRUD + 生命周期流转 + v1.3.0 货柜级聚合）
-> **对应前端**: `DomesticCustomsPage.vue`（`apps/web/src/pages/customs/DomesticCustomsPage.vue`）· `docs/ui/pages/05-domestic-customs.md`
+> **更新**: 2026-04-27（v1.3.0：货柜级报关，containerNo 字段 + LogisticsPlanPage 发起流程）
+> **更新**: 2026-04-30（v1.4.0：**containerNo 改为必填主键 + LogisticsPlanPage 批量报关入口 + 明确与采购单脱钩**）
+> **状态**: 🔧 改造中（v1.4.0 前端改造 + SPEC 更新）
+> **对应前端**: `DomesticCustomsPage.vue`（`apps/web/src/pages/customs/DomesticCustomsPage.vue`）
 > **前置**: LogisticsPlan 已编排货柜号（containerNo）
 > **后续**: JapanCustomsRecord（步骤6）— ✅ 已实现
 
@@ -16,7 +15,7 @@
 
 国内出口报关是跨境贸易的必要环节。货物离港前，向中国海关提交出口申报，获取放行通知后货物方可装船出运。
 
-**货柜级聚合（v1.3.0 新增）**：
+**货柜级聚合（v1.3.0 新增，v1.4.0 强化）**：
 
 实际业务中，**一个货柜号下可能有多个 LogisticsPlan（不同商品/工厂）**，但对应同一份出口报关资料。报关维度为**货柜号**：
 
@@ -30,7 +29,15 @@
   DomesticCustomsRecord(containerNo=TRLU1234567, productCode=商品Y, factoryId=工厂甲)
 ```
 
-> ⚠️ 当前 Phase 1 按**商品+工厂**分组报关。未来可扩展为全明细关联表（方案A）。
+**v1.4.0 核心变更**：
+
+| 字段 | v1.3.0（错误） | v1.4.0（正确） |
+|------|---------------|---------------|
+| 新建入口 | 采购单号（procurementId）为主 | 货柜号（containerNo）为主 |
+| containerNo | 可选 | **必填** |
+| procurementId | 必填 | **可选**（作为参考，不主导流程） |
+
+> 报关业务对象是**货柜**，不是采购单。采购单只是货物来源参考。
 
 ---
 
@@ -42,13 +49,13 @@
 DomesticCustomsRecord（聚合根）
 ├── id: Long
 ├── customsCode: String              # 报关单号（DC-YYYYMMDD-NNN，系统生成）
-├── containerNo: String              # 货柜号（v1.3.0，来自 LogisticsPlan.containerNo）
-├── procurementId: Long              # 关联采购单（FK → procurement.id，可选）
-├── logisticsPlanId: Long            # 关联调配计划（FK → logistics_plan.id，可选；v1.3.0 保留字段）
-├── factoryId: Long                  # 关联工厂（FK → factory.id）
-├── productCode: String              # 货号
-├── subProductCode: String           # 子货号
-├── quantity: Integer                # 报关数量
+├── containerNo: String              # 货柜号（v1.3.0，**v1.4.0 改为必填**）
+├── procurementId: Long             # 关联采购单（**v1.4.0 改为可选参考字段**）
+├── logisticsPlanId: Long           # 关联调配计划（FK → logistics_plan.id，可选）
+├── factoryId: Long                 # 关联工厂（FK → factory.id）
+├── productCode: String             # 货号
+├── subProductCode: String          # 子货号
+├── quantity: Integer               # 报关数量
 ├── estimatedValueCny: BigDecimal   # 预估货值（元）
 ├── status: DomesticCustomsStatus   # PENDING / SUBMITTED / CLEARED / REJECTED
 ├── remarks: String                  # 备注
@@ -57,10 +64,10 @@ DomesticCustomsRecord（聚合根）
 ├── updateTime: LocalDateTime
 │
 └── 领域方法
-    ├── submit()                     # 提交海关 → status = SUBMITTED
-    ├── clear()                      # 放行 → status = CLEARED
-    ├── reject(reason)               # 驳回 → status = REJECTED
-    └── isTerminal()                 # CLEARED 为终态
+    ├── submit()                    # 提交海关 → status = SUBMITTED
+    ├── clear()                     # 放行 → status = CLEARED
+    ├── reject(reason)              # 驳回 → status = REJECTED
+    └── isTerminal()                # CLEARED 为终态
 ```
 
 ---
@@ -86,22 +93,31 @@ public enum DomesticCustomsStatus {
 
 ---
 
-## 4. 触发规则（v1.3.0 修正）
+## 4. 触发规则（v1.4.0）
 
-**规则**：由用户在 LogisticsPlanPage 手动发起，不自动创建。
+**操作路径（正确流程）**：
 
-**操作路径**：
 ```
-LogisticsPlanPage → 选中某货柜号下的计划 → 点击"创建报关"
-    → 跳转 /procurement/domestic-customs?containerNo=TRLU1234567
-    → DomesticCustomsPage 自动填入货柜号 + 显示该货柜下已有报关记录
-    → 用户按商品+工厂分别创建报关单
+LogisticsPlanPage
+  → 按货柜号筛选（containerNo）
+  → 选中某货柜号下的所有计划 → 点击"创建报关"
+  → 跳转 /procurement/domestic-customs?containerNo=TRLU1234567
+  → DomesticCustomsPage 自动填入货柜号
+  → 用户按商品+工厂分别创建报关单（同一货柜号可创建多条）
 ```
 
-**为什么不自动创建（方案B简化理由）**：
+**为什么不自动创建**：
 - 1货柜 = N 个 DomesticCustomsRecord（按商品+工厂分组），自动触发只能创建1条
 - 实际业务由操作员按商品/工厂维度拆分报关
 - 简化设计避免一次自动创建大量无意义记录
+
+**LogisticsPlanPage 改造要点（v1.4.0）**：
+
+| 改造项 | 说明 |
+|--------|------|
+| 按货柜号分组展示 | 表格加 containerNo 列，支持按货柜号筛选 |
+| 货柜级批量"创建报关" | 选中同 containerNo 的多条记录 → 跳转报关页面 |
+| 显示已有报关状态 | 某货柜已报关 → 显示 CLEARED 标签，防止重复创建 |
 
 ---
 
@@ -112,19 +128,42 @@ LogisticsPlanPage → 选中某货柜号下的计划 → 点击"创建报关"
 ```
 GET    /api/v1/customs?page=&pageSize=&containerNo=&procurementId=&status=
 GET    /api/v1/customs/{id}
-POST   /api/v1/customs                              # 创建（containerNo 必填）
-PUT    /api/v1/customs/{id}                          # 编辑
-PATCH  /api/v1/customs/{id}/submit                    # 提交
-PATCH  /api/v1/customs/{id}/clear                    # 放行
-PATCH  /api/v1/customs/{id}/reject                    # 驳回
+POST   /api/v1/customs                              # 创建（**containerNo 必填，procurementId 可选**）
+PUT    /api/v1/customs/{id}                         # 编辑
+PATCH  /api/v1/customs/{id}/submit                  # 提交
+PATCH  /api/v1/customs/{id}/clear                   # 放行
+PATCH  /api/v1/customs/{id}/reject                  # 驳回
 DELETE /api/v1/customs/{id}
 ```
 
-> v1.3.0 新增 `containerNo` 筛选参数，列表页按货柜号筛选。
+> ⚠️ **v1.4.0 API 变更**：POST body 中 `containerNo` 改为必填，`procurementId` 改为可选。
 
 ---
 
-## 6. 缺口阻塞（字段待确认）
+## 6. 前端改造清单（v1.4.0）
+
+### 6.1 DomesticCustomsPage.vue
+
+| 改造项 | 当前 | 目标 |
+|--------|------|------|
+| 新建弹窗 procurementId | 必填 el-input-number | 可选 el-input-number |
+| 新建弹窗 containerNo | 可选 el-input | **必填 el-input（第一位）** |
+| 新建入口文案 | "新建报关" | "按货柜新建报关" |
+| 列表页筛选 | procurementId 优先 | containerNo 优先 |
+| URL 参数 | ?containerNo= | ✅ 已支持 |
+
+### 6.2 LogisticsPlanPage.vue
+
+| 改造项 | 当前 | 目标 |
+|--------|------|------|
+| "创建报关"按钮 | 无 | 有（选中行后出现） |
+| containerNo 列 | 有 | ✅ 已支持 |
+| 按货柜号筛选 | 无 | 有（el-select + remote 搜索） |
+| 已有报关状态提示 | 无 | 有（货柜级 CLEARED 提示） |
+
+---
+
+## 7. 缺口阻塞（字段待确认）
 
 | 字段 | 现状 | 阻塞原因 |
 |------|------|---------|
@@ -135,7 +174,7 @@ DELETE /api/v1/customs/{id}
 
 ---
 
-## 7. 代码实现清单
+## 8. 代码实现清单
 
 - [x] ✅ `DomesticCustomsRecord` 聚合根实体（含 `containerNo` 字段 v1.3.0）
 - [x] ✅ `DomesticCustomsStatus` 枚举（含 `isTerminal()` + `canTransitionTo()`）
@@ -145,7 +184,10 @@ DELETE /api/v1/customs/{id}
 - [x] ✅ `CustomsController` REST 控制器
 - [x] ✅ `@/api/customs.ts` 前端 API 客户端
 - [x] ✅ `DomesticCustomsPage.vue` 前端页面（`apps/web/src/pages/customs/DomesticCustomsPage.vue`）
-- [x] ✅ `LogisticsPlanPage.vue` 增加"创建报关"按钮（v1.3.0）
+- [x] ✅ `LogisticsPlanPage.vue` 有 containerNo 列（v1.3.0）
+- [ ] 🔧 LogisticsPlanPage 增加"创建报关"按钮（v1.4.0）
+- [ ] 🔧 DomesticCustomsPage 新建表单 containerNo 改为必填（v1.4.0）
+- [ ] 🔧 `CustomsCreateCmd.containerNo` 增加 `@NotBlank` 校验（v1.4.0）
 - [ ] 🔴 `CustomsUseCaseTest` 单元测试
 - [x] ✅ DB迁移脚本 `V17__domestic_customs_record_table.sql`
-- [ ] 🔴 V36 迁移：`domestic_customs_record` 增加 `container_no` 字段
+- [x] ✅ DB迁移脚本 `V36__domestic_customs_container_no.sql`（`container_no` 列已存在）

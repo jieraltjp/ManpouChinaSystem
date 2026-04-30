@@ -1,8 +1,8 @@
 # DB-05 — 国内报关数据库设计
 
-> **版本**: 1.3.0
+> **版本**: 1.4.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-27（v1.3.0：增加 container_no 字段，实现货柜级聚合；V36 迁移待执行）
+> **更新**: 2026-04-30（v1.4.0：V36 已存在于 repo，containerNo 字段已通过 JPA ddl-auto 添加；前端改为 containerNo 必填 + procurementId 可选）
 > **更新**: 2026-04-24（v1.3.0：全量实现已确认，修正为 ✅ 已实现；修正代码文件名DomesticCustomsRepository/customs.ts/DomesticCustomsPage.vue）
 > **更新**: 2026-04-24（修正状态：仅聚合根+枚举已实现，UseCase/Controller/前端均未实现，修正为🔴未实现）
 > **更新**: 2026-04-23（对齐 V17 迁移 + 实体实现）
@@ -56,11 +56,13 @@ CREATE TABLE domestic_customs_record (
 
 ---
 
-## 待执行迁移
+## 已执行迁移
+
+> 注意：项目 `ddl-auto: update` 模式下 Flyway 被禁用，V36 通过 JPA `ddl-auto: update` 自动添加列（Flyway 禁用项目，迁移脚本仅作文档记录）。
 
 | 序号 | 文件 | 内容 | 状态 |
 |------|------|------|------|
-| V36 | `V36__domestic_customs_container_no.sql` | domestic_customs_record 增加 container_no 字段 + 索引 | 🔴 待执行 |
+| V36 | `V36__domestic_customs_container_no.sql` | domestic_customs_record 增加 container_no 字段 + 索引 | ✅ 已存在（JPA ddl-auto 添加） |
 
 ---
 
