@@ -93,7 +93,53 @@ systemctl restart redis-server
 systemctl enable redis-server
 ```
 
-**第二步：获取代码（内网无 git 访问时，用 rsync / scp / tar+ssh 推送）**
+**第二步：创建 application-development.yml（gitignored，git pull 后需手动重建）**
+
+```bash
+mkdir -p /opt/ManpouChinaSystem/apps/manpou-allinone/src/main/resources/
+cat > /opt/ManpouChinaSystem/apps/manpou-allinone/src/main/resources/application-development.yml << 'YAML'
+spring:
+  application:
+    name: manpou-allinone
+  datasource:
+    url: jdbc:mysql://192.168.13.202:23306/manpou?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&connectionAttributes=none
+    username: root
+    password: manpou23306
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+  flyway:
+    enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+logging:
+  level:
+    root: INFO
+    com.manpou.allinone: INFO
+  org.hibernate.SQL: WARN
+  org.hibernate.tool.schema: INFO
+YAML
+```
+
+**第三步：获取代码（内网无 git 访问时，用 rsync / scp / tar+ssh 推送）**
 
 ```bash
 # 先在远程创建目录
@@ -108,7 +154,7 @@ tar --exclude='.git' \
     | ssh root@<服务器IP> "tar -xzf - -C /opt/ManpouChinaSystem"
 ```
 
-**第三步：编译后端**
+**第四步：编译后端**
 
 ```bash
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
@@ -122,7 +168,7 @@ cd libs/manpou-common && mvn install -DskipTests -q && cd ..
 cd apps/manpou-allinone && mvn package -DskipTests
 ```
 
-**第四步：启动**
+**第五步：启动**
 
 ```bash
 # 开放防火墙
@@ -164,6 +210,9 @@ systemctl start docker
 # 安装完成后验证（hello-world 必须成功）
 docker run --privileged hello-world
 ```
+
+**创建 application-development.yml（gitignored，git pull 后需手动重建）：**
+（同阶段 A 第二步，完整 YAML 内容略——参考 QUICKREF.md 或 docs/ops/README.md 中阶段 A 的完整配置块）
 
 **启动基础设施（一次性初始化）：**
 

@@ -171,6 +171,49 @@ apt install -y redis-server
 sed -i 's/^# requirepass.*/requirepass redis123/' /etc/redis/redis.conf
 systemctl restart redis-server
 
+# 创建 application-development.yml（gitignored，git pull 后需手动重建）
+mkdir -p /opt/ManpouChinaSystem/apps/manpou-allinone/src/main/resources/
+cat > /opt/ManpouChinaSystem/apps/manpou-allinone/src/main/resources/application-development.yml << 'YAML'
+spring:
+  application:
+    name: manpou-allinone
+  datasource:
+    url: jdbc:mysql://192.168.13.202:23306/manpou?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&connectionAttributes=none
+    username: root
+    password: manpou23306
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+  flyway:
+    enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+logging:
+  level:
+    root: INFO
+    com.manpou.allinone: INFO
+  org.hibernate.SQL: WARN
+  org.hibernate.tool.schema: INFO
+YAML
+
 # 编译
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 cd /opt/ManpouChinaSystem
