@@ -6,13 +6,19 @@
 
 ## 1. 服务拓扑
 
-| 服务 | 端口 | 类型 | JAR / 目录 |
+| 服务 | 端口 | 类型 | 说明 |
 |---|---|---|---|
-| `manpou-allinone` | `18090` | Spring Boot | `apps/manpou-allinone/target/*.jar` |
-| `user-service` | `18081` | Spring Boot | `apps/user-service/target/*.jar` |
-| `web` | `13000` | Vite Dev Server | `apps/web/` |
+| `manpou-allinone` | `18090` | Spring Boot | 后端主服务（JAR: `apps/manpou-allinone/target/*.jar`） |
+| `web` | `13000` | Vite Dev Server | 前端（`apps/web/`） |
+| `user-service` | `18081` | Spring Boot | 用户服务（当前未启用） |
 
-**基础设施依赖：** Docker Desktop（通过 `docker/compose.yaml` 提供 Nacos + MySQL + Redis + Kafka）
+**基础设施（Docker，Phase B）：**
+
+| 服务 | 端口 | 说明 |
+|---|---|---|
+| Redis | `6379` | Docker，密码 `redis123` |
+| Kafka | `9092` | Docker，KRaft 模式 |
+| Nacos | `8848` | Docker，注册/配置中心 |
 
 ---
 
@@ -43,7 +49,7 @@ git pull origin main && ./scripts/start-all.sh
 | `./scripts/start-all.sh status` | 查看三服务运行状态 |
 | `./scripts/stop-all.sh` | 停止全部三服务 |
 | `./scripts/restart-all.sh` | 重启（先停后启） |
-| `./scripts/build-all.sh` | 编译所有微服务 JAR（Phase 0 不需要） |
+| `./scripts/build-all.sh` | 编译所有微服务 JAR |
 
 **日志文件：** `logs/<服务名>.log`
 **PID 文件：** `logs/<服务名>.pid`
@@ -58,62 +64,199 @@ git pull origin main && ./scripts/start-all.sh
 ./scripts/init-config.sh dev
 ```
 
-### Ubuntu 22.04 Server（新装机）
-
-**第一步：安装基础依赖（一键）**
+### Ubuntu Server（新装机，Phase B 需要 Docker）
 
 ```bash
-# 连接到服务器后，以 root 身份执行以下命令
+# 安装 Docker
+apt install -y docker.io docker-compose
+systemctl enable docker
+systemctl start docker
+# 验证
+docker run --privileged hello-world
+```
+
+### Ubuntu 22.04 Server（新装机）
+
+#### 阶段 A：立即可用（无需容器基础设施）
+
+适用于：Proxmox LXC 容器（Docker/Podman 受内核限制）。
+
+**第一步：安装基础依赖**
+
+```bash
+# 以 root 身份执行
 apt update && apt install -y openjdk-21-jdk curl wget git unzip
 
-# 安装 Node.js 20.x
+# Node.js 20.x
 curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt install -y nodejs
 
-# 安装 Docker 和 docker-compose
-apt install -y docker.io docker-compose
-systemctl start docker
-systemctl enable docker
+# Redis（本地缓存）
+apt install -y redis-server
+sed -i 's/^# requirepass.*/requirepass redis123/' /etc/redis/redis.conf
+systemctl restart redis-server
+systemctl enable redis-server
 ```
 
-**第二步：克隆代码**
+**第二步：获取代码（内网无 git 访问时，用 rsync / scp / tar+ssh 推送）**
 
 ```bash
-cd /opt
-git clone <你的仓库地址> ManpouChinaSystem
-cd ManpouChinaSystem
+# 先在远程创建目录
+ssh root@<服务器IP> "mkdir -p /opt/ManpouChinaSystem"
+
+# 打包推送（排除构建产物）
+tar --exclude='.git' \
+    --exclude='apps/manpou-allinone/target' \
+    --exclude='apps/web/node_modules' \
+    --exclude='apps/web/dist' \
+    -czf - . \
+    | ssh root@<服务器IP> "tar -xzf - -C /opt/ManpouChinaSystem"
 ```
 
-**第三步：初始化并启动**
+**第三步：编译后端**
 
 ```bash
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export PATH=\$JAVA_HOME/bin:\$PATH
 cd /opt/ManpouChinaSystem
-./scripts/init-config.sh dev
-./scripts/start-all.sh
+
+# 先编译依赖模块
+cd libs/manpou-common && mvn install -DskipTests -q && cd ..
+
+# 编译主服务
+cd apps/manpou-allinone && mvn package -DskipTests
 ```
 
-> **资源注意**：完整 docker-compose 基础设施（TiDB + Kafka + Nacos + Redis + MinIO + Prometheus + Grafana + OTel）约需 4–8GB 内存。2GB 机器上请先只启动后端，Docker 容器按需启动：
-> ```bash
-> docker compose -f docker/compose.yaml up -d nacos redis   # 最少依赖
-> ```
+**第四步：启动**
 
-执行内容：
-1. 检查 Docker 是否运行
-2. 创建 `.env.local`（若不存在）
-3. 启动 `docker/compose.yaml` 中的基础设施容器
-4. 等待 Nacos 就绪
-5. 推送 Nacos 配置到配置中心
+```bash
+# 开放防火墙
+ufw allow 13000/tcp
+ufw allow 18090/tcp
+
+# 后端（development profile，连接远程 MySQL 192.168.13.202:23306）
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export PATH=\$JAVA_HOME/bin:\$PATH
+export REDIS_PASSWORD=redis123
+cd /opt/ManpouChinaSystem/apps/manpou-allinone
+nohup java -Xms256m -Xmx512m -jar target/manpou-allinone-1.0.0-SNAPSHOT.jar \
+  --server.port=18090 \
+  --spring.profiles.active=development \
+  > /opt/ManpouChinaSystem/logs/manpou-allinone.log 2>&1 &
+
+# 前端（首次需 npm install）
+cd /opt/ManpouChinaSystem/apps/web
+npm install
+nohup npm run dev > /opt/ManpouChinaSystem/logs/web.log 2>&1 &
+```
+
+---
+
+#### 阶段 B：启用容器基础设施（Proxmox 嵌套 或 VM）
+
+适用于：Proxmox LXC 已开启嵌套功能、或使用独立 VM。
+
+**前提条件：** LXC 嵌套已启用，或为独立 VM（而非容器）。
+
+> **LXC 环境特别说明：** 所有 `docker run` 命令必须加 `--privileged`，否则 AppArmor 会阻止容器启动。
+
+```bash
+# 安装 Docker
+apt install -y docker.io docker-compose
+systemctl enable docker
+systemctl start docker
+
+# 安装完成后验证（hello-world 必须成功）
+docker run --privileged hello-world
+```
+
+**启动基础设施（一次性初始化）：**
+
+```bash
+# Redis
+docker run -d --name redis \
+  --restart unless-stopped --privileged \
+  -p 6379:6379 \
+  redis:latest redis-server --requirepass redis123
+
+# Kafka（KRaft，首次需初始化）
+UUID=$(docker run --rm --privileged apache/kafka:3.8.0 \
+  /opt/kafka/bin/kafka-storage.sh random-uuid)
+docker run --rm --privileged apache/kafka:3.8.0 \
+  cat /opt/kafka/config/kraft/server.properties \
+  | sed 's|log.dirs=/tmp/kraft-combined-logs|log.dirs=/kafka/kraft-combined-logs|' \
+  > /tmp/kafka-kraft.properties
+docker volume create kafka-data
+docker run --rm --privileged -v kafka-data:/kafka --user root \
+  apache/kafka:3.8.0 bash -c \
+  'mkdir -p /kafka/kraft-combined-logs && chown 1000:1000 /kafka/kraft-combined-logs'
+docker run --rm --privileged -v kafka-data:/kafka \
+  -v /tmp/kafka-kraft.properties:/opt/kafka/config/kraft/server.properties:ro \
+  --user root apache/kafka:3.8.0 bash -c \
+  'chown appuser:appuser /kafka/kraft-combined-logs && \
+   su appuser -c "/opt/kafka/bin/kafka-storage.sh format \
+   -t $UUID -c /opt/kafka/config/kraft/server.properties --ignore-formatted"'
+docker run -d --name kafka \
+  --restart unless-stopped --privileged \
+  -p 9092:9092 \
+  -v kafka-data:/kafka \
+  -v /tmp/kafka-kraft.properties:/opt/kafka/config/kraft/server.properties:ro \
+  apache/kafka:3.8.0 \
+  /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/kraft/server.properties
+
+# Nacos（JWT secret 必须 >=32 字节 base64）
+SECRET=$(dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 -w0)
+docker run -d --name nacos \
+  --restart unless-stopped --privileged \
+  -p 8848:8848 -p 9848:9848 \
+  -e MODE=standalone -e NACOS_AUTH_ENABLE=false \
+  -e NACOS_AUTH_TOKEN="$SECRET" \
+  -e NACOS_AUTH_PLUGIN_NACOS_TOKEN_SECRET_KEY="$SECRET" \
+  -e NACOS_AUTH_PLUGIN_NACOS_TOKEN_EXPIRE_SECONDS=18000 \
+  -e NACOS_AUTH_IDENTITY_KEY=nacos123 \
+  -e NACOS_AUTH_IDENTITY_VALUE=nacos456 \
+  nacos/nacos-server:latest
+
+# 验证 Nacos 就绪（可能需要 60-90 秒）
+sleep 60 && curl http://localhost:8848/nacos/v1/ns/operator/metrics
+```
+
+**日常启停：**
+
+```bash
+# 启动后端 + 前端
+export REDIS_PASSWORD=redis123
+cd /opt/ManpouChinaSystem/apps/manpou-allinone
+nohup java -Xms256m -Xmx512m -jar target/manpou-allinone-1.0.0-SNAPSHOT.jar \
+  --server.port=18090 > /opt/ManpouChinaSystem/logs/manpou-allinone.log 2>&1 &
+
+cd /opt/ManpouChinaSystem/apps/web
+nohup npm run dev > /opt/ManpouChinaSystem/logs/web.log 2>&1 &
+```
+
+> **如何启用 LXC 嵌套**（Proxmox Web UI）：
+> 停止 LXC → 编辑 → 选项 → 嵌套 → 改为 `1（启用）` → 重启容器。
+> 然后重装 Docker（清理之前损坏的配置）。
+
+---
+
+**Profile 说明**
+
+| Profile | 用途 | 数据库 | Redis |
+|---------|------|--------|-------|
+| `local` | Windows 本地开发 | H2 内存 / 本地 MySQL | 本地 |
+| `development` | Ubuntu 开发服务器 | 远程 MySQL `192.168.13.202:23306` | 本地 `localhost:6379` |
 
 ---
 
 ## 5. 启动后访问地址
 
-| 服务 | 地址 |
-|---|---|
-| 前端页面 | http://localhost:13000 |
-| API 文档 | http://localhost:18090/swagger-ui/index.html |
-| Nacos 控制台 | http://localhost:8848/nacos （nacos / nacos） |
-| MinIO 控制台 | http://localhost:9001 （minioadmin / minioadmin123） |
+| 服务 | Windows 本地 | Ubuntu 服务器 |
+|---|---|---|
+| 前端页面 | http://localhost:13000 | http://192.168.13.123:13000 |
+| 后端 API | http://localhost:18090 | http://192.168.13.123:18090 |
+| Swagger 文档 | http://localhost:18090/swagger-ui/index.html | http://192.168.13.123:18090/swagger-ui/index.html |
+| Nacos（需 Docker） | http://localhost:8848/nacos | http://192.168.13.123:8848/nacos |
 
 ---
 

@@ -26,6 +26,15 @@ WEB_PORT=13000
 
 JAVA_OPTS="-Xms512m -Xmx1024m"
 
+# ---- Profile 选择 ----
+# Windows (git-bash): local（H2 内存数据库）
+# Linux (Ubuntu Server): development（远程 MySQL 192.168.13.202:23306）
+if is_windows; then
+    SPRING_PROFILE="local"
+else
+    SPRING_PROFILE="${SPRING_PROFILES_ACTIVE:-development}"
+fi
+
 # ---- 颜色 ----
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -172,7 +181,7 @@ start_manpou() {
 
     nohup java $JAVA_OPTS -jar "$jar" \
         --server.port=${ALLINONE_PORT} \
-        --spring.profiles.active=local \
+        --spring.profiles.active=${SPRING_PROFILE} \
         > "${PROJECT_DIR}/logs/manpou-allinone.log" 2>&1 &
     local pid=$!
     echo "$pid" > "${PROJECT_DIR}/logs/manpou-allinone.pid"
@@ -210,7 +219,7 @@ start_user() {
 
     nohup java $JAVA_OPTS -jar "$jar" \
         --server.port=${USER_PORT} \
-        --spring.profiles.active=local \
+        --spring.profiles.active=${SPRING_PROFILE} \
         > "${PROJECT_DIR}/logs/user-service.log" 2>&1 &
     local pid=$!
     echo "$pid" > "${PROJECT_DIR}/logs/user-service.pid"
