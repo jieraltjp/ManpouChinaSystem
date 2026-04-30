@@ -158,7 +158,9 @@ docker exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:90
 ./scripts/start-all.sh
 ```
 
-### Ubuntu Server（阶段 A：无需容器基础设施）
+### Ubuntu Server（新装机）
+
+#### 阶段 A：无需容器基础设施
 
 ```bash
 # 安装依赖
@@ -192,14 +194,26 @@ ufw allow 13000/tcp
 ufw allow 18090/tcp
 ```
 
-### Ubuntu Server（阶段 B：启用容器基础设施）
+#### 阶段 B：启用容器基础设施（Docker）
+
+**前提：** LXC 嵌套已启用，或使用独立 VM。
+
+Docker 基础设施初始化步骤见上方「Docker（Phase B）」章节。
+
+日常启动（Phase B）：
 
 ```bash
-# 先启用 LXC 嵌套，或使用独立 VM
-apt install -y docker.io docker-compose
-systemctl start docker
+# 先启动 Docker 基础设施（首次按上方步骤操作，日常只需 restart）
+docker start redis kafka nacos
 
-cd /opt/ManpouChinaSystem
-./scripts/init-config.sh dev
-./scripts/start-all.sh
+# 启动后端（Redis 密码通过环境变量传入）
+export REDIS_PASSWORD=redis123
+cd /opt/ManpouChinaSystem/apps/manpou-allinone
+nohup java -Xms256m -Xmx512m -jar target/manpou-allinone-1.0.0-SNAPSHOT.jar \
+  --server.port=18090 \
+  > /opt/ManpouChinaSystem/logs/manpou-allinone.log 2>&1 &
+
+# 启动前端
+cd /opt/ManpouChinaSystem/apps/web
+nohup npm run dev > /opt/ManpouChinaSystem/logs/web.log 2>&1 &
 ```

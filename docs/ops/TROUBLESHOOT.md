@@ -60,28 +60,44 @@ docker ps --filter "name=nacos"
 
 **解决：**
 ```bash
-docker compose -f docker/compose.yaml up -d
-# 等待 15 秒后验证：
-curl -sf http://localhost:8848/nacos/v1/console/health/readiness
+docker start nacos
+# 或重建（参考 README.md 中完整的 docker run 命令）
+docker rm nacos && \
+SECRET=$(dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 -w0) && \
+docker run -d --name nacos --restart unless-stopped --privileged \
+  -p 8848:8848 -p 9848:9848 -p 8080:8080 \
+  -e MODE=standalone -e NACOS_AUTH_ENABLE=false \
+  -e NACOS_AUTH_TOKEN="$SECRET" \
+  -e NACOS_AUTH_PLUGIN_NACOS_TOKEN_SECRET_KEY="$SECRET" \
+  -e NACOS_AUTH_PLUGIN_NACOS_TOKEN_EXPIRE_SECONDS=18000 \
+  -e NACOS_AUTH_IDENTITY_KEY=nacos123 \
+  -e NACOS_AUTH_IDENTITY_VALUE=nacos456 \
+  nacos/nacos-server:latest
+
+# 等待 60-90 秒后验证（Nacos 启动较慢）：
+curl http://localhost:8848/nacos/v1/ns/operator/metrics
+# 期望返回：{"status":"UP"}
 ```
 
 ---
 
-### 症状：数据库连接失败
+### 症状：后端启动成功但数据库连不上
 
 **排查：**
 ```bash
-docker ps --filter "name=mysql"
-docker logs $(docker ps --filter "name=mysql" -q) 2>&1 | grep -i "access denied\|connection refused\|unknown host"
+# 从服务器测试 MySQL 连通性
+apt install -y mysql-client 2>/dev/null || true
+mysql -h 192.168.13.202 -P 23306 -u root -pmanpou23306 -e "SELECT 1" 2>&1
+
+# 从服务器测试 Redis 连通性
+apt install -y redis-tools 2>/dev/null || true
+redis-cli -h localhost -p 6379 -a redis123 ping
 ```
 
-**解决：**
+**解决：** 确认网络可达后，检查 MySQL 是否允许该 IP 连接。
 ```bash
-# 重启 MySQL 容器
-docker compose -f docker/compose.yaml restart mysql
-
-# 若仍有问题，完全重建（不删除命名卷，需清数据时加 -v）：
-docker compose -f docker/compose.yaml up -d --build mysql
+# 在 MySQL 服务器（192.168.13.202）上执行：
+mysql -u root -pmanpou23306 -e "GRANT ALL PRIVILEGES ON manpou.* TO 'root'@'192.168.13.%' IDENTIFIED BY 'manpou23306'; FLUSH PRIVILEGES;"
 ```
 
 ---

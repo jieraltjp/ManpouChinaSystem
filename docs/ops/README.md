@@ -70,18 +70,7 @@ git pull origin main && ./scripts/start-all.sh
 ./scripts/init-config.sh dev
 ```
 
-### Ubuntu Server（新装机，Phase B 需要 Docker）
-
-```bash
-# 安装 Docker
-apt install -y docker.io docker-compose
-systemctl enable docker
-systemctl start docker
-# 验证
-docker run --privileged hello-world
-```
-
-### Ubuntu 22.04 Server（新装机）
+### Ubuntu Server（新装机）
 
 #### 阶段 A：立即可用（无需容器基础设施）
 
