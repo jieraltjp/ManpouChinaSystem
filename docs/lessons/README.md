@@ -14,10 +14,12 @@
 | [LESSONS-OPS.md](./LESSONS-OPS.md) | 构建 / 部署 / 环境 / 运维 | 7–9, 17–18, 20, 26–28 |
 | [LESSONS-DATABASE.md](./LESSONS-DATABASE.md) | 数据库 / Flyway / Schema | 8, 13, 31–32, 39, 45, 51, 59, 60 |
 | [LESSONS-FRONTEND.md](./LESSONS-FRONTEND.md) | 前端 Vue / TS / i18n / Element Plus | 11–12, 14, 16, 33–34, 37, 40–44, 46–50, 52–59 |
+| [LESSONS-USER-SERVICE.md](./LESSONS-USER-SERVICE.md) | user-service JWT 跨服务 / JPA schema 对齐 | 62–67 |
+| [LESSONS-JWT-CROSS-SERVICE.md](./LESSONS-JWT-CROSS-SERVICE.md) | allinone 只读验签 / Map 反序列化 / RS256 kid 提取 | 68–69 |
 
 ---
 
-## 铁律总表（60 条）
+## 铁律总表（66 条）
 
 ### 后端（17 条）
 
@@ -97,6 +99,26 @@
 | 58 | el-input-number 列宽 = content - 60px(按钮) - 16px(el-col padding)，content < 150px 时按钮截断 | 按钮文字被遮挡 |
 | 60 | nativeQuery=true + Pageable 排序 → Spring Data 追加实体属性名（非列名）→ 报错 Unknown column | 500 错误 |
 
+### user-service 实施（6 条）
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 62 | BaseEntity 字段变更必须同步 Flyway ALTER 迁移 | JPA schema-validation 失败 |
+| 63 | MySQL TINYINT 列对应 Java Integer/Boolean 须用 columnDefinition | 类型不匹配启动失败 |
+| 64 | Flyway 部分失败后先 repair 再重跑 | 困在半失败状态无法启动 |
+| 65 | Flyway INSERT 必须幂等（ON DUPLICATE KEY UPDATE） | 重跑失败或数据重复 |
+| 66 | BCrypt hash 不用记忆，用时现生成并验证 | 密码错误无法登录 |
+| 67 | 编译和启动分离，不用 -q 静默模式 | 错误被掩盖无法诊断 |
+
+### JWT 跨服务（1 条）
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 68 | RestTemplate 反序列化 `Result<内部类VO>` 须用 Map 中间层 | kid=null，缓存失效，401 |
+| 69 | RS256 JWT 提取 kid 必须从 header base64url 解码，禁止先验签再提取 | RS256 无公钥 parse 抛异常，401 |
+
+
+
 ---
 
 ## 快速查询
@@ -111,6 +133,9 @@
 | i18n 重复 key / 硬编码 | LESSONS-FRONTEND.md → Lesson 44, 53 |
 | nativeQuery + Pageable ORDER BY 500 | LESSONS-DATABASE.md → Lesson 60 |
 | 接口变更后数据不对 | LESSONS-BACKEND.md → Lesson 34 |
+| user-service JWT 跨服务 / Flyway+JPA schema 对齐 | LESSONS-USER-SERVICE.md → Lesson 62-67 |
+| allinone 跨服务 JWT 401 / Map 反序列化 | LESSONS-JWT-CROSS-SERVICE.md → Lesson 68 |
+
 
 ---
 
@@ -129,3 +154,7 @@
 | 58 | 2026-04-27 LogisticsPlanPage el-input-number 按钮截断宽度计算修正 |
 | 59 | 2026-04-28 DemandStatus CONFIRMED 新增 + Flyway 禁用项目 @PostConstruct 幂等迁移组件 |
 | 60 | 2026-04-28 `/api/v1/orders/chain` nativeQuery=true + Pageable ORDER BY → Unknown column |
+| 62-67 | 2026-04-30 user-service SPEC-B11 Phase 1 实施（JWT 跨服务 / JPA schema 对齐） |
+| 68 | 2026-04-30 allinone JwtKeyManager 跨服务 JWT 401 根因（ParameterizedTypeReference 泛型失效） |
+| 69 | 2026-04-30 allinone JwtService.parseToken 双重 parse bug（RS256 无公钥 parse 失败） |
+
