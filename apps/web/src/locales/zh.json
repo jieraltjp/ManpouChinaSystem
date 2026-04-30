@@ -1314,6 +1314,7 @@
       "subProductCodePlaceholder": "请输入子货号",
       "quantity": "数量",
       "estimatedValueCny": "预估货值(CNY)",
+      "estimatedValueCnyPlaceholder": "请输入预估货值",
       "factoryId": "工厂ID",
       "factoryIdPlaceholder": "请输入工厂ID",
       "remarks": "备注",
@@ -1335,6 +1336,7 @@
       "selectedCount": "已选 {n} 条",
       "selectedPlans": "已选计划",
       "totalValue": "合计货值",
+      "items": "条记录",
       "createButton": "批量创建 ({n})"
     },
     "message": {

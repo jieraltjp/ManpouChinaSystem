@@ -183,18 +183,6 @@
           <el-table-column :label="$t('customs.column.subProductCode')" prop="subProductCode" min-width="110" />
           <el-table-column :label="$t('customs.column.factoryId')" prop="factoryId" min-width="80" align="center" />
           <el-table-column :label="$t('customs.column.quantity')" prop="quantity" min-width="70" align="right" />
-          <el-table-column :label="$t('customs.column.estimatedValueCny')" min-width="120" align="right">
-            <template #default="{ row }">
-              <el-input-number
-                v-model="row.overrideValueCny"
-                :min="0"
-                :precision="2"
-                size="small"
-                style="width:110px"
-                :placeholder="$t('customs.dialog.estimatedValueCnyPlaceholder')"
-              />
-            </template>
-          </el-table-column>
           <el-table-column :label="$t('customs.column.status')" width="80" align="center">
             <template #default="{ row }">
               <el-tag v-if="row.customsCreated" type="success" size="small">{{ $t('customs.status.created') }}</el-tag>
@@ -204,27 +192,23 @@
         </el-table>
       </div>
 
-      <!-- 第三行：批量字段（备注等） -->
+      <!-- 第三行：批量字段（预估货值 + 备注） -->
       <div v-if="selectedPlanIds.length > 0" class="batch-footer">
         <el-row :gutter="16">
-          <el-col :span="12">
+          <el-col :span="8">
+            <el-form-item :label="$t('customs.dialog.estimatedValueCny')" style="margin-bottom:0">
+              <el-input-number v-model="batchForm.estimatedValueCny" :min="0" :precision="2" :placeholder="$t('customs.dialog.estimatedValueCnyPlaceholder')" style="width:100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('customs.batch.selectedPlans')" style="margin-bottom:0">
+              <div class="batch-count-display">{{ selectedPlanIds.length }} {{ $t('customs.batch.items') }}</div>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
             <el-form-item :label="$t('customs.dialog.remarks')" style="margin-bottom:0">
               <el-input v-model="batchForm.remarks" type="textarea" :rows="2" :placeholder="$t('customs.dialog.remarksPlaceholder')" />
             </el-form-item>
-          </el-col>
-          <el-col :span="12" style="display:flex;align-items:center;justify-content:center">
-            <div class="batch-summary">
-              <div class="batch-summary-item">
-                <span class="batch-summary-label">{{ $t('customs.batch.selectedPlans') }}</span>
-                <span class="batch-summary-value">{{ selectedPlanIds.length }}</span>
-              </div>
-              <div class="batch-summary-item">
-                <span class="batch-summary-label">{{ $t('customs.batch.totalValue') }}</span>
-                <span class="batch-summary-value money">
-                  {{ $t('common.currency.cny') }}{{ batchTotalValueCny?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '0.00' }}
-                </span>
-              </div>
-            </div>
           </el-col>
         </el-row>
       </div>
@@ -334,14 +318,12 @@ const form = reactive<CustomsCreateRequest>({
 // 批量创建表单（v1.4.0）
 const batchForm = reactive({
   containerNo: '',
+  estimatedValueCny: undefined as number | undefined,
   remarks: '',
 })
-const batchPlanList = ref<(LogisticsPlanVO & { overrideValueCny?: number; customsCreated?: boolean })[]>([])
-const batchSelectedRows = ref<(LogisticsPlanVO & { overrideValueCny?: number; customsCreated?: boolean })[]>([])
+const batchPlanList = ref<(LogisticsPlanVO & { customsCreated?: boolean })[]>([])
+const batchSelectedRows = ref<(LogisticsPlanVO & { customsCreated?: boolean })[]>([])
 const selectedPlanIds = computed(() => batchSelectedRows.value.map(r => r.id!))
-const batchTotalValueCny = computed(() =>
-  batchSelectedRows.value.reduce((sum, r) => sum + (r.overrideValueCny ?? 0), 0)
-)
 
 const statusCount = computed(() => {
   const counts: Record<string, number> = { PENDING: 0, SUBMITTED: 0, CLEARED: 0, REJECTED: 0 }
@@ -435,7 +417,6 @@ async function onBatchContainerSelect(containerNo: string) {
     )
     batchPlanList.value = plans.map(p => ({
       ...p,
-      overrideValueCny: undefined,
       customsCreated: existingContainerNos.has(p.productCode + '-' + (p.subProductCode ?? '')),
     }))
     batchSelectedRows.value = []
@@ -458,6 +439,7 @@ function onNew() {
   const urlContainerNo = route.query.containerNo as string | undefined
   Object.assign(batchForm, {
     containerNo: urlContainerNo ?? '',
+    estimatedValueCny: undefined,
     remarks: '',
   })
   Object.assign(form, {
@@ -490,6 +472,7 @@ async function onBatchSubmit() {
     const req: CustomsBatchCreateRequest = {
       containerNo: batchForm.containerNo,
       logisticsPlanIds: selectedPlanIds.value,
+      estimatedValueCny: batchForm.estimatedValueCny,
       remarks: batchForm.remarks || undefined,
     }
     const res = await customsApi.batchCreate(req)
@@ -627,8 +610,5 @@ watch(tableData, () => {
 .batch-hint { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
 .batch-plan-table { margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; }
 .batch-footer { background: var(--bg-page); border-radius: var(--radius-sm); padding: 12px 4px; }
-.batch-summary { display: flex; flex-direction: column; gap: 8px; }
-.batch-summary-item { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.batch-summary-label { font-size: 13px; color: var(--text-secondary); }
-.batch-summary-value { font-size: 20px; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.batch-count-display { font-size: 22px; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; line-height: 32px; }
 </style>

@@ -1315,6 +1315,7 @@
       "subProductCodePlaceholder": "枝番を入力",
       "quantity": "数量",
       "estimatedValueCny": "想定価格(CNY)",
+      "estimatedValueCnyPlaceholder": "想定価格を入力",
       "factoryId": "工場ID",
       "factoryIdPlaceholder": "工場IDを入力",
       "remarks": "備考",
@@ -1336,6 +1337,7 @@
       "selectedCount": "{n}件選択済",
       "selectedPlans": "選択した計画",
       "totalValue": "合計金額",
+      "items": "件",
       "createButton": "一括作成 ({n})"
     },
     "message": {
