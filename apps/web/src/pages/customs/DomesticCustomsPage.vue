@@ -137,11 +137,16 @@
     <!-- 新规创建弹窗 -->
     <el-dialog v-model="dialogVisible" :title="$t('customs.newDialogTitle')" width="640px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="formRules" label-width="110px">
-        <el-form-item :label="$t('customs.dialog.procurementId')" prop="procurementId">
-          <el-input-number v-model="form.procurementId" :min="1" :placeholder="$t('customs.dialog.procurementIdPlaceholder')" style="width:100%" />
+        <el-form-item :label="$t('customs.dialog.containerNo')" prop="containerNo">
+          <el-input
+            v-model="form.containerNo"
+            :placeholder="$t('customs.dialog.containerNoPlaceholder')"
+            maxlength="32"
+            @change="onContainerNoChange"
+          />
         </el-form-item>
-        <el-form-item :label="$t('customs.dialog.containerNo')">
-          <el-input v-model="form.containerNo" :placeholder="$t('customs.dialog.containerNoPlaceholder')" />
+        <el-form-item :label="$t('customs.dialog.procurementId')">
+          <el-input-number v-model="form.procurementId" :min="1" :placeholder="$t('customs.dialog.procurementIdPlaceholder')" style="width:100%" />
         </el-form-item>
         <el-form-item :label="$t('customs.dialog.productCode')" prop="productCode">
           <el-input v-model="form.productCode" :placeholder="$t('customs.dialog.productCodePlaceholder')" />
@@ -229,6 +234,7 @@ import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Document, Clock, Top, CircleCheck } from '@element-plus/icons-vue'
 import { customsApi, type CustomsVO, type DomesticCustomsStatus, type CustomsCreateRequest } from '@/api/customs'
+import { logisticsApi } from '@/api/logistics'
 import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
@@ -266,6 +272,7 @@ const form = reactive<CustomsCreateRequest>({
 })
 
 const formRules: FormRules = {
+  containerNo: [{ required: true, message: () => t('customs.validation.containerNoRequired'), trigger: 'blur' }],
   productCode: [{ required: true, message: () => t('customs.validation.productCodeRequired'), trigger: 'blur' }],
 }
 
@@ -343,7 +350,33 @@ function onNew() {
     estimatedValueCny: undefined,
     remarks: undefined,
   })
+  // URL 参数有货柜号时自动填入 LogisticsPlan 信息
+  if (urlContainerNo) {
+    fillFromLogisticsPlan(urlContainerNo)
+  }
   dialogVisible.value = true
+}
+
+async function onContainerNoChange() {
+  if (!form.containerNo) return
+  await fillFromLogisticsPlan(form.containerNo)
+}
+
+async function fillFromLogisticsPlan(containerNo: string) {
+  try {
+    const res = await logisticsApi.list({ containerNo, pageSize: 1 })
+    const list = res.data.data?.content ?? []
+    if (list.length > 0) {
+      const plan = list[0]
+      form.procurementId = plan.procurementId
+      form.factoryId = plan.factoryId
+      form.productCode = plan.productCode
+      form.subProductCode = plan.subProductCode ?? undefined
+      form.quantity = plan.quantity ?? undefined
+    }
+  } catch (e) {
+    // 查不到也没关系，用户手动填
+  }
 }
 
 async function onSubmitForm() {

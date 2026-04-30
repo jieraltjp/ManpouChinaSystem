@@ -1316,6 +1316,7 @@
       "reasonPlaceholder": "请输入驳回原因"
     },
     "validation": {
+      "containerNoRequired": "货柜号不能为空",
       "productCodeRequired": "请输入货号"
     },
     "message": {

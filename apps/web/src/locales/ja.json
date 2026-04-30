@@ -121,6 +121,8 @@
       "delete": "削除"
     },
     "message": {
+      "createSuccess": "需要の入力が完了しました",
+      "updateSuccess": "更新が完了しました",
       "loadFailed": "読み込みに失敗しました，再試行してください",
       "deleteSuccess": "削除が完了しました",
       "deleteConfirm": "需要「{code}」を削除しますか？",
@@ -147,8 +149,15 @@
       "save": "保存",
       "colorCount": "{count}色展開",
       "selectColorVariant": "カラーを選択",
-      "entryMode": { "single": "単一入力", "batch": "一括入力" },
-      "section": { "basic": "基本情報", "detail": "需要明细", "extra": "補充情報" },
+      "entryMode": {
+        "single": "単一入力",
+        "batch": "一括入力"
+      },
+      "section": {
+        "basic": "基本情報",
+        "detail": "需要明细",
+        "extra": "補充情報"
+      },
       "batchHint": "同一主品番の複数子品番を各自的数量・出荷先で一度に作成する場合に使用",
       "selectMasterCodeFirst": "先に主品番を選択してください",
       "addSubItem": "子品番を追加",
@@ -179,16 +188,6 @@
       "productCodeRequired": "主品番は必須です",
       "quantityRequired": "需要数量は必須です",
       "subProductItemsRequired": "子品番明細を1件以上入力してください"
-    },
-    "message": {
-      "createSuccess": "需要の入力が完了しました",
-      "updateSuccess": "更新が完了しました",
-      "loadFailed": "読み込みに失敗しました，再試行してください",
-      "deleteSuccess": "削除が完了しました",
-      "deleteConfirm": "需要「{code}」を削除しますか？",
-      "deleteConfirmTitle": "削除確認",
-      "unlinkedSuccess": "関連を解除しました，需要は未確認状態に戻りました",
-      "pleaseLinkInProcurement": "発注書ページで関連付けてください"
     }
   },
   "order": {
@@ -630,7 +629,14 @@
       "createCustoms": "通関作成"
     },
     "message": {
-      "containerNoRequiredForCustoms": "先にコンテナ番号を入力してから通関を作成してください"
+      "loadFailed": "配送計画の読み込みに失敗しました",
+      "createSuccess": "配送計画の作成が完了しました",
+      "createFailed": "配送計画の作成に失敗しました",
+      "updateSuccess": "配送計画の更新が完了しました",
+      "updateFailed": "配送計画の更新に失敗しました",
+      "deleteConfirm": "配送計画「{code}」を削除しますか？",
+      "deleteSuccess": "配送計画の削除が完了しました",
+      "deleteFailed": "配送計画の削除に失敗しました"
     },
     "requiresQc": {
       "yes": "検品要",
@@ -678,16 +684,6 @@
       "procurementRequired": "関連発注書を選択してください",
       "productCodeRequired": "品番を入力してください",
       "planTypeRequired": "配送タイプを選択してください"
-    },
-    "message": {
-      "loadFailed": "配送計画の読み込みに失敗しました",
-      "createSuccess": "配送計画の作成が完了しました",
-      "createFailed": "配送計画の作成に失敗しました",
-      "updateSuccess": "配送計画の更新が完了しました",
-      "updateFailed": "配送計画の更新に失敗しました",
-      "deleteConfirm": "配送計画「{code}」を削除しますか？",
-      "deleteSuccess": "配送計画の削除が完了しました",
-      "deleteFailed": "配送計画の削除に失敗しました"
     }
   },
   "factory": {
@@ -1130,35 +1126,70 @@
     },
     "enum": {
       "procurement": {
-        "未定": "未定", "予定": "予定", "OEM": "OEM", "発注待": "発注待",
-        "永康": "永康", "直送": "直送", "倉庫着": "倉庫着", "現地検品": "現地検品",
-        "検品": "検品", "エア便": "エア便", "メーカー直送": "メーカー直送",
-        "輸出": "輸出", "国内通関": "国内通関", "通関": "通関", "日本着": "日本着",
-        "日本通関完了": "日本通関完了", "会計": "会計", "完了": "完了", "退货": "退货"
+        "未定": "未定",
+        "予定": "予定",
+        "OEM": "OEM",
+        "発注待": "発注待",
+        "永康": "永康",
+        "直送": "直送",
+        "倉庫着": "倉庫着",
+        "現地検品": "現地検品",
+        "検品": "検品",
+        "エア便": "エア便",
+        "メーカー直送": "メーカー直送",
+        "輸出": "輸出",
+        "国内通関": "国内通関",
+        "通関": "通関",
+        "日本着": "日本着",
+        "日本通関完了": "日本通関完了",
+        "会計": "会計",
+        "完了": "完了",
+        "退货": "退货"
       },
       "logistics": {
-        "PLANNED": "作成済", "BOOKED": "予約済", "IN_TRANSIT": "輸送中", "DELIVERED": "配達済"
+        "PLANNED": "作成済",
+        "BOOKED": "予約済",
+        "IN_TRANSIT": "輸送中",
+        "DELIVERED": "配達済"
       },
       "domesticCustoms": {
-        "PENDING": "未提出", "SUBMITTED": "提出済", "CLEARED": "通関済", "REJECTED": "却下済"
+        "PENDING": "未提出",
+        "SUBMITTED": "提出済",
+        "CLEARED": "通関済",
+        "REJECTED": "却下済"
       },
       "japanCustoms": {
-        "PENDING": "未通関", "IN_PROGRESS": "通関中", "CLEARED": "通関完了", "FAILED": "通関失敗"
+        "PENDING": "未通関",
+        "IN_PROGRESS": "通関中",
+        "CLEARED": "通関完了",
+        "FAILED": "通関失敗"
       },
       "taxRefund": {
-        "APPLYING": "申請中", "COMPLETED": "完了", "NO_REFUND": "退税なし"
+        "APPLYING": "申請中",
+        "COMPLETED": "完了",
+        "NO_REFUND": "退税なし"
       },
       "sales": {
-        "LISTED": "上架中", "LOW_STOCK": "在庫警告", "OUT_OF_STOCK": "在庫切れ", "DISCONTINUED": "販売停止"
+        "LISTED": "上架中",
+        "LOW_STOCK": "在庫警告",
+        "OUT_OF_STOCK": "在庫切れ",
+        "DISCONTINUED": "販売停止"
       },
       "planType": {
-        "SEA": "船便", "AIR": "航空便"
+        "SEA": "船便",
+        "AIR": "航空便"
       },
       "billingType": {
-        "ZHE_LU_KAI_PIAO": "浙魯開票", "CHAO_HUI_TUI_SHUI": "超慧退税", "NO_REFUND": "退税なし", "OTHER": "その他"
+        "ZHE_LU_KAI_PIAO": "浙魯開票",
+        "CHAO_HUI_TUI_SHUI": "超慧退税",
+        "NO_REFUND": "退税なし",
+        "OTHER": "その他"
       },
       "salesChannel": {
-        "AMAZON": "Amazon", "MERCALI": "メルカリ", "SELF_SITE": "自社サイト", "OTHER": "その他"
+        "AMAZON": "Amazon",
+        "MERCALI": "メルカリ",
+        "SELF_SITE": "自社サイト",
+        "OTHER": "その他"
       }
     }
   },
@@ -1288,7 +1319,8 @@
       "reasonPlaceholder": "却下理由を入力"
     },
     "validation": {
-      "productCodeRequired": "商品コードは必須です"
+      "productCodeRequired": "商品コードは必須です",
+      "containerNoRequired": "コンテナ番号は必須です"
     },
     "message": {
       "loadFailed": "通関書類一覧の読み込みに失敗しました",

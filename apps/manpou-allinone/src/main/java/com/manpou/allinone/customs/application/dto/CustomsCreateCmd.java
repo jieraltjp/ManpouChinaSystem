@@ -12,7 +12,8 @@ import java.math.BigDecimal;
 @Data
 public class CustomsCreateCmd {
 
-    private String containerNo;   // 货柜号（v1.3.0）
+    @NotBlank(message = "货柜号不能为空")
+    private String containerNo;   // 货柜号（v1.4.0 必填）
 
     private Long procurementId;
 
