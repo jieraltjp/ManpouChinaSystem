@@ -51,6 +51,12 @@ git pull origin main && ./scripts/start-all.sh
 | `./scripts/restart-all.sh` | 重启（先停后启） |
 | `./scripts/build-all.sh` | 编译所有微服务 JAR |
 
+> **Profile 自动选择：** `start-all.sh` 会自动检测 OS：
+> - Windows (git-bash): 使用 `local` profile（H2 内存数据库）
+> - Linux (Ubuntu Server): 使用 `development` profile（连接远程 MySQL `192.168.13.202:23306`）
+>
+> 可通过环境变量覆盖：`SPRING_PROFILES_ACTIVE=local ./scripts/start-all.sh`
+
 **日志文件：** `logs/<服务名>.log`
 **PID 文件：** `logs/<服务名>.pid`
 
@@ -249,7 +255,14 @@ nohup npm run dev > /opt/ManpouChinaSystem/logs/web.log 2>&1 &
 | Profile | 用途 | 数据库 | Redis |
 |---------|------|--------|-------|
 | `local` | Windows 本地开发 | H2 内存 / 本地 MySQL | 本地 |
-| `development` | Ubuntu 开发服务器 | 远程 MySQL `192.168.13.202:23306` | 本地 `localhost:6379` |
+| `development` | Ubuntu 开发服务器 | 远程 MySQL `192.168.13.202:23306` | Docker `localhost:6379` |
+
+**配置文件：**
+
+- `application.yml` — 默认配置，包含 Redis、Nacos（均 disabled）、日志格式等公共配置
+- `application-development.yml` — Ubuntu Server 专用，覆盖数据库连接（远程 MySQL）、禁用 Redis auto-config（Nacos 暂未启用）
+
+> Nacos 服务注册（`spring.cloud.nacos.discovery.enabled=true`）目前与 Phase 0 单体架构存在 auto-configuration 耦合问题，将在 Phase B 微服务拆分时一并解决。Phase B 启用时需同时配置 Nacos Config 初始化。详见 TROUBLESHOOT.md。
 
 ---
 

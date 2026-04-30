@@ -122,6 +122,23 @@ docker stop redis kafka nacos && docker rm redis kafka nacos
 # 然后重新执行上方 "启动基础设施" 步骤
 ```
 
+### 验证
+
+```bash
+# Nacos 就绪（返回 {"status":"UP"}）
+curl http://localhost:8848/nacos/v1/ns/operator/metrics
+
+# Kafka 连接（需先进入容器）
+docker exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+# 创建 Kafka topic
+docker exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 \
+  --create --topic procurement-orders --partitions 1 --replication-factor 1
+
+# Nacos 控制台登录（用户名 nacos，密码 manpou）
+# http://192.168.13.123:8080/next/
+```
+
 ---
 
 ## 编译
