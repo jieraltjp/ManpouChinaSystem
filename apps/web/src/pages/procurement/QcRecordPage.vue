@@ -401,6 +401,8 @@
                 :preview-src-list="drawerImages.map(i => i.url)"
                 fit="cover"
                 class="drawer-image-thumb"
+                :lazy="false"
+                @error="(e: Event) => console.error('[QC-Image] load failed, id=' + img.id + ', url=' + img.url, e)"
               />
             </div>
           </template>
@@ -540,9 +542,16 @@ function onImageChange(file: { name: string; raw: File; uid: number }, fileList:
   }
 }
 
-function onImageRemove(file: { name: string; raw?: File; uid: number }) {
-  uploadFileList.value = uploadFileList.value.filter(f => !(f.name === file.name && f.raw === file.raw))
-  URL.revokeObjectURL(file.name)
+function onImageRemove(file: { id?: number; name: string; raw?: File; uid: number }) {
+  // 已有图片（有 id）：按 id 匹配
+  if (file.id != null) {
+    uploadFileList.value = uploadFileList.value.filter(f => f.id !== file.id)
+  } else {
+    // 本地新图片（无 id）：按 name + raw 匹配
+    uploadFileList.value = uploadFileList.value.filter(
+      f => !(f.name === file.name && f.raw === file.raw)
+    )
+  }
 }
 
 async function loadData() {
