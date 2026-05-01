@@ -1257,6 +1257,11 @@
     "view": "詳細",
     "warning": "警告",
     "close": "閉じる",
+    "success": "操作完了",
+    "button": {
+      "search": "検索",
+      "reset": "リセット"
+    },
     "loading": "読み込み中...",
     "noData": "データがありません",
     "back": "戻る",
