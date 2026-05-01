@@ -21,8 +21,6 @@ public class UserVO {
     private String departmentName;
     private List<PositionVO> positions;
     private List<RoleSimpleVO> roles;
-    private String customsCode;
-    private String customsLicense;
     private String language;
     private String timezone;
     private Integer status;

@@ -125,8 +125,6 @@ Tab 3 - 偏好设置：
 | `profile.info.company` | 所属公司 | 所属会社 |
 | `profile.info.department` | 所属部门 | 所属部門 |
 | `profile.info.positions` | 职务 | 役職 |
-| `profile.info.customsCode` | 报关员备案号 | 通関士登録番号 |
-| `profile.info.customsLicense` | 报关员证号 | 通関士資格番号 |
 | `profile.info.status` | 账号状态 | アカウントステータス |
 | `profile.info.createdAt` | 创建时间 | 作成日時 |
 | `profile.info.lastLogin` | 最后登录 | 最終ログイン |

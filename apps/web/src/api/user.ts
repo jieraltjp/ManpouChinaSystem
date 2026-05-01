@@ -21,8 +21,6 @@ export interface UserVO {
   departmentName?: string
   positions?: PositionVO[]
   roles?: RoleSimpleVO[]
-  customsCode?: string
-  customsLicense?: string
   language?: string
   timezone?: string
   status: number
@@ -80,8 +78,6 @@ export interface UserCreateCmd {
   companyId?: number
   departmentId?: number
   roleIds?: number[]
-  customsCode?: string
-  customsLicense?: string
   language?: string
   timezone?: string
 }
@@ -93,8 +89,6 @@ export interface UserUpdateCmd {
   phone?: string
   companyId?: number
   departmentId?: number
-  customsCode?: string
-  customsLicense?: string
   language?: string
   timezone?: string
 }

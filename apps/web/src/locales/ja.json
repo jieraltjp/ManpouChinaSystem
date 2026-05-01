@@ -1822,8 +1822,6 @@
       "company": "所属会社",
       "department": "所属部門",
       "positions": "役職",
-      "customsCode": "通関士登録番号",
-      "customsLicense": "通関士資格番号",
       "role": "役割",
       "password": "初期パスワード",
       "newPassword": "新しいパスワード",

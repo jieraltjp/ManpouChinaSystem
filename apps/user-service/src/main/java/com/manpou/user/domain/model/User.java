@@ -45,12 +45,6 @@ public class User extends BaseEntity {
     @Column(name = "department_id")
     private Long departmentId;
 
-    @Column(name = "customs_code")
-    private String customsCode;
-
-    @Column(name = "customs_license")
-    private String customsLicense;
-
     @Column(name = "language")
     private String language = "zh";
 

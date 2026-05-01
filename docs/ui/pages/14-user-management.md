@@ -193,8 +193,6 @@
 | `user.dialog.company` | 所属公司 | 所属会社 |
 | `user.dialog.department` | 所属部門 | 所属部門 |
 | `user.dialog.positions` | 职务 | 役職 |
-| `user.dialog.customsCode` | 报关员备案号 | 通関士登録番号 |
-| `user.dialog.customsLicense` | 报关员证号 | 通関士資格番号 |
 | `user.dialog.role` | 角色 | 役割 |
 | `user.dialog.password` | 初始密码 | 初期パスワード |
 | `user.dialog.newPassword` | 新密码 | 新しいパスワード |

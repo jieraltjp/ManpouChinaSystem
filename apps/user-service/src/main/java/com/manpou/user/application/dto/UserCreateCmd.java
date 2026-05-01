@@ -32,8 +32,6 @@ public class UserCreateCmd {
     private Long departmentId;
     private List<Long> positionIds;
     private List<Long> roleIds;
-    private String customsCode;
-    private String customsLicense;
     private String language = "zh";
     private String timezone = "CST";
 }

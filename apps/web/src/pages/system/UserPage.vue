@@ -145,8 +145,6 @@
           </template>
           <span v-else>—</span>
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('user.dialog.customsCode')">{{ currentUser?.customsCode || '—' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('user.dialog.customsLicense')">{{ currentUser?.customsLicense || '—' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('user.column.lastLoginTime')">{{ currentUser?.lastLoginTime || '—' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('user.column.lastLoginIp')">{{ currentUser?.lastLoginIp || '—' }}</el-descriptions-item>
       </el-descriptions>
@@ -172,12 +170,6 @@
         </el-form-item>
         <el-form-item :label="$t('user.dialog.phone')" prop="phone">
           <el-input v-model="editForm.phone" :placeholder="$t('user.dialog.phone')" />
-        </el-form-item>
-        <el-form-item :label="$t('user.dialog.customsCode')" prop="customsCode">
-          <el-input v-model="editForm.customsCode" :placeholder="$t('user.dialog.customsCode')" />
-        </el-form-item>
-        <el-form-item :label="$t('user.dialog.customsLicense')" prop="customsLicense">
-          <el-input v-model="editForm.customsLicense" :placeholder="$t('user.dialog.customsLicense')" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -303,7 +295,7 @@ function onReset() {
 
 function onNew() {
   editMode.value = 'create'
-  Object.assign(editForm, { username: '', password: '', nameCn: '', nameJp: '', email: '', phone: '', customsCode: '', customsLicense: '' })
+  Object.assign(editForm, { username: '', password: '', nameCn: '', nameJp: '', email: '', phone: '' })
   editVisible.value = true
 }
 
@@ -316,8 +308,6 @@ async function onEdit(row: UserVO) {
     nameJp: full.nameJp ?? '',
     email: full.email ?? '',
     phone: full.phone ?? '',
-    customsCode: full.customsCode ?? '',
-    customsLicense: full.customsLicense ?? '',
   })
   editVisible.value = true
 }

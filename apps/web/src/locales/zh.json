@@ -1815,8 +1815,6 @@
       "company": "所属公司",
       "department": "所属部门",
       "positions": "职务",
-      "customsCode": "报关员备案号",
-      "customsLicense": "报关员证号",
       "role": "角色",
       "password": "初始密码",
       "newPassword": "新密码",

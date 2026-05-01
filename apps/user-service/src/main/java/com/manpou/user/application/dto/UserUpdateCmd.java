@@ -13,8 +13,6 @@ public class UserUpdateCmd {
     private Long companyId;
     private Long departmentId;
     private List<Long> positionIds;
-    private String customsCode;
-    private String customsLicense;
     private String language;
     private String timezone;
 }

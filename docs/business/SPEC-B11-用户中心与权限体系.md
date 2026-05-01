@@ -239,10 +239,6 @@ CREATE TABLE user (
   company_id       BIGINT       COMMENT '所属公司 FK → company.id',
   department_id    BIGINT       COMMENT '所属部门 FK → department.id',
 
-  -- 海关资质（可多人共用同一报关资质）
-  customs_code     VARCHAR(64)  COMMENT '报关员备案号',
-  customs_license  VARCHAR(128) COMMENT '报关员证号',
-
   -- 偏好
   language         VARCHAR(8)   DEFAULT 'zh',
   timezone         VARCHAR(16)  DEFAULT 'CST',
@@ -757,7 +753,7 @@ public boolean canLogin(User user) {
 - GET 请求（查询类）
 - 健康检查、活跃检测等系统级请求
 - 密码明文（hash 值也不记录）
-- 敏感字段（passwordHash, customsLicense 等）
+- 敏感字段（passwordHash 等）
 
 ### 6.3 实现方式
 
