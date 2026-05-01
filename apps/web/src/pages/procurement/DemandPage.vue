@@ -47,7 +47,7 @@
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('demand.filter.productCode')">
-          <el-input v-model="filterForm.productCode" :placeholder="$t('demand.dialog.productCodePlaceholder')" clearable style="width:140px" />
+          <el-input v-model="filterForm.keyword" :placeholder="$t('demand.dialog.productCodePlaceholder')" clearable style="width:140px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="loadData">{{ $t('demand.filter.search') }}</el-button>
@@ -412,7 +412,7 @@ const formRef = ref<FormInstance>()
 const { t, locale: localeRef } = useI18n()
 const currentLocale = computed(() => localeRef.value)
 
-const filterForm = reactive({ demandType: '', productCode: '' })
+const filterForm = reactive({ demandType: '', keyword: '' })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const tableData = ref<DemandPageVO[]>([])
 const productCategoryMap = ref<Record<string, string>>({}) // productCode -> category
@@ -476,7 +476,7 @@ async function loadData() {
       page: pagination.page - 1,
       pageSize: pagination.pageSize,
       demandType: filterForm.demandType || undefined,
-      productCode: filterForm.productCode.trim() || undefined,
+      keyword: filterForm.keyword.trim() || undefined,
     })
     const payload = res.data as { content: DemandPageVO[]; totalElements: number }
     tableData.value = payload.content || []
@@ -489,7 +489,7 @@ async function loadData() {
 
 function onReset() {
   filterForm.demandType = ''
-  filterForm.productCode = ''
+  filterForm.keyword = ''
   pagination.page = 1
   loadData()
 }

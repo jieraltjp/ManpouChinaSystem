@@ -52,8 +52,8 @@ public class ReplenishmentDemandUseCase {
         Page<ReplenishmentDemand> page;
         if (query.getDemandType() != null) {
             page = demandRepository.findByDemandTypeAndDeletedIsFalse(query.getDemandType(), pageRequest);
-        } else if (query.getProductCode() != null && !query.getProductCode().isBlank()) {
-            page = demandRepository.findByProductCodeAndDeletedIsFalse(query.getProductCode(), pageRequest);
+        } else if (query.getKeyword() != null && !query.getKeyword().isBlank()) {
+            page = demandRepository.findByProductCodeOrSubProductCodeFuzzy(query.getKeyword().trim(), pageRequest);
         } else {
             page = demandRepository.findAllByDeletedIsFalse(pageRequest);
         }

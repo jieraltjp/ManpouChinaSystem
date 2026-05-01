@@ -9,5 +9,5 @@ public class ReplenishmentDemandQuery {
     private Integer page = 0;
     private Integer pageSize = 20;
     private DemandType demandType;
-    private String productCode;
+    private String keyword;
 }

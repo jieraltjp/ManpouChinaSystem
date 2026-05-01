@@ -28,6 +28,16 @@ public interface ReplenishmentDemandRepository extends JpaRepository<Replenishme
 
     Page<ReplenishmentDemand> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
 
+    /**
+     * 货号模糊搜索：同时匹配主货号和子货号（OR）。
+     * 查询条件：deleted=false AND (productCode LIKE %keyword% OR subProductCode LIKE %keyword%)
+     */
+    @org.springframework.data.jpa.repository.Query(
+        "SELECT d FROM ReplenishmentDemand d WHERE d.deleted = false " +
+        "AND (LOWER(d.productCode) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+        "OR  LOWER(d.subProductCode) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<ReplenishmentDemand> findByProductCodeOrSubProductCodeFuzzy(@org.springframework.data.repository.query.Param("keyword") String keyword, Pageable pageable);
+
     List<ReplenishmentDemand> findAllByIdInAndDeletedIsFalse(List<Long> ids);
 
     @Query("SELECT DISTINCT d.destination FROM ReplenishmentDemand d WHERE d.deleted = false AND d.destination IS NOT NULL AND d.destination <> '' ORDER BY d.destination")

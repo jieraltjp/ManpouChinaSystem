@@ -364,10 +364,10 @@
           <template v-else>
             <div class="drawer-images">
               <el-image
-                v-for="(url, i) in (currentRow.images || '').split('\n').filter(Boolean)"
+                v-for="(url, i) in drawerImageList"
                 :key="i"
                 :src="url"
-                :preview-src-list="(currentRow.images || '').split('\n').filter(Boolean)"
+                :preview-src-list="drawerImageList"
                 fit="cover"
                 class="drawer-image-thumb"
               />
@@ -463,6 +463,16 @@ const formRules: FormRules = {
 
 const passCount = computed(() => tableData.value.filter(r => r.result === 'PASS').length)
 const failCount = computed(() => tableData.value.filter(r => r.result === 'FAIL').length)
+
+const drawerImageList = computed(() => {
+  return (currentRow.value?.images || '')
+    .split('\n')
+    .filter(Boolean)
+    .map(url => url.includes('.cos.') && !url.includes('response-content-disposition')
+      ? (url.includes('?') ? url + '&response-content-disposition=inline' : url + '?response-content-disposition=inline')
+      : url
+    )
+})
 
 const boxDimension = computed(() => {
   const r = currentRow.value

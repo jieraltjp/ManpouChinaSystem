@@ -60,7 +60,7 @@ export interface UpdateDemandRequest {
 }
 
 export const demandApi = {
-  list(params: { page?: number; pageSize?: number; demandType?: string; productCode?: string }) {
+  list(params: { page?: number; pageSize?: number; demandType?: string; keyword?: string }) {
     return client.get<DemandPageResponse>('/demands', { params })
   },
   get(id: number) {
