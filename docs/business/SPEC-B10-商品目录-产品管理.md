@@ -382,7 +382,7 @@ throw BusinessException.conflict(
 | `box_desc` 尺寸解析 | **P1** | 部分 `box_desc` 含尺寸（如 `193*23*28cm`）需正则提取至 `package_*_cm` |
 | `sub_code` 命名规范 | P1 | 颜色代码标准化（re=红/bl=蓝/wt=白/...） |
 | warehouse 填充 | **P1** | 已清空，需从商品分类标签提取仓库归属 |
-| 图片存储方案 | P1 | OSS / MinIO / 数据库 BLOB |
+| 图片存储方案 | ~~P1~~ ✅ | 已实施：腾讯云 COS（参考 SPEC-C12） |
 | 各工厂单价差异 | P2 | `product_factory.unit_price_rmb` 是否支持不同工厂不同价 |
 | ✅ `goods_master` 等已删除 | — | 原始数据表已从 MySQL 删除，数据已迁移完毕 |
 | ✅ hs_code / hs_code_jp | — | 已通过 V30 直接 MySQL 迁移完成（CN HS: 2003 条，JP HS: 629 条） |

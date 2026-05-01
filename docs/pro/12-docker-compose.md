@@ -2,7 +2,7 @@
 
 > **文档角色**：架构师 + 运维工程师视角
 > **对应目录**：`docker/`
-> **用途**：本地开发环境基础设施（TiDB / Redis / Kafka / Nacos / MinIO）
+> **用途**：本地开发环境基础设施（MySQL / Redis / Kafka / Nacos）；对象存储使用腾讯云 COS（远程）
 
 ---
 
@@ -26,7 +26,7 @@
 | **Redis** | redis:7 | 6379 | 缓存 + 会话 |
 | **Kafka** | apache/kafka:3.8.0 | 9092 (ext:29092) | 消息队列（KRaft 模式，无需 ZK） |
 | **Nacos** | nacos/nacos-server:v2.3.3 | 8848 (ext:8848) | 配置中心 + 注册中心 |
-| **MinIO** | minio/minio | 9000 (ext:9001) | 对象存储（文件/照片） |
+| ~~MinIO~~ | ~~minio/minio~~ | ~~9000~~ | ⚠️ 已迁移至腾讯云 COS（远程，无需本地） |
 | **Prometheus** | prom/prometheus:v2.55.0 | 9090 | 指标采集 |
 | **Grafana** | grafana/grafana:12.0.0 | 3000 | 可视化监控 |
 | **OTel Collector** | otel/opentelemetry-collector-contrib:0.103.0 | 4317 (grpc) / 4318 (http) | 链路追踪采集 |
@@ -75,7 +75,7 @@ TiDB（MySQL 兼容）启动后可直接连接，无需手动执行初始化 SQL
 | 前端（通过网关） | http://localhost:13000 | — |
 | Nacos | http://localhost:8848/nacos | nacos/nacos |
 | Kafka UI | http://localhost:8090 | — |
-| MinIO Console | http://localhost:9001 | minioadmin/minioadmin123 |
+| ~~MinIO Console~~ | ~~http://localhost:9001~~ | ~~minioadmin/minioadmin123~~ | ⚠️ 已迁移至腾讯云 COS 控制台 |
 | Prometheus | http://localhost:9090 | — |
 | Grafana | http://localhost:3000 | admin/admin |
 | Tempo | http://localhost:3200 | — |

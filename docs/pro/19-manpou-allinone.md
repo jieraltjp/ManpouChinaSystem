@@ -184,9 +184,9 @@ product.UseCase  → Kafka Topic (warehouse-events)  ✅ 正确解耦
 
 ## 6. 数据库
 
-- **开发**：H2 内存（`jdbc:h2:mem:allinone`），不依赖 Docker
+- **开发**：MySQL 8（`192.168.13.202:23306`，本地 `application-local.yml` 覆盖）；H2 仅保留于测试 scope
 - **迁移**：Flyway（`db/migration/V*.sql`，当前禁用）；JPA `ddl-auto: update` 管理开发期 schema
-- **表**：`product_example`, `warehouse_example`, `customs_example`, `logistics_example`, `finance_example`, `notification_example`, `signing_key`, `outbox`
+- **表**（47个迁移）：`product`, `factory`, `replenishment_demand`, `procurement`, `procurement_snapshot`, `demand_procurement_mapping`, `qc_record`, `qc_image`, `logistics_plan`, `container`, `consolidation_pool`, `domestic_customs_record`, `japan_customs_record`, `tax_refund_record`, `sales_record`, `shipment_batch`, `signing_key`, `outbox` 等
 
 ---
 

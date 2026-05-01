@@ -47,7 +47,7 @@ src/main/java/com/manpou/allinone/
             └── ProcurementController.java  # /api/v1/procurements
 
 src/main/resources/
-└── application.yml                    # 18090 端口，H2 内存数据库
+└── application.yml                    # 18090 端口，MySQL 数据库
 ```
 
 ---
@@ -163,8 +163,8 @@ procurement.resetToUndecided();
 
 ## 7. 数据库
 
-- **开发**：H2 内存（`jdbc:h2:mem:allinone`）
-- **表**：`procurement`
+- **开发**：MySQL 8（`192.168.13.202:23306`，通过 `application-local.yml` 覆盖）
+- **表**：`procurement`, `procurement_snapshot`, `demand_procurement_mapping`
 - **迁移**：JPA `ddl-auto: update` 管理开发期 schema
 
 ---

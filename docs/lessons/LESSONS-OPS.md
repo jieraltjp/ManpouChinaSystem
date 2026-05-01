@@ -246,6 +246,18 @@ spring:
     active: local   # ← 激活 application-local.yml（MySQL 配置）
 ```
 
+### 实施记录（2026-05-01）
+
+| 操作 | 文件 | 说明 |
+|------|------|------|
+| MySQL | `application.yml` | `jdbc:h2:mem` → `jdbc:mysql://192.168.13.202:23306/manpou` |
+| MySQL | `application-local.yml` | 新增 datasource / JPA / logging 配置 |
+| MySQL | `pom.xml` | `mysql-connector-java` scope: test → compile |
+| H2 | `java-service/pom.xml` | 移除 H2 依赖 |
+| H2 | `manpou-allinone/pom.xml` | H2 依赖已移除 |
+
+**状态**：✅ 已解决（commit 1df2cc6）
+
 ### 预防
 
 - 运行时依赖不能用 `test` scope

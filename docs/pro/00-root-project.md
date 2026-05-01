@@ -69,7 +69,7 @@ ManpouChinaSystem/
 | UI 组件库 | Element Plus | 2.8+ |
 | 缓存 | Redis | 7 |
 | 消息队列 | Kafka | 3.8 |
-| 对象存储 | MinIO | latest |
+| 对象存储 | 腾讯云 COS | latest |
 | 服务注册/配置 | Nacos | - |
 | 链路追踪 | OTel + Grafana Tempo | - |
 
@@ -156,7 +156,7 @@ docker-compose -f docker-compose.yml up -d
 | AR-002 | 无服务间认证 | 🔴 高 | mTLS / JWT 内部传递 |
 | AR-003 | Kafka 消费者未实现 | 🔴 高 | 实现消费逻辑 |
 | AR-004 | Nacos 配置当前禁用 | 🟡 中 | 开发完成后接入 |
-| AR-005 | MinIO 未集成 | 🟡 中 | P1 接入 |
+| AR-005 | 腾讯云 COS 已集成（CosService + CosTestController） | ✅ 已解决 | — |
 
 ---
 

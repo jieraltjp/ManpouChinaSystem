@@ -76,12 +76,14 @@ public class CosService {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(file.getContentType());
             metadata.setContentLength(file.getSize());
+            // inline：让浏览器直接显示（预览），不弹出下载框
+            metadata.setContentDisposition("inline");
             PutObjectRequest putRequest = new PutObjectRequest(bucket, key, is, metadata);
 
             PutObjectResult putResult = getClient().putObject(putRequest);
             log.info("[COS] upload success, key={}, etag={}", key, putResult.getETag());
 
-            String url = cosConfig.getDomain() + "/" + key;
+            String url = cosConfig.getDomain() + "/" + key + "?response-content-disposition=inline";
             log.info("[COS] public url={}", url);
             return url;
         } catch (IOException e) {
@@ -130,6 +132,9 @@ public class CosService {
      */
     private String extractKey(String url) {
         if (url == null) return null;
+        // 去掉查询参数（?response-content-disposition=inline）
+        int q = url.indexOf('?');
+        if (q >= 0) url = url.substring(0, q);
         String domain = cosConfig.getDomain();
         if (domain != null && !domain.isBlank() && url.startsWith(domain)) {
             return url.substring(domain.length() + 1);

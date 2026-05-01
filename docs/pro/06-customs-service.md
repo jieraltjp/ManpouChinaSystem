@@ -2,6 +2,9 @@
 
 > **文档角色**：后端开发工程师视角 → 报关管理
 > **对应角色文档**：`docs/role/04-后端开发工程师视角分析.md`
+>
+> ⚠️ **已迁移**：报关模块已迁移至 `manpou-allinone`（端口 18090），不再独立部署。
+> 对象存储原计划 MinIO，已迁移至腾讯云 COS（参考 SPEC-C12）。
 
 ---
 
@@ -25,7 +28,7 @@
 | PACKING_LIST 生成 | P0 | 装箱单 |
 | ATTACHED_SHEET 生成 | P1 | 附页（面单） |
 | 单据确认 | P1 | 确认/驳回单据 |
-| 云端备份 | P2 | 单据 PDF 上传 MinIO |
+| 云端备份 | P2 | 单据 PDF 上传 COS（参考 SPEC-C12） |
 
 ---
 
@@ -76,7 +79,7 @@ CREATE TABLE export_document (
 - [ ] **本周**：设计出口单据表（V4__export_document_table.sql）
 - [ ] **下周二**：实现 INVOICE 生成 API
 - [ ] **下周三**：集成 PDF 生成（iText / OpenPDF）
-- [ ] **持续**：单据 PDF 对接 MinIO
+- [ ] **持续**：单据 PDF 对接 COS 存储（已由 SPEC-C12 提供基础设施）
 
 ---
 
