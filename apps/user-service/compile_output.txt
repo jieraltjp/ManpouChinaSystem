@@ -1,0 +1,587 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.manpou:user-service >-----------------------
+[INFO] Building com.manpou:user-service 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] Parameter 'gitSearchRepo' is unknown for plugin 'git-commit-id-maven-plugin:8.0.2:revision (default)'
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ user-service ---
+[INFO] Deleting D:\Programme\java\ManpouChinaSystem\apps\user-service\target
+[INFO] 
+[INFO] --- flatten:1.6.0:clean (flatten.clean) @ user-service ---
+[INFO] Deleting D:\Programme\java\ManpouChinaSystem\apps\user-service\.flattened-pom.xml
+[INFO] 
+[INFO] --- flatten:1.6.0:flatten (flatten) @ user-service ---
+[INFO] Generating flattened POM of project com.manpou:user-service:jar:1.0.0-SNAPSHOT...
+[INFO] 
+[INFO] --- git-commit-id:8.0.2:revision (default) @ user-service ---
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ user-service ---
+[INFO] Copying 19 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ user-service ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 37 source files with javac [debug release 21] to target\classes
+[INFO] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/infrastructure/security/JwtService.java: D:\Programme\java\ManpouChinaSystem\apps\user-service\src\main\java\com\manpou\user\infrastructure\security\JwtService.java使用了未???或不安全的操作。
+[INFO] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/infrastructure/security/JwtService.java: 有???信息, ?使用 -Xlint:unchecked 重新??。
+[INFO] 某些消息已???化; ?使用 -Xdiags:verbose 重新??以?得完整?出
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[12,8] ? RoleCreateCmd 是公共的, ?在名? RoleCreateCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[28,8] ? RoleUpdateCmd 是公共的, ?在名? RoleUpdateCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[36,8] ? RolePermissionsCmd 是公共的, ?在名? RolePermissionsCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[42,8] ? PermissionVO 是公共的, ?在名? PermissionVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[70,8] ? RoleVO 是公共的, ?在名? RoleVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[86,8] ? RoleSimpleVO 是公共的, ?在名? RoleSimpleVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[100,8] ? PermissionTreeVO 是公共的, ?在名? PermissionTreeVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[13,8] ? UserCreateCmd 是公共的, ?在名? UserCreateCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[45,8] ? UserUpdateCmd 是公共的, ?在名? UserUpdateCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[61,8] ? UserStatusCmd 是公共的, ?在名? UserStatusCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[67,8] ? PasswordResetCmd 是公共的, ?在名? PasswordResetCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[73,8] ? UserRolesCmd 是公共的, ?在名? UserRolesCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[79,8] ? UserVO 是公共的, ?在名? UserVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[122,8] ? UserPageQuery 是公共的, ?在名? UserPageQuery.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[134,8] ? UserPageVO 是公共的, ?在名? UserPageVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[144,8] ? PasswordResetVO 是公共的, ?在名? PasswordResetVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[62,17] 找不到符号
+  符号:   ?量 log
+  位置: ? com.manpou.user.application.KeyManagementService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[62,65] 找不到符号
+  符号:   方法 getKid()
+  位置: ?型?com.manpou.user.domain.model.SigningKey的?量 key
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[74,15] 找不到符号
+  符号:   方法 setKid(java.lang.String)
+  位置: ?型?com.manpou.user.domain.model.SigningKey的?量 newKey
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[75,15] 找不到符号
+  符号:   方法 setPublicKeyPem(java.lang.String)
+  位置: ?型?com.manpou.user.domain.model.SigningKey的?量 newKey
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[76,15] 找不到符号
+  符号:   方法 setPrivateKeyPath(java.lang.String)
+  位置: ?型?com.manpou.user.domain.model.SigningKey的?量 newKey
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[78,15] 找不到符号
+  符号:   方法 setCreateTime(java.time.LocalDateTime)
+  位置: ?型?com.manpou.user.domain.model.SigningKey的?量 newKey
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[84,9] 找不到符号
+  符号:   ?量 log
+  位置: ? com.manpou.user.application.KeyManagementService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[84,49] 找不到符号
+  符号:   方法 getKid()
+  位置: ?型?com.manpou.user.domain.model.SigningKey的?量 saved
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[85,21] 找不到符号
+  符号:   方法 getKid()
+  位置: ?型?com.manpou.user.domain.model.SigningKey的?量 saved
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[94,36] 找不到符号
+  符号:   方法 getKid()
+  位置: ?型?com.manpou.user.domain.model.SigningKey的?量 k
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[94,48] 找不到符号
+  符号:   方法 getStatus()
+  位置: ?型?com.manpou.user.domain.model.SigningKey的?量 k
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[94,70] 找不到符号
+  符号:   方法 getCreateTime()
+  位置: ?型?com.manpou.user.domain.model.SigningKey的?量 k
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[111,13] 找不到符号
+  符号:   ?量 log
+  位置: ? com.manpou.user.application.KeyManagementService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[35,48] 找不到符号
+  符号:   方法 getIsDeleted()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 r
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[46,48] 找不到符号
+  符号:   方法 getIsDeleted()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 r
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[56,46] 找不到符号
+  符号:   方法 getRoleCode()
+  位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[61,29] 找不到符号
+  符号:   方法 getRoleCode()
+  位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[62,31] 找不到符号
+  符号:   方法 getRoleNameCn()
+  位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[63,31] 找不到符号
+  符号:   方法 getRoleNameJp()
+  位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[64,29] 找不到符号
+  符号:   方法 getRoleType()
+  位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[65,32] 找不到符号
+  符号:   方法 getDescription()
+  位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[66,13] 找不到符号
+  符号:   方法 setIsEditable(int)
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[67,13] 找不到符号
+  符号:   方法 setStatus(int)
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[68,13] 找不到符号
+  符号:   方法 setIsDeleted(boolean)
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[69,13] 找不到符号
+  符号:   方法 setCreateTime(java.time.LocalDateTime)
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[70,13] 找不到符号
+  符号:   方法 setUpdateTime(java.time.LocalDateTime)
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[72,16] 找不到符号
+  符号:   方法 getPermissionIds()
+  位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[72,51] 找不到符号
+  符号:   方法 getPermissionIds()
+  位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[73,87] 找不到符号
+  符号:   方法 getPermissionIds()
+  位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[74,17] 找不到符号
+  符号:   方法 setPermissions(java.util.Set<com.manpou.user.domain.model.Permission>)
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[78,9] 找不到符号
+  符号:   ?量 log
+  位置: ? com.manpou.user.application.service.RoleService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[78,55] 找不到符号
+  符号:   方法 getId()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 saved
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[78,70] 找不到符号
+  符号:   方法 getRoleCode()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 saved
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[88,48] 找不到符号
+  符号:   方法 getIsDeleted()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 r
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[91,17] 找不到符号
+  符号:   方法 getIsEditable()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[91,49] 找不到符号
+  符号:   方法 getIsEditable()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[95,16] 找不到符号
+  符号:   方法 getRoleNameCn()
+  位置: ?型?com.manpou.user.application.dto.RoleUpdateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[95,64] 找不到符号
+  符号:   方法 getRoleNameCn()
+  位置: ?型?com.manpou.user.application.dto.RoleUpdateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[96,16] 找不到符号
+  符号:   方法 getRoleNameJp()
+  位置: ?型?com.manpou.user.application.dto.RoleUpdateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[96,64] 找不到符号
+  符号:   方法 getRoleNameJp()
+  位置: ?型?com.manpou.user.application.dto.RoleUpdateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[97,16] 找不到符号
+  符号:   方法 getDescription()
+  位置: ?型?com.manpou.user.application.dto.RoleUpdateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[97,66] 找不到符号
+  符号:   方法 getDescription()
+  位置: ?型?com.manpou.user.application.dto.RoleUpdateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[98,13] 找不到符号
+  符号:   方法 setUpdateTime(java.time.LocalDateTime)
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[101,9] 找不到符号
+  符号:   ?量 log
+  位置: ? com.manpou.user.application.service.RoleService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[111,48] 找不到符号
+  符号:   方法 getIsDeleted()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 r
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[114,17] 找不到符号
+  符号:   方法 getIsEditable()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[114,49] 找不到符号
+  符号:   方法 getIsEditable()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[118,13] 找不到符号
+  符号:   方法 setIsDeleted(boolean)
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[119,13] 找不到符号
+  符号:   方法 setUpdateTime(java.time.LocalDateTime)
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[121,9] 找不到符号
+  符号:   ?量 log
+  位置: ? com.manpou.user.application.service.RoleService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[130,48] 找不到符号
+  符号:   方法 getIsDeleted()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 r
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[133,17] 找不到符号
+  符号:   方法 getIsEditable()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[133,49] 找不到符号
+  符号:   方法 getIsEditable()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[137,36] 找不到符号
+  符号:   方法 getPermissionIds()
+  位置: ?型?com.manpou.user.application.dto.RolePermissionsCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[137,70] 找不到符号
+  符号:   方法 getPermissionIds()
+  位置: ?型?com.manpou.user.application.dto.RolePermissionsCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[139,65] 找不到符号
+  符号:   方法 getPermissionIds()
+  位置: ?型?com.manpou.user.application.dto.RolePermissionsCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[140,13] 找不到符号
+  符号:   方法 setPermissions(java.util.Set<com.manpou.user.domain.model.Permission>)
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[141,13] 找不到符号
+  符号:   方法 setUpdateTime(java.time.LocalDateTime)
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[144,9] 找不到符号
+  符号:   ?量 log
+  位置: ? com.manpou.user.application.service.RoleService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[156,48] 找不到符号
+  符号:   方法 getIsDeleted()
+  位置: ?型?com.manpou.user.domain.model.Permission的?量 p
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[162,44] 方法引用无效
+  找不到符号
+    符号:   方法 getModule()
+    位置: ? com.manpou.user.application.dto.PermissionVO
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[167,21] 找不到符号
+  符号:   方法 setModule(java.lang.String)
+  位置: ?型?com.manpou.user.application.dto.PermissionTreeVO的?量 tree
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[168,21] 找不到符号
+  符号:   方法 setModuleNameCn(java.lang.String)
+  位置: ?型?com.manpou.user.application.dto.PermissionTreeVO的?量 tree
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[169,21] 找不到符号
+  符号:   方法 setModuleNameJp(java.lang.String)
+  位置: ?型?com.manpou.user.application.dto.PermissionTreeVO的?量 tree
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[170,21] 找不到符号
+  符号:   方法 setPermissions(java.util.List<com.manpou.user.application.dto.PermissionVO>)
+  位置: ?型?com.manpou.user.application.dto.PermissionTreeVO的?量 tree
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[173,42] 方法引用无效
+  找不到符号
+    符号:   方法 getModule()
+    位置: ? com.manpou.user.application.dto.PermissionTreeVO
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[227,22] 找不到符号
+  符号:   方法 getId()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[228,28] 找不到符号
+  符号:   方法 getRoleCode()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[229,30] 找不到符号
+  符号:   方法 getRoleNameCn()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[230,30] 找不到符号
+  符号:   方法 getRoleNameJp()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[231,28] 找不到符号
+  符号:   方法 getRoleType()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[232,31] 找不到符号
+  符号:   方法 getDescription()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[233,30] 找不到符号
+  符号:   方法 getIsEditable()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[234,26] 找不到符号
+  符号:   方法 getStatus()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[235,30] 找不到符号
+  符号:   方法 getCreateTime()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[236,31] 找不到符号
+  符号:   方法 getPermissions()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[244,22] 找不到符号
+  符号:   方法 getId()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[245,28] 找不到符号
+  符号:   方法 getRoleCode()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[246,30] 找不到符号
+  符号:   方法 getRoleNameCn()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[247,30] 找不到符号
+  符号:   方法 getRoleNameJp()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[248,28] 找不到符号
+  符号:   方法 getRoleType()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[249,30] 找不到符号
+  符号:   方法 getIsEditable()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[250,26] 找不到符号
+  符号:   方法 getStatus()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[251,30] 找不到符号
+  符号:   方法 getCreateTime()
+  位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.932 s
+[INFO] Finished at: 2026-05-01T08:50:24+09:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project user-service: Compilation failure: Compilation failure: 
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[12,8] ? RoleCreateCmd 是公共的, ?在名? RoleCreateCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[28,8] ? RoleUpdateCmd 是公共的, ?在名? RoleUpdateCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[36,8] ? RolePermissionsCmd 是公共的, ?在名? RolePermissionsCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[42,8] ? PermissionVO 是公共的, ?在名? PermissionVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[70,8] ? RoleVO 是公共的, ?在名? RoleVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[86,8] ? RoleSimpleVO 是公共的, ?在名? RoleSimpleVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/RoleDTOs.java:[100,8] ? PermissionTreeVO 是公共的, ?在名? PermissionTreeVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[13,8] ? UserCreateCmd 是公共的, ?在名? UserCreateCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[45,8] ? UserUpdateCmd 是公共的, ?在名? UserUpdateCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[61,8] ? UserStatusCmd 是公共的, ?在名? UserStatusCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[67,8] ? PasswordResetCmd 是公共的, ?在名? PasswordResetCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[73,8] ? UserRolesCmd 是公共的, ?在名? UserRolesCmd.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[79,8] ? UserVO 是公共的, ?在名? UserVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[122,8] ? UserPageQuery 是公共的, ?在名? UserPageQuery.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[134,8] ? UserPageVO 是公共的, ?在名? UserPageVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/dto/UserDTOs.java:[144,8] ? PasswordResetVO 是公共的, ?在名? PasswordResetVO.java 的文件中声明
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[62,17] 找不到符号
+[ERROR]   符号:   ?量 log
+[ERROR]   位置: ? com.manpou.user.application.KeyManagementService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[62,65] 找不到符号
+[ERROR]   符号:   方法 getKid()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.SigningKey的?量 key
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[74,15] 找不到符号
+[ERROR]   符号:   方法 setKid(java.lang.String)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.SigningKey的?量 newKey
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[75,15] 找不到符号
+[ERROR]   符号:   方法 setPublicKeyPem(java.lang.String)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.SigningKey的?量 newKey
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[76,15] 找不到符号
+[ERROR]   符号:   方法 setPrivateKeyPath(java.lang.String)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.SigningKey的?量 newKey
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[78,15] 找不到符号
+[ERROR]   符号:   方法 setCreateTime(java.time.LocalDateTime)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.SigningKey的?量 newKey
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[84,9] 找不到符号
+[ERROR]   符号:   ?量 log
+[ERROR]   位置: ? com.manpou.user.application.KeyManagementService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[84,49] 找不到符号
+[ERROR]   符号:   方法 getKid()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.SigningKey的?量 saved
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[85,21] 找不到符号
+[ERROR]   符号:   方法 getKid()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.SigningKey的?量 saved
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[94,36] 找不到符号
+[ERROR]   符号:   方法 getKid()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.SigningKey的?量 k
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[94,48] 找不到符号
+[ERROR]   符号:   方法 getStatus()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.SigningKey的?量 k
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[94,70] 找不到符号
+[ERROR]   符号:   方法 getCreateTime()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.SigningKey的?量 k
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/KeyManagementService.java:[111,13] 找不到符号
+[ERROR]   符号:   ?量 log
+[ERROR]   位置: ? com.manpou.user.application.KeyManagementService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[35,48] 找不到符号
+[ERROR]   符号:   方法 getIsDeleted()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 r
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[46,48] 找不到符号
+[ERROR]   符号:   方法 getIsDeleted()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 r
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[56,46] 找不到符号
+[ERROR]   符号:   方法 getRoleCode()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[61,29] 找不到符号
+[ERROR]   符号:   方法 getRoleCode()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[62,31] 找不到符号
+[ERROR]   符号:   方法 getRoleNameCn()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[63,31] 找不到符号
+[ERROR]   符号:   方法 getRoleNameJp()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[64,29] 找不到符号
+[ERROR]   符号:   方法 getRoleType()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[65,32] 找不到符号
+[ERROR]   符号:   方法 getDescription()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[66,13] 找不到符号
+[ERROR]   符号:   方法 setIsEditable(int)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[67,13] 找不到符号
+[ERROR]   符号:   方法 setStatus(int)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[68,13] 找不到符号
+[ERROR]   符号:   方法 setIsDeleted(boolean)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[69,13] 找不到符号
+[ERROR]   符号:   方法 setCreateTime(java.time.LocalDateTime)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[70,13] 找不到符号
+[ERROR]   符号:   方法 setUpdateTime(java.time.LocalDateTime)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[72,16] 找不到符号
+[ERROR]   符号:   方法 getPermissionIds()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[72,51] 找不到符号
+[ERROR]   符号:   方法 getPermissionIds()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[73,87] 找不到符号
+[ERROR]   符号:   方法 getPermissionIds()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleCreateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[74,17] 找不到符号
+[ERROR]   符号:   方法 setPermissions(java.util.Set<com.manpou.user.domain.model.Permission>)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[78,9] 找不到符号
+[ERROR]   符号:   ?量 log
+[ERROR]   位置: ? com.manpou.user.application.service.RoleService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[78,55] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 saved
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[78,70] 找不到符号
+[ERROR]   符号:   方法 getRoleCode()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 saved
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[88,48] 找不到符号
+[ERROR]   符号:   方法 getIsDeleted()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 r
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[91,17] 找不到符号
+[ERROR]   符号:   方法 getIsEditable()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[91,49] 找不到符号
+[ERROR]   符号:   方法 getIsEditable()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[95,16] 找不到符号
+[ERROR]   符号:   方法 getRoleNameCn()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleUpdateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[95,64] 找不到符号
+[ERROR]   符号:   方法 getRoleNameCn()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleUpdateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[96,16] 找不到符号
+[ERROR]   符号:   方法 getRoleNameJp()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleUpdateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[96,64] 找不到符号
+[ERROR]   符号:   方法 getRoleNameJp()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleUpdateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[97,16] 找不到符号
+[ERROR]   符号:   方法 getDescription()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleUpdateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[97,66] 找不到符号
+[ERROR]   符号:   方法 getDescription()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RoleUpdateCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[98,13] 找不到符号
+[ERROR]   符号:   方法 setUpdateTime(java.time.LocalDateTime)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[101,9] 找不到符号
+[ERROR]   符号:   ?量 log
+[ERROR]   位置: ? com.manpou.user.application.service.RoleService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[111,48] 找不到符号
+[ERROR]   符号:   方法 getIsDeleted()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 r
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[114,17] 找不到符号
+[ERROR]   符号:   方法 getIsEditable()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[114,49] 找不到符号
+[ERROR]   符号:   方法 getIsEditable()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[118,13] 找不到符号
+[ERROR]   符号:   方法 setIsDeleted(boolean)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[119,13] 找不到符号
+[ERROR]   符号:   方法 setUpdateTime(java.time.LocalDateTime)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[121,9] 找不到符号
+[ERROR]   符号:   ?量 log
+[ERROR]   位置: ? com.manpou.user.application.service.RoleService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[130,48] 找不到符号
+[ERROR]   符号:   方法 getIsDeleted()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 r
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[133,17] 找不到符号
+[ERROR]   符号:   方法 getIsEditable()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[133,49] 找不到符号
+[ERROR]   符号:   方法 getIsEditable()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[137,36] 找不到符号
+[ERROR]   符号:   方法 getPermissionIds()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RolePermissionsCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[137,70] 找不到符号
+[ERROR]   符号:   方法 getPermissionIds()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RolePermissionsCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[139,65] 找不到符号
+[ERROR]   符号:   方法 getPermissionIds()
+[ERROR]   位置: ?型?com.manpou.user.application.dto.RolePermissionsCmd的?量 cmd
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[140,13] 找不到符号
+[ERROR]   符号:   方法 setPermissions(java.util.Set<com.manpou.user.domain.model.Permission>)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[141,13] 找不到符号
+[ERROR]   符号:   方法 setUpdateTime(java.time.LocalDateTime)
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[144,9] 找不到符号
+[ERROR]   符号:   ?量 log
+[ERROR]   位置: ? com.manpou.user.application.service.RoleService
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[156,48] 找不到符号
+[ERROR]   符号:   方法 getIsDeleted()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Permission的?量 p
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[162,44] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getModule()
+[ERROR]     位置: ? com.manpou.user.application.dto.PermissionVO
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[167,21] 找不到符号
+[ERROR]   符号:   方法 setModule(java.lang.String)
+[ERROR]   位置: ?型?com.manpou.user.application.dto.PermissionTreeVO的?量 tree
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[168,21] 找不到符号
+[ERROR]   符号:   方法 setModuleNameCn(java.lang.String)
+[ERROR]   位置: ?型?com.manpou.user.application.dto.PermissionTreeVO的?量 tree
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[169,21] 找不到符号
+[ERROR]   符号:   方法 setModuleNameJp(java.lang.String)
+[ERROR]   位置: ?型?com.manpou.user.application.dto.PermissionTreeVO的?量 tree
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[170,21] 找不到符号
+[ERROR]   符号:   方法 setPermissions(java.util.List<com.manpou.user.application.dto.PermissionVO>)
+[ERROR]   位置: ?型?com.manpou.user.application.dto.PermissionTreeVO的?量 tree
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[173,42] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getModule()
+[ERROR]     位置: ? com.manpou.user.application.dto.PermissionTreeVO
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[227,22] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[228,28] 找不到符号
+[ERROR]   符号:   方法 getRoleCode()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[229,30] 找不到符号
+[ERROR]   符号:   方法 getRoleNameCn()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[230,30] 找不到符号
+[ERROR]   符号:   方法 getRoleNameJp()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[231,28] 找不到符号
+[ERROR]   符号:   方法 getRoleType()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[232,31] 找不到符号
+[ERROR]   符号:   方法 getDescription()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[233,30] 找不到符号
+[ERROR]   符号:   方法 getIsEditable()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[234,26] 找不到符号
+[ERROR]   符号:   方法 getStatus()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[235,30] 找不到符号
+[ERROR]   符号:   方法 getCreateTime()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[236,31] 找不到符号
+[ERROR]   符号:   方法 getPermissions()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[244,22] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[245,28] 找不到符号
+[ERROR]   符号:   方法 getRoleCode()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[246,30] 找不到符号
+[ERROR]   符号:   方法 getRoleNameCn()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[247,30] 找不到符号
+[ERROR]   符号:   方法 getRoleNameJp()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[248,28] 找不到符号
+[ERROR]   符号:   方法 getRoleType()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[249,30] 找不到符号
+[ERROR]   符号:   方法 getIsEditable()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[250,26] 找不到符号
+[ERROR]   符号:   方法 getStatus()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] /D:/Programme/java/ManpouChinaSystem/apps/user-service/src/main/java/com/manpou/user/application/service/RoleService.java:[251,30] 找不到符号
+[ERROR]   符号:   方法 getCreateTime()
+[ERROR]   位置: ?型?com.manpou.user.domain.model.Role的?量 role
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
