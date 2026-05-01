@@ -128,6 +128,7 @@ public class ContainerUseCase {
                 .orElseThrow(() -> new BusinessException("logistics.pool_not_found", "拼柜池不存在"));
 
         Container container = new Container();
+        container.setContainerNo(assembler.generateContainerNo());
         container.setPoolId(poolId);
         container.setContainerType(
                 pool.getTotalCbm().compareTo(new java.math.BigDecimal("67")) > 0

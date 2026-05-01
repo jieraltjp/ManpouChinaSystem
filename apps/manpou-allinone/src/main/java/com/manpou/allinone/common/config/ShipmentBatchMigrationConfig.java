@@ -3,13 +3,18 @@ package com.manpou.allinone.common.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
 
 /**
  * V40-V43 一次性迁移（SPEC-B11 §11）。
  * Flyway 被禁用（使用 Hibernate ddl-auto），此组件手工执行 DDL。
  * 幂等：已执行时跳过。
+ *
+ * 测试环境跳过：Hibernate ddl-auto=create-drop 已处理表结构。
  */
 @Component
 public class ShipmentBatchMigrationConfig {
@@ -17,8 +22,15 @@ public class ShipmentBatchMigrationConfig {
     @Autowired
     private JdbcTemplate jdbc;
 
+    @Autowired
+    private Environment env;
+
     @EventListener(ApplicationReadyEvent.class)
     public void migrate() {
+        // 测试环境跳过（ddl-auto=create-drop 已处理 schema）
+        if (Arrays.asList(env.getActiveProfiles()).contains("test")) {
+            return;
+        }
         migrateV40();
         migrateV41();
         migrateV42();

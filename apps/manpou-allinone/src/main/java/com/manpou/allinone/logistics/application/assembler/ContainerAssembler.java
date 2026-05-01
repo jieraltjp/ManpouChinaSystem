@@ -6,8 +6,20 @@ import com.manpou.allinone.logistics.application.dto.ContainerUpdateCmd;
 import com.manpou.allinone.logistics.domain.model.Container;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.atomic.AtomicLong;
+
 @Component
 public class ContainerAssembler {
+
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final AtomicLong SEQ = new AtomicLong(System.currentTimeMillis() % 1000);
+
+    public String generateContainerNo() {
+        String date = LocalDateTime.now().format(DATE_FMT);
+        return String.format("C-%s-%04d", date, SEQ.incrementAndGet() % 10000);
+    }
 
     public ContainerPageQuery toDto(Container entity) {
         return ContainerPageQuery.builder()

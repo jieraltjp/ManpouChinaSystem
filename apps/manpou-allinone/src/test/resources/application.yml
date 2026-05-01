@@ -24,11 +24,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
-        ddl_extra_settings: ON_ERROR_ROLLBACK
-        javax:
-          persistence:
-            schema-generation:
-              create-database-schemas: false
   flyway:
     enabled: false
 
