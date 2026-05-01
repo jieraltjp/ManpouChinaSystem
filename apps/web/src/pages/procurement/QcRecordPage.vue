@@ -364,10 +364,10 @@
           <template v-else>
             <div class="drawer-images">
               <el-image
-                v-for="(url, i) in drawerImageList"
-                :key="i"
-                :src="url"
-                :preview-src-list="drawerImageList"
+                v-for="img in drawerImages"
+                :key="img.id"
+                :src="img.url"
+                :preview-src-list="drawerImages.map(i => i.url)"
                 fit="cover"
                 class="drawer-image-thumb"
               />
@@ -388,7 +388,7 @@
 import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { ElMessage, type FormInstance, type FormRules, ElMessageBox } from 'element-plus'
 import { Plus, Document, CircleCheck, Warning } from '@element-plus/icons-vue'
-import { inspectionApi, type QcRecordVO, type QcResult, type QcStatus, type QcType } from '@/api/inspection'
+import { inspectionApi, type QcRecordVO, type QcResult, type QcStatus, type QcType, type QcImageVO } from '@/api/inspection'
 import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
 import { shipmentBatchApi, type ShipmentBatchVO } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
@@ -407,7 +407,19 @@ const shipmentBatchList = ref<ShipmentBatchVO[]>([])
 
 const formRef = ref<FormInstance>()
 const uploadRef = ref()
-const uploadFileList = ref<{ name: string; url: string; status: string; raw?: File; uid?: number }[]>([])
+
+/** 上传文件项：id 有值=已有图片，raw 有值=本地待上传文件 */
+interface UploadFileItem {
+  id?: number        // 数据库ID，有则代表已有图片
+  name: string
+  url: string        // COS URL 或本地 blob URL
+  raw?: File         // 本地文件，上传后清空
+  status: 'ready' | 'uploaded'  // ready=待上传，uploaded=已上传到COS
+}
+const uploadFileList = ref<UploadFileItem[]>([])
+
+/** 详情抽屉图片列表（从 qc_image 表加载） */
+const drawerImages = ref<QcImageVO[]>([])
 const { t, locale: localeRef } = useI18n()
 const currentLocale = computed(() => localeRef.value)
 
@@ -464,16 +476,6 @@ const formRules: FormRules = {
 const passCount = computed(() => tableData.value.filter(r => r.result === 'PASS').length)
 const failCount = computed(() => tableData.value.filter(r => r.result === 'FAIL').length)
 
-const drawerImageList = computed(() => {
-  return (currentRow.value?.images || '')
-    .split('\n')
-    .filter(Boolean)
-    .map(url => url.includes('.cos.') && !url.includes('response-content-disposition')
-      ? (url.includes('?') ? url + '&response-content-disposition=inline' : url + '?response-content-disposition=inline')
-      : url
-    )
-})
-
 const boxDimension = computed(() => {
   const r = currentRow.value
   if (!r) return '-'
@@ -485,7 +487,7 @@ const boxDimension = computed(() => {
 })
 
 // --- 图片上传处理（SPEC-C12） ---
-async function onImageChange(file: { name: string; raw: File; status: string; uid: number }, fileList: { name: string; raw: File; status: string; uid: number }[]) {
+function onImageChange(file: { name: string; raw: File; uid: number }, fileList: { name: string; raw: File; uid: number }[]) {
   if (file.raw.size > 5 * 1024 * 1024) {
     ElMessage.warning(t('inspection.dialog.imageSizeWarning'))
     uploadRef.value?.handleRemove(file)
@@ -496,31 +498,20 @@ async function onImageChange(file: { name: string; raw: File; status: string; ui
     uploadRef.value?.handleRemove(file)
     return
   }
-  // 将本地文件追加到 uploadFileList（带临时 url 预览）
-  const alreadyInList = uploadFileList.value.some(f => f.raw === file.raw)
-  if (!alreadyInList) {
-    uploadFileList.value = [...uploadFileList.value, { name: file.name, url: URL.createObjectURL(file.raw), status: 'ready', raw: file.raw, uid: file.uid }]
+  const alreadyIn = uploadFileList.value.some(f => f.name === file.name && f.raw === file.raw)
+  if (!alreadyIn) {
+    uploadFileList.value = [...uploadFileList.value, {
+      name: file.name,
+      url: URL.createObjectURL(file.raw),
+      raw: file.raw,
+      status: 'ready',
+    }]
   }
 }
 
-async function onImageRemove(file: { name: string; raw: File; uid: number }) {
-  uploadFileList.value = uploadFileList.value.filter(f => f.raw !== file.raw)
-  URL.revokeObjectURL(file.name) // 释放预览 URL
-}
-
-async function uploadAndGetUrls(qcRecordId?: number): Promise<string[]> {
-  const pending = uploadFileList.value.filter(f => f.raw)
-  if (!pending.length) return []
-  try {
-    const files = pending.map(f => f.raw).filter((f): f is File => f !== undefined)
-    const res = await inspectionApi.uploadImages(files, qcRecordId)
-    if (res.data && Array.isArray(res.data)) {
-      return res.data.map(r => r.url)
-    }
-  } catch {
-    ElMessage.warning(t('inspection.dialog.imageUploadWarning'))
-  }
-  return []
+function onImageRemove(file: { name: string; raw?: File; uid: number }) {
+  uploadFileList.value = uploadFileList.value.filter(f => !(f.name === file.name && f.raw === file.raw))
+  URL.revokeObjectURL(file.name)
 }
 
 async function loadData() {
@@ -618,14 +609,21 @@ async function onSubmit() {
       submitting.value = false
       return
     }
-    // SPEC-C12: 上传图片，合并到 form.images
-    const newUrls = await uploadAndGetUrls(currentRow.value?.id)
-    const existingUrls = (form.images || '').split('\n').filter(Boolean)
-    const allUrls = [...existingUrls, ...newUrls]
-    const imagesValue = allUrls.length > 0 ? allUrls.join('\n') : undefined
 
     if (currentRow.value) {
-      // 编辑模式
+      // ── 编辑模式 ──────────────────────────────────────────
+      // 1. 记录编辑前的已有图片ID，用于检测被移除的图片
+      const originalIds: number[] = []
+      if (currentRow.value.id) {
+        try {
+          const existing = await inspectionApi.listImages(currentRow.value.id)
+          existing.data?.forEach((img: QcImageVO) => originalIds.push(img.id))
+        } catch { /* ignore */ }
+      }
+      const currentIds = uploadFileList.value.filter(f => f.id != null).map(f => f.id!)
+      const toDeleteIds = originalIds.filter(id => !currentIds.includes(id))
+
+      // 2. 更新 QC 记录
       await inspectionApi.update(currentRow.value.id, {
         sellerName: form.sellerName || undefined,
         qcUserId: form.qcUserId,
@@ -645,13 +643,26 @@ async function onSubmit() {
         material: form.material || undefined,
         qcStandard: form.qcStandard || undefined,
         remarks: form.remarks || undefined,
-        images: imagesValue,
       })
+
+      // 3. 删除被移除的已有图片
+      if (toDeleteIds.length) {
+        await Promise.all(toDeleteIds.map(id => inspectionApi.deleteImage(id)))
+      }
+
+      // 4. 上传新增的本地文件
+      const newLocalFiles = uploadFileList.value.filter(f => f.raw)
+      if (newLocalFiles.length) {
+        await inspectionApi.uploadImages(
+          newLocalFiles.map(f => f.raw!),
+          currentRow.value.id,
+        )
+      }
+
       ElMessage.success(t('inspection.message.updateSuccess'))
     } else {
-      // 创建模式
-      console.log('[QcRecordPage] CREATE mode')
-      await inspectionApi.create({
+      // ── 创建模式 ──────────────────────────────────────────
+      const res = await inspectionApi.create({
         shipmentBatchId: form.shipmentBatchId!,
         procurementId: form.procurementId,
         productCode: form.productCode,
@@ -672,14 +683,26 @@ async function onSubmit() {
         material: form.material || undefined,
         qcStandard: form.qcStandard || undefined,
         remarks: form.remarks || undefined,
-        images: imagesValue,
+        images: undefined,
         destination: form.destination || undefined,
         quantity: form.quantity,
         orderDate: form.orderDate || undefined,
         sellerName: form.sellerName || undefined,
       })
+      const newQcRecordId = res.data
+
+      // 上传新增的本地文件（关联到新建的记录）
+      const newLocalFiles = uploadFileList.value.filter(f => f.raw)
+      if (newLocalFiles.length && newQcRecordId) {
+        await inspectionApi.uploadImages(
+          newLocalFiles.map(f => f.raw!),
+          newQcRecordId,
+        )
+      }
+
       ElMessage.success(t('inspection.message.createSuccess'))
     }
+
     dialogVisible.value = false
     loadData()
   } catch (e: unknown) {
@@ -692,6 +715,12 @@ async function onSubmit() {
 
 function onView(row: QcRecordVO) {
   currentRow.value = row
+  drawerImages.value = []
+  if (row.id) {
+    inspectionApi.listImages(row.id).then(res => {
+      drawerImages.value = res.data ?? []
+    }).catch(() => { drawerImages.value = [] })
+  }
   drawerVisible.value = true
 }
 
@@ -725,6 +754,18 @@ function onEdit(row: QcRecordVO) {
     orderDate: row.orderDate || '',
     sellerName: row.sellerName || '',
   })
+  // 加载已有图片到 uploadFileList（带 DB id 标识）
+  uploadFileList.value = []
+  if (row.id) {
+    inspectionApi.listImages(row.id).then(res => {
+      uploadFileList.value = (res.data ?? []).map((img: QcImageVO) => ({
+        id: img.id,
+        name: img.originalName,
+        url: img.url,
+        status: 'uploaded' as const,
+      }))
+    }).catch(() => { uploadFileList.value = [] })
+  }
   // 加载出货批次下拉（编辑时用于参考）
   if (row.shipmentBatchId) {
     shipmentBatchApi.get(row.shipmentBatchId).then(res => {
