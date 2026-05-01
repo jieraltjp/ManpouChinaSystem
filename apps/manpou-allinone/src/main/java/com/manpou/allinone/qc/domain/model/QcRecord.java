@@ -32,8 +32,8 @@ public class QcRecord extends BaseEntity {
     @Column(name = "procurement_id")
     private Long procurementId;            // 关联采购单（V43后nullable，审计追溯用）
 
-    @Column(name = "shipment_batch_id")
-    private Long shipmentBatchId;          // 关联出货批次（V43新增，必填）
+    @Column(name = "shipment_batch_id", insertable = false, updatable = false)
+    private Long shipmentBatchId;          // 关联出货批次（V43新增，列由迁移脚本管理，JPA 只读）
 
     @Column(name = "seller_name", length = 128)
     private String sellerName;            // 卖家名称（来自工厂名）

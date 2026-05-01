@@ -38,6 +38,7 @@ public class SecurityConfig {
             // 路由权限配置
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/**").permitAll()       // 登录接口
+                .requestMatchers("/api/v1/test/**").permitAll()       // 开发测试接口
                 .requestMatchers("/actuator/health").permitAll()     // 健康检查
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()  // API 文档
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")  // 管理员接口

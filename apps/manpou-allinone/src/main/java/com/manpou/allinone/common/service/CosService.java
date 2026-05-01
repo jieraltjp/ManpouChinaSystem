@@ -2,114 +2,126 @@ package com.manpou.allinone.common.service;
 
 import com.manpou.allinone.common.config.CosConfig;
 import com.manpou.allinone.common.exception.BusinessException;
+import com.qcloud.cos.COSClient;
+import com.qcloud.cos.ClientConfig;
+import com.qcloud.cos.auth.BasicCOSCredentials;
+import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.exception.CosClientException;
+import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.model.*;
+import com.qcloud.cos.region.Region;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.Instant;
+import java.io.InputStream;
 
 /**
- * 腾讯云 COS 对象存储服务（REST API 方式，无 SDK 依赖）。
+ * 腾讯云 COS 对象存储服务（使用官方 COS XML SDK）。
  *
- * COS 签名算法参考：
- * https://cloud.tencent.com/document/product/436/7778
+ * SDK 自动处理签名，无需手写 HMAC-SHA1。
+ * 参考：https://cloud.tencent.com/document/product/436/655
  */
 @Slf4j
 @Service
 public class CosService {
 
     private final CosConfig cosConfig;
-    private final RestTemplate cosRestTemplate;
+    private volatile COSClient cosClient;
 
     @Autowired
-    public CosService(CosConfig cosConfig,
-                      @Autowired(required = false) RestTemplate cosRestTemplate) {
+    public CosService(CosConfig cosConfig) {
         this.cosConfig = cosConfig;
-        this.cosRestTemplate = cosRestTemplate;
+    }
+
+    private COSClient getClient() {
+        if (cosClient != null) {
+            return cosClient;
+        }
+        synchronized (this) {
+            if (cosClient != null) {
+                return cosClient;
+            }
+            if (!cosConfig.isEnabled()) {
+                throw BusinessException.internal("COS 未启用，请检查 cos.enabled 配置");
+            }
+            String secretId = cosConfig.getSecretId();
+            String secretKey = cosConfig.getSecretKey();
+            if (secretId == null || secretId.isBlank()) {
+                throw BusinessException.internal("COS secret-id 未配置");
+            }
+            if (secretKey == null || secretKey.isBlank()) {
+                throw BusinessException.internal("COS secret-key 未配置");
+            }
+
+            COSCredentials credentials = new BasicCOSCredentials(secretId, secretKey);
+            ClientConfig clientConfig = new ClientConfig(new Region(cosConfig.getRegion()));
+            cosClient = new COSClient(credentials, clientConfig);
+            log.info("[COS] SDK client initialized, bucket={}, region={}", cosConfig.getBucket(), cosConfig.getRegion());
+            return cosClient;
+        }
     }
 
     /**
      * 上传文件到 COS，返回完整访问 URL。
      */
-    private void ensureEnabled() {
-        if (!cosConfig.isEnabled()) {
-            throw BusinessException.internal("COS 未启用，请检查 cos.enabled 配置");
-        }
-        if (cosRestTemplate == null) {
-            throw BusinessException.internal("COS RestTemplate 未初始化，请检查 cos.secret-id / cos.secret-key 配置");
-        }
-    }
-
     public String upload(MultipartFile file) {
-        ensureEnabled();
         String key = cosConfig.generateKey(file.getOriginalFilename());
-        String host = cosConfig.getBucketHost();
-        String url = "https://" + host + "/" + key;
+        String bucket = cosConfig.getBucket();
+        log.info("[COS] upload start, bucket={}, key={}, size={}", bucket, key, file.getSize());
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(getMediaType(file.getOriginalFilename()));
-        headers.set("Host", host);
+        try (InputStream is = file.getInputStream()) {
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(file.getContentType());
+            metadata.setContentLength(file.getSize());
+            PutObjectRequest putRequest = new PutObjectRequest(bucket, key, is, metadata);
 
-        // COS 签名（HMAC-SHA1）
-        String auth = makeAuthToken("PUT", "/" + key, file.getSize(), file.getContentType());
-        headers.set("Authorization", auth);
-        headers.set("x-cos-security-token", ""); // V5 风格不需要 token
+            PutObjectResult putResult = getClient().putObject(putRequest);
+            log.info("[COS] upload success, key={}, etag={}", key, putResult.getETag());
 
-        HttpEntity<byte[]> request;
-        try {
-            request = new HttpEntity<>(file.getBytes(), headers);
+            String url = cosConfig.getDomain() + "/" + key;
+            log.info("[COS] public url={}", url);
+            return url;
         } catch (IOException e) {
             throw BusinessException.internal("文件读取失败: " + e.getMessage());
+        } catch (CosServiceException e) {
+            log.error("[COS] upload failed, key={}, code={}, message={}", key, e.getErrorCode(), e.getErrorMessage());
+            throw BusinessException.internal("COS 上传失败 [" + e.getErrorCode() + "]: " + e.getErrorMessage());
+        } catch (CosClientException e) {
+            log.error("[COS] upload failed (client), key={}, message={}", key, e.getMessage());
+            throw BusinessException.internal("COS 上传失败: " + e.getMessage());
         }
-
-        try {
-            ResponseEntity<String> resp = cosRestTemplate.exchange(
-                    url, HttpMethod.PUT, request, String.class);
-            log.info("[COS] Uploaded, key={}, status={}", key, resp.getStatusCode());
-        } catch (HttpClientErrorException e) {
-            log.error("[COS] Upload failed, key={}, status={}, body={}",
-                    key, e.getStatusCode(), e.getResponseBodyAsString());
-            throw BusinessException.internal("COS 上传失败: " + e.getStatusCode());
-        }
-
-        return cosConfig.getDomain() + "/" + key;
     }
 
     /**
      * 删除 COS 对象。
      */
     public void delete(String url) {
-        ensureEnabled();
         String key = extractKey(url);
         if (key == null || key.isBlank()) {
             log.warn("[COS] Cannot extract key from url={}", url);
             return;
         }
-        String host = cosConfig.getBucketHost();
-        String fullUrl = "https://" + host + "/" + key;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Host", host);
-        String auth = makeAuthToken("DELETE", "/" + key, 0, null);
-        headers.set("Authorization", auth);
+        String bucket = cosConfig.getBucket();
+        log.info("[COS] delete start, bucket={}, key={}", bucket, key);
 
         try {
-            ResponseEntity<String> resp = cosRestTemplate.exchange(
-                    fullUrl, HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
-            log.info("[COS] Deleted, key={}, status={}", key, resp.getStatusCode());
-        } catch (HttpClientErrorException e) {
+            DeleteObjectRequest deleteRequest = new DeleteObjectRequest(bucket, key);
+            getClient().deleteObject(deleteRequest);
+            log.info("[COS] delete success, key={}", key);
+        } catch (CosServiceException e) {
             // 404 也算成功（幂等）
-            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                log.info("[COS] Delete skip (not found), key={}", key);
+            if ("NoSuchKey".equals(e.getErrorCode())) {
+                log.info("[COS] delete skip (not found), key={}", key);
                 return;
             }
-            log.error("[COS] Delete failed, key={}, status={}", key, e.getStatusCode());
-            throw BusinessException.internal("COS 删除失败: " + e.getStatusCode());
+            log.error("[COS] delete failed, key={}, code={}, message={}", key, e.getErrorCode(), e.getErrorMessage());
+            throw BusinessException.internal("COS 删除失败 [" + e.getErrorCode() + "]: " + e.getErrorMessage());
+        } catch (CosClientException e) {
+            log.error("[COS] delete failed (client), key={}, message={}", key, e.getMessage());
+            throw BusinessException.internal("COS 删除失败: " + e.getMessage());
         }
     }
 
@@ -126,78 +138,5 @@ public class CosService {
             return url.substring(("https://" + cosConfig.getBucketHost()).length() + 1);
         }
         return url;
-    }
-
-    /**
-     * 生成 COS 签名（V5 HMAC-SHA1）。
-     *
-     * 算法：
-     * 1. KeyTime = "{start_time};{end_time}"
-     * 2. SignKey = HMAC-SHA1(SecretKey, KeyTime)
-     * 3. HttpString = "{method}\n{path}\n{query}\n{keyTime}\n"
-     * 4. StringToSign = "sha1\n{KeyTime}\n{sha1(HttpString)}\n"
-     * 5. Signature = HMAC-SHA1(SignKey, StringToSign)
-     *
-     * 参考：https://cloud.tencent.com/document/product/436/7778
-     */
-    private String makeAuthToken(String method, String path, long contentLength, String contentType) {
-        long now = Instant.now().getEpochSecond();
-        long expired = now + 3600;
-
-        String keyTime = now + ";" + expired;
-
-        // Step 2: SignKey = HMAC-SHA1(SecretKey, KeyTime)
-        String signKey = hmacSha1(keyTime, cosConfig.getSecretKey());
-
-        // Step 3: HTTP String = "method\npath\n\nkeyTime\n"
-        String httpString = method + "\n" + path + "\n\n" + keyTime + "\n";
-
-        // Step 4: StringToSign = "sha1\nkeyTime\nsha1(HttpString)\n"
-        String stringToSign = "sha1\n" + keyTime + "\n" + sha1(httpString) + "\n";
-
-        // Step 5: Signature = HMAC-SHA1(SignKey, StringToSign)
-        String signature = hmacSha1(stringToSign, signKey);
-
-        return "q-sign-algorithm=sha1" +
-                "&q-ak=" + cosConfig.getSecretId() +
-                "&q-sign-time=" + keyTime +
-                "&q-key-time=" + keyTime +
-                "&q-signature=" + signature;
-    }
-
-    private static String sha1(String data) {
-        try {
-            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA1");
-            byte[] digest = md.digest(data.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : digest) sb.append(String.format("%02x", b));
-            return sb.toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static String hmacSha1(String data, String key) {
-        try {
-            javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA1");
-            mac.init(new javax.crypto.spec.SecretKeySpec(
-                    key.getBytes(java.nio.charset.StandardCharsets.UTF_8), "HmacSHA1"));
-            byte[] raw = mac.doFinal(data.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : raw) sb.append(String.format("%02x", b));
-            return sb.toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static org.springframework.http.MediaType getMediaType(String filename) {
-        if (filename == null) return MediaType.APPLICATION_OCTET_STREAM;
-        String lower = filename.toLowerCase();
-        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return MediaType.IMAGE_JPEG;
-        if (lower.endsWith(".png")) return MediaType.IMAGE_PNG;
-        if (lower.endsWith(".webp")) return MediaType.parseMediaType("image/webp");
-        if (lower.endsWith(".gif")) return MediaType.IMAGE_GIF;
-        return MediaType.APPLICATION_OCTET_STREAM;
     }
 }

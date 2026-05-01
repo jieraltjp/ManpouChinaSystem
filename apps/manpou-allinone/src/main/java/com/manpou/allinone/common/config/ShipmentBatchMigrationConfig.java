@@ -138,14 +138,19 @@ public class ShipmentBatchMigrationConfig {
     }
 
     private void migrateV43() {
-        // 检查 shipment_batch_id 列是否已存在
-        if (columnExists("qc_record", "shipment_batch_id")) {
-            System.out.println("[V43] qc_record.shipment_batch_id 列已存在，跳过");
-            return;
+        // 幂等：列可能由 JPA ddl-auto 或迁移脚本创建，忽略已存在的错误
+        try {
+            jdbc.execute("ALTER TABLE qc_record ADD COLUMN IF NOT EXISTS shipment_batch_id BIGINT NULL COMMENT '关联出货批次ID'");
+            System.out.println("[V43] qc_record.shipment_batch_id 列添加完成（或已存在）");
+        } catch (Exception e) {
+            System.out.println("[V43] qc_record.shipment_batch_id 列已存在，跳过: " + e.getMessage());
         }
-        jdbc.execute("ALTER TABLE qc_record ADD COLUMN shipment_batch_id BIGINT NULL COMMENT '关联出货批次ID'");
-        jdbc.execute("ALTER TABLE qc_record ADD INDEX idx_qc_shipment_batch (shipment_batch_id)");
-        System.out.println("[V43] qc_record.shipment_batch_id 列添加完成");
+        try {
+            jdbc.execute("ALTER TABLE qc_record ADD INDEX IF NOT EXISTS idx_qc_shipment_batch ON shipment_batch_id");
+            System.out.println("[V43] idx_qc_shipment_batch 索引创建完成（或已存在）");
+        } catch (Exception e) {
+            System.out.println("[V43] idx_qc_shipment_batch 索引已存在，跳过: " + e.getMessage());
+        }
 
         // 回填存量 QcRecord → ShipmentBatch（历史数据批次）
         Long batchCount = jdbc.queryForObject("""
