@@ -23,7 +23,10 @@
     "factory": "工場管理",
     "product": "商品ディレクトリ",
     "base": "基礎データ",
-    "orderOverview": "注文一覧"
+    "orderOverview": "注文一覧",
+    "system": "システム管理",
+    "user": "ユーザー管理",
+    "role": "役割管理"
   },
   "auth": {
     "login": "ログイン",
@@ -1266,7 +1269,7 @@
       "CST": "中国標準時 (UTC+8)",
       "JST": "日本標準時 (UTC+9)"
     },
-    "user": "User",
+    "user": "ユーザー",
     "units": {
       "kg": "kg",
       "cm": "cm",
@@ -1744,6 +1747,155 @@
       "deleteSuccess": "出荷バッチを削除しました",
       "deleteConfirm": "出荷バッチ「{batchCode}」を削除しますか？",
       "deleteConfirmTitle": "削除確認"
+    }
+  },
+  "user": {
+    "title": "ユーザー管理",
+    "newButton": "ユーザーを追加",
+    "exportButton": "Excel出力",
+    "stat": {
+      "total": "ユーザー総数",
+      "normal": "正常",
+      "disabled": "無効",
+      "todayLogin": "本日ログイン"
+    },
+    "filter": {
+      "keyword": "名前/アカウント/メール",
+      "company": "所属会社",
+      "department": "所属部門",
+      "role": "役割",
+      "status": "ステータス"
+    },
+    "column": {
+      "userCode": "ユーザーコード",
+      "username": "ログインアカウント",
+      "nameCn": "中国語名",
+      "nameJp": "日本語名",
+      "email": "メール",
+      "phone": "電話番号",
+      "company": "所属会社",
+      "department": "所属部門",
+      "positions": "役職",
+      "roles": "役割",
+      "status": "ステータス",
+      "lastLoginTime": "最終ログイン",
+      "lastLoginIp": "ログインIP",
+      "createTime": "作成日時",
+      "action": "操作"
+    },
+    "status": {
+      "normal": "正常",
+      "disabled": "無効"
+    },
+    "action": {
+      "detail": "詳細",
+      "edit": "編集",
+      "delete": "削除",
+      "disable": "無効",
+      "enable": "有効化",
+      "resetPassword": "パスワードリセット",
+      "assignRole": "役割を割り当て"
+    },
+    "dialog": {
+      "createTitle": "ユーザーの追加",
+      "editTitle": "ユーザーの編集",
+      "detailTitle": "ユーザー詳細",
+      "roleTitle": "役割を割り当て",
+      "passwordTitle": "パスワードリセット",
+      "userCode": "ユーザーコード",
+      "username": "ログインアカウント",
+      "nameCn": "中国語名",
+      "nameJp": "日本語名",
+      "email": "メール",
+      "phone": "電話番号",
+      "avatar": "アバター",
+      "company": "所属会社",
+      "department": "所属部門",
+      "positions": "役職",
+      "customsCode": "通関士登録番号",
+      "customsLicense": "通関士資格番号",
+      "role": "役割",
+      "password": "初期パスワード",
+      "newPassword": "新しいパスワード",
+      "confirmPassword": "パスワード確認",
+      "oldPassword": "以前のパスワード",
+      "cancel": "キャンセル",
+      "save": "保存"
+    },
+    "validation": {
+      "usernameRequired": "ログインアカウントは必須です",
+      "emailRequired": "メールは必須です",
+      "emailFormat": "メールの形式が正しくありません",
+      "passwordRequired": "パスワードは必須です",
+      "passwordMismatch": "パスワードが一致しません",
+      "companyRequired": "会社を選択してください",
+      "departmentRequired": "部門を選択してください"
+    },
+    "message": {
+      "createSuccess": "ユーザーが作成されました",
+      "updateSuccess": "ユーザーが更新されました",
+      "deleteSuccess": "ユーザーが削除されました",
+      "resetPasswordSuccess": "パスワードがリセットされました。大切に保管してください",
+      "deleteConfirm": "ユーザー「{username}」を削除しますか？",
+      "deleteConfirmTitle": "削除の確認"
+    }
+  },
+  "role": {
+    "title": "役割管理",
+    "newButton": "役割を追加",
+    "column": {
+      "roleCode": "役割コード",
+      "roleNameCn": "中国語名",
+      "roleNameJp": "日本語名",
+      "roleType": "役割タイプ",
+      "description": "説明",
+      "userCount": "メンバー数",
+      "createTime": "作成日時"
+    },
+    "type": {
+      "SYSTEM": "システム組み込み",
+      "BUSINESS": "ビジネス役割"
+    },
+    "action": {
+      "edit": "編集",
+      "delete": "削除",
+      "config": "権限を設定"
+    },
+    "dialog": {
+      "createTitle": "役割を追加",
+      "editTitle": "役割を編集",
+      "roleCode": "役割コード",
+      "roleNameCn": "役割名（中国語）",
+      "roleNameJp": "役割名（日本語）",
+      "roleType": "役割タイプ",
+      "description": "説明",
+      "cancel": "キャンセル",
+      "save": "保存設定"
+    },
+    "module": {
+      "procurement": "発注管理",
+      "logistics": "物流管理",
+      "customs": "通関管理",
+      "finance": "財務管理",
+      "sales": "販売管理",
+      "product": "商品管理",
+      "system": "システム管理"
+    },
+    "permission": {
+      "selectTip": "左側の役割を選択して権限を設定してください"
+    },
+    "message": {
+      "createSuccess": "役割が作成されました",
+      "updateSuccess": "役割が更新されました",
+      "deleteSuccess": "役割が削除されました",
+      "deleteConfirm": "役割「{name}」を削除しますか？",
+      "deleteConfirmTitle": "削除の確認",
+      "deleteSystemRole": "システム組み込みの役割は削除できません",
+      "permissionSaved": "権限設定が保存されました"
+    },
+    "validation": {
+      "roleCodeRequired": "役割コードは必須です",
+      "roleNameCnRequired": "役割名は必須です"
     }
   }
 }
