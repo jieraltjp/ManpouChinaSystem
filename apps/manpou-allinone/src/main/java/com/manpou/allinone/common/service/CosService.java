@@ -2,18 +2,16 @@ package com.manpou.allinone.common.service;
 
 import com.manpou.allinone.common.config.CosConfig;
 import com.manpou.allinone.common.exception.BusinessException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Base64;
 
 /**
  * 腾讯云 COS 对象存储服务（REST API 方式，无 SDK 依赖）。
@@ -23,16 +21,32 @@ import java.util.Base64;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class CosService {
 
     private final CosConfig cosConfig;
     private final RestTemplate cosRestTemplate;
 
+    @Autowired
+    public CosService(CosConfig cosConfig,
+                      @Autowired(required = false) RestTemplate cosRestTemplate) {
+        this.cosConfig = cosConfig;
+        this.cosRestTemplate = cosRestTemplate;
+    }
+
     /**
      * 上传文件到 COS，返回完整访问 URL。
      */
+    private void ensureEnabled() {
+        if (!cosConfig.isEnabled()) {
+            throw BusinessException.internal("COS 未启用，请检查 cos.enabled 配置");
+        }
+        if (cosRestTemplate == null) {
+            throw BusinessException.internal("COS RestTemplate 未初始化，请检查 cos.secret-id / cos.secret-key 配置");
+        }
+    }
+
     public String upload(MultipartFile file) {
+        ensureEnabled();
         String key = cosConfig.generateKey(file.getOriginalFilename());
         String host = cosConfig.getBucketHost();
         String url = "https://" + host + "/" + key;
@@ -70,6 +84,7 @@ public class CosService {
      * 删除 COS 对象。
      */
     public void delete(String url) {
+        ensureEnabled();
         String key = extractKey(url);
         if (key == null || key.isBlank()) {
             log.warn("[COS] Cannot extract key from url={}", url);

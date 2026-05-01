@@ -172,6 +172,12 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/pages/system/RolePage.vue'),
             meta: { titleKey: 'menu.role', requiresAuth: true },
           },
+          {
+            path: 'cos-test',
+            name: 'CosTest',
+            component: () => import('@/pages/system/CosTestPage.vue'),
+            meta: { titleKey: 'menu.cosTest', requiresAuth: true },
+          },
         ],
       },
     ],

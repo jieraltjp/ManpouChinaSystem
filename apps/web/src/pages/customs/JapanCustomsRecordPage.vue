@@ -81,7 +81,7 @@
       </template>
 
       <!-- 列表视图 -->
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <el-table v-loading="loading" v-if="viewMode === 'list'" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="containerNo" :label="$t('japanCustoms.column.containerNo')" min-width="160">
           <template #default="{ row }">
             <el-link v-if="row.containerNo" type="primary" @click.stop="onJumpToDomestic(row)">{{ row.containerNo }}</el-link>

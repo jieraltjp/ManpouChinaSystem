@@ -26,7 +26,8 @@
     "orderOverview": "注文一覧",
     "system": "システム管理",
     "user": "ユーザー管理",
-    "role": "役割管理"
+    "role": "役割管理",
+    "cosTest": "COS テスト"
   },
   "auth": {
     "login": "ログイン",

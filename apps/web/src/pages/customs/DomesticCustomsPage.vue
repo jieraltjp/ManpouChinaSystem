@@ -46,7 +46,7 @@
           <el-input v-model="filterForm.containerNo" :placeholder="$t('customs.filter.containerNoPlaceholder')" clearable style="width:150px" />
         </el-form-item>
         <el-form-item :label="$t('customs.filter.procurementId')">
-          <el-input-number v-model="filterForm.procurementId" :placeholder="$t('customs.filter.procurementIdPlaceholder')" :min="1" style="width:130px" clearable />
+          <el-input-number v-model="filterForm.procurementId" :placeholder="$t('customs.filter.procurementIdPlaceholder')" :min="1" style="width:130px; height:32px" clearable />
         </el-form-item>
         <el-form-item :label="$t('customs.filter.status')">
           <el-select v-model="filterForm.status" :placeholder="$t('common.all')" clearable style="width:130px">
@@ -74,14 +74,11 @@
             <el-radio-button value="list">{{ $t('customs.viewMode.list') }}</el-radio-button>
             <el-radio-button value="group">{{ $t('customs.viewMode.byContainer') }}</el-radio-button>
           </el-radio-group>
-          <el-button type="primary" size="small" @click="onNew">
-            <el-icon><Plus /></el-icon> {{ $t('customs.batchButton') }}
-          </el-button>
         </div>
       </template>
 
       <!-- 列表视图 -->
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <el-table v-loading="loading" v-if="viewMode === 'list'" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="customsCode" :label="$t('customs.column.customsCode')" min-width="180">
           <template #default="{ row }">
             <span class="code-badge">{{ row.customsCode }}</span>
@@ -713,4 +710,5 @@ watch(tableData, () => {
 .batch-plan-table { margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; }
 .batch-footer { background: var(--bg-page); border-radius: var(--radius-sm); padding: 12px 4px; }
 .batch-count-display { font-size: 22px; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; line-height: 32px; }
+.filter-card :deep(.el-card__body) { padding-bottom: 0; }
 </style>

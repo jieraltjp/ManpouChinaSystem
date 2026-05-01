@@ -26,7 +26,8 @@
     "orderOverview": "订单总览",
     "system": "系统管理",
     "user": "用户管理",
-    "role": "角色管理"
+    "role": "角色管理",
+    "cosTest": "COS 测试"
   },
   "auth": {
     "login": "登录",
