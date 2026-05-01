@@ -374,7 +374,7 @@ async function loadData() {
       salesChannel: filterForm.salesChannel || undefined,
       status: filterForm.status || undefined,
     })
-    const data = res.data.data
+    const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {

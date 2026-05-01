@@ -457,7 +457,7 @@ async function loadData() {
       procurementId: filterForm.procurementId,
       status: filterForm.status || undefined,
     })
-    const data = res.data.data
+    const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {
@@ -488,7 +488,7 @@ async function searchContainers(query: string) {
   containerLoading.value = true
   try {
     const res = await logisticsApi.list({ containerNo: query, pageSize: 20 })
-    containerOptions.value = res.data.data?.content ?? []
+    containerOptions.value = res.data?.content ?? []
   } catch {
     containerOptions.value = []
   } finally {
@@ -505,7 +505,7 @@ async function onBatchContainerSelect(containerNo: string) {
   containerLoading.value = true
   try {
     const res = await logisticsApi.list({ containerNo, pageSize: 100 })
-    const plans: LogisticsPlanVO[] = res.data.data?.content ?? []
+    const plans: LogisticsPlanVO[] = res.data?.content ?? []
     // 检查每个 plan 是否已有报关记录（通过表格数据中的 customsCode 推断）
     const existingContainerNos = new Set(
       tableData.value.filter(r => r.containerNo === containerNo).map(r => r.productCode + '-' + r.subProductCode)
@@ -571,7 +571,7 @@ async function onBatchSubmit() {
       remarks: batchForm.remarks || undefined,
     }
     const res = await customsApi.batchCreate(req)
-    const ids: number[] = res.data.data ?? []
+    const ids: number[] = res.data ?? []
     ElMessage.success(t('customs.message.batchCreateSuccess', { n: ids.length }))
     dialogVisible.value = false
     loadData()

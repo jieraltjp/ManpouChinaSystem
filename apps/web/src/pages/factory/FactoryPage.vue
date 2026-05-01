@@ -307,7 +307,7 @@ async function loadData() {
       city: filterForm.city || undefined,
       county: filterForm.county || undefined,
     })
-    const data = res.data.data
+    const data = res.data
     tableData.value = data.content
     pagination.total = data.totalElements
   } finally {
@@ -319,7 +319,7 @@ async function loadData() {
 async function loadStats() {
   try {
     const res = await factoryApi.stats()
-    factoryStats.value = res.data.data
+    factoryStats.value = res.data
   } catch { /* ignore */ }
 }
 

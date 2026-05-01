@@ -186,7 +186,7 @@ async function fetch() {
   error.value = null
   try {
     const res = await orderOverviewApi.getOverview(procurementId.value)
-    overview.value = res.data.data
+    overview.value = res.data
   } catch (e: unknown) {
     error.value = (e as Error).message ?? t('orderOverview.loadFailed')
   } finally {

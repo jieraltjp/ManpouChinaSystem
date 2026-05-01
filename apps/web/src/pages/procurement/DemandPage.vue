@@ -433,7 +433,7 @@ async function fetchProductCategories(rows: DemandPageVO[]) {
   const map: Record<string, string> = {}
   results.forEach((r, i) => {
     if (r.status === 'fulfilled') {
-      map[codes[i]] = r.value.data.data?.category || '-'
+      map[codes[i]] = r.value.data?.category || '-'
     } else {
       console.warn('[DemandPage] fetch category failed for', codes[i], r.reason)
     }
@@ -478,7 +478,7 @@ async function loadData() {
       demandType: filterForm.demandType || undefined,
       productCode: filterForm.productCode.trim() || undefined,
     })
-    const payload = res.data.data as { content: DemandPageVO[]; totalElements: number }
+    const payload = res.data as { content: DemandPageVO[]; totalElements: number }
     tableData.value = payload.content || []
     pagination.total = payload.totalElements || 0
     fetchProductCategories(tableData.value)
@@ -542,7 +542,7 @@ async function searchMasterCode(query: string) {
     masterCodeLoading.value = true
     try {
       const res = await productApi.suggestMasterCodes(query)
-      masterCodeRaw.value = res.data.data || []
+      masterCodeRaw.value = res.data || []
     } catch (e) { masterCodeRaw.value = [] } finally { masterCodeLoading.value = false }
   }, 300)
 }
@@ -564,7 +564,7 @@ async function loadSubCodeOptions() {
   subCodeLoading.value = true
   try {
     const res = await productApi.suggestSubCodes(masterCode)
-    subCodeOptions.value = res.data.data || []
+    subCodeOptions.value = res.data || []
     // 自动代入第一个子货号
     if (!formData.subProductCode && subCodeOptions.value.length > 0) {
       formData.subProductCode = subCodeOptions.value[0].subCode
@@ -576,7 +576,7 @@ async function searchDestination(query: string) {
   destLoading.value = true
   try {
     const res = await demandApi.suggestDestinations()
-    const all = res.data.data || []
+    const all = res.data || []
     destOptions.value = query
       ? all.filter((d: string) => d.toLowerCase().includes(query.toLowerCase()))
       : all
@@ -588,7 +588,7 @@ async function searchJapanLead(query: string) {
   leadLoading.value = true
   try {
     const res = await demandApi.suggestJapanLeads()
-    const all = res.data.data || []
+    const all = res.data || []
     leadOptions.value = query
       ? all.filter((l: string) => l.toLowerCase().includes(query.toLowerCase()))
       : all

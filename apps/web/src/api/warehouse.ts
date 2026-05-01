@@ -37,13 +37,13 @@ export interface UpdateWarehouseRequest {
 
 export const warehouseApi = {
   list(params: { page?: number; pageSize?: number; keyword?: string }) {
-    return client.get<{ code: string; data: WarehousePageResponse }>('/warehouse', { params })
+    return client.get<WarehousePageResponse>('/warehouse', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: WarehouseVO }>(`/warehouse/${id}`)
+    return client.get<WarehouseVO>(`/warehouse/${id}`)
   },
   create(data: CreateWarehouseRequest) {
-    return client.post<{ code: string; data: number }>('/warehouse', data)
+    return client.post<number>('/warehouse', data)
   },
   update(id: number, data: UpdateWarehouseRequest) {
     return client.put<{ code: string }>(`/warehouse/${id}`, data)

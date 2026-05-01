@@ -81,16 +81,16 @@ export interface UpdateFactoryRequest {
 
 export const factoryApi = {
   list(params: { page?: number; pageSize?: number; factoryName?: string; cooperationStatus?: string; province?: string; city?: string; county?: string }) {
-    return client.get<{ code: string; data: FactoryPageResponse }>('/factories', { params })
+    return client.get<FactoryPageResponse>('/factories', { params })
   },
   stats() {
-    return client.get<{ code: string; data: FactoryStatsDTO }>('/factories/stats')
+    return client.get<FactoryStatsDTO>('/factories/stats')
   },
   get(id: number) {
-    return client.get<{ code: string; data: FactoryPageVO }>(`/factories/${id}`)
+    return client.get<FactoryPageVO>(`/factories/${id}`)
   },
   create(data: CreateFactoryRequest) {
-    return client.post<{ code: string; data: number }>('/factories', data)
+    return client.post<number>('/factories', data)
   },
   update(id: number, data: UpdateFactoryRequest) {
     return client.patch<{ code: string }>(`/factories/${id}`, data)

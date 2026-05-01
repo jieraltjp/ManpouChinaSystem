@@ -308,7 +308,7 @@ async function loadData() {
       planType: filterForm.planType || undefined,
       status: filterForm.status || undefined,
     })
-    const data = res.data.data
+    const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } catch (e) {
@@ -340,7 +340,7 @@ async function loadQcRecordOptions() {
   try {
     // 只过滤 result=PASS，status 不限制（DB 里 status=PENDING 也是合法验货记录）
     const res = await inspectionApi.list({ page: 0, pageSize: 100, result: 'PASS' })
-    qcRecordOptions.value = res.data.data?.content ?? []
+    qcRecordOptions.value = res.data?.content ?? []
   } catch (e) {
     console.error('[LogisticsPlanPage] loadQcRecordOptions failed', e)
     qcRecordOptions.value = []
@@ -359,7 +359,7 @@ watch(dialogVisible, (val) => {
 async function loadFactoryOptions() {
   try {
     const res = await factoryApi.list({ page: 0, pageSize: 200 })
-    factoryOptions.value = res.data.data?.content ?? []
+    factoryOptions.value = res.data?.content ?? []
   } catch (e) {
     console.error('[LogisticsPlanPage] loadFactoryOptions failed', e)
     factoryOptions.value = []
@@ -473,8 +473,8 @@ async function onEdit(row: LogisticsPlanVO) {
   if (row.qcRecordId) {
     try {
       const res = await inspectionApi.get(row.qcRecordId)
-      if (res.data.data?.factoryId) {
-        factoryId = res.data.data.factoryId
+      if (res.data?.factoryId) {
+        factoryId = res.data.factoryId
       }
     } catch {
       // ignore

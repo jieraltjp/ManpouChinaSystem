@@ -184,7 +184,7 @@ async function loadData() {
       procurementId: procurementId.value ?? undefined,
       status: filterForm.status || undefined,
     })
-    const payload = res.data.data as { content: ShipmentBatchVO[]; totalElements: number }
+    const payload = res.data as { content: ShipmentBatchVO[]; totalElements: number }
     tableRows.value = payload?.content ?? []
     pagination.total = payload?.totalElements ?? 0
     if (tableRows.value.length === 0 && pagination.total > 0 && pagination.page > 1) {

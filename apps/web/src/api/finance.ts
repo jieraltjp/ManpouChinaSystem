@@ -39,13 +39,13 @@ export interface UpdateFinanceRequest {
 
 export const financeApi = {
   list(params: { page?: number; pageSize?: number; keyword?: string }) {
-    return client.get<{ code: string; data: FinancePageResponse }>('/finance', { params })
+    return client.get<FinancePageResponse>('/finance', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: FinanceVO }>(`/finance/${id}`)
+    return client.get<FinanceVO>(`/finance/${id}`)
   },
   create(data: CreateFinanceRequest) {
-    return client.post<{ code: string; data: number }>('/finance', data)
+    return client.post<number>('/finance', data)
   },
   update(id: number, data: UpdateFinanceRequest) {
     return client.put<{ code: string }>(`/finance/${id}`, data)

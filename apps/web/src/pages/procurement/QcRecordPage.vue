@@ -446,7 +446,7 @@ watch(dialogVisible, async (val) => {
     shipmentBatchLoading.value = true
     try {
       const res = await shipmentBatchApi.list({ page: 0, pageSize: 200 })
-      shipmentBatchList.value = res.data.data?.content ?? []
+      shipmentBatchList.value = res.data?.content ?? []
     } catch {
       shipmentBatchList.value = []
     } finally {
@@ -504,8 +504,8 @@ async function uploadAndGetUrls(qcRecordId?: number): Promise<string[]> {
   try {
     const files = pending.map(f => f.raw).filter((f): f is File => f !== undefined)
     const res = await inspectionApi.uploadImages(files, qcRecordId)
-    if (res.data.code === 'ok' && res.data.data) {
-      return res.data.data.map(r => r.url)
+    if (res.data && Array.isArray(res.data)) {
+      return res.data.map(r => r.url)
     }
   } catch {
     ElMessage.warning(t('inspection.dialog.imageUploadWarning'))
@@ -525,7 +525,7 @@ async function loadData() {
       procurementId: filterForm.procurementId,
       shipmentBatchId: filterForm.shipmentBatchId,
     })
-    const data = res.data.data
+    const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {
@@ -563,7 +563,7 @@ function onShipmentBatchSelected(id: number) {
   // 通过 procurementId 补充商品信息（productCode, sellerName, material, destination）
   if (batch.procurementId) {
     procurementApi.list({ page: 0, pageSize: 200 }).then(res => {
-      const p = (res.data.data?.content ?? []).find((p: ProcurementPageVO) => p.id === batch.procurementId)
+      const p = (res.data?.content ?? []).find((p: ProcurementPageVO) => p.id === batch.procurementId)
       if (p) {
         form.productCode = p.productCode || ''
         form.subProductCode = p.subProductCode || ''
@@ -718,8 +718,8 @@ function onEdit(row: QcRecordVO) {
   // 加载出货批次下拉（编辑时用于参考）
   if (row.shipmentBatchId) {
     shipmentBatchApi.get(row.shipmentBatchId).then(res => {
-      if (res.data.data) {
-        shipmentBatchList.value = [res.data.data]
+      if (res.data) {
+        shipmentBatchList.value = [res.data]
       }
     }).catch(() => {})
   }
@@ -758,7 +758,7 @@ onMounted(() => {
   loadData()
   // 预加载出货批次下拉（筛选用）
   shipmentBatchApi.list({ page: 0, pageSize: 200 }).then(res => {
-    shipmentBatchList.value = res.data.data?.content ?? []
+    shipmentBatchList.value = res.data?.content ?? []
   }).catch(() => {})
 })
 </script>

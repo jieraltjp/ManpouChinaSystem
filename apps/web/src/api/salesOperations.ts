@@ -78,16 +78,16 @@ export interface SalesRecordStockRequest {
 
 export const salesOperationsApi = {
   list(params: SalesRecordQuery) {
-    return client.get<{ code: string; data: SalesRecordPageResponse }>('/sales-records', { params })
+    return client.get<SalesRecordPageResponse>('/sales-records', { params })
   },
   alerts(params: SalesRecordQuery) {
-    return client.get<{ code: string; data: SalesRecordPageResponse }>('/sales-records/alerts', { params })
+    return client.get<SalesRecordPageResponse>('/sales-records/alerts', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: SalesRecordVO }>(`/sales-records/${id}`)
+    return client.get<SalesRecordVO>(`/sales-records/${id}`)
   },
   create(data: SalesRecordCreateRequest) {
-    return client.post<{ code: string; data: number }>('/sales-records', data)
+    return client.post<number>('/sales-records', data)
   },
   update(id: number, data: SalesRecordUpdateRequest) {
     return client.put<{ code: string }>(`/sales-records/${id}`, data)

@@ -266,15 +266,15 @@ export interface DemandPageResponse {
 
 export const orderOverviewApi = {
   getOverview(procurementId: number) {
-    return client.get<{ code: string; data: OrderOverviewVO }>(`/orders/procurement/${procurementId}/overview`)
+    return client.get<OrderOverviewVO>(`/orders/procurement/${procurementId}/overview`)
   },
   listProcurementSelector(params: { page?: number; pageSize?: number; keyword?: string }) {
-    return client.get<{ code: string; data: ProcurementPageResponse }>('/orders/procurement/selector', { params })
+    return client.get<ProcurementPageResponse>('/orders/procurement/selector', { params })
   },
   listDemandSelector(params: { page?: number; pageSize?: number; status?: string; keyword?: string }) {
-    return client.get<{ code: string; data: DemandPageResponse }>('/orders/demands', { params })
+    return client.get<DemandPageResponse>('/orders/demands', { params })
   },
   getDemandOverview(demandId: number) {
-    return client.get<{ code: string; data: DemandOverviewVO }>(`/orders/demands/${demandId}/overview`)
+    return client.get<DemandOverviewVO>(`/orders/demands/${demandId}/overview`)
   },
 }

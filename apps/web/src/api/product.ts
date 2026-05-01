@@ -167,16 +167,16 @@ export interface ProductFactoryVO {
 
 export const productApi = {
   list(params: { page?: number; pageSize?: number; masterCode?: string; keyword?: string; hsCode?: string; hsCodeJp?: string; factoryName?: string }) {
-    return client.get<{ code: string; data: ProductPageResponse }>('/products', { params })
+    return client.get<ProductPageResponse>('/products', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: ProductPageVO }>(`/products/${id}`)
+    return client.get<ProductPageVO>(`/products/${id}`)
   },
   getByCode(masterCode: string) {
-    return client.get<{ code: string; data: ProductPageVO }>(`/products/code/${masterCode}`)
+    return client.get<ProductPageVO>(`/products/code/${masterCode}`)
   },
   create(data: CreateProductRequest) {
-    return client.post<{ code: string; data: number }>('/products', data)
+    return client.post<number>('/products', data)
   },
   update(id: number, data: UpdateProductRequest) {
     return client.patch<{ code: string }>(`/products/${id}`, data)
@@ -185,16 +185,16 @@ export const productApi = {
     return client.delete<{ code: string }>(`/products/${id}`)
   },
   suggestMasterCodes(keyword: string) {
-    return client.get<{ code: string; data: MasterCodeSuggestVO[] }>('/products/suggest/master-codes', {
+    return client.get<MasterCodeSuggestVO[]>('/products/suggest/master-codes', {
       params: { keyword },
     })
   },
   suggestSubCodes(masterCode: string) {
-    return client.get<{ code: string; data: SubCodeSuggestVO[] }>('/products/suggest/sub-codes', {
+    return client.get<SubCodeSuggestVO[]>('/products/suggest/sub-codes', {
       params: { masterCode },
     })
   },
   getProductFactories(id: number) {
-    return client.get<{ code: string; data: ProductFactoryVO[] }>(`/products/${id}/factories`)
+    return client.get<ProductFactoryVO[]>(`/products/${id}/factories`)
   },
 }

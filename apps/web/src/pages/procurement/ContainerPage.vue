@@ -43,7 +43,7 @@ async function loadData() {
       pageSize: pagination.value.pageSize,
       status: filterForm.value.status || undefined,
     })
-    const data = res.data?.data
+    const data = res.data
     tableData.value = data?.content ?? []
     pagination.value.total = data?.totalElements ?? 0
   } catch {

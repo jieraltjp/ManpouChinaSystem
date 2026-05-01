@@ -100,16 +100,16 @@ export interface JapanCustomsBatchCreateRequest {
 
 export const japanCustomsApi = {
   list(params: JapanCustomsQuery) {
-    return client.get<{ code: string; data: JapanCustomsPageResponse }>('/japan-customs', { params })
+    return client.get<JapanCustomsPageResponse>('/japan-customs', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: JapanCustomsVO }>(`/japan-customs/${id}`)
+    return client.get<JapanCustomsVO>(`/japan-customs/${id}`)
   },
   create(data: JapanCustomsCreateRequest) {
-    return client.post<{ code: string; data: number }>('/japan-customs', data)
+    return client.post<number>('/japan-customs', data)
   },
   batchCreate(data: JapanCustomsBatchCreateRequest) {
-    return client.post<{ code: string; data: number[] }>('/japan-customs/batch', data)
+    return client.post<number[]>('/japan-customs/batch', data)
   },
   update(id: number, data: JapanCustomsUpdateRequest) {
     return client.put<{ code: string }>(`/japan-customs/${id}`, data)

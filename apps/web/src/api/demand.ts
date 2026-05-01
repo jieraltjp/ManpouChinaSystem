@@ -61,13 +61,13 @@ export interface UpdateDemandRequest {
 
 export const demandApi = {
   list(params: { page?: number; pageSize?: number; demandType?: string; productCode?: string }) {
-    return client.get<{ code: string; data: DemandPageResponse }>('/demands', { params })
+    return client.get<DemandPageResponse>('/demands', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: DemandPageVO }>(`/demands/${id}`)
+    return client.get<DemandPageVO>(`/demands/${id}`)
   },
   create(data: CreateDemandRequest) {
-    return client.post<{ code: string; data: number }>('/demands', data)
+    return client.post<number>('/demands', data)
   },
   update(id: number, data: UpdateDemandRequest) {
     return client.patch<{ code: string }>(`/demands/${id}`, data)
@@ -85,14 +85,14 @@ export const demandApi = {
   },
   /** 查看关联的采购单 */
   getLinkedProcurement(id: number) {
-    return client.get<{ code: string; data: unknown }>(`/demands/${id}/procurement`)
+    return client.get<unknown>(`/demands/${id}/procurement`)
   },
   /** 目的地建议（下拉去重列表） */
   suggestDestinations() {
-    return client.get<{ code: string; data: string[] }>('/demands/suggest/destinations')
+    return client.get<string[]>('/demands/suggest/destinations')
   },
   /** 日本担当建议（下拉去重列表） */
   suggestJapanLeads() {
-    return client.get<{ code: string; data: string[] }>('/demands/suggest/japan-leads')
+    return client.get<string[]>('/demands/suggest/japan-leads')
   },
 }

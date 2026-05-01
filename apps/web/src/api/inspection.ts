@@ -107,13 +107,13 @@ export interface UpdateQcRecordRequest {
 
 export const inspectionApi = {
   list(params: { page?: number; pageSize?: number; qcCode?: string; productCode?: string; result?: QcResult; status?: string; qcDateFrom?: string; qcDateTo?: string; procurementId?: number; shipmentBatchId?: number }) {
-    return client.get<{ code: string; data: QcRecordPageResponse }>('/qc-records', { params })
+    return client.get<QcRecordPageResponse>('/qc-records', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: QcRecordVO }>(`/qc-records/${id}`)
+    return client.get<QcRecordVO>(`/qc-records/${id}`)
   },
   create(data: CreateQcRecordRequest) {
-    return client.post<{ code: string; data: number }>('/qc-records', data)
+    return client.post<number>('/qc-records', data)
   },
   update(id: number, data: UpdateQcRecordRequest) {
     return client.patch<{ code: string }>(`/qc-records/${id}`, data)
@@ -127,7 +127,7 @@ export const inspectionApi = {
     const form = new FormData()
     form.append('file', file)
     if (qcRecordId) form.append('qcRecordId', String(qcRecordId))
-    return client.post<{ code: string; data: ImageUploadResult }>('/qc/images/upload', form, {
+    return client.post<ImageUploadResult>('/qc/images/upload', form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
@@ -137,7 +137,7 @@ export const inspectionApi = {
     const form = new FormData()
     files.forEach(f => form.append('files', f))
     if (qcRecordId) form.append('qcRecordId', String(qcRecordId))
-    return client.post<{ code: string; data: ImageUploadResult[] }>('/qc/images/upload-multiple', form, {
+    return client.post<ImageUploadResult[]>('/qc/images/upload-multiple', form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
@@ -149,7 +149,7 @@ export const inspectionApi = {
 
   /** 查询验货记录关联的图片列表（SPEC-C12） */
   listImages(qcRecordId: number) {
-    return client.get<{ code: string; data: QcImageVO[] }>(`/qc/images`, { params: { qcRecordId } })
+    return client.get<QcImageVO[]>(`/qc/images`, { params: { qcRecordId } })
   },
 }
 

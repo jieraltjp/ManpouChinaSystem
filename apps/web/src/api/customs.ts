@@ -83,16 +83,16 @@ export interface RejectRequest {
 
 export const customsApi = {
   list(params: CustomsQuery) {
-    return client.get<{ code: string; data: CustomsPageResponse }>('/customs', { params })
+    return client.get<CustomsPageResponse>('/customs', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: CustomsVO }>(`/customs/${id}`)
+    return client.get<CustomsVO>(`/customs/${id}`)
   },
   create(data: CustomsCreateRequest) {
-    return client.post<{ code: string; data: number }>('/customs', data)
+    return client.post<number>('/customs', data)
   },
   batchCreate(data: CustomsBatchCreateRequest) {
-    return client.post<{ code: string; data: number[] }>('/customs/batch', data)
+    return client.post<number[]>('/customs/batch', data)
   },
   update(id: number, data: CustomsUpdateRequest) {
     return client.put<{ code: string }>(`/customs/${id}`, data)

@@ -330,8 +330,8 @@ async function loadChainList() {
       demandStatus: filter.status || undefined,
       keyword: filter.keyword || undefined,
     })
-    chainData.value = res.data.data?.content ?? []
-    total.value = res.data.data?.totalElements ?? 0
+    chainData.value = res.data?.content ?? []
+    total.value = res.data?.totalElements ?? 0
   } finally {
     loading.value = false
   }
@@ -356,7 +356,7 @@ async function onView(row: OrderChainVO) {
   detailLoading.value = true
   try {
     const res = await orderChainApi.getChainDetail(row.demandId)
-    detailData.value = res.data.data
+    detailData.value = res.data
   } catch {
     detailData.value = null
   } finally {

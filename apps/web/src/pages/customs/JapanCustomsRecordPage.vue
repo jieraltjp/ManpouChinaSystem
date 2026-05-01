@@ -649,7 +649,7 @@ async function loadDomesticTable(containerNo: string) {
       page: 0,
       pageSize: 50,
     })
-    domesticTableOptions.value = res.data.data?.content ?? []
+    domesticTableOptions.value = res.data?.content ?? []
   } catch (e) {
     console.error('[JapanCustomsRecordPage] load domestic customs failed', e)
   } finally {
@@ -670,7 +670,7 @@ async function searchDomesticContainers(keyword: string) {
       page: 0,
       pageSize: 20,
     })
-    const list: CustomsVO[] = res.data.data?.content ?? []
+    const list: CustomsVO[] = res.data?.content ?? []
     // 去重 containerNo
     const seen = new Set<string>()
     domesticContainerOptions.value = list
@@ -721,7 +721,7 @@ async function searchBatchContainers(keyword: string) {
   batchContainerLoading.value = true
   try {
     const res = await customsApi.list({ status: 'CLEARED', containerNo: keyword, page: 0, pageSize: 20 })
-    const list: CustomsVO[] = res.data.data?.content ?? []
+    const list: CustomsVO[] = res.data?.content ?? []
     const seen = new Set<string>()
     batchContainerOptions.value = list
       .filter(r => r.containerNo && !seen.has(r.containerNo) && seen.add(r.containerNo))
@@ -741,7 +741,7 @@ async function onBatchContainerSelect(val: string) {
   batchTableLoading.value = true
   try {
     const res = await customsApi.list({ status: 'CLEARED', containerNo: val, page: 0, pageSize: 50 })
-    batchDomesticList.value = res.data.data?.content ?? []
+    batchDomesticList.value = res.data?.content ?? []
   } catch (e) {
     console.error('[JapanCustomsRecordPage] load batch domestic list failed', e)
   } finally {
@@ -821,7 +821,7 @@ async function loadData() {
       containerNo: filterForm.containerNo || undefined,
       domesticCustomsId: filterForm.domesticCustomsId,
     })
-    const data = res.data.data
+    const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {

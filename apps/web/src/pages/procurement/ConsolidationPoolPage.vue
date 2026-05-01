@@ -40,7 +40,7 @@ async function loadData() {
       status: filterForm.value.status || undefined,
       destinationPort: filterForm.value.destinationPort || undefined,
     })
-    const data = res.data?.data
+    const data = res.data
     tableData.value = data?.content ?? []
     pagination.value.total = data?.totalElements ?? 0
   } catch {
@@ -109,7 +109,7 @@ async function onCreateContainer(row: ConsolidationPoolVO) {
       t('logistics.pool.createContainerConfirm', { poolCode: row.poolCode }),
       t('logistics.pool.createContainer'), { type: 'info' })
     const res = await containerApi.create({ containerNo: '', containerType: 'GP20', poolId: row.id })
-    ElMessage.success(t('logistics.pool.containerCreated') + ' ID: ' + res.data?.data)
+    ElMessage.success(t('logistics.pool.containerCreated') + ' ID: ' + res.data)
     loadData()
   } catch {
     // cancelled

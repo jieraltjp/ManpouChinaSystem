@@ -122,13 +122,13 @@ export interface UpdateLogisticsPlanRequest {
 
 export const logisticsApi = {
   list(params: { page?: number; pageSize?: number; productCode?: string; planType?: PlanType; status?: LogisticsStatus; qcRecordId?: number; procurementId?: number; factoryId?: number; containerNo?: string }) {
-    return client.get<{ code: string; data: LogisticsPlanPageResponse }>('/logistics-plans', { params })
+    return client.get<LogisticsPlanPageResponse>('/logistics-plans', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: LogisticsPlanVO }>(`/logistics-plans/${id}`)
+    return client.get<LogisticsPlanVO>(`/logistics-plans/${id}`)
   },
   create(data: CreateLogisticsPlanRequest) {
-    return client.post<{ code: string; data: number }>('/logistics-plans', data)
+    return client.post<number>('/logistics-plans', data)
   },
   update(id: number, data: UpdateLogisticsPlanRequest) {
     return client.patch<{ code: string }>(`/logistics-plans/${id}`, data)
@@ -159,13 +159,13 @@ export interface UpdateConsolidationPoolRequest {
 
 export const consolidationPoolApi = {
   list(params: { page?: number; pageSize?: number; status?: ConsolidationPoolStatus; destinationPort?: string }) {
-    return client.get<{ code: string; data: ConsolidationPoolPageResponse }>('/consolidation-pools', { params })
+    return client.get<ConsolidationPoolPageResponse>('/consolidation-pools', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: ConsolidationPoolVO }>(`/consolidation-pools/${id}`)
+    return client.get<ConsolidationPoolVO>(`/consolidation-pools/${id}`)
   },
   create(data: CreateConsolidationPoolRequest) {
-    return client.post<{ code: string; data: number }>('/consolidation-pools', data)
+    return client.post<number>('/consolidation-pools', data)
   },
   update(id: number, data: UpdateConsolidationPoolRequest) {
     return client.patch<{ code: string }>(`/consolidation-pools/${id}`, data)
@@ -209,13 +209,13 @@ export interface UpdateContainerRequest {
 
 export const containerApi = {
   list(params: { page?: number; pageSize?: number; status?: ContainerStatus; poolId?: number }) {
-    return client.get<{ code: string; data: ContainerPageResponse }>('/containers', { params })
+    return client.get<ContainerPageResponse>('/containers', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: ContainerVO }>(`/containers/${id}`)
+    return client.get<ContainerVO>(`/containers/${id}`)
   },
   create(data: CreateContainerRequest) {
-    return client.post<{ code: string; data: number }>('/containers', data)
+    return client.post<number>('/containers', data)
   },
   update(id: number, data: UpdateContainerRequest) {
     return client.patch<{ code: string }>(`/containers/${id}`, data)

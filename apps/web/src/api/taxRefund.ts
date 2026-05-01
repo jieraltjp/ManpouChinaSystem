@@ -65,13 +65,13 @@ export interface TaxRefundCompleteRequest {
 
 export const taxRefundApi = {
   list(params: TaxRefundQuery) {
-    return client.get<{ code: string; data: TaxRefundPageResponse }>('/tax-refunds', { params })
+    return client.get<TaxRefundPageResponse>('/tax-refunds', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: TaxRefundVO }>(`/tax-refunds/${id}`)
+    return client.get<TaxRefundVO>(`/tax-refunds/${id}`)
   },
   create(data: TaxRefundCreateRequest) {
-    return client.post<{ code: string; data: number }>('/tax-refunds', data)
+    return client.post<number>('/tax-refunds', data)
   },
   complete(id: number, data: TaxRefundCompleteRequest) {
     return client.patch<{ code: string }>(`/tax-refunds/${id}/complete`, data)

@@ -249,9 +249,9 @@ export interface ChainPageResponse {
 
 export const orderChainApi = {
   listChain(params: { page?: number; pageSize?: number; demandStatus?: string; keyword?: string }) {
-    return client.get<{ code: string; data: ChainPageResponse }>('/orders/chain', { params })
+    return client.get<ChainPageResponse>('/orders/chain', { params })
   },
   getChainDetail(demandId: number) {
-    return client.get<{ code: string; data: OrderChainDetailVO }>(`/orders/chain/${demandId}`)
+    return client.get<OrderChainDetailVO>(`/orders/chain/${demandId}`)
   },
 }

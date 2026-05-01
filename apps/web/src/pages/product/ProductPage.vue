@@ -499,7 +499,7 @@ async function loadData() {
       hsCodeJp: filterForm.hsCodeJp || undefined,
       factoryName: filterForm.factoryName || undefined,
     })
-    const data = res.data.data
+    const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } finally {
@@ -530,7 +530,7 @@ async function onView(row: ProductPageVO) {
   factoriesLoading.value = true
   try {
     const res = await productApi.getProductFactories(row.id)
-    productFactories.value = res.data.data || []
+    productFactories.value = res.data || []
   } catch {
     productFactories.value = []
   } finally {

@@ -121,13 +121,13 @@ export interface UpdateProcurementRequest {
 
 export const procurementApi = {
   list(params: { page?: number; pageSize?: number; status?: string; productCode?: string; customerCompany?: string; factoryId?: number }) {
-    return client.get<{ code: string; data: ProcurementPageResponse }>('/procurements', { params })
+    return client.get<ProcurementPageResponse>('/procurements', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: ProcurementPageVO }>(`/procurements/${id}`)
+    return client.get<ProcurementPageVO>(`/procurements/${id}`)
   },
   create(data: CreateProcurementRequest) {
-    return client.post<{ code: string; data: number }>('/procurements', data)
+    return client.post<number>('/procurements', data)
   },
   update(id: number, data: UpdateProcurementRequest) {
     return client.patch<{ code: string }>(`/procurements/${id}`, data)
@@ -183,13 +183,13 @@ export interface UpdateShipmentBatchRequest {
 
 export const shipmentBatchApi = {
   list(params: { page?: number; pageSize?: number; procurementId?: number; status?: ShipmentBatchStatus }) {
-    return client.get<{ code: string; data: ShipmentBatchPageResponse }>('/shipment-batches', { params })
+    return client.get<ShipmentBatchPageResponse>('/shipment-batches', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: ShipmentBatchVO }>(`/shipment-batches/${id}`)
+    return client.get<ShipmentBatchVO>(`/shipment-batches/${id}`)
   },
   create(data: CreateShipmentBatchRequest) {
-    return client.post<{ code: string; data: number }>('/shipment-batches', data)
+    return client.post<number>('/shipment-batches', data)
   },
   update(id: number, data: UpdateShipmentBatchRequest) {
     return client.patch<{ code: string }>(`/shipment-batches/${id}`, data)

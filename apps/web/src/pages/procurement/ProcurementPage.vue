@@ -536,7 +536,7 @@ const factoryOptions = ref<FactoryPageVO[]>([])
 async function loadFactories() {
   try {
     const res = await factoryApi.list({ page: 0, pageSize: 200 })
-    factoryOptions.value = (res.data.data as { content: FactoryPageVO[] })?.content ?? []
+    factoryOptions.value = (res.data as { content: FactoryPageVO[] })?.content ?? []
   } catch { /* handled by interceptor */ }
 }
 
@@ -546,7 +546,7 @@ const selectedDemandId = ref<number | null>(null)
 async function loadDemands() {
   try {
     const res = await demandApi.list({ page: 0, pageSize: 200 })
-    demandOptions.value = (res.data.data as { content: DemandPageVO[] })?.content ?? []
+    demandOptions.value = (res.data as { content: DemandPageVO[] })?.content ?? []
   } catch { /* handled by interceptor */ }
 }
 
@@ -567,7 +567,7 @@ async function fetchCategory(productCode: string) {
   }
   try {
     const res = await productApi.getByCode(productCode)
-    const cat = res.data.data?.category || '-'
+    const cat = res.data?.category || '-'
     productCategoryMap.value = { ...productCategoryMap.value, [productCode]: cat }
     formData.category = getCategoryLabel(productCode)
   } catch {
@@ -583,7 +583,7 @@ async function fetchProductCategories(rows: ProcurementPageVO[]) {
   const map: Record<string, string> = {}
   results.forEach((r, i) => {
     if (r.status === 'fulfilled') {
-      map[codes[i]] = r.value.data.data?.category || '-'
+      map[codes[i]] = r.value.data?.category || '-'
     }
   })
   productCategoryMap.value = { ...productCategoryMap.value, ...map }
@@ -789,7 +789,7 @@ async function loadData() {
       productCode: filterForm.productCode.trim() || undefined,
       customerCompany: filterForm.customerCompany.trim() || undefined,
     })
-    const payload = res.data.data as { content: ProcurementPageVO[]; totalElements: number }
+    const payload = res.data as { content: ProcurementPageVO[]; totalElements: number }
     tableRows.value = payload?.content ?? []
     pagination.total = payload?.totalElements ?? 0
     fetchProductCategories(tableRows.value)
@@ -916,7 +916,7 @@ async function onSubmit() {
           status: formData.status || undefined,
         }
         const res = await procurementApi.create(req)
-        const newProcurementId = res.data.data as number
+        const newProcurementId = res.data as number
         const savedMsg = convertingDemandId.value !== null ? t('order.message.createSuccessConverting') : t('order.message.createSuccess')
         ElMessage.success(savedMsg)
         // 若为转采购模式，则关联需求单（v2.2.0）
@@ -960,7 +960,7 @@ async function onSubmit() {
         const idx = tableRows.value.findIndex(r => r.id === updatedId)
         if (idx !== -1) {
           const { data } = await procurementApi.get(updatedId)
-          tableRows.value[idx] = data.data as ProcurementPageVO
+          tableRows.value[idx] = data as ProcurementPageVO
         }
       }
       dialogVisible.value = false

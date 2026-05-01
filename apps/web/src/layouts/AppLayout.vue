@@ -248,8 +248,7 @@ function onLogout() {
 .sidebar {
   background: linear-gradient(180deg, #1E2533 0%, #252D3D 100%);
   transition: width 0.3s;
-  overflow-x: hidden;            /* 裁剪水平溢出：防止菜单项文字撑开侧边栏 */
-  overflow-y: visible;           /* 允许垂直溢出：使绝对定位的 arrow 能完整显示 */
+  overflow: visible;      /* 移出溢出控制，让绝对定位的 arrow 完整显示 */
   box-shadow: 2px 0 16px rgba(0,0,0,0.18);
   border-right: none;
 }
@@ -271,10 +270,11 @@ function onLogout() {
   box-shadow: 0 2px 8px rgba(232,101,10,0.35);
 }
 
-/* ── 菜单通用 ── */
+/* ── 菜单容器：负责水平截断 ── */
 .sidebar-menu {
   border-right: none;
   background: transparent;
+  overflow-x: hidden;   /* 水平截断在这里处理，arrow 不受影响 */
 }
 
 /* 子菜单标题行 */
@@ -285,7 +285,7 @@ function onLogout() {
   width: calc(100% - 16px);
   transition: all var(--transition-fast);
   min-width: 0;
-  overflow: visible;     /* 允许 arrow 完整显示 */
+  overflow: hidden;     /* 截断文字，绝对定位的 arrow 不受影响 */
 }
 
 /* 强制显示被 Element Plus 隐藏的 arrow */

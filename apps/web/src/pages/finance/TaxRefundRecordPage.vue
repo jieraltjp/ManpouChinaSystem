@@ -351,7 +351,7 @@ async function searchProcurement(query: string) {
   procurementLoading.value = true
   try {
     const res = await procurementApi.list({ page: 0, pageSize: 20, productCode: query.trim() || undefined })
-    procurementOptions.value = res.data.data?.content ?? []
+    procurementOptions.value = res.data?.content ?? []
   } catch { procurementOptions.value = [] }
   finally { procurementLoading.value = false }
 }
@@ -505,7 +505,7 @@ async function loadData() {
       status: filterForm.status || undefined,
       procurementId: filterForm.procurementId,
     })
-    const data = res.data.data
+    const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
   } catch (e: unknown) {

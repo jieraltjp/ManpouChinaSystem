@@ -37,13 +37,13 @@ export interface UpdateNotificationRequest {
 
 export const notificationApi = {
   list(params: { page?: number; pageSize?: number; keyword?: string }) {
-    return client.get<{ code: string; data: NotificationPageResponse }>('/notifications', { params })
+    return client.get<NotificationPageResponse>('/notifications', { params })
   },
   get(id: number) {
-    return client.get<{ code: string; data: NotificationVO }>(`/notifications/${id}`)
+    return client.get<NotificationVO>(`/notifications/${id}`)
   },
   create(data: CreateNotificationRequest) {
-    return client.post<{ code: string; data: number }>('/notifications', data)
+    return client.post<number>('/notifications', data)
   },
   update(id: number, data: UpdateNotificationRequest) {
     return client.put<{ code: string }>(`/notifications/${id}`, data)
