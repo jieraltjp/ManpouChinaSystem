@@ -1,11 +1,14 @@
-# 页面文档：用户管理
+# 页面规格 — 用户管理
 
-> **页面路径**: `/system/user`
-> **组件文件**: `apps/web/src/pages/system/UserPage.vue`
-> **路由定义**: `apps/web/src/router/index.ts`
-> **权限要求**: `user:read`
-> **依赖**: SPEC-B11-用户中心与权限体系
-> **最后更新**: 2026-04-30
+> **版本**: 1.0.0
+> **创建**: 2026-04-30
+> **更新**: 2026-05-01（v1.0.0：Phase 3 前端开发）
+> **路由**: `/system/user`
+> **组件**: `apps/web/src/pages/system/UserPage.vue`
+> **对应后端**: `GET/PUT/POST/DELETE /api/v1/users`
+> **对应 DB**: SPEC-B11 V7（user 表）
+> **依赖文档**: `SPEC-B11-用户中心与权限体系.md` · `SPEC-B11-IMPLEMENT.md`
+> **状态**: 🔄 Phase3 前端待开发
 
 ---
 

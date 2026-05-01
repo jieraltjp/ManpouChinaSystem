@@ -1,11 +1,14 @@
-# 页面文档：操作日志
+# 页面规格 — 操作日志
 
-> **页面路径**: `/system/audit-log`
-> **组件文件**: `apps/web/src/pages/system/AuditLogPage.vue`
-> **路由定义**: `apps/web/src/router/index.ts`
-> **权限要求**: `audit:read`
-> **依赖**: SPEC-B11-用户中心与权限体系
-> **最后更新**: 2026-04-30
+> **版本**: 1.0.0
+> **创建**: 2026-04-30
+> **更新**: 2026-05-01（v1.0.0：Phase 4 前端待开发）
+> **路由**: `/system/audit-log`
+> **组件**: `apps/web/src/pages/system/AuditLogPage.vue`
+> **对应后端**: `GET /api/v1/audit-logs`（分页查询）
+> **对应 DB**: SPEC-B11 V9（audit_log 表）
+> **依赖文档**: `SPEC-B11-用户中心与权限体系.md` · `SPEC-B11-IMPLEMENT.md`
+> **状态**: 🔄 Phase4 前端待开发
 
 ---
 

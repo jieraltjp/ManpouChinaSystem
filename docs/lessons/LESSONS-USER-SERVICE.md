@@ -2,7 +2,7 @@
 
 > 项目：ManpouChinaSystem
 > 覆盖范围：user-service JWT 跨服务架构 / Flyway + JPA schema 对齐 / MySQL TINYINT 类型映射
-> Lesson 编号：62–67（共 6 条，新增至总表）
+> Lesson 编号：62–71（共 10 条）
 
 ---
 
@@ -325,6 +325,142 @@ mvn spring-boot:run -pl apps/manpou-allinone &
 
 ---
 
+---
+
+## Lesson 68: Maven annotationProcessorPaths Lombok 版本必须与 classpath 一致
+
+### 问题
+
+user-service 编译报错：`cannot find symbol: method getStatus()`，`cannot find symbol: method setCreateTime(...)` 等——Lombok 未生成 getter/setter。
+
+### 根因
+
+`mvn compile -X` 显示：
+```
+compile classpath: ...lombok-1.18.46.jar...
+annotationProcessorPaths: ...lombok-1.18.32.jar...
+```
+annotation processor 用 1.18.32，运行时 classpath 用 1.18.46。版本不匹配导致 Lombok 处理器生成的代码与运行时不一致。
+
+### 修复
+
+user-service/pom.xml 中 annotation processor 版本与 classpath 对齐：
+```xml
+<annotationProcessorPaths>
+    <path>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.18.46</version>  <!-- 与 classpath 一致 -->
+    </path>
+    ...
+</annotationProcessorPaths>
+```
+
+### 排查方法
+
+```bash
+# 1. 查看 classpath Lombok 版本
+mvn dependency:tree -pl apps/user-service | grep lombok
+
+# 2. 对比 annotation processor 版本
+mvn compile -X 2>&1 | grep "lombok.*jar"
+```
+
+### 预防
+
+- annotation processor 永远显式指定版本，不用 `${lombok.version}`（父 POM 版本可能与 classpath 不同）
+- 每引入新模块，先检查 Lombok 版本一致性
+
+---
+
+## Lesson 69: BaseEntity 的 setter 须 public——子类 Service 在不同包无法访问 protected
+
+### 问题
+
+编译报错：`setCreateTime(...) has protected access in BaseEntity`
+
+### 根因
+
+`BaseEntity` 字段是 `private`，只有 `@Getter`（Lombok 生成 getter），没有 setter。但子类 `RoleService` / `UserService` 在 `application.service` 包，与 `BaseEntity`（`domain.model` 包）不在同一包，`protected` 仍无法访问。
+
+### 修复
+
+BaseEntity 中添加 public setter 方法：
+```java
+// BaseEntity.java
+public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
+public void setCreateBy(String createBy) { this.createBy = createBy; }
+public void setUpdateBy(String updateBy) { this.updateBy = updateBy; }
+public void setIsDeleted(Boolean isDeleted) { this.isDeleted = isDeleted; }
+```
+
+### 预防
+
+- `@Access(AccessType.FIELD)` + Lombok `@Getter` 的 entity，如需 Service 层注入字段，BaseEntity 必须提供 public setter
+- 或改用 `@Access(AccessType.PROPERTY)` + `@Setter`，由 Lombok 生成
+
+---
+
+## Lesson 70: UserRepository 使用 Specification 查询必须显式继承 JpaSpecificationExecutor
+
+### 问题
+
+编译报错：`no suitable method found for findAll((root,cq,cb)->..., PageRequest)`
+
+### 根因
+
+`UserRepository extends JpaRepository<User, Long>` —— `JpaRepository` 不包含 `findAll(Specification, Pageable)` 方法，该方法在 `JpaSpecificationExecutor` 接口中。
+
+虽然 `JpaRepository` 间接继承了 `JpaSpecificationExecutor`，但 Spring Data JPA 的处理器需要**直接声明**继承才能正确生成实现类。
+
+### 修复
+
+```java
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+    // ...
+}
+```
+
+### 预防
+
+- 任何需要 `Specification` / `Example` / `QueryByExampleExecutor` 查询的 Repository，必须显式继承对应接口
+- 不要依赖接口间的间接继承关系
+
+---
+
+## Lesson 71: 同一 .java 文件内的多个 top-level public 类导致 JDK 编译异常
+
+### 问题
+
+RoleDTOs.java / UserDTOs.java 合并多个 public 类，javac 报错：`cannot find symbol: RoleCreateCmd`，但类定义明明存在。
+
+### 根因
+
+Windows 环境下 JDK 21 对同一文件中多个 top-level public 类的处理存在不确定性。根本原因不明，但拆分为独立文件后问题消失。
+
+### 修复
+
+每个 public 类一个 .java 文件（标准 Java 实践）：
+```
+application/dto/
+├── RoleCreateCmd.java
+├── RoleUpdateCmd.java
+├── RolePermissionsCmd.java
+├── PermissionVO.java
+├── RoleVO.java
+├── RoleSimpleVO.java
+├── PermissionTreeVO.java
+└── ...
+```
+
+### 预防
+
+- **一个 public 类 = 一个 .java 文件**（Java 语言规范要求，但不是所有编译器严格遵守）
+- 禁止同一文件多个 public 类（包括内部类 public static class 也要检查）
+
+---
+
 ## 铁律总结表（user-service 实施）
 
 | # | 铁律 | 违反后果 |
@@ -335,3 +471,7 @@ mvn spring-boot:run -pl apps/manpou-allinone &
 | 65 | Flyway INSERT 必须幂等（ON DUPLICATE KEY UPDATE） | 重跑失败或数据重复 |
 | 66 | BCrypt hash 不用记忆，用时现生成并验证 | 密码错误无法登录 |
 | 67 | 编译和启动分离，不用 -q 静默模式 | 错误被掩盖，无法诊断 |
+| 68 | annotationProcessorPaths Lombok 版本必须与 classpath 一致 | Lombok 不生成代码 |
+| 69 | BaseEntity setter 须 public（跨包访问） | protected 无法被 service 包访问 |
+| 70 | Repository 使用 Specification 必须显式继承 JpaSpecificationExecutor | 方法不存在编译失败 |
+| 71 | 一个 public 类一个 .java 文件 | JDK 编译异常 |

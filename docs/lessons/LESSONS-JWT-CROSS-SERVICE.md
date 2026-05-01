@@ -1,12 +1,12 @@
-# 工程教训 — JWT 跨服务验签与 user-service 实施
+# 工程教训 — JWT 跨服务验签（allinone 只读验签 / user-service 签发）
 
 > 项目：ManpouChinaSystem
 > 覆盖范围：JWT 跨服务 Plan B 架构 / allinone 只读验签 / user-service 签发
-> Lesson 编号：68–69（共 2 条，新增）
+> Lesson 编号：72–73（共 2 条）
 
 ---
 
-## Lesson 68: RestTemplate + ParameterizedTypeReference + 内部类泛型反序列化失效
+## Lesson 72: RestTemplate + ParameterizedTypeReference + 内部类泛型反序列化失效
 
 ### 问题
 
@@ -42,7 +42,7 @@ String pem = String.valueOf(data.get("publicKey"));
 
 ---
 
-## Lesson 69: JWT RS256 验签必须在有公钥后才能 parse——allinone JwtService.parseToken 双重 parse bug
+## Lesson 73: JWT RS256 验签必须在有公钥后才能 parse——allinone JwtService.parseToken 双重 parse bug
 
 ### 问题
 
@@ -107,6 +107,6 @@ private static String extractKidFromHeader(String token) {
 
 | # | 铁律 | 违反后果 |
 |---|------|---------|
-| 68 | RestTemplate 反序列化 `Result<内部类VO>` 须用 Map 中间层 | kid=null，缓存失效，401 |
-| 69 | RS256 JWT 提取 kid 必须从 header base64url 解码，禁止先验签 | RS256 无公钥 parse 抛异常，401 |
+| 72 | RestTemplate 反序列化 `Result<内部类VO>` 须用 Map 中间层 | kid=null，缓存失效，401 |
+| 73 | RS256 JWT 提取 kid 必须从 header base64url 解码，禁止先验签 | RS256 无公钥 parse 抛异常，401 |
 

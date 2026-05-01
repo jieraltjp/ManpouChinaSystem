@@ -14,12 +14,12 @@
 | [LESSONS-OPS.md](./LESSONS-OPS.md) | 构建 / 部署 / 环境 / 运维 | 7–9, 17–18, 20, 26–28 |
 | [LESSONS-DATABASE.md](./LESSONS-DATABASE.md) | 数据库 / Flyway / Schema | 8, 13, 31–32, 39, 45, 51, 59, 60 |
 | [LESSONS-FRONTEND.md](./LESSONS-FRONTEND.md) | 前端 Vue / TS / i18n / Element Plus | 11–12, 14, 16, 33–34, 37, 40–44, 46–50, 52–59 |
-| [LESSONS-USER-SERVICE.md](./LESSONS-USER-SERVICE.md) | user-service JWT 跨服务 / JPA schema 对齐 | 62–67 |
-| [LESSONS-JWT-CROSS-SERVICE.md](./LESSONS-JWT-CROSS-SERVICE.md) | allinone 只读验签 / Map 反序列化 / RS256 kid 提取 | 68–69 |
+| [LESSONS-USER-SERVICE.md](./LESSONS-USER-SERVICE.md) | user-service JWT / Flyway / Lombok / JPA / Spring Data | 62–71 |
+| [LESSONS-JWT-CROSS-SERVICE.md](./LESSONS-JWT-CROSS-SERVICE.md) | allinone 只读验签 / Map 反序列化 / RS256 kid 提取 | 72–73 |
 
 ---
 
-## 铁律总表（66 条）
+## 铁律总表（73 条）
 
 ### 后端（17 条）
 

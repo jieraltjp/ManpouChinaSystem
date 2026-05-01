@@ -1,11 +1,14 @@
-# 页面文档：个人中心
+# 页面规格 — 个人中心
 
-> **页面路径**: `/profile`
-> **组件文件**: `apps/web/src/pages/profile/ProfilePage.vue`
-> **路由定义**: `apps/web/src/router/index.ts`
-> **权限要求**: 已登录用户（无需额外权限）
-> **依赖**: SPEC-B11-用户中心与权限体系
-> **最后更新**: 2026-04-30
+> **版本**: 1.0.0
+> **创建**: 2026-04-30
+> **更新**: 2026-05-01（v1.0.0：Phase 5 前端待开发）
+> **路由**: `/profile`
+> **组件**: `apps/web/src/pages/profile/ProfilePage.vue`
+> **对应后端**: `GET/PUT /api/v1/users/me` · `PUT /api/v1/auth/password`
+> **对应 DB**: SPEC-B11 V7（user 表）
+> **依赖文档**: `SPEC-B11-用户中心与权限体系.md` · `SPEC-B11-IMPLEMENT.md`
+> **状态**: 🔄 Phase5 前端待开发
 
 ---
 
