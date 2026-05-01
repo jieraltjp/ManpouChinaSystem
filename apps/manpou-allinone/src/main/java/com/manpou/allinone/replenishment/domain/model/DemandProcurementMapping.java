@@ -13,7 +13,7 @@ import lombok.Setter;
  */
 @Entity
 @Table(name = "demand_procurement_mapping",
-        uniqueConstraints = @UniqueConstraint(name = "uk_demand_procurement", columnNames = "demand_id, procurement_id"),
+        uniqueConstraints = @UniqueConstraint(name = "uk_demand_procurement", columnNames = {"demand_id", "procurement_id"}),
         indexes = {
                 @Index(name = "idx_mapping_demand", columnList = "demand_id"),
                 @Index(name = "idx_mapping_procurement", columnList = "procurement_id")

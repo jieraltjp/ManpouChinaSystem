@@ -248,7 +248,8 @@ function onLogout() {
 .sidebar {
   background: linear-gradient(180deg, #1E2533 0%, #252D3D 100%);
   transition: width 0.3s;
-  overflow: hidden;
+  overflow-x: hidden;            /* 裁剪水平溢出：防止菜单项文字撑开侧边栏 */
+  overflow-y: visible;           /* 允许垂直溢出：使绝对定位的 arrow 能完整显示 */
   box-shadow: 2px 0 16px rgba(0,0,0,0.18);
   border-right: none;
 }
@@ -283,10 +284,30 @@ function onLogout() {
   margin: 2px 8px;
   width: calc(100% - 16px);
   transition: all var(--transition-fast);
+  min-width: 0;
+  overflow: visible;     /* 允许 arrow 完整显示 */
 }
+
+/* 强制显示被 Element Plus 隐藏的 arrow */
+.sidebar-menu :deep(.el-sub-menu__icon-arrow) {
+  display: flex !important;  /* 覆盖 Element Plus 的 display: none !important */
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: absolute;        /* 确保相对定位正确 */
+  right: 8px;               /* 与标题右侧保持间距 */
+  z-index: 10;              /* 提升层级，避免被文字覆盖 */
+}
+
 .sidebar-menu :deep(.el-sub-menu__title:hover) {
   background: rgba(255,255,255,0.06);
   color: #fff;
+}
+
+/* 标题文字截断：保证 arrow 不被文字覆盖 */
+.sidebar-menu :deep(.el-sub-menu__title > span) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* 激活父级菜单（发注管理）时橙色 */

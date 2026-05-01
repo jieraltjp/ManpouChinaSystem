@@ -254,7 +254,16 @@
       "Bash(echo \"New PID: $!\")",
       "Bash(export SSH_ASKPASS=\"/tmp/askpass.sh\")",
       "Bash(export SSH_ASKPASS_REQUIRE=force)",
-      "Bash(export DISPLAY=:0)"
+      "Bash(export DISPLAY=:0)",
+      "Bash(pkill -f \"manpou-allinone.*SNAPSHOT.jar\")",
+      "Bash(DISPLAY=:0 SSH_ASKPASS=/tmp/ssh_askpass.sh SSH_ASKPASS_REQUIRE=force scp *)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(wsl --list)",
+      "Bash(./scripts/start-all.sh)",
+      "Bash(D:/Programme/java/ManpouChinaSystem/scripts/restart-all.bat manpou-allinone *)",
+      "Bash(SSH_ASKPASS=/d/Programme/java/ManpouChinaSystem/askpass.sh DISPLAY=dummy ssh *)",
+      "Bash(SSH_ASKPASS=/d/Programme/java/ManpouChinaSystem/askpass.sh DISPLAY=dummy git push *)",
+      "Bash(SSH_ASKPASS=/d/Programme/java/ManpouChinaSystem/askpass.sh DISPLAY=dummy scp *)"
     ]
   }
 }

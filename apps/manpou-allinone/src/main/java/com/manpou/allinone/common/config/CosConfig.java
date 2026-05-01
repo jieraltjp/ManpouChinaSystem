@@ -1,6 +1,7 @@
 package com.manpou.allinone.common.config;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -16,6 +17,7 @@ import java.util.LinkedHashMap;
 @Configuration
 @ConfigurationProperties(prefix = "cos")
 @Getter
+@Setter
 public class CosConfig {
 
     private boolean enabled = false;

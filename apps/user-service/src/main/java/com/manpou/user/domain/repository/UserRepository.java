@@ -2,6 +2,7 @@ package com.manpou.user.domain.repository;
 
 import com.manpou.user.domain.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -10,7 +11,7 @@ import java.util.Optional;
  * 用户仓库。
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
     Optional<User> findByUsername(String username);
 

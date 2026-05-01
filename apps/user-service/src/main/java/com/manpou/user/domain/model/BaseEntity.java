@@ -69,4 +69,11 @@ public abstract class BaseEntity {
     public boolean isDeleted() {
         return Boolean.TRUE.equals(this.isDeleted);
     }
+
+    // ===== 受保护的 setter（供子类 Service 使用） =====
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
+    public void setCreateBy(String createBy) { this.createBy = createBy; }
+    public void setUpdateBy(String updateBy) { this.updateBy = updateBy; }
+    public void setIsDeleted(Boolean isDeleted) { this.isDeleted = isDeleted; }
 }

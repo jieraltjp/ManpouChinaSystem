@@ -25,7 +25,14 @@ client.interceptors.request.use((config) => {
 
 /** 响应拦截：统一错误处理 + 401 跳转登录 */
 client.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    // 统一解包 Result<T> 包装：{ code, message, data } → data
+    // 如果后端直接返回数组（如 GET /roles），res.data 就是数组，无需解包
+    if (res.data && typeof res.data === 'object' && 'code' in res.data && 'data' in res.data) {
+      res.data = res.data.data
+    }
+    return res
+  },
   (err) => {
     if (!err.response) {
       ElMessage.error(t('common.error.network'))
