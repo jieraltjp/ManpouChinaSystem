@@ -121,4 +121,52 @@ export const inspectionApi = {
   delete(id: number) {
     return client.delete<{ code: string }>(`/qc-records/${id}`)
   },
+
+  /** 上传单张图片（SPEC-C12） */
+  uploadImage(file: File, qcRecordId?: number) {
+    const form = new FormData()
+    form.append('file', file)
+    if (qcRecordId) form.append('qcRecordId', String(qcRecordId))
+    return client.post<{ code: string; data: ImageUploadResult }>('/qc/images/upload', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
+
+  /** 批量上传图片（SPEC-C12） */
+  uploadImages(files: File[], qcRecordId?: number) {
+    const form = new FormData()
+    files.forEach(f => form.append('files', f))
+    if (qcRecordId) form.append('qcRecordId', String(qcRecordId))
+    return client.post<{ code: string; data: ImageUploadResult[] }>('/qc/images/upload-multiple', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
+
+  /** 删除图片（SPEC-C12） */
+  deleteImage(id: number) {
+    return client.delete<{ code: string }>(`/qc/images?id=${id}`)
+  },
+
+  /** 查询验货记录关联的图片列表（SPEC-C12） */
+  listImages(qcRecordId: number) {
+    return client.get<{ code: string; data: QcImageVO[] }>(`/qc/images`, { params: { qcRecordId } })
+  },
+}
+
+export interface ImageUploadResult {
+  url: string
+  filename: string
+  size: number
+}
+
+export interface QcImageVO {
+  id: number
+  qcRecordId: number | null
+  filename: string
+  originalName: string
+  url: string
+  size: number
+  mimeType: string
+  uploadedBy: number | null
+  createTime: string
 }
