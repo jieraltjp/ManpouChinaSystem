@@ -1,6 +1,7 @@
 # API 契约测试文档
 
 > 基于 REST Assured + JUnit 5，验证 API 响应结构与状态码。
+> ⚠️ 响应/请求字段必须与 `application/dto/` 下实际的 Cmd/Query 类完全对齐。
 
 ---
 
@@ -8,7 +9,7 @@
 
 ### 1.1 GET /api/v1/qc-records
 
-**期望响应**:
+**期望响应**（`QcRecordPageQuery.java`）:
 ```json
 {
   "code": "ok",
@@ -19,9 +20,13 @@
         "id": 1,
         "qcCode": "Q-20260421-001",
         "procurementId": 1,
+        "shipmentBatchId": 1,
         "sellerName": "杭州测试服饰厂",
+        "factoryId": 1,
+        "factoryName": "杭州测试服饰厂",
         "productCode": "odn-test-001",
         "subProductCode": "red",
+        "qcUserId": null,
         "qcType": "ONSITE",
         "qcDate": "2026-04-15",
         "result": "PASS",
@@ -61,12 +66,17 @@
 
 ### 1.2 POST /api/v1/qc-records
 
+> `QcRecordCreateCmd.java` — `shipmentBatchId` 和 `productCode` 为必填字段（`@NotNull`）
+
 **请求体**:
 ```json
 {
+  "shipmentBatchId": 1,
   "procurementId": 1,
+  "sellerName": "杭州测试服饰厂",
   "productCode": "odn-test-001",
   "subProductCode": "red",
+  "qcUserId": null,
   "qcType": "ONSITE",
   "qcDate": "2026-04-15",
   "result": "PASS",
@@ -74,7 +84,16 @@
   "inspectionCount": 100,
   "passedCount": 97,
   "boxCount": 10,
-  "qcStandard": "外观无破损"
+  "boxLengthCm": 40,
+  "boxWidthCm": 30,
+  "boxHeightCm": 20,
+  "netWeightPerUnit": 0.5,
+  "grossWeight": 55,
+  "taxInclusivePrice": 6000,
+  "material": "棉",
+  "taxRefund": true,
+  "qcStandard": "外观无破损",
+  "remarks": "抽检"
 }
 ```
 
@@ -88,6 +107,21 @@
 ```
 
 **HTTP 状态码**: 200
+
+**异常: shipmentBatchId 为空**:
+```json
+// 请求体缺少 shipmentBatchId
+```
+→ 期望: 400，message 包含 "关联出货批次不能为空"
+
+**异常: productCode 为空**:
+```json
+{
+  "shipmentBatchId": 1
+  // 缺少 productCode
+}
+```
+→ 期望: 400，message 包含 "货号不能为空"
 
 ### 1.3 PATCH /api/v1/qc-records/{id}
 
@@ -122,7 +156,7 @@
 
 ### 2.1 GET /api/v1/logistics-plans
 
-**期望响应**:
+**期望响应**（`LogisticsPlanPageQuery.java`）:
 ```json
 {
   "code": "ok",
@@ -132,8 +166,12 @@
       {
         "id": 1,
         "planCode": "L-20260421-001",
+        "containerNo": null,
+        "qcRecordId": 1,
+        "qcCode": "Q-20260421-001",
         "procurementId": 1,
         "factoryId": 1,
+        "factoryName": "杭州测试服饰厂",
         "productCode": "odn-test-001",
         "subProductCode": "red",
         "planType": "SEA",
@@ -170,6 +208,7 @@
 ```json
 {
   "procurementId": 1,
+  "factoryId": 1,
   "productCode": "odn-test-001",
   "planType": "SEA",
   "cargoLengthCm": 50,
@@ -208,12 +247,6 @@ PLANNED → BOOKED → IN_TRANSIT → DELIVERED
 **期望响应**: `{"code":"ok","message":"success","data":null}`
 
 **异常: 已终态禁止修改**:
-```json
-{
-  "status": "BOOKED",
-  // 再次PATCH DELIVERED后的记录
-}
-```
 → 期望: 业务异常 "调配计划已完成，禁止修改"
 
 **异常: 删除已运输记录**:
@@ -230,7 +263,10 @@ PLANNED → BOOKED → IN_TRANSIT → DELIVERED
 
 ```bash
 #!/bin/bash
+# manpou-allinone 端口
 BASE="http://localhost:18090/api/v1"
+
+# 获取测试令牌（admin/admin123）
 TOKEN=$(curl -s -X POST $BASE/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"admin123"}' | \
@@ -238,17 +274,17 @@ TOKEN=$(curl -s -X POST $BASE/auth/login \
 
 H="Authorization: Bearer $TOKEN"
 
-# Step 1: 创建验货记录
+# Step 1: 创建验货记录（shipmentBatchId 必填）
 QC_ID=$(curl -s -X POST $BASE/qc-records $H \
   -H "Content-Type: application/json" \
-  -d '{"procurementId":1,"productCode":"odn-test-001","qcType":"ONSITE","qcDate":"2026-04-15","result":"PASS","status":"COMPLETED","inspectionCount":100,"passedCount":97}' \
+  -d '{"shipmentBatchId":1,"procurementId":1,"productCode":"odn-test-001","qcType":"ONSITE","qcDate":"2026-04-15","result":"PASS","status":"COMPLETED","inspectionCount":100,"passedCount":97}' \
   | grep -o '"data":[0-9]*' | cut -d':' -f2)
 echo "Created QC record: $QC_ID"
 
-# Step 2: 创建调配计划
+# Step 2: 创建调配计划（factoryId 必填）
 LP_ID=$(curl -s -X POST $BASE/logistics-plans $H \
   -H "Content-Type: application/json" \
-  -d '{"procurementId":1,"productCode":"odn-test-001","planType":"SEA","cargoLengthCm":50,"cargoWidthCm":40,"cargoHeightCm":30,"cargoWeightKg":25.5}' \
+  -d '{"procurementId":1,"factoryId":1,"productCode":"odn-test-001","planType":"SEA","cargoLengthCm":50,"cargoWidthCm":40,"cargoHeightCm":30,"cargoWeightKg":25.5}' \
   | grep -o '"data":[0-9]*' | cut -d':' -f2)
 echo "Created LogisticsPlan: $LP_ID"
 
@@ -288,3 +324,26 @@ curl -s -X PATCH $BASE/logistics-plans/$LP_ID $H \
 | DELIVERED | BOOKED | ❌ 禁止 |
 | DELIVERED | IN_TRANSIT | ❌ 禁止 |
 | PLANNED | DELIVERED | ❌ 禁止 |
+
+### Container
+
+| 当前状态 | 目标状态 | 结果 |
+|---------|---------|------|
+| CREATED | LOADED | ✅ |
+| CREATED | DEPARTED | ❌ 禁止（须先 LOADED） |
+| LOADED | DEPARTED | ✅ |
+| LOADED | CREATED | ❌ 禁止 |
+| DEPARTED | ARRIVED | ✅ |
+| ARRIVED | (终态) | - |
+
+### ConsolidationPool
+
+| 当前状态 | 目标状态 | 结果 |
+|---------|---------|------|
+| OPEN | PENDING | ✅ (封池) |
+| OPEN | LOADED | ✅ (直接装柜) |
+| PENDING | LOADED | ✅ |
+| PENDING | OPEN | ❌ 禁止 |
+| LOADED | SHIPPED | ✅ |
+| LOADED | OPEN | ❌ 禁止 |
+| SHIPPED | (终态) | - |

@@ -183,6 +183,7 @@ apps/web/src/
 | 数据库设计 | `docs/database/DB-发注管理数据库设计-步骤1-4.md` |
 | API 文档 | `docs/business/API-发注管理.md` |
 | 前端 UI 文档 | `docs/ui/README.md` |
+| 测试策略 | `docs/test/TEST-STRATEGY.md` |
 | 经验教训库 | `docs/lessons/README.md` |
 | CI/CD 流程 | `docs/pro/15-ci-cd.md` |
 
