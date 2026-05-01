@@ -298,7 +298,20 @@
           <el-input v-model="form.remarks" type="textarea" :rows="1" :placeholder="$t('inspection.dialog.remarksPlaceholder')" />
         </el-form-item>
         <el-form-item :label="$t('inspection.dialog.images')">
-          <el-input v-model="form.images" type="textarea" :rows="1" :placeholder="$t('inspection.dialog.imagesPlaceholder')" />
+          <el-upload
+            ref="uploadRef"
+            action="#"
+            :auto-upload="false"
+            :limit="9"
+            :file-list="uploadFileList"
+            :on-change="onImageChange"
+            :on-remove="onImageRemove"
+            accept="image/jpeg,image/png,image/webp"
+            list-type="picture-card"
+          >
+            <el-icon><Plus /></el-icon>
+          </el-upload>
+          <div class="upload-tip">{{ $t('inspection.dialog.imagesTip') }}</div>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -347,12 +360,18 @@
         <el-descriptions-item :label="$t('inspection.dialog.qcStandard')" :span="2">{{ currentRow.qcStandard || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.images')" :span="2">
-          <span v-if="!currentRow.images">-</span>
+          <div v-if="!currentRow.images">-</div>
           <template v-else>
-            <span v-for="(url, i) in (currentRow.images || '').split('\n').filter(Boolean)" :key="i">
-              <a :href="url" target="_blank" style="color:#409eff;word-break:break-all;">{{ url }}</a>
-              <br />
-            </span>
+            <div class="drawer-images">
+              <el-image
+                v-for="(url, i) in (currentRow.images || '').split('\n').filter(Boolean)"
+                :key="i"
+                :src="url"
+                :preview-src-list="(currentRow.images || '').split('\n').filter(Boolean)"
+                fit="cover"
+                class="drawer-image-thumb"
+              />
+            </div>
           </template>
         </el-descriptions-item>
         <!-- 元数据 -->
@@ -387,6 +406,8 @@ const tableData = ref<QcRecordVO[]>([])
 const shipmentBatchList = ref<ShipmentBatchVO[]>([])
 
 const formRef = ref<FormInstance>()
+const uploadRef = ref()
+const uploadFileList = ref<{ name: string; url: string; status: string; raw?: File; uid?: number }[]>([])
 const { t, locale: localeRef } = useI18n()
 const currentLocale = computed(() => localeRef.value)
 
@@ -452,6 +473,45 @@ const boxDimension = computed(() => {
   if (r.boxHeightCm) parts.push(r.boxHeightCm)
   return parts.length ? parts.join(t('common.format.times')) + t('common.units.cm') : '-'
 })
+
+// --- 图片上传处理（SPEC-C12） ---
+async function onImageChange(file: { name: string; raw: File; status: string; uid: number }, fileList: { name: string; raw: File; status: string; uid: number }[]) {
+  if (file.raw.size > 5 * 1024 * 1024) {
+    ElMessage.warning(t('inspection.dialog.imageSizeWarning'))
+    uploadRef.value?.handleRemove(file)
+    return
+  }
+  if (fileList.length > 9) {
+    ElMessage.warning(t('inspection.dialog.imageCountWarning'))
+    uploadRef.value?.handleRemove(file)
+    return
+  }
+  // 将本地文件追加到 uploadFileList（带临时 url 预览）
+  const alreadyInList = uploadFileList.value.some(f => f.raw === file.raw)
+  if (!alreadyInList) {
+    uploadFileList.value = [...uploadFileList.value, { name: file.name, url: URL.createObjectURL(file.raw), status: 'ready', raw: file.raw, uid: file.uid }]
+  }
+}
+
+async function onImageRemove(file: { name: string; raw: File; uid: number }) {
+  uploadFileList.value = uploadFileList.value.filter(f => f.raw !== file.raw)
+  URL.revokeObjectURL(file.name) // 释放预览 URL
+}
+
+async function uploadAndGetUrls(qcRecordId?: number): Promise<string[]> {
+  const pending = uploadFileList.value.filter(f => f.raw)
+  if (!pending.length) return []
+  try {
+    const files = pending.map(f => f.raw).filter((f): f is File => f !== undefined)
+    const res = await inspectionApi.uploadImages(files, qcRecordId)
+    if (res.data.code === 'ok' && res.data.data) {
+      return res.data.data.map(r => r.url)
+    }
+  } catch {
+    ElMessage.warning(t('inspection.dialog.imageUploadWarning'))
+  }
+  return []
+}
 
 async function loadData() {
   loading.value = true
@@ -534,6 +594,7 @@ function onNew() {
     taxInclusivePrice: 0, material: '',
     qcStandard: '', remarks: '', images: '', destination: '', quantity: 0, orderDate: '', sellerName: '',
   })
+  uploadFileList.value = []
   dialogVisible.value = true
 }
 
@@ -547,6 +608,12 @@ async function onSubmit() {
       submitting.value = false
       return
     }
+    // SPEC-C12: 上传图片，合并到 form.images
+    const newUrls = await uploadAndGetUrls(currentRow.value?.id)
+    const existingUrls = (form.images || '').split('\n').filter(Boolean)
+    const allUrls = [...existingUrls, ...newUrls]
+    const imagesValue = allUrls.length > 0 ? allUrls.join('\n') : undefined
+
     if (currentRow.value) {
       // 编辑模式
       await inspectionApi.update(currentRow.value.id, {
@@ -568,7 +635,7 @@ async function onSubmit() {
         material: form.material || undefined,
         qcStandard: form.qcStandard || undefined,
         remarks: form.remarks || undefined,
-        images: form.images || undefined,
+        images: imagesValue,
       })
       ElMessage.success(t('inspection.message.updateSuccess'))
     } else {
@@ -595,7 +662,7 @@ async function onSubmit() {
         material: form.material || undefined,
         qcStandard: form.qcStandard || undefined,
         remarks: form.remarks || undefined,
-        images: form.images || undefined,
+        images: imagesValue,
         destination: form.destination || undefined,
         quantity: form.quantity,
         orderDate: form.orderDate || undefined,
@@ -712,4 +779,7 @@ onMounted(() => {
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
 .divider-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 .drawer-label { font-weight: 600; }
+.drawer-images { display: flex; flex-wrap: wrap; gap: 8px; }
+.drawer-image-thumb { width: 80px; height: 80px; border-radius: 4px; cursor: pointer; }
+.upload-tip { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
 </style>

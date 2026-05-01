@@ -154,6 +154,26 @@ const routes: RouteRecordRaw[] = [
           },
         ],
       },
+      {
+        path: 'system',
+        name: 'System',
+        redirect: '/system/user',
+        meta: { titleKey: 'menu.system', requiresAuth: true },
+        children: [
+          {
+            path: 'user',
+            name: 'SystemUser',
+            component: () => import('@/pages/system/UserPage.vue'),
+            meta: { titleKey: 'menu.user', requiresAuth: true },
+          },
+          {
+            path: 'role',
+            name: 'SystemRole',
+            component: () => import('@/pages/system/RolePage.vue'),
+            meta: { titleKey: 'menu.role', requiresAuth: true },
+          },
+        ],
+      },
     ],
   },
   {

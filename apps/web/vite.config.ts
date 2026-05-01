@@ -19,6 +19,19 @@ export default defineConfig({
         target: 'http://localhost:18081',
         changeOrigin: true,
       },
+      // 用户管理请求：指向 user-service（用户/角色/权限 CRUD）
+      '/api/v1/users': {
+        target: 'http://localhost:18081',
+        changeOrigin: true,
+      },
+      '/api/v1/roles': {
+        target: 'http://localhost:18081',
+        changeOrigin: true,
+      },
+      '/api/v1/permissions': {
+        target: 'http://localhost:18081',
+        changeOrigin: true,
+      },
       // 业务请求：指向 allinone（所有业务 API）
       // 生产环境：改为 18080 (api-gateway)，由网关统一路由
       '/api': {

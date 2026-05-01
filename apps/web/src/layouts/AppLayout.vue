@@ -94,6 +94,22 @@
             <template #title>{{ $t('menu.orderOverview') }}</template>
           </el-menu-item>
         </el-sub-menu>
+
+        <!-- 系统管理 -->
+        <el-sub-menu index="system" :popper-class="'sidebar-popper'">
+          <template #title>
+            <el-icon><Setting /></el-icon>
+            <span v-if="!isCollapsed">{{ $t('menu.system') }}</span>
+          </template>
+          <el-menu-item index="/system/user">
+            <el-icon><User /></el-icon>
+            <template #title>{{ $t('menu.user') }}</template>
+          </el-menu-item>
+          <el-menu-item index="/system/role">
+            <el-icon><Key /></el-icon>
+            <template #title>{{ $t('menu.role') }}</template>
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-aside>
 
@@ -171,7 +187,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, DocumentCopy, Box, Goods, OfficeBuilding, Menu, Document, Money, Tickets, TrendCharts } from '@element-plus/icons-vue'
+import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, DocumentCopy, Box, Goods, OfficeBuilding, Menu, Document, Money, Tickets, TrendCharts, Setting, User, Key } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
 import type { Locale } from '@/locales'
@@ -200,6 +216,8 @@ const routeTitleMap: Record<string, string> = {
   '/base/factory': 'factory.title',
   '/base/product': 'product.title',
   '/base/overview': 'orderOverview.title',
+  '/system/user': 'menu.user',
+  '/system/role': 'menu.role',
 }
 const currentPageTitle = computed(() => {
   const key = routeTitleMap[route.path]
