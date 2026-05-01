@@ -74,9 +74,10 @@
     <el-card class="table-card" shadow="never">
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="qcCode" :label="$t('inspection.column.qcCode')" min-width="160" />
-        <el-table-column :label="$t('inspection.column.shipmentBatchId')" min-width="120" align="center">
+        <el-table-column :label="$t('inspection.column.shipmentBatchId')" min-width="150" align="center">
           <template #default="{ row }">
-            <span v-if="row.shipmentBatchId" class="product-code">{{ row.shipmentBatchId }}</span>
+            <span v-if="row.batchCode" class="product-code">{{ row.batchCode }}</span>
+            <span v-else-if="row.shipmentBatchId" class="product-code">{{ row.shipmentBatchId }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -164,6 +165,10 @@
                   :value="b.id"
                 />
               </el-select>
+              <div v-if="currentRow?.batchCode" class="batch-info-tag">
+                <el-tag size="small" type="info">{{ currentRow.batchCode }}</el-tag>
+                <el-tag v-if="currentRow.batchStatus" size="small" type="warning" style="margin-left:4px">{{ currentRow.batchStatus }}</el-tag>
+              </div>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -337,6 +342,13 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.qcType')">{{ qcTypeLabel(currentRow.qcType) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.qcDate')">{{ currentRow.qcDate || '-' }}</el-descriptions-item>
+        <!-- 出货批次与货柜信息 -->
+        <el-descriptions-item :label="$t('inspection.column.shipmentBatchId')" :span="2">
+          <span v-if="currentRow.batchCode" class="product-code">{{ currentRow.batchCode }}</span>
+          <el-tag v-else-if="currentRow.shipmentBatchId" size="small" type="info">{{ currentRow.shipmentBatchId }}</el-tag>
+          <span v-else>-</span>
+          <el-tag v-if="currentRow.batchStatus" size="small" type="warning" style="margin-left:8px">{{ currentRow.batchStatus }}</el-tag>
+        </el-descriptions-item>
         <!-- 商品信息 -->
         <el-descriptions-item :label="$t('inspection.column.productCode')">
           <span class="product-code">{{ currentRow.productCode }}</span>
@@ -346,7 +358,10 @@
         <el-descriptions-item :label="$t('inspection.dialog.material')">{{ currentRow.material || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.destination')">{{ currentRow.destination || '-' }}</el-descriptions-item>
         <!-- 验货数据 -->
-        <el-descriptions-item :label="$t('inspection.dialog.quantity')">{{ currentRow.quantity ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('inspection.dialog.quantity')">
+          <span>{{ currentRow.quantity ?? '-' }}</span>
+          <span v-if="currentRow.shipmentQuantity" style="color:#909399;font-size:12px;margin-left:6px">（批次: {{ currentRow.shipmentQuantity }}）</span>
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.inspectionCount')">{{ currentRow.inspectionCount ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.passedCount')">{{ currentRow.passedCount ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.defectiveCount')">{{ currentRow.defectiveCount ?? '-' }}</el-descriptions-item>
@@ -833,4 +848,5 @@ onMounted(() => {
 .drawer-images { display: flex; flex-wrap: wrap; gap: 8px; }
 .drawer-image-thumb { width: 80px; height: 80px; border-radius: 4px; cursor: pointer; }
 .upload-tip { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+.batch-info-tag { margin-top: 6px; display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
 </style>
