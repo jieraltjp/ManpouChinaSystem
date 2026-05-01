@@ -45,9 +45,6 @@
         <el-form-item :label="$t('japanCustoms.filter.entryNo')">
           <el-input v-model="filterForm.keyword" :placeholder="$t('japanCustoms.filter.entryNoPlaceholder')" clearable style="width:170px" />
         </el-form-item>
-        <el-form-item :label="$t('japanCustoms.filter.domesticCustomsId')">
-          <el-input-number v-model="filterForm.domesticCustomsId" :min="1" style="width:130px" clearable />
-        </el-form-item>
         <el-form-item :label="$t('japanCustoms.filter.status')">
           <el-select v-model="filterForm.status" :placeholder="$t('common.all')" clearable style="width:140px">
             <el-option value="PENDING" :label="$t('japanCustoms.status.pending')" />
@@ -61,9 +58,6 @@
           <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
           <el-button type="primary" @click="onNew">
             <el-icon><Plus /></el-icon> {{ $t('japanCustoms.action.newCustoms') }}
-          </el-button>
-          <el-button type="success" @click="onBatchOpen">
-            <el-icon><Box /></el-icon> {{ $t('japanCustoms.action.batchImport') }}
           </el-button>
         </el-form-item>
       </el-form>
@@ -96,12 +90,6 @@
         <el-table-column prop="domesticCustomsId" :label="$t('japanCustoms.column.domesticCustomsId')" min-width="100" align="center">
           <template #default="{ row }">
             <span v-if="row.domesticCustomsId">{{ row.domesticCustomsId }}</span>
-            <span v-else>-</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="procurementId" :label="$t('japanCustoms.column.procurementId')" min-width="80" align="center">
-          <template #default="{ row }">
-            <span v-if="row.procurementId">{{ row.procurementId }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -316,118 +304,8 @@
       </template>
     </el-dialog>
 
-    <!-- 新规清关弹窗 -->
-    <el-dialog v-model="createDialogVisible" :title="$t('japanCustoms.newDialogTitle')" width="760px" destroy-on-close>
-      <!-- 第一步：选择国内报关记录 -->
-      <div v-if="!selectedDomestic" class="domestic-select-section">
-        <div class="domestic-select-header">
-          <span class="domestic-select-label">{{ $t('japanCustoms.dialog.selectDomesticTip') }}</span>
-          <el-select
-            v-model="domesticSearchContainer"
-            filterable
-            remote
-            reserve-keyword
-            :placeholder="$t('japanCustoms.dialog.containerNoPlaceholder')"
-            :remote-method="searchDomesticContainers"
-            :loading="domesticContainerLoading"
-            clearable
-            style="width:260px"
-          >
-            <el-option
-              v-for="item in domesticContainerOptions"
-              :key="item"
-              :label="item"
-              :value="item"
-            />
-          </el-select>
-        </div>
-        <el-table
-          v-loading="domesticTableLoading"
-          :data="domesticTableOptions"
-          max-height="280"
-          stripe
-          highlight-current-row
-          @row-click="onDomesticRowClick"
-        >
-          <el-table-column :label="$t('japanCustoms.column.domesticCustomsId')" prop="id" width="100" align="center" />
-          <el-table-column :label="$t('japanCustoms.column.containerNo')" prop="containerNo" min-width="140">
-            <template #default="{ row }">{{ row.containerNo ?? '-' }}</template>
-          </el-table-column>
-          <el-table-column :label="$t('japanCustoms.column.productCode')" prop="productCode" min-width="130">
-            <template #default="{ row }"><span class="product-code">{{ row.productCode }}</span></template>
-          </el-table-column>
-          <el-table-column :label="$t('japanCustoms.column.subProductCode')" prop="subProductCode" min-width="110">
-            <template #default="{ row }">{{ row.subProductCode ?? '-' }}</template>
-          </el-table-column>
-          <el-table-column :label="$t('japanCustoms.column.procurementId')" prop="procurementId" width="100" align="center">
-            <template #default="{ row }">{{ row.procurementId ?? '-' }}</template>
-          </el-table-column>
-          <el-table-column :label="$t('customs.column.status')" width="80" align="center">
-            <template #default="{ row }">
-              <el-tag :type="row.status === 'CLEARED' ? 'success' : 'info'" size="small">
-                {{ row.status }}
-              </el-tag>
-            </template>
-          </el-table-column>
-        </el-table>
-        <div v-if="domesticTableOptions.length === 0 && !domesticTableLoading" class="domestic-empty-tip">
-          {{ $t('japanCustoms.dialog.noDomesticTip') }}
-        </div>
-      </div>
-
-      <!-- 第二步：已选国内报关，自动填充表单 -->
-      <div v-else class="form-section">
-        <div class="selected-domestic-banner">
-          <span class="banner-label">{{ $t('japanCustoms.dialog.selectedDomestic') }}：</span>
-          <el-tag type="success" size="small">{{ selectedDomestic.customsCode }}</el-tag>
-          <span class="banner-detail">{{ selectedDomestic.containerNo ?? '-' }} / {{ selectedDomestic.productCode }}</span>
-          <el-button text size="small" type="primary" @click="onChangeDomestic">{{ $t('japanCustoms.dialog.changeDomestic') }}</el-button>
-        </div>
-        <el-form ref="createFormRef" :model="createForm" :rules="createRules" label-width="130px">
-          <el-form-item :label="$t('japanCustoms.column.containerNo')" prop="containerNo">
-            <el-input v-model="createForm.containerNo" maxlength="32" />
-          </el-form-item>
-          <el-form-item :label="$t('japanCustoms.column.domesticCustomsId')" prop="domesticCustomsId">
-            <el-input-number v-model="createForm.domesticCustomsId" :min="1" style="width:100%" disabled />
-          </el-form-item>
-          <el-form-item :label="$t('japanCustoms.column.procurementId')">
-            <el-input-number v-model="createForm.procurementId" :min="1" style="width:100%" />
-          </el-form-item>
-          <el-form-item :label="$t('japanCustoms.column.productCode')">
-            <el-input v-model="createForm.productCode" maxlength="32" />
-          </el-form-item>
-          <el-form-item :label="$t('japanCustoms.column.subProductCode')">
-            <el-input v-model="createForm.subProductCode" maxlength="64" />
-          </el-form-item>
-          <el-form-item :label="$t('japanCustoms.column.arrivalDate')">
-            <el-date-picker v-model="createForm.arrivalDate" type="date" value-format="YYYY-MM-DD" style="width:100%" />
-          </el-form-item>
-          <el-form-item :label="$t('japanCustoms.column.arrivalPort')">
-            <el-input v-model="createForm.arrivalPort" maxlength="64" />
-          </el-form-item>
-          <el-form-item :label="$t('japanCustoms.column.broker')">
-            <el-input v-model="createForm.customsBroker" maxlength="128" />
-          </el-form-item>
-          <el-form-item :label="$t('japanCustoms.column.weight')">
-            <el-input-number v-model="createForm.declaredWeightKg" :min="0" :precision="3" style="width:100%" />
-          </el-form-item>
-          <el-form-item :label="$t('japanCustoms.column.volume')">
-            <el-input-number v-model="createForm.declaredVolumeCbm" :min="0" :precision="4" style="width:100%" />
-          </el-form-item>
-          <el-form-item :label="$t('japanCustoms.column.remarks')">
-            <el-input v-model="createForm.remarks" type="textarea" :rows="2" maxlength="512" />
-          </el-form-item>
-        </el-form>
-      </div>
-      <template #footer>
-        <el-button @click="createDialogVisible = false">{{ $t('common.cancel') }}</el-button>
-        <el-button v-if="!selectedDomestic" disabled type="primary">{{ $t('common.confirm') }}</el-button>
-        <el-button v-else type="primary" :loading="createSubmitting" @click="onCreate">{{ $t('common.confirm') }}</el-button>
-      </template>
-    </el-dialog>
-
-    <!-- 批量导入弹窗（按货柜） -->
-    <el-dialog v-model="batchDialogVisible" :title="$t('japanCustoms.batchDialogTitle')" width="720px" destroy-on-close>
+    <!-- 新规清关弹窗：输入货柜号 → 下拉选择 → 复选框选中 → 提交 -->
+    <el-dialog v-model="createDialogVisible" :title="$t('japanCustoms.newDialogTitle')" width="700px" destroy-on-close>
       <div class="batch-header">
         <span class="batch-label">{{ $t('japanCustoms.batchDialog.containerNo') }}：</span>
         <el-select
@@ -442,36 +320,29 @@
           style="flex:1; min-width:200px"
           @change="onBatchContainerSelect"
         >
-          <el-option
-            v-for="item in batchContainerOptions"
-            :key="item"
-            :label="item"
-            :value="item"
-          />
+          <el-option v-for="item in batchContainerOptions" :key="item" :label="item" :value="item" />
         </el-select>
-        <span v-if="batchForm.containerNo" class="batch-hint">
+        <span v-if="batchForm.containerNo && batchSelectedIds.length > 0" class="batch-hint">
           {{ $t('japanCustoms.batchDialog.selectedCount', { n: batchSelectedIds.length }) }}
         </span>
       </div>
 
       <div v-if="batchForm.containerNo" class="batch-plan-table">
         <el-table
-          :data="batchDomesticList"
           v-loading="batchTableLoading"
-          max-height="280"
+          :data="batchDomesticList"
+          max-height="320"
           stripe
           @selection-change="onBatchSelectionChange"
         >
           <el-table-column type="selection" width="40" />
-          <el-table-column :label="$t('japanCustoms.column.domesticCustomsId')" prop="id" width="100" align="center" />
-          <el-table-column :label="$t('japanCustoms.column.productCode')" min-width="130">
-            <template #default="{ row }"><span class="product-code">{{ row.productCode }}</span></template>
+          <el-table-column :label="$t('japanCustoms.column.domesticCustomsId')" prop="id" width="90" align="center" />
+          <el-table-column :label="$t('japanCustoms.column.containerNo')" prop="containerNo" min-width="140" />
+          <el-table-column :label="$t('japanCustoms.column.productCode')" min-width="120">
+            <template #default="{ row }"><span class="product-code">{{ row.productCode ?? '-' }}</span></template>
           </el-table-column>
-          <el-table-column :label="$t('japanCustoms.column.subProductCode')" prop="subProductCode" min-width="110">
+          <el-table-column :label="$t('japanCustoms.column.subProductCode')" prop="subProductCode" min-width="100">
             <template #default="{ row }">{{ row.subProductCode ?? '-' }}</template>
-          </el-table-column>
-          <el-table-column :label="$t('japanCustoms.column.procurementId')" prop="procurementId" width="100" align="center">
-            <template #default="{ row }">{{ row.procurementId ?? '-' }}</template>
           </el-table-column>
           <el-table-column :label="$t('customs.column.status')" width="80" align="center">
             <template #default="{ row }">
@@ -480,18 +351,14 @@
           </el-table-column>
         </el-table>
       </div>
+
       <div v-if="batchDomesticList.length === 0 && batchForm.containerNo && !batchTableLoading" class="domestic-empty-tip">
         {{ $t('japanCustoms.batchDialog.noDataTip') }}
       </div>
 
       <template #footer>
-        <el-button @click="batchDialogVisible = false">{{ $t('common.cancel') }}</el-button>
-        <el-button
-          type="primary"
-          :loading="batchSubmitting"
-          :disabled="batchSelectedIds.length === 0"
-          @click="onBatchSubmit"
-        >
+        <el-button @click="createDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="batchSubmitting" :disabled="batchSelectedIds.length === 0" @click="onBatchSubmit">
           {{ $t('japanCustoms.batchDialog.createButton', { n: batchSelectedIds.length }) }}
         </el-button>
       </template>
@@ -512,8 +379,6 @@ const drawerVisible = ref(false)
 const completeDialogVisible = ref(false)
 const failDialogVisible = ref(false)
 const createDialogVisible = ref(false)
-const createSubmitting = ref(false)
-const createFormRef = ref()
 const actionLoading = ref('')
 const failReason = ref('')
 const completingRowId = ref<number | null>(null)
@@ -524,7 +389,6 @@ const currentRow = ref<JapanCustomsVO | null>(null)
 const filterForm = reactive({
   containerNo: '',
   keyword: '',
-  domesticCustomsId: undefined as number | undefined,
   status: '' as JapanCustomsStatus | '',
 })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
@@ -535,30 +399,7 @@ const completeForm = reactive({
   clearanceDate: '',
 })
 
-const createForm = reactive({
-  containerNo: '',
-  domesticCustomsId: undefined as number | undefined,
-  procurementId: undefined as number | undefined,
-  productCode: '',
-  subProductCode: '',
-  arrivalDate: '',
-  arrivalPort: '',
-  customsBroker: '',
-  declaredWeightKg: undefined as number | undefined,
-  declaredVolumeCbm: undefined as number | undefined,
-  remarks: '',
-})
-
-// 新规清关联动国内报关
-const selectedDomestic = ref<CustomsVO | null>(null)
-const domesticSearchContainer = ref('')
-const domesticContainerLoading = ref(false)
-const domesticContainerOptions = ref<string[]>([])
-const domesticTableLoading = ref(false)
-const domesticTableOptions = ref<CustomsVO[]>([])
-
-// 批量导入
-const batchDialogVisible = ref(false)
+// 新规清关：货柜号下拉 + 复选框
 const batchForm = reactive({ containerNo: '' })
 const batchContainerLoading = ref(false)
 const batchContainerOptions = ref<string[]>([])
@@ -566,11 +407,6 @@ const batchTableLoading = ref(false)
 const batchDomesticList = ref<CustomsVO[]>([])
 const batchSelectedIds = ref<number[]>([])
 const batchSubmitting = ref(false)
-
-const createRules = computed(() => ({
-  containerNo: [{ required: true, message: t('japanCustoms.validation.containerNoRequired'), trigger: 'blur' }],
-  domesticCustomsId: [{ required: true, message: t('japanCustoms.validation.domesticCustomsIdRequired'), trigger: 'blur' }],
-}))
 
 const { t } = useI18n()
 
@@ -619,98 +455,11 @@ function statusTagType(status?: string): string {
 }
 
 function onNew() {
-  createFormRef.value?.resetFields()
-  createForm.containerNo = ''
-  createForm.domesticCustomsId = undefined
-  createForm.procurementId = undefined
-  createForm.productCode = ''
-  createForm.subProductCode = ''
-  createForm.arrivalDate = ''
-  createForm.arrivalPort = ''
-  createForm.customsBroker = ''
-  createForm.declaredWeightKg = undefined
-  createForm.declaredVolumeCbm = undefined
-  createForm.remarks = ''
-  selectedDomestic.value = null
-  domesticSearchContainer.value = ''
-  domesticContainerOptions.value = []
-  domesticTableOptions.value = []
-  createDialogVisible.value = true
-  // 初始加载所有 CLEARED 的国内报关记录
-  loadDomesticTable('')
-}
-
-async function loadDomesticTable(containerNo: string) {
-  domesticTableLoading.value = true
-  try {
-    const res = await customsApi.list({
-      status: 'CLEARED',
-      containerNo: containerNo || undefined,
-      page: 0,
-      pageSize: 50,
-    })
-    domesticTableOptions.value = res.data?.content ?? []
-  } catch (e) {
-    console.error('[JapanCustomsRecordPage] load domestic customs failed', e)
-  } finally {
-    domesticTableLoading.value = false
-  }
-}
-
-async function searchDomesticContainers(keyword: string) {
-  if (!keyword) {
-    domesticContainerOptions.value = []
-    return
-  }
-  domesticContainerLoading.value = true
-  try {
-    const res = await customsApi.list({
-      status: 'CLEARED',
-      containerNo: keyword,
-      page: 0,
-      pageSize: 20,
-    })
-    const list: CustomsVO[] = res.data?.content ?? []
-    // 去重 containerNo
-    const seen = new Set<string>()
-    domesticContainerOptions.value = list
-      .filter(r => r.containerNo && !seen.has(r.containerNo) && seen.add(r.containerNo))
-      .map(r => r.containerNo as string)
-  } catch (e) {
-    console.error('[JapanCustomsRecordPage] search domestic containers failed', e)
-  } finally {
-    domesticContainerLoading.value = false
-  }
-}
-
-watch(domesticSearchContainer, (val) => {
-  loadDomesticTable(val ?? '')
-})
-
-function onDomesticRowClick(row: CustomsVO) {
-  selectedDomestic.value = row
-  createForm.containerNo = row.containerNo ?? ''
-  createForm.domesticCustomsId = row.id
-  createForm.procurementId = row.procurementId ?? undefined
-  createForm.productCode = row.productCode
-  createForm.subProductCode = row.subProductCode ?? ''
-}
-
-function onChangeDomestic() {
-  selectedDomestic.value = null
-  createForm.domesticCustomsId = undefined
-  createForm.containerNo = ''
-  createForm.procurementId = undefined
-  createForm.productCode = ''
-  createForm.subProductCode = ''
-}
-
-function onBatchOpen() {
   batchForm.containerNo = ''
   batchContainerOptions.value = []
   batchDomesticList.value = []
   batchSelectedIds.value = []
-  batchDialogVisible.value = true
+  createDialogVisible.value = true
 }
 
 async function searchBatchContainers(keyword: string) {
@@ -762,46 +511,13 @@ async function onBatchSubmit() {
       domesticCustomsIds: batchSelectedIds.value,
     })
     ElMessage.success(t('japanCustoms.batchDialog.createSuccess', { n: batchSelectedIds.value.length }))
-    batchDialogVisible.value = false
+    createDialogVisible.value = false
     loadData()
   } catch (e) {
     console.error('[JapanCustomsRecordPage] batch create failed', e)
     ElMessage.error(t('japanCustoms.message.actionFailed'))
   } finally {
     batchSubmitting.value = false
-  }
-}
-
-async function onCreate() {
-  if (!createFormRef.value) return
-  try {
-    await createFormRef.value.validate()
-  } catch {
-    return
-  }
-  createSubmitting.value = true
-  try {
-    await japanCustomsApi.create({
-      containerNo: createForm.containerNo,
-      domesticCustomsId: createForm.domesticCustomsId,
-      procurementId: createForm.procurementId,
-      productCode: createForm.productCode || undefined,
-      subProductCode: createForm.subProductCode || undefined,
-      arrivalDate: createForm.arrivalDate || undefined,
-      arrivalPort: createForm.arrivalPort || undefined,
-      customsBroker: createForm.customsBroker || undefined,
-      declaredWeightKg: createForm.declaredWeightKg,
-      declaredVolumeCbm: createForm.declaredVolumeCbm,
-      remarks: createForm.remarks || undefined,
-    })
-    ElMessage.success(t('japanCustoms.message.createSuccess'))
-    createDialogVisible.value = false
-    loadData()
-  } catch (e) {
-    console.error('[JapanCustomsRecordPage] create failed', e)
-    ElMessage.error(t('japanCustoms.message.createFailed'))
-  } finally {
-    createSubmitting.value = false
   }
 }
 
@@ -819,7 +535,6 @@ async function loadData() {
       pageSize: pagination.pageSize,
       status: filterForm.status || undefined,
       containerNo: filterForm.containerNo || undefined,
-      domesticCustomsId: filterForm.domesticCustomsId,
     })
     const data = res.data
     tableData.value = data?.content ?? []
@@ -838,7 +553,6 @@ function onSearchFromButton() { pagination.page = 1; loadData() }
 function onReset() {
   filterForm.containerNo = ''
   filterForm.keyword = ''
-  filterForm.domesticCustomsId = undefined
   filterForm.status = ''
   pagination.page = 1
   loadData()
@@ -985,6 +699,7 @@ watch(tableData, () => {
 .banner-detail { font-size: 12px; color: #999; }
 .form-section { margin-top: 4px; }
 .batch-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.create-mode-tabs { margin-bottom: 16px; display: flex; justify-content: flex-start; }
 .batch-label { font-weight: 600; font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
 .batch-hint { font-size: 12px; color: #67c23a; font-weight: 600; white-space: nowrap; }
 .batch-plan-table { margin-top: 8px; }

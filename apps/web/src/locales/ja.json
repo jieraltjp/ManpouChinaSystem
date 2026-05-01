@@ -1485,6 +1485,8 @@
       "containerNo": "コンテナ番号を入力"
     },
     "dialog": {
+      "modeSingle": "個別",
+      "modeBatch": "一括",
       "selectDomesticTip": "国内通関を選択（通関済）：",
       "containerNoPlaceholder": "コンテナ番号で検索...",
       "noDomesticTip": "利用可能な国内通関記録がありません",

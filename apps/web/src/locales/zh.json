@@ -1516,6 +1516,8 @@
       "containerNo": "请输入货柜号"
     },
     "dialog": {
+      "modeSingle": "单个",
+      "modeBatch": "批量",
       "selectDomesticTip": "选择国内报关（已放行）：",
       "containerNoPlaceholder": "搜索货柜号...",
       "noDomesticTip": "暂无可用国内报关记录",
