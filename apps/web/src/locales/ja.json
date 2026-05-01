@@ -430,7 +430,7 @@
   },
   "inspection": {
     "title": "検品記録",
-    "newButton": "新規入力",
+    "newButton": "新規検品",
     "newDialogTitle": "新規検品",
     "stat": {
       "total": "検品記録総数",

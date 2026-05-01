@@ -109,6 +109,10 @@
             <el-icon><Key /></el-icon>
             <template #title>{{ $t('menu.role') }}</template>
           </el-menu-item>
+          <el-menu-item index="/system/cos-test">
+            <el-icon><Cloudy /></el-icon>
+            <template #title>{{ $t('menu.cosTest') }}</template>
+          </el-menu-item>
         </el-sub-menu>
       </el-menu>
     </el-aside>
@@ -187,7 +191,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, DocumentCopy, Box, Goods, OfficeBuilding, Menu, Document, Money, Tickets, TrendCharts, Setting, User, Key } from '@element-plus/icons-vue'
+import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, DocumentCopy, Box, Goods, OfficeBuilding, Menu, Document, Money, Tickets, TrendCharts, Setting, User, Key, Cloudy } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
 import type { Locale } from '@/locales'
@@ -218,6 +222,7 @@ const routeTitleMap: Record<string, string> = {
   '/base/overview': 'orderOverview.title',
   '/system/user': 'menu.user',
   '/system/role': 'menu.role',
+  '/system/cos-test': 'menu.cosTest',
 }
 const currentPageTitle = computed(() => {
   const key = routeTitleMap[route.path]

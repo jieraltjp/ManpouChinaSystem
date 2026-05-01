@@ -472,7 +472,7 @@
   },
   "inspection": {
     "title": "验货记录",
-    "newButton": "新规录入",
+    "newButton": "新建验货",
     "newDialogTitle": "新规验货",
     "stat": {
       "total": "验货记录总数",
