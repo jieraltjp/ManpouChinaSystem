@@ -56,11 +56,11 @@
             <el-option value="REJECTED" :label="$t('customs.status.rejected')" />
           </el-select>
         </el-form-item>
-        <el-form-item>
+        <el-form-item style="flex-shrink:0">
           <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
           <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
           <el-button type="primary" @click="onNew">
-            <el-icon><Plus /></el-icon>{{ $t('customs.batchButton') }}
+            <el-icon><Plus /></el-icon><span>{{ $t('customs.batchButton') }}</span>
           </el-button>
         </el-form-item>
       </el-form>
