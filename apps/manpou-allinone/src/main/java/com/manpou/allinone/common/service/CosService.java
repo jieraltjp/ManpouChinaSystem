@@ -114,31 +114,38 @@ public class CosService {
     }
 
     /**
-     * 生成 COS 签名（简化版 HMAC-SHA1）。
+     * 生成 COS 签名（V5 HMAC-SHA1）。
      *
-     * COS 签名格式（V5）：
-     * q-sign-algorithm=sha1
-     * q-ak=<SecretId>
-     * q-sign-time=<signtime>
-     * q-key-time=<keytime>
-     * q-signature=<signature>
+     * 算法：
+     * 1. KeyTime = "{start_time};{end_time}"
+     * 2. SignKey = HMAC-SHA1(SecretKey, KeyTime)
+     * 3. HttpString = "{method}\n{path}\n{query}\n{keyTime}\n"
+     * 4. StringToSign = "sha1\n{KeyTime}\n{sha1(HttpString)}\n"
+     * 5. Signature = HMAC-SHA1(SignKey, StringToSign)
+     *
+     * 参考：https://cloud.tencent.com/document/product/436/7778
      */
     private String makeAuthToken(String method, String path, long contentLength, String contentType) {
         long now = Instant.now().getEpochSecond();
-        long expired = now + 3600; // 1小时有效期
+        long expired = now + 3600;
 
-        String signTime = now + ";" + expired;
-        String keyTime = signTime;
+        String keyTime = now + ";" + expired;
 
-        // 关键字符串（Canonical Request）
-        // HTTPMethod + "\n" + CanonicalURI + "\n" + CanonicalQueryString + "\n" + CanonicalHeaders + "\n" + SignedHeaders + "\n" + HashedCanonicalResource
-        String httpString = method + "\n" + path + "\n\n\n" + expired + "\n";
-        String stringToSign = "sha1\n" + signTime + "\n" + sha1(httpString) + "\n";
-        String signature = hmacSha1(stringToSign, cosConfig.getSecretKey());
+        // Step 2: SignKey = HMAC-SHA1(SecretKey, KeyTime)
+        String signKey = hmacSha1(keyTime, cosConfig.getSecretKey());
+
+        // Step 3: HTTP String = "method\npath\n\nkeyTime\n"
+        String httpString = method + "\n" + path + "\n\n" + keyTime + "\n";
+
+        // Step 4: StringToSign = "sha1\nkeyTime\nsha1(HttpString)\n"
+        String stringToSign = "sha1\n" + keyTime + "\n" + sha1(httpString) + "\n";
+
+        // Step 5: Signature = HMAC-SHA1(SignKey, StringToSign)
+        String signature = hmacSha1(stringToSign, signKey);
 
         return "q-sign-algorithm=sha1" +
                 "&q-ak=" + cosConfig.getSecretId() +
-                "&q-sign-time=" + signTime +
+                "&q-sign-time=" + keyTime +
                 "&q-key-time=" + keyTime +
                 "&q-signature=" + signature;
     }
