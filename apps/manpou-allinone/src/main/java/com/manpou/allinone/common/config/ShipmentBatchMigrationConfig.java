@@ -153,6 +153,7 @@ public class ShipmentBatchMigrationConfig {
         }
 
         // 回填存量 QcRecord → ShipmentBatch（历史数据批次）
+        // 出货数量取 SUM(qc.inspection_count)，无QC记录时为0
         Long batchCount = jdbc.queryForObject("""
             SELECT COUNT(DISTINCT procurement_id) FROM qc_record
             WHERE is_deleted = false AND procurement_id IS NOT NULL
@@ -187,6 +188,26 @@ public class ShipmentBatchMigrationConfig {
                 GROUP BY qc.procurement_id
                 """);
             System.out.println("[V43] 回填 " + batchCount + " 个历史 ShipmentBatch 完成");
+        }
+
+        // 修正已创建的历史批次 shipment_quantity（按关联 QC 记录 SUM(inspection_count) 回填）
+        int fixedCount = jdbc.queryForObject("""
+            SELECT COUNT(*) FROM shipment_batch sb
+            WHERE sb.remarks LIKE '%历史数据迁移%'
+              AND sb.is_deleted = false
+            """, Integer.class);
+        if (fixedCount > 0) {
+            jdbc.update("""
+                UPDATE shipment_batch sb
+                SET sb.shipment_quantity = (
+                    SELECT COALESCE(SUM(qc.inspection_count), 0)
+                    FROM qc_record qc
+                    WHERE qc.shipment_batch_id = sb.id AND qc.is_deleted = false
+                )
+                WHERE sb.remarks LIKE '%历史数据迁移%'
+                  AND sb.is_deleted = false
+                """);
+            System.out.println("[V43] 修正 " + fixedCount + " 个历史批次的 shipment_quantity 完成");
         }
 
         // 关联 QcRecord → ShipmentBatch

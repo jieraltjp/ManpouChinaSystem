@@ -13,6 +13,12 @@ export interface QcRecordVO {
   qcCode: string
   procurementId?: number    // 保留用于审计追溯
   shipmentBatchId?: number  // V43新增：关联出货批次
+
+  // 出货批次信息（enrichment）
+  batchCode?: string       // 批次编号
+  batchStatus?: string     // 批次状态
+  shipmentQuantity?: number // 批次出货数量
+
   sellerName?: string
   factoryId?: number    // 关联工厂ID（来自 procurement.factoryId，v1.3.0）
   factoryName?: string  // 关联工厂名称（来自 factory 表，v1.3.0）

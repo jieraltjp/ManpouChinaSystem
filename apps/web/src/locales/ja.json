@@ -457,6 +457,8 @@
       "productCode": "品番",
       "subProductCode": "子品番",
       "sellerName": "出荷元名",
+      "quantity": "出荷数量",
+      "orderQuantity": "受注数量",
       "inspectionCount": "検査数",
       "passedCount": "合格数",
       "defectiveCount": "不良数",

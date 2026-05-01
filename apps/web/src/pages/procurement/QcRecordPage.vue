@@ -92,6 +92,18 @@
           </template>
         </el-table-column>
         <el-table-column prop="sellerName" :label="$t('inspection.column.sellerName')" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="shipmentQuantity" :label="$t('inspection.column.quantity')" min-width="80" align="right">
+          <template #default="{ row }">
+            <span v-if="row.shipmentQuantity" class="product-code">{{ row.shipmentQuantity }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="quantity" :label="$t('inspection.column.orderQuantity')" min-width="80" align="right">
+          <template #default="{ row }">
+            <span v-if="row.quantity" style="color:#909399">{{ row.quantity }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="inspectionCount" :label="$t('inspection.column.inspectionCount')" min-width="90" align="right" />
         <el-table-column prop="passedCount" :label="$t('inspection.column.passedCount')" min-width="90" align="right">
           <template #default="{ row }">
@@ -358,9 +370,13 @@
         <el-descriptions-item :label="$t('inspection.dialog.material')">{{ currentRow.material || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.destination')">{{ currentRow.destination || '-' }}</el-descriptions-item>
         <!-- 验货数据 -->
-        <el-descriptions-item :label="$t('inspection.dialog.quantity')">
-          <span>{{ currentRow.quantity ?? '-' }}</span>
-          <span v-if="currentRow.shipmentQuantity" style="color:#909399;font-size:12px;margin-left:6px">（批次: {{ currentRow.shipmentQuantity }}）</span>
+        <el-descriptions-item :label="$t('inspection.column.quantity')">
+          <span v-if="currentRow.shipmentQuantity" class="product-code">{{ currentRow.shipmentQuantity }}</span>
+          <span v-else>-</span>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('inspection.column.orderQuantity')">
+          <span v-if="currentRow.quantity">{{ currentRow.quantity }}</span>
+          <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.inspectionCount')">{{ currentRow.inspectionCount ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.column.passedCount')">{{ currentRow.passedCount ?? '-' }}</el-descriptions-item>
@@ -375,7 +391,7 @@
         <el-descriptions-item :label="$t('inspection.dialog.qcStandard')" :span="2">{{ currentRow.qcStandard || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.images')" :span="2">
-          <div v-if="!currentRow.images">-</div>
+          <div v-if="!drawerImages.length">-</div>
           <template v-else>
             <div class="drawer-images">
               <el-image

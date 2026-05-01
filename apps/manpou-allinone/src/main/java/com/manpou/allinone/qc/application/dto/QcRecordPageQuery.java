@@ -18,6 +18,12 @@ public class QcRecordPageQuery {
     private String qcCode;
     private Long procurementId;
     private Long shipmentBatchId;          // 关联出货批次（V43新增）
+
+    // 出货批次信息（enrichment）
+    private String batchCode;              // 批次编号
+    private String batchStatus;           // 批次状态
+    private Integer shipmentQuantity;      // 批次出货数量
+
     private String sellerName;
     private Long factoryId;              // 关联工厂ID（来自 procurement.factoryId，v1.3.0）
     private String factoryName;         // 关联工厂名称（来自 factory 表，v1.3.0）

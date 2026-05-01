@@ -2,6 +2,8 @@ package com.manpou.allinone.qc.application.assembler;
 
 import com.manpou.allinone.common.port.FactoryQueryPort;
 import com.manpou.allinone.common.port.ProcurementPort;
+import com.manpou.allinone.procurement.domain.model.ShipmentBatch;
+import com.manpou.allinone.procurement.domain.repository.ShipmentBatchRepository;
 import com.manpou.allinone.qc.application.dto.QcRecordCreateCmd;
 import com.manpou.allinone.qc.application.dto.QcRecordPageQuery;
 import com.manpou.allinone.qc.application.dto.QcRecordUpdateCmd;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -20,10 +23,14 @@ public class QcRecordAssembler {
 
     private final ProcurementPort procurementPort;
     private final FactoryQueryPort factoryQueryPort;
+    private final ShipmentBatchRepository shipmentBatchRepository;
 
-    public QcRecordAssembler(ProcurementPort procurementPort, FactoryQueryPort factoryQueryPort) {
+    public QcRecordAssembler(ProcurementPort procurementPort,
+                             FactoryQueryPort factoryQueryPort,
+                             ShipmentBatchRepository shipmentBatchRepository) {
         this.procurementPort = procurementPort;
         this.factoryQueryPort = factoryQueryPort;
+        this.shipmentBatchRepository = shipmentBatchRepository;
     }
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -34,6 +41,10 @@ public class QcRecordAssembler {
         return String.format("Q-%s-%03d", date, SEQ.incrementAndGet() % 1000);
     }
 
+    /**
+     * 通过 procurementId 查找货柜号。
+     * 路径：procurement → logistics_plan（多条）→ container（取第一条有货柜号的）
+     */
     public QcRecordPageQuery toDto(QcRecord entity) {
         // v1.3.0：通过 procurementId 查 factoryId/factoryName
         String factoryName = null;
@@ -46,11 +57,30 @@ public class QcRecordAssembler {
                         .orElse(null);
             }
         }
+
+        // 出货批次 enrichment（shipment_batch_id → batchCode / shipmentQuantity）
+        String batchCode = null;
+        String batchStatus = null;
+        Integer shipmentQuantity = null;
+
+        if (entity.getShipmentBatchId() != null) {
+            Optional<ShipmentBatch> batchOpt = shipmentBatchRepository.findByIdAndDeletedIsFalse(entity.getShipmentBatchId());
+            if (batchOpt.isPresent()) {
+                ShipmentBatch batch = batchOpt.get();
+                batchCode = batch.getBatchCode();
+                batchStatus = batch.getStatus().name();
+                shipmentQuantity = batch.getShipmentQuantity();
+            }
+        }
+
         return QcRecordPageQuery.builder()
                 .id(entity.getId())
                 .qcCode(entity.getQcCode())
                 .procurementId(entity.getProcurementId())
                 .shipmentBatchId(entity.getShipmentBatchId())
+                .batchCode(batchCode)
+                .batchStatus(batchStatus)
+                .shipmentQuantity(shipmentQuantity)
                 .sellerName(entity.getSellerName())
                 .factoryId(factoryId)
                 .factoryName(factoryName)

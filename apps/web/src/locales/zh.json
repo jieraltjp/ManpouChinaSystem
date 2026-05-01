@@ -499,6 +499,8 @@
       "productCode": "货号",
       "subProductCode": "子货号",
       "sellerName": "卖家名称",
+      "quantity": "出货数量",
+      "orderQuantity": "订单数量",
       "inspectionCount": "检品数",
       "passedCount": "合格数",
       "defectiveCount": "不良数",
