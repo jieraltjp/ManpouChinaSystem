@@ -693,6 +693,7 @@ async function onSubmit() {
       // 4. 上传新增的本地文件
       const newLocalFiles = uploadFileList.value.filter(f => f.raw)
       if (newLocalFiles.length) {
+        console.log('[QC-Image] editing record ' + currentRow.value.id + ', uploading ' + newLocalFiles.length + ' new images')
         await inspectionApi.uploadImages(
           newLocalFiles.map(f => f.raw!),
           currentRow.value.id,
@@ -731,13 +732,15 @@ async function onSubmit() {
       })
       const newQcRecordId = res.data
 
-      // 上传新增的本地文件（关联到新建的记录）
+      // 批量上传
       const newLocalFiles = uploadFileList.value.filter(f => f.raw)
       if (newLocalFiles.length && newQcRecordId) {
-        await inspectionApi.uploadImages(
+        console.log('[QC-Image] uploading ' + newLocalFiles.length + ' images for new record id=' + newQcRecordId)
+        const upRes = await inspectionApi.uploadImages(
           newLocalFiles.map(f => f.raw!),
           newQcRecordId,
         )
+        console.log('[QC-Image] upload result', upRes.data)
       }
 
       ElMessage.success(t('inspection.message.createSuccess'))
@@ -758,8 +761,12 @@ function onView(row: QcRecordVO) {
   drawerImages.value = []
   if (row.id) {
     inspectionApi.listImages(row.id).then(res => {
+      console.log('[QC-Image] onView loaded, qcRecordId=' + row.id + ', count=' + (res.data?.length ?? 0), res.data)
       drawerImages.value = res.data ?? []
-    }).catch(() => { drawerImages.value = [] })
+    }).catch((err: unknown) => {
+      console.error('[QC-Image] onView failed, qcRecordId=' + row.id, err)
+      drawerImages.value = []
+    })
   }
   drawerVisible.value = true
 }
@@ -798,13 +805,17 @@ function onEdit(row: QcRecordVO) {
   uploadFileList.value = []
   if (row.id) {
     inspectionApi.listImages(row.id).then(res => {
+      console.log('[QC-Image] onEdit loaded, qcRecordId=' + row.id + ', count=' + (res.data?.length ?? 0), res.data)
       uploadFileList.value = (res.data ?? []).map((img: QcImageVO) => ({
         id: img.id,
         name: img.originalName,
         url: img.url,
         status: 'uploaded' as const,
       }))
-    }).catch(() => { uploadFileList.value = [] })
+    }).catch((err: unknown) => {
+      console.error('[QC-Image] onEdit failed, qcRecordId=' + row.id, err)
+      uploadFileList.value = []
+    })
   }
   // 加载出货批次下拉（编辑时用于参考）
   if (row.shipmentBatchId) {
