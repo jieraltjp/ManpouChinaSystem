@@ -15,6 +15,7 @@ export const useAuthStore = defineStore('auth', () => {
   const claims = ref<UserClaims | null>(null)
 
   const isAuthenticated = computed(() => !!token.value)
+  const isAdmin = computed(() => claims.value?.roles.includes('ADMIN') ?? false)
 
   /** 解码 token 获取用户信息 */
   function decodeToken(t: string) {
@@ -59,6 +60,7 @@ export const useAuthStore = defineStore('auth', () => {
     token,
     claims,
     isAuthenticated,
+    isAdmin,
     loadPublicKey,
     login,
     logout,

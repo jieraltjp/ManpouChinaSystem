@@ -14,7 +14,7 @@
         router
         class="sidebar-menu"
       >
-        <el-menu-item index="/dashboard">
+        <el-menu-item v-if="auth.isAdmin" index="/dashboard">
           <el-icon><DataBoard /></el-icon>
           <template #title>{{ $t('menu.dashboard') }}</template>
         </el-menu-item>

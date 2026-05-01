@@ -18,13 +18,13 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        redirect: '/dashboard',
+        redirect: '/procurement/procurement',
       },
       {
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/pages/dashboard/DashboardPage.vue'),
-        meta: { titleKey: 'menu.dashboard', requiresAuth: true },
+        meta: { titleKey: 'menu.dashboard', requiresAuth: true, roles: ['ADMIN'] },
       },
       {
         path: 'procurement',
@@ -184,7 +184,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/dashboard',
+    redirect: '/procurement/procurement',
   },
 ]
 
@@ -203,7 +203,12 @@ router.beforeEach((to, _from, next) => {
   }
 
   if (to.name === 'Login' && auth.isAuthenticated) {
-    next({ name: 'Dashboard' })
+    next(auth.isAdmin ? { name: 'Dashboard' } : { name: 'ProcurementOrder' })
+    return
+  }
+
+  if (to.name === 'Dashboard' && !auth.isAdmin) {
+    next({ name: 'ProcurementOrder' })
     return
   }
 
