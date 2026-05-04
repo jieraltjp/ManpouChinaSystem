@@ -5,7 +5,9 @@ import com.manpou.user.common.exception.BusinessException;
 import com.manpou.user.domain.model.Role;
 import com.manpou.user.domain.model.User;
 import com.manpou.user.domain.repository.RoleRepository;
+import com.manpou.user.domain.repository.UserPositionRepository;
 import com.manpou.user.domain.repository.UserRepository;
+import com.manpou.user.domain.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +34,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final UserPositionRepository userPositionRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -70,9 +75,19 @@ public class UserService {
             );
         }
 
-        List<UserVO> vos = result.getContent().stream()
-            .map(this::toVO)
-            .toList();
+        List<User> users = result.getContent();
+        List<UserVO> vos;
+        if (users.isEmpty()) {
+            vos = List.of();
+        } else {
+            List<Long> userIds = users.stream().map(User::getId).toList();
+            Map<Long, List<Role>> rolesMap = loadRolesMap(userIds);
+            Map<Long, List<UserVO.PositionVO>> positionsMap = loadPositionsMap(userIds);
+            vos = users.stream()
+                .map(u -> toVO(u, rolesMap.getOrDefault(u.getId(), List.of()),
+                                positionsMap.getOrDefault(u.getId(), List.of())))
+                .toList();
+        }
 
         UserPageVO pageVO = new UserPageVO();
         pageVO.setContent(vos);
@@ -117,8 +132,6 @@ public class UserService {
         user.setAvatarUrl(cmd.getAvatarUrl());
         user.setCompanyId(cmd.getCompanyId());
         user.setDepartmentId(cmd.getDepartmentId());
-        user.setCustomsCode(cmd.getCustomsCode());
-        user.setCustomsLicense(cmd.getCustomsLicense());
         user.setLanguage(cmd.getLanguage());
         user.setTimezone(cmd.getTimezone());
         user.setStatus(1);
@@ -152,8 +165,6 @@ public class UserService {
         if (cmd.getAvatarUrl() != null) user.setAvatarUrl(cmd.getAvatarUrl());
         if (cmd.getCompanyId() != null) user.setCompanyId(cmd.getCompanyId());
         if (cmd.getDepartmentId() != null) user.setDepartmentId(cmd.getDepartmentId());
-        if (cmd.getCustomsCode() != null) user.setCustomsCode(cmd.getCustomsCode());
-        if (cmd.getCustomsLicense() != null) user.setCustomsLicense(cmd.getCustomsLicense());
         if (cmd.getLanguage() != null) user.setLanguage(cmd.getLanguage());
         if (cmd.getTimezone() != null) user.setTimezone(cmd.getTimezone());
         user.setUpdateTime(LocalDateTime.now());
@@ -222,17 +233,20 @@ public class UserService {
     }
 
     private void assignRoles(User user, List<Long> roleIds) {
-        // 关联表由 Role.permissions 维护，通过 RoleRepository 查 user_role
-        // 简单实现：清除旧关联，插入新关联
-        // user_role 表结构：id, user_id, role_id, create_time
-        // 此处简化处理，关联由 Role.permissions 的多对多维护
+        // 清除旧关联
+        userRoleRepository.deleteByUserId(user.getId());
+        // 插入新关联
+        for (Long roleId : roleIds) {
+            userRoleRepository.insertUserRole(user.getId(), roleId);
+        }
     }
 
     // ===== VO 转换 =====
 
-    private UserVO toVO(User user) {
+    private UserVO toVO(User user, List<Role> roles, List<UserVO.PositionVO> positions) {
         UserVO vo = new UserVO();
         vo.setId(user.getId());
+        vo.setUserCode(user.getUserCode());
         vo.setUsername(user.getUsername());
         vo.setNameCn(user.getNameCn());
         vo.setNameJp(user.getNameJp());
@@ -241,8 +255,6 @@ public class UserService {
         vo.setAvatarUrl(user.getAvatarUrl());
         vo.setCompanyId(user.getCompanyId());
         vo.setDepartmentId(user.getDepartmentId());
-        vo.setCustomsCode(user.getCustomsCode());
-        vo.setCustomsLicense(user.getCustomsLicense());
         vo.setLanguage(user.getLanguage());
         vo.setTimezone(user.getTimezone());
         vo.setStatus(user.getStatus());
@@ -250,14 +262,6 @@ public class UserService {
         vo.setLastLoginTime(user.getLastLoginTime());
         vo.setLastLoginIp(user.getLastLoginIp());
         vo.setCreateTime(user.getCreateTime());
-        return vo;
-    }
-
-    private UserVO toDetailVO(User user) {
-        UserVO vo = toVO(user);
-
-        // 加载角色
-        List<Role> roles = roleRepository.findRolesByUserId(user.getId());
         vo.setRoles(roles.stream().map(r -> {
             UserVO.RoleSimpleVO rvo = new UserVO.RoleSimpleVO();
             rvo.setId(r.getId());
@@ -266,8 +270,59 @@ public class UserService {
             rvo.setRoleNameJp(r.getRoleNameJp());
             return rvo;
         }).toList());
-
+        vo.setPositions(positions);
         return vo;
+    }
+
+    private UserVO toDetailVO(User user) {
+        List<Role> roles = roleRepository.findRolesByUserId(user.getId());
+        List<UserVO.PositionVO> positions = loadPositions(user.getId());
+        return toVO(user, roles, positions);
+    }
+
+    private Map<Long, List<Role>> loadRolesMap(List<Long> userIds) {
+        if (userIds.isEmpty()) return Map.of();
+        // 查询角色信息
+        List<Role> allRoles = roleRepository.findAll().stream()
+            .filter(r -> !Boolean.TRUE.equals(r.getIsDeleted()))
+            .toList();
+        // 查询 user_role 关联
+        Map<Long, List<Long>> userRoleMap = userIds.stream()
+            .collect(Collectors.toMap(
+                Function.identity(),
+                userRoleRepository::findRoleIdsByUserId
+            ));
+        // 组装
+        return userRoleMap.entrySet().stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                e -> e.getValue().stream()
+                    .map(roleId -> allRoles.stream()
+                        .filter(r -> r.getId().equals(roleId))
+                        .findFirst().orElse(null))
+                    .filter(r -> r != null)
+                    .toList()
+            ));
+    }
+
+    private Map<Long, List<UserVO.PositionVO>> loadPositionsMap(List<Long> userIds) {
+        if (userIds.isEmpty()) return Map.of();
+        List<Object[]> rows = userPositionRepository.findPositionsByUserIds(userIds);
+        return rows.stream().collect(Collectors.groupingBy(
+            row -> ((Number) row[0]).longValue(),
+            Collectors.mapping(row -> {
+                UserVO.PositionVO pv = new UserVO.PositionVO();
+                pv.setId(((Number) row[1]).longValue());
+                pv.setNameCn((String) row[2]);
+                pv.setNameJp((String) row[3]);
+                return pv;
+            }, Collectors.toList())
+        ));
+    }
+
+    private List<UserVO.PositionVO> loadPositions(Long userId) {
+        return loadPositionsMap(List.of(userId))
+            .getOrDefault(userId, List.of());
     }
 
     private String generateRandomPassword(int length) {

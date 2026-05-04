@@ -13,12 +13,12 @@ CREATE TABLE role (
     is_deleted      TINYINT      NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 预置角色
+-- 预置角色（is_editable=1，后续可通过 API 修改）
 INSERT INTO role (role_code, role_name_cn, role_name_jp, role_type, is_editable, create_time, update_time) VALUES
-('ADMIN',   '系统管理员',   'システム管理者',    'SYSTEM',   0, NOW(3), NOW(3)),
-('MANAGER', '运营主管',     '運営マネージャー', 'BUSINESS', 0, NOW(3), NOW(3)),
-('OPERATOR','普通运营',     '一般運営者',       'BUSINESS', 0, NOW(3), NOW(3)),
-('VIEWER',  '查看者',       '閲覧者',           'BUSINESS', 0, NOW(3), NOW(3));
+('ADMIN',   '系统管理员',   'システム管理者',    'SYSTEM',   1, NOW(3), NOW(3)),
+('MANAGER', '运营主管',     '運営マネージャー', 'BUSINESS', 1, NOW(3), NOW(3)),
+('OPERATOR','普通运营',     '一般運営者',       'BUSINESS', 1, NOW(3), NOW(3)),
+('VIEWER',  '查看者',       '閲覧者',           'BUSINESS', 1, NOW(3), NOW(3));
 
 -- 权限表（72 条）
 CREATE TABLE permission (

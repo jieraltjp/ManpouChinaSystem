@@ -69,4 +69,13 @@ public class RoleController {
                                            @RequestBody RolePermissionsCmd cmd) {
         return Result.ok(roleService.assignPermissions(id, cmd));
     }
+
+    /**
+     * 更新角色属性（仅 isEditable / description）。
+     */
+    @PatchMapping("/{id}")
+    public Result<RoleVO> patch(@PathVariable Long id,
+                                @RequestBody RolePatchCmd cmd) {
+        return Result.ok(roleService.patch(id, cmd));
+    }
 }

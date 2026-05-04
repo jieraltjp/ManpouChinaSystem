@@ -145,6 +145,25 @@ public class RoleService {
         return toVO(saved);
     }
 
+    /**
+     * 局部更新角色（允许修改 isEditable / description）。
+     * 仅管理员通过 Flyway 迁移或调试时使用。
+     */
+    @Transactional
+    public RoleVO patch(Long id, RolePatchCmd cmd) {
+        Role role = roleRepository.findById(id)
+            .filter(r -> !Boolean.TRUE.equals(r.getIsDeleted()))
+            .orElseThrow(() -> new BusinessException("role.notFound", "角色不存在"));
+
+        if (cmd.getIsEditable() != null) role.setIsEditable(cmd.getIsEditable());
+        if (cmd.getDescription() != null) role.setDescription(cmd.getDescription());
+        role.setUpdateTime(LocalDateTime.now());
+
+        Role saved = roleRepository.save(role);
+        log.info("Role patched: id={}, isEditable={}, description={}", id, cmd.getIsEditable(), cmd.getDescription());
+        return toVO(saved);
+    }
+
     // ===== 权限树 =====
 
     /**
