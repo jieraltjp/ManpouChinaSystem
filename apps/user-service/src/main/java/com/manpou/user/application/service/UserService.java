@@ -54,7 +54,10 @@ public class UserService {
                     cb.like(root.get("username"), kw),
                     cb.or(
                         cb.like(root.get("nameCn"), kw),
-                        cb.like(root.get("email"), kw)
+                        cb.like(root.get("nameJp"), kw),
+                        cb.like(root.get("email"), kw),
+                        cb.like(root.get("phone"), kw),
+                        cb.like(root.get("userCode"), kw)
                     ),
                     cb.equal(root.get("isDeleted"), false),
                     query.getStatus() != null

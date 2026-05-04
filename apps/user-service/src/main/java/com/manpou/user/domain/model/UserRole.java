@@ -27,4 +27,9 @@ public class UserRole {
 
     @Column(name = "create_time", nullable = false)
     private LocalDateTime createTime;
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.createTime == null) this.createTime = LocalDateTime.now();
+    }
 }

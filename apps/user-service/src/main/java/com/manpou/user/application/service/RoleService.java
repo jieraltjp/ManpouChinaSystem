@@ -155,7 +155,13 @@ public class RoleService {
             .filter(r -> !Boolean.TRUE.equals(r.getIsDeleted()))
             .orElseThrow(() -> new BusinessException("role.notFound", "角色不存在"));
 
-        if (cmd.getIsEditable() != null) role.setIsEditable(cmd.getIsEditable());
+        if (cmd.getIsEditable() != null) {
+            Integer v = cmd.getIsEditable();
+            if (v != 0 && v != 1) {
+                throw new BusinessException("role.patch.isEditable.invalid", "isEditable 值必须为 0 或 1");
+            }
+            role.setIsEditable(v);
+        }
         if (cmd.getDescription() != null) role.setDescription(cmd.getDescription());
         role.setUpdateTime(LocalDateTime.now());
 
