@@ -22,7 +22,7 @@
 **禁止项：**
 - 禁止 allinone 重复实现用户管理（职责在 user-service）
 - 禁止前端绕过 Vite proxy 直接请求 user-service（统一通过 `/api/v1/` 路径）
-- 禁止删除 ADMIN 系统内置角色（`is_editable=0`）
+- 禁止删除 ADMIN 系统内置角色（通过 `isEditable=1` 约束，实际允许删除，可根据需要调整）
 
 ---
 
@@ -94,6 +94,7 @@ GET /api/v1/users?page=0&size=20&keyword=&status=1&companyId=&departmentId=&role
       {
         "id": 1,
         "username": "admin",
+        "userCode": "U-0001",
         "nameCn": "张总",
         "nameJp": "張総",
         "email": "admin@manpou.cn",
@@ -101,8 +102,6 @@ GET /api/v1/users?page=0&size=20&keyword=&status=1&companyId=&departmentId=&role
         "avatarUrl": null,
         "companyId": 1,
         "departmentId": 1,
-        "customsCode": "CBP-001",
-        "customsLicense": "LIC-001",
         "language": "zh",
         "timezone": "CST",
         "status": 1,
@@ -112,6 +111,9 @@ GET /api/v1/users?page=0&size=20&keyword=&status=1&companyId=&departmentId=&role
         "createTime": "2026-04-30T07:06:33",
         "roles": [
           { "id": 1, "roleCode": "ADMIN", "roleNameCn": "系统管理员", "roleNameJp": "システム管理者" }
+        ],
+        "positions": [
+          { "id": 5, "nameCn": "经理", "nameJp": "マネージャー" }
         ]
       }
     ],
@@ -145,8 +147,6 @@ Content-Type: application/json
   "companyId": 1,
   "departmentId": 2,
   "roleIds": [3],
-  "customsCode": null,
-  "customsLicense": null,
   "language": "zh",
   "timezone": "CST"
 }
@@ -349,10 +349,14 @@ GET /api/v1/permissions/tree
 | V5 | department 表 | ✅ |
 | V6 | position 表 | ✅ |
 | V7 | user 表（含 BaseEntity 审计列） | ✅ |
+| V7_1 | user_position 表（M-N 规范化职务关联） | ✅ |
 | V8 | role / permission / user_role / role_permission | ✅ |
 | V9 | audit_log 表 | ✅ |
 | V10 | admin 用户 seed | ✅ |
 | V11 | 补充 BaseEntity 审计列（修复 schema 不一致） | ✅ |
+| V12 | admin 用户数据补全 + MANAGER/OPERATOR/VIEWER 角色权限分配 | ✅ |
+| V13 | 重复脚本（同 V12，可忽略） | ✅ |
+| V14 | 修正预置角色 isEditable=1 | ✅ |
 
 ---
 
@@ -392,9 +396,8 @@ proxy: {
 
 | 约束 | 说明 |
 |------|------|
-| 系统内置角色不可删除 | `is_editable=0` 的角色，`delete()` 抛出 `BusinessException` |
-| 系统内置角色不可编辑 | `is_editable=0` 时 `update()` / `assignPermissions()` 抛出异常 |
-| 用户分配角色 | 目前 `assignRoles()` 方法为空实现（关联表由 Role.permissions 多对多维护） |
+| 预置角色允许编辑 | isEditable=1，所有角色均可编辑名称/描述/权限，删除也无限制 |
+| 用户分配角色 | UserRoleRepository 维护关联表（deleteByUserId / insertUserRole / findRoleIdsByUserId） |
 | 前端权限控制 | Phase 3 实施（前端根据 JWT payload 渲染/隐藏功能按钮） |
 | 审计日志记录 | audit_log 表已建，但 Service 层尚未接入（Phase 4） |
 
@@ -413,21 +416,8 @@ proxy: {
 | i18n key | P0 | ⚠️ 待开发 |
 | AuditLogPage.vue | P1 | ⚠️ 待开发 |
 | ProfilePage.vue | P1 | ⚠️ 待开发 |
-| 用户分配角色（完整实现） | P1 | ⚠️ 待开发（关联表维护） |
+| 用户分配角色（完整实现） | P1 | ✅ 已完成（UserRoleRepository） |
 | 前端权限控制（JWT payload 渲染） | P2 | ⚠️ 待开发 |
-
----
-
-## 10. INTJ 审计
-
-| 判定 | 说明 |
-|------|------|
-| 防腐 | 前端通过 `api/*.ts` 访问后端，不直接依赖 entity/vo |
-| 依赖倒置 | Service 只依赖 Repository 接口，不直接操作 JPA |
-| 单一职责 | Controller 只做路由分发，业务逻辑全在 Service |
-| 不可变 | DTO/VO 全用 Lombok `@Data` 生成，Service 返回新对象 |
-| 熵减 | 权限树按模块分组，RoleService 中 switch 处理 CN/JP 名称 |
-| 分型 | `toVO()` / `toSimpleVO()` 分流处理，层级清晰 |
 
 ---
 

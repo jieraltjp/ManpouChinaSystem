@@ -296,7 +296,7 @@ CREATE TABLE role (
   role_name_jp    VARCHAR(64)  NOT NULL,
   role_type       VARCHAR(16)  COMMENT 'SYSTEM/BUSINESS',
   description     VARCHAR(256),
-  is_editable     TINYINT      DEFAULT 1 COMMENT '0=系统内置不可编辑',
+  is_editable     TINYINT      DEFAULT 1 COMMENT '0=不可编辑，1=可编辑（预置角色设为1）',
   status          TINYINT      DEFAULT 1,
   create_time     DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   update_time     DATETIME(3)  NOT NULL,
@@ -335,12 +335,12 @@ CREATE TABLE role_permission (
   KEY idx_permission (permission_id)
 );
 
--- 预置角色
+-- 预置角色（isEditable=1，均可编辑）
 INSERT INTO role (role_code, role_name_cn, role_name_jp, role_type, is_editable) VALUES
-('ADMIN',   '系统管理员',   'システム管理者',    'SYSTEM',   0),
-('MANAGER', '运营主管',     '運営マネージャー', 'BUSINESS', 0),
-('OPERATOR','普通运营',     '一般運営者',       'BUSINESS', 0),
-('VIEWER',  '查看者',       '閲覧者',           'BUSINESS', 0);
+('ADMIN',   '系统管理员',   'システム管理者',    'SYSTEM',   1),
+('MANAGER', '运营主管',     '運営マネージャー', 'BUSINESS', 1),
+('OPERATOR','普通运营',     '一般運営者',       'BUSINESS', 1),
+('VIEWER',  '查看者',       '閲覧者',           'BUSINESS', 1);
 ```
 
 #### `V9__audit_log.sql`
@@ -509,9 +509,10 @@ public boolean canLogin(User user) {
 | GET | `/` | role:read | 角色列表 |
 | GET | `/{id}` | role:read | 角色详情（含权限列表） |
 | POST | `/` | role:create | 新建角色 |
-| PUT | `/{id}` | role:update | 编辑角色（系统内置不可编辑） |
-| DELETE | `/{id}` | role:delete | 删除角色（系统内置不可删除） |
+| PUT | `/{id}` | role:update | 编辑角色（所有角色均可编辑） |
+| DELETE | `/{id}` | role:delete | 删除角色（所有角色均可删除） |
 | PUT | `/{id}/permissions` | role:update | 分配权限 |
+| PATCH | `/{id}` | role:update | 局部更新角色（仅 isEditable / description） |
 
 ### 3.4 权限管理 API（`/api/v1/permissions`）
 
