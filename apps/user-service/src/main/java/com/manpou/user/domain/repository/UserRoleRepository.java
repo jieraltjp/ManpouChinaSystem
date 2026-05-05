@@ -54,10 +54,10 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
     void insertUserRole(@Param("userId") Long userId, @Param("roleId") Long roleId);
 
     /**
-     * 批量插入用户角色关联。
+     * 批量查询各角色的成员数量。
+     * 返回 [roleId, count] 元组列表。
      */
-    @Modifying
-    @Query(value = "INSERT INTO user_role (user_id, role_id, create_time) VALUES (:userId, :roleId, NOW(3))",
+    @Query(value = "SELECT ur.role_id, COUNT(ur.user_id) FROM user_role ur GROUP BY ur.role_id",
            nativeQuery = true)
-    void batchInsertUserRoles(@Param("userId") Long userId, @Param("roleIds") List<Long> roleIds);
+    List<Object[]> countUsersByRoleIds();
 }

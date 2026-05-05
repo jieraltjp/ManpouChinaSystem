@@ -6,6 +6,7 @@ import com.manpou.user.domain.model.Permission;
 import com.manpou.user.domain.model.Role;
 import com.manpou.user.domain.repository.PermissionRepository;
 import com.manpou.user.domain.repository.RoleRepository;
+import com.manpou.user.domain.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,15 +26,24 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
+    private final UserRoleRepository userRoleRepository;
 
     /**
      * 角色列表（不含权限）。
      */
     @Transactional(readOnly = true)
     public List<RoleSimpleVO> listAll() {
-        return roleRepository.findAll().stream()
+        List<Role> roles = roleRepository.findAll().stream()
             .filter(r -> !Boolean.TRUE.equals(r.getIsDeleted()))
-            .map(this::toSimpleVO)
+            .toList();
+        // 批量加载各角色成员数量
+        Map<Long, Integer> userCountMap = userRoleRepository.countUsersByRoleIds().stream()
+            .collect(Collectors.toMap(
+                row -> ((Number) row[0]).longValue(),
+                row -> ((Number) row[1]).intValue()
+            ));
+        return roles.stream()
+            .map(r -> toSimpleVO(r, userCountMap.getOrDefault(r.getId(), 0)))
             .toList();
     }
 
@@ -186,16 +196,28 @@ public class RoleService {
             .map(this::toPermissionVO)
             .collect(Collectors.groupingBy(PermissionVO::getModule));
 
+        // 计算各模块的最小 sort_order（用于模块排序）
+        Map<String, Integer> moduleSortKey = byModule.entrySet().stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                e -> e.getValue().stream()
+                    .mapToInt(PermissionVO::getSortOrder)
+                    .min().orElse(0)
+            ));
+
         return byModule.entrySet().stream()
             .map(e -> {
                 PermissionTreeVO tree = new PermissionTreeVO();
                 tree.setModule(e.getKey());
                 tree.setModuleNameCn(moduleNameCn(e.getKey()));
                 tree.setModuleNameJp(moduleNameJp(e.getKey()));
-                tree.setPermissions(e.getValue());
+                // 模块内按 sort_order 排序
+                tree.setPermissions(e.getValue().stream()
+                    .sorted(Comparator.comparingInt(PermissionVO::getSortOrder))
+                    .toList());
                 return tree;
             })
-            .sorted(Comparator.comparing(PermissionTreeVO::getModule))
+            .sorted(Comparator.comparing(e -> moduleSortKey.getOrDefault(e.getModule(), 0)))
             .toList();
     }
 
@@ -264,7 +286,7 @@ public class RoleService {
         return vo;
     }
 
-    private RoleSimpleVO toSimpleVO(Role role) {
+    private RoleSimpleVO toSimpleVO(Role role, int userCount) {
         RoleSimpleVO vo = new RoleSimpleVO();
         vo.setId(role.getId());
         vo.setRoleCode(role.getRoleCode());
@@ -273,7 +295,7 @@ public class RoleService {
         vo.setRoleType(role.getRoleType());
         vo.setIsEditable(role.getIsEditable());
         vo.setStatus(role.getStatus());
-        vo.setCreateTime(role.getCreateTime());
+        vo.setUserCount(userCount);
         return vo;
     }
 

@@ -265,8 +265,10 @@ public class UserService {
         if (roleIds == null || roleIds.isEmpty()) return;
         // 清除旧关联
         userRoleRepository.deleteByUserId(user.getId());
-        // 批量插入（单次 SQL）
-        userRoleRepository.batchInsertUserRoles(user.getId(), roleIds);
+        // 逐条插入（事务由调用方保证原子性）
+        for (Long roleId : roleIds) {
+            userRoleRepository.insertUserRole(user.getId(), roleId);
+        }
     }
 
     // ===== VO 转换 =====
