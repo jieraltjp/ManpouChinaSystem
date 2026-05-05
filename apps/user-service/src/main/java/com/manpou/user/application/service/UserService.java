@@ -17,12 +17,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.data.jpa.domain.Specification;
 
 /**
  * 用户管理服务。
@@ -46,37 +47,29 @@ public class UserService {
         PageRequest page = PageRequest.of(
             query.getPage(), query.getSize(), Sort.by(Sort.Direction.DESC, "id"));
 
-        Page<User> result;
-        if (query.getKeyword() != null && !query.getKeyword().isBlank()) {
-            String kw = "%" + query.getKeyword().trim() + "%";
-            result = userRepository.findAll(
-                (root, cq, cb) -> cb.and(
-                    cb.like(root.get("username"), kw),
-                    cb.or(
-                        cb.like(root.get("nameCn"), kw),
-                        cb.like(root.get("nameJp"), kw),
-                        cb.like(root.get("email"), kw),
-                        cb.like(root.get("phone"), kw),
-                        cb.like(root.get("userCode"), kw)
-                    ),
-                    cb.equal(root.get("isDeleted"), false),
-                    query.getStatus() != null
-                        ? cb.equal(root.get("status"), query.getStatus())
-                        : cb.conjunction()
-                ),
-                page
-            );
-        } else {
-            result = userRepository.findAll(
-                (root, cq, cb) -> cb.and(
-                    cb.equal(root.get("isDeleted"), false),
-                    query.getStatus() != null
-                        ? cb.equal(root.get("status"), query.getStatus())
-                        : cb.conjunction()
-                ),
-                page
-            );
+        // roleId 筛选：先查 user_role 获取目标用户 ID 列表
+        List<Long> roleFilteredUserIds = null;
+        if (query.getRoleId() != null) {
+            roleFilteredUserIds = userRoleRepository.findUserIdsByRoleId(query.getRoleId());
+            if (roleFilteredUserIds.isEmpty()) {
+                UserPageVO empty = new UserPageVO();
+                empty.setContent(List.of());
+                empty.setTotalElements(0L);
+                empty.setTotalPages(0);
+                empty.setNumber(query.getPage());
+                empty.setSize(query.getSize());
+                return empty;
+            }
         }
+
+        Specification<User> spec;
+        if (query.getKeyword() != null && !query.getKeyword().isBlank()) {
+            spec = buildKeywordSpec(query, roleFilteredUserIds, query.getKeyword().trim());
+        } else {
+            spec = buildBaseSpec(query, roleFilteredUserIds);
+        }
+
+        Page<User> result = userRepository.findAll(spec, page);
 
         List<User> users = result.getContent();
         List<UserVO> vos;
@@ -99,6 +92,39 @@ public class UserService {
         pageVO.setNumber(result.getNumber());
         pageVO.setSize(result.getSize());
         return pageVO;
+    }
+
+    private Specification<User> buildKeywordSpec(UserPageQuery query, List<Long> roleFilteredUserIds, String keyword) {
+        return (root, cq, cb) -> {
+            List<Predicate> preds = new ArrayList<>();
+            String kw = "%" + keyword + "%";
+            preds.add(cb.like(root.get("username"), kw));
+            preds.add(cb.or(
+                cb.like(root.get("nameCn"), kw),
+                cb.like(root.get("nameJp"), kw),
+                cb.like(root.get("email"), kw),
+                cb.like(root.get("phone"), kw),
+                cb.like(root.get("userCode"), kw)
+            ));
+            preds.add(cb.equal(root.get("isDeleted"), false));
+            if (query.getStatus() != null) preds.add(cb.equal(root.get("status"), query.getStatus()));
+            if (query.getCompanyId() != null) preds.add(cb.equal(root.get("companyId"), query.getCompanyId()));
+            if (query.getDepartmentId() != null) preds.add(cb.equal(root.get("departmentId"), query.getDepartmentId()));
+            if (roleFilteredUserIds != null) preds.add(root.get("id").in(roleFilteredUserIds));
+            return cb.and(preds.toArray(new Predicate[0]));
+        };
+    }
+
+    private Specification<User> buildBaseSpec(UserPageQuery query, List<Long> roleFilteredUserIds) {
+        return (root, cq, cb) -> {
+            List<Predicate> preds = new ArrayList<>();
+            preds.add(cb.equal(root.get("isDeleted"), false));
+            if (query.getStatus() != null) preds.add(cb.equal(root.get("status"), query.getStatus()));
+            if (query.getCompanyId() != null) preds.add(cb.equal(root.get("companyId"), query.getCompanyId()));
+            if (query.getDepartmentId() != null) preds.add(cb.equal(root.get("departmentId"), query.getDepartmentId()));
+            if (roleFilteredUserIds != null) preds.add(root.get("id").in(roleFilteredUserIds));
+            return cb.and(preds.toArray(new Predicate[0]));
+        };
     }
 
     /**
@@ -236,12 +262,11 @@ public class UserService {
     }
 
     private void assignRoles(User user, List<Long> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) return;
         // 清除旧关联
         userRoleRepository.deleteByUserId(user.getId());
-        // 插入新关联
-        for (Long roleId : roleIds) {
-            userRoleRepository.insertUserRole(user.getId(), roleId);
-        }
+        // 批量插入（单次 SQL）
+        userRoleRepository.batchInsertUserRoles(user.getId(), roleIds);
     }
 
     // ===== VO 转换 =====
@@ -289,12 +314,15 @@ public class UserService {
         List<Role> allRoles = roleRepository.findAll().stream()
             .filter(r -> !Boolean.TRUE.equals(r.getIsDeleted()))
             .toList();
-        // 查询 user_role 关联
-        Map<Long, List<Long>> userRoleMap = userIds.stream()
-            .collect(Collectors.toMap(
-                Function.identity(),
-                userRoleRepository::findRoleIdsByUserId
-            ));
+        // 批量查询 user_role 关联（单次 SQL）
+        List<Object[]> rows = userRoleRepository.findRoleIdsByUserIds(userIds);
+        // 按 userId 分组
+        Map<Long, List<Long>> userRoleMap = rows.stream().collect(
+            Collectors.groupingBy(
+                row -> ((Number) row[0]).longValue(),
+                Collectors.mapping(row -> ((Number) row[1]).longValue(), Collectors.toList())
+            )
+        );
         // 组装
         return userRoleMap.entrySet().stream()
             .collect(Collectors.toMap(

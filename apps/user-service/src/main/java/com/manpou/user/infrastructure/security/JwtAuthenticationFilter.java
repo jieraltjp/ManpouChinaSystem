@@ -58,9 +58,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 JwtClaims claims = jwtService.extractClaims(token);
 
                 // 构建认证信息（JwtClaims 是 record，使用 roles() 等访问器）
-                List<SimpleGrantedAuthority> authorities = claims.roles().stream()
+                List<SimpleGrantedAuthority> authorities = new java.util.ArrayList<>();
+                // 角色 → ROLE_<role>
+                claims.roles().stream()
                     .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                    .toList();
+                    .forEach(authorities::add);
+                // 权限 → 直接作为 authority（支持 @PreAuthorize("hasAuthority('role:create')")）
+                if (claims.permissions() != null) {
+                    claims.permissions().stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .forEach(authorities::add);
+                }
 
                 UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(

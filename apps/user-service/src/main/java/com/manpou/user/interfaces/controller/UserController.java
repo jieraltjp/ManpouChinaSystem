@@ -5,6 +5,7 @@ import com.manpou.user.application.dto.*;
 import com.manpou.user.application.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public class UserController {
      * 新建用户。
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('user:create')")
     public Result<UserVO> create(@Valid @RequestBody UserCreateCmd cmd) {
         return Result.ok(userService.create(cmd));
     }
@@ -47,6 +49,7 @@ public class UserController {
      * 更新用户。
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('user:update')")
     public Result<UserVO> update(@PathVariable Long id,
                                   @RequestBody UserUpdateCmd cmd) {
         return Result.ok(userService.update(id, cmd));
@@ -56,6 +59,7 @@ public class UserController {
      * 删除用户（软删除）。
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('user:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         userService.delete(id);
         return Result.ok();
@@ -65,6 +69,7 @@ public class UserController {
      * 启用/禁用用户。
      */
     @PutMapping("/{id}/status")
+    @PreAuthorize("hasAuthority('user:update')")
     public Result<Void> updateStatus(@PathVariable Long id,
                                      @RequestBody UserStatusCmd cmd) {
         userService.updateStatus(id, cmd.getStatus());
@@ -75,6 +80,7 @@ public class UserController {
      * 重置密码。
      */
     @PutMapping("/{id}/password/reset")
+    @PreAuthorize("hasAuthority('user:reset_password')")
     public Result<PasswordResetVO> resetPassword(@PathVariable Long id) {
         return Result.ok(userService.resetPassword(id));
     }
@@ -83,6 +89,7 @@ public class UserController {
      * 分配角色。
      */
     @PutMapping("/{id}/roles")
+    @PreAuthorize("hasAuthority('user:update')")
     public Result<Void> assignRoles(@PathVariable Long id,
                                     @RequestBody UserRolesCmd cmd) {
         userService.assignRoles(id, cmd.getRoleIds());

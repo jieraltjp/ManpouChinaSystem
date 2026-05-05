@@ -23,6 +23,21 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
     List<Long> findRoleIdsByUserId(@Param("userId") Long userId);
 
     /**
+     * 批量查询多个用户的角色 ID 列表（避免 N+1）。
+     * 返回 [userId, roleId] 元组列表。
+     */
+    @Query(value = "SELECT ur.user_id, ur.role_id FROM user_role ur WHERE ur.user_id IN :userIds",
+           nativeQuery = true)
+    List<Object[]> findRoleIdsByUserIds(@Param("userIds") List<Long> userIds);
+
+    /**
+     * 查询拥有指定角色的用户 ID 列表。
+     */
+    @Query(value = "SELECT ur.user_id FROM user_role ur WHERE ur.role_id = :roleId",
+           nativeQuery = true)
+    List<Long> findUserIdsByRoleId(@Param("roleId") Long roleId);
+
+    /**
      * 删除用户所有角色关联。
      */
     @Modifying
@@ -37,4 +52,12 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
     @Query(value = "INSERT INTO user_role (user_id, role_id, create_time) VALUES (:userId, :roleId, NOW(3))",
            nativeQuery = true)
     void insertUserRole(@Param("userId") Long userId, @Param("roleId") Long roleId);
+
+    /**
+     * 批量插入用户角色关联。
+     */
+    @Modifying
+    @Query(value = "INSERT INTO user_role (user_id, role_id, create_time) VALUES (:userId, :roleId, NOW(3))",
+           nativeQuery = true)
+    void batchInsertUserRoles(@Param("userId") Long userId, @Param("roleIds") List<Long> roleIds);
 }

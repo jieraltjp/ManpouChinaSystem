@@ -5,6 +5,7 @@ import com.manpou.user.application.dto.*;
 import com.manpou.user.application.service.RoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public class RoleController {
      * 新建角色。
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('role:create')")
     public Result<RoleVO> create(@Valid @RequestBody RoleCreateCmd cmd) {
         return Result.ok(roleService.create(cmd));
     }
@@ -47,6 +49,7 @@ public class RoleController {
      * 更新角色。
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('role:update')")
     public Result<RoleVO> update(@PathVariable Long id,
                                   @RequestBody RoleUpdateCmd cmd) {
         return Result.ok(roleService.update(id, cmd));
@@ -56,6 +59,7 @@ public class RoleController {
      * 删除角色。
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('role:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         roleService.delete(id);
         return Result.ok();
@@ -65,6 +69,7 @@ public class RoleController {
      * 分配权限。
      */
     @PutMapping("/{id}/permissions")
+    @PreAuthorize("hasAuthority('role:assign')")
     public Result<RoleVO> assignPermissions(@PathVariable Long id,
                                            @RequestBody RolePermissionsCmd cmd) {
         return Result.ok(roleService.assignPermissions(id, cmd));
@@ -74,6 +79,7 @@ public class RoleController {
      * 更新角色属性（仅 isEditable / description）。
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Result<RoleVO> patch(@PathVariable Long id,
                                 @RequestBody RolePatchCmd cmd) {
         return Result.ok(roleService.patch(id, cmd));
