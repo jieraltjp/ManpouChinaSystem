@@ -170,6 +170,10 @@ public class RoleService {
             if (v != 0 && v != 1) {
                 throw new BusinessException("role.patch.isEditable.invalid", "isEditable 值必须为 0 或 1");
             }
+            // 防止通过 patch 绕过 update 的 isEditable==0 拦截
+            if (role.getIsEditable() != null && role.getIsEditable() == 0 && v != 0) {
+                throw new BusinessException("role.notEditable", "系统内置角色不可修改属性");
+            }
             role.setIsEditable(v);
         }
         if (cmd.getDescription() != null) role.setDescription(cmd.getDescription());
