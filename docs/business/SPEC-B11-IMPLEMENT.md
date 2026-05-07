@@ -411,7 +411,7 @@ proxy: {
 |------|------|
 | 预置角色允许编辑 | isEditable=1，所有角色均可编辑名称/描述/权限，删除也无限制 |
 | 用户分配角色 | UserRoleRepository 维护关联表（deleteByUserId / insertUserRole / findRoleIdsByUserId） |
-| 前端权限控制 | Phase 3 实施（前端根据 JWT payload 渲染/隐藏功能按钮） |
+| 前端权限控制 | ⚠️ Phase 3 未实施（根据 JWT payload 渲染/隐藏功能按钮，待开发） |
 | 审计日志记录 | audit_log 表已建，但 Service 层尚未接入（Phase 4） |
 
 ---
