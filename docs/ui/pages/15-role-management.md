@@ -8,7 +8,7 @@
 > **对应后端**: `GET/POST/PUT/DELETE /api/v1/roles` · `GET /api/v1/permissions/tree`
 > **对应 DB**: SPEC-B11 V8（role / permission 表）
 > **依赖文档**: `SPEC-B11-用户中心与权限体系.md` · `SPEC-B11-IMPLEMENT.md`
-> **状态**: 🔄 Phase3 前端待开发
+> **状态**: ✅ Phase 3 完成（RolePage.vue + api/role.ts + Vite proxy + 路由均已实现）
 
 ---
 

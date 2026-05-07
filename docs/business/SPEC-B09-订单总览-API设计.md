@@ -3,7 +3,7 @@
 > **版本**: 3.0.0
 > **创建**: 2026-04-22
 > **更新**: 2026-04-28（v3.0.0：彻底移除双 Tab 架构，改为单一 v_order_chain 视图；一行 = 一个 Demand，LEFT JOIN 串联全链路8步）
-> **状态**: 🔄 设计中
+> **状态**: ✅ 已实现（v3.0.0 单视图架构 + OrderOverviewPage.vue）
 > **对应前端**: `OrderOverviewPage.vue` · `docs/ui/pages/09-order-overview.md`
 > **对应 DB 文档**: `docs/database/DB-09-order-overview.md`
 > **核心**: 单视图架构 — Demand 锚点（每行 = 一个子货号，从步骤1到步骤8的完整链路，通过 v_order_chain 视图暴露）
