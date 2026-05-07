@@ -1,14 +1,14 @@
 # 页面规格 — 订单总览（核心视图）
 
-> **版本**: 2.0.0
+> **版本**: 2.1.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-28（v2.0.0：移除双 Tab 架构，改为单一列表 + 详情抽屉；Demand 锚点，v_order_chain 视图驱动）
+> **更新**: 2026-05-07（v2.1.0：页面已实现，更新状态；步骤5-8字段详情待业务样本确认）
 > **路由**: `/base/overview`
 > **组件**: `OrderOverviewPage.vue`
 > **对应后端**: `GET /api/v1/orders/chain` 列表 + `GET /api/v1/orders/chain/{demandId}` 详情
 > **对应 DB**: `docs/database/DB-09-order-overview.md`
 > **依赖文档**: `SPEC-B00-全链路总览.md` · `SPEC-B09-订单总览-API设计.md`
-> **状态**: 🔄 Phase1 开发中
+> **状态**: ✅ 已实现（OrderOverviewPage.vue + OrderOverviewController 已实现；步骤5-8字段详情待业务方确认）
 
 ---
 

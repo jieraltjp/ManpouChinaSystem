@@ -1,10 +1,11 @@
 # 页面规格 — 发注单总览（核心视图）
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-27
+> **更新**: 2026-05-07（v1.1.0：修正 API 路径 orders/procurement/{id}/overview）
 > **路由**: `/base/overview/procurement/:procurementId`
 > **组件**: `ProcurementOverviewPage.vue`
-> **对应后端**: `GET /api/v1/orders/{procurementId}/overview`
+> **对应后端**: `GET /api/v1/orders/procurement/{procurementId}/overview`
 > **API**: `orderOverviewApi.getOverview(procurementId)`
 
 ---

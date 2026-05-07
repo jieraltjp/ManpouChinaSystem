@@ -1,8 +1,8 @@
 # 页面规格 — 步骤3：验货记录
 
-> **版本**: 1.1.1
+> **版本**: 1.1.2
 > **创建**: 2026-04-22
-> **更新**: 2026-04-27（v1.1.1：移除 taxRefund 字段；移除 defectiveCount 输入框（后端自动计算）；新规默认值 qcType=ONSITE/qcDate=今天；弹窗宽度 680→820px；布局优化）
+> **更新**: 2026-05-07（v1.1.2：修正跳转目标 /procurement/logistics → /procurement/logistics-plan）
 > **路由**: `/procurement/qc-record`
 > **组件**: `QcRecordPage.vue`
 > **对应后端**: `QcRecord` 聚合根
@@ -125,7 +125,7 @@
 
 ### 5.2 行为
 
-- 点击 → 跳转 `/procurement/logistics?fromQc={id}`
+- 点击 → 跳转 `/procurement/logistics-plan?fromQc={id}`
 - 调配页面预填充：
   - `procurementId`（来自 QcRecord）
   - `productCode` / `subProductCode`（来自 QcRecord）

@@ -22,17 +22,20 @@
 | UI-03 | [pages/03-examples.md](pages/03-examples.md) | `/examples` | — | ✅ |
 | UI-04 | [pages/01-demand.md](pages/01-demand.md) | `/procurement/demand` | 01 | ✅ |
 | UI-05 | [pages/02-procurement.md](pages/02-procurement.md) | `/procurement/procurement` | 02 | ✅ |
-| UI-06 | [pages/03-inspection.md](pages/03-inspection.md) | `/procurement/inspection` | 03 | ✅ |
-| UI-07 | [pages/04-logistics.md](pages/04-logistics.md) | `/procurement/logistics` | 04 | ✅ |
-| UI-08 | [pages/05-domestic-customs.md](pages/05-domestic-customs.md) | `/procurement/customs` | 05 | ✅ |
+| UI-06 | [pages/03-inspection.md](pages/03-inspection.md) | `/procurement/qc-record` | 03 | ✅ |
+| UI-07 | [pages/04-logistics.md](pages/04-logistics.md) | `/procurement/logistics-plan` | 04 | ✅ |
+| UI-08 | [pages/05-domestic-customs.md](pages/05-domestic-customs.md) | `/procurement/domestic-customs` | 05 | ✅ |
 | UI-09 | [pages/06-japan-customs.md](pages/06-japan-customs.md) | `/procurement/japan-customs` | 06 | ✅ |
-| UI-10 | [pages/07-tax-refund.md](pages/07-tax-refund.md) | `/finance/tax-refund` | 07 | ✅ |
-| UI-11 | [pages/08-sales.md](pages/08-sales.md) | `/sales/operations` | 08 | ✅ |
+| UI-10 | [pages/07-tax-refund.md](pages/07-tax-refund.md) | `/finance/tax-refund-record` | 07 | ✅ |
+| UI-11 | [pages/08-sales.md](pages/08-sales.md) | `/sales/sales-record` | 08 | ✅ |
 | UI-12 | [pages/09-order-overview.md](pages/09-order-overview.md) | `/base/overview` | 09 | ✅ |
 | UI-13 | [pages/10-product.md](pages/10-product.md) | `/base/product` | — | ✅ |
 | UI-14 | [pages/11-factory.md](pages/11-factory.md) | `/base/factory` | — | ✅ |
-| UI-15 | [pages/12-demand-overview.md](pages/12-demand-overview.md) | `/base/overview/demand/:id` | — | ✅ |
-| UI-16 | [pages/13-procurement-overview.md](pages/13-procurement-overview.md) | `/base/overview/order/:id` | — | ✅ |
+| UI-15 | [pages/12-demand-overview.md](pages/12-demand-overview.md) | `/base/overview/demand/:demandId` | — | ✅ |
+| UI-16 | [pages/13-procurement-overview.md](pages/13-procurement-overview.md) | `/base/overview/procurement/:procurementId` | — | ✅ |
+| — | [pages/17-shipment-batch.md](pages/17-shipment-batch.md) | `/procurement/shipment-batch` | — | ✅ |
+| — | [pages/18-consolidation-pool.md](pages/18-consolidation-pool.md) | `/procurement/consolidation-pool` | — | ✅ |
+| — | [pages/19-container.md](pages/19-container.md) | `/procurement/container` | — | ✅ |
 | UI-17 | [pages/14-user-management.md](pages/14-user-management.md) | `/system/user` | B-11 | ✅ Phase 3 完成 |
 | UI-18 | [pages/15-role-management.md](pages/15-role-management.md) | `/system/role` | B-11 | ✅ Phase 3 完成 |
 | UI-19 | [pages/16-audit-log.md](pages/16-audit-log.md) | `/system/audit-log` | B-11 | 📋 待开发 |
@@ -51,16 +54,22 @@
 | 01 | `/procurement/demand` | DemandPage.vue | UI-04 |
 | 02 | `/procurement/procurement` | ProcurementPage.vue | UI-05 |
 | 03 | `/procurement/qc-record` | QcRecordPage.vue | UI-06 |
-| 04 | `/procurement/logistics-plan` | LogisticsPlanPage.vue | UI-07 ✅ |
-| 05 | `/procurement/domestic-customs` | DomesticCustomsPage.vue | UI-08 ✅ |
-| 06 | `/procurement/japan-customs` | JapanCustomsRecordPage.vue | UI-09 ✅ |
-| — | `/finance/tax-refund-record` | TaxRefundRecordPage.vue | UI-10 ✅ |
-| — | `/sales/sales-record` | SalesRecordPage.vue | UI-11 ✅ |
-| — | `/base/factory` | FactoryPage.vue | — |
-| — | `/base/product` | ProductPage.vue | — |
-| 09 | `/base/overview` | OrderOverviewPage.vue | UI-12 ✅ |
+| — | `/procurement/shipment-batch` | ShipmentBatchPage.vue | 17-shipment-batch.md ✅ |
+| 04 | `/procurement/logistics-plan` | LogisticsPlanPage.vue | UI-07 |
+| — | `/procurement/consolidation-pool` | ConsolidationPoolPage.vue | 18-consolidation-pool.md ✅ |
+| — | `/procurement/container` | ContainerPage.vue | 19-container.md ✅ |
+| 05 | `/procurement/domestic-customs` | DomesticCustomsPage.vue | UI-08 |
+| 06 | `/procurement/japan-customs` | JapanCustomsRecordPage.vue | UI-09 |
+| — | `/finance/tax-refund-record` | TaxRefundRecordPage.vue | UI-10 |
+| — | `/sales/sales-record` | SalesRecordPage.vue | UI-11 |
+| — | `/base/factory` | FactoryPage.vue | UI-14 |
+| — | `/base/product` | ProductPage.vue | UI-13 |
+| 09 | `/base/overview` | OrderOverviewPage.vue | UI-12 |
+| — | `/base/overview/demand/:demandId` | DemandOverviewPage.vue | UI-15 |
+| — | `/base/overview/procurement/:procurementId` | ProcurementOverviewPage.vue | UI-16 |
 | B-11 | `/system/user` | UserPage.vue | UI-17 ✅ |
 | B-11 | `/system/role` | RolePage.vue | UI-18 ✅ |
+| B-11 | `/system/cos-test` | CosTestPage.vue | — |
 | B-11 | `/system/audit-log` | AuditLogPage.vue | UI-19 📋 |
 | B-11 | `/profile` | ProfilePage.vue | UI-20 📋 |
 

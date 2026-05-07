@@ -1,10 +1,11 @@
 # 页面规格 — 需求单总览
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-27
+> **更新**: 2026-05-07（v1.1.0：修正 API 路径 orders/demands）
 > **路由**: `/base/overview/demand/:demandId`
 > **组件**: `DemandOverviewPage.vue`
-> **对应后端**: `GET /api/v1/orders/demand/{demandId}/overview`
+> **对应后端**: `GET /api/v1/orders/demands/{demandId}/overview`
 > **API**: `orderOverviewApi.getDemandOverview(demandId)`
 
 ---
