@@ -17,8 +17,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * JWT 认证过滤器。
@@ -32,6 +33,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
+
+    /** ADMIN 角色 *:* 展开后的所有具体权限（42条，按 SPEC-B11） */
+    private static final Set<String> ALL_PERMISSIONS = Set.of(
+        "demand:create", "demand:read", "demand:update", "demand:delete",
+        "procurement:create", "procurement:read", "procurement:update", "procurement:delete",
+        "shipment:create", "shipment:read", "shipment:update", "shipment:delete",
+        "qc:create", "qc:read", "qc:update", "qc:delete",
+        "logistics:create", "logistics:read", "logistics:update", "logistics:delete",
+        "consolidation:create", "consolidation:read", "consolidation:update", "consolidation:delete",
+        "container:create", "container:read", "container:update", "container:delete",
+        "customs:create", "customs:read", "customs:update", "customs:delete",
+        "japan_customs:create", "japan_customs:read", "japan_customs:update", "japan_customs:delete",
+        "tax_refund:create", "tax_refund:read", "tax_refund:update", "tax_refund:delete",
+        "sales:create", "sales:read", "sales:update", "sales:delete",
+        "factory:create", "factory:read", "factory:update", "factory:delete",
+        "product:create", "product:read", "product:update", "product:delete",
+        "user:create", "user:read", "user:update", "user:delete", "user:reset_password",
+        "role:create", "role:read", "role:update", "role:delete", "role:assign",
+        "audit:read"
+    );
 
     private final JwtService jwtService;
     private final ObjectMapper objectMapper;
@@ -58,16 +79,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 JwtClaims claims = jwtService.extractClaims(token);
 
                 // 构建认证信息（JwtClaims 是 record，使用 roles() 等访问器）
-                List<SimpleGrantedAuthority> authorities = new java.util.ArrayList<>();
+                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
                 // 角色 → ROLE_<role>
                 claims.roles().stream()
                     .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                     .forEach(authorities::add);
                 // 权限 → 直接作为 authority（支持 @PreAuthorize("hasAuthority('role:create')")）
+                // ADMIN 角色的 *:* 权限需要展开为所有具体权限
                 if (claims.permissions() != null) {
-                    claims.permissions().stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .forEach(authorities::add);
+                    boolean isAdmin = claims.roles().contains("ADMIN");
+                    for (String perm : claims.permissions()) {
+                        if (isAdmin && "*:*".equals(perm)) {
+                            // ADMIN + *:* → 展开为所有具体权限
+                            authorities.add(new SimpleGrantedAuthority(perm)); // 保留 *:* 也加上
+                            for (String specific : ALL_PERMISSIONS) {
+                                authorities.add(new SimpleGrantedAuthority(specific));
+                            }
+                        } else {
+                            authorities.add(new SimpleGrantedAuthority(perm));
+                        }
+                    }
                 }
 
                 UsernamePasswordAuthenticationToken authentication =

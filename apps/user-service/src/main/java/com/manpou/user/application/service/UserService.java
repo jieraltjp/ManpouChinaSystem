@@ -167,6 +167,7 @@ public class UserService {
         user.setRegistrationStatus("APPROVED");
         user.setCreateTime(LocalDateTime.now());
         user.setIsDeleted(false);
+        user.setUserCode("U-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase());
 
         User saved = userRepository.save(user);
 
