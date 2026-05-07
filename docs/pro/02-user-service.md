@@ -152,7 +152,7 @@ src/main/resources/
 
 | ID | 问题 | 状态 | 说明 |
 |----|------|------|------|
-| U-001 | AuthController 硬编码占位符登录 | 🔴 待修复 | 需接入真实用户数据 |
+| U-001 | AuthController 硬编码占位符登录 | ✅ 已修复 | 真实登录/JWT RS256 已实现 |
 | U-002 | signing_key 表未集成轮换 | 🟡 待开发 | KeyManagementService 未实现 |
 | U-003 | Refresh Token 未实现 | 🟡 待开发 | 只有 access token |
 
@@ -181,10 +181,10 @@ src/main/resources/
 
 ## 8. 行动项
 
-- [ ] **本周**：修复 AuthController 硬编码占位符登录
-- [ ] **本周**：接入真实用户表（V4__user_table.sql）
-- [ ] **下周二**：实现 KeyManagementService（密钥自动轮换）
-- [ ] **下周三**：实现 Refresh Token 机制
+- [x] ✅ **已完成**：修复 AuthController 硬编码占位符登录（2026-04-30）
+- [x] ✅ **已完成**：接入真实用户表（V4__user_table.sql）
+- [ ] **待定**：实现 KeyManagementService（密钥自动轮换）
+- [ ] **待定**：实现 Refresh Token 机制
 - [ ] **持续**：所有 API 必须通过 Spring Security 认证
 
 ---
