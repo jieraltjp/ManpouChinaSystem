@@ -5,7 +5,7 @@
 > **更新**: 2026-04-21（v1.3.0 初版）
 > **依据**: `SPEC-B02-发注单-步骤2.md` + `DOMAIN-发注管理领域模型.md`
 
-> ⚠️ **代码实现进度**: 发注单 CRUD ✅ 已实现 · 完整状态流转校验 ✅ 已实现 · 商品目录 ✅ 已实现（masterCode/subCode）· 验货记录 ✅ 已实现 · 货柜 🔴 占位 · 财务/通知/报关 🔴 Example 存根 · 财务/退货/空运推荐 🔴 未实现
+> ⚠️ **代码实现进度**: 发注单 CRUD ✅ 已实现 · 完整状态流转校验 ✅ 已实现 · 商品目录 ✅ 已实现（masterCode/subCode）· 验货记录 ✅ 已实现 · 货柜 ✅ 已实现 · 财务/通知/报关 🔴 Example 存根 · 财务/退货/空运推荐 🔴 未实现
 
 ---
 
@@ -330,9 +330,9 @@ GET /api/v1/products/code/{masterCode}
 
 ---
 
-## 4. 货柜管理
+## 4. 货柜管理 ✅
 
-> 🔴 **待实现**：Container 聚合根未实现，API 路径待定。
+> Container 聚合根已实现（v1.5.0），API 路径见 Controller。
 
 ```
 POST /api/v1/containers
@@ -436,7 +436,7 @@ POST /api/v1/procurements/{id}/returns
 |---------|------|------|
 | `POST /api/v1/procurements/{id}/finance` | 财务结算关联 | Phase 7 |
 | `POST /api/v1/procurements/{id}/returns` | 退货管理 | Phase 8 |
-| `GET /api/v1/consolidation-pools/**` | 集拼池管理 | Phase 4 |
-| `GET /api/v1/containers/**` | 货柜管理 | Phase 4 |
-| `POST /api/v1/orders/{id}/overview` | 订单聚合总览 | Phase 4 |
+| `GET /api/v1/consolidation-pools/**` | 集拼池管理 | ✅ 已实现 |
+| `GET /api/v1/containers/**` | 货柜管理 | ✅ 已实现 |
+| `POST /api/v1/orders/{id}/overview` | 订单聚合总览 | ✅ 已实现 |
 | `空运推荐`（自动） | 尺寸/重量达标自动推荐空运 | Phase 4 |

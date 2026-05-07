@@ -1,9 +1,9 @@
 # SPEC-B04 — 调配计划业务规格（步骤4）
 
-> **版本**: 1.2.0
+> **版本**: 1.3.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-27 — v1.2.0：LogisticsPlan 关联从 procurementId 改为 qcRecordId（验完货才知道实际装箱尺寸，用于调配订舱）
-> **状态**: ✅ 已实现（LogisticsPlan）；⚡占位（Container/ConsolidationPool）
+> **更新**: 2026-05-07（v1.3.0：Container / ConsolidationPool 已实现）
+> **状态**: ✅ 已实现（LogisticsPlan + Container + ConsolidationPool）
 > **业务步号**: 04（调配计划）
 > **对应 UI 文档**: `docs/ui/pages/04-logistics.md`
 > **对应数据库文档**: `docs/database/DB-04-logistics.md`

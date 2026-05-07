@@ -20,7 +20,7 @@
 | DB-02 | [DB-02-procurement-order.md](DB-02-procurement-order.md) | 02 | ✅ | procurement 表 |
 | DB-10 | [DB-10-factory.md](DB-10-factory.md) | 02 | 🔄 | factory 表（v1.4.0 字段扩展） |
 | DB-03 | [DB-03-inspection.md](DB-03-inspection.md) | 03 | ✅ | qc_record 表 |
-| DB-04 | [DB-04-logistics.md](DB-04-logistics.md) | 04 | ✅/⚡ | logistics_plan ✅ · container/consolidation_pool ⚡占位 |
+| DB-04 | [DB-04-logistics.md](DB-04-logistics.md) | 04 | ✅ | logistics_plan + container + consolidation_pool 均已实现 |
 | DB-05 | [DB-05-domestic-customs.md](DB-05-domestic-customs.md) | 05 | ✅ | domestic_customs_record 表 |
 | DB-06 | [DB-06-japan-customs.md](DB-06-japan-customs.md) | 06 | ✅ | japan_customs_record 表 |
 | DB-07 | [DB-07-tax-refund.md](DB-07-tax-refund.md) | 07 | ✅ | tax_refund_record 表 |
@@ -81,14 +81,14 @@
 |------|--------|------|
 | `qc_record` | QcRecord | ✅ |
 
-### DB-04 调配计划 ✅/⚡
+### DB-04 调配计划 ✅
 
 | 表名 | 聚合根 | 状态 |
 |------|--------|------|
 | `logistics_plan` | LogisticsPlan | ✅ |
-| `container` | Container | ⚡占位 |
-| `consolidation_pool` | ConsolidationPool | ⚡占位 |
-| `consolidation_pool_item` | ConsolidationPoolItem | ⚡占位 |
+| `container` | Container | ✅ |
+| `consolidation_pool` | ConsolidationPool | ✅ |
+| `consolidation_pool_item` | ConsolidationPoolItem | ✅ |
 
 ### DB-05 国内报关 ✅
 
