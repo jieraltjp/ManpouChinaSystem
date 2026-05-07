@@ -26,11 +26,11 @@
 | B-01 | [SPEC-B01-补货需求-步骤1.md](./SPEC-B01-补货需求-步骤1.md) | 补货需求聚合根 ✅ |
 | B-02 | [SPEC-B02-发注单-步骤2.md](./SPEC-B02-发注单-步骤2.md) | 发注单+工厂聚合根 ✅ |
 | B-03 | [SPEC-B03-验货记录-步骤3.md](./SPEC-B03-验货记录-步骤3.md) | 验货记录聚合根 ✅ |
-| B-04 | [SPEC-B04-调配计划-步骤4.md](./SPEC-B04-调配计划-步骤4.md) | 调配计划+货柜+拼柜 ✅（Container/ConsolidationPool ⚡占位） |
-| B-05 | [SPEC-B05-国内报关-步骤5.md](./SPEC-B05-国内报关-步骤5.md) | DomesticCustomsRecord ⚡占位 |
-| B-06 | [SPEC-B06-日本清关-步骤6.md](./SPEC-B06-日本清关-步骤6.md) | JapanCustomsRecord ⚡占位 |
-| B-07 | [SPEC-B07-退税-步骤7.md](./SPEC-B07-退税-步骤7.md) | TaxRefundRecord ⚡占位 |
-| B-08 | [SPEC-B08-运营销售-步骤8.md](./SPEC-B08-运营销售-步骤8.md) | SalesRecord ⚡占位 |
+| B-04 | [SPEC-B04-调配计划-步骤4.md](./SPEC-B04-调配计划-步骤4.md) | 调配计划+货柜+拼柜 ✅（v1.3.0） |
+| B-05 | [SPEC-B05-国内报关-步骤5.md](./SPEC-B05-国内报关-步骤5.md) | DomesticCustomsRecord ✅（v1.4.0） |
+| B-06 | [SPEC-B06-日本清关-步骤6.md](./SPEC-B06-日本清关-步骤6.md) | JapanCustomsRecord ✅（v1.4.0） |
+| B-07 | [SPEC-B07-退税-步骤7.md](./SPEC-B07-退税-步骤7.md) | TaxRefundRecord ✅（v1.2.0） |
+| B-08 | [SPEC-B08-运营销售-步骤8.md](./SPEC-B08-运营销售-步骤8.md) | SalesRecord ✅（v1.3.0） |
 | B-09 | [SPEC-B09-订单总览-API设计.md](./SPEC-B09-订单总览-API设计.md) | **核心视图**：聚合接口设计 ✅ |
 | B-10 | [SPEC-B10-商品目录-产品管理.md](./SPEC-B10-商品目录-产品管理.md) | Product + product_factory 多对多设计 🟡 |
 | B-11 | [SPEC-B11-用户中心与权限体系.md](./SPEC-B11-用户中心与权限体系.md) | 用户管理+角色权限+操作日志+个人中心 📋 |

@@ -333,7 +333,7 @@ ShipmentBatch → QcRecord（REMOTE类型）
   → 直接进入步骤6日本清关
 ```
 
-**Container（占位实体）**：
+**Container（货柜）**：
 
 | 字段 | 说明 |
 |------|------|
@@ -342,7 +342,7 @@ ShipmentBatch → QcRecord（REMOTE类型）
 | totalCbm | 总体积（约70m³满柜） |
 | totalWeightKg | 总重量 |
 
-**ConsolidationPool（占位实体）**：
+**ConsolidationPool（拼柜池）**：
 
 | 字段 | 说明 |
 |------|------|
@@ -630,7 +630,7 @@ LogisticsPlanUseCase.update(IN_TRANSIT)
 | 3 验货 | QcRecord | PENDING / COMPLETED / RETURN_REQUESTED | COMPLETED |
 | 4 调配 | LogisticsPlan | PLANNED / BOOKED / IN_TRANSIT / DELIVERED | DELIVERED |
 | 4 拼柜池 | ConsolidationPool | POOL_PENDING / POOL_READY / CONTAINER_PLANNED / LOADED | LOADED |
-| 4 货柜 | Container | —（占位） | — |
+| 4 货柜 | Container | PENDING / LOADED / SHIPPED / ARRIVED / CLEARED | ARRIVED / CLEARED |
 | 5 国内报关 | DomesticCustomsRecord | PENDING / SUBMITTED / CLEARED / REJECTED | CLEARED |
 | 6 日本清关 | JapanCustomsRecord | PENDING / IN_PROGRESS / CLEARED / FAILED | CLEARED / FAILED |
 | 7 退税 | TaxRefundRecord | APPLYING / COMPLETED / NO_REFUND | COMPLETED / NO_REFUND |

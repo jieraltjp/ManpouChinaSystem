@@ -58,7 +58,7 @@ LogisticsPlan（聚合根）
     └── updateStatus(LogisticsStatus)  # 状态推进（含FSM校验）
 ```
 
-### Container（货柜）⚡占位
+### Container（货柜）
 
 ```
 Container（聚合根）
@@ -74,7 +74,7 @@ Container（聚合根）
     └── closeLoading()          # 装柜完成
 ```
 
-### ConsolidationPool（拼柜池）⚡占位
+### ConsolidationPool（拼柜池）
 
 ```
 ConsolidationPool（聚合根）
@@ -136,7 +136,7 @@ public enum LogisticsStatus {
   PLANNED ──[订舱]──▶ BOOKED ──[实际发货]──▶ IN_TRANSIT ──[到货]──▶ DELIVERED [终态]
 ```
 
-### Container ⚡占位
+### Container
 
 ```
   LOADING ──[开船]──▶ DEPARTED ──[到港]──▶ ARRIVED ──[送达]──▶ DELIVERED
@@ -171,12 +171,12 @@ POST   /api/v1/logistics-plans
 PATCH  /api/v1/logistics-plans/{id}
 DELETE /api/v1/logistics-plans/{id}
 
-# Container ⚡占位
+# Container
 GET    /api/v1/containers?page=&pageSize=&status=
 POST   /api/v1/containers
 PATCH  /api/v1/containers/{id}
 
-# ConsolidationPool ⚡占位
+# ConsolidationPool
 GET    /api/v1/consolidation-pools?page=&pageSize=&status=
 POST   /api/v1/consolidation-pools
 POST   /api/v1/consolidation-pools/{poolId}/items   # 添加货物
