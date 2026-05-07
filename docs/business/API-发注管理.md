@@ -1,7 +1,7 @@
 # 发注管理 — API 契约
 
-> **版本**: 1.5.0
-> **更新**: 2026-05-07（v1.5.0：清理过时占位标注；修正货柜/集拼池/订单总览为已实现）
+> **版本**: 1.5.1
+> **更新**: 2026-05-07（v1.5.1：修正 estimatedPriceJpy 注释；补 Container 字段必填表；补 Phase2 状态说明）
 > **依据**: `SPEC-B02-发注单-步骤2.md` + `DOMAIN-发注管理领域模型.md`
 
 > **代码实现进度**: 发注单 CRUD ✅ 已实现 · 完整状态流转校验 ✅ 已实现 · 商品目录 ✅ 已实现（masterCode/subCode）· 验货记录 ✅ 已实现 · 货柜 ✅ 已实现 · 国内报关 ✅ 已实现 · 日本清关 ✅ 已实现 · 财务 🔴 待开发（FinanceRecord 聚合根）· 通知 🔴 Example 存根 · 退货管理 🔴 待开发 · 空运推荐 🔴 待开发
@@ -85,7 +85,8 @@ POST /api/v1/procurements
 | customerCompany | 客户公司 | | |
 | status | 状态 | | default: 未定 |
 
-**计算字段**（前端实时计算，后端存结果）：
+**计算字段**（后端在创建/更新时自动计算并存储，前端仅用于表单实时预览）：
+> ⚠️ 文档旧版写"前端实时计算"有歧义——实际是后端计算存储，frontend `previewPriceJpy` 仅作表单预览用。
 ```
 estimatedPriceJpy = (priceRmb / taxPoint * 1.02 * 1.2) * exchangeRate * 1.05
 ```
@@ -111,7 +112,7 @@ GET /api/v1/procurements
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| status | string | 状态过滤（未定/予定/OEM/発注待/永康/直送/倉庫着/現地検品/検品/エア便/メーカー直送/輸出/国内通関/通関/日本着/日本通関完了/会計/完了/退货） |
+| status | string | 状态过滤（**Phase2**：已下单/已出货；**标准19态**：未定/予定/OEM/発注待/永康/直送/倉庫着/現地検品/検品/エア便/メーカー直送/輸出/国内通関/通関/日本着/日本通関完了/会計/完了/退货） |
 | productCode | string | 商品代码 |
 | customerCompany | string | 客户公司 |
 | page | int | 页码，默认 0（0-indexed） |
@@ -337,7 +338,17 @@ GET /api/v1/products/code/{masterCode}
 POST /api/v1/containers
 ```
 
-**请求体**：
+**请求体字段**：
+
+| 字段 | 必填 | 说明 |
+|------|------|------|
+| containerNo | ✅ | 集装箱号 |
+| containerType | ✅ | 箱型（GP20/GP40/HC40/HC45） |
+| sealNo | | 封条号 |
+| portOfLoading | | 装货港代码 |
+| portOfDestination | | 目的港代码 |
+| procurementIds | | 关联发注单 ID 列表 |
+
 ```json
 {
   "containerNo": "MSKU1234567",
@@ -348,6 +359,8 @@ POST /api/v1/containers
   "procurementIds": [1, 3, 7]
 }
 ```
+
+**⚠️ 缺口**：前端 `ContainerPage.vue` 当前仅实现基础字段，`sealNo`/`portOfLoading`/`portOfDestination`/`procurementIds` 尚未接入表单（详情见 `docs/ui/pages/19-container.md` §缺口分析）。
 
 ---
 

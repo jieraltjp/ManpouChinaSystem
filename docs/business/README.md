@@ -1,7 +1,7 @@
 # 业务文档 — README
 
-> **版本**: 1.1.0
-> **更新**: 2026-04-30（新增 B-11 用户中心与权限体系）
+> **版本**: 1.2.0
+> **更新**: 2026-05-07（新增审计报告；B-API/B-DOMAIN 版本更新）
 
 ---
 
@@ -38,6 +38,7 @@
 | B-DOMAIN | [DOMAIN-发注管理领域模型.md](./DOMAIN-发注管理领域模型.md) | 聚合根、值对象、枚举、仓储接口 |
 | B-PLAN | [SPEC-B04-调配计划-步骤4.md](./SPEC-B04-调配计划-步骤4.md) | LogisticsPlan 状态机（PLANNED→BOOKED→IN_TRANSIT→DELIVERED） |
 | B-INSPECT | [SPEC-B03-验货记录-步骤3.md](./SPEC-B03-验货记录-步骤3.md) | QcRecord 状态机（COMPLETED/RETURN_REQUESTED） |
+| 审计报告 | [../audit/BUSINESS-LOGIC-AUDIT-2026-05-07.md](../audit/BUSINESS-LOGIC-AUDIT-2026-05-07.md) | FSM/DB-Entity/计算字段/字段必填五层对齐审计 |
 
 ---
 

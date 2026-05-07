@@ -1,7 +1,7 @@
 # 发注管理 — 领域模型
 
-> **版本**: 1.6.0
-> **更新**: 2026-04-28（DemandStatus 新增 CONFIRMED）
+> **版本**: 1.6.1
+> **更新**: 2026-05-07（v1.6.1：补 Phase2 状态及前后端 FSM 不一致警告）
 > **依据**: 业务流分析（8步全链路） + `SPEC-B02-发注单-步骤2.md`
 
 > **代码实现进度**:
@@ -441,6 +441,10 @@ ReturnRecord（值对象）
 
 ### ShipmentStatus（出货单状态）
 
+> ⚠️ **前后端状态机不一致警告**：后端代码实际有21态（含 Phase2 `已下单`/`已出货`），但本领域文档仅记录标准19态。前端 `ProcurementPage.vue` 目前仅展示2态（已下单/已出货），完全绕过了19态状态机。详见 `docs/audit/BUSINESS-LOGIC-AUDIT-2026-05-07.md`。
+
+**标准19态（API 文档定义）**：
+
 ```java
 public enum ShipmentStatus {
     未定,           // 还未下单（已转为 ReplenishmentDemand，此状态仅作历史兼容）
@@ -468,6 +472,15 @@ public enum ShipmentStatus {
     // 空运路径：未定 → 発注待 → 直送 → 倉庫着 → 検品 → エア便 → 国内通関 → 通関 → 日本着 → 日本通関完了 → 会計 → 完了
 }
 ```
+
+**Phase2 附加2态（代码有但文档未记录）**：
+
+```java
+    已下单,         // Phase2：已转批次（batchCount > 0）
+    已出货,         // Phase2：已发货
+```
+
+> ⚠️ 附加态不在 API 文档中，与标准19态之间的转换规则需参照 `ShipmentStatus.java` 源码。
 
 ### BillingType（报关类型 — 新增，替换 billingMethod）
 
