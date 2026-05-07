@@ -332,12 +332,25 @@ GET /api/v1/permissions/tree
 
 ### Phase 5 — 个人中心 ⚠️ 待开发
 
-1. `pages/system/ProfilePage.vue`（UI-20）
+1. `pages/profile/ProfilePage.vue`（UI-20）
 2. 路由注册（`/profile`）
-3. 当前用户信息 API（`/api/v1/users/me`）
-4. 修改个人信息 API
-5. 修改密码 API
-6. i18n key 补充
+3. 当前用户信息 API（`GET /api/v1/users/me`）
+4. 修改个人信息 API（`PUT /api/v1/auth/profile`）
+5. 修改密码 API（`PUT /api/v1/auth/password`）
+6. i18n key 补充（`profile.*`）
+
+### Phase 6 — 注册 + 审核流程 ⚠️ 待开发
+
+**后端 API：**
+1. `POST /api/v1/auth/register`（用户注册，自动创建 `registrationStatus=PENDING`）
+2. `GET /api/v1/users/pending`（查询待审核用户列表，仅 ADMIN）
+3. `PUT /api/v1/users/{id}/approve`（审核通过，`registrationStatus=APPROVED`）
+4. `PUT /api/v1/users/{id}/reject`（审核拒绝，`registrationStatus=REJECTED`）
+
+**前端：**
+1. `pages/auth/RegisterPage.vue`（注册页，登录页加「注册」入口）
+2. `pages/system/PendingUsersPage.vue`（待审核用户列表，仅 ADMIN 可见）
+3. 路由注册（`/register` · `/system/pending-users`）
 
 ---
 
