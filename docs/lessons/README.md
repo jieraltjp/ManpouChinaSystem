@@ -16,6 +16,11 @@
 | [LESSONS-FRONTEND.md](./LESSONS-FRONTEND.md) | 前端 Vue / TS / i18n / Element Plus | 11–12, 14, 16, 33–34, 37, 40–44, 46–50, 52–59 |
 | [LESSONS-USER-SERVICE.md](./LESSONS-USER-SERVICE.md) | user-service JWT / Flyway / Lombok / JPA / Spring Data | 62–71 |
 | [LESSONS-JWT-CROSS-SERVICE.md](./LESSONS-JWT-CROSS-SERVICE.md) | allinone 只读验签 / Map 反序列化 / RS256 kid 提取 | 72–73 |
+| [LESSON-55-56.md](./LESSON-55-56.md) | el-input-number 列宽 + dialog 紧凑设计 | 55, 56 |
+| [LESSON-57.md](./LESSON-57.md) | 业务锚点变更：procurementId → qcRecordId | 57 |
+| [LESSON-58.md](./LESSON-58.md) | el-input-number 按钮截断：padding 计算漏扣 | 58 |
+| [LESSON-60.md](./LESSON-60.md) | Spring Data JPA nativeQuery + Pageable ORDER BY 陷阱 | 60 |
+| [LESSON-API-UNWRAP-CONSISTENCY.md](./LESSON-API-UNWRAP-CONSISTENCY.md) | client.ts Result<T> 解包一致性 | 74 |
 
 ---
 

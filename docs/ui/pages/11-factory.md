@@ -205,4 +205,4 @@
 |------|------|
 | 统计卡只有3个（前端） | 后端返回5个（total/active/potential/suspended/eliminated），前端仅展示其中3个 |
 | 经纬度未在前端展示 | 经纬度可录入但表格不显示，仅在详情抽屉可见 |
-| paymentTerms 未实现 | dialog 和 drawer 均有 paymentTerms 字段，但 form 表单无此控件 |
+| paymentTerms 表单缺失 | 后端 Factory.entity 有 paymentTerms 字段，但新增/编辑弹窗表单无此控件（仅展示在详情抽屉） |
