@@ -231,20 +231,27 @@ POST /api/v1/roles
 PUT /api/v1/roles/{id}
 ```
 
-### 3.13 删除角色
+### 3.13 局部更新角色（管理员调试）
+
+```
+PATCH /api/v1/roles/{id}
+{ "isEditable": 1 }   // 仅 ADMIN 可调用，用于修正预置角色属性
+```
+
+### 3.14 删除角色
 
 ```
 DELETE /api/v1/roles/{id}
 ```
 
-### 3.14 分配权限
+### 3.15 分配权限
 
 ```
 PUT /api/v1/roles/{id}/permissions
 { "permissionIds": [1, 2, 3, 5] }
 ```
 
-### 3.15 权限树
+### 3.16 权限树
 
 ```
 GET /api/v1/permissions/tree
@@ -289,6 +296,7 @@ GET /api/v1/permissions/tree
 | 新增角色 | POST | `/api/v1/roles` | ✅ |
 | 更新角色 | PUT | `/api/v1/roles/{id}` | ✅ |
 | 删除角色 | DELETE | `/api/v1/roles/{id}` | ✅ |
+| 局部更新角色 | PATCH | `/api/v1/roles/{id}` | ✅ |
 | 分配权限 | PUT | `/api/v1/roles/{id}/permissions` | ✅ |
 
 ---
