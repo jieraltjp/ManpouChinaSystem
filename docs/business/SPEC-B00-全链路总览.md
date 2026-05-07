@@ -1,8 +1,8 @@
 # 全链路业务流索引 — MANPOU 中国系统
 
-> **版本**: 1.3.0
+> **版本**: 1.5.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-27（v1.3.0：步骤5-8全部实现，与各SPEC文档同步；修正全链路总览图中的步骤5/6/7/8状态）
+> **更新**: 2026-05-07（v1.5.0：Container / ConsolidationPool 已实现；与全链路业务流程同步）
 > **状态**: ✅ 已实现（全链路8步 CRUD + 事件驱动 + 反馈循环）
 > **依据**: 用户业务描述（8步全链路 + 商品数据库 + 循环反馈）
 
@@ -256,7 +256,7 @@
 ## 第四步：调配（海运 / 空运 / 拼柜）
 
 **对应文档**: `SPEC-B04-调配计划-步骤4.md` · `DOMAIN-发注管理领域模型.md` §1.6
-**对应代码**: `LogisticsPlan` ✅ · `Container` 🔴未实现 · `ConsolidationPool` 🔴未实现
+**对应代码**: `LogisticsPlan` ✅ · `Container` ✅ 已实现 · `ConsolidationPool` ✅ 已实现
 
 ### 需要什么（输入）
 
@@ -313,8 +313,8 @@
 
 | 问题 | 现状 | 建议 |
 |------|------|------|
-| Container 实体 | 未实现 | 需创建 `container` 表和 `Container` 聚合根 |
-| ConsolidationPool 实体 | 未实现 | 需创建拼柜池管理 |
+| Container 实体 | ✅ 已实现 | `Container` 聚合根（v1.5.0） |
+| ConsolidationPool 实体 | ✅ 已实现 | `ConsolidationPool` 聚合根（v1.5.0） |
 | 起运港/目的港字段 | LogisticsPlan 无此字段 | 需要添加 departurePort / arrivalPort |
 | 工厂联系人信息 | 从 Factory 带入 factoryId，但联系人字段不在 LogisticsPlan | 用户信息已通过 factoryId 关联查询 |
 | 空运/海运判定 | 用户手动选择 planType | 可根据 cargoVolumeCbm + cargoWeightKg 自动推荐 |
@@ -586,7 +586,7 @@
 | P0 | 5,6,7 | 国内报关/日本清关/退税字段全部空白 | 无法形成完整链路 |
 | P0 | 8 | 运营销售模块完全缺失 | 反馈循环无法闭合 |
 | P0 | 商品库 | Product.hsCode / taxPoint 缺失 | 无法支撑步骤5、7 |
-| P1 | 4 | Container / ConsolidationPool 未实现 | 拼柜功能无法使用 |
+| P1 | 4 | Container / ConsolidationPool 已实现 | ✅ v1.5.0 |
 | P1 | 2 | Factory 缺少微信/QQ/经纬度 | 工厂信息不完整 |
 | P1 | 3 | sellerName 应从 Factory 自动代入 | 减少用户输入 |
 | P1 | 3 | qcUserId 无用户管理 | 验货责任人无法选择 |
@@ -618,12 +618,11 @@
    - [x] ✅ JapanCustomsRecord 聚合根（日本清关 v1.2.0）
    - [x] ✅ TaxRefundRecord 聚合根（退税 v1.1.0）
    - [x] ✅ SalesRecord 聚合根（运营销售 v1.2.0）
-   - [x] ✅ Container / ConsolidationPool（占位，待业务方确认字段）
+   - [x] ✅ Container / ConsolidationPool（v1.5.0 已实现）
 
 2. **业务方确认**（仍在阻塞中）
    - [ ] 提供真实国内报关单样本 → 补充 HS 编码/申报价值/出口口岸等字段
    - [ ] 确认运营销售数据来源（平台 API / 人工维护）
-   - [ ] Container 货柜管理字段确认
 
 3. **反馈循环设计**
    - [ ] 确定库存预警阈值机制

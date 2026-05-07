@@ -1,10 +1,10 @@
 # SPEC-B11 — 用户中心与权限体系 · 实现设计
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-05-01
-> **更新**: 2026-05-01（v1.0.0：Phase 2 后端 CRUD 完成）
-> **状态**: 🟡 Phase 2 后端完成，前端待开发
-> **前置**: SPEC-B11 v1.1.0 · user-service Flyway V10 已完成 · Vite proxy 已配置
+> **更新**: 2026-05-07（v1.1.0：Phase 3 前端完成 + 审计修复 Round 1~5）
+> **状态**: 🟡 Phase 3 前端完成，Phase 6（注册+审核）待开发
+> **前置**: SPEC-B11 v1.1.0 · user-service Flyway V14 已完成 · Vite proxy 已配置
 > **关联**: UI-17 · UI-18 · UI-19 · UI-20 · docs/ui/pages/14-user-management.md · docs/ui/pages/15-role-management.md
 > **INTJ 编号**: DOC-B11-IMPL-001
 
@@ -313,15 +313,15 @@ GET /api/v1/permissions/tree
 6. BaseEntity public setter 方法
 7. 编译通过，打包，user-service 重启
 
-### Phase 3 — 前端页面 ⚠️ 待开发
+### Phase 3 — 前端页面 ✅ 2026-05-07
 
-1. `api/user.ts`（用户 API 客户端）
-2. `api/role.ts`（角色 API 客户端）
-3. Vite proxy 补充（`/api/v1/users` → user-service）
-4. `pages/system/UserPage.vue`（UI-17）
-5. `pages/system/RolePage.vue`（UI-18）
-6. 路由注册（`/system/user` · `/system/role`）
-7. i18n key 补充（zh.json · ja.json）
+1. `api/user.ts`（用户 API 客户端） ✅
+2. `api/role.ts`（角色 API 客户端） ✅
+3. Vite proxy 补充（`/api/v1/users` → user-service） ✅
+4. `pages/system/UserPage.vue`（UI-17） ✅
+5. `pages/system/RolePage.vue`（UI-18） ✅
+6. 路由注册（`/system/user` · `/system/role`） ✅
+7. i18n key 补充（zh.json · ja.json） ✅
 
 ### Phase 4 — 操作日志（前端）⚠️ 待开发
 
@@ -408,16 +408,20 @@ proxy: {
 | 项目 | 优先级 | 状态 |
 |------|--------|------|
 | Phase 2 后端 CRUD | P0 | 🟢 已完成 |
-| Vite proxy 配置 | P0 | 🟢 已完成（auth） |
-| 前端 API 客户端 | P0 | ⚠️ 待开发 |
-| UserPage.vue | P0 | ⚠️ 待开发 |
-| RolePage.vue | P0 | ⚠️ 待开发 |
-| 路由注册 | P0 | ⚠️ 待开发 |
-| i18n key | P0 | ⚠️ 待开发 |
+| Vite proxy 配置 | P0 | 🟢 已完成（auth + users + roles + permissions） |
+| 前端 API 客户端 | P0 | ✅ 已完成（api/user.ts + api/role.ts） |
+| UserPage.vue | P0 | ✅ 已完成 |
+| RolePage.vue | P0 | ✅ 已完成 |
+| 路由注册 | P0 | ✅ 已完成（/system/user + /system/role） |
+| i18n key | P0 | ✅ 已完成 |
+| GET 接口 @PreAuthorize 鉴权 | P0 | ⚠️ 待开发（所有 GET 端点需加读权限） |
+| 前端权限控制（JWT payload 渲染） | P1 | ⚠️ 待开发 |
+| 前端删除用户按钮 | P1 | ⚠️ 待开发（UserPage.vue 缺少） |
+| 前端筛选器（roleId/departmentId/companyId） | P1 | ⚠️ 待开发（UserPage.vue 缺少） |
 | AuditLogPage.vue | P1 | ⚠️ 待开发 |
 | ProfilePage.vue | P1 | ⚠️ 待开发 |
 | 用户分配角色（完整实现） | P1 | ✅ 已完成（UserRoleRepository） |
-| 前端权限控制（JWT payload 渲染） | P2 | ⚠️ 待开发 |
+| Phase 6 注册+审核（全栈） | P2 | ⚠️ 待开发 |
 
 ---
 

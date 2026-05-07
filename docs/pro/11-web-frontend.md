@@ -13,7 +13,7 @@
 | 端口 | 13000（开发） |
 | 包名 | `@manpou/web` |
 | 描述 | Vue 3 + TypeScript + Element Plus 管理后台前端 |
-| 当前状态 | 脚手架 ✅，页面待开发 |
+| 当前状态 | 核心业务页面已完成（Demand/Procurement/QC/Logistics/Customs/Sales），用户管理（Phase 3）已完成，Phase 4-6 待开发 |
 
 ---
 

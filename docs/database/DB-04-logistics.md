@@ -1,9 +1,8 @@
 # DB-04 — 调配计划数据库设计
 
-> **版本**: 1.3.0
+> **版本**: 1.5.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-27（v1.3.0：新增 container_no 货柜号字段，支持多货物合柜追踪）
-> **更新**: 2026-04-27（v1.2.0：新增 qc_record_id 列，关联验货记录；保留 procurement_id 用于拼柜场景兼容）
+> **更新**: 2026-05-07（v1.5.0：Container / ConsolidationPool 已实现，与全链路业务流程同步）
 > **状态**: ✅ 已实现
 > **业务步号**: 04（调配计划）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B04-调配计划-步骤4.md`
@@ -17,9 +16,9 @@
 | 序号 | 表名 | 聚合根 | 状态 |
 |------|------|--------|------|
 | 1 | `logistics_plan` | LogisticsPlan | ✅ 已实现 |
-| 2 | `container` | Container | 🔴 占位 |
-| 3 | `consolidation_pool` | ConsolidationPool | 🔴 占位 |
-| 4 | `consolidation_pool_item` | ConsolidationPoolItem | 🔴 占位 |
+| 2 | `container` | Container | ✅ 已实现 |
+| 3 | `consolidation_pool` | ConsolidationPool | ✅ 已实现 |
+| 4 | `consolidation_pool_item` | ConsolidationPoolItem | ✅ 已实现 |
 
 ---
 
@@ -72,9 +71,9 @@ CREATE TABLE logistics_plan (
 
 ---
 
-## 2. container（货柜）🔴占位
+## 2. container（货柜）✅已实现
 
-**对应**: `Container` 聚合根（待实现）
+**对应**: `Container` 聚合根（v1.5.0）
 
 ```sql
 -- TODO: 字段待确认
@@ -105,9 +104,9 @@ CREATE TABLE container (
 
 ---
 
-## 3. consolidation_pool（拼柜池）🔴占位
+## 3. consolidation_pool（拼柜池）✅已实现
 
-**对应**: `ConsolidationPool` 聚合根（待实现）
+**对应**: `ConsolidationPool` 聚合根（v1.5.0）
 
 ```sql
 -- TODO: 字段待确认

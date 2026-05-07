@@ -21,7 +21,7 @@
 | UI-02 | [pages/02-dashboard.md](pages/02-dashboard.md) | `/dashboard` | — | ✅ |
 | UI-03 | [pages/03-examples.md](pages/03-examples.md) | `/examples` | — | ✅ |
 | UI-04 | [pages/01-demand.md](pages/01-demand.md) | `/procurement/demand` | 01 | ✅ |
-| UI-05 | [pages/02-procurement.md](pages/02-procurement.md) | `/procurement/order` | 02 | ✅ |
+| UI-05 | [pages/02-procurement.md](pages/02-procurement.md) | `/procurement/procurement` | 02 | ✅ |
 | UI-06 | [pages/03-inspection.md](pages/03-inspection.md) | `/procurement/inspection` | 03 | ✅ |
 | UI-07 | [pages/04-logistics.md](pages/04-logistics.md) | `/procurement/logistics` | 04 | ✅ |
 | UI-08 | [pages/05-domestic-customs.md](pages/05-domestic-customs.md) | `/procurement/customs` | 05 | ✅ |
@@ -33,8 +33,8 @@
 | UI-14 | [pages/11-factory.md](pages/11-factory.md) | `/base/factory` | — | ✅ |
 | UI-15 | [pages/12-demand-overview.md](pages/12-demand-overview.md) | `/base/overview/demand/:id` | — | ✅ |
 | UI-16 | [pages/13-procurement-overview.md](pages/13-procurement-overview.md) | `/base/overview/order/:id` | — | ✅ |
-| UI-17 | [pages/14-user-management.md](pages/14-user-management.md) | `/system/user` | B-11 | 📋 待开发 |
-| UI-18 | [pages/15-role-management.md](pages/15-role-management.md) | `/system/role` | B-11 | 📋 待开发 |
+| UI-17 | [pages/14-user-management.md](pages/14-user-management.md) | `/system/user` | B-11 | ✅ Phase 3 完成 |
+| UI-18 | [pages/15-role-management.md](pages/15-role-management.md) | `/system/role` | B-11 | ✅ Phase 3 完成 |
 | UI-19 | [pages/16-audit-log.md](pages/16-audit-log.md) | `/system/audit-log` | B-11 | 📋 待开发 |
 | UI-20 | [pages/17-profile.md](pages/17-profile.md) | `/profile` | B-11 | 📋 待开发 |
 | — | [05-UI改版方案-橙色商业主题.md](05-UI改版方案-橙色商业主题.md) | — | — | ✅ |
@@ -59,8 +59,8 @@
 | — | `/base/factory` | FactoryPage.vue | — |
 | — | `/base/product` | ProductPage.vue | — |
 | 09 | `/base/overview` | OrderOverviewPage.vue | UI-12 ✅ |
-| B-11 | `/system/user` | UserPage.vue | UI-17 📋 |
-| B-11 | `/system/role` | RolePage.vue | UI-18 📋 |
+| B-11 | `/system/user` | UserPage.vue | UI-17 ✅ |
+| B-11 | `/system/role` | RolePage.vue | UI-18 ✅ |
 | B-11 | `/system/audit-log` | AuditLogPage.vue | UI-19 📋 |
 | B-11 | `/profile` | ProfilePage.vue | UI-20 📋 |
 
