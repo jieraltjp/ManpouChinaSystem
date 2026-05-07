@@ -1,11 +1,10 @@
 # 发注管理 — API 契约
 
-> **版本**: 1.4.0 ⚠️ 部分过时
-> **更新**: 2026-04-28（v1.9.0 字段 leadTimeDays/cartonNotes 已补充至 SPEC-B02；本文件待全面修订）
-> **更新**: 2026-04-21（v1.3.0 初版）
+> **版本**: 1.5.0
+> **更新**: 2026-05-07（v1.5.0：清理过时占位标注；修正货柜/集拼池/订单总览为已实现）
 > **依据**: `SPEC-B02-发注单-步骤2.md` + `DOMAIN-发注管理领域模型.md`
 
-> ⚠️ **代码实现进度**: 发注单 CRUD ✅ 已实现 · 完整状态流转校验 ✅ 已实现 · 商品目录 ✅ 已实现（masterCode/subCode）· 验货记录 ✅ 已实现 · 货柜 ✅ 已实现 · 财务/通知/报关 🔴 Example 存根 · 财务/退货/空运推荐 🔴 未实现
+> **代码实现进度**: 发注单 CRUD ✅ 已实现 · 完整状态流转校验 ✅ 已实现 · 商品目录 ✅ 已实现（masterCode/subCode）· 验货记录 ✅ 已实现 · 货柜 ✅ 已实现 · 国内报关 ✅ 已实现 · 日本清关 ✅ 已实现 · 财务 🔴 待开发（FinanceRecord 聚合根）· 通知 🔴 Example 存根 · 退货管理 🔴 待开发 · 空运推荐 🔴 待开发
 
 ---
 
@@ -352,9 +351,9 @@ POST /api/v1/containers
 
 ---
 
-## 5. 财务结算（会計）
+## 5. 财务结算（会計）🔴
 
-> 🔴 **待实现**：FinanceRecord 聚合根未实现，API 路径待定。
+> 🔴 **待开发**：FinanceRecord 聚合根未实现，API 路径待定。
 
 ```
 POST /api/v1/procurements/{id}/finance
@@ -373,9 +372,9 @@ POST /api/v1/procurements/{id}/finance
 
 ---
 
-## 6. 退货管理
+## 6. 退货管理 🔴
 
-> 🔴 **待实现**：退货记录聚合根未实现，API 路径待定。
+> 🔴 **待开发**：退货记录聚合根未实现，API 路径待定。
 
 ```
 POST /api/v1/procurements/{id}/returns
@@ -430,13 +429,10 @@ POST /api/v1/procurements/{id}/returns
 
 ---
 
-## 9. 未实现端点（文档占位，待 Phase 2-8 实现）
+## 9. 待开发端点
 
-| 文档路径 | 说明 | 阶段 |
-|---------|------|------|
+| 端点 | 说明 | 阶段 |
+|------|------|------|
 | `POST /api/v1/procurements/{id}/finance` | 财务结算关联 | Phase 7 |
 | `POST /api/v1/procurements/{id}/returns` | 退货管理 | Phase 8 |
-| `GET /api/v1/consolidation-pools/**` | 集拼池管理 | ✅ 已实现 |
-| `GET /api/v1/containers/**` | 货柜管理 | ✅ 已实现 |
-| `POST /api/v1/orders/{id}/overview` | 订单聚合总览 | ✅ 已实现 |
-| `空运推荐`（自动） | 尺寸/重量达标自动推荐空运 | Phase 4 |
+| `空运推荐`（自动） | 尺寸/重量达标自动推荐空运 | 待定 |
