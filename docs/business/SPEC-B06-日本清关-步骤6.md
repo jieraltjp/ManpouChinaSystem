@@ -1,6 +1,7 @@
 # 日本清关 — 业务规格（步骤6）
 
-> **版本**: 1.4.1
+> **版本**: 1.5.0
+> **更新**: 2026-05-08（v1.5.0：complete()签名修正为3参数；移除不存在的PATCH /{id}端点）
 > **创建**: 2026-04-22
 > **更新**: 2026-05-07（v1.4.1：补POST /batch/PUT/DELETE端点）
 > **更新**: 2026-04-30（v1.4.0：**containerNo 为主键 + 与 DomesticCustomsRecord 联动 + 货柜级批量创建**）
@@ -78,7 +79,7 @@ JapanCustomsRecord（聚合根）
 │
 └── 领域方法
     ├── startClearance()         # 开始清关 → status = IN_PROGRESS
-    ├── complete(importDuty, consumptionTax)  # 放行 → status = CLEARED
+    ├── complete(importDuty, consumptionTax, clearanceDate)  # 放行 → status = CLEARED（含清关日期）
     ├── fail(reason)             # 失败 → status = FAILED
     └── isTerminal()             # CLEARED / FAILED 为终态
 ```
@@ -130,7 +131,6 @@ GET    /api/v1/japan-customs/{id}
 POST   /api/v1/japan-customs                              # 创建（**containerNo 必填**）
 POST   /api/v1/japan-customs/batch                       # 批量创建（v1.4.0新增）
 PUT    /api/v1/japan-customs/{id}                        # 编辑（v1.4.0新增）
-PATCH  /api/v1/japan-customs/{id}
 PATCH  /api/v1/japan-customs/{id}/start                  # 开始清关
 PATCH  /api/v1/japan-customs/{id}/complete               # 完成清关（含缴纳税费）
 PATCH  /api/v1/japan-customs/{id}/fail                   # 清关失败

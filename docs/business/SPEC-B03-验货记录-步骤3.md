@@ -1,6 +1,7 @@
 # SPEC-B03 — 验货记录业务规格（步骤3）
 
-> **版本**: 1.1.2
+> **版本**: 1.2.0
+> **更新**: 2026-05-08（v1.2.0：Entity补shipmentBatchId字段）
 > **更新**: 2026-05-07（v1.1.2：注⚠️QcRecord.taxRefund字段Entity仍存在，与文档v1.1.1不一致）
 > **更新**: 2026-04-27（v1.1.1：移除 QcRecord.taxRefund，退税由采购层 billingType 决定）
 > **更新**: 2026-04-27（v1.1.0：新增验货完成后自动推进采购单状态；新增选择采购后代入字段自动预填）
@@ -42,6 +43,7 @@ QcRecord（聚合根）
 ├── id: Long
 ├── qcCode: String              # Q-YYYYMMDD-NNN
 ├── procurementId: Long          # 关联采购单（FK）
+├── shipmentBatchId: Long        # 关联出货批次（V43新增，JPA只读，DB管理）
 ├── sellerName: String          # 卖家名称（来自 Factory.factoryName）
 ├── productCode: String          # 货号
 ├── subProductCode: String      # 子货号

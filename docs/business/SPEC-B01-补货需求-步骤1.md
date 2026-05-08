@@ -1,6 +1,7 @@
 # SPEC-B01 — 补货需求业务规格（步骤1）
 
-> **版本**: 2.2.0
+> **版本**: 2.3.0
+> **更新**: 2026-05-08（v2.3.0：Entity补remarks字段；API补suggest/destinations和suggest/japan-leads端点）
 > **更新**: 2026-04-28（v2.2.0：彻底移除转采购流程，改为在发注单页面关联需求；状态精简为 PENDING/CONFIRMED 两级）
 > **更新**: 2026-04-28（v2.1.0：DemandStatus 新增 CONFIRMED 状态 + toggle-confirm 接口 PENDING↔CONFIRMED 切换）
 > **更新**: 2026-04-24（v2.0.0：每条 Demand = 一个子货号（主货号+子货号 = 商品唯一标识））
@@ -42,6 +43,7 @@ ReplenishmentDemand（聚合根）
 ├── status: DemandStatus         # PENDING / CONFIRMED
 ├── linkedProcurementId: Long   # 关联的 Procurement.id（CONFIRMED 时填充）
 ├── imageUrl: String             # 商品图片URL（反规范自 Product 表）
+├── remarks: String             # 备注
 └── 领域方法
     ├── markAsLinked(procurementId)    # 标记已关联发注单 → status=CONFIRMED
     └── unlinkProcurement()            # 取消关联 → status=PENDING，linkedProcurementId=null
@@ -111,6 +113,8 @@ DELETE /api/v1/demands/{id}                     # 任何状态均可删除
 POST   /api/v1/demands/{id}/link               # 关联到发注单（v2.2.0）
 POST   /api/v1/demands/{id}/unlink             # 取消关联（v2.2.0）
 GET    /api/v1/demands/{id}/procurement        # 查看关联的采购单
+GET    /api/v1/demands/suggest/destinations   # 目的地自动补全
+GET    /api/v1/demands/suggest/japan-leads     # 日本担当自动补全
 ```
 
 > **注意（v2.2.0）**：移除了 `POST /{id}/convert`（转采购）和 `POST /{id}/revert`（撤销转换）接口，移除了 `status` 筛选参数。

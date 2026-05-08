@@ -1,6 +1,7 @@
 # 退税 — 业务规格（步骤7）
 
-> **版本**: 1.2.0
+> **版本**: 1.3.0
+> **更新**: 2026-05-08（v1.3.0：complete()签名修正为3参数actualAmount/refundDate/refundBank）
 > **创建**: 2026-04-22
 > **更新**: 2026-04-27（v1.2.0：修正触发规则为手动创建；原「JapanClear → 自动创建」为错误描述，代码中无对应实现）
 > **状态**: ✅ 已实现（手动创建）
@@ -47,7 +48,7 @@ TaxRefundRecord（聚合根）
 │
 └── 领域方法
     ├── calculateEstimatedRefund()        # 计算理论退税额
-    ├── complete(actualAmount)           # 标记退税完成
+    ├── complete(actualAmount, refundDate, refundBank)  # 标记退税完成（含退款日期和银行）
     ├── markNoRefund()                   # 标记为不退税
     └── isTerminal()                    # COMPLETED / NO_REFUND 为终态
 ```
