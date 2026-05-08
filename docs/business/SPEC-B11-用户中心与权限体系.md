@@ -1,8 +1,8 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.5.0
+> **版本**: 1.6.0
 > **创建**: 2026-04-30
-> **修订**: 2026-05-08（v1.5.0：Phase 2 实际未实现——GET /pending、PUT /approve、PUT /reject、GET /modules等端点标记⚠️）
+> **更新**: 2026-05-08（v1.6.0：补充 warehouse/notification 模块（V15）；更新权限总数 93→101；Phase 2 端点缺口标记⚠️）
 > **状态**: ⚠️ Phase 2 部分完成；⚠️ Phase 3 部分完成；Phase 4-6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
@@ -21,7 +21,7 @@
 
 本设计覆盖：
 - 用户管理（账号/密码/姓名/邮箱/手机/头像/组织/职务/海关资质）
-- 角色与权限管理（4 级角色 + 42 条权限编码）
+- 角色与权限管理（4 级角色 + 101 条权限编码）
 - 操作日志（CREATE/UPDATE/DELETE/STATUS_CHANGE/LOGIN 全链路记录）
 - 个人中心（信息修改/密码修改/偏好设置）
 - **用户注册 + 管理员审核（方案B：JWT 跨服务验证）**
@@ -562,10 +562,10 @@ public boolean canLogin(User user) {
 
 ## 4. 权限编码规范
 
-### 4.1 权限编码定义（66 条，实际实现）
+### 4.1 权限编码定义（101 条，V8 93 条 + V15 8 条）
 
 **格式**: `{模块}:{动作}`
-**已剔除**：未实现的 `order:read`、`permission:read`、`audit:export`、`auth:*`、`customs:approve`、`tax_refund:complete`。
+> ⚠️ 以下权限在 SPEC 设计时被标记"已剔除"，但实际 V8 中已实现：`order:read`、`permission:read`、`audit:export`、`customs:approve`、`tax_refund:complete`。
 
 #### 发注管理模块（procurement）
 
@@ -655,6 +655,25 @@ public boolean canLogin(User user) {
 | `role:update` | 编辑角色 | 役割を編集 | UPDATE |
 | `role:assign` | 分配角色 | 役割を割り当て | ADMIN |
 | `audit:read` | 查看操作日志 | 操作ログを表示 | READ |
+| `audit:export` | 导出操作日志 | 操作ログをエクスポート | EXPORT |
+
+#### 仓储模块（warehouse）
+
+| 权限编码 | 中文名 | 日文名 | 动作 |
+|---------|--------|--------|------|
+| `warehouse:read` | 查看仓储记录 | 倉庫記録を表示 | READ |
+| `warehouse:create` | 创建仓储记录 | 倉庫記録を作成 | CREATE |
+| `warehouse:update` | 编辑仓储记录 | 倉庫記録を編集 | UPDATE |
+| `warehouse:delete` | 删除仓储记录 | 倉庫記録を削除 | DELETE |
+
+#### 通知模块（notification）
+
+| 权限编码 | 中文名 | 日文名 | 动作 |
+|---------|--------|--------|------|
+| `notification:read` | 查看通知 | 通知を表示 | READ |
+| `notification:create` | 创建通知 | 通知を作成 | CREATE |
+| `notification:update` | 编辑通知 | 通知を編集 | UPDATE |
+| `notification:delete` | 删除通知 | 通知を削除 | DELETE |
 
 ---
 
@@ -783,7 +802,7 @@ public Result<DemandVO> update(@PathVariable Long id, @RequestBody @Valid Demand
 | 依赖倒置？ | ✅ | domain 层只引用 common.enums/exception |
 | 领域语言？ | ✅ | 权限模块使用业务语言（角色/权限/审批），非技术语言 |
 | 日志？ | ✅ | 操作日志全链路记录，含 traceId |
-| 提交？ | ✅ | 按 Flyway 版本顺序：V4→V5→V6→V7→V7.1→V8→V9 |
+| 提交？ | ✅ | 按 Flyway 版本顺序：V4→V5→V6→V7→V7.1→V8→V9→V10→V11→V12→V13→V14→V15 |
 | 单体优先？ | ✅ | 认证在 user-service（18081），业务在 manpou-allinone（18090） |
 | i18n？ | ✅ | 所有 UI 文本使用 i18n key，中日双语 |
 | 密码安全？ | ✅ | BCrypt 哈希，强度 12，永不明文传输/存储 |
@@ -826,7 +845,7 @@ Phase 2: 用户 CRUD + 角色管理（P0）
   前端: 待审核用户列表 + 审核弹窗
 
 Phase 3: 权限控制 ✅ 完成（⚠️ 部分）
-  ✅ allinone JwtAuthenticationFilter：提取 permissions（66条），ADMIN `*:*` 展开
+  ✅ allinone JwtAuthenticationFilter：提取 permissions（V8 93条 + V15 8条 = 101条），ADMIN `*:*` 展开
   ✅ allinone 21个业务 Controller 加 @PreAuthorize（共123个注解）
   ⚠️ 前端: 路由守卫仅支持角色检查（roles），不支持细粒度权限
   ⚠️ 前端: 按钮级 hasPermission() 仅在 UserPage.vue 实现，其他页面未集成
