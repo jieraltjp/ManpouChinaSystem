@@ -1,9 +1,9 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.3.0
+> **版本**: 1.4.0
 > **创建**: 2026-04-30
-> **修订**: 2026-05-08（v1.3.0：Phase 3 权限控制 ✅ 完成——allinone JWT 提取 permissions，17个 Controller 注解完毕；权限数量 58→66 补充 warehouse/notification）
-> **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；Phase 4-6 待开发
+> **修订**: 2026-05-08（v1.4.0：Phase 3 状态修正——后端21 Controller注解完成✅；前端路由守卫仅角色级⚠️；按钮权限仅UserPage⚠️；菜单动态显示未实现🔲）
+> **状态**: ✅ Phase 2 完成；⚠️ Phase 3 部分完成；Phase 4-6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
 
@@ -825,12 +825,12 @@ Phase 2: 用户 CRUD + 角色管理（P0）
   前端: 权限树（只读）
   前端: 待审核用户列表 + 审核弹窗
 
-Phase 3: 权限控制 ✅ 完成
+Phase 3: 权限控制 ✅ 完成（⚠️ 部分）
   ✅ allinone JwtAuthenticationFilter：提取 permissions（66条），ADMIN `*:*` 展开
-  ✅ allinone 17个业务 Controller 加 @PreAuthorize
-  ⚠️ 前端: 路由守卫增加 hasPermission
-  ⚠️ 前端: 按钮级 v-if="hasPermission('xxx')"
-  ⚠️ 前端: 菜单按权限动态显示/隐藏
+  ✅ allinone 21个业务 Controller 加 @PreAuthorize（共123个注解）
+  ⚠️ 前端: 路由守卫仅支持角色检查（roles），不支持细粒度权限
+  ⚠️ 前端: 按钮级 hasPermission() 仅在 UserPage.vue 实现，其他页面未集成
+  🔲 前端: 菜单按权限动态显示/隐藏（未实现）
 
 Phase 4: 操作日志（P1）
   V9

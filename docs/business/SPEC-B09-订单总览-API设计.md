@@ -1,7 +1,8 @@
 # 订单总览 — API 设计
 
-> **版本**: 3.1.0
+> **版本**: 3.2.0
 > **创建**: 2026-04-22
+> **更新**: 2026-05-08（v3.2.0：TypeScript接口和JSON示例移除不存在的step5-8Status字段）
 > **更新**: 2026-05-07（v3.1.0：OrderChainVO字段修正；productNameZh嵌套SnapshotVO；仅step1-4Status）
 > **状态**: ✅ 已实现（v3.0.0 单视图架构 + OrderOverviewPage.vue）
 > **对应前端**: `OrderOverviewPage.vue` · `docs/ui/pages/09-order-overview.md`
@@ -71,11 +72,7 @@ replenishment_demand (锚点)
       "step1Status": "COMPLETED",
       "step2Status": "COMPLETED",
       "step3Status": "COMPLETED",
-      "step4Status": "NOT_STARTED",
-      "step5Status": "NOT_STARTED",
-      "step6Status": "NOT_STARTED",
-      "step7Status": "NOT_STARTED",
-      "step8Status": "NOT_STARTED"
+      "step4Status": "NOT_STARTED"
     }
   ],
   "totalElements": 50,
@@ -241,10 +238,6 @@ export interface OrderChainVO {
   step2Status: string
   step3Status: string
   step4Status: string
-  step5Status: string
-  step6Status: string
-  step7Status: string
-  step8Status: string
 }
 
 export interface OrderChainDetailVO {

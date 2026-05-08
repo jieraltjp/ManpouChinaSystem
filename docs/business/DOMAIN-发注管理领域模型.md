@@ -1,6 +1,7 @@
 # 发注管理 — 领域模型
 
-> **版本**: 1.7.0
+> **版本**: 1.8.0
+> **更新**: 2026-05-08（v1.8.0：Procurement.moveTo()→updateStatus()；ProcurementDomainService标记⚠️不存在）
 > **更新**: 2026-05-07（v1.7.0：DemandStatus修正为v2.2.0模型；Factory.linkProductCode()注⚠️）
 > **依据**: 业务流分析（8步全链路） + `SPEC-B02-发注单-步骤2.md`
 
@@ -175,7 +176,7 @@ Procurement（聚合根）
 ├── updateTime: LocalDateTime
 │
 └── 领域方法（状态推进）
-    └── moveTo(status)               # 推进状态（由操作员在页面触发，完了为终态）
+    └── updateStatus(ShipmentStatus)  # 推进状态（含FSM校验，完了为终态）
 ```
 
 ---
@@ -698,7 +699,9 @@ public interface ConsolidationPoolRepository extends JpaRepository<Consolidation
 
 ## 6. 领域服务
 
-### ProcurementDomainService
+### ProcurementDomainService ⚠️
+
+> ⚠️ **Entity中不存在此类**。代码中无 `ProcurementDomainService` 类，`onQcPassed()` 业务逻辑以事件监听器 `ProcurementQcPassedEventListener` 实现。
 
 ```java
 @Service
@@ -712,9 +715,9 @@ public class ProcurementDomainService {
 
     public void onQcPassed(Procurement order, QcType type) {
         if (type == REMOTE) {
-            order.moveTo(メーカー直送);
+            order.updateStatus(メーカー直送);
         } else {
-            order.moveTo(推荐空运(order) ? エア便 : 輸出);
+            order.updateStatus(推荐空运(order) ? エア便 : 輸出);
         }
     }
 

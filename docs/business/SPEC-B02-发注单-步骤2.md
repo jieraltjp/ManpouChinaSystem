@@ -126,9 +126,8 @@ Procurement（聚合根）
 
 ```java
 public enum DemandStatus {
-    PENDING,     // 待确认
-    CONVERTED,  // 已转采购
-    CANCELLED   // 已取消
+    PENDING,     // 待确认（录入后默认，或取消关联后）
+    CONFIRMED    // 已确认（已关联发注单，由发注单页面关联时写入 linkedProcurementId）
 }
 ```
 
