@@ -2,7 +2,7 @@
 
 > **版本**: 1.3.0
 > **创建**: 2026-05-01
-> **更新**: 2026-05-08（v1.3.0：Phase 3 权限控制 ✅ 实现完成——allinone JWT 提取 permissions，17个业务 Controller 注解完毕）
+> **更新**: 2026-05-08（v1.3.1：Phase 3 前端完成——UserPage.vue 按钮 v-if + router 角色守卫 + LoginPage 重定向）
 > **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；Phase 4-6 待开发
 > **前置**: SPEC-B11 v1.1.0 · user-service Flyway V14 已完成 · Vite proxy 已配置
 > **关联**: UI-17 · UI-18 · UI-19 · UI-20 · docs/ui/pages/14-user-management.md · docs/ui/pages/15-role-management.md
@@ -425,7 +425,7 @@ proxy: {
 |------|------|
 | 预置角色允许编辑 | isEditable=1，所有角色均可编辑名称/描述/权限，删除也无限制 |
 | 用户分配角色 | UserRoleRepository 维护关联表（deleteByUserId / insertUserRole / findRoleIdsByUserId） |
-| 前端权限控制 | ⚠️ Phase 3 未完成（前端页面完成，但 allinone JWT 过滤器缺失 permissions 提取，业务 Controller 零注解） |
+| 前端权限控制 | ✅ Phase 3 完成——allinone JwtAuthenticationFilter 提取 permissions + 17个 Controller @PreAuthorize + 前端按钮 v-if + 路由角色守卫 |
 | 审计日志记录 | audit_log 表已建，但 Service 层尚未接入（Phase 4） |
 
 ---
