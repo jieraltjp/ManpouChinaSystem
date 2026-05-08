@@ -658,13 +658,48 @@
       "procurementRequired": "関連発注書を選択してください",
       "productCodeRequired": "品番を入力してください",
       "planTypeRequired": "配送タイプを選択してください"
+    },
+    "poolStatus": {
+      "OPEN": "</minimax:tool_call>",
+      "PENDING": "積載待ち",
+      "LOADED": "積載済",
+      "SHIPPED": "出荷済"
+    },
+    "containerStatus": {
+      "CREATED": "作成済",
+      "LOADED": "積載済",
+      "DEPARTED": "出発済",
+      "ARRIVED": "到着済"
+    },
+    "container": {
+      "type": {
+        "GP20": "20GP普通",
+        "GP40": "40GP普通",
+        "HC40": "40HC背高",
+        "HC45": "45HC背高"
+      },
+      "newButton": "新規コンテナ",
+      "editTitle": "コンテナ編集",
+      "deleteConfirm": "コンテナ「{code}」を削除しますか？",
+      "containerNoRequired": "コンテナ番号は必須です",
+      "containerNoPlaceholder": "例: TEMU1234567",
+      "filter": {
+        "status": "コンテナステータス",
+        "containerNo": "コンテナ番号",
+        "containerNoHint": "コンテナ番号を入力"
+      },
+      "column": {
+        "containerNo": "コンテナ番号",
+        "containerType": "柜型",
+        "totalCbm": "積載容量",
+        "totalWeightKg": "積載重量",
+        "planCount": "計画数",
+        "status": "ステータス",
+        "loadDate": "積載日",
+        "departureDate": "出発日",
+        "arrivalDate": "到着日"
+      }
     }
-  },
-  "poolStatus": {
-    "OPEN": "受付中",
-    "PENDING": "積載待ち",
-    "LOADED": "積載済",
-    "SHIPPED": "出荷済"
   },
   "pool": {
     "newButton": "新規コンソリ池",
@@ -691,41 +726,6 @@
     },
     "action": {
       "createContainer": "コンテナ作成"
-    }
-  },
-  "containerStatus": {
-    "CREATED": "作成済",
-    "LOADED": "積載済",
-    "DEPARTED": "出発済",
-    "ARRIVED": "到着済"
-  },
-  "container": {
-    "type": {
-      "GP20": "20GP普通",
-      "GP40": "40GP普通",
-      "HC40": "40HC背高",
-      "HC45": "45HC背高"
-    },
-    "newButton": "新規コンテナ",
-    "editTitle": "コンテナ編集",
-    "deleteConfirm": "コンテナ「{code}」を削除しますか？",
-    "containerNoRequired": "コンテナ番号は必須です",
-    "containerNoPlaceholder": "例: TEMU1234567",
-    "filter": {
-      "status": "コンテナステータス",
-      "containerNo": "コンテナ番号",
-      "containerNoHint": "コンテナ番号を入力"
-    },
-    "column": {
-      "containerNo": "コンテナ番号",
-      "containerType": "柜型",
-      "totalCbm": "積載容量",
-      "totalWeightKg": "積載重量",
-      "planCount": "計画数",
-      "status": "ステータス",
-      "loadDate": "積載日",
-      "departureDate": "出発日",
-      "arrivalDate": "到着日"
     }
   },
   "factory": {

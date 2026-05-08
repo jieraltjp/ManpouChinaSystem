@@ -94,7 +94,7 @@ async function onSubmit() {
 
 async function onDelete(row: ConsolidationPoolVO) {
   try {
-    await ElMessageBox.confirm(t('logistics.pool.deleteConfirm'), t('common.button.delete'), { type: 'warning' })
+    await ElMessageBox.confirm(t('logistics.pool.deleteConfirm'), t('common.delete'), { type: 'warning' })
     await consolidationPoolApi.delete(row.id)
     ElMessage.success(t('common.message.deleteSuccess'))
     loadData()
@@ -172,9 +172,9 @@ onMounted(loadData)
         <el-table-column prop="createTime" :label="$t('logistics.column.createTime')" min-width="160" />
         <el-table-column :label="$t('logistics.column.actions')" min-width="200" fixed="right">
           <template #default="{ row }">
-            <el-button size="small" @click="onEdit(row)">{{ $t('common.button.edit') }}</el-button>
+            <el-button size="small" @click="onEdit(row)">{{ $t('common.edit') }}</el-button>
             <el-button size="small" type="primary" plain @click="onCreateContainer(row)">{{ $t('logistics.pool.action.createContainer') }}</el-button>
-            <el-button size="small" type="danger" plain @click="onDelete(row)">{{ $t('common.button.delete') }}</el-button>
+            <el-button size="small" type="danger" plain @click="onDelete(row)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -202,8 +202,8 @@ onMounted(loadData)
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">{{ $t('common.button.cancel') }}</el-button>
-        <el-button type="primary" @click="onSubmit">{{ $t('common.button.save') }}</el-button>
+        <el-button @click="dialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="onSubmit">{{ $t('common.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
