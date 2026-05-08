@@ -1,5 +1,6 @@
 package com.manpou.allinone.qc.interfaces.controller;
 
+import com.manpou.allinone.common.config.CosConfig;
 import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.common.service.CosService;
 import com.manpou.allinone.common.result.Result;
@@ -26,6 +27,7 @@ public class QcImageController {
 
     private final CosService cosService;
     private final QcImageRepository qcImageRepository;
+    private final CosConfig cosConfig;
 
     // --- 内部 DTO ---
 
@@ -49,11 +51,11 @@ public class QcImageController {
                 throw BusinessException.invalidParam("每条验货记录最多上传 " + MAX_PER_RECORD + " 张图片");
             }
         }
-        String url = cosService.upload(file);
+        String key = cosService.upload(file);
         QcImage image = new QcImage(
-                extractFilename(url),
+                key,                             // 存储干净 key（用于 COS delete）
                 file.getOriginalFilename(),
-                url,
+                buildDisplayUrl(key),             // 存储展示 URL（含 query param）
                 file.getSize(),
                 file.getContentType()
         );
@@ -61,8 +63,8 @@ public class QcImageController {
             image.setQcRecordId(qcRecordId);
         }
         qcImageRepository.save(image);
-        log.info("[QC-Image] uploaded, id={}, url={}", image.getId(), url);
-        return Result.ok(new ImageUploadResult(url, image.getFilename(), file.getSize()));
+        log.info("[QC-Image] uploaded, id={}, key={}", image.getId(), key);
+        return Result.ok(new ImageUploadResult(buildDisplayUrl(key), image.getFilename(), file.getSize()));
     }
 
     /**
@@ -89,11 +91,11 @@ public class QcImageController {
         List<ImageUploadResult> results = new java.util.ArrayList<>();
         for (MultipartFile file : files) {
             validateFile(file);
-            String url = cosService.upload(file);
+            String key = cosService.upload(file);
             QcImage image = new QcImage(
-                    extractFilename(url),
+                    key,                             // 存储干净 key（用于 COS delete）
                     file.getOriginalFilename(),
-                    url,
+                    buildDisplayUrl(key),             // 存储展示 URL（含 query param）
                     file.getSize(),
                     file.getContentType()
             );
@@ -101,7 +103,7 @@ public class QcImageController {
                 image.setQcRecordId(qcRecordId);
             }
             qcImageRepository.save(image);
-            results.add(new ImageUploadResult(url, image.getFilename(), file.getSize()));
+            results.add(new ImageUploadResult(buildDisplayUrl(key), image.getFilename(), file.getSize()));
         }
         return Result.ok(results);
     }
@@ -150,7 +152,15 @@ public class QcImageController {
 
     private String extractFilename(String url) {
         if (url == null) return null;
+        // 防腐：先剥离 query string（?response-content-disposition=inline 等）
+        int q = url.indexOf('?');
+        if (q >= 0) url = url.substring(0, q);
         int lastSlash = url.lastIndexOf('/');
         return lastSlash >= 0 ? url.substring(lastSlash + 1) : url;
+    }
+
+    /** 构造带 inline disposition 的展示 URL */
+    private String buildDisplayUrl(String key) {
+        return cosConfig.getDomain() + "/" + key + "?response-content-disposition=inline";
     }
 }
