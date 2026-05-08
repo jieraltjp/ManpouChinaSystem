@@ -2,7 +2,7 @@
 
 > **版本**: 1.6.0
 > **创建**: 2026-04-30
-> **更新**: 2026-05-08（v1.6.0：补充 warehouse/notification 模块（V15）；更新权限总数 93→101；Phase 2 端点缺口标记⚠️）
+> **更新**: 2026-05-08（v1.6.0：补充 warehouse/notification 模块（V15）；DB 权限101条（V8 93+V15 8）；代码 ALL_PERMISSIONS Set 66条；Phase 2 端点缺口标记⚠️）
 > **状态**: ⚠️ Phase 2 部分完成；⚠️ Phase 3 部分完成；Phase 4-6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
@@ -21,7 +21,7 @@
 
 本设计覆盖：
 - 用户管理（账号/密码/姓名/邮箱/手机/头像/组织/职务/海关资质）
-- 角色与权限管理（4 级角色 + 101 条权限编码）
+- 角色与权限管理（4 级角色 + 66 条权限编码（代码 Set）；DB 实际 101 条）
 - 操作日志（CREATE/UPDATE/DELETE/STATUS_CHANGE/LOGIN 全链路记录）
 - 个人中心（信息修改/密码修改/偏好设置）
 - **用户注册 + 管理员审核（方案B：JWT 跨服务验证）**
@@ -562,10 +562,10 @@ public boolean canLogin(User user) {
 
 ## 4. 权限编码规范
 
-### 4.1 权限编码定义（101 条，V8 93 条 + V15 8 条）
+### 4.1 权限编码定义（66 条，ALL_PERMISSIONS Set；DB 实际 101 条 V8 93 + V15 8）
 
 **格式**: `{模块}:{动作}`
-> ⚠️ 以下权限在 SPEC 设计时被标记"已剔除"，但实际 V8 中已实现：`order:read`、`permission:read`、`audit:export`、`customs:approve`、`tax_refund:complete`。
+> ⚠️ 以下权限在早期 SPEC 设计时被标记"已剔除"，但实际 V8 迁移中已实现：`order:read`、`permission:read`、`audit:export`、`customs:approve`、`tax_refund:complete`。
 
 #### 发注管理模块（procurement）
 
@@ -811,7 +811,7 @@ public Result<DemandVO> update(@PathVariable Long id, @RequestBody @Valid Demand
 | 注册审核？ | ✅ | PENDING → APPROVED/REJECTED 状态机，完整流程 + 登录双重校验 |
 | 数据库范式？ | ✅ | position_ids JSON → user_position 中间表（M-N 规范化） |
 | 幂等性？ | ✅ | approve/reject 改为 PUT，审核操作幂等 |
-| 权限完整性？ | ✅ | 实际实现 58 条（已修正文档），与 ALL_PERMISSIONS 一致 |
+| 权限完整性？ | ✅ | 代码 ALL_PERMISSIONS Set 66条（DB V8+V15 共101条） |
 | 审计日志？ | ✅ | REGISTER/REGISTRATION_APPROVED/REJECTED action 已补充 |
 
 ---
@@ -845,7 +845,7 @@ Phase 2: 用户 CRUD + 角色管理（P0）
   前端: 待审核用户列表 + 审核弹窗
 
 Phase 3: 权限控制 ✅ 完成（⚠️ 部分）
-  ✅ allinone JwtAuthenticationFilter：提取 permissions（V8 93条 + V15 8条 = 101条），ADMIN `*:*` 展开
+  ✅ allinone JwtAuthenticationFilter：提取 permissions（DB 101条），ADMIN `*:*` 展开为 ALL_PERMISSIONS（66条代码 Set）
   ✅ allinone 21个业务 Controller 加 @PreAuthorize（共123个注解）
   ⚠️ 前端: 路由守卫仅支持角色检查（roles），不支持细粒度权限
   ⚠️ 前端: 按钮级 hasPermission() 仅在 UserPage.vue 实现，其他页面未集成
