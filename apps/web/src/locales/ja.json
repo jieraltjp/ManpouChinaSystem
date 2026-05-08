@@ -610,7 +610,7 @@
       "deleteConfirm": "配送計画「{code}」を削除しますか？",
       "deleteSuccess": "配送計画の削除が完了しました",
       "deleteFailed": "配送計画の削除に失敗しました",
-      "containerNoRequired": "コンテナ番号が空のため通関を作成できません"
+      "containerNoRequiredForCustoms": "コンテナ番号を記入してから通関を作成してください"
     },
     "requiresQc": {
       "yes": "検品要",
@@ -698,6 +698,33 @@
         "loadDate": "積載日",
         "departureDate": "出発日",
         "arrivalDate": "到着日"
+      }
+    },
+    "pool": {
+      "newButton": "新規コンソリデーションプール",
+      "editTitle": "プール編集",
+      "deleteConfirm": "プール「{code}」を削除しますか？",
+      "createContainer": "コンテナ作成",
+      "createContainerConfirm": "プール「{poolCode}」のコンテナを作成しますか？",
+      "containerCreated": "コンテナ作成成功",
+      "destinationRequired": "寄港地は必須です",
+      "destinationPlaceholder": "例: Tokyo, Yokohama",
+      "filter": {
+        "status": "ステータス",
+        "destinationPort": "寄港地",
+        "destinationHint": "寄港地を入力"
+      },
+      "column": {
+        "poolCode": "プール番号",
+        "destinationPort": "寄港地",
+        "totalCbm": "総容量",
+        "totalWeightKg": "総重量",
+        "planCount": "計画数",
+        "threshold": "トリガー閾値",
+        "status": "ステータス"
+      },
+      "action": {
+        "createContainer": "コンテナ作成"
       }
     }
   },
@@ -867,7 +894,19 @@
       "material": "材質",
       "unit": "単位",
       "linkedFactories": "関連工場",
-      "action": "操作"
+      "action": "操作",
+      "image": "画像",
+      "janCode": "JANコード",
+      "nameJa": "日本語名称",
+      "materialJa": "日本語材質",
+      "category": "分類",
+      "status": "状態",
+      "quantities": "在庫",
+      "cartonQty": "箱数",
+      "hsCodeJp": "日本HSコード",
+      "taxPoint": "インボイス係数",
+      "taxRate": "消費税率",
+      "requiresQc": "品質検査要"
     },
     "action": {
       "detail": "詳細",
@@ -915,7 +954,9 @@
       "section": {
         "basicInfo": "基本情報",
         "specInfo": "仕様情報",
-        "factories": "関連工場"
+        "factories": "関連工場",
+        "packageInfo": "外箱情報",
+        "warehouseInfo": "倉庫情報"
       },
       "noFactories": "関連工場なし",
       "preferred": "優先",
@@ -925,7 +966,20 @@
       "moq": "最小注文数",
       "leadTimeDays": "リードタイム",
       "unitPrice": "単価",
-      "days": "日"
+      "days": "日",
+      "janCode": "JANコード",
+      "materialJa": "日本語材質",
+      "status": "商品状態",
+      "quantities": "在庫数量",
+      "cartonQty": "箱数",
+      "amountRmb": "金額(CNY)",
+      "hsCodeJp": "日本HSコード",
+      "volumeCbm": "容積(m³)",
+      "packageLengthCm": "外箱長(cm)",
+      "packageWidthCm": "外箱幅(cm)",
+      "packageHeightCm": "外箱高(cm)",
+      "packageVolumeCbm": "外箱容積(m³)",
+      "packageWeightKg": "外箱重量(kg)"
     },
     "dialog": {
       "newTitle": "新規商品追加",
@@ -943,7 +997,6 @@
       "unitPriceRmb": "税込単価(CNY)",
       "netWeight": "正味重量(kg)",
       "grossWeight": "総重量(kg)",
-      "cargoSize": "貨物サイズ",
       "lengthCm": "長さ(cm)",
       "widthCm": "幅(cm)",
       "heightCm": "高さ(cm)",
@@ -963,14 +1016,27 @@
       "declarationElementsPlaceholder": "材質|住所|ブランド",
       "remarks": "備考",
       "remarksPlaceholder": "備考情報",
-      "exportCategory": "輸出分類",
-      "exportCategoryPlaceholder": "輸出分類",
-      "factory": "関連工場",
-      "factoryPlaceholder": "工場を選択",
-      "notes": "備考",
-      "notesPlaceholder": "備考情報",
       "cancel": "キャンセル",
-      "save": "保存"
+      "save": "保存",
+      "janCode": "JANコード",
+      "janCodePlaceholder": "バーコード",
+      "materialJa": "日本語材質",
+      "materialJaPlaceholder": "日本語材質",
+      "category": "商品分類",
+      "status": "商品状態",
+      "quantities": "在庫数量",
+      "cartonQty": "箱数",
+      "netWeightPlaceholder": "正味重量",
+      "grossWeightPlaceholder": "総重量",
+      "hsCodeJp": "日本HSコード",
+      "hsCodeJpPlaceholder": "税番",
+      "warehouse": "倉庫所属",
+      "warehousePlaceholder": "倉庫",
+      "requiresQc": "品質検査要",
+      "colorName": "カラー名称",
+      "colorNamePlaceholder": "例：赤色",
+      "imageUrl": "商品画像",
+      "imageUrlPlaceholder": "画像URL"
     },
     "validation": {
       "masterCodeRequired": "主品番は必須です",
@@ -1280,7 +1346,9 @@
     "action": {
       "back": "戻る",
       "retry": "再試行"
-    }
+    },
+    "yes": "はい",
+    "no": "いいえ"
   },
   "validation": {
     "required": "この項目は必須です"
