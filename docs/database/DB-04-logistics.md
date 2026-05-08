@@ -1,8 +1,8 @@
 # DB-04 — 调配计划数据库设计
 
-> **版本**: 1.5.0
+> **版本**: 1.6.0
 > **创建**: 2026-04-22
-> **更新**: 2026-05-07（v1.5.0：Container / ConsolidationPool 已实现，与全链路业务流程同步）
+> **更新**: 2026-05-08（v1.6.0：Container/ConsolidationPool DB schema完全重写——移除TODO陈旧内容，更新为V45/V46实际表结构）
 > **状态**: ✅ 已实现
 > **业务步号**: 04（调配计划）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B04-调配计划-步骤4.md`
@@ -73,62 +73,56 @@ CREATE TABLE logistics_plan (
 
 ## 2. container（货柜）✅已实现
 
-**对应**: `Container` 聚合根（v1.5.0）
+**对应**: `Container` 聚合根（v1.5.0，V46）
 
 ```sql
--- TODO: 字段待确认
--- 预期字段: container_code / container_no / container_type / seal_no /
---           departure_port / arrival_port / estimated_departure_date /
---           actual_departure_date / status / remarks
 CREATE TABLE container (
-    id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    container_code     VARCHAR(32)  NOT NULL UNIQUE COMMENT 'C-YYYYMMDD-NNN',
-    container_no       VARCHAR(32)  NOT NULL COMMENT '货柜号（船公司提供）',
-    container_type     VARCHAR(10)  NOT NULL COMMENT '20GP / 40GP / 40HC / 45HC',
-    seal_no            VARCHAR(32) COMMENT '封条号',
-    departure_port     VARCHAR(64) COMMENT '起运港',
-    arrival_port       VARCHAR(64) COMMENT '目的港',
-    estimated_departure_date DATE COMMENT '预计开船日',
-    actual_departure_date   DATE COMMENT '实际开船日',
-    estimated_arrival_date  DATE COMMENT '预计到港日',
-    actual_arrival_date     DATE COMMENT '实际到港日',
-    status             VARCHAR(20) NOT NULL DEFAULT 'LOADING' COMMENT 'LOADING / DEPARTED / ARRIVED / DELIVERED',
-    remarks            VARCHAR(512),
-    create_time        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    create_by          VARCHAR(64) NOT NULL,
-    update_by          VARCHAR(64) NOT NULL,
-    is_deleted         BOOLEAN NOT NULL DEFAULT FALSE
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    container_no    VARCHAR(32)  NOT NULL UNIQUE COMMENT '货柜号（如 TEMU1234567）',
+    container_type  VARCHAR(24)  NOT NULL DEFAULT '20GP' COMMENT '20GP|40GP|40HC|45HC',
+    total_cbm       DECIMAL(10, 4) DEFAULT 0 COMMENT '已装载总体积(m³)',
+    total_weight_kg DECIMAL(12, 4) DEFAULT 0 COMMENT '已装载总重量(kg)',
+    plan_count      INT DEFAULT 0 COMMENT '关联计划数',
+    pool_id         BIGINT COMMENT '关联拼柜池ID',
+    status          VARCHAR(24) NOT NULL DEFAULT 'CREATED' COMMENT 'CREATED|LOADED|DEPARTED|ARRIVED',
+    load_date       DATE COMMENT '装柜日期',
+    departure_date  DATE COMMENT '离港日期',
+    arrival_date    DATE COMMENT '到港日期',
+    create_time     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    create_by       VARCHAR(64) NOT NULL DEFAULT 'SYSTEM',
+    update_by       VARCHAR(64) NOT NULL DEFAULT 'SYSTEM',
+    is_deleted      BOOLEAN NOT NULL DEFAULT FALSE
 );
 ```
+
+> ⚠️ Entity中不存在：`container_code`（无此字段）、`seal_no`、`departure_port`、`arrival_port`、`estimated_*` 日期字段
 
 ---
 
 ## 3. consolidation_pool（拼柜池）✅已实现
 
-**对应**: `ConsolidationPool` 聚合根（v1.5.0）
+**对应**: `ConsolidationPool` 聚合根（v1.5.0，V45）
 
 ```sql
--- TODO: 字段待确认
 CREATE TABLE consolidation_pool (
-    id                     BIGINT AUTO_INCREMENT PRIMARY KEY,
-    pool_code             VARCHAR(32) NOT NULL UNIQUE COMMENT 'P-YYYYMMDD-NNN',
-    destination            VARCHAR(128) NOT NULL COMMENT '目的地（同一目的港的货物合并）',
-    departure_port        VARCHAR(64) COMMENT '起运港',
-    arrival_port          VARCHAR(64) COMMENT '目的港',
-    total_weight          DECIMAL(12,4) COMMENT '总重量(kg) = SUM',
-    total_volume          DECIMAL(12,6) COMMENT '总体积(m³) = SUM',
-    plan_type             VARCHAR(20) COMMENT '默认 CONSOLIDATION',
-    container_id          BIGINT COMMENT '分配货柜ID',
-    status                VARCHAR(20) NOT NULL DEFAULT 'POOL_PENDING' COMMENT 'POOL_PENDING / POOL_READY / LOADED / DEPARTED',
-    remarks               VARCHAR(512),
-    create_time           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    create_by             VARCHAR(64) NOT NULL,
-    update_by             VARCHAR(64) NOT NULL,
-    is_deleted            BOOLEAN NOT NULL DEFAULT FALSE
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    pool_code       VARCHAR(32) NOT NULL UNIQUE COMMENT '池编号，如 CP-20260430-001',
+    destination_port VARCHAR(64) NOT NULL COMMENT '目的港（如 Tokyo, Yokohama）',
+    total_cbm       DECIMAL(12, 4) DEFAULT 0 COMMENT '当前总体积(m³)',
+    total_weight_kg DECIMAL(12, 4) DEFAULT 0 COMMENT '当前总重量(kg)',
+    plan_count      INT DEFAULT 0 COMMENT '关联计划数',
+    container_threshold_cbm DECIMAL(10, 4) DEFAULT 70 COMMENT '触发装柜的体积阈值(m³)',
+    status          VARCHAR(24) NOT NULL DEFAULT 'OPEN' COMMENT 'OPEN|PENDING|LOADED|SHIPPED',
+    create_time     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    create_by       VARCHAR(64) NOT NULL DEFAULT 'SYSTEM',
+    update_by       VARCHAR(64) NOT NULL DEFAULT 'SYSTEM',
+    is_deleted      BOOLEAN NOT NULL DEFAULT FALSE
 );
 ```
+
+> ⚠️ Entity中不存在：`departure_port`、`arrival_port`、`plan_type`、`container_id`（containerId字段）、`remarks`
 
 ---
 
@@ -145,6 +139,6 @@ CREATE TABLE consolidation_pool (
 - [x] ✅ `LogisticsPlanUseCaseTest` 单元测试（12 个用例，全部通过）
 - [x] ✅ `@/api/logistics.ts` 前端 API 客户端（v1.2.0 qcRecordId 类型）
 - [x] ✅ `LogisticsPlanPage.vue` 页面（v1.2.0 验货记录下拉替代采购单下拉）
-- [ ] 🔴 `Container` 聚合根实体
-- [ ] 🔴 `ConsolidationPool` 聚合根实体
-- [ ] 🔴 `ConsolidationPoolItem` 聚合根实体
+- [x] ✅ `Container` 聚合根实体（V46，字段：containerNo/containerType/totalCbm/totalWeightKg/planCount/poolId/status/loadDate/departureDate/arrivalDate）
+- [x] ✅ `ConsolidationPool` 聚合根实体（V45，字段：poolCode/destinationPort/totalCbm/totalWeightKg/planCount/containerThresholdCbm/status）
+- [ ] 🔴 `ConsolidationPoolItem` 聚合根实体（不存在，无对应迁移脚本）
