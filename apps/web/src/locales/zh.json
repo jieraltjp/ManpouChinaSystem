@@ -157,8 +157,15 @@
       "save": "保存",
       "colorCount": "{count}个颜色",
       "selectColorVariant": "选择颜色变体",
-      "entryMode": { "single": "单个录入", "batch": "批量录入" },
-      "section": { "basic": "基本信息", "detail": "需求明细", "extra": "补充信息" },
+      "entryMode": {
+        "single": "单个录入",
+        "batch": "批量录入"
+      },
+      "section": {
+        "basic": "基本信息",
+        "detail": "需求明细",
+        "extra": "补充信息"
+      },
       "batchHint": "一次创建多条需求单，适用于同一主货号下多个子货号各有不同数量/目的地的情况",
       "selectMasterCodeFirst": "请先选择主货号",
       "addSubItem": "添加子货号",
@@ -640,11 +647,17 @@
     "action": {
       "detail": "详情",
       "edit": "编辑",
-      "delete": "删除",
-      "createCustoms": "创建报关"
+      "delete": "删除"
     },
     "message": {
-      "containerNoRequired": "货柜号为空，无法创建报关，请先填写货柜号"
+      "loadFailed": "加载调配计划失败",
+      "createSuccess": "调配计划创建成功",
+      "createFailed": "创建调配计划失败",
+      "updateSuccess": "调配计划更新成功",
+      "updateFailed": "更新调配计划失败",
+      "deleteConfirm": "确认删除调配计划「{code}」？",
+      "deleteSuccess": "删除调配计划成功",
+      "deleteFailed": "删除调配计划失败"
     },
     "requiresQc": {
       "yes": "需检测",
@@ -692,17 +705,6 @@
       "procurementRequired": "请选择关联采购单",
       "productCodeRequired": "请输入货号",
       "planTypeRequired": "请选择调配类型"
-    },
-    "message": {
-      "loadFailed": "加载调配计划失败",
-      "createSuccess": "调配计划创建成功",
-      "createFailed": "创建调配计划失败",
-      "updateSuccess": "调配计划更新成功",
-      "updateFailed": "更新调配计划失败",
-      "deleteConfirm": "确认删除调配计划「{code}」？",
-      "deleteSuccess": "删除调配计划成功",
-      "deleteFailed": "删除调配计划失败",
-      "containerNoRequiredForCustoms": "请先填写货柜号再创建报关"
     },
     "poolStatus": {
       "OPEN": "开放入库",
@@ -1112,7 +1114,16 @@
       "reset": "重置",
       "status": "状态"
     },
-    "stepNames": ["补货", "发注", "验货", "调配", "国报", "日报", "退税", "运营"],
+    "stepNames": [
+      "补货",
+      "发注",
+      "验货",
+      "调配",
+      "国报",
+      "日报",
+      "退税",
+      "运营"
+    ],
     "status": {
       "all": "全部",
       "pending": "待处理",
@@ -1258,35 +1269,70 @@
     },
     "enum": {
       "procurement": {
-        "未定": "未定", "予定": "予定", "OEM": "OEM", "発注待": "発注待",
-        "永康": "永康", "直送": "直送", "倉庫着": "倉庫着", "現地検品": "現地検品",
-        "検品": "検品", "エア便": "エア便", "メーカー直送": "メーカー直送",
-        "輸出": "輸出", "国内通関": "国内通関", "通関": "通関", "日本着": "日本着",
-        "日本通関完了": "日本通関完了", "会計": "会計", "完了": "完了", "退货": "退货"
+        "未定": "未定",
+        "予定": "予定",
+        "OEM": "OEM",
+        "発注待": "発注待",
+        "永康": "永康",
+        "直送": "直送",
+        "倉庫着": "倉庫着",
+        "現地検品": "現地検品",
+        "検品": "検品",
+        "エア便": "エア便",
+        "メーカー直送": "メーカー直送",
+        "輸出": "輸出",
+        "国内通関": "国内通関",
+        "通関": "通関",
+        "日本着": "日本着",
+        "日本通関完了": "日本通関完了",
+        "会計": "会計",
+        "完了": "完了",
+        "退货": "退货"
       },
       "logistics": {
-        "PLANNED": "已创建", "BOOKED": "已订舱", "IN_TRANSIT": "运输中", "DELIVERED": "已送达"
+        "PLANNED": "已创建",
+        "BOOKED": "已订舱",
+        "IN_TRANSIT": "运输中",
+        "DELIVERED": "已送达"
       },
       "domesticCustoms": {
-        "PENDING": "待提交", "SUBMITTED": "已提交", "CLEARED": "已清关", "REJECTED": "已驳回"
+        "PENDING": "待提交",
+        "SUBMITTED": "已提交",
+        "CLEARED": "已清关",
+        "REJECTED": "已驳回"
       },
       "japanCustoms": {
-        "PENDING": "待清关", "IN_PROGRESS": "清关中", "CLEARED": "已清关", "FAILED": "清关失败"
+        "PENDING": "待清关",
+        "IN_PROGRESS": "清关中",
+        "CLEARED": "已清关",
+        "FAILED": "清关失败"
       },
       "taxRefund": {
-        "APPLYING": "申请中", "COMPLETED": "已完成", "NO_REFUND": "不退税"
+        "APPLYING": "申请中",
+        "COMPLETED": "已完成",
+        "NO_REFUND": "不退税"
       },
       "sales": {
-        "LISTED": "上架中", "LOW_STOCK": "库存预警", "OUT_OF_STOCK": "已售罄", "DISCONTINUED": "已下架"
+        "LISTED": "上架中",
+        "LOW_STOCK": "库存预警",
+        "OUT_OF_STOCK": "已售罄",
+        "DISCONTINUED": "已下架"
       },
       "planType": {
-        "SEA": "海运", "AIR": "空运"
+        "SEA": "海运",
+        "AIR": "空运"
       },
       "billingType": {
-        "ZHE_LU_KAI_PIAO": "浙鲁开票", "CHAO_HUI_TUI_SHUI": "超慧退税", "NO_REFUND": "不退税", "OTHER": "其他"
+        "ZHE_LU_KAI_PIAO": "浙鲁开票",
+        "CHAO_HUI_TUI_SHUI": "超慧退税",
+        "NO_REFUND": "不退税",
+        "OTHER": "其他"
       },
       "salesChannel": {
-        "AMAZON": "Amazon", "MERCALI": "メルカリ", "SELF_SITE": "自有网站", "OTHER": "其他"
+        "AMAZON": "Amazon",
+        "MERCALI": "メルカリ",
+        "SELF_SITE": "自有网站",
+        "OTHER": "其他"
       }
     }
   },

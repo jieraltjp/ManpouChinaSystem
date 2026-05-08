@@ -598,8 +598,7 @@
     "action": {
       "detail": "詳細",
       "edit": "編集",
-      "delete": "削除",
-      "createCustoms": "通関作成"
+      "delete": "削除"
     },
     "message": {
       "loadFailed": "配送計画の読み込みに失敗しました",
@@ -609,8 +608,7 @@
       "updateFailed": "配送計画の更新に失敗しました",
       "deleteConfirm": "配送計画「{code}」を削除しますか？",
       "deleteSuccess": "配送計画の削除が完了しました",
-      "deleteFailed": "配送計画の削除に失敗しました",
-      "containerNoRequiredForCustoms": "コンテナ番号を記入してから通関を作成してください"
+      "deleteFailed": "配送計画の削除に失敗しました"
     },
     "requiresQc": {
       "yes": "検品要",
