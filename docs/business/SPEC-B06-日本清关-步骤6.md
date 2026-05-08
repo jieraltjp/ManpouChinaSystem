@@ -1,8 +1,8 @@
 # 日本清关 — 业务规格（步骤6）
 
-> **版本**: 1.4.0
+> **版本**: 1.4.1
 > **创建**: 2026-04-22
-> **更新**: 2026-04-24（v1.2.0：补充 subProductCode 字段，全链路子货号追踪完整）
+> **更新**: 2026-05-07（v1.4.1：补POST /batch/PUT/DELETE端点）
 > **更新**: 2026-04-30（v1.4.0：**containerNo 为主键 + 与 DomesticCustomsRecord 联动 + 货柜级批量创建**）
 > **状态**: ✅ 已实现（v1.4.0 containerNo 全链路实现完成，V44 待执行）
 > **对应前端**: `JapanCustomsRecordPage.vue`（`apps/web/src/pages/customs/JapanCustomsRecordPage.vue`）
@@ -128,10 +128,13 @@ DomesticCustomsPage（国内报关）
 GET    /api/v1/japan-customs?page=&pageSize=&containerNo=&domesticCustomsId=&status=
 GET    /api/v1/japan-customs/{id}
 POST   /api/v1/japan-customs                              # 创建（**containerNo 必填**）
+POST   /api/v1/japan-customs/batch                       # 批量创建（v1.4.0新增）
+PUT    /api/v1/japan-customs/{id}                        # 编辑（v1.4.0新增）
 PATCH  /api/v1/japan-customs/{id}
 PATCH  /api/v1/japan-customs/{id}/start                  # 开始清关
 PATCH  /api/v1/japan-customs/{id}/complete               # 完成清关（含缴纳税费）
 PATCH  /api/v1/japan-customs/{id}/fail                   # 清关失败
+DELETE /api/v1/japan-customs/{id}                        # 删除（v1.4.0新增）
 ```
 
 > ⚠️ **v1.4.0 API 变更**：

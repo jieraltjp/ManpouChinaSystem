@@ -1,8 +1,8 @@
 # 国内报关 — 业务规格（步骤5）
 
-> **版本**: 1.5.0
+> **版本**: 1.5.1
 > **创建**: 2026-04-22
-> **更新**: 2026-04-27（v1.3.0：货柜级报关，containerNo 字段 + LogisticsPlanPage 发起流程）
+> **更新**: 2026-05-07（v1.5.1：补POST /batch批量创建端点）
 > **更新**: 2026-04-30（v1.4.0：containerNo 改为必填主键 + 批量创建对话框 + CustomsBatchCreateCmd）
 > **状态**: ✅ v1.4.0 实施完成
 > **对应前端**: `DomesticCustomsPage.vue`（`apps/web/src/pages/customs/DomesticCustomsPage.vue`）
@@ -129,6 +129,7 @@ LogisticsPlanPage
 GET    /api/v1/customs?page=&pageSize=&containerNo=&procurementId=&status=
 GET    /api/v1/customs/{id}
 POST   /api/v1/customs                              # 创建（**containerNo 必填，procurementId 可选**）
+POST   /api/v1/customs/batch                       # 批量创建（按货柜号聚合，v1.4.0新增）
 PUT    /api/v1/customs/{id}                         # 编辑
 PATCH  /api/v1/customs/{id}/submit                  # 提交
 PATCH  /api/v1/customs/{id}/clear                   # 放行
