@@ -83,9 +83,8 @@ public class CosService {
             PutObjectResult putResult = getClient().putObject(putRequest);
             log.info("[COS] upload success, key={}, etag={}", key, putResult.getETag());
 
-            String url = cosConfig.getDomain() + "/" + key + "?response-content-disposition=inline";
-            log.info("[COS] public url={}", url);
-            return url;
+            // 防腐层：返回干净 key，由调用方决定是否追加 query param
+            return key;
         } catch (IOException e) {
             throw BusinessException.internal("文件读取失败: " + e.getMessage());
         } catch (CosServiceException e) {
