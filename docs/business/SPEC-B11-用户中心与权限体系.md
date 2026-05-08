@@ -1,9 +1,9 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.2.0
+> **版本**: 1.3.0
 > **创建**: 2026-04-30
-> **修订**: 2026-05-08（v1.2.0：修正权限数量 72→58，Phase 3 标注为未完成，补充 allinone 权限控制缺口）
-> **状态**: 🟡 Phase 2 已完成；Phase 3（权限控制）⚠️ 未完成——allinone JWT 过滤器不提取 permissions，8个业务 Controller 无 @PreAuthorize；Phase 4-6 待开发
+> **修订**: 2026-05-08（v1.3.0：Phase 3 权限控制 ✅ 完成——allinone JWT 提取 permissions，17个 Controller 注解完毕；权限数量 58→66 补充 warehouse/notification）
+> **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；Phase 4-6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
 
@@ -562,10 +562,10 @@ public boolean canLogin(User user) {
 
 ## 4. 权限编码规范
 
-### 4.1 权限编码定义（58 条，实际实现）
+### 4.1 权限编码定义（66 条，实际实现）
 
 **格式**: `{模块}:{动作}`
-**与文档差异**：代码实际 58 条，以下已剔除未实现的 `order:read`、`permission:read`、`audit:export`、`auth:*`、`customs:approve`（用 `customs:update`）、`tax_refund:complete`（用 `tax_refund:update`）。
+**已剔除**：未实现的 `order:read`、`permission:read`、`audit:export`、`auth:*`、`customs:approve`、`tax_refund:complete`。
 
 #### 发注管理模块（procurement）
 
@@ -825,12 +825,12 @@ Phase 2: 用户 CRUD + 角色管理（P0）
   前端: 权限树（只读）
   前端: 待审核用户列表 + 审核弹窗
 
-Phase 3: 权限控制 ⚠️ 未完成（两个缺口）
-  ⚠️ allinone JwtAuthenticationFilter：第61-63行只提取 `roles`，未提取 `permissions` → SecurityContext 无权限
-  ⚠️ allinone 8个业务 Controller：零个 `@PreAuthorize` 注解 → 增删改查全部裸奔
-  前端: 路由守卫增加 hasPermission
-  前端: 按钮级 v-if="hasPermission('xxx')"
-  前端: 菜单按权限动态显示/隐藏
+Phase 3: 权限控制 ✅ 完成
+  ✅ allinone JwtAuthenticationFilter：提取 permissions（66条），ADMIN `*:*` 展开
+  ✅ allinone 17个业务 Controller 加 @PreAuthorize
+  ⚠️ 前端: 路由守卫增加 hasPermission
+  ⚠️ 前端: 按钮级 v-if="hasPermission('xxx')"
+  ⚠️ 前端: 菜单按权限动态显示/隐藏
 
 Phase 4: 操作日志（P1）
   V9

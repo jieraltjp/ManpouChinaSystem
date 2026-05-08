@@ -1,6 +1,7 @@
 package com.manpou.allinone.order.interfaces.controller;
 
 import com.manpou.allinone.common.result.Result;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.manpou.allinone.order.application.dto.DemandOverviewVO;
 import com.manpou.allinone.order.application.dto.OrderChainDetailVO;
 import com.manpou.allinone.order.application.dto.OrderChainVO;
@@ -38,11 +39,13 @@ public class OrderOverviewController {
     // ===== Procurement 锚点（已有）=====
 
     @GetMapping("/procurement/{procurementId}/overview")
+    @PreAuthorize("hasAuthority('procurement:read')")
     public Result<OrderOverviewPageVO> getOverview(@PathVariable("procurementId") Long procurementId) {
         return Result.ok(orderOverviewUseCase.getOverview(procurementId));
     }
 
     @GetMapping("/procurement/selector")
+    @PreAuthorize("hasAuthority('procurement:read')")
     public Result<Page<OrderProcurementSelectorDTO>> selector(ProcurementQuery query) {
         PageRequest pageRequest = PageRequest.of(
                 query.getPage(),
@@ -56,6 +59,7 @@ public class OrderOverviewController {
     // ===== Demand 锚点（新增）=====
 
     @GetMapping("/demands")
+    @PreAuthorize("hasAuthority('procurement:read')")
     public Result<Page<OrderDemandSelectorDTO>> listDemands(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int pageSize,
@@ -79,6 +83,7 @@ public class OrderOverviewController {
     }
 
     @GetMapping("/demands/{demandId}/overview")
+    @PreAuthorize("hasAuthority('procurement:read')")
     public Result<DemandOverviewVO> getDemandOverview(@PathVariable Long demandId) {
         return Result.ok(orderOverviewUseCase.getDemandOverview(demandId));
     }
@@ -90,6 +95,7 @@ public class OrderOverviewController {
      * 排序由 OrderChainUseCase 在内存中按 demandCreateTime DESC 实现。
      */
     @GetMapping("/chain")
+    @PreAuthorize("hasAuthority('procurement:read')")
     public Result<Page<OrderChainVO>> listChain(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int pageSize,
@@ -103,6 +109,7 @@ public class OrderOverviewController {
      * 订单总览详情（指定 Demand 的全链路步骤1~4数据）。
      */
     @GetMapping("/chain/{demandId}")
+    @PreAuthorize("hasAuthority('procurement:read')")
     public Result<OrderChainDetailVO> getChainDetail(@PathVariable Long demandId) {
         return Result.ok(orderChainUseCase.getChainDetail(demandId));
     }

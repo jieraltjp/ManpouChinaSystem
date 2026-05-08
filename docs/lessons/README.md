@@ -17,6 +17,7 @@
 | [LESSONS-FRONTEND.md](./LESSONS-FRONTEND.md) | 前端 Vue / TS / i18n / Element Plus | 11–12, 14, 16, 33–34, 37, 40–44, 46–50, 52–59 |
 | [LESSONS-USER-SERVICE.md](./LESSONS-USER-SERVICE.md) | user-service JWT / Flyway / Lombok / JPA / Spring Data | 62–71 |
 | [LESSONS-JWT-CROSS-SERVICE.md](./LESSONS-JWT-CROSS-SERVICE.md) | allinone 只读验签 / Map 反序列化 / RS256 kid 提取 | 72–73 |
+| [LESSON-75.md](./LESSON-75.md) | allinone JWT 遗漏 permissions 导致 @PreAuthorize 失效 | 75 |
 | [LESSON-55-56.md](./LESSON-55-56.md) | el-input-number 列宽 + dialog 紧凑设计 | 55, 56 |
 | [LESSON-57.md](./LESSON-57.md) | 业务锚点变更：procurementId → qcRecordId | 57 |
 | [LESSON-58.md](./LESSON-58.md) | el-input-number 按钮截断：padding 计算漏扣 | 58 |
@@ -26,7 +27,7 @@
 
 ---
 
-## 铁律总表（73 条）
+## 铁律总表（75 条）
 
 ### 后端（17 条）
 
@@ -142,6 +143,7 @@
 | 接口变更后数据不对 | LESSONS-BACKEND.md → Lesson 34 |
 | user-service JWT 跨服务 / Flyway+JPA schema 对齐 | LESSONS-USER-SERVICE.md → Lesson 62-67 |
 | allinone 跨服务 JWT 401 / Map 反序列化 | LESSONS-JWT-CROSS-SERVICE.md → Lesson 68 |
+| allinone JWT 遗漏 permissions / Controller 零注解 | LESSON-75.md |
 
 
 ---
@@ -164,4 +166,5 @@
 | 62-67 | 2026-04-30 user-service SPEC-B11 Phase 1 实施（JWT 跨服务 / JPA schema 对齐） |
 | 68 | 2026-04-30 allinone JwtKeyManager 跨服务 JWT 401 根因（ParameterizedTypeReference 泛型失效） |
 | 69 | 2026-04-30 allinone JwtService.parseToken 双重 parse bug（RS256 无公钥 parse 失败） |
+| 75 | 2026-05-08 allinone JWT 遗漏 permissions + 17个 Controller 零注解，导致 Phase 3 权限控制形同虚设 |
 

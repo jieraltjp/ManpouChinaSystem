@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,33 +17,39 @@ public class TaxRefundController {
     private final TaxRefundUseCase taxRefundUseCase;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('tax_refund:read')")
     public ResponseEntity<Page<TaxRefundPageQuery>> list(TaxRefundQuery query) {
         return ResponseEntity.ok(taxRefundUseCase.pageQuery(query));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('tax_refund:read')")
     public ResponseEntity<TaxRefundPageQuery> get(@PathVariable Long id) {
         return ResponseEntity.ok(taxRefundUseCase.getById(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('tax_refund:create')")
     public ResponseEntity<Long> create(@Valid @RequestBody TaxRefundCreateCmd cmd) {
         return ResponseEntity.ok(taxRefundUseCase.create(cmd));
     }
 
     @PatchMapping("/{id}/complete")
+    @PreAuthorize("hasAuthority('tax_refund:update')")
     public ResponseEntity<Void> complete(@PathVariable Long id, @Valid @RequestBody TaxRefundCompleteCmd cmd) {
         taxRefundUseCase.complete(id, cmd);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/no-refund")
+    @PreAuthorize("hasAuthority('tax_refund:update')")
     public ResponseEntity<Void> markNoRefund(@PathVariable Long id) {
         taxRefundUseCase.markNoRefund(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('tax_refund:delete')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         taxRefundUseCase.delete(id);
         return ResponseEntity.noContent().build();

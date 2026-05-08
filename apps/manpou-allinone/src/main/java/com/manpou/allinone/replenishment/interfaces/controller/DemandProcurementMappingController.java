@@ -1,6 +1,7 @@
 package com.manpou.allinone.replenishment.interfaces.controller;
 
 import com.manpou.allinone.common.result.Result;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.manpou.allinone.replenishment.application.dto.DemandProcurementMappingCreateCmd;
 import com.manpou.allinone.replenishment.application.dto.DemandProcurementMappingPageQuery;
 import com.manpou.allinone.replenishment.application.dto.DemandProcurementMappingQuery;
@@ -25,6 +26,7 @@ public class DemandProcurementMappingController {
      * GET /api/v1/demand-mappings?demandId=1&page=1&pageSize=20
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('demand:read')")
     public Result<Page<DemandProcurementMappingPageQuery>> list(DemandProcurementMappingQuery query) {
         return Result.ok(mappingUseCase.pageQuery(query));
     }
@@ -33,6 +35,7 @@ public class DemandProcurementMappingController {
      * 根据 ID 查询。
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('demand:read')")
     public Result<DemandProcurementMappingPageQuery> get(@PathVariable("id") Long id) {
         return Result.ok(mappingUseCase.getById(id));
     }
@@ -42,6 +45,7 @@ public class DemandProcurementMappingController {
      * POST /api/v1/demand-mappings
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('demand:create')")
     public Result<Long> create(@Valid @RequestBody DemandProcurementMappingCreateCmd cmd) {
         Long id = mappingUseCase.create(cmd);
         return Result.ok("分配映射创建成功", id);
@@ -52,6 +56,7 @@ public class DemandProcurementMappingController {
      * DELETE /api/v1/demand-mappings/{id}
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('demand:delete')")
     public Result<Void> cancel(@PathVariable("id") Long id) {
         mappingUseCase.cancel(id);
         return Result.ok("分配映射已取消", null);

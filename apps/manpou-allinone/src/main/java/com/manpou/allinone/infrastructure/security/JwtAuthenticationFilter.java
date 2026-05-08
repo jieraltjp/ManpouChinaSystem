@@ -17,14 +17,21 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * JWT 认证过滤器。
  *
  * 从请求头提取 JWT Token，验证并设置 SecurityContext。
  * 详见 docs/pro/19-manpou-allinone.md §认证授权
+ *
+ * <p>Phase 3 修复（2026-05-08）：
+ * 从 JWT Claims 中同时提取 roles 和 permissions，构建完整的 Spring Security authorities。
+ * roles → {@code ROLE_<role>} 格式，支持 hasRole() 检查；
+ * permissions → 直接作为 authority，支持 hasAuthority('xxx:create') 检查。
+ * ADMIN 角色的 *:* 权限展开为所有具体权限（58条，与 user-service ALL_PERMISSIONS 同步）。
  */
 @Slf4j
 @Component
@@ -32,6 +39,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
+
+    /**
+     * ADMIN 角色 *:* 展开后的所有具体权限（66条，与 user-service JwtAuthenticationFilter.ALL_PERMISSIONS 同步）。
+     * 按 SPEC-B11 v1.2.0 定义，新增 warehouse/notification（Phase 3 权限控制）。
+     */
+    private static final Set<String> ALL_PERMISSIONS = Set.of(
+        "demand:create", "demand:read", "demand:update", "demand:delete",
+        "procurement:create", "procurement:read", "procurement:update", "procurement:delete",
+        "shipment:create", "shipment:read", "shipment:update", "shipment:delete",
+        "qc:create", "qc:read", "qc:update", "qc:delete",
+        "logistics:create", "logistics:read", "logistics:update", "logistics:delete",
+        "consolidation:create", "consolidation:read", "consolidation:update", "consolidation:delete",
+        "container:create", "container:read", "container:update", "container:delete",
+        "customs:create", "customs:read", "customs:update", "customs:delete",
+        "japan_customs:create", "japan_customs:read", "japan_customs:update", "japan_customs:delete",
+        "tax_refund:create", "tax_refund:read", "tax_refund:update", "tax_refund:delete",
+        "sales:create", "sales:read", "sales:update", "sales:delete",
+        "factory:create", "factory:read", "factory:update", "factory:delete",
+        "product:create", "product:read", "product:update", "product:delete",
+        "warehouse:create", "warehouse:read", "warehouse:update", "warehouse:delete",
+        "notification:create", "notification:read", "notification:update", "notification:delete",
+        "user:create", "user:read", "user:update", "user:delete", "user:reset_password",
+        "role:create", "role:read", "role:update", "role:delete", "role:assign",
+        "audit:read"
+    );
 
     private final JwtService jwtService;
     private final ObjectMapper objectMapper;
@@ -58,13 +90,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 JwtClaims claims = jwtService.extractClaims(token);
 
                 // 构建认证信息（JwtClaims 是 record，使用 roles() 等访问器）
-                List<SimpleGrantedAuthority> authorities = claims.roles().stream()
-                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                    .toList();
+                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+                // 角色 → ROLE_<role>（支持 hasRole() 检查）
+                for (String role : claims.roles()) {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+                }
+
+                // 权限 → 直接作为 authority（支持 hasAuthority('xxx:create') 检查）
+                if (claims.permissions() != null) {
+                    boolean isAdmin = claims.roles().contains("ADMIN");
+                    for (String perm : claims.permissions()) {
+                        if (isAdmin && "*:*".equals(perm)) {
+                            // ADMIN + *:* → 展开为所有具体权限
+                            authorities.add(new SimpleGrantedAuthority(perm));
+                            for (String specific : ALL_PERMISSIONS) {
+                                authorities.add(new SimpleGrantedAuthority(specific));
+                            }
+                        } else {
+                            authorities.add(new SimpleGrantedAuthority(perm));
+                        }
+                    }
+                }
 
                 UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                        claims.userId(),  // record accessor（getUserId 由 UserContext 覆写）
+                        claims.userId(),
                         null,
                         authorities
                     );

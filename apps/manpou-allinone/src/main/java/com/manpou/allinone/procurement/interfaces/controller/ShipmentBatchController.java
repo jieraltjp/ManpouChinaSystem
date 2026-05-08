@@ -2,6 +2,7 @@ package com.manpou.allinone.procurement.interfaces.controller;
 
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.manpou.allinone.procurement.application.dto.ShipmentBatchCreateCmd;
 import com.manpou.allinone.procurement.application.dto.ShipmentBatchPageQuery;
 import com.manpou.allinone.procurement.application.dto.ShipmentBatchQuery;
@@ -29,6 +30,7 @@ public class ShipmentBatchController {
      * GET /api/v1/shipment-batches?procurementId=1&status=待验货&page=1&pageSize=20
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('shipment:read')")
     public Result<Page<ShipmentBatchPageQuery>> list(ShipmentBatchQuery query) {
         return Result.ok(shipmentBatchUseCase.pageQuery(query));
     }
@@ -37,6 +39,7 @@ public class ShipmentBatchController {
      * 根据 ID 查询。
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('shipment:read')")
     public Result<ShipmentBatchPageQuery> get(@PathVariable("id") Long id) {
         return Result.ok(shipmentBatchUseCase.getById(id));
     }
@@ -47,6 +50,7 @@ public class ShipmentBatchController {
      */
     @PostMapping
     @Idempotent(ttl = 24 * 60 * 60)
+    @PreAuthorize("hasAuthority('shipment:create')")
     public Result<Long> create(@Valid @RequestBody ShipmentBatchCreateCmd cmd) {
         Long id = shipmentBatchUseCase.create(cmd);
         return Result.ok("出货批次创建成功", id);
@@ -57,6 +61,7 @@ public class ShipmentBatchController {
      * PATCH /api/v1/shipment-batches/{id}
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('shipment:update')")
     public Result<Void> update(@PathVariable("id") Long id,
                               @Valid @RequestBody ShipmentBatchUpdateCmd cmd) {
         shipmentBatchUseCase.update(id, cmd);
@@ -69,6 +74,7 @@ public class ShipmentBatchController {
      * 仅待验货状态可删除。
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('shipment:delete')")
     public Result<Void> delete(@PathVariable("id") Long id) {
         shipmentBatchUseCase.delete(id);
         return Result.ok("出货批次删除成功", null);
@@ -79,6 +85,7 @@ public class ShipmentBatchController {
      * POST /api/v1/shipment-batches/{id}/link-qc
      */
     @PostMapping("/{id}/link-qc")
+    @PreAuthorize("hasAuthority('shipment:update')")
     public Result<Void> linkQc(@PathVariable("id") Long id,
                                 @RequestBody Map<String, Long> body) {
         Long qcRecordId = body.get("qcRecordId");

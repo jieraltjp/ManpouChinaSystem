@@ -1,6 +1,7 @@
 package com.manpou.allinone.product.interfaces.controller;
 
 import com.manpou.allinone.product.application.dto.MasterCodeSuggestVO;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.manpou.allinone.product.application.dto.ProductCreateCmd;
 import com.manpou.allinone.product.application.dto.ProductPageQuery;
 import com.manpou.allinone.product.application.dto.ProductQuery;
@@ -37,6 +38,7 @@ public class ProductController {
      * GET /api/v1/products?hsCode=9403200000
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('product:read')")
     public Result<Page<ProductPageQuery>> list(ProductQuery query) {
         return Result.ok(productUseCase.pageQuery(query));
     }
@@ -45,6 +47,7 @@ public class ProductController {
      * 根据 ID 查询单个商品。
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('product:read')")
     public Result<ProductPageQuery> get(@PathVariable Long id) {
         return Result.ok(productUseCase.getById(id));
     }
@@ -53,6 +56,7 @@ public class ProductController {
      * 根据主货号查询（步骤1商品选择器调用）。
      */
     @GetMapping("/code/{masterCode}")
+    @PreAuthorize("hasAuthority('product:read')")
     public Result<ProductPageQuery> getByMasterCode(@PathVariable String masterCode) {
         return Result.ok(productUseCase.getByMasterCode(masterCode));
     }
@@ -61,6 +65,7 @@ public class ProductController {
      * 主货号自动补全（步骤1补货需求页调用）。
      */
     @GetMapping("/suggest/master-codes")
+    @PreAuthorize("hasAuthority('product:read')")
     public Result<List<MasterCodeSuggestVO>> suggestMasterCodes(@RequestParam String keyword) {
         return Result.ok(productUseCase.suggestMasterCodes(keyword));
     }
@@ -69,6 +74,7 @@ public class ProductController {
      * 子货号候选项（按主货号过滤，步骤1补货需求页调用）。
      */
     @GetMapping("/suggest/sub-codes")
+    @PreAuthorize("hasAuthority('product:read')")
     public Result<List<SubCodeSuggestVO>> suggestSubCodes(@RequestParam String masterCode) {
         return Result.ok(productUseCase.suggestSubCodes(masterCode));
     }
@@ -78,6 +84,7 @@ public class ProductController {
      * GET /api/v1/products/{id}/factories
      */
     @GetMapping("/{id}/factories")
+    @PreAuthorize("hasAuthority('product:read')")
     public Result<List<ProductFactoryVO>> getProductFactories(@PathVariable Long id) {
         return Result.ok(productUseCase.getProductFactories(id));
     }
@@ -87,6 +94,7 @@ public class ProductController {
      */
     @PostMapping
     @Idempotent(ttl = 24 * 60 * 60)
+    @PreAuthorize("hasAuthority('product:create')")
     public Result<Long> create(@Valid @RequestBody ProductCreateCmd cmd) {
         Long id = productUseCase.create(cmd);
         return Result.ok("商品创建成功", id);
@@ -96,6 +104,7 @@ public class ProductController {
      * 更新商品（部分更新）。
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('product:update')")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody ProductUpdateCmd cmd) {
         productUseCase.update(id, cmd);
@@ -106,6 +115,7 @@ public class ProductController {
      * 删除商品（逻辑删除）。
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('product:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         productUseCase.delete(id);
         return Result.ok("商品删除成功", null);

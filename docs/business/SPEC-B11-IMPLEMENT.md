@@ -1,9 +1,9 @@
 # SPEC-B11 — 用户中心与权限体系 · 实现设计
 
-> **版本**: 1.2.0
+> **版本**: 1.3.0
 > **创建**: 2026-05-01
-> **更新**: 2026-05-08（v1.2.0：修正 Phase 3 状态——权限控制实际未完成，补充 allinone 缺口清单）
-> **状态**: 🟡 Phase 2 后端完成；Phase 3 权限控制 ⚠️ 未完成（allinone JWT 不提取 permissions，8个业务 Controller 无注解）；Phase 4-6 待开发
+> **更新**: 2026-05-08（v1.3.0：Phase 3 权限控制 ✅ 实现完成——allinone JWT 提取 permissions，17个业务 Controller 注解完毕）
+> **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；Phase 4-6 待开发
 > **前置**: SPEC-B11 v1.1.0 · user-service Flyway V14 已完成 · Vite proxy 已配置
 > **关联**: UI-17 · UI-18 · UI-19 · UI-20 · docs/ui/pages/14-user-management.md · docs/ui/pages/15-role-management.md
 > **INTJ 编号**: DOC-B11-IMPL-001
@@ -321,28 +321,21 @@ GET /api/v1/permissions/tree
 6. BaseEntity public setter 方法
 7. 编译通过，打包，user-service 重启
 
-### Phase 3 — 权限控制 ⚠️ 未完成 2026-05-08
-
-> **⚠️ Phase 3 有两个致命缺口，前端页面完成后权限仍形同虚设**
+### Phase 3 — 权限控制 ✅ 完成 2026-05-08
 
 **缺口 1（allinone JwtAuthenticationFilter）：**
-- 第61-63行：`claims.roles() → ROLE_USER/ADMIN`，`claims.permissions()` **完全忽略**
-- 后果：JWT 中有 `permissions:["procurement:create", ...]`，但 SecurityContext 为空
-- 修复：`JwtAuthenticationFilter` 需要和 user-service 一样提取 `permissions` 到 authorities
+- `claims.roles()` → `ROLE_USER/ADMIN`，`claims.permissions()` **完全忽略**
+- 修复：复制 `ALL_PERMISSIONS` 常量（66条），提取 permissions 到 authorities，ADMIN `*:*` 展开
+- 文件：`JwtAuthenticationFilter.java`
 
 **缺口 2（allinone 业务 Controller）：**
-- 全部 8 个业务 Controller（Procurement / Customs / Product / Factory / Logistics / Finance / Qc / Shipment）：**零个** `@PreAuthorize` 注解
-- 后果：即使 JwtAuthenticationFilter 修复，Controller 端也无权限拦截
-- 修复：每个 Controller 方法加上 `@PreAuthorize("hasAuthority('xxx:create')")`
+- 17 个业务 Controller 全部 **零个** `@PreAuthorize` 注解
+- 修复：按 HTTP 方法 + 业务语义加注解（GET:read / POST:create / PUT-PATCH:update / DELETE:delete）
 
-**前端页面（已完成）：**
-1. `api/user.ts`（用户 API 客户端） ✅
-2. `api/role.ts`（角色 API 客户端） ✅
-3. Vite proxy 补充（`/api/v1/users` → user-service） ✅
-4. `pages/system/UserPage.vue`（UI-17） ✅
-5. `pages/system/RolePage.vue`（UI-18） ✅
-6. 路由注册（`/system/user` · `/system/role`） ✅
-7. i18n key 补充（zh.json · ja.json） ✅
+**实现完成清单：**
+1. allinone `JwtAuthenticationFilter` ✅ 提取 permissions（66条，与 user-service 同步）
+2. allinone 17个业务 Controller 加 `@PreAuthorize` ✅
+3. user-service `ALL_PERMISSIONS` 同步补充 warehouse/notification 权限 ✅
 
 ### Phase 4 — 操作日志（前端）⚠️ 待开发
 
@@ -448,8 +441,8 @@ proxy: {
 | RolePage.vue | P0 | ✅ 已完成 |
 | 路由注册 | P0 | ✅ 已完成（/system/user + /system/role） |
 | i18n key | P0 | ✅ 已完成 |
-| allinone JwtAuthenticationFilter 提取 permissions | P0 | ⚠️ 待开发（第61-63行缺失） |
-| allinone 8个业务 Controller 加 @PreAuthorize | P0 | ⚠️ 待开发（全部 Controller 零注解） |
+| allinone JwtAuthenticationFilter 提取 permissions | P0 | ✅ 已完成（66条，与 user-service 同步） |
+| allinone 17个业务 Controller 加 @PreAuthorize | P0 | ✅ 已完成（demand/procurement/shipment/qc/logistics/consolidation/container/customs/japan_customs/tax_refund/sales/warehouse/notification/order/product/factory） |
 | 前端权限控制（JWT payload 渲染） | P1 | ⚠️ 待开发 |
 | 前端删除用户按钮 | P1 | ⚠️ 待开发（UserPage.vue 缺少） |
 | 前端筛选器（roleId/departmentId/companyId） | P1 | ⚠️ 待开发（UserPage.vue 缺少） |
@@ -473,4 +466,4 @@ proxy: {
 
 ---
 
-*文档版本: 1.2.0 · 状态: Phase 2 完成；Phase 3 权限控制 ⚠️ 未完成 · 2026-05-08*
+*文档版本: 1.3.0 · 状态: Phase 2 ✅ Phase 3 ✅ · 2026-05-08*

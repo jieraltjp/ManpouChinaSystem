@@ -7,6 +7,7 @@ import com.manpou.allinone.warehouse.application.dto.WarehouseUpdateCmd;
 import com.manpou.allinone.warehouse.application.usecase.WarehouseUseCase;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
+import org.springframework.security.access.prepost.PreAuthorize;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,7 @@ public class WarehouseController {
      * 分页查询Warehouse列表。
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('warehouse:read')")
     public Result<Page<WarehousePageQuery>> list(WarehouseQuery query) {
         return Result.ok(warehouseUseCase.pageQuery(query));
     }
@@ -36,6 +38,7 @@ public class WarehouseController {
      * 根据 ID 查询单个Warehouse。
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('warehouse:read')")
     public Result<WarehousePageQuery> get(@PathVariable Long id) {
         return Result.ok(warehouseUseCase.getById(id));
     }
@@ -47,6 +50,7 @@ public class WarehouseController {
      */
     @PostMapping
     @Idempotent(ttl = 24 * 60 * 60)
+    @PreAuthorize("hasAuthority('warehouse:create')")
     public Result<Long> create(@Valid @RequestBody WarehouseCreateCmd cmd) {
         Long id = warehouseUseCase.create(cmd);
         return Result.ok("创建成功", id);
@@ -56,6 +60,7 @@ public class WarehouseController {
      * 更新Warehouse。
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('warehouse:update')")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody WarehouseUpdateCmd cmd) {
         warehouseUseCase.update(id, cmd);
@@ -66,6 +71,7 @@ public class WarehouseController {
      * 删除Warehouse（逻辑删除）。
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('warehouse:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         warehouseUseCase.delete(id);
         return Result.ok("删除成功", null);

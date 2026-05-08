@@ -3,6 +3,7 @@ package com.manpou.allinone.qc.interfaces.controller;
 import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.common.service.CosService;
 import com.manpou.allinone.common.result.Result;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.manpou.allinone.qc.domain.model.QcImage;
 import com.manpou.allinone.qc.domain.repository.QcImageRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class QcImageController {
      * POST /api/v1/qc/images/upload
      */
     @PostMapping("/upload")
+    @PreAuthorize("hasAuthority('qc:create')")
     public Result<ImageUploadResult> upload(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "qcRecordId", required = false) Long qcRecordId) {
@@ -68,6 +70,7 @@ public class QcImageController {
      * POST /api/v1/qc/images/upload-multiple
      */
     @PostMapping("/upload-multiple")
+    @PreAuthorize("hasAuthority('qc:create')")
     public Result<List<ImageUploadResult>> uploadMultiple(
             @RequestParam("files") MultipartFile[] files,
             @RequestParam(value = "qcRecordId", required = false) Long qcRecordId) {
@@ -108,6 +111,7 @@ public class QcImageController {
      * DELETE /api/v1/qc/images?id=123
      */
     @DeleteMapping
+    @PreAuthorize("hasAuthority('qc:delete')")
     public Result<Void> delete(@RequestParam("id") Long id) {
         QcImage image = qcImageRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("QcImage", id));
@@ -123,6 +127,7 @@ public class QcImageController {
      * GET /api/v1/qc/images?qcRecordId=123
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('qc:read')")
     public Result<List<QcImage>> list(@RequestParam("qcRecordId") Long qcRecordId) {
         List<QcImage> images = qcImageRepository.findByQcRecordIdAndIsDeletedFalse(qcRecordId);
         return Result.ok(images);

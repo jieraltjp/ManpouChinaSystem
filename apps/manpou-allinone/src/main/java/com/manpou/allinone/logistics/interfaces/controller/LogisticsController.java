@@ -2,6 +2,7 @@ package com.manpou.allinone.logistics.interfaces.controller;
 
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanCreateCmd;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanPageQuery;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanQuery;
@@ -23,22 +24,26 @@ public class LogisticsController {
     private final LogisticsPlanUseCase logisticsPlanUseCase;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('logistics:read')")
     public Result<Page<LogisticsPlanPageQuery>> list(LogisticsPlanQuery query) {
         return Result.ok(logisticsPlanUseCase.pageQuery(query));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('logistics:read')")
     public Result<LogisticsPlanPageQuery> get(@PathVariable("id") Long id) {
         return Result.ok(logisticsPlanUseCase.getById(id));
     }
 
     @PostMapping
     @Idempotent(ttl = 86400)
+    @PreAuthorize("hasAuthority('logistics:create')")
     public Result<Long> create(@Valid @RequestBody LogisticsPlanCreateCmd cmd) {
         return Result.ok(logisticsPlanUseCase.create(cmd));
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('logistics:update')")
     public Result<Void> update(@PathVariable("id") Long id,
                                @RequestBody LogisticsPlanUpdateCmd cmd) {
         logisticsPlanUseCase.update(id, cmd);
@@ -46,6 +51,7 @@ public class LogisticsController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('logistics:delete')")
     public Result<Void> delete(@PathVariable("id") Long id) {
         logisticsPlanUseCase.delete(id);
         return Result.ok();

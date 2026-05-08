@@ -10,6 +10,7 @@ import com.manpou.allinone.procurement.application.usecase.ProcurementUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -30,6 +31,7 @@ public class ProcurementController {
      * GET /api/v1/procurements?status=未定&productCode=de077&customerCompany=永康&page=1&pageSize=20
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('procurement:read')")
     public Result<Page<ProcurementPageQuery>> list(ProcurementQuery query) {
         return Result.ok(procurementUseCase.pageQuery(query));
     }
@@ -38,6 +40,7 @@ public class ProcurementController {
      * 根据 ID 查询单个发注单。
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('procurement:read')")
     public Result<ProcurementPageQuery> get(@PathVariable("id") Long id) {
         return Result.ok(procurementUseCase.getById(id));
     }
@@ -48,6 +51,7 @@ public class ProcurementController {
      * 计算字段 estimatedPriceJpy 由后端自动计算并存储。
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('procurement:create')")
     @Idempotent(ttl = 24 * 60 * 60)
     public Result<Long> create(@Valid @RequestBody ProcurementCreateCmd cmd) {
         Long id = procurementUseCase.create(cmd);
@@ -60,6 +64,7 @@ public class ProcurementController {
      * 状态推进规则见 docs/business/SPEC-B02-发注单-步骤2.md §4 状态流转。
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('procurement:update')")
     public Result<Void> update(@PathVariable("id") Long id,
                                @Valid @RequestBody ProcurementUpdateCmd cmd) {
         procurementUseCase.update(id, cmd);
@@ -72,6 +77,7 @@ public class ProcurementController {
      * 仅未定/発注待状态可删除。
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('procurement:delete')")
     public Result<Void> delete(@PathVariable("id") Long id) {
         procurementUseCase.delete(id);
         return Result.ok("发注单删除成功", null);

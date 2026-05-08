@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
 
-    /** ADMIN 角色 *:* 展开后的所有具体权限（42条，按 SPEC-B11） */
+    /** ADMIN 角色 *:* 展开后的所有具体权限（66条，与 allinone JwtAuthenticationFilter.ALL_PERMISSIONS 同步，按 SPEC-B11 v1.2.0） */
     private static final Set<String> ALL_PERMISSIONS = Set.of(
         "demand:create", "demand:read", "demand:update", "demand:delete",
         "procurement:create", "procurement:read", "procurement:update", "procurement:delete",
@@ -49,6 +49,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "sales:create", "sales:read", "sales:update", "sales:delete",
         "factory:create", "factory:read", "factory:update", "factory:delete",
         "product:create", "product:read", "product:update", "product:delete",
+        "warehouse:create", "warehouse:read", "warehouse:update", "warehouse:delete",
+        "notification:create", "notification:read", "notification:update", "notification:delete",
         "user:create", "user:read", "user:update", "user:delete", "user:reset_password",
         "role:create", "role:read", "role:update", "role:delete", "role:assign",
         "audit:read"

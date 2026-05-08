@@ -9,6 +9,7 @@ import com.manpou.allinone.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,28 +28,33 @@ public class JapanCustomsController {
     private final JapanCustomsUseCase japanCustomsUseCase;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('japan_customs:read')")
     public Result<Page<JapanCustomsPageQuery>> list(JapanCustomsQuery query) {
         return Result.ok(japanCustomsUseCase.pageQuery(query));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('japan_customs:read')")
     public Result<JapanCustomsPageQuery> get(@PathVariable Long id) {
         return Result.ok(japanCustomsUseCase.getById(id));
     }
 
     @PostMapping
     @Idempotent(ttl = 24 * 60 * 60)
+    @PreAuthorize("hasAuthority('japan_customs:create')")
     public Result<Long> create(@Valid @RequestBody JapanCustomsCreateCmd cmd) {
         return Result.ok("创建成功", japanCustomsUseCase.create(cmd));
     }
 
     @PostMapping("/batch")
     @Idempotent(ttl = 24 * 60 * 60)
+    @PreAuthorize("hasAuthority('japan_customs:create')")
     public Result<List<Long>> batchCreate(@Valid @RequestBody JapanCustomsBatchCreateCmd cmd) {
         return Result.ok("批量创建成功", japanCustomsUseCase.batchCreate(cmd));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('japan_customs:update')")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody JapanCustomsUpdateCmd cmd) {
         japanCustomsUseCase.update(id, cmd);
@@ -56,12 +62,14 @@ public class JapanCustomsController {
     }
 
     @PatchMapping("/{id}/start")
+    @PreAuthorize("hasAuthority('japan_customs:update')")
     public Result<Void> start(@PathVariable Long id) {
         japanCustomsUseCase.startClearance(id);
         return Result.ok("开始清关", null);
     }
 
     @PatchMapping("/{id}/complete")
+    @PreAuthorize("hasAuthority('japan_customs:update')")
     public Result<Void> complete(@PathVariable Long id,
                                   @Valid @RequestBody JapanCustomsCompleteCmd cmd) {
         japanCustomsUseCase.complete(id, cmd);
@@ -69,6 +77,7 @@ public class JapanCustomsController {
     }
 
     @PatchMapping("/{id}/fail")
+    @PreAuthorize("hasAuthority('japan_customs:update')")
     public Result<Void> fail(@PathVariable Long id,
                               @Valid @RequestBody JapanCustomsFailCmd cmd) {
         japanCustomsUseCase.fail(id, cmd);
@@ -76,6 +85,7 @@ public class JapanCustomsController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('japan_customs:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         japanCustomsUseCase.delete(id);
         return Result.ok("删除成功", null);

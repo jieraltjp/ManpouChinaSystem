@@ -7,6 +7,7 @@ import com.manpou.allinone.notification.application.dto.NotificationUpdateCmd;
 import com.manpou.allinone.notification.application.usecase.NotificationUseCase;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
+import org.springframework.security.access.prepost.PreAuthorize;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,7 @@ public class NotificationController {
      * 分页查询Notification列表。
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('notification:read')")
     public Result<Page<NotificationPageQuery>> list(NotificationQuery query) {
         return Result.ok(notificationUseCase.pageQuery(query));
     }
@@ -36,6 +38,7 @@ public class NotificationController {
      * 根据 ID 查询单个Notification。
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('notification:read')")
     public Result<NotificationPageQuery> get(@PathVariable Long id) {
         return Result.ok(notificationUseCase.getById(id));
     }
@@ -47,6 +50,7 @@ public class NotificationController {
      */
     @PostMapping
     @Idempotent(ttl = 24 * 60 * 60)
+    @PreAuthorize("hasAuthority('notification:create')")
     public Result<Long> create(@Valid @RequestBody NotificationCreateCmd cmd) {
         Long id = notificationUseCase.create(cmd);
         return Result.ok("创建成功", id);
@@ -56,6 +60,7 @@ public class NotificationController {
      * 更新Notification。
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('notification:update')")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody NotificationUpdateCmd cmd) {
         notificationUseCase.update(id, cmd);
@@ -66,6 +71,7 @@ public class NotificationController {
      * 删除Notification（逻辑删除）。
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('notification:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         notificationUseCase.delete(id);
         return Result.ok("删除成功", null);
