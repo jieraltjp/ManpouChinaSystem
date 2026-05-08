@@ -63,7 +63,7 @@
         <el-form-item>
           <el-button type="primary" @click="onSearch">{{ $t('factory.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('factory.filter.reset') }}</el-button>
-          <el-button type="primary" @click="onNew">
+          <el-button type="primary" @click="onNew" v-if="hasPermission('factory:create')">
             <el-icon><Plus /></el-icon>{{ $t('factory.newButton') }}
           </el-button>
         </el-form-item>
@@ -91,8 +91,8 @@
         <el-table-column :label="$t('factory.column.action')" min-width="150" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('factory.action.detail') }}</el-button>
-            <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('factory.action.edit') }}</el-button>
-            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('factory.action.delete') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onEdit(row)" v-if="hasPermission('factory:update')">{{ $t('factory.action.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click.stop="onDelete(row)" v-if="hasPermission('factory:delete')">{{ $t('factory.action.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -145,7 +145,7 @@
         </div>
         <div class="drawer-footer">
           <el-button @click="detailVisible = false">{{ $t('factory.drawer.close') }}</el-button>
-          <el-button type="primary" @click="onEditFromDrawer">{{ $t('factory.drawer.edit') }}</el-button>
+          <el-button type="primary" @click="onEditFromDrawer" v-if="hasPermission('factory:update')">{{ $t('factory.drawer.edit') }}</el-button>
         </div>
       </div>
     </el-drawer>
@@ -245,8 +245,10 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, OfficeBuilding, CircleCheck, Warning } from '@element-plus/icons-vue'
 import { factoryApi } from '@/api/factory'
 import type { FactoryPageVO, CreateFactoryRequest, UpdateFactoryRequest, CooperationStatus, FactoryStatsDTO } from '@/api/factory'
+import { usePermission } from '@/composables/usePermission'
 
 const { t } = useI18n()
+const { hasPermission } = usePermission()
 
 const loading = ref(false)
 const submitting = ref(false)

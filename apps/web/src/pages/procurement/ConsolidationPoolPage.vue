@@ -7,6 +7,9 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { consolidationPoolApi, type ConsolidationPoolVO, type ConsolidationPoolStatus } from '@/api/logistics'
 import { containerApi } from '@/api/logistics'
+import { usePermission } from '@/composables/usePermission'
+
+const { hasPermission } = usePermission()
 
 const { t } = useI18n()
 
@@ -137,7 +140,7 @@ onMounted(loadData)
         <el-form-item>
           <el-button type="primary" @click="onSearch">{{ $t('logistics.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('logistics.filter.reset') }}</el-button>
-          <el-button type="primary" @click="onNew">
+          <el-button type="primary" @click="onNew" v-if="hasPermission('consolidation:create')">
             <el-icon><Plus /></el-icon>{{ $t('logistics.pool.newButton') }}
           </el-button>
         </el-form-item>
@@ -172,9 +175,9 @@ onMounted(loadData)
         <el-table-column prop="createTime" :label="$t('logistics.column.createTime')" min-width="160" />
         <el-table-column :label="$t('logistics.column.actions')" min-width="200" fixed="right">
           <template #default="{ row }">
-            <el-button size="small" @click="onEdit(row)">{{ $t('common.edit') }}</el-button>
+            <el-button size="small" @click="onEdit(row)" v-if="hasPermission('consolidation:update')">{{ $t('common.edit') }}</el-button>
             <el-button size="small" type="primary" plain @click="onCreateContainer(row)">{{ $t('logistics.pool.action.createContainer') }}</el-button>
-            <el-button size="small" type="danger" plain @click="onDelete(row)">{{ $t('common.delete') }}</el-button>
+            <el-button size="small" type="danger" plain @click="onDelete(row)" v-if="hasPermission('consolidation:delete')">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>

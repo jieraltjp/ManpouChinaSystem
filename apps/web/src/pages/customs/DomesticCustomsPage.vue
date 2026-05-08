@@ -59,7 +59,7 @@
         <el-form-item style="flex-shrink:0">
           <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
           <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
-          <el-button type="primary" @click="onNew">
+          <el-button v-if="hasPermission('customs:create')" type="primary" @click="onNew">
             <el-icon><Plus /></el-icon><span>{{ $t('customs.batchButton') }}</span>
           </el-button>
         </el-form-item>
@@ -120,7 +120,7 @@
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
             <template v-if="row.status === 'PENDING'">
               <el-button link type="success" size="small" :loading="actionLoading === row.id + '-submit'" @click.stop="onSubmit(row)">{{ $t('customs.action.submit') }}</el-button>
-              <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
+              <el-button v-if="hasPermission('customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
             </template>
             <template v-else-if="row.status === 'SUBMITTED'">
               <el-button link type="success" size="small" :loading="actionLoading === row.id + '-clear'" @click.stop="onClear(row)">{{ $t('customs.action.clear') }}</el-button>
@@ -181,7 +181,7 @@
                 <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
                 <template v-if="row.status === 'PENDING'">
                   <el-button link type="success" size="small" :loading="actionLoading === row.id + '-submit'" @click.stop="onSubmit(row)">{{ $t('customs.action.submit') }}</el-button>
-                  <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
+                  <el-button v-if="hasPermission('customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
                 </template>
                 <template v-else-if="row.status === 'SUBMITTED'">
                   <el-button link type="success" size="small" :loading="actionLoading === row.id + '-clear'" @click.stop="onClear(row)">{{ $t('customs.action.clear') }}</el-button>
@@ -350,7 +350,9 @@ import { Plus, Document, Clock, Top, CircleCheck, Box } from '@element-plus/icon
 import { customsApi, type CustomsVO, type DomesticCustomsStatus, type CustomsCreateRequest, type CustomsBatchCreateRequest } from '@/api/customs'
 import { logisticsApi, type LogisticsPlanVO } from '@/api/logistics'
 import { useI18n } from 'vue-i18n'
+import { usePermission } from '@/composables/usePermission'
 
+const { hasPermission } = usePermission()
 const loading = ref(false)
 const submitting = ref(false)
 const dialogVisible = ref(false)

@@ -19,7 +19,7 @@
         <el-form-item>
           <el-button type="primary" @click="loadData">{{ $t('order.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('order.filter.reset') }}</el-button>
-          <el-button type="primary" @click="onNew" :disabled="!procurementId">
+          <el-button type="primary" @click="onNew" :disabled="!procurementId" v-if="hasPermission('shipment:create')">
             <el-icon><Plus /></el-icon>{{ $t('shipmentBatch.action.create') }}
           </el-button>
         </el-form-item>
@@ -53,9 +53,9 @@
         </el-table-column>
         <el-table-column :label="$t('order.column.action')" min-width="180" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="onEdit(row)">{{ $t('demand.action.edit') }}</el-button>
+            <el-button link type="primary" size="small" @click="onEdit(row)" v-if="hasPermission('shipment:update')">{{ $t('demand.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click="onDelete(row)"
-              :disabled="!deletableStatuses.includes(row.status)">{{ $t('common.delete') }}</el-button>
+              :disabled="!deletableStatuses.includes(row.status)" v-if="hasPermission('shipment:delete')">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -108,6 +108,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
+import { usePermission } from '@/composables/usePermission'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, ArrowLeft } from '@element-plus/icons-vue'
@@ -117,6 +118,7 @@ import { useI18n } from 'vue-i18n'
 const route = useRoute()
 const router = useRouter()
 const { t, locale: localeRef } = useI18n()
+const { hasPermission } = usePermission()
 
 const loading = ref(false)
 const submitting = ref(false)

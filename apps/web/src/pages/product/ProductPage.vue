@@ -36,7 +36,7 @@
         <el-form-item>
           <el-button type="primary" @click="loadData">{{ $t('product.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('product.filter.reset') }}</el-button>
-          <el-button type="primary" @click="onNew">
+          <el-button type="primary" @click="onNew" v-if="hasPermission('product:create')">
             <el-icon><Plus /></el-icon>{{ $t('product.newButton') }}
           </el-button>
         </el-form-item>
@@ -91,8 +91,8 @@
         <el-table-column :label="$t('product.column.action')" min-width="150" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('product.action.detail') }}</el-button>
-            <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('product.action.edit') }}</el-button>
-            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('product.action.delete') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onEdit(row)" v-if="hasPermission('product:update')">{{ $t('product.action.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click.stop="onDelete(row)" v-if="hasPermission('product:delete')">{{ $t('product.action.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -218,7 +218,7 @@
         </div>
         <div class="drawer-footer">
           <el-button @click="detailVisible = false">{{ $t('product.drawer.close') }}</el-button>
-          <el-button type="primary" @click="onEditFromDrawer">{{ $t('product.drawer.edit') }}</el-button>
+          <el-button type="primary" @click="onEditFromDrawer" v-if="hasPermission('product:update')">{{ $t('product.drawer.edit') }}</el-button>
         </div>
       </div>
     </el-drawer>
@@ -428,8 +428,10 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Goods, Loading } from '@element-plus/icons-vue'
 import { productApi } from '@/api/product'
 import type { ProductPageVO, CreateProductRequest, UpdateProductRequest, ProductFactoryVO } from '@/api/product'
+import { usePermission } from '@/composables/usePermission'
 
 const { t } = useI18n()
+const { hasPermission } = usePermission()
 
 const loading = ref(false)
 const submitting = ref(false)

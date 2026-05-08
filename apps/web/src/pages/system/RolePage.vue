@@ -3,7 +3,7 @@
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true">
         <el-form-item>
-          <el-button type="primary" @click="onNew">
+          <el-button v-if="hasPermission('role:create')" type="primary" @click="onNew">
             <el-icon><Plus /></el-icon>{{ $t('role.newButton') }}
           </el-button>
         </el-form-item>
@@ -32,8 +32,8 @@
               <div class="role-meta">
                 <span v-if="r.userCount !== undefined">{{ r.userCount }} {{ $t('role.column.userCount') }}</span>
                 <span class="role-actions">
-                  <el-button link class="btn-blue" size="small" @click.stop="onEdit(r)">{{ $t('role.action.edit') }}</el-button>
-                  <el-button v-if="r.isEditable !== 0" link type="danger" size="small" @click.stop="onDelete(r)">{{ $t('role.action.delete') }}</el-button>
+                  <el-button v-if="hasPermission('role:update')" link class="btn-blue" size="small" @click.stop="onEdit(r)">{{ $t('role.action.edit') }}</el-button>
+                  <el-button v-if="r.isEditable !== 0 && hasPermission('role:delete')" link type="danger" size="small" @click.stop="onDelete(r)">{{ $t('role.action.delete') }}</el-button>
                 </span>
               </div>
             </div>
@@ -47,7 +47,7 @@
           <template #header>
             <div class="perm-header">
               <span>{{ selectedRole ? (currentLocale === 'ja' ? selectedRole.roleNameJp : selectedRole.roleNameCn) : $t('role.permission.selectTip') }}</span>
-              <el-button v-if="selectedRole && selectedRole.isEditable !== 0" type="primary" size="small" :loading="permSaving" @click="onSavePermissions">
+              <el-button v-if="selectedRole && selectedRole.isEditable !== 0 && hasPermission('role:assign')" type="primary" size="small" :loading="permSaving" @click="onSavePermissions">
                 {{ $t('role.dialog.save') }}
               </el-button>
             </div>
@@ -103,7 +103,7 @@
       </el-form>
       <template #footer>
         <el-button @click="editVisible = false">{{ $t('role.dialog.cancel') }}</el-button>
-        <el-button type="primary" :loading="editSaving" @click="onSaveEdit">{{ $t('role.dialog.save') }}</el-button>
+        <el-button v-if="hasPermission('role:update')" type="primary" :loading="editSaving" @click="onSaveEdit">{{ $t('role.dialog.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -114,11 +114,13 @@ import { ref, reactive, computed, nextTick } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Lock } from '@element-plus/icons-vue'
 import { useI18n } from 'vue-i18n'
+import { usePermission } from '@/composables/usePermission'
 import * as roleApi from '@/api/role'
 import type { RoleVO, RoleCreateCmd, RoleUpdateCmd } from '@/api/role'
 
 const { t, locale } = useI18n()
 const currentLocale = computed(() => locale.value)
+const { hasPermission } = usePermission()
 
 interface PermNode {
   id: number

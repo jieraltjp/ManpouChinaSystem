@@ -47,7 +47,7 @@
         <el-form-item>
           <el-button type="primary" @click="onSearchFromButton">{{ $t('logistics.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('logistics.filter.reset') }}</el-button>
-          <el-button type="primary" @click="onNew">
+          <el-button v-if="hasPermission('logistics:create')" type="primary" @click="onNew">
             <el-icon><Plus /></el-icon>{{ $t('logistics.newButton') }}
           </el-button>
         </el-form-item>
@@ -102,8 +102,8 @@
         <el-table-column :label="$t('logistics.column.action')" min-width="220" align="center">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click.stop="onCreateCustoms(row)">{{ $t('logistics.action.createCustoms') }}</el-button>
-            <el-button link type="warning" size="small" @click.stop="onEdit(row)" :disabled="row.status === 'DELIVERED'">{{ $t('logistics.action.edit') }}</el-button>
-            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('logistics.action.delete') }}</el-button>
+            <el-button v-if="hasPermission('logistics:update')" link type="warning" size="small" @click.stop="onEdit(row)" :disabled="row.status === 'DELIVERED'">{{ $t('logistics.action.edit') }}</el-button>
+            <el-button v-if="hasPermission('logistics:delete')" link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('logistics.action.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -250,6 +250,9 @@ import { logisticsApi, type LogisticsPlanVO, type LogisticsStatus, type PlanType
 import { inspectionApi, type QcRecordVO } from '@/api/inspection'
 import { factoryApi, type FactoryPageVO } from '@/api/factory'
 import { useI18n } from 'vue-i18n'
+import { usePermission } from '@/composables/usePermission'
+
+const { hasPermission } = usePermission()
 
 const loading = ref(false)
 const submitting = ref(false)

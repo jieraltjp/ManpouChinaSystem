@@ -64,7 +64,7 @@
         <el-form-item>
           <el-button type="primary" @click="onSearchFromButton">{{ $t('inspection.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('inspection.filter.reset') }}</el-button>
-          <el-button type="primary" @click="onNew">
+          <el-button type="primary" @click="onNew" v-if="hasPermission('qc:create')">
             <el-icon><Plus /></el-icon>{{ $t('inspection.newButton') }}
           </el-button>
         </el-form-item>
@@ -135,8 +135,8 @@
         <el-table-column :label="$t('inspection.column.action')" min-width="180" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('inspection.action.detail') }}</el-button>
-            <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('inspection.action.edit') }}</el-button>
-            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('inspection.action.delete') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onEdit(row)" v-if="hasPermission('qc:update')">{{ $t('inspection.action.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click.stop="onDelete(row)" v-if="hasPermission('qc:delete')">{{ $t('inspection.action.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -425,6 +425,9 @@ import { inspectionApi, type QcRecordVO, type QcResult, type QcStatus, type QcTy
 import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
 import { shipmentBatchApi, type ShipmentBatchVO } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
+import { usePermission } from '@/composables/usePermission'
+
+const { hasPermission } = usePermission()
 
 const loading = ref(false)
 const submitting = ref(false)

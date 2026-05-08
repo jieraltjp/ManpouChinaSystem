@@ -52,7 +52,7 @@
         <el-form-item>
           <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
           <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
-          <el-button type="primary" @click="onNew">
+          <el-button type="primary" @click="onNew" v-if="hasPermission('tax_refund:create')">
             <el-icon><Plus /></el-icon>{{ $t('taxRefund.newButton') }}
           </el-button>
         </el-form-item>
@@ -106,8 +106,8 @@
         <el-table-column :label="$t('taxRefund.column.action')" min-width="240" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('taxRefund.action.detail') }}</el-button>
-            <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('taxRefund.action.edit') }}</el-button>
-            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('taxRefund.action.delete') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onEdit(row)" v-if="hasPermission('tax_refund:update')">{{ $t('taxRefund.action.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click.stop="onDelete(row)" v-if="hasPermission('tax_refund:delete')">{{ $t('taxRefund.action.delete') }}</el-button>
             <template v-if="row.status === 'APPLYING'">
               <el-button link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('taxRefund.action.complete') }}</el-button>
               <el-button link type="warning" size="small" :loading="actionLoading === row.id + '-no-refund'" @click.stop="onNoRefund(row)">{{ $t('taxRefund.action.noRefund') }}</el-button>
@@ -294,6 +294,7 @@ import { Document, Clock, CircleCheck, Close, Plus } from '@element-plus/icons-v
 import { taxRefundApi, type TaxRefundVO, type TaxRefundStatus, type TaxRefundCreateRequest } from '@/api/taxRefund'
 import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
+import { usePermission } from '@/composables/usePermission'
 
 const loading = ref(false)
 const drawerVisible = ref(false)
@@ -471,6 +472,7 @@ function billingTypeLabel(val?: string | null): string {
 }
 
 const { t } = useI18n()
+const { hasPermission } = usePermission()
 
 const statusCount = computed(() => {
   const counts: Record<string, number> = { APPLYING: 0, COMPLETED: 0, NO_REFUND: 0 }

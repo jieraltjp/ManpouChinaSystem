@@ -56,7 +56,7 @@
         <el-form-item>
           <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
           <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
-          <el-button type="primary" @click="onNew">
+          <el-button v-if="hasPermission('japan_customs:create')" type="primary" @click="onNew">
             <el-icon><Plus /></el-icon> {{ $t('japanCustoms.action.newCustoms') }}
           </el-button>
         </el-form-item>
@@ -131,7 +131,7 @@
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('japanCustoms.action.detail') }}</el-button>
             <template v-if="row.status === 'PENDING'">
               <el-button link type="success" size="small" :loading="actionLoading === row.id + '-start'" @click.stop="onStart(row)">{{ $t('japanCustoms.action.start') }}</el-button>
-              <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
+              <el-button v-if="hasPermission('japan_customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
             </template>
             <template v-else-if="row.status === 'IN_PROGRESS'">
               <el-button link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('japanCustoms.action.complete') }}</el-button>
@@ -205,7 +205,7 @@
                 <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('japanCustoms.action.detail') }}</el-button>
                 <template v-if="row.status === 'PENDING'">
                   <el-button link type="success" size="small" :loading="actionLoading === row.id + '-start'" @click.stop="onStart(row)">{{ $t('japanCustoms.action.start') }}</el-button>
-                  <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
+                  <el-button v-if="hasPermission('japan_customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
                 </template>
                 <template v-else-if="row.status === 'IN_PROGRESS'">
                   <el-button link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('japanCustoms.action.complete') }}</el-button>
@@ -373,7 +373,9 @@ import { Document, Clock, Loading, CircleCheck, Plus, Box } from '@element-plus/
 import { japanCustomsApi, type JapanCustomsVO, type JapanCustomsStatus } from '@/api/japanCustoms'
 import { customsApi, type CustomsVO } from '@/api/customs'
 import { useI18n } from 'vue-i18n'
+import { usePermission } from '@/composables/usePermission'
 
+const { hasPermission } = usePermission()
 const loading = ref(false)
 const drawerVisible = ref(false)
 const completeDialogVisible = ref(false)

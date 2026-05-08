@@ -6,7 +6,9 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { containerApi, type ContainerVO, type ContainerStatus, type ContainerType } from '@/api/logistics'
+import { usePermission } from '@/composables/usePermission'
 
+const { hasPermission } = usePermission()
 const { t } = useI18n()
 
 const loading = ref(false)
@@ -139,7 +141,7 @@ onMounted(loadData)
         <el-form-item>
           <el-button type="primary" @click="onSearch">{{ $t('logistics.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('logistics.filter.reset') }}</el-button>
-          <el-button type="primary" @click="onNew">
+          <el-button v-if="hasPermission('container:create')" type="primary" @click="onNew">
             <el-icon><Plus /></el-icon>{{ $t('logistics.container.newButton') }}
           </el-button>
         </el-form-item>
@@ -176,8 +178,8 @@ onMounted(loadData)
         <el-table-column prop="createTime" :label="$t('logistics.column.createTime')" min-width="160" />
         <el-table-column :label="$t('logistics.column.actions')" min-width="140" fixed="right">
           <template #default="{ row }">
-            <el-button size="small" @click="onEdit(row)">{{ $t('common.edit') }}</el-button>
-            <el-button size="small" type="danger" plain @click="onDelete(row)">{{ $t('common.delete') }}</el-button>
+            <el-button v-if="hasPermission('container:update')" size="small" @click="onEdit(row)">{{ $t('common.edit') }}</el-button>
+            <el-button v-if="hasPermission('container:delete')" size="small" type="danger" plain @click="onDelete(row)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>

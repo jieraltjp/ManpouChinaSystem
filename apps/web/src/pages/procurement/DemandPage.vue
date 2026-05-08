@@ -52,7 +52,7 @@
         <el-form-item>
           <el-button type="primary" @click="loadData">{{ $t('demand.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('demand.filter.reset') }}</el-button>
-          <el-button type="primary" @click="onNew">
+          <el-button type="primary" @click="onNew" v-if="hasPermission('demand:create')">
             <el-icon><Plus /></el-icon> {{ $t('demand.newButton') }}
           </el-button>
         </el-form-item>
@@ -126,8 +126,8 @@
         <el-table-column :label="$t('demand.column.action')" min-width="260" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('common.view') }}</el-button>
-            <el-button link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('demand.action.edit') }}</el-button>
-            <el-button link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onEdit(row)" v-if="hasPermission('demand:update')">{{ $t('demand.action.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click.stop="onDelete(row)" v-if="hasPermission('demand:delete')">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -384,6 +384,9 @@ import { Plus, Clock, Warning, CircleCheck } from '@element-plus/icons-vue'
 import { demandApi, type DemandPageVO, type DemandType } from '@/api/demand'
 import { productApi, type MasterCodeSuggestVO, type SubCodeSuggestVO } from '@/api/product'
 import { useI18n } from 'vue-i18n'
+import { usePermission } from '@/composables/usePermission'
+
+const { hasPermission } = usePermission()
 
 const loading = ref(false)
 const submitting = ref(false)

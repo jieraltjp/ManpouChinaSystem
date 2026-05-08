@@ -65,7 +65,7 @@
         <el-form-item>
           <el-button type="primary" @click="loadData">{{ $t('order.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('order.filter.reset') }}</el-button>
-          <el-button type="primary" @click="onNew">
+          <el-button type="primary" @click="onNew" v-if="hasPermission('procurement:create')">
             <el-icon><Plus /></el-icon>{{ $t('order.newButton') }}
           </el-button>
         </el-form-item>
@@ -149,9 +149,9 @@
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('order.message.detail') }}</el-button>
             <el-button link type="success" size="small" @click.stop="onOpenShipmentBatches(row)">{{ $t('order.action.shipmentBatch') }}</el-button>
             <el-button link type="warning" size="small" @click.stop="onEdit(row)"
-              :disabled="row.status === ORDER_STATUS_SHIPPED">{{ $t('demand.action.edit') }}</el-button>
+              :disabled="row.status === ORDER_STATUS_SHIPPED" v-if="hasPermission('procurement:update')">{{ $t('demand.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)"
-              :disabled="!deletableStatuses.includes(row.status)">{{ $t('common.delete') }}</el-button>
+              :disabled="!deletableStatuses.includes(row.status)" v-if="hasPermission('procurement:delete')">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -481,6 +481,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
+import { usePermission } from '@/composables/usePermission'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, Clock, CircleCheck, Warning, Document, Edit } from '@element-plus/icons-vue'
@@ -503,6 +504,7 @@ const convertingDemandId = ref<number | null>(null)
 const route = useRoute()
 const router = useRouter()
 const { t, locale: localeRef } = useI18n()
+const { hasPermission } = usePermission()
 const currentLocale = computed(() => localeRef.value)
 
 // 后端 order_status 枚举值（同时作为 i18n key）

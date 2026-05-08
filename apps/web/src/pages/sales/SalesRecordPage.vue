@@ -69,7 +69,7 @@
         <el-form-item>
           <el-button type="primary" @click="onSearchFromButton">{{ $t('common.search') }}</el-button>
           <el-button @click="onReset">{{ $t('common.reset') }}</el-button>
-          <el-button type="primary" @click="onCreate">
+          <el-button type="primary" @click="onCreate" v-if="hasPermission('sales:create')">
             <el-icon><Plus /></el-icon>{{ $t('sales.newButton') }}
           </el-button>
         </el-form-item>
@@ -136,7 +136,7 @@
             </template>
             <template v-else>
               <el-button link type="success" size="small" :loading="actionLoading === row.id + '-relist'" @click.stop="onRelist(row)">{{ $t('sales.action.relist') }}</el-button>
-              <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
+              <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)" v-if="hasPermission('sales:delete')">{{ $t('common.delete') }}</el-button>
             </template>
           </template>
         </el-table-column>
@@ -285,8 +285,10 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, CircleCheck, Warning, CloseBold, Remove, Goods } from '@element-plus/icons-vue'
 import { salesOperationsApi, type SalesRecordVO, type SalesStatus, type SalesChannel } from '@/api/salesOperations'
 import { useI18n } from 'vue-i18n'
+import { usePermission } from '@/composables/usePermission'
 
 const { t } = useI18n()
+const { hasPermission } = usePermission()
 
 const loading = ref(false)
 const saveLoading = ref(false)
