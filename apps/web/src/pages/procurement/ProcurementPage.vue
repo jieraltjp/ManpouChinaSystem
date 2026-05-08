@@ -212,7 +212,7 @@
 
       <div class="drawer-actions">
         <el-button @click="drawerVisible = false">{{ $t('order.drawer.close') }}</el-button>
-        <el-button type="primary" @click="onEdit(currentRow)">{{ $t('order.drawer.edit') }}</el-button>
+        <el-button v-if="hasPermission('procurement:update')" type="primary" @click="onEdit(currentRow)">{{ $t('order.drawer.edit') }}</el-button>
       </div>
     </el-drawer>
 

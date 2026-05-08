@@ -109,8 +109,8 @@
             <el-button link type="warning" size="small" @click.stop="onEdit(row)" v-if="hasPermission('tax_refund:update')">{{ $t('taxRefund.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)" v-if="hasPermission('tax_refund:delete')">{{ $t('taxRefund.action.delete') }}</el-button>
             <template v-if="row.status === 'APPLYING'">
-              <el-button link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('taxRefund.action.complete') }}</el-button>
-              <el-button link type="warning" size="small" :loading="actionLoading === row.id + '-no-refund'" @click.stop="onNoRefund(row)">{{ $t('taxRefund.action.noRefund') }}</el-button>
+              <el-button v-if="hasPermission('tax_refund:update')" link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('taxRefund.action.complete') }}</el-button>
+              <el-button v-if="hasPermission('tax_refund:update')" link type="warning" size="small" :loading="actionLoading === row.id + '-no-refund'" @click.stop="onNoRefund(row)">{{ $t('taxRefund.action.noRefund') }}</el-button>
             </template>
           </template>
         </el-table-column>

@@ -119,12 +119,12 @@
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
             <template v-if="row.status === 'PENDING'">
-              <el-button link type="success" size="small" :loading="actionLoading === row.id + '-submit'" @click.stop="onSubmit(row)">{{ $t('customs.action.submit') }}</el-button>
+              <el-button v-if="hasPermission('customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-submit'" @click.stop="onSubmit(row)">{{ $t('customs.action.submit') }}</el-button>
               <el-button v-if="hasPermission('customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
             </template>
             <template v-else-if="row.status === 'SUBMITTED'">
-              <el-button link type="success" size="small" :loading="actionLoading === row.id + '-clear'" @click.stop="onClear(row)">{{ $t('customs.action.clear') }}</el-button>
-              <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-reject'" @click.stop="onReject(row)">{{ $t('customs.action.reject') }}</el-button>
+              <el-button v-if="hasPermission('customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-clear'" @click.stop="onClear(row)">{{ $t('customs.action.clear') }}</el-button>
+              <el-button v-if="hasPermission('customs:update')" link type="danger" size="small" :loading="actionLoading === row.id + '-reject'" @click.stop="onReject(row)">{{ $t('customs.action.reject') }}</el-button>
             </template>
           </template>
         </el-table-column>
@@ -180,12 +180,12 @@
               <template #default="{ row }">
                 <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
                 <template v-if="row.status === 'PENDING'">
-                  <el-button link type="success" size="small" :loading="actionLoading === row.id + '-submit'" @click.stop="onSubmit(row)">{{ $t('customs.action.submit') }}</el-button>
+                  <el-button v-if="hasPermission('customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-submit'" @click.stop="onSubmit(row)">{{ $t('customs.action.submit') }}</el-button>
                   <el-button v-if="hasPermission('customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
                 </template>
                 <template v-else-if="row.status === 'SUBMITTED'">
-                  <el-button link type="success" size="small" :loading="actionLoading === row.id + '-clear'" @click.stop="onClear(row)">{{ $t('customs.action.clear') }}</el-button>
-                  <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-reject'" @click.stop="onReject(row)">{{ $t('customs.action.reject') }}</el-button>
+                  <el-button v-if="hasPermission('customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-clear'" @click.stop="onClear(row)">{{ $t('customs.action.clear') }}</el-button>
+                  <el-button v-if="hasPermission('customs:update')" link type="danger" size="small" :loading="actionLoading === row.id + '-reject'" @click.stop="onReject(row)">{{ $t('customs.action.reject') }}</el-button>
                 </template>
               </template>
             </el-table-column>

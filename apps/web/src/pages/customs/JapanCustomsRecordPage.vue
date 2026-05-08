@@ -130,12 +130,12 @@
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('japanCustoms.action.detail') }}</el-button>
             <template v-if="row.status === 'PENDING'">
-              <el-button link type="success" size="small" :loading="actionLoading === row.id + '-start'" @click.stop="onStart(row)">{{ $t('japanCustoms.action.start') }}</el-button>
+              <el-button v-if="hasPermission('japan_customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-start'" @click.stop="onStart(row)">{{ $t('japanCustoms.action.start') }}</el-button>
               <el-button v-if="hasPermission('japan_customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
             </template>
             <template v-else-if="row.status === 'IN_PROGRESS'">
-              <el-button link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('japanCustoms.action.complete') }}</el-button>
-              <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-fail'" @click.stop="onFail(row)">{{ $t('japanCustoms.action.fail') }}</el-button>
+              <el-button v-if="hasPermission('japan_customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('japanCustoms.action.complete') }}</el-button>
+              <el-button v-if="hasPermission('japan_customs:update')" link type="danger" size="small" :loading="actionLoading === row.id + '-fail'" @click.stop="onFail(row)">{{ $t('japanCustoms.action.fail') }}</el-button>
             </template>
           </template>
         </el-table-column>
@@ -204,12 +204,12 @@
               <template #default="{ row }">
                 <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('japanCustoms.action.detail') }}</el-button>
                 <template v-if="row.status === 'PENDING'">
-                  <el-button link type="success" size="small" :loading="actionLoading === row.id + '-start'" @click.stop="onStart(row)">{{ $t('japanCustoms.action.start') }}</el-button>
+                  <el-button v-if="hasPermission('japan_customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-start'" @click.stop="onStart(row)">{{ $t('japanCustoms.action.start') }}</el-button>
                   <el-button v-if="hasPermission('japan_customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
                 </template>
                 <template v-else-if="row.status === 'IN_PROGRESS'">
-                  <el-button link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('japanCustoms.action.complete') }}</el-button>
-                  <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-fail'" @click.stop="onFail(row)">{{ $t('japanCustoms.action.fail') }}</el-button>
+                  <el-button v-if="hasPermission('japan_customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('japanCustoms.action.complete') }}</el-button>
+                  <el-button v-if="hasPermission('japan_customs:update')" link type="danger" size="small" :loading="actionLoading === row.id + '-fail'" @click.stop="onFail(row)">{{ $t('japanCustoms.action.fail') }}</el-button>
                 </template>
               </template>
             </el-table-column>
@@ -358,7 +358,7 @@
 
       <template #footer>
         <el-button @click="createDialogVisible = false">{{ $t('common.cancel') }}</el-button>
-        <el-button type="primary" :loading="batchSubmitting" :disabled="batchSelectedIds.length === 0" @click="onBatchSubmit">
+        <el-button v-if="hasPermission('japan_customs:create')" type="primary" :loading="batchSubmitting" :disabled="batchSelectedIds.length === 0" @click="onBatchSubmit">
           {{ $t('japanCustoms.batchDialog.createButton', { n: batchSelectedIds.length }) }}
         </el-button>
       </template>

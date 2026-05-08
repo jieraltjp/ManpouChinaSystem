@@ -131,11 +131,11 @@
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('sales.action.detail') }}</el-button>
             <template v-if="row.status !== 'DISCONTINUED'">
-              <el-button link type="info" size="small" @click.stop="onUpdateStock(row)">{{ $t('sales.action.updateStock') }}</el-button>
-              <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-discontinue'" @click.stop="onDiscontinue(row)">{{ $t('sales.action.discontinue') }}</el-button>
+              <el-button v-if="hasPermission('sales:update')" link type="info" size="small" @click.stop="onUpdateStock(row)">{{ $t('sales.action.updateStock') }}</el-button>
+              <el-button v-if="hasPermission('sales:update')" link type="danger" size="small" :loading="actionLoading === row.id + '-discontinue'" @click.stop="onDiscontinue(row)">{{ $t('sales.action.discontinue') }}</el-button>
             </template>
             <template v-else>
-              <el-button link type="success" size="small" :loading="actionLoading === row.id + '-relist'" @click.stop="onRelist(row)">{{ $t('sales.action.relist') }}</el-button>
+              <el-button v-if="hasPermission('sales:update')" link type="success" size="small" :loading="actionLoading === row.id + '-relist'" @click.stop="onRelist(row)">{{ $t('sales.action.relist') }}</el-button>
               <el-button link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)" v-if="hasPermission('sales:delete')">{{ $t('common.delete') }}</el-button>
             </template>
           </template>

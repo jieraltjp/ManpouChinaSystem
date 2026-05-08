@@ -176,7 +176,7 @@ onMounted(loadData)
         <el-table-column :label="$t('logistics.column.actions')" min-width="200" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="onEdit(row)" v-if="hasPermission('consolidation:update')">{{ $t('common.edit') }}</el-button>
-            <el-button size="small" type="primary" plain @click="onCreateContainer(row)">{{ $t('logistics.pool.action.createContainer') }}</el-button>
+            <el-button v-if="hasPermission('container:create')" size="small" type="primary" plain @click="onCreateContainer(row)">{{ $t('logistics.pool.action.createContainer') }}</el-button>
             <el-button size="small" type="danger" plain @click="onDelete(row)" v-if="hasPermission('consolidation:delete')">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>

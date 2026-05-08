@@ -175,7 +175,7 @@
       </el-descriptions>
       <div class="drawer-footer">
         <el-button @click="drawerVisible = false">{{ $t('common.close') }}</el-button>
-        <el-button type="primary" @click="drawerVisible = false; currentRow && onEdit(currentRow)">{{ $t('demand.action.edit') }}</el-button>
+        <el-button v-if="hasPermission('demand:update')" type="primary" @click="drawerVisible = false; currentRow && onEdit(currentRow)">{{ $t('demand.action.edit') }}</el-button>
       </div>
     </el-drawer>
 
