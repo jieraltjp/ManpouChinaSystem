@@ -21,6 +21,7 @@
 | [LESSON-76.md](./LESSON-76.md) | allinone 重启流程——JAR 锁定的正确处理 | 76 |
 | [LESSON-COS-URL-QUERY-PARAM.md](./LESSON-COS-URL-QUERY-PARAM.md) | CosService.upload() 返回 URL 含 query param，提取方法未同步剥离 → COS 预览 404 | 77 |
 | [LESSON-PERMISSION-AUDIT-2026-05-08.md](./LESSON-PERMISSION-AUDIT-2026-05-08.md) | 权限三角审计：前端/后端/DB 完全一致，8条孤岛权限无影响 | 78 |
+| [LESSON-JWT-KEY-ENV.md](./LESSON-JWT-KEY-ENV.md) | JWT 密钥 DB/classpath 来源不一致导致 allinone 401，改为 env var 加载 | 79 |
 | [LESSON-55-56.md](./LESSON-55-56.md) | el-input-number 列宽 + dialog 紧凑设计 | 55, 56 |
 | [LESSON-57.md](./LESSON-57.md) | 业务锚点变更：procurementId → qcRecordId | 57 |
 | [LESSON-58.md](./LESSON-58.md) | el-input-number 按钮截断：padding 计算漏扣 | 58 |
