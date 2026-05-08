@@ -1,14 +1,14 @@
 # 页面规格 — 用户管理
 
-> **版本**: 1.0.0
+> **版本**: 1.0.1
 > **创建**: 2026-04-30
-> **更新**: 2026-05-01（v1.0.0：Phase 3 前端开发）
+> **更新**: 2026-05-08（v1.0.1：版本对齐，Phase 3 后端权限控制见 SPEC-B11 v1.2.0）
 > **路由**: `/system/user`
 > **组件**: `apps/web/src/pages/system/UserPage.vue`
 > **对应后端**: `GET/PUT/POST/DELETE /api/v1/users`
 > **对应 DB**: SPEC-B11 V7（user 表）
 > **依赖文档**: `SPEC-B11-用户中心与权限体系.md` · `SPEC-B11-IMPLEMENT.md`
-> **状态**: ✅ Phase 3 完成（UserPage.vue + api/user.ts + Vite proxy + 路由均已实现）
+> **状态**: ✅ 前端页面完成（api/user.ts + UserPage.vue + Vite proxy + 路由；后端权限控制 Phase 3 待 allinone 实现）
 
 ---
 

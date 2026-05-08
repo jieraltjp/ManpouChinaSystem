@@ -36,8 +36,8 @@
 | — | [pages/17-shipment-batch.md](pages/17-shipment-batch.md) | `/procurement/shipment-batch` | — | ✅ |
 | — | [pages/18-consolidation-pool.md](pages/18-consolidation-pool.md) | `/procurement/consolidation-pool` | — | ✅ |
 | — | [pages/19-container.md](pages/19-container.md) | `/procurement/container` | — | ✅ |
-| UI-17 | [pages/14-user-management.md](pages/14-user-management.md) | `/system/user` | B-11 | ✅ Phase 3 完成 |
-| UI-18 | [pages/15-role-management.md](pages/15-role-management.md) | `/system/role` | B-11 | ✅ Phase 3 完成 |
+| UI-17 | [pages/14-user-management.md](pages/14-user-management.md) | `/system/user` | B-11 | ✅ 前端完成（权限控制 Phase 3 待 allinone） |
+| UI-18 | [pages/15-role-management.md](pages/15-role-management.md) | `/system/role` | B-11 | ✅ 前端完成（权限控制 Phase 3 待 allinone） |
 | UI-19 | [pages/16-audit-log.md](pages/16-audit-log.md) | `/system/audit-log` | B-11 | 📋 待开发 |
 | UI-20 | [pages/17-profile.md](pages/17-profile.md) | `/profile` | B-11 | 📋 待开发 |
 | — | [05-UI改版方案-橙色商业主题.md](05-UI改版方案-橙色商业主题.md) | — | — | ✅ |

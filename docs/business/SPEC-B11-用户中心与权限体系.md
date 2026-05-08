@@ -1,9 +1,9 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **创建**: 2026-04-30
-> **修订**: 2026-05-07（v1.1.0：JWT 跨服务验证架构 + 注册审核流程 + 数据库规范化）
-> **状态**: 🟡 Phase 2-3 已完成（Phase 4 操作日志、Phase 5 个人中心、Phase 6 注册审核待开发）
+> **修订**: 2026-05-08（v1.2.0：修正权限数量 72→58，Phase 3 标注为未完成，补充 allinone 权限控制缺口）
+> **状态**: 🟡 Phase 2 已完成；Phase 3（权限控制）⚠️ 未完成——allinone JWT 过滤器不提取 permissions，8个业务 Controller 无 @PreAuthorize；Phase 4-6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
 
@@ -562,9 +562,10 @@ public boolean canLogin(User user) {
 
 ## 4. 权限编码规范
 
-### 4.1 权限编码定义（72 条）
+### 4.1 权限编码定义（58 条，实际实现）
 
 **格式**: `{模块}:{动作}`
+**与文档差异**：代码实际 58 条，以下已剔除未实现的 `order:read`、`permission:read`、`audit:export`、`auth:*`、`customs:approve`（用 `customs:update`）、`tax_refund:complete`（用 `tax_refund:update`）。
 
 #### 发注管理模块（procurement）
 
@@ -612,7 +613,6 @@ public boolean canLogin(User user) {
 | `customs:create` | 创建报关单 | 通関書類を作成 | CREATE |
 | `customs:update` | 编辑报关单 | 通関書類を編集 | UPDATE |
 | `customs:delete` | 删除报关单 | 通関書類を削除 | DELETE |
-| `customs:approve` | 审批报关单 | 通関書類を承認 | APPROVE |
 | `japan_customs:read` | 查看日本清关 | 日本通関を表示 | READ |
 | `japan_customs:create` | 创建日本清关 | 日本通関を作成 | CREATE |
 | `japan_customs:start` | 启动清关 | 通関を開始 | START |
@@ -626,7 +626,6 @@ public boolean canLogin(User user) {
 | `tax_refund:read` | 查看退税记录 | 退税記録を表示 | READ |
 | `tax_refund:create` | 创建退税记录 | 退税記録を作成 | CREATE |
 | `tax_refund:update` | 编辑退税记录 | 退税記録を編集 | UPDATE |
-| `tax_refund:complete` | 完成退税 | 退税を完了 | APPROVE |
 | `tax_refund:delete` | 删除退税记录 | 退税記録を削除 | DELETE |
 | `sales:read` | 查看销售记录 | 販売記録を表示 | READ |
 | `sales:create` | 创建销售记录 | 販売記録を作成 | CREATE |
@@ -640,7 +639,6 @@ public boolean canLogin(User user) {
 | `product:create` | 创建商品 | 商品を作成 | CREATE |
 | `product:update` | 编辑商品 | 商品を編集 | UPDATE |
 | `product:delete` | 删除商品 | 商品を削除 | DELETE |
-| `order:read` | 查看订单总览 | 注文一覧を表示 | READ |
 
 #### 系统管理模块
 
@@ -656,17 +654,7 @@ public boolean canLogin(User user) {
 | `role:create` | 创建角色 | 役割を作成 | CREATE |
 | `role:update` | 编辑角色 | 役割を編集 | UPDATE |
 | `role:assign` | 分配角色 | 役割を割り当て | ADMIN |
-| `permission:read` | 查看权限 | 権限を表示 | READ |
 | `audit:read` | 查看操作日志 | 操作ログを表示 | READ |
-| `audit:export` | 导出操作日志 | 操作ログをエクスポート | ADMIN |
-
-#### 认证模块
-
-| 权限编码 | 中文名 | 日文名 | 动作 |
-|---------|--------|--------|------|
-| `auth:register` | 用户注册 | ユーザー登録 | CREATE |
-| `auth:login` | 登录 | ログイン | READ |
-| `auth:logout` | 登出 | ログアウト | UPDATE |
 
 ---
 
@@ -687,16 +675,14 @@ public boolean canLogin(User user) {
 | logistics | ✅ | ✅ | ✅ | ✅ | — |
 | consolidation | ✅ | ✅ | ✅ | ✅ | — |
 | container | ✅ | ✅ | ✅ | ✅ | — |
-| customs | ✅ | ✅ | ✅ | ✅ | ✅ approve |
+| customs | ✅ | ✅ | ✅ | ✅ | — |
 | japan_customs | ✅ | ✅ | — | ✅ | ✅ start/complete |
-| tax_refund | ✅ | ✅ | ✅ | ✅ | ✅ complete |
+| tax_refund | ✅ | ✅ | ✅ | ✅ | — |
 | sales | ✅ | ✅ | ✅ | ✅ | — |
 | factory | ✅ | ✅ | ✅ | ✅ | — |
 | product | ✅ | ✅ | ✅ | ✅ | — |
-| order | ✅ | — | — | — | — |
 | user | ✅ | — | — | — | — |
 | role | ✅ | — | — | — | — |
-| permission | ✅ | — | — | — | — | 查看权限树 |
 | audit | ✅ | — | — | — | — |
 
 ### 5.3 OPERATOR（普通运营）
@@ -716,7 +702,6 @@ public boolean canLogin(User user) {
 | sales | ✅ | ✅ | ✅ | — | — |
 | factory | ✅ | ✅ | ✅ own | — | — |
 | product | ✅ | ✅ | ✅ own | — | — |
-| order | ✅ | — | — | — | — |
 
 > **own** = 只能操作本人创建的数据（`createBy = 当前用户`）
 
@@ -807,7 +792,7 @@ public Result<DemandVO> update(@PathVariable Long id, @RequestBody @Valid Demand
 | 注册审核？ | ✅ | PENDING → APPROVED/REJECTED 状态机，完整流程 + 登录双重校验 |
 | 数据库范式？ | ✅ | position_ids JSON → user_position 中间表（M-N 规范化） |
 | 幂等性？ | ✅ | approve/reject 改为 PUT，审核操作幂等 |
-| 权限完整性？ | ✅ | permission:read 已补充，MANAGER 矩阵已补充，72 条无遗漏 |
+| 权限完整性？ | ✅ | 实际实现 58 条（已修正文档），与 ALL_PERMISSIONS 一致 |
 | 审计日志？ | ✅ | REGISTER/REGISTRATION_APPROVED/REJECTED action 已补充 |
 
 ---
@@ -840,7 +825,9 @@ Phase 2: 用户 CRUD + 角色管理（P0）
   前端: 权限树（只读）
   前端: 待审核用户列表 + 审核弹窗
 
-Phase 3: 前端权限控制（P0）
+Phase 3: 权限控制 ⚠️ 未完成（两个缺口）
+  ⚠️ allinone JwtAuthenticationFilter：第61-63行只提取 `roles`，未提取 `permissions` → SecurityContext 无权限
+  ⚠️ allinone 8个业务 Controller：零个 `@PreAuthorize` 注解 → 增删改查全部裸奔
   前端: 路由守卫增加 hasPermission
   前端: 按钮级 v-if="hasPermission('xxx')"
   前端: 菜单按权限动态显示/隐藏
