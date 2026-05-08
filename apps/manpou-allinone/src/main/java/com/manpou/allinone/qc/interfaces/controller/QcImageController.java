@@ -52,10 +52,11 @@ public class QcImageController {
             }
         }
         String key = cosService.upload(file);
+        String displayUrl = buildDisplayUrl(key);
         QcImage image = new QcImage(
-                key,                             // 存储干净 key（用于 COS delete）
+                extractFilename(key),            // basename: xxx.jpg（用于 COS delete 时提取 key）
                 file.getOriginalFilename(),
-                buildDisplayUrl(key),             // 存储展示 URL（含 query param）
+                displayUrl,                     // 展示 URL（含 query param）
                 file.getSize(),
                 file.getContentType()
         );
@@ -64,7 +65,7 @@ public class QcImageController {
         }
         qcImageRepository.save(image);
         log.info("[QC-Image] uploaded, id={}, key={}", image.getId(), key);
-        return Result.ok(new ImageUploadResult(buildDisplayUrl(key), image.getFilename(), file.getSize()));
+        return Result.ok(new ImageUploadResult(displayUrl, image.getFilename(), file.getSize()));
     }
 
     /**
@@ -92,10 +93,11 @@ public class QcImageController {
         for (MultipartFile file : files) {
             validateFile(file);
             String key = cosService.upload(file);
+            String displayUrl = buildDisplayUrl(key);
             QcImage image = new QcImage(
-                    key,                             // 存储干净 key（用于 COS delete）
+                    extractFilename(key),            // basename: xxx.jpg（用于 COS delete 时提取 key）
                     file.getOriginalFilename(),
-                    buildDisplayUrl(key),             // 存储展示 URL（含 query param）
+                    displayUrl,                     // 展示 URL（含 query param）
                     file.getSize(),
                     file.getContentType()
             );
@@ -103,7 +105,7 @@ public class QcImageController {
                 image.setQcRecordId(qcRecordId);
             }
             qcImageRepository.save(image);
-            results.add(new ImageUploadResult(buildDisplayUrl(key), image.getFilename(), file.getSize()));
+            results.add(new ImageUploadResult(displayUrl, image.getFilename(), file.getSize()));
         }
         return Result.ok(results);
     }
