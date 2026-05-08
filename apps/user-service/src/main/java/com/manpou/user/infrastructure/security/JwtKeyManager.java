@@ -1,11 +1,7 @@
 package com.manpou.user.infrastructure.security;
 
 import com.manpou.user.domain.port.SigningKeyPort;
-import com.manpou.common.time.Clock;
 import com.manpou.common.security.PemParser;
-import com.manpou.user.domain.model.SigningKey;
-import com.manpou.user.domain.model.SigningKeyStatus;
-import com.manpou.user.domain.repository.SigningKeyRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,90 +12,70 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
- * RSA 密钥管理器（支持密钥轮换）。
+ * JWT 密钥管理器（环境变量优先，classpath fallback）。
  *
- * 密钥存储策略：
- * - 公钥：存储在 signing_key 表
- * - 私钥：存储在文件系统 keys/private-{kid}.pem
+ * 加载顺序：
+ * 1. 环境变量 JWT_PRIVATE_KEY / JWT_PUBLIC_KEY（生产/开发推荐）
+ * 2. classpath keys/private.pem / keys/public.pem（初始部署 fallback）
  *
- * 启动流程：
- * 1. 查 DB 获取 ACTIVE 密钥
- * 2. 若无记录：从 classpath 引导（兼容旧部署）
- * 3. 若有记录：从文件系统加载对应私钥
- *
- * 详见 docs/pro/02-user-service.md §认证授权
+ * kid 固定为配置值，无 DB 依赖，避免 DB 与 classpath 密钥不一致的问题。
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtKeyManager implements SigningKeyPort {
 
-    private static final String LEGACY_PRIVATE_KEY_PATH = "keys/private.pem";
-    private static final String LEGACY_PUBLIC_KEY_PATH = "keys/public.pem";
+    @Value("${jwt.key.private:#{null}}")
+    private String privateKeyPem;
 
-    private final SigningKeyRepository signingKeyRepository;
-    private final Clock clock;
+    @Value("${jwt.key.public:#{null}}")
+    private String publicKeyPem;
 
-    @Value("${jwt.key.directory:keys}")
-    private String keyDirectory;
+    @Value("${jwt.key.kid:default-kid}")
+    private String kid;
 
     private PrivateKey privateKey;
     private PublicKey publicKey;
-    private SigningKey currentKey;
 
     @PostConstruct
     public void init() {
-        loadActiveKey();
+        this.privateKey = loadPrivateKey();
+        this.publicKey = loadPublicKey();
+        log.info("JwtKeyManager initialized, kid={}, source=env", kid);
     }
 
-    /**
-     * 加载当前活跃密钥。
-     * 优先从 DB 加载；无记录则从 classpath 引导。
-     */
-    private void loadActiveKey() {
-        Optional<SigningKey> dbKey = signingKeyRepository.findByStatus(SigningKeyStatus.ACTIVE);
-
-        if (dbKey.isPresent()) {
-            currentKey = dbKey.get();
-            this.privateKey = loadPrivateKeyFromPath(currentKey.getPrivateKeyPath());
-            this.publicKey  = PemParser.parsePublicKey(currentKey.getPublicKeyPem());
-            log.info("JWT key loaded from DB: kid={}", currentKey.getKid());
-            return;
+    private PrivateKey loadPrivateKey() {
+        if (privateKeyPem != null && !privateKeyPem.isBlank()) {
+            return PemParser.parsePrivateKey(privateKeyPem);
         }
-
-        // 引导：从 classpath 加载旧密钥并写入 DB
-        log.warn("No active signing key in DB — bootstrapping from classpath (first deployment)");
-        this.privateKey = loadPrivateKeyFromClasspath(LEGACY_PRIVATE_KEY_PATH);
-        this.publicKey = loadPublicKeyFromClasspath(LEGACY_PUBLIC_KEY_PATH);
-        String kid = UUID.randomUUID().toString().substring(0, 8);
-
-        SigningKey bootstrap = new SigningKey();
-        bootstrap.setKid(kid);
-        bootstrap.setPublicKeyPem(PemParser.toPublicPem(publicKey));
-        bootstrap.setPrivateKeyPath(LEGACY_PRIVATE_KEY_PATH); // 引导密钥共享 classpath 路径
-        bootstrap.setStatus(SigningKeyStatus.ACTIVE);
-        bootstrap.setCreateTime(clock.nowLocalDateTime());
-        currentKey = signingKeyRepository.save(bootstrap);
-        log.info("JWT bootstrap key persisted: kid={}", kid);
+        // Fallback: classpath
+        try (InputStream is = new ClassPathResource("keys/private.pem").getInputStream()) {
+            return PemParser.parsePrivateKey(new String(is.readAllBytes(), StandardCharsets.UTF_8));
+        } catch (IOException ex) {
+            throw new IllegalStateException(
+                "RSA private key not found: set jwt.key.private env var or place keys/private.pem on classpath", ex);
+        }
     }
 
-    /** 当前签发密钥 ID。 */
+    private PublicKey loadPublicKey() {
+        if (publicKeyPem != null && !publicKeyPem.isBlank()) {
+            return PemParser.parsePublicKey(publicKeyPem);
+        }
+        // Fallback: classpath
+        try (InputStream is = new ClassPathResource("keys/public.pem").getInputStream()) {
+            return PemParser.parsePublicKey(new String(is.readAllBytes(), StandardCharsets.UTF_8));
+        } catch (IOException ex) {
+            throw new IllegalStateException(
+                "RSA public key not found: set jwt.key.public env var or place keys/public.pem on classpath", ex);
+        }
+    }
+
     public String getCurrentKid() {
-        return currentKey.getKid();
+        return kid;
     }
 
     public PrivateKey getPrivateKey() {
@@ -110,63 +86,28 @@ public class JwtKeyManager implements SigningKeyPort {
         return publicKey;
     }
 
-    /** 当前公钥 PEM（给前端验签用）。 */
+    /** 当前公钥 PEM（供前端验签 / allinone 跨服务拉取） */
     public String getPublicKeyPem() {
-        return currentKey.getPublicKeyPem();
+        if (publicKeyPem != null && !publicKeyPem.isBlank()) {
+            return publicKeyPem;
+        }
+        return PemParser.toPublicPem(publicKey);
     }
 
     /**
-     * 根据 kid 获取公钥 PEM（供 allinone 跨服务验证调用）。
+     * 根据 kid 获取公钥 PEM。
+     * 本实现 kid 固定，忽略入参（AuthController.activePublicKey 使用 getPublicKeyPem 无参版本）。
      */
-    public String getPublicKeyPemByKid(String kid) {
-        return signingKeyRepository.findByKid(kid)
-            .map(SigningKey::getPublicKeyPem)
-            .orElseThrow(() -> new SecurityException("Signing key not found: kid=" + kid));
+    public String getPublicKeyPemByKid(String ignoredKid) {
+        return getPublicKeyPem();
     }
 
-    /**
-     * 热加载密钥（轮换后由 KeyManagementService 调用）。
-     */
+    @Override
     public void reloadActiveKey() {
-        loadActiveKey();
-        log.info("JWT key hot-reloaded: kid={}", currentKey.getKid());
+        log.warn("Hot-reload not supported in env-based key mode — restart to apply changes");
     }
 
-    // ===== 私钥加载 =====
-
-    private PrivateKey loadPrivateKeyFromPath(String relativePath) {
-        try {
-            Path path = Path.of(keyDirectory, relativePath.replace("keys/", ""));
-            if (!path.isAbsolute()) {
-                // 相对于 classpath 根目录
-                try (InputStream is = new ClassPathResource(relativePath).getInputStream()) {
-                    return PemParser.parsePrivateKey(new String(is.readAllBytes(), StandardCharsets.UTF_8));
-                }
-            }
-            return PemParser.parsePrivateKey(Files.readString(path));
-        } catch (IOException ex) {
-            throw new IllegalStateException(
-                "RSA private key not found: " + relativePath, ex);
-        }
+    public String getActivePublicKeyPem() {
+        return getPublicKeyPem();
     }
-
-    private PrivateKey loadPrivateKeyFromClasspath(String path) {
-        try (InputStream is = new ClassPathResource(path).getInputStream()) {
-            return PemParser.parsePrivateKey(new String(is.readAllBytes(), StandardCharsets.UTF_8));
-        } catch (IOException ex) {
-            throw new IllegalStateException(
-                "RSA private key not found on classpath: " + path, ex);
-        }
-    }
-
-    private PublicKey loadPublicKeyFromClasspath(String path) {
-        try (InputStream is = new ClassPathResource(path).getInputStream()) {
-            String pem = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            return PemParser.parsePublicKey(pem);
-        } catch (IOException ex) {
-            throw new IllegalStateException(
-                "RSA public key not found on classpath: " + path, ex);
-        }
-    }
-
 }

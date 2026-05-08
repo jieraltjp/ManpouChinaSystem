@@ -78,11 +78,16 @@ logging:
   org.hibernate.SQL: WARN
   org.hibernate.type.descriptor.sql.BasicBinder: WARN
 
-# JWT 配置（RS256 密钥从 classpath:keys/ 加载）
+# JWT 配置（RS256 密钥从环境变量加载，classpath keys/ 为 fallback）
 jwt:
   access-token-ttl-seconds: 86400     # 1 天
   key:
     algorithm: RS256                   # 非对称签名，公钥暴露给前端
+    kid: ${JWT_KID:e57043d2}          # 密钥 ID，写入 token header "kid"
+    # 私钥（用于签发 token）：环境变量或 application-local.yml
+    private: ${JWT_PRIVATE_KEY:}
+    # 公钥（用于 allinone 跨服务验签）：环境变量或 application-local.yml
+    public: ${JWT_PUBLIC_KEY:}
 
 # ============================================================
 # ConfigSource 配置（ADR-0014 Phase A — 配置抽象层）

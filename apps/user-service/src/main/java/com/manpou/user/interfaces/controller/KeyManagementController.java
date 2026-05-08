@@ -27,26 +27,26 @@ public class KeyManagementController {
     private final KeyManagementService keyManagementService;
 
     /**
-     * 轮换密钥：停用当前密钥，生成并激活新密钥（原子操作）。
+     * 轮换密钥（已禁用）。
+     * 当前使用环境变量加载密钥，轮换请更新 JWT_PRIVATE_KEY / JWT_PUBLIC_KEY 环境变量后重启。
      */
     @PostMapping("/rotate")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(
-        summary = "轮换签名密钥",
-        description = "停用当前 ACTIVE 密钥，生成并激活新密钥。旧密钥保留用于验签历史 Token。"
-    )
+    @Operation(summary = "轮换签名密钥（已禁用）")
     public Result<String> rotateKey() {
-        String newKid = keyManagementService.rotateKey();
-        return Result.ok(newKid);
+        return Result.fail("auth.key-rotation-disabled",
+            "密钥轮换已禁用：使用环境变量 JWT_PRIVATE_KEY / JWT_PUBLIC_KEY 管理密钥，更新后重启生效");
     }
 
     /**
-     * 查询所有密钥元数据（不含私钥）。
+     * 查询所有密钥元数据（已禁用）。
+     * 当前使用环境变量加载密钥，无 DB 元数据。
      */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "查询所有密钥", description = "列出所有密钥的元数据（不含私钥内容）。")
+    @Operation(summary = "查询所有密钥（已禁用）")
     public Result<List<KeyManagementService.KeyInfo>> listKeys() {
-        return Result.ok(keyManagementService.listKeys());
+        return Result.fail("auth.key-list-disabled",
+            "密钥列表已禁用：使用环境变量 JWT_PRIVATE_KEY / JWT_PUBLIC_KEY 管理密钥");
     }
 }
