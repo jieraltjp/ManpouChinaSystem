@@ -1,8 +1,8 @@
 # 运营销售 — 业务规格（步骤8）
 
-> **版本**: 1.3.0
+> **版本**: 1.4.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-27（v1.3.0：修正 estimatedPriceJpy 字段——实际 Entity 不存在，移除；同步实现清单）
+> **更新**: 2026-05-07（v1.4.0：修正 japanCustomsId缺失/safetyThreshold→safetyStock/补全实现清单）
 > **更新**: 2026-04-23（v1.2.0：实现 JapanCustoms→SalesRecord 自动创建 + SalesRecord→ReplenishmentDemand 反馈循环 + SalesChannel 枚举）
 > **状态**: ✅ 已实现
 > **路由**: `/sales/sales-record`
@@ -35,7 +35,7 @@
 SalesRecord（聚合根）
 ├── id: Long
 ├── procurementId: Long                  # 关联采购单
-├── japanCustomsId: Long                # 关联日本清关单
+├── japanCustomsId: Long ⚠️             # ⚠️ Entity中不存在（审计v1.9.0：断裂业务链）
 ├── productCode: String                 # 主货号
 ├── subProductCode: String              # 子货号
 ├── salesChannel: SalesChannel          # 销售渠道
@@ -46,7 +46,7 @@ SalesRecord（聚合根）
 ├── returnedQuantity: Integer           # 累计退货数量
 ├── returnRate: BigDecimal              # 退货率（自动计算）
 ├── sellingPriceJpy: BigDecimal         # 实际销售价（JPY）
-├── safetyThreshold: Integer            # 安全库存阈值
+├── safetyStock: Integer ⚠️             # ⚠️ Entity字段名为safetyStock，非safetyThreshold
 ├── status: SalesStatus                 # LISTED / LOW_STOCK / OUT_OF_STOCK / DISCONTINUED
 ├── remarks: String                    # 备注
 ├── createdBy: String
@@ -54,11 +54,12 @@ SalesRecord（聚合根）
 ├── updatedAt: LocalDateTime
 │
 └── 领域方法
-    ├── list(channel, price, stock)    # 上架
-    ├── decrementStock(quantity)        # 库存扣减（销售出库）
-    ├── incrementStock(quantity)         # 库存回增（退货入库）
+    ├── list(channel, price, stock) ⚠️  # ⚠️ Entity中不存在此方法（待补）
+    ├── updateStock(sold, returned)    # ⚠️ Entity仅此复合方法，无独立decrement/increment
+    ├── decrementStock(quantity) ⚠️      # ⚠️ Entity中不存在（待补）
+    ├── incrementStock(quantity) ⚠️      # ⚠️ Entity中不存在（待补）
     ├── calculateReturnRate()           # 退货率 = returnedQuantity / salesQuantity
-    ├── isLowStock()                   # currentStock < safetyThreshold
+    ├── isLowStock()                   # currentStock < safetyStock
     ├── discontinue()                   # 下架 → status = DISCONTINUED
     └── isTerminal()                   # DISCONTINUED 为终态
 ```
@@ -101,7 +102,7 @@ public enum SalesChannel {
 
 ### 3.2 库存预警
 
-**规则**：`currentStock < safetyThreshold` → status = LOW_STOCK
+**规则**：`currentStock < safetyStock` → status = LOW_STOCK
 `currentStock == 0` → status = OUT_OF_STOCK
 
 ---
@@ -117,7 +118,7 @@ SalesRecord.isLowStock() = true
             demandType = REPLENISHMENT
             productCode = this.productCode
             subProductCode = this.subProductCode
-            quantity = safetyThreshold - currentStock
+            quantity = safetyStock - currentStock
             destination = Procurement.destination（通过 procurementId 查询 Procurement 获取）
             japanLead = this.japanLead（来自 Procurement）
 ```
@@ -166,7 +167,7 @@ DELETE /api/v1/sales-records/{id}                   # 删除（非终态）
 | 库存实时扣减 | 占位 | 销售出库如何触发？平台 webhook？定时同步？ |
 | 退货数据来源 | 占位 | 退货入库如何触发？ |
 | 销售渠道枚举 | 占位 | 具体枚举值需运营方确认 |
-| 补货建议算法 | 无 | safetyThreshold 按商品设置还是全局默认值？ |
+| 补货建议算法 | 无 | safetyStock 按商品设置还是全局默认值？ |
 
 ---
 
@@ -174,6 +175,14 @@ DELETE /api/v1/sales-records/{id}                   # 删除（非终态）
 
 - [x] ✅ `SalesRecord` 聚合根实体
 - [x] ✅ `SalesStatus` 枚举（含 `isTerminal()` + `canTransitionTo()` + `isListed()`）
+
+### ⚠️ 设计缺口（v1.4.0 补充）
+
+| 缺口 | 说明 | 来源 |
+|------|------|------|
+| `japanCustomsId` 字段 | Entity不存在，断裂 JapanCustoms→Sales 业务链 | 审计v1.9.0 §29 |
+| `list(channel, price, stock)` | Entity无此方法 | 审计v1.9.0 §29 |
+| `decrementStock/incrementStock` | Entity仅`updateStock(sold,returned)`复合方法 | 审计v1.9.0 §29 |
 - [x] ✅ `SalesRecordRepository` 领域接口
 - [x] ✅ `SalesRecordAssembler` DTO ↔ Entity 转换器
 - [x] ✅ `SalesRecordUseCase` 用例服务（含库存管理 + 退货率计算）

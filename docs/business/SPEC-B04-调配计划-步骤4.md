@@ -1,8 +1,8 @@
 # SPEC-B04 — 调配计划业务规格（步骤4）
 
-> **版本**: 1.3.0
+> **版本**: 1.4.0
 > **创建**: 2026-04-22
-> **更新**: 2026-05-07（v1.3.0：Container / ConsolidationPool 已实现）
+> **更新**: 2026-05-07（v1.4.0：修正 ContainerCode 4位/池码前缀CP-/ContainerStatus状态名）
 > **状态**: ✅ 已实现（LogisticsPlan + Container + ConsolidationPool）
 > **业务步号**: 04（调配计划）
 > **对应 UI 文档**: `docs/ui/pages/04-logistics.md`
@@ -63,13 +63,13 @@ LogisticsPlan（聚合根）
 ```
 Container（聚合根）
 ├── id: Long
-├── containerCode: String         # C-YYYYMMDD-NNN
+├── containerCode: String         # C-YYYYMMDD-NNNN（4位序号，与代码一致）
 ├── containerNo: String          # 货柜号
 ├── containerType: ContainerType  # 20GP / 40GP / 40HC / 45HC
 ├── sealNo: String               # 封条号
 ├── departurePort: String        # 起运港
 ├── arrivalPort: String         # 目的港
-├── status: ContainerStatus     # LOADING → DEPARTED → ARRIVED → DELIVERED
+├── status: ContainerStatus     # CREATED / LOADED / DEPARTED / ARRIVED（与代码一致）
 └── 领域方法
     └── closeLoading()          # 装柜完成
 ```
@@ -79,7 +79,7 @@ Container（聚合根）
 ```
 ConsolidationPool（聚合根）
 ├── id: Long
-├── poolCode: String             # P-YYYYMMDD-NNN
+├── poolCode: String             # CP-YYYYMMDD-NNN（前缀CP-，与代码一致）
 ├── destination: String         # 目的港
 ├── totalWeight: BigDecimal    # 总重量(kg)
 ├── totalVolume: BigDecimal    # 总体积(m³)
@@ -139,7 +139,7 @@ public enum LogisticsStatus {
 ### Container
 
 ```
-  LOADING ──[开船]──▶ DEPARTED ──[到港]──▶ ARRIVED ──[送达]──▶ DELIVERED
+  CREATED ──[装柜完成]──▶ LOADED ──[开船]──▶ DEPARTED ──[到港]──▶ ARRIVED
 ```
 
 ---
@@ -197,6 +197,6 @@ DELETE /api/v1/consolidation-pools/{poolId}/items/{itemId}
 - [x] ✅ `LogisticsPlanUseCaseTest` 单元测试（12个用例，全部通过）
 - [x] ✅ `@/api/logistics.ts` 前端 API 客户端（v1.2.0 qcRecordId 类型）
 - [x] ✅ `LogisticsPlanPage.vue` 页面（v1.2.0 验货记录下拉替代采购单下拉）
-- [ ] 🔴 `Container` 聚合根实体
-- [ ] 🔴 `ConsolidationPool` 聚合根实体
-- [ ] 🔴 `ConsolidationPoolItem` 聚合根实体
+- [x] ✅ `Container` 聚合根实体（含 `containerCode` C-YYYYMMDD-NNNN）
+- [x] ✅ `ConsolidationPool` 聚合根实体（含 `poolCode` CP-YYYYMMDD-NNN）
+- [x] ✅ `ConsolidationPoolItem` 聚合根实体

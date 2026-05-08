@@ -591,7 +591,9 @@
       "cargoVolumeCbm": "容積",
       "requiresQc": "検品要",
       "status": "ステータス",
-      "action": "操作"
+      "action": "操作",
+      "createTime": "作成日時",
+      "actions": "操作"
     },
     "action": {
       "detail": "詳細",

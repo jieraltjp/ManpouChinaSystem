@@ -633,7 +633,9 @@
       "cargoVolumeCbm": "体积",
       "requiresQc": "需要检测",
       "status": "状态",
-      "action": "操作"
+      "action": "操作",
+      "createTime": "创建时间",
+      "actions": "操作"
     },
     "action": {
       "detail": "详情",
