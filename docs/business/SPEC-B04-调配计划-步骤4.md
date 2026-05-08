@@ -1,7 +1,8 @@
 # SPEC-B04 — 调配计划业务规格（步骤4）
 
-> **版本**: 1.5.0
+> **版本**: 1.6.0
 > **创建**: 2026-04-22
+> **更新**: 2026-05-08（v1.6.0：Container/ConsolidationPool实体完全重写——移除不存在字段sealNo/departurePort/arrivalPort/containerId，更新领域方法为addPlan/removePlan/isReadyToLoad等）
 > **更新**: 2026-05-07（v1.5.0：ConsolidationPool字段名修正；Container.containerCode缺失注⚠️）
 > **状态**: ✅ 已实现（LogisticsPlan + Container + ConsolidationPool）
 > **业务步号**: 04（调配计划）
@@ -63,32 +64,46 @@ LogisticsPlan（聚合根）
 ```
 Container（聚合根）
 ├── id: Long
-├── containerNo: String          # 货柜号（TEMU1234567，UNIQUE）
-├── containerType: ContainerType  # 20GP / 40GP / 40HC / 45HC
-├── sealNo: String               # 封条号
-├── departurePort: String        # 起运港
-├── arrivalPort: String         # 目的港
-├── status: ContainerStatus     # CREATED / LOADED / DEPARTED / ARRIVED（与代码一致）
+├── containerNo: String            # 货柜号（TEMU1234567，UNIQUE）
+├── containerType: ContainerType   # 20GP / 40GP / 40HC / 45HC
+├── totalCbm: BigDecimal          # 总体积（m³）
+├── totalWeightKg: BigDecimal      # 总重量（kg）
+├── planCount: Integer            # 关联计划数
+├── poolId: Long                 # 关联拼柜池
+├── status: ContainerStatus      # CREATED / LOADED / DEPARTED / ARRIVED
+├── loadDate: LocalDate          # 装柜日期
+├── departureDate: LocalDate     # 离港日期
+├── arrivalDate: LocalDate       # 到港日期
 └── 领域方法
-    └── closeLoading()          # 装柜完成
+    ├── addPlan(volumeCbm, weightKg)  # 新增关联计划（累加体积/重量）
+    └── advanceStatus(newStatus)      # 状态推进（含FSM校验）
 ```
+
+> ⚠️ Entity中不存在：`sealNo`（封条号）、`departurePort`（起运港）、`arrivalPort`（目的港）、`closeLoading()` — 均未实现
 
 ### ConsolidationPool（拼柜池）
 
 ```
 ConsolidationPool（聚合根）
 ├── id: Long
-├── poolCode: String             # CP-YYYYMMDD-NNN（前缀CP-，与代码一致）
-├── destinationPort: String ⚠️   # Entity字段名为destinationPort，非destination
-├── totalWeightKg: BigDecimal ⚠️ # Entity字段名为totalWeightKg，非totalWeight
-├── totalCbm: BigDecimal ⚠️     # Entity字段名为totalCbm，非totalVolume
-├── containerId: Long            # 实际货柜（装柜后赋值）
-├── status: PoolStatus          # POOL_PENDING → POOL_READY → LOADED
+├── poolCode: String             # CP-YYYYMMDD-NNN（前缀CP-）
+├── destinationPort: String      # 目的港
+├── totalCbm: BigDecimal        # 总体积（m³）
+├── totalWeightKg: BigDecimal   # 总重量（kg）
+├── planCount: Integer          # 关联计划数
+├── containerThresholdCbm: BigDecimal  # 触发装柜阈值（默认70m³）
+├── status: ConsolidationPoolStatus  # OPEN / PENDING / LOADED / SHIPPED
 └── 领域方法
-    ├── add(qcRecordId)         # 加入拼柜（关联验货记录）
-    ├── remove(qcRecordId)     # 移出
-    └── consolidate(containerId) # 触发装柜
+    ├── addPlan(volumeCbm, weightKg)    # 加入拼柜（累加体积/重量）
+    ├── removePlan(volumeCbm, weightKg) # 移出拼柜（扣除体积/重量）
+    ├── isReadyToLoad()                 # 总体积 >= 阈值
+    ├── closeToPending()                # 封池（OPEN → PENDING）
+    ├── markLoaded()                    # 装柜完成（PENDING → LOADED）
+    ├── markShipped()                   # 出港（LOADED → SHIPPED）
+    └── advanceStatus(newStatus)         # 状态推进（含FSM校验）
 ```
+
+> ⚠️ Entity中不存在：`containerId`（装柜后赋值字段）、`add(qcRecordId)`、`remove(qcRecordId)`、`consolidate(containerId)`
 
 ---
 

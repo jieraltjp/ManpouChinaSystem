@@ -1,6 +1,7 @@
 # SPEC-B02 — 发注单业务规格（步骤2）
 
-> **版本**: 1.11.0
+> **版本**: 1.12.0
+> **更新**: 2026-05-08（v1.12.0：Procurement.linkedDemandId/linkedDemandItemId标记⚠️——Entity不存在，N:1关联改为DemandProcurementMapping表实现）
 > **更新**: 2026-05-07（v1.11.0：ReplenishmentDemand修正为v2.2.0模型；移除/convert改/link；Factory.linkProductCode注⚠️）
 > **更新**: 2026-04-24（v1.6.0：补货需求转采购改为批量模式；一个 ReplenishmentDemand 批量生成多条 Procurement）
 > **更新**: 2026-04-23（补充元数据字段）
@@ -105,8 +106,8 @@ Procurement（聚合根）
 ├── chinaLead: String          # 中国担当
 ├── destination: String        # 发送目的地（转采购时从 SubProductItem 代入）
 ├── customerCompany: String    # 客户公司
-├── linkedDemandId: Long     # 关联的需求单 ID（v1.6.0 新增）
-├── linkedDemandItemId: Long  # 关联的需求单子货号明细 ID（v1.6.0 新增）
+├── linkedDemandId: Long ⚠️ # ⚠️ Entity中不存在；N:1关联改为 DemandProcurementMapping 表实现
+├── linkedDemandItemId: Long ⚠️ # ⚠️ Entity中不存在；N:1关联改为 DemandProcurementMapping 表实现
 ├── leadTimeDays: Integer     # 交货期天数（30/45/60），默认值 30
 ├── cartonNotes: String       # 纸箱备注（v1.9.0 新增）
 ├── afterSalesDeadline: LocalDate  # 售后截止日（v1.10.0 新增）

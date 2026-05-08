@@ -1,7 +1,8 @@
 # 运营销售 — 业务规格（步骤8）
 
-> **版本**: 1.4.0
+> **版本**: 1.5.0
 > **创建**: 2026-04-22
+> **更新**: 2026-05-08（v1.5.0：领域方法修正——移除不存在的list()/decrementStock()/incrementStock()，确认有recalculateReturnRate()/relist()）
 > **更新**: 2026-05-07（v1.4.0：修正 japanCustomsId缺失/safetyThreshold→safetyStock/补全实现清单）
 > **更新**: 2026-04-23（v1.2.0：实现 JapanCustoms→SalesRecord 自动创建 + SalesRecord→ReplenishmentDemand 反馈循环 + SalesChannel 枚举）
 > **状态**: ✅ 已实现
@@ -54,13 +55,11 @@ SalesRecord（聚合根）
 ├── updatedAt: LocalDateTime
 │
 └── 领域方法
-    ├── list(channel, price, stock) ⚠️  # ⚠️ Entity中不存在此方法（待补）
-    ├── updateStock(sold, returned)    # ⚠️ Entity仅此复合方法，无独立decrement/increment
-    ├── decrementStock(quantity) ⚠️      # ⚠️ Entity中不存在（待补）
-    ├── incrementStock(quantity) ⚠️      # ⚠️ Entity中不存在（待补）
-    ├── calculateReturnRate()           # 退货率 = returnedQuantity / salesQuantity
-    ├── isLowStock()                   # currentStock < safetyStock
-    ├── discontinue()                   # 下架 → status = DISCONTINUED
+    ├── updateStock(sold, returned)   # 复合方法：currentStock += returned - sold
+    ├── recalculateReturnRate()        # 退货率 = returnedQuantity / salesQuantity
+    ├── isLowStock()                  # currentStock < safetyStock
+    ├── discontinue()                  # 下架 → status = DISCONTINUED
+    ├── relist()                       # 重新上架（OUT_OF_STOCK → LISTED）
     └── isTerminal()                   # DISCONTINUED 为终态
 ```
 

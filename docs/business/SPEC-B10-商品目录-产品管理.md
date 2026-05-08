@@ -1,6 +1,7 @@
 # SPEC-B10 — 商品目录业务规格（商品类）
 
-> **版本**: 2.1.0
+> **版本**: 2.2.0
+> **更新**: 2026-05-08（v2.2.0：ProductStatus枚举移除⚠️——Entity使用String status，无对应Java枚举）
 > **更新**: 2026-04-24（v2.0.0：关联工厂显示名称 factoryNames；新增日本HS编码/工厂名称筛选）
 > **更新**: 2026-04-24（v1.9.0：关联工厂数量 factoryCount（修复：JPQL from 放错 repository））
 > **更新**: 2026-04-24（v1.6.0：表格列重组；移除库存/箱数；新增含税单价/票点；UI文档同步更新）
@@ -127,13 +128,9 @@ public enum ProductCategory {
     FACTORY_DIRECT    // 工厂直供
 }
 
-public enum ProductStatus {
-    ACTIVE,           // 在售/可用
-    INACTIVE          // 停售/禁用
-}
 ```
 
-> **ProductStatus 与 category 的区别**：category 是商品类型（商业模式），status 是上下架状态（运营状态）。两者独立，含义不同。
+> ⚠️ **Entity使用 `String status`，非 `ProductStatus` 枚举**。DB中 `goods_master.商品区分` 直接存字符串（如"通常"/"予約"），Entity 无对应 Java 枚举。`ProductStatus` 枚举仅为文档说明业务含义。
 
 ---
 
