@@ -1,8 +1,8 @@
 # 订单总览 — API 设计
 
-> **版本**: 3.0.0
+> **版本**: 3.1.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-28（v3.0.0：彻底移除双 Tab 架构，改为单一 v_order_chain 视图；一行 = 一个 Demand，LEFT JOIN 串联全链路8步）
+> **更新**: 2026-05-07（v3.1.0：OrderChainVO字段修正；productNameZh嵌套SnapshotVO；仅step1-4Status）
 > **状态**: ✅ 已实现（v3.0.0 单视图架构 + OrderOverviewPage.vue）
 > **对应前端**: `OrderOverviewPage.vue` · `docs/ui/pages/09-order-overview.md`
 > **对应 DB 文档**: `docs/database/DB-09-order-overview.md`
@@ -118,28 +118,31 @@ replenishment_demand (锚点)
 
 ### 3.1 OrderChainVO（列表行）
 
-| 字段 | 类型 | 来源表 | 说明 |
-|------|------|--------|------|
-| `demandId` | Long | replenishment_demand | 需求单 ID |
-| `demandCode` | String | replenishment_demand | 需求单号 |
-| `demandType` | String | replenishment_demand | REPLENISHMENT / NEW_PURCHASE |
-| `demandProductCode` | String | replenishment_demand | 主货号 |
-| `demandSubProductCode` | String | replenishment_demand | 子货号全码 |
-| `demandQuantity` | Integer | replenishment_demand | 需求数量 |
-| `demandDestination` | String | replenishment_demand | 目的地 |
-| `demandJapanLead` | String | replenishment_demand | 日本担当 |
-| `demandStatus` | String | replenishment_demand | PENDING / CONFIRMED |
-| `linkedProcurementId` | Long | replenishment_demand | 关联的发注单 ID |
-| `productNameZh` | String | product | 商品中文名 |
-| `productCategory` | String | product | OEM / ORDINARY / FACTORY_DIRECT |
-| `step1Status` | String | computed | COMPLETED / NOT_STARTED |
-| `step2Status` | String | computed | COMPLETED / NOT_STARTED |
-| `step3Status` | String | computed | COMPLETED / NOT_STARTED |
-| `step4Status` | String | computed | COMPLETED / NOT_STARTED |
-| `step5Status` | String | computed | COMPLETED / NOT_STARTED |
-| `step6Status` | String | computed | COMPLETED / NOT_STARTED |
-| `step7Status` | String | computed | COMPLETED / NOT_STARTED |
-| `step8Status` | String | computed | COMPLETED / NOT_STARTED |
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `demandId` | Long | 需求单 ID |
+| `demandCode` | String | 需求单号 |
+| `demandType` | String | REPLENISHMENT / NEW_PURCHASE |
+| `demandProductCode` | String | 主货号 |
+| `demandSubProductCode` | String | 子货号全码 |
+| `demandQuantity` | Integer | 需求数量 |
+| `demandDestination` | String | 目的地 |
+| `demandJapanLead` | String | 日本担当 |
+| `demandStatus` | String | PENDING / CONFIRMED |
+| `linkedProcurementId` | Long | 关联的发注单 ID |
+| `demandImageUrl` | String | ⚠️ 文档未列，Entity有 |
+| `demandCreateTime` | LocalDateTime | ⚠️ 文档未列，Entity有 |
+| `demandUpdateTime` | LocalDateTime | ⚠️ 文档未列，Entity有 |
+| `snapshot` | SnapshotVO ⚠️ | ⚠️ productNameZh/category嵌套在此，非直接字段 |
+| `step1Status` | String | COMPLETED / NOT_STARTED |
+| `step2Status` | String | COMPLETED / NOT_STARTED |
+| `step3Status` | String | COMPLETED / NOT_STARTED |
+| `step4Status` | String | COMPLETED / NOT_STARTED |
+
+> ⚠️ **v3.1.0 修正**：
+> - `productNameZh`/`productCategory` 嵌套在 `SnapshotVO` 内，非直接字段
+> - 仅 `step1Status`~`step4Status`（无 step5~step8Status）
+> - `demandImageUrl`/`demandCreateTime`/`demandUpdateTime` 文档未列但 Entity 有
 
 ### 3.2 OrderChainDetailVO（详情）
 

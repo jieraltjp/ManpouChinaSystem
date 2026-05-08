@@ -1,7 +1,7 @@
 # SPEC-B02 — 发注单业务规格（步骤2）
 
-> **版本**: 1.10.0
-> **更新**: 2026-04-28（v1.10.0：新增售后截止日 afterSalesDeadline 字段）
+> **版本**: 1.11.0
+> **更新**: 2026-05-07（v1.11.0：ReplenishmentDemand修正为v2.2.0模型；移除/convert改/link；Factory.linkProductCode注⚠️）
 > **更新**: 2026-04-24（v1.6.0：补货需求转采购改为批量模式；一个 ReplenishmentDemand 批量生成多条 Procurement）
 > **更新**: 2026-04-23（补充元数据字段）
 > **创建**: 2026-04-22
@@ -24,21 +24,26 @@
 
 ### 2.1 ReplenishmentDemand（补货需求单）
 
-> **入口**：步骤1已创建，此处引用。（v1.6.0：支持批量转采购）
+> ⚠️ **v2.2.0 重大变更**：字段与 v1.x 完全重构。以下为 v2.2.0 最新结构。
+> **入口**：步骤1已创建，此处引用。（v2.2.0：批量转采购改为通过 DemandProcurementMapping 关联）
 
 ```
-ReplenishmentDemand（聚合根）
+ReplenishmentDemand（聚合根）— v2.2.0
 ├── id: Long
 ├── demandCode: String           # D-YYYYMMDD-NNN
 ├── demandType: DemandType        # REPLENISHMENT / NEW_PURCHASE
 ├── productCode: String           # 主货号
-├── subProductItems: List<SubProductItem> # 子货号明细（JSON；含数量+目的地）
-├── japanLead: String            # 日本担当（整单共用）
-├── status: DemandStatus        # PENDING → CONVERTED → CANCELLED
-├── linkedDemandItems: List<LinkedDemandItem> # 关联的 Procurement 明细（CONVERTED时填充）
+├── subProductCode: String        # 子货号/枝番
+├── quantity: Integer             # 数量
+├── destination: String          # 目的地
+├── japanLead: String            # 日本担当
+├── status: DemandStatus ⚠️      # ⚠️ v2.2.0: PENDING → CONFIRMED（原CONVERTED/CANCELLED已移除）
+├── linkedProcurementId: Long    # 关联采购单ID（CONFIRMED时赋值）
+├── imageUrl: String             # 商品图片
+├── remarks: String
 └── 领域方法
-    ├── convertToProcurement(factoryId)  # 转为发注单，批量生成 Procurement（v1.6.0）
-    └── cancel()                        # 取消需求
+    ├── markAsLinked(procurementId) ⚠️  # ⚠️ v2.2.0替代convertToProcurement()
+    └── unlinkProcurement() ⚠️          # ⚠️ v2.2.0替代cancel()
 ```
 
 ### 2.2 Factory（工厂）
@@ -68,7 +73,7 @@ Factory（聚合根）
 ├── paymentTerms: PaymentTerms  # 账期
 ├── notes: String              # 备注
 └── 领域方法
-    └── linkProductCode(code)   # 关联货号
+    └── linkProductCode(code) ⚠️  # ⚠️ Entity未实现此方法（审计v2.0.0 §SPEC）
 ```
 
 ### 2.3 Procurement（发注单）
@@ -199,9 +204,15 @@ GET    /api/v1/demands?page=&pageSize=&demandType=&productCode=&status=
 GET    /api/v1/demands/{id}
 POST   /api/v1/demands
 PATCH  /api/v1/demands/{id}
-POST   /api/v1/demands/{id}/convert    # 转采购 → 批量创建 N 条 Procurement（v1.6.0）
 DELETE /api/v1/demands/{id}
+POST   /api/v1/demands/{id}/link          # v2.2.0：关联采购单 → status=CONFIRMED
+POST   /api/v1/demands/{id}/unlink         # v2.2.0：取消关联 → status=PENDING
+GET    /api/v1/demands/{id}/procurement    # 获取关联的采购单列表
+GET    /api/v1/demands/suggest/destinations # 目的港自动补全
+GET    /api/v1/demands/suggest/japan-leads  # 日本担当自动补全
 ```
+
+> ⚠️ **v2.2.0 变更**：`/convert` 端点已移除，改用 `/link`+`DemandProcurementMapping` 表实现多对多关联。
 
 ### FactoryController
 

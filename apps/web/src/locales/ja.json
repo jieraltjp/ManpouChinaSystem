@@ -660,7 +660,7 @@
       "planTypeRequired": "配送タイプを選択してください"
     },
     "poolStatus": {
-      "OPEN": "</minimax:tool_call>",
+      "OPEN": "開放中",
       "PENDING": "積載待ち",
       "LOADED": "積載済",
       "SHIPPED": "出荷済"
@@ -690,7 +690,7 @@
       },
       "column": {
         "containerNo": "コンテナ番号",
-        "containerType": "柜型",
+        "containerType": "サイズ",
         "totalCbm": "積載容量",
         "totalWeightKg": "積載重量",
         "planCount": "計画数",
@@ -699,33 +699,6 @@
         "departureDate": "出発日",
         "arrivalDate": "到着日"
       }
-    }
-  },
-  "pool": {
-    "newButton": "新規コンソリ池",
-    "editTitle": "コンソリ池編集",
-    "deleteConfirm": "コンソリ池「{code}」を削除しますか？",
-    "createContainer": "コンテナ作成",
-    "createContainerConfirm": "コンソリ池「{poolCode}」のコンテナを作成しますか？",
-    "containerCreated": "コンテナ作成成功",
-    "destinationRequired": "寄港地は必須です",
-    "destinationPlaceholder": "例: Tokyo, Yokohama",
-    "filter": {
-      "status": "池ステータス",
-      "destinationPort": "寄港地",
-      "destinationHint": "寄港地を入力"
-    },
-    "column": {
-      "poolCode": "池番号",
-      "destinationPort": "寄港地",
-      "totalCbm": "総容量",
-      "totalWeightKg": "総重量",
-      "planCount": "計画数",
-      "threshold": "トリガー閾値",
-      "status": "ステータス"
-    },
-    "action": {
-      "createContainer": "コンテナ作成"
     }
   },
   "factory": {

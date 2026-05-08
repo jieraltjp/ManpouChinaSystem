@@ -1,7 +1,7 @@
 # 发注管理 — 领域模型
 
-> **版本**: 1.6.1
-> **更新**: 2026-05-07（v1.6.1：补 Phase2 状态及前后端 FSM 不一致警告）
+> **版本**: 1.7.0
+> **更新**: 2026-05-07（v1.7.0：DemandStatus修正为v2.2.0模型；Factory.linkProductCode()注⚠️）
 > **依据**: 业务流分析（8步全链路） + `SPEC-B02-发注单-步骤2.md`
 
 > **代码实现进度**:
@@ -43,15 +43,15 @@ ReplenishmentDemand（聚合根）
 ├── quantity: Integer               # 需求量
 ├── destination: String             # 目的地
 ├── japanLead: String               # 日本担当
-├── status: DemandStatus            # PENDING(待确认) | CONFIRMED(已确认) | CONVERTED(已转采购) | CANCELLED(取消)
-├── linkedProcurementId: Long        # 关联的采购单ID（status=CONVERTED 时赋值）
+├── status: DemandStatus ⚠️        # ⚠️ v2.2.0后仅PENDING/CONFIRMED（原CONVERTED/CANCELLED已移除）
+├── linkedProcurementId: Long        # 关联的采购单ID（status=CONFIRMED 时赋值）
 ├── createdBy: String
 ├── createdAt: LocalDateTime
 ├── updatedAt: LocalDateTime
 │
 └── 领域方法
-    ├── convertToProcurement()       # 转为采购单，生成 Procurement 记录
-    └── cancel()                     # 取消需求
+    ├── markAsLinked(procurementId) ⚠️  # ⚠️ v2.2.0替代convertToProcurement()
+    └── unlinkProcurement() ⚠️          # ⚠️ v2.2.0替代cancel()
 ```
 
 **DemandType 枚举：**
@@ -63,13 +63,12 @@ public enum DemandType {
 }
 ```
 
-**DemandStatus 枚举：**
+**DemandStatus 枚举（v2.2.0）：**
 
 ```java
 public enum DemandStatus {
     PENDING,      // 待确认（录入后默认状态）
-    CONVERTED,   // 已转采购（生成 Procurement 后推进至此）
-    CANCELLED    // 已取消
+    CONFIRMED    // 已关联采购单（由 markAsLinked() 推进）
 }
 ```
 
