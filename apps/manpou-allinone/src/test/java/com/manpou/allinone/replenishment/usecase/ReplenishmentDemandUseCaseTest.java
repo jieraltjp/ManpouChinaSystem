@@ -148,12 +148,12 @@ class ReplenishmentDemandUseCaseTest {
         ReplenishmentDemandQuery query = new ReplenishmentDemandQuery();
         query.setPage(0);
         query.setPageSize(20);
-        query.setProductCode("odn999");
+        query.setKeyword("odn999");
 
         var result = demandUseCase.pageQuery(query);
 
         assertThat(result.getContent())
-                .allMatch(d -> d.getProductCode().equals("odn999"));
+                .allMatch(d -> d.getProductCode().contains("odn999"));
     }
 
     @Test

@@ -13,8 +13,6 @@ public interface ProductFactoryRepository {
 
     Optional<ProductFactory> findById(Long id);
 
-    ProductFactory save(ProductFactory entity);
-
     void deleteById(Long id);
 
     List<ProductFactory> findByProductId(Long productId);
