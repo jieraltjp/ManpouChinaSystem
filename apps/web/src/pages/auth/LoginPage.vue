@@ -289,10 +289,11 @@ async function submitLogin() {
 .lang-switcher {
   position: absolute;
   top: 28px;
-  right: 36px;
+  left: 36px;
   display: flex;
   align-items: center;
   gap: 10px;
+  z-index: 10;
 }
 .lang-label {
   font-size: 12px;
@@ -387,5 +388,14 @@ async function submitLogin() {
     flex: 1;
     padding: 32px 24px;
   }
+}
+
+/* 语言切换按钮 — 确保可点击 */
+.lang-switcher .el-radio-button {
+  overflow: visible;
+}
+.lang-switcher .el-radio-button__inner {
+  cursor: pointer;
+  user-select: none;
 }
 </style>

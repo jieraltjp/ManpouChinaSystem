@@ -164,13 +164,13 @@ const routes: RouteRecordRaw[] = [
             path: 'user',
             name: 'SystemUser',
             component: () => import('@/pages/system/UserPage.vue'),
-            meta: { titleKey: 'menu.user', requiresAuth: true },
+            meta: { titleKey: 'menu.user', requiresAuth: true, roles: ['ADMIN', 'MANAGER'] },
           },
           {
             path: 'role',
             name: 'SystemRole',
             component: () => import('@/pages/system/RolePage.vue'),
-            meta: { titleKey: 'menu.role', requiresAuth: true },
+            meta: { titleKey: 'menu.role', requiresAuth: true, roles: ['ADMIN'] },
           },
           {
             path: 'cos-test',
@@ -200,6 +200,17 @@ router.beforeEach((to, _from, next) => {
   if (to.meta.requiresAuth !== false && !auth.isAuthenticated) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
     return
+  }
+
+  // 检查角色限制（meta.roles）
+  const allowedRoles = (to.meta.roles as string[] | undefined)
+  if (allowedRoles && allowedRoles.length > 0) {
+    const userRoles = auth.claims?.roles ?? []
+    const hasRole = allowedRoles.some(r => userRoles.includes(r))
+    if (!hasRole) {
+      next({ name: 'ProcurementOrder' })
+      return
+    }
   }
 
   if (to.name === 'Login' && auth.isAuthenticated) {

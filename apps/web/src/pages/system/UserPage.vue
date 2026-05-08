@@ -63,7 +63,7 @@
         <el-form-item>
           <el-button type="primary" @click="onSearch">{{ $t('common.button.search') }}</el-button>
           <el-button @click="onReset">{{ $t('common.button.reset') }}</el-button>
-          <el-button type="primary" @click="onNew">
+          <el-button v-if="hasPermission('user:create')" type="primary" @click="onNew">
             <el-icon><Plus /></el-icon>{{ $t('user.newButton') }}
           </el-button>
         </el-form-item>
@@ -101,12 +101,12 @@
         <el-table-column :label="$t('user.column.action')" min-width="220" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('user.action.detail') }}</el-button>
-            <el-button link class="btn-blue" size="small" @click.stop="onEdit(row)">{{ $t('user.action.edit') }}</el-button>
-            <el-button link type="warning" size="small" @click.stop="onAssignRole(row)">{{ $t('user.action.assignRole') }}</el-button>
-            <el-button link :type="row.status === 1 ? 'danger' : 'success'" size="small" @click.stop="onToggleStatus(row)">
+            <el-button v-if="hasPermission('user:update')" link class="btn-blue" size="small" @click.stop="onEdit(row)">{{ $t('user.action.edit') }}</el-button>
+            <el-button v-if="hasPermission('role:assign')" link type="warning" size="small" @click.stop="onAssignRole(row)">{{ $t('user.action.assignRole') }}</el-button>
+            <el-button v-if="hasPermission('user:update')" link :type="row.status === 1 ? 'danger' : 'success'" size="small" @click.stop="onToggleStatus(row)">
               {{ row.status === 1 ? $t('user.action.disable') : $t('user.action.enable') }}
             </el-button>
-            <el-button link class="btn-blue" size="small" @click.stop="onResetPwd(row)">
+            <el-button v-if="hasPermission('user:reset_password')" link class="btn-blue" size="small" @click.stop="onResetPwd(row)">
               {{ $t('user.action.resetPassword') }}
             </el-button>
           </template>
@@ -220,9 +220,11 @@ import * as userApi from '@/api/user'
 import * as roleApi from '@/api/role'
 import type { UserVO, UserCreateCmd, UserUpdateCmd } from '@/api/user'
 import type { RoleVO } from '@/api/role'
+import { usePermission } from '@/composables/usePermission'
 
 const { t, locale } = useI18n()
 const currentLocale = computed(() => locale.value)
+const { hasPermission } = usePermission()
 
 // ===== 状态 =====
 const loading = ref(false)
