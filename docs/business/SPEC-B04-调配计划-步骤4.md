@@ -1,8 +1,8 @@
 # SPEC-B04 — 调配计划业务规格（步骤4）
 
-> **版本**: 1.4.0
+> **版本**: 1.5.0
 > **创建**: 2026-04-22
-> **更新**: 2026-05-07（v1.4.0：修正 ContainerCode 4位/池码前缀CP-/ContainerStatus状态名）
+> **更新**: 2026-05-07（v1.5.0：ConsolidationPool字段名修正；Container.containerCode缺失注⚠️）
 > **状态**: ✅ 已实现（LogisticsPlan + Container + ConsolidationPool）
 > **业务步号**: 04（调配计划）
 > **对应 UI 文档**: `docs/ui/pages/04-logistics.md`
@@ -63,8 +63,7 @@ LogisticsPlan（聚合根）
 ```
 Container（聚合根）
 ├── id: Long
-├── containerCode: String         # C-YYYYMMDD-NNNN（4位序号，与代码一致）
-├── containerNo: String          # 货柜号
+├── containerNo: String          # 货柜号（TEMU1234567，UNIQUE）
 ├── containerType: ContainerType  # 20GP / 40GP / 40HC / 45HC
 ├── sealNo: String               # 封条号
 ├── departurePort: String        # 起运港
@@ -80,11 +79,11 @@ Container（聚合根）
 ConsolidationPool（聚合根）
 ├── id: Long
 ├── poolCode: String             # CP-YYYYMMDD-NNN（前缀CP-，与代码一致）
-├── destination: String         # 目的港
-├── totalWeight: BigDecimal    # 总重量(kg)
-├── totalVolume: BigDecimal    # 总体积(m³)
-├── containerId: Long          # 实际货柜（装柜后赋值）
-├── status: PoolStatus         # POOL_PENDING → POOL_READY → LOADED
+├── destinationPort: String ⚠️   # Entity字段名为destinationPort，非destination
+├── totalWeightKg: BigDecimal ⚠️ # Entity字段名为totalWeightKg，非totalWeight
+├── totalCbm: BigDecimal ⚠️     # Entity字段名为totalCbm，非totalVolume
+├── containerId: Long            # 实际货柜（装柜后赋值）
+├── status: PoolStatus          # POOL_PENDING → POOL_READY → LOADED
 └── 领域方法
     ├── add(qcRecordId)         # 加入拼柜（关联验货记录）
     ├── remove(qcRecordId)     # 移出

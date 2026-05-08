@@ -28,7 +28,7 @@ function containerStatusTag(type: ContainerStatus) {
 }
 
 function containerStatusLabel(type: ContainerStatus) {
-  return t(`logistics.container.status.${type}`)
+  return t(`logistics.containerStatus.${type}`)
 }
 
 function containerTypeLabel(type: ContainerType) {

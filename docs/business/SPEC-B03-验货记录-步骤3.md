@@ -1,6 +1,7 @@
 # SPEC-B03 — 验货记录业务规格（步骤3）
 
-> **版本**: 1.1.1
+> **版本**: 1.1.2
+> **更新**: 2026-05-07（v1.1.2：注⚠️QcRecord.taxRefund字段Entity仍存在，与文档v1.1.1不一致）
 > **更新**: 2026-04-27（v1.1.1：移除 QcRecord.taxRefund，退税由采购层 billingType 决定）
 > **更新**: 2026-04-27（v1.1.0：新增验货完成后自动推进采购单状态；新增选择采购后代入字段自动预填）
 > **更新**: 2026-04-23（补充元数据字段）
@@ -23,6 +24,8 @@
 **关键设计**：QcRecord 从内嵌值对象升级为独立聚合根，可独立查询和追踪。
 
 **v1.1.1 字段移除**：`taxRefund`（是否退税）已从 QcRecord 移除。退税决策属于采购层，由 `Procurement.billingType`（报关类型）决定。
+
+> ⚠️ **v1.1.2 补充**：Entity `QcRecord.java` 仍含 `taxRefund` 字段（DB列未DROP），与文档v1.1.1不一致。此为代码与文档的差距，待决策是否从Entity中移除。
 
 **v1.1.0 新增自动行为**：
 - 创建验货记录时，若 `sellerName` 未填，自动从关联 Procurement.factoryId → Factory.factoryName 代入（K-03 规则）
