@@ -1,8 +1,8 @@
 # 运营销售 — 业务规格（步骤8）
 
-> **版本**: 1.5.0
+> **版本**: 1.6.0
 > **创建**: 2026-04-22
-> **更新**: 2026-05-08（v1.5.0：领域方法修正——移除不存在的list()/decrementStock()/incrementStock()，确认有recalculateReturnRate()/relist()）
+> **更新**: 2026-05-08（v1.6.0：safetyStock字段移除冗余⚠️标注（字段名已正确）；v1.5.0确认有recalculateReturnRate()/relist()）
 > **更新**: 2026-05-07（v1.4.0：修正 japanCustomsId缺失/safetyThreshold→safetyStock/补全实现清单）
 > **更新**: 2026-04-23（v1.2.0：实现 JapanCustoms→SalesRecord 自动创建 + SalesRecord→ReplenishmentDemand 反馈循环 + SalesChannel 枚举）
 > **状态**: ✅ 已实现
@@ -47,7 +47,7 @@ SalesRecord（聚合根）
 ├── returnedQuantity: Integer           # 累计退货数量
 ├── returnRate: BigDecimal              # 退货率（自动计算）
 ├── sellingPriceJpy: BigDecimal         # 实际销售价（JPY）
-├── safetyStock: Integer ⚠️             # ⚠️ Entity字段名为safetyStock，非safetyThreshold
+├── safetyStock: Integer                # 安全库存阈值
 ├── status: SalesStatus                 # LISTED / LOW_STOCK / OUT_OF_STOCK / DISCONTINUED
 ├── remarks: String                    # 备注
 ├── createdBy: String
