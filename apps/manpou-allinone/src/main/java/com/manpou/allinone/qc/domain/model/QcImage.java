@@ -26,12 +26,14 @@ public class QcImage {
     private Long qcRecordId;
 
     @Column(name = "filename", nullable = false)
+    @Setter
     private String filename;
 
     @Column(name = "original_name", nullable = false)
     private String originalName;
 
     @Column(name = "url", nullable = false, length = 512)
+    @Setter
     private String url;
 
     @Column(name = "size", nullable = false)

@@ -52,11 +52,11 @@ public class QcImageController {
             }
         }
         String key = cosService.upload(file);
-        String displayUrl = buildDisplayUrl(key);
+        String url = cosConfig.getDomain() + "/" + key;  // 干净 URL，无 query param
         QcImage image = new QcImage(
-                extractFilename(key),            // basename: xxx.jpg（用于 COS delete 时提取 key）
+                extractFilename(key),    // basename: xxx.jpg
                 file.getOriginalFilename(),
-                displayUrl,                     // 展示 URL（含 query param）
+                url,
                 file.getSize(),
                 file.getContentType()
         );
@@ -65,7 +65,7 @@ public class QcImageController {
         }
         qcImageRepository.save(image);
         log.info("[QC-Image] uploaded, id={}, key={}", image.getId(), key);
-        return Result.ok(new ImageUploadResult(displayUrl, image.getFilename(), file.getSize()));
+        return Result.ok(new ImageUploadResult(url, image.getFilename(), file.getSize()));
     }
 
     /**
@@ -93,11 +93,11 @@ public class QcImageController {
         for (MultipartFile file : files) {
             validateFile(file);
             String key = cosService.upload(file);
-            String displayUrl = buildDisplayUrl(key);
+            String url = cosConfig.getDomain() + "/" + key;  // 干净 URL，无 query param
             QcImage image = new QcImage(
-                    extractFilename(key),            // basename: xxx.jpg（用于 COS delete 时提取 key）
+                    extractFilename(key),    // basename: xxx.jpg
                     file.getOriginalFilename(),
-                    displayUrl,                     // 展示 URL（含 query param）
+                    url,
                     file.getSize(),
                     file.getContentType()
             );
@@ -105,7 +105,7 @@ public class QcImageController {
                 image.setQcRecordId(qcRecordId);
             }
             qcImageRepository.save(image);
-            results.add(new ImageUploadResult(displayUrl, image.getFilename(), file.getSize()));
+            results.add(new ImageUploadResult(url, image.getFilename(), file.getSize()));
         }
         return Result.ok(results);
     }
@@ -138,7 +138,7 @@ public class QcImageController {
     }
 
     /**
-     * 临时清理接口：修复含 ?response-content-disposition=inline 的脏 URL。
+     * 临时清理接口：修复脏数据。
      * 修复完成后删除此接口。
      */
     @PostMapping("/cleanup-urls")
@@ -148,18 +148,29 @@ public class QcImageController {
         int count = 0;
         for (QcImage img : all) {
             String url = img.getUrl();
-            if (url != null && url.contains("?response-content-disposition=inline")) {
-                String cleanUrl = url.replace("?response-content-disposition=inline", "");
-                img.setUrl(cleanUrl);
-                // filename 去掉路径前缀，只保留 basename
-                String fn = img.getFilename();
-                if (fn != null && fn.contains("/")) {
-                    fn = fn.substring(fn.lastIndexOf('/') + 1);
+            String fn = img.getFilename();
+            boolean dirty = false;
+
+            // 去掉 url 中的 query string
+            if (url != null && url.contains("?")) {
+                img.setUrl(url.substring(0, url.indexOf('?')));
+                dirty = true;
+            }
+
+            // filename 必须是纯 basename
+            if (fn != null) {
+                String cleanFn = fn;
+                int qi = cleanFn.indexOf('?');
+                if (qi >= 0) cleanFn = cleanFn.substring(0, qi);
+                int slashIdx = cleanFn.lastIndexOf('/');
+                if (slashIdx >= 0) cleanFn = cleanFn.substring(slashIdx + 1);
+                if (!cleanFn.equals(fn)) {
+                    img.setFilename(cleanFn);
+                    dirty = true;
                 }
-                if (fn != null && fn.contains("?")) {
-                    fn = fn.substring(0, fn.indexOf('?'));
-                }
-                img.setFilename(fn);
+            }
+
+            if (dirty) {
                 qcImageRepository.save(img);
                 count++;
             }
@@ -183,17 +194,9 @@ public class QcImageController {
         }
     }
 
-    private String extractFilename(String url) {
-        if (url == null) return null;
-        // 防腐：先剥离 query string（?response-content-disposition=inline 等）
-        int q = url.indexOf('?');
-        if (q >= 0) url = url.substring(0, q);
-        int lastSlash = url.lastIndexOf('/');
-        return lastSlash >= 0 ? url.substring(lastSlash + 1) : url;
-    }
-
-    /** 构造带 inline disposition 的展示 URL */
-    private String buildDisplayUrl(String key) {
-        return cosConfig.getDomain() + "/" + key + "?response-content-disposition=inline";
+    /** 从 COS key 提取 basename（如 qc-images/2026/05/08/xxx.jpg → xxx.jpg） */
+    private String extractFilename(String key) {
+        int slashIdx = key.lastIndexOf('/');
+        return slashIdx >= 0 ? key.substring(slashIdx + 1) : key;
     }
 }
