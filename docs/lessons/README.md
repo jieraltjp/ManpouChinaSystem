@@ -19,12 +19,13 @@
 | [LESSONS-JWT-CROSS-SERVICE.md](./LESSONS-JWT-CROSS-SERVICE.md) | allinone 只读验签 / Map 反序列化 / RS256 kid 提取 | 72–73 |
 | [LESSON-75.md](./LESSON-75.md) | allinone JWT 遗漏 permissions 导致 @PreAuthorize 失效 | 75 |
 | [LESSON-76.md](./LESSON-76.md) | allinone 重启流程——JAR 锁定的正确处理 | 76 |
+| [LESSON-COS-URL-QUERY-PARAM.md](./LESSON-COS-URL-QUERY-PARAM.md) | CosService.upload() 返回 URL 含 query param，提取方法未同步剥离 → COS 预览 404 | 77 |
+| [LESSON-PERMISSION-AUDIT-2026-05-08.md](./LESSON-PERMISSION-AUDIT-2026-05-08.md) | 权限三角审计：前端/后端/DB 完全一致，8条孤岛权限无影响 | 78 |
 | [LESSON-55-56.md](./LESSON-55-56.md) | el-input-number 列宽 + dialog 紧凑设计 | 55, 56 |
 | [LESSON-57.md](./LESSON-57.md) | 业务锚点变更：procurementId → qcRecordId | 57 |
 | [LESSON-58.md](./LESSON-58.md) | el-input-number 按钮截断：padding 计算漏扣 | 58 |
 | [LESSON-60.md](./LESSON-60.md) | Spring Data JPA nativeQuery + Pageable ORDER BY 陷阱 | 60 |
 | [LESSON-API-UNWRAP-CONSISTENCY.md](./LESSON-API-UNWRAP-CONSISTENCY.md) | client.ts Result<T> 解包一致性 | 74 |
-| [LESSON-COS-URL-QUERY-PARAM.md](./LESSON-COS-URL-QUERY-PARAM.md) | CosService.upload() 返回 URL 含 query param，提取方法未同步剥离 → COS 预览 404 | 77 |
 | [BUSINESS-LOGIC-AUDIT-2026-05-07.md](../audit/BUSINESS-LOGIC-AUDIT-2026-05-07.md) | FSM·DB-Entity·计算字段·字段必填五层对齐审计 | — |
 
 ---
