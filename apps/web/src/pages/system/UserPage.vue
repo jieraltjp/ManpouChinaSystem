@@ -188,7 +188,7 @@
       </el-checkbox-group>
       <template #footer>
         <el-button @click="roleVisible = false">{{ $t('user.dialog.cancel') }}</el-button>
-        <el-button type="primary" :loading="roleSaving" @click="onSaveRoles">{{ $t('user.dialog.save') }}</el-button>
+        <el-button v-if="hasPermission('role:assign')" type="primary" :loading="roleSaving" @click="onSaveRoles">{{ $t('user.dialog.save') }}</el-button>
       </template>
     </el-dialog>
 
@@ -203,7 +203,7 @@
       <div v-else style="text-align:center;color:#909399">—</div>
       <template #footer>
         <el-button @click="pwdVisible = false">{{ $t('user.dialog.cancel') }}</el-button>
-        <el-button type="primary" :loading="pwdLoading" @click="doResetPassword" :disabled="!!newPassword">
+        <el-button v-if="hasPermission('user:reset_password')" type="primary" :loading="pwdLoading" @click="doResetPassword" :disabled="!!newPassword">
           {{ $t('user.action.resetPassword') }}
         </el-button>
       </template>

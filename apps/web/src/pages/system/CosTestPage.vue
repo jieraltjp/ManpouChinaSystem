@@ -61,7 +61,7 @@
         </template>
       </el-upload>
       <div class="upload-actions">
-        <el-button type="primary" :loading="uploadLoading" :disabled="!selectedFile" @click="handleUpload">
+        <el-button v-if="hasRole('ADMIN')" type="primary" :loading="uploadLoading" :disabled="!selectedFile" @click="handleUpload">
           上传到 COS
         </el-button>
         <el-button :disabled="!selectedFile" @click="selectedFile = null; fileList = []">清除</el-button>
@@ -81,7 +81,7 @@
           <el-image :src="uploadResult.url" fit="contain" class="cos-preview" :preview-src-list="[uploadResult.url]" />
         </div>
         <div class="result-actions">
-          <el-button size="small" type="danger" @click="handleDelete(uploadResult.url)">
+          <el-button v-if="hasRole('ADMIN')" size="small" type="danger" @click="handleDelete(uploadResult.url)">
             <el-icon><Delete /></el-icon> 从 COS 删除
           </el-button>
         </div>
@@ -95,6 +95,9 @@ import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { UploadFilled, Refresh, Delete } from '@element-plus/icons-vue'
 import { getCosStatus, uploadCosFile, deleteCosFile, type CosStatusInfo, type CosUploadResult } from '@/api/cos'
+import { usePermission } from '@/composables/usePermission'
+
+const { hasRole } = usePermission()
 
 const status = ref<CosStatusInfo | null>(null)
 const statusLoading = ref(false)

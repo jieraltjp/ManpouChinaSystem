@@ -80,7 +80,7 @@ logging:
 
 # JWT 配置（RS256 密钥从 classpath:keys/ 加载）
 jwt:
-  access-token-ttl-seconds: 900        # 15 分钟
+  access-token-ttl-seconds: 86400     # 1 天
   key:
     algorithm: RS256                   # 非对称签名，公钥暴露给前端
 

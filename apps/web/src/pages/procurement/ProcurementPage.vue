@@ -133,6 +133,7 @@
         <el-table-column prop="status" :label="$t('order.column.status')" min-width="110" align="center">
           <template #default="{ row }">
             <el-tag
+              v-if="hasPermission('procurement:update')"
               :type="statusType(row)"
               size="small"
               :disable-transitions="false"

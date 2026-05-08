@@ -24,6 +24,7 @@
 | [LESSON-58.md](./LESSON-58.md) | el-input-number 按钮截断：padding 计算漏扣 | 58 |
 | [LESSON-60.md](./LESSON-60.md) | Spring Data JPA nativeQuery + Pageable ORDER BY 陷阱 | 60 |
 | [LESSON-API-UNWRAP-CONSISTENCY.md](./LESSON-API-UNWRAP-CONSISTENCY.md) | client.ts Result<T> 解包一致性 | 74 |
+| [LESSON-COS-URL-QUERY-PARAM.md](./LESSON-COS-URL-QUERY-PARAM.md) | CosService.upload() 返回 URL 含 query param，提取方法未同步剥离 → COS 预览 404 | 77 |
 | [BUSINESS-LOGIC-AUDIT-2026-05-07.md](../audit/BUSINESS-LOGIC-AUDIT-2026-05-07.md) | FSM·DB-Entity·计算字段·字段必填五层对齐审计 | — |
 
 ---

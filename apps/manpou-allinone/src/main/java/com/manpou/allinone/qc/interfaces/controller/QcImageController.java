@@ -137,6 +137,37 @@ public class QcImageController {
         return Result.ok(images);
     }
 
+    /**
+     * 临时清理接口：修复含 ?response-content-disposition=inline 的脏 URL。
+     * 修复完成后删除此接口。
+     */
+    @PostMapping("/cleanup-urls")
+    @PreAuthorize("hasAuthority('qc:delete')")
+    public Result<Integer> cleanupDirtyUrls() {
+        List<QcImage> all = qcImageRepository.findAll();
+        int count = 0;
+        for (QcImage img : all) {
+            String url = img.getUrl();
+            if (url != null && url.contains("?response-content-disposition=inline")) {
+                String cleanUrl = url.replace("?response-content-disposition=inline", "");
+                img.setUrl(cleanUrl);
+                // filename 去掉路径前缀，只保留 basename
+                String fn = img.getFilename();
+                if (fn != null && fn.contains("/")) {
+                    fn = fn.substring(fn.lastIndexOf('/') + 1);
+                }
+                if (fn != null && fn.contains("?")) {
+                    fn = fn.substring(0, fn.indexOf('?'));
+                }
+                img.setFilename(fn);
+                qcImageRepository.save(img);
+                count++;
+            }
+        }
+        log.info("[QC-Image] cleanup done, fixed {} records", count);
+        return Result.ok(count);
+    }
+
     // --- 内部方法 ---
 
     private void validateFile(MultipartFile file) {
