@@ -2,7 +2,7 @@
 
 > 项目：ManpouChinaSystem
 > 覆盖范围：Maven 打包 / 进程管理 / 环境配置 / 密钥管理
-> Lesson 编号：7–9, 17–18, 20, 26–28（共 9 条）
+> Lesson 编号：7–9, 17–18, 20, 26–28, 76（共 10 条）
 
 ---
 
@@ -17,6 +17,7 @@
 - [Lesson 26: Maven `-q` 静默模式会吞掉 spring-boot:repackage 失败，导致 JAR 无法启动](#lesson-26-maven--q-静默模式会吞掉-spring-bootrepackage-失败导致-jar-无法启动)
 - [Lesson 27: 依赖 scope 必须与实际运行环境匹配（H2 test scope vs runtime）](#lesson-27-依赖-scope-必须与实际运行环境匹配h2-test-scope-vs-runtime)
 - [Lesson 28: 编译与启动必须分离，禁止在脚本中隐蔽失败](#lesson-28-编译与启动必须分离禁止在脚本中隐蔽失败)
+- [Lesson 76: allinone 重启流程——JAR 锁定的正确处理](#lesson-76-allinone-重启流程jar-锁定的正确处理)
 
 ---
 
@@ -322,6 +323,52 @@ java -Xms512m -Xmx1024m \
 
 ---
 
+## Lesson 76: allinone 重启流程——JAR 锁定的正确处理
+
+### 问题
+
+JWT filter / Controller 注解修复已提交，但 restart-all.bat 后权限仍不生效。
+
+**根因**：`start-all.bat` 第 76 行 `mvn package -q` 静默打包，若进程持有 JAR 句柄，`spring-boot:repackage` 重命名失败被吞掉。启动的仍是旧 JAR。
+
+### 正确流程
+
+```bash
+# 1. 找到进程（不用端口，TIME_WAIT 时端口空）
+powershell -Command "Get-CimInstance Win32_Process | Where-Object { \$_.CommandLine -like '*manpou-allinone*' }"
+
+# 2. 杀进程
+powershell -Command "Stop-Process -Id <PID> -Force"
+
+# 3. 等句柄释放（必须！）
+sleep 5
+
+# 4. 删 JAR
+powershell -Command "Remove-Item target/manpou-allinone-*.jar -Force"
+
+# 5. 打包（禁止 -q）
+cd apps/manpou-allinone && mvn package -DskipTests
+
+# 6. 启动
+java -Xms512m -Xmx1024m -jar target/manpou-allinone-1.0.0-SNAPSHOT.jar \
+  --server.port=18090 --spring.profiles.active=local &
+```
+
+### 干跑验证（代码变更后必须）
+
+```bash
+TOKEN=$(curl -s -X POST http://localhost:18081/api/v1/auth/login \
+  -d '{"username":"jiangjie","password":"123456"}' | jq -r '.data.accessToken')
+
+# 无权限 → 403
+curl -w "\n%{http_code}" -X DELETE \
+  -H "Authorization: Bearer $TOKEN" \
+  http://localhost:18090/api/v1/procurements/999
+# 期望: {"code":"auth.forbidden"...} HTTP 403
+```
+
+---
+
 ## 铁律总结表（运维/部署）
 
 | # | 铁律 | 违反后果 |
@@ -333,5 +380,6 @@ java -Xms512m -Xmx1024m \
 | 18 | private.pem 仅存于签发中心服务，禁止全量分发 | 安全漏洞 |
 | 20 | 分页约定 page=0 vs page=1 开发前锁定 | 前后端不对齐 |
 | 26 | 打包禁止 `-q` + 确保无旧进程锁 JAR | JAR 不可用 |
+| 76 | 代码变更后重启 allinone 必须：先停进程→等5秒→删JAR→重打包→干跑验证 | 旧 JAR 不含新代码，权限验证形同虚设 |
 | 27 | 运行时依赖不能是 test scope | 启动失败 |
 | 28 | 编译与启动必须分离，错误必须可见 | 错误被掩盖 |

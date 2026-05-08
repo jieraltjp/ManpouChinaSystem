@@ -12,12 +12,13 @@
 | 文件 | 覆盖范围 | Lesson 编号 |
 |------|---------|------------|
 | [LESSONS-BACKEND.md](./LESSONS-BACKEND.md) | 后端 Java / Spring / JPA / DDD | 1–6, 10, 25, 29–34, 38 |
-| [LESSONS-OPS.md](./LESSONS-OPS.md) | 构建 / 部署 / 环境 / 运维 | 7–9, 17–18, 20, 26–28 |
+| [LESSONS-OPS.md](./LESSONS-OPS.md) | 构建 / 部署 / 环境 / 运维 | 7–9, 17–18, 20, 26–28, 76 |
 | [LESSONS-DATABASE.md](./LESSONS-DATABASE.md) | 数据库 / Flyway / Schema | 8, 13, 31–32, 39, 45, 51, 59, 60 |
 | [LESSONS-FRONTEND.md](./LESSONS-FRONTEND.md) | 前端 Vue / TS / i18n / Element Plus | 11–12, 14, 16, 33–34, 37, 40–44, 46–50, 52–59 |
 | [LESSONS-USER-SERVICE.md](./LESSONS-USER-SERVICE.md) | user-service JWT / Flyway / Lombok / JPA / Spring Data | 62–71 |
 | [LESSONS-JWT-CROSS-SERVICE.md](./LESSONS-JWT-CROSS-SERVICE.md) | allinone 只读验签 / Map 反序列化 / RS256 kid 提取 | 72–73 |
 | [LESSON-75.md](./LESSON-75.md) | allinone JWT 遗漏 permissions 导致 @PreAuthorize 失效 | 75 |
+| [LESSON-76.md](./LESSON-76.md) | allinone 重启流程——JAR 锁定的正确处理 | 76 |
 | [LESSON-55-56.md](./LESSON-55-56.md) | el-input-number 列宽 + dialog 紧凑设计 | 55, 56 |
 | [LESSON-57.md](./LESSON-57.md) | 业务锚点变更：procurementId → qcRecordId | 57 |
 | [LESSON-58.md](./LESSON-58.md) | el-input-number 按钮截断：padding 计算漏扣 | 58 |
@@ -27,7 +28,7 @@
 
 ---
 
-## 铁律总表（75 条）
+## 铁律总表（76 条）
 
 ### 后端（17 条）
 
@@ -60,6 +61,7 @@
 | 18 | private.pem 仅存于签发中心服务，禁止全量分发 | 安全漏洞 |
 | 20 | 分页约定 page=0 vs page=1 开发前锁定 | 前后端不对齐 |
 | 26 | 打包禁止 `-q` + 确保无旧进程锁 JAR | JAR 不可用 |
+| 76 | 代码变更后重启 allinone：先停进程→等5秒→删JAR→重打包→干跑验证 | 旧 JAR 无新代码，权限验证形同虚设 |
 | 27 | 运行时依赖不能是 test scope | 启动失败 |
 | 28 | 编译与启动必须分离，错误必须可见 | 错误被掩盖 |
 
@@ -167,4 +169,5 @@
 | 68 | 2026-04-30 allinone JwtKeyManager 跨服务 JWT 401 根因（ParameterizedTypeReference 泛型失效） |
 | 69 | 2026-04-30 allinone JwtService.parseToken 双重 parse bug（RS256 无公钥 parse 失败） |
 | 75 | 2026-05-08 allinone JWT 遗漏 permissions + 17个 Controller 零注解，导致 Phase 3 权限控制形同虚设 |
+| 76 | 2026-05-08 allinone 重启流程——`-q` 掩盖 repackage 失败 + 进程未杀干净导致旧 JAR 启动 |
 
