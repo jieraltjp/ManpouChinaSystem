@@ -1,7 +1,7 @@
 # 日本清关 — 业务规格（步骤6）
 
-> **版本**: 1.5.0
-> **更新**: 2026-05-08（v1.5.0：complete()签名修正为3参数；移除不存在的PATCH /{id}端点）
+> **版本**: 1.6.0
+> **更新**: 2026-05-08（v1.6.0：移除重复customsEntryNo字段；补全generateEntryNo()领域方法）
 > **创建**: 2026-04-22
 > **更新**: 2026-05-07（v1.4.1：补POST /batch/PUT/DELETE端点）
 > **更新**: 2026-04-30（v1.4.0：**containerNo 为主键 + 与 DomesticCustomsRecord 联动 + 货柜级批量创建**）
@@ -61,7 +61,6 @@ JapanCustomsRecord（聚合根）
 ├── productCode: String           # 货号（**v1.4.0 新增**）
 ├── subProductCode: String        # 子货号/颜色（来自 LogisticsPlan）
 ├── status: JapanCustomsStatus   # PENDING / IN_PROGRESS / CLEARED / FAILED
-├── customsEntryNo: String         # 入境报关号（已在 DB）
 ├── arrivalDate: LocalDate        # 到达日期
 ├── customsBroker: String          # 清关行
 ├── brokerPhone: String           # 清关行电话
@@ -78,6 +77,7 @@ JapanCustomsRecord（聚合根）
 ├── updateTime: LocalDateTime
 │
 └── 领域方法
+    ├── generateEntryNo()          # 生成入境报关号（JC-YYYYMMDD-NNN，自动调用）
     ├── startClearance()         # 开始清关 → status = IN_PROGRESS
     ├── complete(importDuty, consumptionTax, clearanceDate)  # 放行 → status = CLEARED（含清关日期）
     ├── fail(reason)             # 失败 → status = FAILED
