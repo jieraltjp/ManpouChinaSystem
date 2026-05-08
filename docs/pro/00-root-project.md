@@ -23,7 +23,7 @@
 ManpouChinaSystem/
 ├── apps/
 │   ├── java-service/         # [Parent POM] 所有 Java 服务的父 pom
-│   ├── manpou-allinone/      # 7 领域合一 jar（端口 18090）⚡ Phase 0
+│   ├── manpou-allinone/      # 8 领域合一 jar（端口 18090）⚡ Phase 0
 │   ├── user-service/         # 用户认证 + 权限管理（端口 18081）
 │   ├── procurement-service/  # 发注管理（端口 18083）
 │   ├── warehouse-service/    # 仓储管理（端口 18084）⚡ 后期独立
@@ -80,7 +80,7 @@ ManpouChinaSystem/
 | 服务 | 端口 | 上下文路径 | 备注 |
 |------|------|-----------|------|
 | api-gateway | 18080 | / | 统一入口 |
-| **manpou-allinone** | **18090** | / | ⚡ Phase 0：7 领域合一（含发注/仓储/报关等） |
+| **manpou-allinone** | **18090** | / | ⚡ Phase 0：8 领域合一（procurement/factory/qc/logistics/replenishment/product/customs/finance） |
 | user-service | 18081 | / | JWT 认证 |
 | warehouse-service | 18084 | / | ⚡ 后期独立 |
 | customs-service | 18085 | / | ⚡ 后期独立 |
@@ -131,8 +131,8 @@ docker-compose -f docker-compose.yml up -d
 - **Token 有效期**：15 分钟（access token）
 - **密钥管理**：JWT 签名密钥表（signing_key 表）+ 自动轮换
 - **登录入口**：
-  - 6 领域（product/warehouse/customs/logistics/finance/notification）：`POST /api/v1/auth/login` → manpou-allinone (18090)
-  - 发注单：user-service (18081) 保留独立认证
+  - 登录统一：`POST /api/v1/auth/login` → user-service (18081)
+  - manpou-allinone (18090)：8 领域（procurement/factory/qc/logistics/replenishment/product/customs/finance），无登录端点（仅 `/public-key`）
   - 前端统一入口：api-gateway (18080) → 各服务
 
 ---
@@ -213,5 +213,5 @@ docker-compose -f docker-compose.yml up -d
 | `docs/ui/README.md` | 前端 UI 文档入口 |
 | `docs/ui/ARCHITECTURE.md` | 系统架构图（Mermaid） |
 | `docs/pro/05-procurement-service.md` | 发注服务文档 |
-| `docs/pro/19-manpou-allinone.md` | 6 领域合一单体 |
+| `docs/pro/19-manpou-allinone.md` | 8 领域合一单体 |
 | `docs/pro/20-ubuntu-deploy-dev.md` | Ubuntu 轻量部署指南 |

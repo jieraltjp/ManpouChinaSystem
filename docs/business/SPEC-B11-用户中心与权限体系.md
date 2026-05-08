@@ -1,9 +1,9 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.4.0
+> **版本**: 1.5.0
 > **创建**: 2026-04-30
-> **修订**: 2026-05-08（v1.4.0：Phase 3 状态修正——后端21 Controller注解完成✅；前端路由守卫仅角色级⚠️；按钮权限仅UserPage⚠️；菜单动态显示未实现🔲）
-> **状态**: ✅ Phase 2 完成；⚠️ Phase 3 部分完成；Phase 4-6 待开发
+> **修订**: 2026-05-08（v1.5.0：Phase 2 实际未实现——GET /pending、PUT /approve、PUT /reject、GET /modules等端点标记⚠️）
+> **状态**: ⚠️ Phase 2 部分完成；⚠️ Phase 3 部分完成；Phase 4-6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
 
@@ -478,18 +478,18 @@ public boolean canLogin(User user) {
 | 方法 | 路径 | 权限 | 说明 |
 |------|------|:----:|------|
 | GET | `/` | user:read | 分页查询用户列表 |
-| GET | `/pending` | user:approve | 待审核用户列表 |
+| GET | `/pending` ⚠️ | user:approve | 待审核用户列表（⚠️ 未实现，Phase 2） |
 | GET | `/{id}` | user:read | 获取用户详情 |
 | POST | `/` | user:create | 新建用户（管理员直建，跳过审核） |
-| PUT | `/{id}/approve` | user:approve | 审核通过（幂等，开通账号 + 分配默认角色） |
-| PUT | `/{id}/reject` | user:approve | 审核拒绝（幂等，记录拒绝原因） |
+| PUT | `/{id}/approve` ⚠️ | user:approve | 审核通过（⚠️ 未实现，Phase 2） |
+| PUT | `/{id}/reject` ⚠️ | user:approve | 审核拒绝（⚠️ 未实现，Phase 2） |
 | PUT | `/{id}` | user:update | 编辑用户 |
 | DELETE | `/{id}` | user:delete | 软删除用户 |
 | PUT | `/{id}/status` | user:update | 启用/禁用用户 |
 | PUT | `/{id}/password/reset` | user:reset_password | 重置密码（生成随机密码） |
 | PUT | `/{id}/roles` | user:update | 分配角色 |
-| PUT | `/{id}/positions` | user:update | 分配职务 |
-| GET | `/{id}/audit-logs` | user:read | 获取该用户操作日志 |
+| PUT | `/{id}/positions` ⚠️ | user:update | 分配职务（⚠️ 未实现，Phase 2） |
+| GET | `/{id}/audit-logs` ⚠️ | user:read | 获取该用户操作日志（⚠️ 未实现，Phase 4） |
 
 **查询参数**（GET `/`）：
 | 参数 | 类型 | 说明 |
@@ -519,7 +519,7 @@ public boolean canLogin(User user) {
 | 方法 | 路径 | 权限 | 说明 |
 |------|------|:----:|------|
 | GET | `/` | permission:read | 权限列表（树形结构） |
-| GET | `/modules` | permission:read | 按模块分组的权限列表 |
+| GET | `/modules` ⚠️ | permission:read | 按模块分组的权限列表（⚠️ 未实现） |
 
 ### 3.5 组织管理 API（`/api/v1/organization`）
 
