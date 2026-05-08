@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
@@ -83,6 +84,15 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public Result<Void> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
         return Result.fail("http.method-not-allowed", "HTTP method not allowed: " + e.getMethod());
+    }
+
+    // ===== 安全异常 =====
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Result<Void> handleAccessDenied(AccessDeniedException e) {
+        log.warn("[权限不足] {}", e.getMessage());
+        return Result.fail("auth.forbidden", "Access denied: insufficient permissions");
     }
 
     // ===== 系统异常（记录完整堆栈） =====
