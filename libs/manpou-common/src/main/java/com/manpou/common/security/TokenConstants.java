@@ -16,8 +16,8 @@ public final class TokenConstants {
     /** Token 类型（RFC 6750） */
     public static final String BEARER_PREFIX = "Bearer";
 
-    /** Access Token 有效期（秒），15 分钟 */
-    public static final long ACCESS_TOKEN_TTL_SECONDS = 900;
+    /** Access Token 有效期（秒），1 天 */
+    public static final long ACCESS_TOKEN_TTL_SECONDS = 86400;
 
     /** 密钥 classpath 引导路径（旧部署兼容） */
     public static final String LEGACY_PRIVATE_KEY_PATH = "keys/private.pem";
