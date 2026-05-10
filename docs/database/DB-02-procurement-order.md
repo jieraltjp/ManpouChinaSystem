@@ -1,8 +1,8 @@
 # DB-02 — 发注单数据库设计
 
-> **版本**: 1.3.0
+> **版本**: 1.4.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-23（v1.2.0：移除不存在的 billing_method 字段，与 V18 脚本对齐）
+> **更新**: 2026-05-11（v1.4.0：新增 shipment_batch(V40) 和 demand_procurement_mapping(V41) 到表清单）
 > **更新**: 2026-04-28（v1.3.0：新增 after_sales_deadline 售后截止日字段）
 > **状态**: ✅ 已实现
 > **业务步号**: 02（发注单+工厂）
@@ -19,6 +19,8 @@
 | 1 | `procurement` | Procurement | ✅ 已实现 |
 | 2 | `factory` | Factory | ✅ 已实现（字段更新见 DB-10） |
 | 3 | `product` | Product | ✅ 已实现（详细设计见 DB-11-product.md） |
+| 4 | `shipment_batch` | ShipmentBatch | ✅ 已实现（V40） |
+| 5 | `demand_procurement_mapping` | — | ✅ 已实现（V41） |
 
 ---
 

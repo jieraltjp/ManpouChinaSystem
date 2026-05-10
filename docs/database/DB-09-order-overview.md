@@ -1,9 +1,9 @@
 # DB-09 — 订单总览数据库设计
 
-> **版本**: 2.2.0
-> **更新**: 2026-04-28（v2.2.0：procurement_snapshot 补全——Factory/Product 快照字段补全至完整清单；新增 V40 迁移计划）
+> **版本**: 2.3.0
+> **更新**: 2026-05-11（v2.3.0：procurement_snapshot 无Flyway迁移（Entity存在，ddl-auto update建表）；V40实际创建shipment_batch；移除§4.2过时迁移计划）
 > **创建**: 2026-04-22
-> **状态**: 🔄 Phase1 开发中
+> **状态**: 🔄 Phase1 开发中（⚠️ procurement_snapshot Flyway迁移缺失）
 > **业务步号**: 09（订单总览 — 核心视图）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B09-订单总览-API设计.md`
 > **对应 UI 文档**: `docs/ui/pages/09-order-overview.md`
@@ -217,8 +217,8 @@ WHERE d.is_deleted = FALSE;
 
 ## 4. procurement_snapshot 表（发注单快照）
 
-> **v2.2.0 新增**：记录下单时刻的工厂和商品信息，保证历史订单数据不变。
-> 由 `ProcurementUseCase` 在创建发注单时自动写入，允许事后修改。
+> ⚠️ Entity存在（`ProcurementSnapshot.java`），开发期由JPA `ddl-auto: update`自动建表；
+> ⚠️ 无Flyway迁移脚本，生产环境部署需额外执行建表语句或启用ddl-auto。
 > Entity: `com.manpou.allinone.order.domain.model.ProcurementSnapshot`
 
 ### 4.1 完整字段清单
@@ -259,71 +259,12 @@ WHERE d.is_deleted = FALSE;
 | | `product_tax_point` | DECIMAL(5,4) | 票点 | ⚠️ 缺 |
 | **商品-图片** | `product_image_url` | VARCHAR(512) | 商品图片URL | ⚠️ 缺 |
 
-> **图例**: ✅ = 已有字段，⚠️ = 缺失字段（需 V40 迁移添加）
+> **图例**: ✅ = 已有字段（JPA ddl-auto），⚠️ = 缺失字段（需补充建表迁移）
 
-### 4.2 迁移计划（V40）
+### 4.2 待创建 Flyway 迁移（V*__procurement_snapshot_table.sql）
 
-```sql
--- V40：procurement_snapshot 补全 Factory/Product 快照字段
-ALTER TABLE procurement_snapshot
-  ADD COLUMN factory_city            VARCHAR(64)  DEFAULT '' COMMENT '市',
-  ADD COLUMN factory_county         VARCHAR(64)  DEFAULT '' COMMENT '县/区',
-  ADD COLUMN factory_rough_location VARCHAR(500) COMMENT '详细地址',
-  ADD COLUMN factory_longitude      DECIMAL(11,8) COMMENT '经度',
-  ADD COLUMN factory_latitude      DECIMAL(11,8) COMMENT '纬度',
-  ADD COLUMN factory_contact_wechat VARCHAR(64)   DEFAULT '' COMMENT '微信号',
-  ADD COLUMN factory_contact_qq    VARCHAR(32)   DEFAULT '' COMMENT 'QQ号',
-  ADD COLUMN factory_category       VARCHAR(32)   DEFAULT '' COMMENT '分类',
-  ADD COLUMN factory_cooperation_status VARCHAR(32) DEFAULT 'POTENTIAL' COMMENT '合作状态',
-  ADD COLUMN factory_payment_terms VARCHAR(64)   DEFAULT 'NET_30' COMMENT '账期',
-  ADD COLUMN product_master_code   VARCHAR(32)   DEFAULT '' COMMENT '主货号',
-  ADD COLUMN product_sub_code       VARCHAR(64)   DEFAULT '' COMMENT '子货号',
-  ADD COLUMN product_jan_code       VARCHAR(64)   DEFAULT '' COMMENT 'JAN码',
-  ADD COLUMN product_name_en        VARCHAR(255)  DEFAULT '' COMMENT '英文名称',
-  ADD COLUMN product_origin        VARCHAR(100)  DEFAULT '' COMMENT '原产国',
-  ADD COLUMN product_material      VARCHAR(64)   DEFAULT '' COMMENT '材质',
-  ADD COLUMN product_unit          VARCHAR(50)   DEFAULT '' COMMENT '计量单位',
-  ADD COLUMN product_hs_code      VARCHAR(20)   DEFAULT '' COMMENT '中国HS编码',
-  ADD COLUMN product_hs_code_jp   VARCHAR(20)   DEFAULT '' COMMENT '日本HS编码',
-  ADD COLUMN product_unit_price_rmb DECIMAL(12,4) COMMENT '单价(CNY)',
-  ADD COLUMN product_tax_point     DECIMAL(5,4) COMMENT '票点',
-  ADD COLUMN product_image_url     VARCHAR(512)  DEFAULT '' COMMENT '商品图片URL';
-
--- 回填历史数据（基于 procurement.id 关联 factory/product 表）
-UPDATE procurement_snapshot sn
-  INNER JOIN procurement p ON p.id = sn.procurement_id
-  INNER JOIN factory f ON f.id = p.factory_id
-  INNER JOIN product prd ON prd.master_code = p.product_code
-    AND (prd.sub_code IS NULL OR prd.sub_code = p.sub_product_code)
-SET
-  sn.factory_city = f.city,
-  sn.factory_county = f.county,
-  sn.factory_rough_location = f.rough_location,
-  sn.factory_longitude = f.longitude,
-  sn.factory_latitude = f.latitude,
-  sn.factory_contact_wechat = f.contact_wechat,
-  sn.factory_contact_qq = f.contact_qq,
-  sn.factory_category = f.category,
-  sn.factory_cooperation_status = f.cooperation_status,
-  sn.factory_payment_terms = f.payment_terms,
-  sn.product_master_code = prd.master_code,
-  sn.product_sub_code = prd.sub_code,
-  sn.product_jan_code = prd.jan_code,
-  sn.product_name_en = prd.name_en,
-  sn.product_origin = prd.origin,
-  sn.product_material = prd.material,
-  sn.product_unit = prd.unit,
-  sn.product_hs_code = prd.hs_code,
-  sn.product_hs_code_jp = prd.hs_code_jp,
-  sn.product_unit_price_rmb = prd.unit_price_rmb,
-  sn.product_tax_point = prd.tax_point,
-  sn.product_image_url = prd.image_url
-WHERE sn.factory_id IS NOT NULL;
-
--- 同步更新 ProcurementSnapshot.java 实体补全所有字段
--- 同步更新 ProcurementUseCase.java 填充新字段
--- 同步更新 OrderChainView.java / OrderChainDetailVO.java
-```
+> ⚠️ **重要**：procurement_snapshot 表无 Flyway 迁移脚本；Entity 由 JPA `ddl-auto: update` 在开发期建表，生产部署需手动执行建表或启用 ddl-auto。
+> ⚠️ V40 实际创建的是 `shipment_batch` 表（出货批次），不是 procurement_snapshot。
 
 ---
 
@@ -514,6 +455,7 @@ SELECT
 FROM replenishment_demand d
   LEFT JOIN procurement p ON p.id = d.linked_procurement_id AND p.is_deleted = b'0'
   -- 工厂+商品快照（通过 procurement.id → procurement_snapshot.procurement_id）
+  -- ⚠️ procurement_snapshot 无 Flyway 建表迁移，生产部署需补充
   LEFT JOIN procurement_snapshot sn ON sn.procurement_id = p.id
   -- 步骤3：验货记录（通过 procurement.id）
   LEFT JOIN qc_record q ON q.procurement_id = p.id AND q.is_deleted = b'0'

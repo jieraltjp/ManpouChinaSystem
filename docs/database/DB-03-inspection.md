@@ -1,8 +1,8 @@
 # DB-03 — 验货记录数据库设计
 
-> **版本**: 1.2.0
+> **版本**: 1.3.0
 > **创建**: 2026-04-22
-> **更新**: 2026-05-08（v1.2.0：索引名称与 V15 实际迁移对齐，移除不存在的 idx_qc_result/is_deleted，新增 idx_qc_product_code/create_time）
+> **更新**: 2026-05-11（v1.3.0：新增 qc_image 表（V47）及 V48 URL修复迁移；v1.2.0索引对齐）
 > **状态**: ✅ 已实现
 > **业务步号**: 03（验货记录）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` §第三步
@@ -16,6 +16,7 @@
 | 序号 | 表名 | 聚合根 | 状态 |
 |------|------|--------|------|
 | 1 | `qc_record` | QcRecord | ✅ 已实现 |
+| 2 | `qc_image` | QcImage | ✅ 已实现（V47，腾讯云COS存储） |
 
 ---
 
@@ -103,6 +104,34 @@ CREATE TABLE qc_record (
 | orderDate | `order_date` | 下单日 |
 | createTime / updateTime | `create_time / update_time` | 审计字段 |
 | isDeleted | `is_deleted` | 逻辑删除 |
+
+---
+
+## 2. qc_image（验货图片）✅已实现（V47）
+
+**对应**: `QcImage` 聚合根（V47，腾讯云COS存储）
+
+```sql
+CREATE TABLE qc_image (
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    qc_record_id  BIGINT NULL COMMENT '关联验货记录ID（nullable，支持先上传后关联）',
+    filename       VARCHAR(255) NOT NULL COMMENT 'COS对象名（不含前缀路径）',
+    original_name  VARCHAR(255) NOT NULL COMMENT '原始文件名',
+    url            VARCHAR(512) NOT NULL COMMENT '完整访问URL（含?response-content-disposition=inline）',
+    size           BIGINT NOT NULL COMMENT '文件大小（字节）',
+    mime_type      VARCHAR(64) NOT NULL COMMENT 'MIME类型',
+    uploaded_by    BIGINT NULL COMMENT '上传用户ID',
+    create_time    DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    is_deleted     TINYINT(1) NOT NULL DEFAULT 0 COMMENT '软删标记',
+    deleted_at     DATETIME(3) NULL COMMENT '删除时间',
+    deleted_by     BIGINT NULL COMMENT '删除操作人',
+    INDEX idx_qc_record_id (qc_record_id),
+    INDEX idx_filename (filename),
+    INDEX idx_create_time (create_time)
+);
+```
+
+> ⚠️ Entity中不存在：`thumbnailUrl`（缩略图字段），`QcImageController` 中直接生成COS缩略图URL。
 
 ---
 
