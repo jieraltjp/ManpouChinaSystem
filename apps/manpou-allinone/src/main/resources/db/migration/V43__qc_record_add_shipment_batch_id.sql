@@ -32,7 +32,7 @@ SELECT
     'SYSTEM',
     0
 FROM qc_record qc
-WHERE qc.deleted = false
+WHERE qc.is_deleted = FALSE
   AND qc.procurement_id IS NOT NULL
   AND NOT EXISTS (
       SELECT 1 FROM shipment_batch sb WHERE sb.procurement_id = qc.procurement_id AND sb.remarks LIKE '%历史数据迁移%'
@@ -48,7 +48,7 @@ JOIN (
     GROUP BY procurement_id
 ) sb ON sb.procurement_id = qc.procurement_id
 SET qc.shipment_batch_id = sb.batch_id
-WHERE qc.deleted = false
+WHERE qc.is_deleted = FALSE
   AND qc.shipment_batch_id IS NULL
   AND qc.procurement_id IS NOT NULL;
 

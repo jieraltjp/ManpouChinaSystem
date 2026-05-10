@@ -1,8 +1,8 @@
 # SPEC-B04 — 调配计划业务规格（步骤4）
 
-> **版本**: 1.6.0
+> **版本**: 1.7.0
 > **创建**: 2026-04-22
-> **更新**: 2026-05-08（v1.6.0：Container/ConsolidationPool实体完全重写——移除不存在字段sealNo/departurePort/arrivalPort/containerId，更新领域方法为addPlan/removePlan/isReadyToLoad等）
+> **更新**: 2026-05-11（v1.7.0：修正ContainerType枚举值 GP20/GP40/HC40/HC45（代码vs doc）；DB-04同步）
 > **更新**: 2026-05-07（v1.5.0：ConsolidationPool字段名修正；Container.containerCode缺失注⚠️）
 > **状态**: ✅ 已实现（LogisticsPlan + Container + ConsolidationPool）
 > **业务步号**: 04（调配计划）
@@ -65,7 +65,7 @@ LogisticsPlan（聚合根）
 Container（聚合根）
 ├── id: Long
 ├── containerNo: String            # 货柜号（TEMU1234567，UNIQUE）
-├── containerType: ContainerType   # 20GP / 40GP / 40HC / 45HC
+├── containerType: ContainerType   # GP20 / GP40 / HC40 / HC45（@Enumerated(EnumType.STRING)）
 ├── totalCbm: BigDecimal          # 总体积（m³）
 ├── totalWeightKg: BigDecimal      # 总重量（kg）
 ├── planCount: Integer            # 关联计划数

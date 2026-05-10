@@ -1,10 +1,9 @@
 # DB-06 — 日本清关数据库设计
 
-> **版本**: 1.4.0
+> **版本**: 1.5.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-24（v1.2.0：补充 sub_product_code 列，全链路子货号追踪完整）
-> **更新**: 2026-04-30（v1.4.0：**container_no 为主键字段 + product_code + factory_id 列，V44 已创建**）
-> **状态**: ✅ 已实现（v1.4.0 container_no + product_code + factory_id 已实现，V44 迁移待执行）
+> **更新**: 2026-05-11（v1.5.0：V44 已执行，移除"待执行迁移"章节；container_no/product_code/factory_id 列 + idx_jp_container_no 索引均已存在）
+> **状态**: ✅ 已实现
 > **业务步号**: 06（日本清关）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B06-日本清关-步骤6.md`
 > **对应 UI 文档**: `docs/ui/pages/06-japan-customs.md`
@@ -16,7 +15,7 @@
 
 | 序号 | 表名 | 聚合根 | 状态 |
 |------|------|--------|------|
-| 1 | `japan_customs_record` | JapanCustomsRecord | 🔧 改造中（V44 待执行） |
+| 1 | `japan_customs_record` | JapanCustomsRecord | ✅ 已实现 |
 
 ---
 
@@ -67,11 +66,11 @@ CREATE TABLE japan_customs_record (
 
 ---
 
-## 待执行迁移
+## 已执行迁移
 
 | 序号 | 文件 | 内容 | 状态 |
 |------|------|------|------|
-| V44 | `V44__japan_customs_container_no.sql` | japan_customs_record 增加 container_no + product_code + factory_id 列 + 索引 | 🔴 待执行 |
+| V44 | `V44__japan_customs_container_no.sql` | japan_customs_record 增加 container_no + product_code + factory_id 列 + idx_jp_container_no 索引 | ✅ 已执行 |
 
 ---
 
@@ -81,12 +80,12 @@ CREATE TABLE japan_customs_record (
 |---------|---------|------|------|
 | id | `id` | ✅ | |
 | customsEntryNo | `customs_entry_no` | ✅ | |
-| containerNo | `container_no` | 🔧 V44 新增 | v1.4.0 必填 |
+| containerNo | `container_no` | ✅ | v1.4.0 必填 |
 | domesticCustomsId | `domestic_customs_id` | ✅ | |
 | logisticsPlanId | `logistics_plan_id` | ✅ | |
 | procurementId | `procurement_id` | ✅（允许 NULL） | v1.4.0 改为可选参考 |
-| factoryId | `factory_id` | 🔧 V44 新增 | v1.4.0 新增 |
-| productCode | `product_code` | 🔧 V44 新增 | v1.4.0 新增 |
+| factoryId | `factory_id` | ✅ | v1.4.0 新增 |
+| productCode | `product_code` | ✅ | v1.4.0 新增 |
 | subProductCode | `sub_product_code` | ✅（v1.6.1 新增） | |
 | status | `status` | ✅ | |
 | customsEntryNo | `customs_entry_no` | ✅ | |

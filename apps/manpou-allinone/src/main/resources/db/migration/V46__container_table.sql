@@ -16,7 +16,7 @@
 CREATE TABLE container (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     container_no    VARCHAR(32) NOT NULL COMMENT '货柜号（如 TEMU1234567）',
-    container_type  VARCHAR(24) NOT NULL DEFAULT '20GP' COMMENT '20GP|40GP|40HC|45HC',
+    container_type  VARCHAR(24) NOT NULL DEFAULT 'GP20' COMMENT 'GP20|GP40|HC40|HC45 (@Enumerated(EnumType.STRING))',
 
     -- 尺寸与载量
     total_cbm       DECIMAL(10, 4) DEFAULT 0 COMMENT '已装载总体积(m³)',

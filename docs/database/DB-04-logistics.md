@@ -1,8 +1,8 @@
 # DB-04 — 调配计划数据库设计
 
-> **版本**: 1.6.0
+> **版本**: 1.7.0
 > **创建**: 2026-04-22
-> **更新**: 2026-05-08（v1.6.0：Container/ConsolidationPool DB schema完全重写——移除TODO陈旧内容，更新为V45/V46实际表结构）
+> **更新**: 2026-05-11（v1.7.0：container_type DEFAULT 'GP20'（JPA @Enumerated存储枚举名）；V46已同步；V43修复is_deleted WHERE条件bug）
 > **状态**: ✅ 已实现
 > **业务步号**: 04（调配计划）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B04-调配计划-步骤4.md`
@@ -79,7 +79,7 @@ CREATE TABLE logistics_plan (
 CREATE TABLE container (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     container_no    VARCHAR(32)  NOT NULL UNIQUE COMMENT '货柜号（如 TEMU1234567）',
-    container_type  VARCHAR(24)  NOT NULL DEFAULT '20GP' COMMENT '20GP|40GP|40HC|45HC',
+    container_type  VARCHAR(24)  NOT NULL DEFAULT 'GP20' COMMENT 'GP20|GP40|HC40|HC45 (@Enumerated(EnumType.STRING))',
     total_cbm       DECIMAL(10, 4) DEFAULT 0 COMMENT '已装载总体积(m³)',
     total_weight_kg DECIMAL(12, 4) DEFAULT 0 COMMENT '已装载总重量(kg)',
     plan_count      INT DEFAULT 0 COMMENT '关联计划数',

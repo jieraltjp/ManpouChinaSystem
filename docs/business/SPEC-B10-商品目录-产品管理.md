@@ -1,7 +1,7 @@
 # SPEC-B10 — 商品目录业务规格（商品类）
 
-> **版本**: 2.2.0
-> **更新**: 2026-05-08（v2.2.0：ProductStatus枚举移除⚠️——Entity使用String status，无对应Java枚举）
+> **版本**: 2.3.0
+> **更新**: 2026-05-11（v2.3.0：补全CREATE TABLE——V24新增字段 jan_code/status/quantities/carton_qty/amount_rmb/material_ja/hs_code_jp 均已加入表结构；Entity使用String status）
 > **更新**: 2026-04-24（v2.0.0：关联工厂显示名称 factoryNames；新增日本HS编码/工厂名称筛选）
 > **更新**: 2026-04-24（v1.9.0：关联工厂数量 factoryCount（修复：JPQL from 放错 repository））
 > **更新**: 2026-04-24（v1.6.0：表格列重组；移除库存/箱数；新增含税单价/票点；UI文档同步更新）
@@ -171,7 +171,10 @@ CREATE TABLE product (
     image_url          VARCHAR(512) COMMENT '商品图片 URL',
     color_name         VARCHAR(64),
     material           VARCHAR(64),
+    material_ja        VARCHAR(255) COMMENT '材质（日文，V24新增）',
     category           VARCHAR(20),
+    status             VARCHAR(32) COMMENT '商品区分（通常/予約，V24新增）',
+    jan_code           VARCHAR(64) COMMENT 'JANコード（V24新增）',
     origin             VARCHAR(100) COMMENT '原产国',
     unit               VARCHAR(50),
     length_cm          DECIMAL(8,2),
@@ -184,8 +187,12 @@ CREATE TABLE product (
     tax_point          DECIMAL(5,4) DEFAULT 1.1,
     tax_rate           DECIMAL(5,4) DEFAULT 0.10,
     hs_code            VARCHAR(20) COMMENT 'HS编码',
+    hs_code_jp         VARCHAR(20) COMMENT '日本HS编码（税番，V24新增）',
     declaration_elements TEXT COMMENT '申报要素',
     units_per_package  INT COMMENT '每箱数量',
+    quantities         INT COMMENT '数量（V24新增）',
+    carton_qty        INT COMMENT '箱数（V24新增）',
+    amount_rmb        DECIMAL(14,4) COMMENT '金额(RMB)（V24新增）',
     package_length_cm  DECIMAL(8,2),
     package_width_cm   DECIMAL(8,2),
     package_height_cm  DECIMAL(8,2),
@@ -200,7 +207,8 @@ CREATE TABLE product (
     is_deleted        BOOLEAN NOT NULL DEFAULT FALSE,
     UNIQUE KEY uk_master_sub (master_code, sub_code),
     INDEX idx_master_code (master_code),
-    INDEX idx_hs_code (hs_code)
+    INDEX idx_hs_code (hs_code),
+    INDEX idx_hs_code_jp (hs_code_jp)
 );
 
 CREATE TABLE product_factory (
