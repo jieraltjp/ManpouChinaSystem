@@ -511,28 +511,7 @@ CREATE TABLE IF NOT EXISTS `procurement` (
   KEY `idx_procurement_order_date` (`order_date`),
   KEY `idx_proc_is_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS `procurement_snapshot` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `procurement_id` bigint NOT NULL COMMENT '???注? FK',
-  `factory_id` bigint DEFAULT NULL COMMENT '工厂 ID（????）',
-  `factory_code` varchar(32) DEFAULT NULL COMMENT '工厂?号（下??刻）',
-  `factory_name` varchar(128) DEFAULT NULL COMMENT '工厂名称（下??刻）',
-  `factory_province` varchar(64) DEFAULT NULL COMMENT '工厂省?（下??刻）',
-  `factory_city` varchar(64) DEFAULT NULL COMMENT '工厂城市（下??刻）',
-  `factory_contact_name` varchar(64) DEFAULT NULL COMMENT '工厂?系人（下??刻）',
-  `factory_contact_phone` varchar(32) DEFAULT NULL COMMENT '工厂??（下??刻）',
-  `product_name_zh` varchar(255) DEFAULT NULL COMMENT '商品中文名（下??刻）',
-  `product_name_ja` varchar(128) DEFAULT NULL COMMENT '商品日文名（下??刻）',
-  `product_category` varchar(32) DEFAULT NULL COMMENT '商品分?（下??刻）',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `create_by` varchar(64) NOT NULL,
-  `is_deleted` bit(1) NOT NULL,
-  `update_by` varchar(64) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `procurement_id` (`procurement_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='?注?快照????下??刻的工厂和商品信息';
+-- procurement_snapshot 表由 V16 单独创建（幂等兜底）
 
 CREATE TABLE IF NOT EXISTS `demand_procurement_mapping` (
   `id` bigint NOT NULL AUTO_INCREMENT,
