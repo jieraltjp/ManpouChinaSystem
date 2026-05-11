@@ -17,7 +17,7 @@
 
 | 版本 | 文件 | 说明 |
 |------|------|------|
-| **V15** | `V15__baseline_schema.sql` | 43 张表 DDL + 全部种子数据（幂等） |
+| **V15** | `V15__baseline_schema.sql` | 32 张表 DDL + 全部种子数据（幂等；不含 flyway_schema_history 和 procurement_snapshot） |
 | **V16** | `V16__procurement_snapshot.sql` | 发注单快照表（幂等兜底） |
 
 **已删除**：V1~V49 共 35 个旧迁移文件（历史包袱，V15 已包含全部表结构）。
@@ -42,14 +42,14 @@ mysql -h <host> -P <port> -u root -p -e \
   "CREATE DATABASE IF NOT EXISTS manpou
    CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
 
-# 2. 导入完整 schema（38 张表 + 种子数据，一次完成）
+# 2. 导入完整 schema（34 张表 + 种子数据，一次完成）
 mysql -h <host> -P <port> -u root -p manpou \
   < apps/manpou-allinone/sql/production_schema.sql
 
-# 3.（可选）导入静态基础数据（中国 HS 编码 / 日本 HS 编码）
-# 如果 production_schema.sql 已包含，跳过
-# mysql -h <host> -P <port> -u root -p manpou < apps/manpou-allinone/sql/cn_hs_code_data.sql
-# mysql -h <host> -P <port> -u root -p manpou < apps/manpou-allinone/sql/jp_hs_code_data.sql
+# 3.（可选）导入大表数据（cn_hs_code / jp_hs_code）
+# production_schema.sql 仅含表结构，数据需从当前生产 DB 单独导出导入
+# mysql -h <host> -P <port> -u root -p manpou < <(mysqldump ... cn_hs_code)
+# mysql -h <host> -P <port> -u root -p manpou < <(mysqldump ... jp_hs_code)
 
 # 4. 启动 manpou-allinone（激活 production profile）
 export SPRING_PROFILES_ACTIVE=production
@@ -96,14 +96,14 @@ FROM flyway_schema_history ORDER BY installed_rank;
 
 ## 3. 大表静态数据
 
-| 表 | 行数 | 文件 |
+| 表 | 行数 | 说明 |
 |----|------|------|
-| `cn_hs_code` | ~12000 | `sql/cn_hs_code_data.sql`（从 production_schema.sql 提取） |
-| `jp_hs_code` | ~9700 | `sql/jp_hs_code_data.sql`（从 production_schema.sql 提取） |
-| `factory` | ~500 | 已在 production_schema.sql 中 |
-| `product` | ~5000 | 已在 production_schema.sql 中 |
+| `cn_hs_code` | ~12000 | production_schema.sql 仅含表结构，数据需从当前生产 DB 单独导出 |
+| `jp_hs_code` | ~9700 | production_schema.sql 仅含表结构，数据需从当前生产 DB 单独导出 |
+| `factory` | ~500 | production_schema.sql 仅含表结构，数据由 JPA ddl-auto 在开发期生成 |
+| `product` | ~5000 | production_schema.sql 仅含表结构，数据由 JPA ddl-auto 在开发期生成 |
 
-如需分离导入：将上述文件解压后单独执行。
+如需导入大表数据：从当前生产 DB 执行 `SELECT * INTO OUTFILE` 或 mysqldump 单独导出。
 
 ---
 
@@ -122,11 +122,11 @@ FROM flyway_schema_history ORDER BY installed_rank;
 
 | 文件 | 说明 |
 |------|------|
-| `apps/manpou-allinone/sql/production_schema.sql` | 完整数据库 Schema（38 表，mysqldump 2026-05-11） |
-| `V15__baseline_schema.sql` | 43 张表 DDL + 种子数据（生产基准） |
+| `apps/manpou-allinone/sql/production_schema.sql` | 完整数据库 Schema（34 表，mysqldump 2026-05-11） |
+| `V15__baseline_schema.sql` | 32 张表 DDL + 种子数据（生产基准） |
 | `V16__procurement_snapshot.sql` | 发注单快照表（幂等兜底） |
 | `application-production.yml` | 生产配置（Flyway 启用，baseline='14'） |
-| `docs/business/DB-09-order-overview.md` | procurement_snapshot 设计文档 |
+| `docs/database/DB-09-order-overview.md` | procurement_snapshot 设计文档 |
 
 ---
 

@@ -869,12 +869,12 @@ VALUES
 -- 角色
 INSERT IGNORE INTO role (id, role_code, role_name_cn, role_name_jp, role_type, is_editable, status, create_time, update_time, is_deleted, create_by, update_by)
 VALUES
-(1, 'ADMIN',   '系统管理员', 'システム管理者',    'SYSTEM',   1, 1, NOW(3), NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+(1, 'ADMIN',   '系统管理员', 'システム管理者',    'SYSTEM',   0, 1, NOW(3), NOW(3), 0, 'SYSTEM', 'SYSTEM'),
 (2, 'MANAGER', '运营主管',   '運営マネージャー', 'BUSINESS', 1, 1, NOW(3), NOW(3), 0, 'SYSTEM', 'SYSTEM'),
 (3, 'OPERATOR','普通运营',   '一般運営者',        'BUSINESS', 1, 1, NOW(3), NOW(3), 0, 'SYSTEM', 'SYSTEM'),
 (4, 'VIEWER',  '查看者',     '閲覧者',            'BUSINESS', 1, 1, NOW(3), NOW(3), 0, 'SYSTEM', 'SYSTEM');
 
--- 权限（74条，V8:64 + V15:8 + V16:1；含重复audit:export行，INSERT IGNORE兜底）
+-- 权限（78条，V8:64 + V15:8 + V16:1；INSERT IGNORE 幂等）
 INSERT IGNORE INTO permission (id, permission_code, permission_name_cn, permission_name_jp, module, action_, sort_order, status, create_time, is_deleted, create_by, update_by) VALUES
 -- demand CRUD
 (1,  'demand:read',    '查看补货需求', '補充需要を表示', 'demand',        'READ',    1,  1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
