@@ -51,10 +51,10 @@ mysql -h <host> -P <port> -u root -p manpou \
 # mysql -h <host> -P <port> -u root -p manpou < apps/manpou-allinone/sql/cn_hs_code_data.sql
 # mysql -h <host> -P <port> -u root -p manpou < apps/manpou-allinone/sql/jp_hs_code_data.sql
 
-# 4. 启动 manpou-allinone（激活 prod profile）
-export SPRING_PROFILES_ACTIVE=prod
-# 或启动参数: --spring.profiles.active=prod
-# application-prod.yml 中 spring.profiles.active=prod 会覆盖 application.yml 的 local 默认值
+# 4. 启动 manpou-allinone（激活 production profile）
+export SPRING_PROFILES_ACTIVE=production
+# 或启动参数: --spring.profiles.active=production
+# application-production.yml 中 spring.profiles.active=production 会覆盖 application.yml 的 local 默认值
 # Flyway 检测到 baseline='14'，自动跳过 V1~V14
 # 执行 V15（幂等：表已存在则跳过）→ V16
 ```
@@ -64,12 +64,12 @@ export SPRING_PROFILES_ACTIVE=prod
 生产数据库已有 JPA 创建的表，使用 `baseline-on-migrate`：
 
 ```bash
-# 启动时指定 prod profile，application-prod.yml 已配置：
-# export SPRING_PROFILES_ACTIVE=prod
-# Flyway 配置（application-prod.yml）：
+# 启动时指定 production profile，application-production.yml 已配置：
+# export SPRING_PROFILES_ACTIVE=production
+# Flyway 配置（application-production.yml）：
 spring:
   profiles:
-    active: prod              # 覆盖 application.yml 的 local 默认值
+    active: production        # 覆盖 application.yml 的 local 默认值
   jpa:
     hibernate:
       ddl-auto: validate       # 不靠 ddl-auto，靠 Flyway
@@ -125,7 +125,7 @@ FROM flyway_schema_history ORDER BY installed_rank;
 | `apps/manpou-allinone/sql/production_schema.sql` | 完整数据库 Schema（38 表，mysqldump 2026-05-11） |
 | `V15__baseline_schema.sql` | 43 张表 DDL + 种子数据（生产基准） |
 | `V16__procurement_snapshot.sql` | 发注单快照表（幂等兜底） |
-| `application-prod.yml` | 生产配置（Flyway 启用，baseline='14'） |
+| `application-production.yml` | 生产配置（Flyway 启用，baseline='14'） |
 | `docs/business/DB-09-order-overview.md` | procurement_snapshot 设计文档 |
 
 ---
