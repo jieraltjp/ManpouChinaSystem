@@ -136,8 +136,9 @@ apps/web/src/
 
 ### 数据库迁移
 
-- 开发期：JPA `ddl-auto: update`（H2 内存数据库）
-- 生产：Flyway 迁移脚本（`db/migration/V*.sql`）
+- 开发期：JPA `ddl-auto: update`（MySQL 23306）
+- 生产：Flyway 迁移脚本（`db/migration/V15__baseline_schema.sql` + `V16__procurement_snapshot.sql`）
+- 生产激活：`SPRING_PROFILES_ACTIVE=production`（见 `application-production.yml`）
 - **禁止 Flyway 版本号重编号**，冲突时立即修正
 
 ### i18n 规范
