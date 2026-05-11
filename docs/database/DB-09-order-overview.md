@@ -1,9 +1,9 @@
 # DB-09 — 订单总览数据库设计
 
 > **版本**: 2.3.0
-> **更新**: 2026-05-11（v2.3.0：procurement_snapshot 无Flyway迁移（Entity存在，ddl-auto update建表）；V40实际创建shipment_batch；移除§4.2过时迁移计划）
+> **更新**: 2026-05-11（v2.3.1：新增 V49__procurement_snapshot_table.sql Flyway迁移；Entity通过ddl-auto建表现已被正式迁移覆盖；见 docs/pro/PRODUCTION-DEPLOY.md 部署指南）
 > **创建**: 2026-04-22
-> **状态**: 🔄 Phase1 开发中（⚠️ procurement_snapshot Flyway迁移缺失）
+> **状态**: 🔄 Phase1 开发中
 > **业务步号**: 09（订单总览 — 核心视图）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B09-订单总览-API设计.md`
 > **对应 UI 文档**: `docs/ui/pages/09-order-overview.md`
@@ -263,7 +263,7 @@ WHERE d.is_deleted = FALSE;
 
 ### 4.2 待创建 Flyway 迁移（V*__procurement_snapshot_table.sql）
 
-> ⚠️ **重要**：procurement_snapshot 表无 Flyway 迁移脚本；Entity 由 JPA `ddl-auto: update` 在开发期建表，生产部署需手动执行建表或启用 ddl-auto。
+> ✅ **已修复**：V49__procurement_snapshot_table.sql（Flyway 迁移脚本）已创建，Entity 覆盖完整字段。
 > ⚠️ V40 实际创建的是 `shipment_batch` 表（出货批次），不是 procurement_snapshot。
 
 ---
