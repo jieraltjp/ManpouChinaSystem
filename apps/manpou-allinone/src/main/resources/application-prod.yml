@@ -1,0 +1,54 @@
+# ============================================================
+# 生产环境配置 — manpou-allinone
+# 启用 Flyway，使用 production_schema.sql 初始化 + V15/V16 增量迁移
+# ============================================================
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate    # 生产用 Flyway 管理 schema，不靠 ddl-auto
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: '14'    # 已有 V1~V14 记录，跳过
+    locations: classpath:db/migration
+    validate-on-migrate: true
+
+  datasource:
+    url: jdbc:mysql://${DB_HOST:192.168.13.202}:${DB_PORT:23306}/${DB_NAME:manpou}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:manpou23306}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 30
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DB:0}
+      timeout: 5000
+
+logging:
+  level:
+    root: INFO
+    com.manpou.allinone: INFO
+  pattern:
+    console: '{"time":"%d{yyyy-MM-dd HH:mm:ss.SSS}","level":"%level","service":"${spring.application.name}","traceId":"%X{traceId}","thread":"%t","logger":"%logger{36}","msg":"%msg"}%n'
+  org.hibernate.SQL: WARN
+  org.hibernate.type.descriptor.sql.BasicBinder: WARN

@@ -1,10 +1,9 @@
 -- ============================================================
--- V49: 发注单快照表（procurement_snapshot）
--- ============================================================
+-- V16: 发注单快照表（procurement_snapshot）
 -- Entity: com.manpou.allinone.order.domain.model.ProcurementSnapshot
 -- 说明: 记录下单时刻的工厂和商品信息，保证历史订单数据不变。
 --       由 ProcurementUseCase 在创建发注单时自动填充。
--- 审计: INTJ 2026-05-11（DB-09 v2.3.0 确认此 Flyway 迁移缺失）
+-- 幂等: CREATE TABLE IF NOT EXISTS（V15 已包含表结构，此文件仅做兜底）
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS procurement_snapshot (
