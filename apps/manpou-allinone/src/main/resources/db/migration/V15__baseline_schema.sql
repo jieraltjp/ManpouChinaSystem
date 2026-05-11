@@ -5,7 +5,8 @@
 -- Flyway baseline: V14 (已应用)
 -- 所有表使用 CREATE TABLE IF NOT EXISTS，幂等安全
 -- 注意: flyway_schema_history 由 baseline/生产初始化脚本创建，V15 不重复定义
--- 注意: cn_hs_code/jp_hs_code 等大数据量表仅含表结构，参考数据需单独导入
+-- 注意: cn_hs_code/jp_hs_code 表仅含表结构；factory(~500行)/product(~5000行)
+--       的实际数据由 JPA ddl-auto 在开发期生成，production_schema.sql 为纯 DDL
 -- ============================================================
 
 -- -------------------------------------------------------

@@ -1,9 +1,14 @@
 # ============================================================
 # 生产环境配置 — manpou-allinone
 # 启用 Flyway，使用 production_schema.sql 初始化 + V15/V16 增量迁移
+# 激活方式：设置环境变量 SPRING_PROFILES_ACTIVE=prod
+#           或启动参数 --spring.profiles.active=prod
 # ============================================================
 
 spring:
+  profiles:
+    active: prod           # 覆盖 application.yml 的默认值 local
+
   jpa:
     hibernate:
       ddl-auto: validate    # 生产用 Flyway 管理 schema，不靠 ddl-auto

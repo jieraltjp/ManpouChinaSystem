@@ -52,7 +52,10 @@ mysql -h <host> -P <port> -u root -p manpou \
 # mysql -h <host> -P <port> -u root -p manpou < apps/manpou-allinone/sql/jp_hs_code_data.sql
 
 # 4. 启动 manpou-allinone（激活 prod profile）
-# Spring Boot 检测到 baseline='14'，自动跳过 V1~V14
+export SPRING_PROFILES_ACTIVE=prod
+# 或启动参数: --spring.profiles.active=prod
+# application-prod.yml 中 spring.profiles.active=prod 会覆盖 application.yml 的 local 默认值
+# Flyway 检测到 baseline='14'，自动跳过 V1~V14
 # 执行 V15（幂等：表已存在则跳过）→ V16
 ```
 
@@ -61,17 +64,21 @@ mysql -h <host> -P <port> -u root -p manpou \
 生产数据库已有 JPA 创建的表，使用 `baseline-on-migrate`：
 
 ```bash
-# 启动时指定 prod profile，application-prod.yml 配置如下：
+# 启动时指定 prod profile，application-prod.yml 已配置：
+# export SPRING_PROFILES_ACTIVE=prod
+# Flyway 配置（application-prod.yml）：
 spring:
+  profiles:
+    active: prod              # 覆盖 application.yml 的 local 默认值
+  jpa:
+    hibernate:
+      ddl-auto: validate       # 不靠 ddl-auto，靠 Flyway
   flyway:
     enabled: true
     baseline-on-migrate: true
     baseline-version: '14'    # 已有 V1~V14 记录，跳过
     locations: classpath:db/migration
     validate-on-migrate: true
-  jpa:
-    hibernate:
-      ddl-auto: validate       # 不靠 ddl-auto，靠 Flyway
 ```
 
 `flyway_schema_history` 最终记录：`V1~V14（baseline） + V15 + V16`
