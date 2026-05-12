@@ -409,7 +409,7 @@
         <!-- 元数据 -->
         <el-descriptions-item :label="$t('inspection.dialog.createBy')">{{ currentRow.createBy || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.createTime')">
-          {{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
+          {{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
         </el-descriptions-item>
       </el-descriptions>
     </el-drawer>
@@ -456,7 +456,6 @@ const uploadFileList = ref<UploadFileItem[]>([])
 /** 详情抽屉图片列表（从 qc_image 表加载） */
 const drawerImages = ref<QcImageVO[]>([])
 const { t, locale: localeRef } = useI18n()
-const currentLocale = computed(() => localeRef.value)
 
 const form = reactive({
   shipmentBatchId: undefined as number | undefined,  // V43新增：关联出货批次（必填）

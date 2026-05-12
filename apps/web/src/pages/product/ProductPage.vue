@@ -213,8 +213,8 @@
         <!-- 审计信息 -->
         <div class="drawer-section-title" style="margin-top:8px">{{ $t('product.drawer.createTime') }} / {{ $t('product.drawer.updateTime') }}</div>
         <div class="detail-grid" style="margin-bottom:0">
-          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.createTime') }}</span><span class="detail-value">{{ currentRow.createTime || '-' }}</span></div>
-          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.updateTime') }}</span><span class="detail-value">{{ currentRow.updateTime || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.createTime') }}</span><span class="detail-value">{{ formatTime(currentRow.createTime) }}</span></div>
+          <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.updateTime') }}</span><span class="detail-value">{{ formatTime(currentRow.updateTime) }}</span></div>
         </div>
         <div class="drawer-footer">
           <el-button @click="detailVisible = false">{{ $t('product.drawer.close') }}</el-button>
@@ -430,8 +430,16 @@ import { productApi } from '@/api/product'
 import type { ProductPageVO, CreateProductRequest, UpdateProductRequest, ProductFactoryVO } from '@/api/product'
 import { usePermission } from '@/composables/usePermission'
 
-const { t } = useI18n()
+const { t, locale: localeRef } = useI18n()
 const { hasPermission } = usePermission()
+
+function formatTime(ts: string | undefined | null): string {
+  if (!ts) return '-'
+  return new Date(ts).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  })
+}
 
 const loading = ref(false)
 const submitting = ref(false)

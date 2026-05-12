@@ -186,7 +186,7 @@
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('sales.column.createBy')">{{ currentRow.createBy || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('sales.column.createTime')">{{ currentRow.createTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('sales.column.createTime')">{{ formatTime(currentRow.createTime) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('sales.column.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
       </el-descriptions>
     </el-drawer>
@@ -287,8 +287,16 @@ import { salesOperationsApi, type SalesRecordVO, type SalesStatus, type SalesCha
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
 
-const { t } = useI18n()
+const { t, locale: localeRef } = useI18n()
 const { hasPermission } = usePermission()
+
+function formatTime(ts: string | undefined | null): string {
+  if (!ts) return '-'
+  return new Date(ts).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  })
+}
 
 const loading = ref(false)
 const saveLoading = ref(false)

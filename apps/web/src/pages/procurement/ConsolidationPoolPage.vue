@@ -11,7 +11,15 @@ import { usePermission } from '@/composables/usePermission'
 
 const { hasPermission } = usePermission()
 
-const { t } = useI18n()
+const { t, locale: localeRef } = useI18n()
+
+function formatTime(ts: string | undefined | null): string {
+  if (!ts) return '-'
+  return new Date(ts).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  })
+}
 
 const loading = ref(false)
 const tableData = ref<ConsolidationPoolVO[]>([])
@@ -172,7 +180,9 @@ onMounted(loadData)
             <el-tag :type="poolStatusTag(row.status)" size="small">{{ poolStatusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" :label="$t('logistics.column.createTime')" min-width="160" />
+        <el-table-column :label="$t('logistics.column.createTime')" min-width="160">
+          <template #default="{ row }">{{ formatTime(row.createTime) }}</template>
+        </el-table-column>
         <el-table-column :label="$t('logistics.column.actions')" min-width="200" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="onEdit(row)" v-if="hasPermission('consolidation:update')">{{ $t('common.edit') }}</el-button>

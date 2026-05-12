@@ -136,8 +136,8 @@
         </span></div>
         <div class="detail-section-title">{{ $t('factory.drawer.section.audit') }}</div>
         <div class="detail-item"><span class="detail-label">{{ $t('factory.drawer.createBy') }}</span><span class="detail-value">{{ currentRow.createBy ?? $t('common.format.dash') }}</span></div>
-        <div class="detail-item"><span class="detail-label">{{ $t('factory.drawer.createTime') }}</span><span class="detail-value">{{ currentRow.createTime ?? $t('common.format.dash') }}</span></div>
-        <div class="detail-item"><span class="detail-label">{{ $t('factory.drawer.updateTime') }}</span><span class="detail-value">{{ currentRow.updateTime ?? $t('common.format.dash') }}</span></div>
+        <div class="detail-item"><span class="detail-label">{{ $t('factory.drawer.createTime') }}</span><span class="detail-value">{{ formatTime(currentRow.createTime) }}</span></div>
+        <div class="detail-item"><span class="detail-label">{{ $t('factory.drawer.updateTime') }}</span><span class="detail-value">{{ formatTime(currentRow.updateTime) }}</span></div>
 
         <div v-if="currentRow.notes" class="detail-item full-width">
           <span class="detail-label">{{ $t('factory.drawer.notes') }}</span>
@@ -247,8 +247,16 @@ import { factoryApi } from '@/api/factory'
 import type { FactoryPageVO, CreateFactoryRequest, UpdateFactoryRequest, CooperationStatus, FactoryStatsDTO } from '@/api/factory'
 import { usePermission } from '@/composables/usePermission'
 
-const { t } = useI18n()
+const { t, locale: localeRef } = useI18n()
 const { hasPermission } = usePermission()
+
+function formatTime(ts: string | undefined | null): string {
+  if (!ts) return '-'
+  return new Date(ts).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  })
+}
 
 const loading = ref(false)
 const submitting = ref(false)

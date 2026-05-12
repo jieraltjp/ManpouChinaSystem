@@ -37,7 +37,9 @@
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
       <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="300">
-        <el-table-column prop="createTime" :label="$t('auditLog.column.createTime')" min-width="160" />
+        <el-table-column :label="$t('auditLog.column.createTime')" min-width="160">
+          <template #default="{ row }">{{ formatTime(row.createTime) }}</template>
+        </el-table-column>
         <el-table-column prop="username" :label="$t('auditLog.column.username')" min-width="110" />
         <el-table-column :label="$t('auditLog.column.module')" min-width="100">
           <template #default="{ row }">
@@ -81,7 +83,7 @@
     <!-- 详情抽屉 -->
     <el-drawer v-model="detailVisible" :title="$t('auditLog.detail.title')" size="560px">
       <el-descriptions :column="1" border>
-        <el-descriptions-item :label="$t('auditLog.column.createTime')">{{ currentLog?.createTime }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('auditLog.column.createTime')">{{ formatTime(currentLog?.createTime) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('auditLog.column.username')">{{ currentLog?.username }}</el-descriptions-item>
         <el-descriptions-item :label="$t('auditLog.column.operatorName')">{{ currentLog?.operatorName || '—' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('auditLog.column.module')">{{ $t(`auditLog.module.${currentLog?.module ?? ''}`) }}</el-descriptions-item>
@@ -109,8 +111,19 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import { pageAuditLogs } from '@/api/auditLog'
 import type { AuditLogVO } from '@/api/auditLog'
+
+const { t, locale: localeRef } = useI18n()
+
+function formatTime(ts: string | undefined | null): string {
+  if (!ts) return '-'
+  return new Date(ts).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  })
+}
 
 const MODULE_OPTIONS = ['auth', 'procurement', 'factory', 'product', 'user', 'role']
 const ACTION_OPTIONS = ['LOGIN', 'CREATE', 'UPDATE', 'DELETE', 'APPROVE', 'REJECT']

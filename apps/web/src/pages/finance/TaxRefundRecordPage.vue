@@ -162,7 +162,7 @@
         <el-descriptions-item :label="$t('taxRefund.column.refundDate')">{{ currentRow.refundDate ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.refundBank')">{{ currentRow.refundBank ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.createBy')">{{ currentRow.createBy || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('taxRefund.column.createTime')">{{ currentRow.createTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('taxRefund.column.createTime')">{{ formatTime(currentRow.createTime) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
       </el-descriptions>
     </el-drawer>
@@ -471,8 +471,16 @@ function billingTypeLabel(val?: string | null): string {
   return t('taxRefund.enum.billingType.' + val) ?? val
 }
 
-const { t } = useI18n()
+const { t, locale: localeRef } = useI18n()
 const { hasPermission } = usePermission()
+
+function formatTime(ts: string | undefined | null): string {
+  if (!ts) return '-'
+  return new Date(ts).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  })
+}
 
 const statusCount = computed(() => {
   const counts: Record<string, number> = { APPLYING: 0, COMPLETED: 0, NO_REFUND: 0 }

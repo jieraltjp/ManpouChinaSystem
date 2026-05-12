@@ -171,7 +171,7 @@
         <el-descriptions-item :label="$t('demand.column.japanLead')">{{ currentRow.japanLead || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('demand.column.status')">{{ demandStatusLabel(currentRow) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('demand.dialog.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('demand.column.createTime')">{{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN') : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('demand.column.createTime')">{{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('demand.column.createBy')">{{ currentRow.createBy || '-' }}</el-descriptions-item>
       </el-descriptions>
       <div class="drawer-footer">
@@ -414,7 +414,6 @@ const currentRow = ref<DemandPageVO | null>(null)
 const formRef = ref<FormInstance>()
 
 const { t, locale: localeRef } = useI18n()
-const currentLocale = computed(() => localeRef.value)
 
 const filterForm = reactive({ demandType: '', keyword: '' })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })

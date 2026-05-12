@@ -268,7 +268,7 @@
         <el-descriptions-item :label="$t('japanCustoms.column.clearanceDate')">{{ currentRow.clearanceDate ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.createBy')">{{ currentRow.createBy || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('japanCustoms.column.createTime')">{{ currentRow.createTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('japanCustoms.column.createTime')">{{ formatTime(currentRow.createTime) }}</el-descriptions-item>
       </el-descriptions>
     </el-drawer>
 
@@ -410,7 +410,15 @@ const batchDomesticList = ref<CustomsVO[]>([])
 const batchSelectedIds = ref<number[]>([])
 const batchSubmitting = ref(false)
 
-const { t } = useI18n()
+const { t, locale: localeRef } = useI18n()
+
+function formatTime(ts: string | undefined | null): string {
+  if (!ts) return '-'
+  return new Date(ts).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  })
+}
 
 const statusCount = computed(() => {
   const counts: Record<string, number> = { PENDING: 0, IN_PROGRESS: 0, CLEARED: 0, FAILED: 0 }

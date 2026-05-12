@@ -201,9 +201,9 @@
         <el-descriptions-item :label="$t('order.drawer.chinaLead')">{{ currentRow.chinaLead || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.destination')" :span="2">{{ currentRow.destination || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.createBy')">{{ currentRow.createBy || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('order.drawer.createTime')">{{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.createTime')">{{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.updateBy')">{{ currentRow.updateBy || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('order.drawer.updateTime')">{{ currentRow.updateTime ? new Date(currentRow.updateTime).toLocaleString(currentLocale === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.updateTime')">{{ currentRow.updateTime ? new Date(currentRow.updateTime).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}</el-descriptions-item>
       </el-descriptions>
 
       <div class="drawer-actions">
@@ -501,7 +501,6 @@ const route = useRoute()
 const router = useRouter()
 const { t, locale: localeRef } = useI18n()
 const { hasPermission } = usePermission()
-const currentLocale = computed(() => localeRef.value)
 
 // 后端 order_status 枚举值（同时作为 i18n key）
 const ORDER_STATUS_ORDERED = '已下单'
