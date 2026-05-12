@@ -1,13 +1,13 @@
 # 权限代码文档对齐审计
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
 > **创建**: 2026-05-12
-> **更新**: 2026-05-12（v1.1.0：补充 Phase 4 状态；明确 ADMIN `*:*` 展开逻辑；确认 MANAGER 含 audit:read）
-> **目的**: 确保 V15 DB（78条）、ALL_PERMISSIONS Set（63条）、SPEC-B11 文档三方一致
+> **更新**: 2026-05-12（v1.3.0：V17 补入 japan_customs:update (ID=51)；JapanCustomsController @PreAuthorize 修正；JwtAuthenticationFilter 两端注释更新）
+> **目的**: 确保 V15+V17 DB（79条）、ALL_PERMISSIONS Set（63条）、SPEC-B11 文档三方一致
 
 ---
 
-## 1. V15 DB 实际数据（78条）
+## 1. DB 实际数据（79条，V15 78条 + V17 1条）
 
 来源：`allinone/src/main/resources/db/migration/V15__baseline_schema.sql` 第 877-976 行。
 
@@ -93,21 +93,26 @@
 
 与 V15 DB 差异分析：
 
-### 2.1 DB 有、Set 缺（5条）
+### 2.1 DB 有、Set 缺（11条）
 
 | permission_code | DB ID | 说明 |
 |----------------|-------|------|
-| customs:approve | 45 | DB 有，Set 无 → `@PreAuthorize` 无法生效 |
+| customs:approve | 45 | @PreAuthorize 在 CustomsController，MANAGER 有此权限 |
+| warehouse:read | 101 | DB 有，Set 无 |
+| warehouse:create | 102 | DB 有，Set 无 |
+| warehouse:update | 103 | DB 有，Set 无 |
+| warehouse:delete | 104 | DB 有，Set 无 |
 | notification:read | 111 | DB 有，Set 无 |
 | notification:create | 112 | DB 有，Set 无 |
 | notification:update | 113 | DB 有，Set 无 |
 | notification:delete | 114 | DB 有，Set 无 |
 
-**结论**：这 5 条通过运行时 DB 查询填充（`user-service` 从 DB 读 permissions 写入 JWT），不影响 ADMIN 展开。
+**影响**：warehouse/notification CRUD 只有 ADMIN（`*:*`）能用；MANAGER/OPERATOR/VIEWER 无法使用。
+customs:approve 在 CustomsController 有 @PreAuthorize，MANAGER/OPERATOR/VIEWER 会 403（虽然 DB 有此权限）。
 
 ### 2.2 Set 有、DB 缺（0条） ✅
 
-2026-05-12 审计修正：已移除 phantom warehouse/notification CRUD，仅保留 DB 有的 `notification:delete`（ID=114）。
+> v1.3.0：japan_customs:update 已通过 V17 补入 DB（ID=51），此前此项在 Set 和 @PreAuthorize 引用中存在但 DB 缺失。
 
 ### 2.3 两端对齐状态
 
@@ -115,7 +120,7 @@
 |------|---------|-----------|---------|
 | allinone JwtAuthenticationFilter | 63 | ✅ | 2026-05-12 |
 | user-service JwtAuthenticationFilter | 63 | ✅ | 2026-05-12 |
-| V15 permission 表 | 78 | — | — |
+| V15+V17 permission 表 | 79 | — | — |
 
 ---
 
@@ -132,17 +137,26 @@
 
 ---
 
-## 4. Phase 5+ 待补权限（DB 有、Set 无）
+## 4. 待补权限（DB 有、Set 无）
 
-| permission_code | DB ID | 说明 | 补入 Set 时机 |
-|----------------|-------|------|--------------|
-| customs:approve | 45 | 国内报关审批（@PreAuthorize 已加在 CustomsController）| Phase 5 |
-| notification:read | 111 | DB 有，Set 无 | Phase 5 |
-| notification:create | 112 | DB 有，Set 无 | Phase 5 |
-| notification:update | 113 | DB 有，Set 无 | Phase 5 |
-| notification:delete | 114 | DB 有，Set 无 | Phase 5 |
-| warehouse:read/create/update/delete | — | Phase 5+ 仓储模块 | Phase 5+ |
+| permission_code | DB ID | 状态 | 修复 |
+|----------------|-------|------|------|
+| customs:approve | 45 | DB 有，Set 无（@PreAuthorize 已加在 CustomsController）| MANAGER/OPERATOR 无此权限，建议加入 Set |
+| warehouse:read | 101 | DB 有，Set 无 | 建议加入 Set |
+| warehouse:create | 102 | DB 有，Set 无 | 建议加入 Set |
+| warehouse:update | 103 | DB 有，Set 无 | 建议加入 Set |
+| warehouse:delete | 104 | DB 有，Set 无 | 建议加入 Set |
+| notification:read | 111 | DB 有，Set 无 | Phase 5+ |
+| notification:create | 112 | DB 有，Set 无 | Phase 5+ |
+| notification:update | 113 | DB 有，Set 无 | Phase 5+ |
+| notification:delete | 114 | DB 有，Set 无 | Phase 5+ |
 | user:approve | 85 | Phase 6 注册审核 | Phase 6 |
+
+### 4.1 已修复
+
+| permission_code | DB ID | 修复版本 | 说明 |
+|----------------|-------|---------|------|
+| japan_customs:update | 51 | **V17 ✅** | Set 有、DB 无 → V17 INSERT (ID=51)；JapanCustomsController @PreAuthorize 改为语义对应（start→japan_customs:start，complete→japan_customs:complete） |
 
 ---
 

@@ -61,20 +61,25 @@ audit:read, audit:export                                                -- 2条
 
 ## 变更流程
 
-### 新增权限（Phase 5+ 示例：warehouse）
+### 新增权限（示例：将 warehouse CRUD 从 DB 加入 Set）
+
+warehouse CRUD 已在 V15 DB（ID 101-104），但未入 ALL_PERMISSIONS Set：
 
 ```java
-// Step 1: V15__baseline_schema.sql 新增 INSERT
-// (115, 'warehouse:read', '查看仓储', '倉庫記録を表示', 'warehouse', 'READ', ...);
+// Step 1: ✅ DB 已有 INSERT（V15）
+// (101, 'warehouse:read',   ...)
+// (102, 'warehouse:create', ...)
+// (103, 'warehouse:update', ...)
+// (104, 'warehouse:delete', ...)
 
-// Step 2: 两端 ALL_PERMISSIONS 同步追加
+// Step 2: 两端 ALL_PERMISSIONS 同步追加（待做）
 private static final Set<String> ALL_PERMISSIONS = Set.of(
     ...
-    "warehouse:create", "warehouse:read", "warehouse:update", "warehouse:delete",
+    "warehouse:read", "warehouse:create", "warehouse:update", "warehouse:delete",
     ...
 );
 
-// Step 3: 对应 Controller 加注解
+// Step 3: ✅ WarehouseController 已有 @PreAuthorize
 @PreAuthorize("hasAuthority('warehouse:create')")
 @PostMapping
 public Result<Void> create(...) { ... }

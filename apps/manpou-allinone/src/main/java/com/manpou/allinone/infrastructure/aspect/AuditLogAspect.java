@@ -142,7 +142,11 @@ public class AuditLogAspect {
 
     /**
      * 从方法返回值中提取 ID。
-     * 支持 Result<T> → 取 .payload；直接返回 Long/Integer 也支持。
+     * 支持：
+     * - Result&lt;T&gt; → 取 .payload（单个 ID）
+     * - Result&lt;List&lt;Long&gt;&gt; → 取第一个元素（批量创建主 ID）
+     * - ResponseEntity&lt;T&gt; → 取 .body
+     * - Long / Integer → 直接返回
      */
     @SuppressWarnings("unchecked")
     private String extractReturnId(Object returnValue) {
@@ -152,7 +156,16 @@ public class AuditLogAspect {
                 com.manpou.allinone.common.result.Result<Object> r =
                         (com.manpou.allinone.common.result.Result<Object>) returnValue;
                 Object payload = r.getPayload();
+                // Result<List<Long>> → 取第一个
+                if (payload instanceof java.util.List<?> list && !list.isEmpty()) {
+                    return String.valueOf(list.get(0));
+                }
                 return payload != null ? String.valueOf(payload) : null;
+            }
+            // ResponseEntity<T>
+            if (returnValue instanceof org.springframework.http.ResponseEntity<?> re) {
+                Object body = re.getBody();
+                return body != null ? String.valueOf(body) : null;
             }
             return String.valueOf(returnValue);
         } catch (Exception ex) {
@@ -167,7 +180,7 @@ public class AuditLogAspect {
      */
     private boolean isSystemException(Throwable t) {
         String name = t.getClass().getName();
-        return name.contains("IllegalArgument") || name.contains("AccessDenied")
+        return name.contains("IllegalArgument")
                 || name.contains("BeanCreation") || name.contains("BeanInitialization")
                 || name.contains("HttpMessageNotReadable") || name.contains("MissingServletRequest")
                 || name.contains("MethodArgumentTypeMismatch") || name.contains("ConstraintViolation")
@@ -228,12 +241,19 @@ public class AuditLogAspect {
     /**
      * 脱敏：字段名含敏感关键词时，将值替换为 "***"。
      * 包含深度限制（maxDepth=3）和循环引用检测，防止 StackOverflow。
+     *
+     * <p>DAG 支持：path（当前路径）检测真循环；seen（全局已访问）防止跨分支重复处理。
+     * 同一对象在不同分支出现（如 shared AddressDTO）不会被误判为 cyclic。
      */
     private Object sanitize(Object value) {
-        return sanitizeImpl(value, 0, java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()));
+        var path = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        var seen = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        return sanitizeImpl(value, 0, path, seen);
     }
 
-    private Object sanitizeImpl(Object value, int depth, java.util.Set<Object> visited) {
+    private Object sanitizeImpl(Object value, int depth,
+                              java.util.Set<Object> path,
+                              java.util.Set<Object> seen) {
         if (value == null) return null;
         if (depth > 3) return "[max-depth]";
 
@@ -244,20 +264,30 @@ public class AuditLogAspect {
         // 枚举：返回 .name()，避免暴露内部 $VALUES 字段
         if (cls.isEnum()) return ((Enum<?>) value).name();
 
-        // 循环引用检测
-        if (visited.contains(value)) return "[cyclic]";
-        visited.add(value);
+        // 真循环：同一对象在当前递归路径中再次出现
+        if (path.contains(value)) return "[cyclic]";
+        // DAG 共享节点：在其他分支已处理过，直接返回占位（避免重复）
+        if (seen.contains(value)) return "[shared]";
+
+        path.add(value);
+        seen.add(value);
 
         try {
             if (value instanceof java.util.Collection<?> c) {
-                return c.stream().limit(50).map(v -> sanitizeImpl(v, depth + 1, visited)).toList();
+                var result = c.stream().limit(50).map(v -> sanitizeImpl(v, depth + 1, path, seen)).toList();
+                path.remove(value);
+                return result;
             }
             if (value instanceof java.util.Map<?, ?> m) {
                 Map<String, Object> result = new HashMap<>();
                 m.forEach((k, v) -> {
                     String key = String.valueOf(k);
-                    result.put(key, SENSITIVE_PATTERN.matcher(key).find() ? "***" : sanitizeImpl(v, depth + 1, visited));
+                    Object sanitized = SENSITIVE_PATTERN.matcher(key).find()
+                            ? "***"
+                            : sanitizeImpl(v, depth + 1, path, seen);
+                    result.put(key, sanitized);
                 });
+                path.remove(value);
                 return result;
             }
             // 普通 Bean：逐字段处理
@@ -266,10 +296,15 @@ public class AuditLogAspect {
                 f.setAccessible(true);
                 String fieldName = f.getName();
                 Object fieldValue = f.get(value);
-                map.put(fieldName, SENSITIVE_PATTERN.matcher(fieldName).find() ? "***" : sanitizeImpl(fieldValue, depth + 1, visited));
+                Object sanitized = SENSITIVE_PATTERN.matcher(fieldName).find()
+                        ? "***"
+                        : sanitizeImpl(fieldValue, depth + 1, path, seen);
+                map.put(fieldName, sanitized);
             }
+            path.remove(value);
             return map;
         } catch (Exception ex) {
+            path.remove(value);
             return String.valueOf(value);
         }
     }

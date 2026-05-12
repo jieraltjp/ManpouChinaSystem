@@ -34,7 +34,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
 
-    /** ADMIN 角色 *:* 展开后的所有具体权限（63条，与 V15 DB 实际 67 条对齐）。warehouse/notification 已移除（DB 不存在）；已补充 japan_customs:start/complete, user:approve, permission:read, audit:export */
+    /** ADMIN 角色 *:* 展开后的所有具体权限（63条）。
+     * V15 DB 实际 78 条（warehouse CRUD ID 101-104 + notification CRUD ID 111-114 未入 Set）。
+     * japan_customs:update 通过 V17 迁补入 DB（ID 51）。
+     */
     private static final Set<String> ALL_PERMISSIONS = Set.of(
         "demand:create", "demand:read", "demand:update", "demand:delete",
         "procurement:create", "procurement:read", "procurement:update", "procurement:delete",

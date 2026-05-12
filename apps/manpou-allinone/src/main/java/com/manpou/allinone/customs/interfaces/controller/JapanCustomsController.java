@@ -67,7 +67,7 @@ public class JapanCustomsController {
 
     @PatchMapping("/{id}/start")
     @AuditLog(module = "japan_customs", action = "UPDATE", resourceType = "japan_customs", resourceId = "#id")
-    @PreAuthorize("hasAuthority('japan_customs:update')")
+    @PreAuthorize("hasAuthority('japan_customs:start')")
     public Result<Void> start(@PathVariable Long id) {
         japanCustomsUseCase.startClearance(id);
         return Result.ok("开始清关", null);
@@ -75,7 +75,7 @@ public class JapanCustomsController {
 
     @PatchMapping("/{id}/complete")
     @AuditLog(module = "japan_customs", action = "UPDATE", resourceType = "japan_customs", resourceId = "#id")
-    @PreAuthorize("hasAuthority('japan_customs:update')")
+    @PreAuthorize("hasAuthority('japan_customs:complete')")
     public Result<Void> complete(@PathVariable Long id,
                                   @Valid @RequestBody JapanCustomsCompleteCmd cmd) {
         japanCustomsUseCase.complete(id, cmd);

@@ -86,15 +86,4 @@ public class ProcurementController {
         procurementUseCase.delete(id);
         return Result.ok("发注单删除成功", null);
     }
-
-    /**
-     * 测试端点：验证 AuditLogAspect + AuditLogClient 是否正常工作。
-     * POST /api/v1/procurements/test-audit
-     */
-    @PostMapping("/test-audit")
-    @PreAuthorize("hasAuthority('procurement:create')")
-    @AuditLog(module = "procurement", action = "TEST", resourceType = "procurement")
-    public Result<String> testAuditLog() {
-        return Result.ok("audit log test triggered");
-    }
 }

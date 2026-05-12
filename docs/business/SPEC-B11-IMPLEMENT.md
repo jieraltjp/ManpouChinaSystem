@@ -1,10 +1,10 @@
 # SPEC-B11 — 用户中心与权限体系 · 实现设计
 
-> **版本**: 1.5.0
+> **版本**: 1.6.0
 > **创建**: 2026-05-01
-> **更新**: 2026-05-12（v1.5.0：Phase 4 操作日志完成——链路验证通过；ALL_PERMISSIONS 修正为63条）
+> **更新**: 2026-05-12（v1.6.0：V17 修复 japan_customs:update 缺失 Bug；JapanCustomsController @PreAuthorize 修正；Phase 3 缺口全部闭合）
 > **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；✅ Phase 4 操作日志完成；Phase 5-6 待开发
-> **前置**: SPEC-B11 v1.8.0 · Vite proxy 已配置 · allinone V15/V16 已就绪
+> **前置**: SPEC-B11 v1.8.0 · Vite proxy 已配置 · allinone V15/V16/V17 已就绪
 > **关联**: UI-17 · UI-18 · UI-19 · UI-20 · docs/ui/pages/14-user-management.md · docs/ui/pages/15-role-management.md · `docs/permission/`（权限代码对齐文档）
 > **INTJ 编号**: DOC-B11-IMPL-001
 
@@ -335,10 +335,11 @@ GET /api/v1/permissions/tree
 **实现完成清单：**
 1. allinone `JwtAuthenticationFilter` ✅ 提取 permissions（63条，与 V15 DB 实际对齐）
 2. allinone 21个业务 Controller 加 `@PreAuthorize` ✅
-3. user-service `ALL_PERMISSIONS` 与 V15 DB 对齐（warehouse CRUD 移除；notification CRUD 在 DB 中但未入 Set；补充 japan_customs:start/complete, user:approve, permission:read, audit:export）✅
+3. user-service `ALL_PERMISSIONS` 与 V15 DB 对齐（warehouse CRUD 在 DB 中但未入 Set；notification CRUD 同理；补充 japan_customs:start/complete, user:approve, permission:read, audit:export）✅
 4. Phase 3 遗留缺口：
    - AuditLogPage.vue 缺少 `hasPermission('audit:read')` 检查（依赖路由 roles 兜底）
    - CosTestPage.vue 缺少 roles 限制（后端 /api/v1/test/** 为 permitAll，生产环境风险）
+   - japan_customs:update 缺失：Set 有、DB 无 → V17 已补（ID=51），JapanCustomsController @PreAuthorize 修正为语义对应
 
 ### Phase 4 — 操作日志 ✅ 完成（2026-05-12）
 
@@ -358,6 +359,7 @@ GET /api/v1/permissions/tree
 5. 修改密码 API（`PUT /api/v1/auth/password`）
 6. i18n key 补充（`profile.*`）
 ⚠️ notification CRUD 后端已实现（无前端 UI）
+⚠️ warehouse CRUD 后端已实现（无前端 UI，DB 有但 ALL_PERMISSIONS Set 无）
 
 ### Phase 6 — 注册 + 审核流程 ⚠️ 待开发（后端部分实现）
 
@@ -382,8 +384,9 @@ GET /api/v1/permissions/tree
 |------|------|------|------|
 | V15 | `V15__baseline_schema.sql` | 32 表 DDL + 种子数据（78 条权限 + 4 角色 + admin 用户 + 职务 + 组织） | ✅ |
 | V16 | `V16__procurement_snapshot.sql` | procurement_snapshot 表（幂等兜底） | ✅ |
+| V17 | `V17__japan_customs_update_permission.sql` | INSERT japan_customs:update (ID=51) 修复 Set/DB 不一致 | ✅ |
 
-> DB 实际权限：67 条（ID 1~94 + 114）。BCrypt hash: `$2a$12$t7mRpfsCDNFgj6LET1Y47eH7J2.MJ5i5nAYwYL6SfKdWE7LN.vqUG`（admin/admin123）
+> DB 实际权限：79 条（V15 78条 + V17 1条）。BCrypt hash: `$2a$12$t7mRpfsCDNFgj6LET1Y47eH7J2.MJ5i5nAYwYL6SfKdWE7LN.vqUG`（admin/admin123）
 
 ---
 

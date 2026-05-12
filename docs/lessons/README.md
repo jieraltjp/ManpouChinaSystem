@@ -2,42 +2,91 @@
 
 > 项目：ManpouChinaSystem
 > 生成：2026-04-27
-> 更新：2026-05-12（新增 Lesson 80-87：操作日志切面审计 + 二次审计修复）
-> 来源：全面审计会话（Lombok-Decoupling-DI-Lessons.md v54 lessons 拆分）
+> 更新：2026-05-12（审计系统全面修复 + 教训目录分类重组）
+> 来源：全面审计会话（Lombok-Decoupling-DI-Lessons.md v54 lessons 拆分 + 审计系统 Round 1-3 修复）
 
 ---
 
-## 文档结构
+## 目录结构
 
-| 文件 | 覆盖范围 | Lesson 编号 |
-|------|---------|------------|
-| [LESSONS-BACKEND.md](./LESSONS-BACKEND.md) | 后端 Java / Spring / JPA / DDD | 1–6, 10, 25, 29–34, 38 |
-| [LESSONS-OPS.md](./LESSONS-OPS.md) | 构建 / 部署 / 环境 / 运维 | 7–9, 17–18, 20, 26–28, 76 |
-| [LESSONS-DATABASE.md](./LESSONS-DATABASE.md) | 数据库 / Flyway / Schema | 8, 13, 31–32, 39, 45, 51, 59, 60 |
-| [LESSONS-FRONTEND.md](./LESSONS-FRONTEND.md) | 前端 Vue / TS / i18n / Element Plus | 11–12, 14, 16, 33–34, 37, 40–44, 46–50, 52–59 |
-| [LESSONS-USER-SERVICE.md](./LESSONS-USER-SERVICE.md) | user-service JWT / Flyway / Lombok / JPA / Spring Data | 62–71 |
-| [LESSONS-JWT-CROSS-SERVICE.md](./LESSONS-JWT-CROSS-SERVICE.md) | allinone 只读验签 / Map 反序列化 / RS256 kid 提取 | 72–73 |
-| [LESSON-75.md](./LESSON-75.md) | allinone JWT 遗漏 permissions 导致 @PreAuthorize 失效 | 75 |
-| [LESSON-76.md](./LESSON-76.md) | allinone 重启流程——JAR 锁定的正确处理 | 76 |
-| [LESSON-COS-URL-QUERY-PARAM.md](./LESSON-COS-URL-QUERY-PARAM.md) | CosService.upload() 返回 URL 含 query param，提取方法未同步剥离 → COS 预览 404 | 77 |
-| [LESSON-PERMISSION-AUDIT-2026-05-08.md](./LESSON-PERMISSION-AUDIT-2026-05-08.md) | 权限三角审计：前端/后端/DB 完全一致，8条孤岛权限无影响 | 78 |
-| [LESSON-JWT-KEY-ENV.md](./LESSON-JWT-KEY-ENV.md) | JWT 密钥 DB/classpath 来源不一致导致 allinone 401，改为 env var 加载 | 79 |
-| [LESSON-AUDIT-LOG-2026-05-12.md](./LESSON-AUDIT-LOG-2026-05-12.md) | @EnableAsync 缺失 / 审计日志写错 DB / UserContext 缺 getUsername / @PreAuthorize 内部调用绕过 / 未重启旧 JAR | 80–84 |
-| [LESSON-85.md](./LESSON-85.md) | #_return 对 ResponseEntity/Result\<List\> 返回类型静默失效 | 85 |
-| [LESSON-86.md](./LESSON-86.md) | sanitizeImpl visited 集合导致 DAG 结构误判为 cyclic | 86 |
-| [LESSON-87.md](./LESSON-87.md) | operatorName 始终 null — JWT 缺少 realName/companyId/departmentId claim | 87 |
-| [LESSON-55-56.md](./LESSON-55-56.md) | el-input-number 列宽 + dialog 紧凑设计 | 55, 56 |
-| [LESSON-57.md](./LESSON-57.md) | 业务锚点变更：procurementId → qcRecordId | 57 |
-| [LESSON-58.md](./LESSON-58.md) | el-input-number 按钮截断：padding 计算漏扣 | 58 |
-| [LESSON-60.md](./LESSON-60.md) | Spring Data JPA nativeQuery + Pageable ORDER BY 陷阱 | 60 |
-| [LESSON-API-UNWRAP-CONSISTENCY.md](./LESSON-API-UNWRAP-CONSISTENCY.md) | client.ts Result<T> 解包一致性 | 74 |
-| [BUSINESS-LOGIC-AUDIT-2026-05-07.md](../audit/BUSINESS-LOGIC-AUDIT-2026-05-07.md) | FSM·DB-Entity·计算字段·字段必填五层对齐审计 | — |
+```
+docs/lessons/
+├── backend/        ← Java / Spring / JPA / DDD / 业务逻辑
+├── ops/            ← 构建 / 部署 / 环境 / 运维
+├── database/       ← 数据库 / Flyway / Schema
+├── frontend/       ← 前端 Vue / TS / i18n / Element Plus
+├── security/       ← JWT / 权限 / 认证
+├── user-service/   ← user-service 专项（JWT/Flyway/Lombok/JPA）
+├── audit/          ← 审计日志系统专项
+├── README.md       ← 本文件（总索引）
+├── BUSINESS-LOGIC-AUDIT-2026-05-07.md   ← 业务逻辑五层对齐审计（未分类）
+└── AUDIT-2026-04-27-procurement-demand-table-mismatch.md ← 发注需求表不匹配审计（未分类）
+```
 
 ---
 
-## 铁律总表（70 条）
+## 按专题索引
 
-### 后端（21 条）
+### backend/ — 后端 Java / Spring / JPA / DDD
+
+| 文件 | 覆盖 Lesson |
+|------|------------|
+| [backend/LESSONS-BACKEND.md](./backend/LESSONS-BACKEND.md) | 1–6, 10, 25, 29–34, 38 |
+| [backend/LESSON-75.md](./backend/LESSON-75.md) | 75 — allinone JWT 遗漏 permissions + 17个 Controller 零注解 |
+| [backend/LESSON-76.md](./backend/LESSON-76.md) | 76 — allinone 重启流程（JAR 锁定的正确处理）|
+| [backend/LESSON-85.md](./backend/LESSON-85.md) | 85 — `#_return` 对 ResponseEntity/Result\<List\> 静默失效 |
+| [backend/LESSON-86.md](./backend/LESSON-86.md) | 86 — sanitizeImpl visited 集合误判 DAG 结构为 cyclic |
+
+### ops/ — 构建 / 部署 / 环境 / 运维
+
+| 文件 | 覆盖 Lesson |
+|------|------------|
+| [ops/LESSONS-OPS.md](./ops/LESSONS-OPS.md) | 7–9, 17–18, 20, 26–28, 76 |
+
+### database/ — 数据库 / Flyway / Schema
+
+| 文件 | 覆盖 Lesson |
+|------|------------|
+| [database/LESSONS-DATABASE.md](./database/LESSONS-DATABASE.md) | 8, 13, 31–32, 39, 45, 51, 59, 60 |
+
+### frontend/ — 前端 Vue / TS / i18n / Element Plus
+
+| 文件 | 覆盖 Lesson |
+|------|------------|
+| [frontend/LESSONS-FRONTEND.md](./frontend/LESSONS-FRONTEND.md) | 11–12, 14, 16, 33–34, 37, 40–44, 46–50, 52–59 |
+| [frontend/LESSON-55-56.md](./frontend/LESSON-55-56.md) | 55, 56 — el-input-number 列宽 / dialog 紧凑设计 |
+| [frontend/LESSON-57.md](./frontend/LESSON-57.md) | 57 — 业务锚点变更：procurementId → qcRecordId |
+| [frontend/LESSON-58.md](./frontend/LESSON-58.md) | 58 — el-input-number padding 计算漏扣 |
+| [frontend/LESSON-60.md](./frontend/LESSON-60.md) | 60 — nativeQuery + Pageable ORDER BY 陷阱 |
+| [frontend/LESSON-API-UNWRAP-CONSISTENCY.md](./frontend/LESSON-API-UNWRAP-CONSISTENCY.md) | 74 — client.ts Result\<T\> 解包一致性 |
+| [frontend/LESSON-COS-URL-QUERY-PARAM.md](./frontend/LESSON-COS-URL-QUERY-PARAM.md) | 77 — COS URL 含 query param，提取未剥离 → 预览 404 |
+
+### security/ — JWT / 权限 / 认证
+
+| 文件 | 覆盖 Lesson |
+|------|------------|
+| [security/LESSONS-JWT-CROSS-SERVICE.md](./security/LESSONS-JWT-CROSS-SERVICE.md) | 72, 73 — allinone 只读验签 / Map 反序列化 / RS256 kid 提取 |
+| [security/LESSON-JWT-KEY-ENV.md](./security/LESSON-JWT-KEY-ENV.md) | 79 — JWT 密钥 DB/classpath 来源不一致导致 allinone 401 |
+| [security/LESSON-PERMISSION-AUDIT-2026-05-08.md](./security/LESSON-PERMISSION-AUDIT-2026-05-08.md) | 78 — 权限三角审计：前端/后端/DB 完全一致，8条孤岛权限无影响 |
+
+### user-service/ — user-service 专项
+
+| 文件 | 覆盖 Lesson |
+|------|------------|
+| [user-service/LESSONS-USER-SERVICE.md](./user-service/LESSONS-USER-SERVICE.md) | 62–71 |
+
+### audit/ — 审计日志系统专项
+
+| 文件 | 覆盖 Lesson |
+|------|------------|
+| [audit/LESSON-AUDIT-LOG-2026-05-12.md](./audit/LESSON-AUDIT-LOG-2026-05-12.md) | 80–84 — @EnableAsync 缺失 / 审计日志写错 DB / UserContext 缺 getUsername / @PreAuthorize 代理绕过 / 未重启旧 JAR |
+| [audit/LESSON-87.md](./audit/LESSON-87.md) | 87 — operatorName 始终 null — JWT 缺少 realName/companyId/departmentId claim |
+
+---
+
+## 铁律总表（按分类）
+
+### 后端（23 条）
 
 | # | 铁律 | 违反后果 |
 |---|------|---------|
@@ -56,10 +105,12 @@
 | 33 | 业务链起点 = Overview 入口锚点 | Demand 新建后不可见 |
 | 34 | 接口变更 = 后端 VO + 前端类型 + 模板 + i18n 同步 | undefined 显示 |
 | 38 | 业务逻辑校验在入口处，零值/空值必须防御 | 脏数据 |
+| 75 | JWT 新增 claim 必须两端同步；新增 Controller 必须加 @PreAuthorize | 权限验证形同虚设 |
 | 80 | `@EnableAsync` 缺失导致 `@Async` 方法同步执行——新增异步方法时同步检查启动类注解 | 异步变同步，事务污染 |
 | 81 | 跨服务审计日志查不到时先确认写入方数据库——user-service 写 user_service DB，allinone 写 manpou DB | 查错库浪费时间 |
 | 82 | 接口新增方法时必须检查所有实现类——`UserContext` 新增 `getUsername()` → `JwtClaims` + `JwtContextHolder` 同步实现 | 接口实现缺失，运行时 NPE |
 | 83 | `@PreAuthorize` 必须加在 Controller 层，内部方法调用绕过 AOP 代理 | 权限控制形同虚设 |
+| 85 | `#_return` SpEL 引用仅支持 `Result<T>` 单个值，不支持 ResponseEntity/Result\<List\> | 审计日志 resourceId 为 null |
 
 ### 运维/部署（9 条）
 
@@ -73,8 +124,7 @@
 | 20 | 分页约定 page=0 vs page=1 开发前锁定 | 前后端不对齐 |
 | 26 | 打包禁止 `-q` + 确保无旧进程锁 JAR | JAR 不可用 |
 | 76 | 代码变更后重启 allinone：先停进程→等5秒→删JAR→重打包→干跑验证 | 旧 JAR 无新代码，权限验证形同虚设 |
-| 27 | 运行时依赖不能是 test scope | 启动失败 |
-| 28 | 编译与启动必须分离，错误必须可见 | 错误被掩盖 |
+| 77 | async/sendAsync 方法变更后必须重启目标服务确认生效 | 异步逻辑形同虚设 |
 
 ### 数据库（8 条）
 
@@ -86,8 +136,10 @@
 | 39 | DB schema 文档版本号 ≥ 代码版本号 | 文档失效 |
 | 45 | Flyway 迁移版本号不得重复，冲突时立即修正 | 迁移执行顺序不确定 |
 | 51 | JPQL 查询字段名 = 实体字段名，非数据库列名 | 查询报错 |
+| 59 | Flyway 禁用项目新增枚举值须同步 ALTER DB 列类型 | Data truncated 500 错误 |
+| 60 | nativeQuery=true + Pageable 排序 → Spring Data 追加实体属性名（非列名）→ 报错 Unknown column | 500 错误 |
 
-### 前端（21 条）
+### 前端（24 条）
 
 | # | 铁律 | 违反后果 |
 |---|------|---------|
@@ -114,11 +166,18 @@
 | 53 | i18n JSON 中 key 不得重复——后值覆盖前值（JSON 规范未定义合并行为） | 文案错误 |
 | 54 | 多文件样式修复必须用 grep 全局扫描——防止"改了 A 漏了 B" | 修复不完整 |
 | 55 | el-input-number 所在列 span≥4（dialog 宽 800+），按钮才不被截断 | 按钮显示异常 |
-| 56 | 表单 diviser 仅在跨语义区大区块时使用，紧凑表单禁止加分隔线 | 视觉噪音 |
+| 56 | 表单 divider 仅在跨语义区大区块时使用，紧凑表单禁止加分隔线 | 视觉噪音 |
 | 57 | 业务关联变更须从 SPEC → DB → 后端 → 前端八层同步，锚点选择决定数据质量 | 调配计划用采购单锚点导致无实际 cargo 尺寸 |
-| 59 | Flyway 禁用项目新增枚举值须同步 ALTER DB 列类型，V38 类迁移组件幂等设计 | Data truncated 500 错误 |
 | 58 | el-input-number 列宽 = content - 60px(按钮) - 16px(el-col padding)，content < 150px 时按钮截断 | 按钮文字被遮挡 |
-| 60 | nativeQuery=true + Pageable 排序 → Spring Data 追加实体属性名（非列名）→ 报错 Unknown column | 500 错误 |
+| 59 | Flyway 禁用项目新增枚举值须同步 ALTER DB 列类型，V38 类迁移组件幂等设计 | Data truncated 500 错误 |
+
+### security（3 条）
+
+| # | 铁律 | 违反后果 |
+|---|------|---------|
+| 68 | RestTemplate 反序列化 `Result<内部类VO>` 须用 Map 中间层 | kid=null，缓存失效，401 |
+| 69 | RS256 JWT 提取 kid 必须从 header base64url 解码，禁止先验签再提取 | RS256 无公钥 parse 抛异常，401 |
+| 79 | JWT 密钥来源必须统一——env var > classpath > DB，禁止混用 | allinone 401 |
 
 ### user-service 实施（6 条）
 
@@ -131,14 +190,15 @@
 | 66 | BCrypt hash 不用记忆，用时现生成并验证 | 密码错误无法登录 |
 | 67 | 编译和启动分离，不用 -q 静默模式 | 错误被掩盖无法诊断 |
 
-### JWT 跨服务（1 条）
+### 审计日志专项（5 条）
 
 | # | 铁律 | 违反后果 |
 |---|------|---------|
-| 68 | RestTemplate 反序列化 `Result<内部类VO>` 须用 Map 中间层 | kid=null，缓存失效，401 |
-| 69 | RS256 JWT 提取 kid 必须从 header base64url 解码，禁止先验签再提取 | RS256 无公钥 parse 抛异常，401 |
-
-
+| 80 | `@EnableAsync` 缺失导致 `@Async` 方法同步执行 | 异步变同步，事务污染 |
+| 81 | 跨服务审计日志查不到时先确认写入方数据库 | 查错库浪费时间 |
+| 82 | 接口新增方法时必须检查所有实现类同步 | 接口实现缺失，运行时 NPE |
+| 83 | `@PreAuthorize` 必须加在 Controller 层，内部方法调用绕过 AOP 代理 | 权限控制形同虚设 |
+| 87 | JWT 缺少 realName/companyId/departmentId claim → operatorName 始终 null | 审计日志用户信息不完整 |
 
 ---
 
@@ -146,47 +206,47 @@
 
 | 场景 | 查哪个文件 |
 |------|-----------|
-| Lombok 报错 / 跨模块编译失败 | LESSONS-BACKEND.md → Lesson 1 |
-| Spring 启动失败 Bean 歧义 | LESSONS-BACKEND.md → Lesson 3, 25 |
-| 前端列错位 / el-table 问题 | LESSONS-FRONTEND.md → Lesson 46, 47 |
-| 打包后 JAR 无法启动 | LESSONS-OPS.md → Lesson 26 |
-| DB 迁移报错 / VARCHAR 超限 | LESSONS-DATABASE.md → Lesson 31, 32 |
-| i18n 重复 key / 硬编码 | LESSONS-FRONTEND.md → Lesson 44, 53 |
-| nativeQuery + Pageable ORDER BY 500 | LESSONS-DATABASE.md → Lesson 60 |
-| 接口变更后数据不对 | LESSONS-BACKEND.md → Lesson 34 |
-| user-service JWT 跨服务 / Flyway+JPA schema 对齐 | LESSONS-USER-SERVICE.md → Lesson 62-67 |
-| allinone 跨服务 JWT 401 / Map 反序列化 | LESSONS-JWT-CROSS-SERVICE.md → Lesson 68 |
-| allinone JWT 遗漏 permissions / Controller 零注解 | LESSON-75.md |
-| @EnableAsync 缺失 / UserContext 缺 getUsername / 审计日志写错 DB / @PreAuthorize 内部调用绕过 | LESSON-AUDIT-LOG-2026-05-12.md |
-
+| Lombok 报错 / 跨模块编译失败 | `backend/LESSONS-BACKEND.md` → Lesson 1 |
+| Spring 启动失败 Bean 歧义 | `backend/LESSONS-BACKEND.md` → Lesson 3, 25 |
+| 前端列错位 / el-table 问题 | `frontend/LESSONS-FRONTEND.md` → Lesson 46, 47 |
+| 打包后 JAR 无法启动 | `ops/LESSONS-OPS.md` → Lesson 26 |
+| DB 迁移报错 / VARCHAR 超限 | `database/LESSONS-DATABASE.md` → Lesson 31, 32 |
+| i18n 重复 key / 硬编码 | `frontend/LESSONS-FRONTEND.md` → Lesson 44, 53 |
+| nativeQuery + Pageable ORDER BY 500 | `database/LESSONS-DATABASE.md` → Lesson 60 |
+| 接口变更后数据不对 | `backend/LESSONS-BACKEND.md` → Lesson 34 |
+| user-service JWT 跨服务 / Flyway+JPA schema 对齐 | `user-service/LESSONS-USER-SERVICE.md` → Lesson 62–71 |
+| allinone 跨服务 JWT 401 / Map 反序列化 | `security/LESSONS-JWT-CROSS-SERVICE.md` → Lesson 72–73 |
+| allinone JWT 遗漏 permissions / Controller 零注解 | `backend/LESSON-75.md` |
+| @EnableAsync 缺失 / UserContext 缺 getUsername / 审计日志写错 DB / @PreAuthorize 内部调用绕过 | `audit/LESSON-AUDIT-LOG-2026-05-12.md` |
+| `#_return` SpEL 不生效 | `backend/LESSON-85.md` |
+| sanitizeImpl DAG 误判 cyclic | `backend/LESSON-86.md` |
+| operatorName 始终 null | `audit/LESSON-87.md` |
 
 ---
 
-## 新增 Lesson 来源
+## Lesson 来源记录
 
 | Lesson | 来源 |
 |--------|------|
-| 46–50 | 2026-04-24 Element Plus 表格全面审计 |
-| 51 | 2026-04-24 JPQL 字段名错误修复 |
-| 52 | 2026-04-27 /procurement/demand dist 时间差审计 |
-| 53 | 2026-04-27 zh.json / ja.json 重复 key 修复 |
-| 54 | 2026-04-27 全局样式修复漏扫审计 |
-| 55 | 2026-04-27 QcRecordPage el-input-number 列宽截断修复 |
-| 56 | 2026-04-27 QcRecordPage dialog 无必要 divider 移除 |
+| 1–6, 10, 25, 29–34, 38 | Lombok-Decoupling-DI-Lessons.md v54 lessons 拆分 |
+| 7–9, 17–18, 20, 26–28 | 构建/部署/运维经验积累 |
+| 8, 13, 31–32, 39, 45, 51, 59, 60 | 数据库迁移实战 |
+| 11–12, 14, 16, 21, 24, 33–34, 37, 40–44, 46–50, 52–59 | 前端 Vue/TS/i18n/Element Plus 实战 |
+| 55–56 | 2026-04-27 QcRecordPage el-input-number 列宽截断修复 |
 | 57 | 2026-04-27 LogisticsPlan procurementId → qcRecordId 业务锚点修正 |
 | 58 | 2026-04-27 LogisticsPlanPage el-input-number 按钮截断宽度计算修正 |
-| 59 | 2026-04-28 DemandStatus CONFIRMED 新增 + Flyway 禁用项目 @PostConstruct 幂等迁移组件 |
-| 60 | 2026-04-28 `/api/v1/orders/chain` nativeQuery=true + Pageable ORDER BY → Unknown column |
-| 62-67 | 2026-04-30 user-service SPEC-B11 Phase 1 实施（JWT 跨服务 / JPA schema 对齐） |
-| 68 | 2026-04-30 allinone JwtKeyManager 跨服务 JWT 401 根因（ParameterizedTypeReference 泛型失效） |
-| 69 | 2026-04-30 allinone JwtService.parseToken 双重 parse bug（RS256 无公钥 parse 失败） |
-| 75 | 2026-05-08 allinone JWT 遗漏 permissions + 17个 Controller 零注解，导致 Phase 3 权限控制形同虚设 |
-| 76 | 2026-05-08 allinone 重启流程——`-q` 掩盖 repackage 失败 + 进程未杀干净导致旧 JAR 启动 |
-| 77 | 2026-05-08 CosService.upload() URL 含 query param，提取时未剥离 → COS 预览 404 |
-| 78 | 2026-05-08 权限三角审计：前端/后端/DB 完全一致，8条孤岛权限无影响 |
-| 79 | 2026-05-08 JWT 密钥 DB/classpath 来源不一致导致 allinone 401，改为 env var 加载 |
-| 80 | 2026-05-12 user-service `@EnableAsync` 缺失导致 `saveAsync` 同步执行，审计日志延迟写入 |
-| 81 | 2026-05-12 审计日志写入 `user_service` DB（非 `manpou` DB），跨库查询找不到记录 |
-| 82 | 2026-05-12 `UserContext` 接口缺失 `getUsername()`，`JwtClaims` 有值但无法传递到审计日志 |
-| 83 | 2026-05-12 `@PreAuthorize` 在内部方法调用时绕过 Spring AOP 代理——仅 Controller 层注解有效 |
-
+| 62–71 | 2026-04-30 user-service SPEC-B11 Phase 1 实施 |
+| 72 | 2026-04-30 allinone JwtKeyManager 跨服务 JWT 401 根因（ParameterizedTypeReference 泛型失效）|
+| 73 | 2026-04-30 allinone JwtService.parseToken 双重 parse bug（RS256 无公钥 parse 失败）|
+| 75 | 2026-05-08 allinone JWT 遗漏 permissions + 17个 Controller 零注解 |
+| 76 | 2026-05-08 allinone 重启流程（`-q` 掩盖 repackage 失败 + 进程未杀干净）|
+| 77 | 2026-05-08 CosService.upload() URL 含 query param → COS 预览 404 |
+| 78 | 2026-05-08 权限三角审计：前端/后端/DB 完全一致 |
+| 79 | 2026-05-08 JWT 密钥 DB/classpath 来源不一致导致 allinone 401 |
+| 80 | 2026-05-12 user-service `@EnableAsync` 缺失导致 `saveAsync` 同步执行 |
+| 81 | 2026-05-12 审计日志写入 `user_service` DB（非 `manpou` DB）|
+| 82 | 2026-05-12 `UserContext` 接口缺失 `getUsername()`，`JwtClaims` 有值但无法传递 |
+| 83 | 2026-05-12 `@PreAuthorize` 在内部方法调用时绕过 Spring AOP 代理 |
+| 85 | 2026-05-12 `#_return` 对 ResponseEntity/Result\<List\> 静默失效 |
+| 86 | 2026-05-12 sanitizeImpl visited 集合误判 DAG 结构为 cyclic |
+| 87 | 2026-05-12 JWT 缺少 realName/companyId/departmentId claim → operatorName 始终 null |

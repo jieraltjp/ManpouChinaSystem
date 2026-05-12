@@ -114,7 +114,9 @@
             <el-tag :type="statusTagType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" :label="$t('customs.column.createTime')" min-width="160" />
+        <el-table-column prop="createTime" :label="$t('customs.column.createTime')" min-width="160">
+          <template #default="{ row }">{{ formatTime(row.createTime) }}</template>
+        </el-table-column>
         <el-table-column :label="$t('customs.column.action')" min-width="200" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
@@ -175,7 +177,9 @@
                 <el-tag :type="statusTagType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="createTime" :label="$t('customs.column.createTime')" min-width="160" />
+            <el-table-column prop="createTime" :label="$t('customs.column.createTime')" min-width="160">
+          <template #default="{ row }">{{ formatTime(row.createTime) }}</template>
+        </el-table-column>
             <el-table-column :label="$t('customs.column.action')" min-width="180" align="center">
               <template #default="{ row }">
                 <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
@@ -317,13 +321,13 @@
         <el-descriptions-item :label="$t('customs.column.subProductCode')">{{ currentRow.subProductCode ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('customs.column.quantity')">{{ currentRow.quantity ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('customs.column.estimatedValueCny')">
-          <span v-if="currentRow.estimatedValueCny !== null" class="money">{{ $t('common.currency.cny') }}{{ currentRow.estimatedValueCny.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
+          <span v-if="currentRow.estimatedValueCny != null" class="money">{{ $t('common.currency.cny') }}{{ currentRow.estimatedValueCny?.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('customs.dialog.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('customs.dialog.createBy')">{{ currentRow.createBy || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('customs.dialog.createTime')">{{ currentRow.createTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('customs.dialog.updateTime')">{{ currentRow.updateTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('customs.dialog.createTime')">{{ formatTime(currentRow.createTime) }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('customs.dialog.updateTime')">{{ formatTime(currentRow.updateTime) }}</el-descriptions-item>
       </el-descriptions>
     </el-drawer>
 
@@ -377,7 +381,16 @@ const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const tableData = ref<CustomsVO[]>([])
 
 const route = useRoute()
-const { t } = useI18n()
+const { t, locale: localeRef } = useI18n()
+const currentLocale = computed(() => localeRef.value)
+
+function formatTime(ts: string | undefined | null): string {
+  if (!ts) return '-'
+  return new Date(ts).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  })
+}
 
 // 单记录表单（保留备用；当前主模式为批量）
 const form = reactive<CustomsCreateRequest>({

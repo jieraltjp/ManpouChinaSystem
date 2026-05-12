@@ -60,16 +60,16 @@
 | customs:create | ● | ● | ● | ○ |
 | customs:update | ● | ● | ● | ○ |
 | customs:delete | ● | ● | ● | ○ |
-| customs:approve | ● | ○ | ○ | ○ |
+| customs:approve | ● | ● | ○ | ○ |
 | japan_customs:read | ● | ● | ● | ● |
 | japan_customs:create | ● | ● | ● | ○ |
 | japan_customs:start | ● | ● | ● | ○ |
-| japan_customs:complete | ● | ○ | ○ | ○ |
+| japan_customs:complete | ● | ● | ○ | ○ |
 | japan_customs:delete | ● | ● | ● | ○ |
 | tax_refund:read | ● | ● | ● | ● |
 | tax_refund:create | ● | ● | ● | ○ |
 | tax_refund:update | ● | ● | ● | ○ |
-| tax_refund:complete | ● | ○ | ○ | ○ |
+| tax_refund:complete | ● | ● | ○ | ○ |
 | tax_refund:delete | ● | ● | ● | ○ |
 | sales:read | ● | ● | ● | ● |
 | sales:create | ● | ● | ● | ○ |
@@ -83,8 +83,15 @@
 | product:create | ● | ● | ● | ○ |
 | product:update | ● | ● | ● | ○ |
 | product:delete | ● | ● | ● | ○ |
-| order:read | ● | ● | ★ | ● |
-| notification:delete | ● | ● | ● | ○ |
+| order:read | ● | ● | ● | ● |
+| warehouse:read | ● | ● | ○ | ○ |
+| warehouse:create | ● | ● | ○ | ○ |
+| warehouse:update | ● | ● | ○ | ○ |
+| warehouse:delete | ● | ● | ○ | ○ |
+| notification:read | ● | ● | ○ | ○ |
+| notification:create | ● | ● | ○ | ○ |
+| notification:update | ● | ● | ○ | ○ |
+| notification:delete | ● | ● | ○ | ○ |
 
 ### 系统管理模块
 
@@ -110,11 +117,13 @@
 ## V15 SQL 实现
 
 ```sql
--- ADMIN (role_id=1): 全部权限
+-- ADMIN (role_id=1): 全部权限（78条，含 warehouse/notification）
 INSERT IGNORE INTO role_permission (role_id, permission_id)
 SELECT 1, id FROM permission WHERE is_deleted = 0;
 
--- MANAGER (role_id=2): 全部业务权限（不含系统管理写操作）
+-- MANAGER (role_id=2): 全部业务权限（仅排除系统管理写操作）
+-- 不排除：customs:approve, japan_customs:complete, tax_refund:complete
+-- 包含：warehouse CRUD（ID 101-104），notification CRUD（ID 111-114）
 INSERT IGNORE INTO role_permission (role_id, permission_id)
 SELECT 2, p.id FROM permission p
 WHERE p.is_deleted = 0
@@ -124,21 +133,23 @@ WHERE p.is_deleted = 0
         'permission:read'
   );
 
--- OPERATOR (role_id=3): 业务 CRUD + order:read
+-- OPERATOR (role_id=3): 核心业务 CRUD + order:read
+-- 不含：warehouse, notification, user, role, permission, audit
 INSERT IGNORE INTO role_permission (role_id, permission_id)
 SELECT 3, p.id FROM permission p
 WHERE p.is_deleted = 0
-  AND (
-    p.module IN ('demand','procurement','shipment','qc','logistics',
-                 'consolidation','container','customs','japan_customs',
-                 'tax_refund','sales','factory','product','notification')
-    OR p.permission_code IN ('order:read')
-  );
+  AND p.module IN ('demand','procurement','shipment','qc','logistics',
+                   'consolidation','container','customs','japan_customs',
+                   'tax_refund','sales','factory','product','order')
+  AND p.action_ IN ('READ', 'CREATE', 'UPDATE', 'DELETE');
 
--- VIEWER (role_id=4): 业务只读
+-- VIEWER (role_id=4): 核心业务只读
 INSERT IGNORE INTO role_permission (role_id, permission_id)
 SELECT 4, p.id FROM permission p
 WHERE p.is_deleted = 0
+  AND p.module IN ('demand','procurement','shipment','qc','logistics',
+                   'consolidation','container','customs','japan_customs',
+                   'tax_refund','sales','factory','product','order')
   AND p.action_ = 'READ';
 ```
 
@@ -146,17 +157,19 @@ WHERE p.is_deleted = 0
 
 ## 特殊说明
 
-### ADMIN 角色约束
+### MANAGER 实际权限（与 SPEC-B11 §5 矩阵差异说明）
 
-- `is_editable = 0`：数据库层面标记，RoleService 应在更新/删除时检查
-- 代码硬编码：禁止通过角色管理 UI 编辑 ADMIN 的名称/描述/权限
+SPEC-B11 v1.9.0 前的矩阵存在错误。MANAGER 排除列表仅含 8 个系统管理写操作权限，
+**不排除** customs:approve、japan_customs:complete、tax_refund:complete，
+且包含 warehouse CRUD 和 notification CRUD（均为 V15 DB 实际存在）。已修正本矩阵。
 
 ### order:read 权限
 
-OPERATOR 拥有 `order:read`，但 `order` 模块无 CRUD，仅有 READ。
-这使得普通运营可以查看订单总览（`/base/overview`）。
+OPERATOR 拥有 `order:read`（order 模块无 CRUD，仅有 READ），
+使得普通运营可以查看订单总览（`/base/overview`）。
 
-### customs:approve vs japan_customs:complete
+### customs:approve / japan_customs:complete / tax_refund:complete
 
-- `customs:approve`：国内报关审批（ADMIN 独有）
-- `japan_customs:complete`：日本清关完成（ADMIN + MANAGER）
+- `customs:approve`：国内报关审批（**ADMIN + MANAGER**）
+- `japan_customs:complete`：日本清关完成（**ADMIN + MANAGER**）
+- `tax_refund:complete`：完成退税（**ADMIN + MANAGER**）

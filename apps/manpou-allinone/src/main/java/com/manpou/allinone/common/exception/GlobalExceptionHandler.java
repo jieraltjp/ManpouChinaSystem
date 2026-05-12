@@ -1,8 +1,13 @@
 package com.manpou.allinone.common.exception;
 
 import com.manpou.allinone.common.result.Result;
+import com.manpou.allinone.infrastructure.client.AuditLogClient;
+import com.manpou.allinone.infrastructure.security.JwtContextHolder;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -15,6 +20,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -28,10 +35,13 @@ import java.util.stream.Collectors;
  * - 系统异常（其他所有）
  */
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private static final ValidationErrorCodeMapper MAPPER = ValidationErrorCodeMapper.INSTANCE;
+
+    private final AuditLogClient auditLogClient;
 
     // ===== 业务异常 =====
 
@@ -90,9 +100,45 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public Result<Void> handleAccessDenied(AccessDeniedException e) {
+    public Result<Void> handleAccessDenied(AccessDeniedException e, HttpServletRequest request) {
         log.warn("[权限不足] {}", e.getMessage());
+        sendAccessDeniedAudit(e, request);
         return Result.fail("auth.forbidden", "Access denied: insufficient permissions");
+    }
+
+    private void sendAccessDeniedAudit(AccessDeniedException e, HttpServletRequest request) {
+        try {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("traceId", MDC.get("traceId"));
+            payload.put("userId", JwtContextHolder.getUserId());
+            payload.put("username", JwtContextHolder.getUsername());
+            payload.put("module", "auth");
+            payload.put("action", "AUTH_DENIED");
+            payload.put("resourceType", null);
+            payload.put("resourceId", null);
+            payload.put("httpMethod", request.getMethod());
+            payload.put("httpUrl", request.getRequestURI());
+            payload.put("ipAddress", extractClientIp(request));
+            payload.put("userAgent", request.getHeader("User-Agent"));
+            payload.put("detail", "{\"error\": \"" + e.getClass().getSimpleName() + "\", \"message\": \"" + e.getMessage() + "\"}");
+            auditLogClient.sendAsync(payload);
+        } catch (Exception ex) {
+            log.warn("[权限不足] 审计日志发送失败: {}", ex.getMessage());
+        }
+    }
+
+    private String extractClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0].trim();
+        }
+        return ip;
     }
 
     @ExceptionHandler(Exception.class)
