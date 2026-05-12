@@ -25,4 +25,14 @@ public class ContainerCreateCmd {
     private LocalDate departureDate;
 
     private LocalDate arrivalDate;
+
+    // ===== v2.0 扩展字段（SPEC-B12）=====
+    @Length(max = 32)
+    private String timeSlot;                  // 时间段
+
+    @Length(max = 128)
+    private String arrivalLocation;           // 到岗地点
+
+    @Length(max = 512)
+    private String remarks;                  // 备注
 }

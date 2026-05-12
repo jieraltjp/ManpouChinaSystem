@@ -1,12 +1,11 @@
 # SPEC-B12 — 货柜与船只管理
 
-> **版本**: v1.2.0
+> **版本**: v1.3.0
 > **日期**: 2026-05-12
-> **状态**: 设计中
-> **对应 UI**: UI-19（货柜管理）· UI-20（船只管理）
-> **对应 DB**: DB-04 v1.5.0（container 已有）· DB-14（ship 表 + container 扩展，待 V18）
-> **对应 Flyway**: V18（ship + container 扩展）
-> **对应前端**: `ShipManagementPage.vue` · `ContainerManagementPage.vue`（扩展）
+> **状态**: ✅ Phase 1/2/3 实施完成
+> **对应 UI**: UI-19（货柜管理 v2.0）· UI-20（船只管理）
+> **对应 DB**: V18（ship 表 + container 扩展）
+> **对应前端**: `pages/logistics/ShipPage.vue` · `pages/procurement/ContainerPage.vue`（已扩展）
 
 ---
 
@@ -373,7 +372,7 @@ public Result<Void> assignShip(@PathVariable Long id, @RequestBody @Valid Assign
 > **Flyway 版本**：V18__ship_and_container_extension.sql
 > **生产激活**：`SPRING_PROFILES_ACTIVE=production`
 
-### Phase 1 — 数据库 + 船只 CRUD
+### Phase 1 — 数据库 + 船只 CRUD ✅
 
 1. 新增 Flyway `V18__ship_and_container_extension.sql`
    - 创建 `ship` 表（含审计字段 + 索引）
@@ -385,23 +384,23 @@ public Result<Void> assignShip(@PathVariable Long id, @RequestBody @Valid Assign
 6. `@AuditLog` 注解（ship CRUD 4 接口 + container assign/unassign 2 接口）
 7. 编写单元测试
 
-### Phase 2 — 前端船只管理
+### Phase 2 — 前端船只管理 ✅
 
-1. 新增 `ship.ts` API 客户端（shipApi）
-2. 新增 `ShipManagementPage.vue`
-3. 菜单注册（`base` 分组，与 FactoryPage 同级）
-4. i18n 同步（zh.json / ja.json）：`ship.*` key
-5. 权限守卫（router 路由守卫 + hasPermission 按钮控制）
+1. 新增 `api/ship.ts` API 客户端（shipApi）
+2. 新增 `pages/logistics/ShipPage.vue`
+3. 菜单注册（`base` 分组，路径 `/base/ship`）
+4. i18n 同步（zh.json / ja.json）：`ship.*` + `menu.ship` key
+5. 权限守卫（router 无角色限制 + hasPermission 按钮控制）
 
-### Phase 3 — 前端货柜管理（v2.0）
+### Phase 3 — 前端货柜管理（v2.0）✅
 
-1. 扩展 `ContainerPage.vue`（已有）：
-   - 列表新增"船只"筛选 + "船名/船号"列
-   - 编辑弹窗新增 shipId（下拉选船只）+ timeSlot + arrivalLocation + remarks
-   - 详情抽屉新增物流信息区块（船名/船号/时间段/到岗地点/备注）
-   - 新增"分配船只"快捷按钮
-2. i18n 同步：`logistics.container.*` + 新增 key
-3. 权限守卫
+1. 扩展 `ContainerPage.vue`：
+   - 列表新增"船只"筛选（下拉）+ shipName / timeSlot / arrivalLocation 列
+   - 编辑弹窗新增 timeSlot + arrivalLocation + remarks 字段
+   - 新增"分配船只"快捷按钮（弹窗选船）
+   - 新增"解除船只关联"按钮
+2. i18n 同步：`logistics.container.filter.ship` + `dialog.assignShip` + 新增列 key
+3. `logistics.ts` 扩展 `ContainerVO` / `CreateContainerRequest` / `UpdateContainerRequest`
 
 ---
 
@@ -413,3 +412,21 @@ public Result<Void> assignShip(@PathVariable Long id, @RequestBody @Valid Assign
 | 历史货柜数据补录 | 现有 container 记录的 ship_id 等字段需批量回填 | P2 |
 | 状态机自动化推进 | load_date / departure_date / arrival_date 填写时自动推进状态 | P2 |
 | `consolidation_pool_item` Entity | DB-04 标注为"不存在"，需确认是否仍在使用 | P2 |
+
+---
+
+## 11. 实施记录（2026-05-12）
+
+| 改动 | 文件 | 说明 |
+|------|------|------|
+| 后端字段修复 | `ContainerCreateCmd.java` | 补 timeSlot / arrivalLocation / remarks 字段 + @Length 校验 |
+| 后端 Assembler 修复 | `ContainerAssembler.toEntity()` | 补 v2.0 扩展字段映射 |
+| 后端权限展开修复 | `JwtAuthenticationFilter.ALL_PERMISSIONS` | 补 `ship:create/read/update/delete`，否则 ADMIN 的 `*:*` 展开后无 ship 权限 |
+| 前端 API | `api/ship.ts`（新建）| ShipVO + shipApi CRUD |
+| 前端 API 扩展 | `api/logistics.ts` | ContainerVO 补 ship 字段 + assignShip/unassignShip 方法 |
+| 前端页面 | `pages/logistics/ShipPage.vue`（新建）| 船只管理 CRUD + 货柜数显示 |
+| 前端页面扩展 | `ContainerPage.vue` | ship 筛选 + ship 列 + timeSlot/arrivalLocation/remarks 字段 + 分配船只弹窗 |
+| 路由 | `router/index.ts` | 注册 `/base/ship` |
+| AppLayout 菜单 | `AppLayout.vue` | 硬编码菜单栏加 `/base/ship` 入口 + Ship 图标 |
+| i18n | zh.json / ja.json | `logistics.ship.*` + `logistics.container.dialog.*` + `menu.ship`（去掉序号前缀）|
+| 文档 | SPEC-B12 | 状态更新为"Phase 1/2/3 实施完成" |

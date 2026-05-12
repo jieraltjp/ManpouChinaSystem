@@ -42,6 +42,13 @@ export interface ContainerVO {
   arrivalDate?: string
   createTime?: string
   updateTime?: string
+  // ===== v2.0 扩展字段（SPEC-B12）=====
+  shipId?: number
+  shipName?: string
+  shipNumber?: string
+  timeSlot?: string
+  arrivalLocation?: string
+  remarks?: string
 }
 
 // ===== 调配计划 =====
@@ -196,6 +203,10 @@ export interface CreateContainerRequest {
   loadDate?: string
   departureDate?: string
   arrivalDate?: string
+  // ===== v2.0 扩展字段（SPEC-B12）=====
+  timeSlot?: string
+  arrivalLocation?: string
+  remarks?: string
 }
 
 export interface UpdateContainerRequest {
@@ -205,10 +216,20 @@ export interface UpdateContainerRequest {
   loadDate?: string
   departureDate?: string
   arrivalDate?: string
+  // ===== v2.0 扩展字段（SPEC-B12）=====
+  shipId?: number
+  timeSlot?: string
+  arrivalLocation?: string
+  remarks?: string
+}
+
+export interface AssignShipRequest {
+  shipId: number
+  loadDate?: string
 }
 
 export const containerApi = {
-  list(params: { page?: number; pageSize?: number; status?: ContainerStatus; poolId?: number }) {
+  list(params: { page?: number; pageSize?: number; status?: ContainerStatus; poolId?: number; shipId?: number }) {
     return client.get<ContainerPageResponse>('/containers', { params })
   },
   get(id: number) {
@@ -225,5 +246,11 @@ export const containerApi = {
   },
   addPlan(containerId: number, planId: number) {
     return client.post<{ code: string }>(`/containers/${containerId}/plans/${planId}`)
+  },
+  assignShip(containerId: number, data: AssignShipRequest) {
+    return client.put<void>(`/containers/${containerId}/assign-ship`, data)
+  },
+  unassignShip(containerId: number) {
+    return client.put<void>(`/containers/${containerId}/unassign-ship`)
   },
 }

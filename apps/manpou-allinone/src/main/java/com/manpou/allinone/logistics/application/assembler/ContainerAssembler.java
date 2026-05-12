@@ -51,6 +51,10 @@ public class ContainerAssembler {
             entity.setContainerType(cmd.getContainerType());
         }
         if (cmd.getPoolId() != null) entity.setPoolId(cmd.getPoolId());
+        // v2.0 扩展字段
+        if (cmd.getTimeSlot() != null) entity.setTimeSlot(cmd.getTimeSlot());
+        if (cmd.getArrivalLocation() != null) entity.setArrivalLocation(cmd.getArrivalLocation());
+        if (cmd.getRemarks() != null) entity.setRemarks(cmd.getRemarks());
         return entity;
     }
 

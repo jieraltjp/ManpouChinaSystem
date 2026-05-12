@@ -14,6 +14,7 @@
     "logisticsPlan": "04 配送計画",
     "consolidationPool": "05 コンソリ池",
     "container": "06 コンテナ管理",
+    "ship": "船舶管理",
     "domesticCustoms": "05 国内通関",
     "japanCustomsRecord": "06 日本通関",
     "finance": "財務管理",
@@ -685,7 +686,9 @@
       "filter": {
         "status": "コンテナステータス",
         "containerNo": "コンテナ番号",
-        "containerNoHint": "コンテナ番号を入力"
+        "containerNoHint": "コンテナ番号を入力",
+        "ship": "関連船舶",
+        "shipHint": "船舶を選択"
       },
       "column": {
         "containerNo": "コンテナ番号",
@@ -696,7 +699,65 @@
         "status": "ステータス",
         "loadDate": "積載日",
         "departureDate": "出発日",
-        "arrivalDate": "到着日"
+        "arrivalDate": "到着日",
+        "shipName": "船名",
+        "shipNumber": "船号",
+        "timeSlot": "時間帯",
+        "arrivalLocation": " 도착場所",
+        "remarks": "備考"
+      },
+      "dialog": {
+        "assignShip": "船舶を割当",
+        "shipName": "関連船舶",
+        "shipPlaceholder": "船舶を選択してください",
+        "timeSlot": "時間帯",
+        "timeSlotPlaceholder": "例: 2026-W24",
+        "arrivalLocation": "到着場所",
+        "arrivalLocationPlaceholder": "例: 東京倉庫A",
+        "remarks": "備考",
+        "remarksPlaceholder": "備考情報"
+      },
+      "assignSuccess": "船舶割当成功",
+      "unassignSuccess": "船舶を解除しました"
+    },
+    "ship": {
+      "title": "船舶管理",
+      "newButton": "新規船舶追加",
+      "editTitle": "船舶編集",
+      "deleteConfirm": "船舶「{name}」（船号：{number}）を削除しますか？船舶には {count} 個のコンテナがあります。",
+      "deleteSuccess": "船舶を削除しました",
+      "nameRequired": "船名は必須です",
+      "numberRequired": "船号は必須です",
+      "numberExists": "船号は既に存在します",
+      "hasContainers": "この船舶には {count} 個のコンテナがあります。先に解除してください",
+      "filter": {
+        "shipName": "船名",
+        "shipNameHint": "船名を入力",
+        "shipNumber": "船号",
+        "shipNumberHint": "船号を入力",
+        "arrivalPort": "目的港",
+        "arrivalPortHint": "目的港を入力"
+      },
+      "column": {
+        "shipName": "船名",
+        "shipNumber": "船号",
+        "carrier": "船会社",
+        "departurePort": "出発港",
+        "arrivalPort": "目的港",
+        "containerCount": "コンテナ数",
+        "createTime": "作成日時"
+      },
+      "dialog": {
+        "shipName": "船名",
+        "shipNamePlaceholder": "例: 日章丸",
+        "shipNumber": "船号",
+        "shipNumberPlaceholder": "例: V2026A",
+        "carrier": "船会社",
+        "carrierPlaceholder": "例: 中遠海運",
+        "departurePort": "出発港",
+        "departurePortPlaceholder": "例: 上海港",
+        "arrivalPort": "目的港",
+        "arrivalPortPlaceholder": "例: 東京港"
       }
     },
     "pool": {

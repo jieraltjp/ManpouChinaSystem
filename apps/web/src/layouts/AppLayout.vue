@@ -93,6 +93,10 @@
             <el-icon><Document /></el-icon>
             <template #title>{{ $t('menu.orderOverview') }}</template>
           </el-menu-item>
+          <el-menu-item index="/base/ship">
+            <el-icon><Ship /></el-icon>
+            <template #title>{{ $t('menu.ship') }}</template>
+          </el-menu-item>
         </el-sub-menu>
 
         <!-- 系统管理 -->
@@ -195,7 +199,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, DocumentCopy, Box, Goods, OfficeBuilding, Menu, Document, Money, Tickets, TrendCharts, Setting, User, Key, Cloudy } from '@element-plus/icons-vue'
+import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, DocumentCopy, Box, Goods, OfficeBuilding, Menu, Document, Money, Tickets, TrendCharts, Setting, User, Key, Cloudy, Ship } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
 import type { Locale } from '@/locales'
@@ -224,6 +228,7 @@ const routeTitleMap: Record<string, string> = {
   '/base/factory': 'factory.title',
   '/base/product': 'product.title',
   '/base/overview': 'orderOverview.title',
+  '/base/ship': 'logistics.ship.title',
   '/system/user': 'menu.user',
   '/system/role': 'menu.role',
   '/system/cos-test': 'menu.cosTest',

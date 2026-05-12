@@ -14,6 +14,7 @@
     "logisticsPlan": "04 调配计划",
     "consolidationPool": "05 拼柜池",
     "container": "06 货柜管理",
+    "ship": "船只管理",
     "domesticCustoms": "05 国内报关",
     "japanCustomsRecord": "06 日本清关",
     "finance": "财务管理",
@@ -761,7 +762,9 @@
       "filter": {
         "status": "货柜状态",
         "containerNo": "货柜号",
-        "containerNoHint": "输入货柜号"
+        "containerNoHint": "输入货柜号",
+        "ship": "关联船只",
+        "shipHint": "选择船只"
       },
       "column": {
         "containerNo": "货柜号",
@@ -772,7 +775,65 @@
         "status": "状态",
         "loadDate": "装柜日期",
         "departureDate": "离港日期",
-        "arrivalDate": "到港日期"
+        "arrivalDate": "到港日期",
+        "shipName": "船名",
+        "shipNumber": "船号",
+        "timeSlot": "时间段",
+        "arrivalLocation": "到岗地点",
+        "remarks": "备注"
+      },
+      "dialog": {
+        "assignShip": "分配船只",
+        "shipName": "关联船只",
+        "shipPlaceholder": "请选择船只",
+        "timeSlot": "时间段",
+        "timeSlotPlaceholder": "如 2026-W24",
+        "arrivalLocation": "到岗地点",
+        "arrivalLocationPlaceholder": "如 东京仓库A",
+        "remarks": "备注",
+        "remarksPlaceholder": "备注信息"
+      },
+      "assignSuccess": "船只分配成功",
+      "unassignSuccess": "船只已解除"
+    },
+    "ship": {
+      "title": "船只管理",
+      "newButton": "新增船只",
+      "editTitle": "编辑船只",
+      "deleteConfirm": "确认删除船只「{name}」（船号：{number}）？船只下有 {count} 个货柜，无法删除。",
+      "deleteSuccess": "船只删除成功",
+      "nameRequired": "船名不能为空",
+      "numberRequired": "船号不能为空",
+      "numberExists": "船号已存在",
+      "hasContainers": "该船只下有 {count} 个货柜，请先解除关联",
+      "filter": {
+        "shipName": "船名",
+        "shipNameHint": "输入船名",
+        "shipNumber": "船号",
+        "shipNumberHint": "输入船号",
+        "arrivalPort": "目的港",
+        "arrivalPortHint": "输入目的港"
+      },
+      "column": {
+        "shipName": "船名",
+        "shipNumber": "船号",
+        "carrier": "船公司",
+        "departurePort": "出发港",
+        "arrivalPort": "目的港",
+        "containerCount": "关联货柜",
+        "createTime": "创建时间"
+      },
+      "dialog": {
+        "shipName": "船名",
+        "shipNamePlaceholder": "如 日章丸",
+        "shipNumber": "船号",
+        "shipNumberPlaceholder": "如 V2026A",
+        "carrier": "船公司",
+        "carrierPlaceholder": "如 中远海运",
+        "departurePort": "出发港",
+        "departurePortPlaceholder": "如 上海港",
+        "arrivalPort": "目的港",
+        "arrivalPortPlaceholder": "如 东京港"
       }
     }
   },
