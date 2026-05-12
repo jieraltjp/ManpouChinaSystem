@@ -1,5 +1,6 @@
 package com.manpou.allinone.replenishment.interfaces.controller;
 
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.result.Result;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.manpou.allinone.replenishment.application.dto.DemandProcurementMappingCreateCmd;
@@ -45,6 +46,7 @@ public class DemandProcurementMappingController {
      * POST /api/v1/demand-mappings
      */
     @PostMapping
+      @AuditLog(module = "replenishment", action = "CREATE", resourceType = "demand_procurement_mapping", resourceId = "#_return")
     @PreAuthorize("hasAuthority('demand:create')")
     public Result<Long> create(@Valid @RequestBody DemandProcurementMappingCreateCmd cmd) {
         Long id = mappingUseCase.create(cmd);
@@ -56,6 +58,7 @@ public class DemandProcurementMappingController {
      * DELETE /api/v1/demand-mappings/{id}
      */
     @DeleteMapping("/{id}")
+    @AuditLog(module = "replenishment", action = "DELETE", resourceType = "demand_procurement_mapping", resourceId = "#id")
     @PreAuthorize("hasAuthority('demand:delete')")
     public Result<Void> cancel(@PathVariable("id") Long id) {
         mappingUseCase.cancel(id);

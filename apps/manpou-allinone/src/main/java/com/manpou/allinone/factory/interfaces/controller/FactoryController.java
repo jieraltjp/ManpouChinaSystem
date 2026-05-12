@@ -1,5 +1,6 @@
 package com.manpou.allinone.factory.interfaces.controller;
 
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.result.Result;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.manpou.allinone.factory.application.dto.FactoryCreateCmd;
@@ -39,6 +40,7 @@ public class FactoryController {
     }
 
     @PostMapping
+      @AuditLog(module = "factory", action = "CREATE", resourceType = "factory", resourceId = "#_return")
     @PreAuthorize("hasAuthority('factory:create')")
     public Result<Long> create(@Valid @RequestBody FactoryCreateCmd cmd) {
         Long id = factoryUseCase.create(cmd);
@@ -46,6 +48,7 @@ public class FactoryController {
     }
 
     @PatchMapping("/{id}")
+    @AuditLog(module = "factory", action = "UPDATE", resourceType = "factory", resourceId = "#id")
     @PreAuthorize("hasAuthority('factory:update')")
     public Result<Void> update(@PathVariable("id") Long id,
                                 @Valid @RequestBody FactoryUpdateCmd cmd) {
@@ -54,6 +57,7 @@ public class FactoryController {
     }
 
     @DeleteMapping("/{id}")
+    @AuditLog(module = "factory", action = "DELETE", resourceType = "factory", resourceId = "#id")
     @PreAuthorize("hasAuthority('factory:delete')")
     public Result<Void> delete(@PathVariable("id") Long id) {
         factoryUseCase.delete(id);

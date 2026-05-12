@@ -1,5 +1,6 @@
 package com.manpou.allinone.sales.interfaces.controller;
 
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.sales.application.dto.*;
 import com.manpou.allinone.sales.application.usecase.SalesRecordUseCase;
 import jakarta.validation.Valid;
@@ -35,12 +36,14 @@ public class SalesRecordController {
     }
 
     @PostMapping
+      @AuditLog(module = "sales", action = "CREATE", resourceType = "sales_record", resourceId = "#_return")
     @PreAuthorize("hasAuthority('sales:create')")
     public ResponseEntity<Long> create(@Valid @RequestBody SalesRecordCreateCmd cmd) {
         return ResponseEntity.ok(salesRecordUseCase.create(cmd));
     }
 
     @PutMapping("/{id}")
+    @AuditLog(module = "sales", action = "UPDATE", resourceType = "sales_record", resourceId = "#id")
     @PreAuthorize("hasAuthority('sales:update')")
     public ResponseEntity<Void> update(@PathVariable Long id, @Valid @RequestBody SalesRecordUpdateCmd cmd) {
         salesRecordUseCase.update(id, cmd);
@@ -48,6 +51,7 @@ public class SalesRecordController {
     }
 
     @PatchMapping("/{id}/stock")
+    @AuditLog(module = "sales", action = "UPDATE", resourceType = "sales_record", resourceId = "#id")
     @PreAuthorize("hasAuthority('sales:update')")
     public ResponseEntity<Void> updateStock(@PathVariable Long id, @Valid @RequestBody SalesRecordStockCmd cmd) {
         salesRecordUseCase.updateStock(id, cmd);
@@ -55,6 +59,7 @@ public class SalesRecordController {
     }
 
     @PatchMapping("/{id}/discontinue")
+    @AuditLog(module = "sales", action = "UPDATE", resourceType = "sales_record", resourceId = "#id")
     @PreAuthorize("hasAuthority('sales:update')")
     public ResponseEntity<Void> discontinue(@PathVariable Long id) {
         salesRecordUseCase.discontinue(id);
@@ -62,6 +67,7 @@ public class SalesRecordController {
     }
 
     @PatchMapping("/{id}/relist")
+    @AuditLog(module = "sales", action = "UPDATE", resourceType = "sales_record", resourceId = "#id")
     @PreAuthorize("hasAuthority('sales:update')")
     public ResponseEntity<Void> relist(@PathVariable Long id) {
         salesRecordUseCase.relist(id);
@@ -69,6 +75,7 @@ public class SalesRecordController {
     }
 
     @DeleteMapping("/{id}")
+    @AuditLog(module = "sales", action = "DELETE", resourceType = "sales_record", resourceId = "#id")
     @PreAuthorize("hasAuthority('sales:delete')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         salesRecordUseCase.delete(id);

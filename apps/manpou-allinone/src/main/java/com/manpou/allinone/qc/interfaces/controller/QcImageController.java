@@ -1,5 +1,6 @@
 package com.manpou.allinone.qc.interfaces.controller;
 
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.config.CosConfig;
 import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.common.service.CosService;
@@ -41,6 +42,7 @@ public class QcImageController {
      */
     @PostMapping("/upload")
     @PreAuthorize("hasAuthority('qc:create')")
+      @AuditLog(module = "qc", action = "CREATE", resourceType = "qc_image", resourceId = "#_return")
     public Result<ImageUploadResult> upload(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "qcRecordId", required = false) Long qcRecordId) {
@@ -74,6 +76,7 @@ public class QcImageController {
      */
     @PostMapping("/upload-multiple")
     @PreAuthorize("hasAuthority('qc:create')")
+      @AuditLog(module = "qc", action = "CREATE", resourceType = "qc_image", resourceId = "#_return")
     public Result<List<ImageUploadResult>> uploadMultiple(
             @RequestParam("files") MultipartFile[] files,
             @RequestParam(value = "qcRecordId", required = false) Long qcRecordId) {
@@ -116,6 +119,7 @@ public class QcImageController {
      */
     @DeleteMapping
     @PreAuthorize("hasAuthority('qc:delete')")
+    @AuditLog(module = "qc", action = "DELETE", resourceType = "qc_image", resourceId = "#id")
     public Result<Void> delete(@RequestParam("id") Long id) {
         QcImage image = qcImageRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> BusinessException.notFound("QcImage", id));

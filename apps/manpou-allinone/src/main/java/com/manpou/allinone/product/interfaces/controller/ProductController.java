@@ -9,6 +9,7 @@ import com.manpou.allinone.product.application.dto.ProductUpdateCmd;
 import com.manpou.allinone.product.application.dto.ProductFactoryVO;
 import com.manpou.allinone.product.application.dto.SubCodeSuggestVO;
 import com.manpou.allinone.product.application.usecase.ProductUseCase;
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
 import jakarta.validation.Valid;
@@ -93,6 +94,7 @@ public class ProductController {
      * 创建商品。
      */
     @PostMapping
+      @AuditLog(module = "product", action = "CREATE", resourceType = "product", resourceId = "#_return")
     @Idempotent(ttl = 24 * 60 * 60)
     @PreAuthorize("hasAuthority('product:create')")
     public Result<Long> create(@Valid @RequestBody ProductCreateCmd cmd) {
@@ -104,6 +106,7 @@ public class ProductController {
      * 更新商品（部分更新）。
      */
     @PatchMapping("/{id}")
+    @AuditLog(module = "product", action = "UPDATE", resourceType = "product", resourceId = "#id")
     @PreAuthorize("hasAuthority('product:update')")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody ProductUpdateCmd cmd) {
@@ -115,6 +118,7 @@ public class ProductController {
      * 删除商品（逻辑删除）。
      */
     @DeleteMapping("/{id}")
+    @AuditLog(module = "product", action = "DELETE", resourceType = "product", resourceId = "#id")
     @PreAuthorize("hasAuthority('product:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         productUseCase.delete(id);

@@ -21,7 +21,7 @@
 
 ### 问题
 
-user-service 启动时 JPA schema-validation 报错：
+JPA schema-validation 报错：
 ```
 Schema-validation: missing column [create_by] in table [permission]
 Schema-validation: missing column [create_by] in table [role]
@@ -31,11 +31,9 @@ Schema-validation: missing column [create_by] in table [role]
 
 ### 根因
 
-V8 Flyway 迁移创建的 `permission` 和 `role` 表只定义了业务字段，没有包含 `BaseEntity` 的审计列：
+SQL 迁移创建的表只定义了业务字段，没有包含 `BaseEntity` 的审计列：
 - `permission` 表缺少：`create_by`, `update_by`, `update_time`
 - `role` 表缺少：`create_by`, `update_by`
-
-同时 `user_role` 关联表也不需要 BaseEntity 字段。
 
 ### 本次修复
 
@@ -47,9 +45,9 @@ conn.createStatement().executeUpdate(
     "ALTER TABLE role ADD COLUMN create_by VARCHAR(64) NOT NULL DEFAULT 'SYSTEM'");
 ```
 
-2. 创建 V11 迁移记录变更（确保新环境不重复问题）：
+2. 创建 Flyway 迁移记录变更（确保新环境不重复问题）：
 ```sql
--- V11: 补充 BaseEntity 审计列
+-- 补充 BaseEntity 审计列
 ALTER TABLE permission
     ADD COLUMN create_by VARCHAR(64) NOT NULL DEFAULT 'SYSTEM',
     ADD COLUMN update_by VARCHAR(64) NOT NULL DEFAULT 'SYSTEM',
@@ -125,9 +123,9 @@ private Integer isEditable = 1;
 
 ### 问题
 
-V10 迁移因 SQL 错误部分执行后：
+迁移因 SQL 错误部分执行后：
 ```
-Migration V10__cleanup_and_seed.sql failed
+Migration V__xxx.sql failed
 Please remove any half-completed changes then run repair to fix the schema history.
 ```
 
@@ -135,7 +133,7 @@ Please remove any half-completed changes then run repair to fix the schema histo
 
 ### 根因
 
-Flyway 的 `flyway_schema_history` 表记录了 V10 的 `success=0`。后续启动时 Flyway validate 发现 failed migration，要求先 repair。
+Flyway 的 `flyway_schema_history` 表记录了该版本的 `success=0`。后续启动时 Flyway validate 发现 failed migration，要求先 repair。
 
 ### 正确流程
 
@@ -176,7 +174,7 @@ conn.createStatement().executeUpdate(
 
 ### 问题
 
-V10 迁移第一次失败后修复重跑，再次失败（主键冲突）：
+迁移第一次失败后修复重跑，再次失败（主键冲突）：
 ```
 Duplicate entry '1' for key 'PRIMARY'
 ```

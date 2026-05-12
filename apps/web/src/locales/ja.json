@@ -27,7 +27,8 @@
     "system": "システム管理",
     "user": "ユーザー管理",
     "role": "役割管理",
-    "cosTest": "COS テスト"
+    "cosTest": "COS テスト",
+    "auditLog": "操作ログ"
   },
   "auth": {
     "login": "ログイン",
@@ -1945,6 +1946,59 @@
     "validation": {
       "roleCodeRequired": "役割コードは必須です",
       "roleNameCnRequired": "役割名は必須です"
+    }
+  },
+  "auditLog": {
+    "title": "操作ログ",
+    "column": {
+      "createTime": "操作時間",
+      "username": "アカウント",
+      "operatorName": "操作者",
+      "module": "モジュール",
+      "action": "アクション",
+      "httpMethod": "メソッド",
+      "httpUrl": "URL",
+      "resourceType": "リソースタイプ",
+      "resourceId": "リソースID",
+      "ipAddress": "IP アドレス",
+      "detail": "詳細"
+    },
+    "filter": {
+      "userId": "操作者アカウント",
+      "module": "モジュール",
+      "action": "アクション",
+      "resourceType": "リソースタイプ",
+      "startTime": "開始時間",
+      "endTime": "終了時間",
+      "reset": "リセット",
+      "search": "検索"
+    },
+    "action": {
+      "viewDetail": "詳細を見る"
+    },
+    "detail": {
+      "title": "ログ詳細",
+      "close": "閉じる"
+    },
+    "module": {
+      "auth": "認証",
+      "procurement": "発注管理",
+      "factory": "工場管理",
+      "product": "商品管理",
+      "user": "ユーザー管理",
+      "role": "役割管理"
+    },
+    "actionTag": {
+      "LOGIN": "ログイン",
+      "CREATE": "新規作成",
+      "UPDATE": "更新",
+      "DELETE": "削除",
+      "APPROVE": "承認",
+      "REJECT": "却下"
+    },
+    "message": {
+      "loadFailed": "ログ一覧の読み込みに失敗しました",
+      "detailLoadFailed": "ログ詳細の読み込みに失敗しました"
     }
   }
 }

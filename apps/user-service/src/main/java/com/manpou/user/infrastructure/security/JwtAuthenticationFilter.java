@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
 
-    /** ADMIN 角色 *:* 展开后的所有具体权限（66条，与 allinone JwtAuthenticationFilter.ALL_PERMISSIONS 同步，按 SPEC-B11 v1.2.0） */
+    /** ADMIN 角色 *:* 展开后的所有具体权限（63条，与 V15 DB 实际 67 条对齐）。warehouse/notification 已移除（DB 不存在）；已补充 japan_customs:start/complete, user:approve, permission:read, audit:export */
     private static final Set<String> ALL_PERMISSIONS = Set.of(
         "demand:create", "demand:read", "demand:update", "demand:delete",
         "procurement:create", "procurement:read", "procurement:update", "procurement:delete",
@@ -45,15 +45,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "container:create", "container:read", "container:update", "container:delete",
         "customs:create", "customs:read", "customs:update", "customs:delete",
         "japan_customs:create", "japan_customs:read", "japan_customs:update", "japan_customs:delete",
+        "japan_customs:start", "japan_customs:complete",
         "tax_refund:create", "tax_refund:read", "tax_refund:update", "tax_refund:delete",
         "sales:create", "sales:read", "sales:update", "sales:delete",
         "factory:create", "factory:read", "factory:update", "factory:delete",
         "product:create", "product:read", "product:update", "product:delete",
-        "warehouse:create", "warehouse:read", "warehouse:update", "warehouse:delete",
-        "notification:create", "notification:read", "notification:update", "notification:delete",
-        "user:create", "user:read", "user:update", "user:delete", "user:reset_password",
+        "order:read",
+        "user:create", "user:read", "user:update", "user:delete", "user:approve", "user:reset_password",
         "role:create", "role:read", "role:update", "role:delete", "role:assign",
-        "audit:read"
+        "permission:read",
+        "audit:read", "audit:export"
     );
 
     private final JwtService jwtService;

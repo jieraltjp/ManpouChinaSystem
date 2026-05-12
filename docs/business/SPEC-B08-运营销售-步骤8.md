@@ -188,7 +188,7 @@ DELETE /api/v1/sales-records/{id}                   # 删除（非终态）
 - [x] ✅ `SalesRecordController` REST 控制器（`/api/v1/sales-records`）
 - [x] ✅ `@/api/salesOperations.ts` 前端 API 客户端
 - [x] ✅ `SalesRecordPage.vue` 页面（`apps/web/src/pages/sales/SalesRecordPage.vue`）
-- [x] ✅ DB migration `V14__sales_record_table.sql`
+- [x] ✅ DB migration `V14__sales_record_table.sql`（已合并至 allinone V15）
 - [x] ✅ 聚合接口 `GET /api/v1/orders/{id}/overview` step8 集成（`OrderOverviewUseCase`）
 - [x] ✅ `SalesChannel` 枚举（AMAZON / MERCALI / SELF_SITE / OTHER）
 - [x] ✅ JapanCustomsClearedEvent + JapanCustomsClearedEventListener（清关完成→自动创建 SalesRecord）

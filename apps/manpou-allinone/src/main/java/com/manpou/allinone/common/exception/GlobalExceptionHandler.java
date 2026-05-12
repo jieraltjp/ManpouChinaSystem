@@ -95,8 +95,6 @@ public class GlobalExceptionHandler {
         return Result.fail("auth.forbidden", "Access denied: insufficient permissions");
     }
 
-    // ===== 系统异常（记录完整堆栈） =====
-
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Void> handleException(Exception e) {

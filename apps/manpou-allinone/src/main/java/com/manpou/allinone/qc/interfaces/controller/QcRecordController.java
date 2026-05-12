@@ -1,5 +1,6 @@
 package com.manpou.allinone.qc.interfaces.controller;
 
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.result.Result;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.manpou.allinone.qc.application.dto.QcRecordCreateCmd;
@@ -36,12 +37,14 @@ public class QcRecordController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('qc:create')")
+      @AuditLog(module = "qc", action = "CREATE", resourceType = "qc_record", resourceId = "#_return")
     public Result<Long> create(@Valid @RequestBody QcRecordCreateCmd cmd) {
         return Result.ok(qcRecordUseCase.create(cmd));
     }
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('qc:update')")
+    @AuditLog(module = "qc", action = "UPDATE", resourceType = "qc_record", resourceId = "#id")
     public Result<Void> update(@PathVariable("id") Long id,
                                @RequestBody QcRecordUpdateCmd cmd) {
         qcRecordUseCase.update(id, cmd);
@@ -50,6 +53,7 @@ public class QcRecordController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('qc:delete')")
+    @AuditLog(module = "qc", action = "DELETE", resourceType = "qc_record", resourceId = "#id")
     public Result<Void> delete(@PathVariable("id") Long id) {
         qcRecordUseCase.delete(id);
         return Result.ok();

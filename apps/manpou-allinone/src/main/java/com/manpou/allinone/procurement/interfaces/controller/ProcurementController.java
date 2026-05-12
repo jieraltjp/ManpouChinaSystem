@@ -1,5 +1,6 @@
 package com.manpou.allinone.procurement.interfaces.controller;
 
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.procurement.application.dto.ProcurementCreateCmd;
@@ -53,6 +54,7 @@ public class ProcurementController {
     @PostMapping
     @PreAuthorize("hasAuthority('procurement:create')")
     @Idempotent(ttl = 24 * 60 * 60)
+      @AuditLog(module = "procurement", action = "CREATE", resourceType = "procurement", resourceId = "#_return")
     public Result<Long> create(@Valid @RequestBody ProcurementCreateCmd cmd) {
         Long id = procurementUseCase.create(cmd);
         return Result.ok("发注单创建成功", id);
@@ -65,6 +67,7 @@ public class ProcurementController {
      */
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('procurement:update')")
+    @AuditLog(module = "procurement", action = "UPDATE", resourceType = "procurement", resourceId = "#id")
     public Result<Void> update(@PathVariable("id") Long id,
                                @Valid @RequestBody ProcurementUpdateCmd cmd) {
         procurementUseCase.update(id, cmd);
@@ -78,8 +81,20 @@ public class ProcurementController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('procurement:delete')")
+    @AuditLog(module = "procurement", action = "DELETE", resourceType = "procurement", resourceId = "#id")
     public Result<Void> delete(@PathVariable("id") Long id) {
         procurementUseCase.delete(id);
         return Result.ok("发注单删除成功", null);
+    }
+
+    /**
+     * 测试端点：验证 AuditLogAspect + AuditLogClient 是否正常工作。
+     * POST /api/v1/procurements/test-audit
+     */
+    @PostMapping("/test-audit")
+    @PreAuthorize("hasAuthority('procurement:create')")
+    @AuditLog(module = "procurement", action = "TEST", resourceType = "procurement")
+    public Result<String> testAuditLog() {
+        return Result.ok("audit log test triggered");
     }
 }

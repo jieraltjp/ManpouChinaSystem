@@ -22,6 +22,7 @@ import org.slf4j.MDC;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,6 +80,7 @@ public class ProcurementUseCase {
      * factoryId 为必填，且工厂必须存在且未被逻辑删除。
      */
     @Transactional
+    @PreAuthorize("hasAuthority('procurement:create')")
     public Long create(ProcurementCreateCmd cmd) {
         // 校验关联工厂
         if (cmd.getFactoryId() == null) {

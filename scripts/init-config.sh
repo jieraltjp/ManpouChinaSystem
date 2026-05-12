@@ -61,11 +61,13 @@ check_env_local() {
 SERVER_PORT=8080
 APP_NAME=app-service
 
-# ----- 数据库（dev 环境使用 H2，无需额外配置） -----
-DB_TYPE=h2
-DB_NAME=appdb
-DB_USER=sa
-DB_PASSWORD=
+# ----- 数据库（默认 MySQL，生产使用 192.168.13.202:23306） -----
+DB_TYPE=mysql
+DB_HOST=192.168.13.202
+DB_PORT=23306
+DB_NAME=manpou
+DB_USER=root
+DB_PASSWORD=manpou23306
 
 # ----- Nacos 注册中心 -----
 NACOS_SERVER=localhost:8848
@@ -87,7 +89,7 @@ MINIO_SECRET_KEY=minioadmin123
 MINIO_BUCKET=app-files
 
 # ----- Java 服务特定 -----
-JAVA_DSN=jdbc:h2:mem:appdb
+JAVA_DSN=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
 EOF
         info ".env.local 创建完成，请根据需要修改"
     else

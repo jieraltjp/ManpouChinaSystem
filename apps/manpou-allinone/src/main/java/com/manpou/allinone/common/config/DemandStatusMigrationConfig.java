@@ -8,8 +8,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * V38 一次性迁移：将 replenishment_demand.status 从 ENUM 改为 VARCHAR(32)。
- * Flyway 被禁用（使用 Hibernate ddl-auto），此组件手工执行 DDL。
- * 支持 MySQL 和 H2 两种数据库。
+ * Hibernate ddl-auto=update 会自动执行 schema 变更，此组件用于幂等兜底。
  */
 @Component
 public class DemandStatusMigrationConfig {
@@ -21,7 +20,7 @@ public class DemandStatusMigrationConfig {
     public void migrate() {
         String colType = getColumnType();
         if (colType == null) {
-            // H2 MEMORY DB 可能表尚未就绪，忽略
+            // 表尚未就绪，忽略
             return;
         }
         if ("varchar(32)".equalsIgnoreCase(colType) || "VARCHAR(32)".equals(colType)) {
@@ -36,21 +35,12 @@ public class DemandStatusMigrationConfig {
 
     private String getColumnType() {
         try {
-            // 优先尝试 MySQL 语法
             return jdbc.queryForObject(
                 "SELECT COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS " +
                 "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'REPLENISHMENT_DEMAND' AND COLUMN_NAME = 'STATUS'",
                 String.class);
-        } catch (Exception mysqlEx) {
-            try {
-                // H2 兼容：表名大写，列名大写
-                return jdbc.queryForObject(
-                    "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS " +
-                    "WHERE TABLE_NAME = 'REPLENISHMENT_DEMAND' AND COLUMN_NAME = 'STATUS' AND TABLE_SCHEMA = 'PUBLIC'",
-                    String.class);
-            } catch (Exception h2Ex) {
-                return null;
-            }
+        } catch (Exception ex) {
+            return null;
         }
     }
 }

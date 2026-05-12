@@ -178,6 +178,12 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/pages/system/CosTestPage.vue'),
             meta: { titleKey: 'menu.cosTest', requiresAuth: true },
           },
+          {
+            path: 'audit-log',
+            name: 'AuditLog',
+            component: () => import('@/pages/system/AuditLogPage.vue'),
+            meta: { titleKey: 'menu.auditLog', requiresAuth: true, roles: ['ADMIN', 'MANAGER'] },
+          },
         ],
       },
     ],

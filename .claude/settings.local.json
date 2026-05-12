@@ -263,7 +263,9 @@
       "Bash(D:/Programme/java/ManpouChinaSystem/scripts/restart-all.bat manpou-allinone *)",
       "Bash(SSH_ASKPASS=/d/Programme/java/ManpouChinaSystem/askpass.sh DISPLAY=dummy ssh *)",
       "Bash(SSH_ASKPASS=/d/Programme/java/ManpouChinaSystem/askpass.sh DISPLAY=dummy git push *)",
-      "Bash(SSH_ASKPASS=/d/Programme/java/ManpouChinaSystem/askpass.sh DISPLAY=dummy scp *)"
+      "Bash(SSH_ASKPASS=/d/Programme/java/ManpouChinaSystem/askpass.sh DISPLAY=dummy scp *)",
+      "Read(//tmp/**)",
+      "Bash(tasklist *)"
     ]
   }
 }

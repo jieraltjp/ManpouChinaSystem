@@ -27,7 +27,7 @@ WEB_PORT=13000
 JAVA_OPTS="-Xms512m -Xmx1024m"
 
 # ---- Profile 选择 ----
-# Windows (git-bash): local（H2 内存数据库）
+# Windows (git-bash): local（MySQL 23306）
 # Linux (Ubuntu Server): development（远程 MySQL 192.168.13.202:23306）
 if is_windows; then
     SPRING_PROFILE="local"

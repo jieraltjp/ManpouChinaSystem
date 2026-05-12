@@ -32,6 +32,10 @@ export default defineConfig({
         target: 'http://localhost:18081',
         changeOrigin: true,
       },
+      '/api/v1/audit-logs': {
+        target: 'http://localhost:18081',
+        changeOrigin: true,
+      },
       // 业务请求：指向 allinone（所有业务 API）
       // 生产环境：改为 18080 (api-gateway)，由网关统一路由
       '/api': {

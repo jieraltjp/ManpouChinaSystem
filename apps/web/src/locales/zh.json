@@ -27,7 +27,8 @@
     "system": "系统管理",
     "user": "用户管理",
     "role": "角色管理",
-    "cosTest": "COS 测试"
+    "cosTest": "COS 测试",
+    "auditLog": "操作日志"
   },
   "auth": {
     "login": "登录",
@@ -1945,6 +1946,59 @@
     "validation": {
       "roleCodeRequired": "角色编码不能为空",
       "roleNameCnRequired": "角色名称不能为空"
+    }
+  },
+  "auditLog": {
+    "title": "操作日志",
+    "column": {
+      "createTime": "操作时间",
+      "username": "账号",
+      "operatorName": "操作人",
+      "module": "模块",
+      "action": "动作",
+      "httpMethod": "方法",
+      "httpUrl": "URL",
+      "resourceType": "资源类型",
+      "resourceId": "资源ID",
+      "ipAddress": "IP 地址",
+      "detail": "详情"
+    },
+    "filter": {
+      "userId": "操作人账号",
+      "module": "模块",
+      "action": "动作",
+      "resourceType": "资源类型",
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "reset": "重置",
+      "search": "查询"
+    },
+    "action": {
+      "viewDetail": "查看详情"
+    },
+    "detail": {
+      "title": "日志详情",
+      "close": "关闭"
+    },
+    "module": {
+      "auth": "认证",
+      "procurement": "发注管理",
+      "factory": "工厂管理",
+      "product": "商品管理",
+      "user": "用户管理",
+      "role": "角色管理"
+    },
+    "actionTag": {
+      "LOGIN": "登录",
+      "CREATE": "新建",
+      "UPDATE": "更新",
+      "DELETE": "删除",
+      "APPROVE": "审批",
+      "REJECT": "驳回"
+    },
+    "message": {
+      "loadFailed": "加载日志列表失败",
+      "detailLoadFailed": "加载日志详情失败"
     }
   }
 }

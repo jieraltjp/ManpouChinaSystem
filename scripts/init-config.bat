@@ -52,10 +52,12 @@ if not exist "!env_file!" (
         echo # ================================================
         echo SERVER_PORT=8080
         echo APP_NAME=app-service
-        echo DB_TYPE=h2
-        echo DB_NAME=appdb
-        echo DB_USER=sa
-        echo DB_PASSWORD=
+        echo DB_TYPE=mysql
+        echo DB_HOST=192.168.13.202
+        echo DB_PORT=23306
+        echo DB_NAME=manpou
+        echo DB_USER=root
+        echo DB_PASSWORD=manpou23306
         echo NACOS_SERVER=localhost:8848
         echo NACOS_NAMESPACE=dev
         echo REDIS_HOST=localhost
@@ -67,7 +69,7 @@ if not exist "!env_file!" (
         echo MINIO_ACCESS_KEY=minioadmin
         echo MINIO_SECRET_KEY=minioadmin123
         echo MINIO_BUCKET=app-files
-        echo JAVA_DSN=jdbc:h2:mem:appdb
+        echo JAVA_DSN=jdbc:mysql://%%DB_HOST%%:%%DB_PORT%%/%%DB_NAME%%?useSSL=false^&allowPublicKeyRetrieval=true^&serverTimezone=Asia/Shanghai
     ) > "!env_file!"
     echo !INFO!.env.local 创建完成，请根据需要修改
 ) else (

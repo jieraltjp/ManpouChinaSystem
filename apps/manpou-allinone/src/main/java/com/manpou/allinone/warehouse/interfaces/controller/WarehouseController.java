@@ -5,6 +5,7 @@ import com.manpou.allinone.warehouse.application.dto.WarehousePageQuery;
 import com.manpou.allinone.warehouse.application.dto.WarehouseQuery;
 import com.manpou.allinone.warehouse.application.dto.WarehouseUpdateCmd;
 import com.manpou.allinone.warehouse.application.usecase.WarehouseUseCase;
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,6 +50,7 @@ public class WarehouseController {
      * 客户端需在请求头携带 X-Idempotency-Key: {uuid}
      */
     @PostMapping
+      @AuditLog(module = "warehouse", action = "CREATE", resourceType = "warehouse", resourceId = "#_return")
     @Idempotent(ttl = 24 * 60 * 60)
     @PreAuthorize("hasAuthority('warehouse:create')")
     public Result<Long> create(@Valid @RequestBody WarehouseCreateCmd cmd) {
@@ -60,6 +62,7 @@ public class WarehouseController {
      * 更新Warehouse。
      */
     @PutMapping("/{id}")
+    @AuditLog(module = "warehouse", action = "UPDATE", resourceType = "warehouse", resourceId = "#id")
     @PreAuthorize("hasAuthority('warehouse:update')")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody WarehouseUpdateCmd cmd) {
@@ -71,6 +74,7 @@ public class WarehouseController {
      * 删除Warehouse（逻辑删除）。
      */
     @DeleteMapping("/{id}")
+    @AuditLog(module = "warehouse", action = "DELETE", resourceType = "warehouse", resourceId = "#id")
     @PreAuthorize("hasAuthority('warehouse:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         warehouseUseCase.delete(id);

@@ -187,6 +187,7 @@ apps/web/src/
 | 测试策略 | `docs/test/TEST-STRATEGY.md` |
 | 经验教训库 | `docs/lessons/README.md` |
 | CI/CD 流程 | `docs/pro/15-ci-cd.md` |
+| 权限与日志 | `docs/permission/README.md` |
 
 ---
 

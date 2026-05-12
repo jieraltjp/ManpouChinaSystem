@@ -129,6 +129,6 @@ DELETE /api/v1/tax-refunds/{id}            # 软删除（终态禁止删除）
 - [x] ✅ `TaxRefundController` REST 控制器（`/api/v1/tax-refunds`）
 - [x] ✅ `@/api/taxRefund.ts` 前端 API 客户端
 - [x] ✅ `TaxRefundRecordPage.vue` 页面（`apps/web/src/pages/finance/TaxRefundRecordPage.vue`）
-- [x] ✅ DB migration `V13__tax_refund_record_table.sql`
+- [x] ✅ DB migration `V13__tax_refund_record_table.sql`（已合并至 allinone V15）
 - [x] ✅ 聚合接口 `GET /api/v1/orders/{id}/overview` step7 集成（`OrderOverviewUseCase`）
 - [ ] 🔴 `TaxRefundUseCaseTest` 单元测试（含理论计算验证）

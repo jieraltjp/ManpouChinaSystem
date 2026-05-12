@@ -1,5 +1,6 @@
 package com.manpou.allinone.procurement.interfaces.controller;
 
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,6 +52,7 @@ public class ShipmentBatchController {
     @PostMapping
     @Idempotent(ttl = 24 * 60 * 60)
     @PreAuthorize("hasAuthority('shipment:create')")
+      @AuditLog(module = "shipment", action = "CREATE", resourceType = "batch", resourceId = "#_return")
     public Result<Long> create(@Valid @RequestBody ShipmentBatchCreateCmd cmd) {
         Long id = shipmentBatchUseCase.create(cmd);
         return Result.ok("出货批次创建成功", id);
@@ -62,6 +64,7 @@ public class ShipmentBatchController {
      */
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('shipment:update')")
+    @AuditLog(module = "shipment", action = "UPDATE", resourceType = "batch", resourceId = "#id")
     public Result<Void> update(@PathVariable("id") Long id,
                               @Valid @RequestBody ShipmentBatchUpdateCmd cmd) {
         shipmentBatchUseCase.update(id, cmd);
@@ -75,6 +78,7 @@ public class ShipmentBatchController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('shipment:delete')")
+    @AuditLog(module = "shipment", action = "DELETE", resourceType = "batch", resourceId = "#id")
     public Result<Void> delete(@PathVariable("id") Long id) {
         shipmentBatchUseCase.delete(id);
         return Result.ok("出货批次删除成功", null);
@@ -86,6 +90,7 @@ public class ShipmentBatchController {
      */
     @PostMapping("/{id}/link-qc")
     @PreAuthorize("hasAuthority('shipment:update')")
+    @AuditLog(module = "shipment", action = "UPDATE", resourceType = "batch", resourceId = "#id")
     public Result<Void> linkQc(@PathVariable("id") Long id,
                                 @RequestBody Map<String, Long> body) {
         Long qcRecordId = body.get("qcRecordId");

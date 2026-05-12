@@ -113,6 +113,10 @@
             <el-icon><Cloudy /></el-icon>
             <template #title>{{ $t('menu.cosTest') }}</template>
           </el-menu-item>
+          <el-menu-item index="/system/audit-log">
+            <el-icon><Document /></el-icon>
+            <template #title>{{ $t('menu.auditLog') }}</template>
+          </el-menu-item>
         </el-sub-menu>
       </el-menu>
     </el-aside>

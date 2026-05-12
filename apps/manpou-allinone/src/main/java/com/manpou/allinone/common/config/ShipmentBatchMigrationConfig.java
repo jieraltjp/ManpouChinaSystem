@@ -252,7 +252,7 @@ public class ShipmentBatchMigrationConfig {
     }
 
     private boolean tableExists(String tableName) {
-        // H2 的 INFORMATION_SCHEMA.TABLES 中表名为大写，同时检查大小写
+        // INFORMATION_SCHEMA.TABLES 表名大小写处理
         String upper = tableName.toUpperCase();
         String lower = tableName.toLowerCase();
         Integer count = jdbc.queryForObject(
@@ -263,7 +263,7 @@ public class ShipmentBatchMigrationConfig {
     }
 
     private boolean columnExists(String tableName, String columnName) {
-        // H2 的 INFORMATION_SCHEMA.COLUMNS 中表名/列名均为大写，同时检查大小写
+        // INFORMATION_SCHEMA.COLUMNS 表名/列名大小写处理
         String upperTable = tableName.toUpperCase();
         String lowerTable = tableName.toLowerCase();
         String upperCol = columnName.toUpperCase();

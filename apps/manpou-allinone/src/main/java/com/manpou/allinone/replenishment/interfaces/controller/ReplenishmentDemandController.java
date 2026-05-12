@@ -2,6 +2,7 @@ package com.manpou.allinone.replenishment.interfaces.controller;
 
 import java.util.List;
 
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.procurement.application.dto.ProcurementPageQuery;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandCreateCmd;
@@ -36,6 +37,7 @@ public class ReplenishmentDemandController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('demand:create')")
+    @AuditLog(module = "replenishment", action = "CREATE", resourceType = "demand", resourceId = "#_return")
     public Result<Long> create(@Valid @RequestBody ReplenishmentDemandCreateCmd cmd) {
         Long id = demandUseCase.create(cmd);
         return Result.ok("需求单创建成功", id);
@@ -43,6 +45,7 @@ public class ReplenishmentDemandController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('demand:update')")
+    @AuditLog(module = "replenishment", action = "UPDATE", resourceType = "demand", resourceId = "#id")
     public Result<Void> update(@PathVariable("id") Long id,
                                 @Valid @RequestBody ReplenishmentDemandUpdateCmd cmd) {
         demandUseCase.update(id, cmd);
@@ -51,6 +54,7 @@ public class ReplenishmentDemandController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('demand:delete')")
+    @AuditLog(module = "replenishment", action = "DELETE", resourceType = "demand", resourceId = "#id")
     public Result<Void> delete(@PathVariable("id") Long id) {
         demandUseCase.delete(id);
         return Result.ok("需求单删除成功", null);
@@ -62,6 +66,7 @@ public class ReplenishmentDemandController {
      */
     @PostMapping("/{id}/link")
     @PreAuthorize("hasAuthority('demand:update')")
+    @AuditLog(module = "replenishment", action = "UPDATE", resourceType = "demand", resourceId = "#id")
     public Result<Void> linkToProcurement(
             @PathVariable("id") Long id,
             @RequestParam("procurementId") Long procurementId) {
@@ -75,6 +80,7 @@ public class ReplenishmentDemandController {
      */
     @PostMapping("/{id}/unlink")
     @PreAuthorize("hasAuthority('demand:update')")
+    @AuditLog(module = "replenishment", action = "UPDATE", resourceType = "demand", resourceId = "#id")
     public Result<Void> unlinkProcurement(@PathVariable("id") Long id) {
         demandUseCase.unlinkProcurement(id);
         return Result.ok("已取消关联", null);

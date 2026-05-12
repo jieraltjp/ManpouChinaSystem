@@ -178,6 +178,6 @@ DELETE /api/v1/japan-customs/{id}                        # 删除（v1.4.0新增
 - [x] ✅ `@/api/japanCustoms.ts` 前端 API 客户端（含 containerNo v1.4.0）
 - [x] ✅ `JapanCustomsRecordPage.vue` 前端页面（含 containerNo 筛选/列/新建 v1.4.0）
 - [x] ✅ `OrderOverviewUseCase` 已集成 JapanCustomsRecord（步骤6）
-- [x] ✅ DB迁移脚本 `V12__japan_customs_record_table.sql`
-- [x] ✅ DB迁移脚本 `V44__japan_customs_container_no.sql`（v1.4.0：container_no + product_code + factory_id 列 + 索引）
+- [x] ✅ DB迁移脚本 `V12__japan_customs_record_table.sql`（已合并至 allinone V15）
+- [x] ✅ DB迁移脚本 `V44__japan_customs_container_no.sql`（已合并至 allinone V15；v1.4.0：container_no + product_code + factory_id 列 + 索引）
 - [ ] 🔴 `JapanCustomsUseCaseTest` 单元测试

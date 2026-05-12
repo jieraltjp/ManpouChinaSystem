@@ -5,6 +5,7 @@ import com.manpou.allinone.finance.application.dto.FinancePageQuery;
 import com.manpou.allinone.finance.application.dto.FinanceQuery;
 import com.manpou.allinone.finance.application.dto.FinanceUpdateCmd;
 import com.manpou.allinone.finance.application.usecase.FinanceUseCase;
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,6 +50,7 @@ public class FinanceController {
      * 客户端需在请求头携带 X-Idempotency-Key: {uuid}
      */
     @PostMapping
+      @AuditLog(module = "finance", action = "CREATE", resourceType = "finance", resourceId = "#_return")
     @Idempotent(ttl = 24 * 60 * 60)
     @PreAuthorize("hasAuthority('sales:create')")
     public Result<Long> create(@Valid @RequestBody FinanceCreateCmd cmd) {
@@ -60,6 +62,7 @@ public class FinanceController {
      * 更新Finance。
      */
     @PutMapping("/{id}")
+    @AuditLog(module = "finance", action = "UPDATE", resourceType = "finance", resourceId = "#id")
     @PreAuthorize("hasAuthority('sales:update')")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody FinanceUpdateCmd cmd) {
@@ -71,6 +74,7 @@ public class FinanceController {
      * 删除Finance（逻辑删除）。
      */
     @DeleteMapping("/{id}")
+    @AuditLog(module = "finance", action = "DELETE", resourceType = "finance", resourceId = "#id")
     @PreAuthorize("hasAuthority('sales:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         financeUseCase.delete(id);

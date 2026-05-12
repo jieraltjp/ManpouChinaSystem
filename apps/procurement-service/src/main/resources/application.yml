@@ -18,12 +18,12 @@ spring:
       cloud:
         enabled: false
 
-  # 数据源（本地 H2 无 Docker；生产切 MySQL）
+  # 数据源（本地 MySQL 23306；生产通过环境变量覆盖）
   datasource:
-    url: jdbc:h2:mem:${DB_NAME:app};MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:mysql://${DB_HOST:192.168.13.202}:${DB_PORT:23306}/${DB_NAME:manpou}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:manpou23306}
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
@@ -34,11 +34,11 @@ spring:
   # JPA 配置
   jpa:
     hibernate:
-      ddl-auto: update     # 本地 H2 用 update；生产环境必须 validate
+      ddl-auto: update     # 本地开发用 update；生产环境建议 validate 或启用 Flyway
     show-sql: false       # 本地 dev 可改为 true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
         jdbc:
           batch_size: 50
@@ -49,7 +49,7 @@ spring:
         #   use_second_level_cache: true
         #   region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
 
-  # Flyway 数据库迁移（本地 H2 禁用，生产 MySQL 启用）
+  # Flyway 数据库迁移（骨架服务暂无迁移脚本，当前依赖 JPA ddl-auto）
   flyway:
     enabled: false
 

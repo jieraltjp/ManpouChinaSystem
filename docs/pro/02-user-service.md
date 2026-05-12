@@ -103,10 +103,7 @@ src/main/java/com/manpou/user/
 src/main/resources/
 ├── application.yml                    # 主配置（18081 端口）
 ├── config/local.yaml                  # 本地配置
-├── db/migration/
-│   ├── V1__init_schema.sql           # example 表
-│   ├── V2__outbox_table.sql          # Outbox 消息表
-│   └── V3__signing_key_table.sql     # JWT 签名密钥表
+├── db/migration/                     # 已删除（user-service 无独立迁移，依赖 allinone V15 同一 DB）
 └── keys/
     ├── private.pem                   # JWT 私钥（RS256）
     └── public.pem                    # JWT 公钥
@@ -162,19 +159,21 @@ src/main/resources/
 
 ### 7.1 现有表
 
-| 表名 | V | 说明 |
-|------|---|------|
-| `example` | V1 | 示例表 |
-| `outbox` | V2 | Outbox 消息表 |
-| `signing_key` | V3 | JWT 签名密钥表 |
+| 表名 | 来源 | 说明 |
+|------|------|------|
+| `outbox`, `saga_log` | allinone V15（共享 DB） | 基础设施表 |
+| `signing_key` | user-service JPA ddl-auto | JWT 签名密钥表 |
+| `user`, `role`, `permission` | allinone V15（共享 DB） | 用户体系核心表 |
 
-### 7.2 待创建表
+### 7.2 用户体系表（✅ 已完成，依赖 allinone V15）
 
-| 表名 | 优先级 | 说明 |
-|------|--------|------|
-| `user` | P0 | 用户主表 |
-| `role` | P0 | 角色表 |
-| `user_role` | P0 | 用户角色关联表 |
+| 表名 | 状态 | 来源 |
+|------|------|------|
+| `user` | ✅ | allinone V15 |
+| `role` | ✅ | allinone V15 |
+| `permission` | ✅ | allinone V15 |
+| `user_role`, `role_permission` | ✅ | allinone V15 |
+| `company`, `department`, `position` | ✅ | allinone V15 |
 | `permission` | P1 | 权限表 |
 
 ---
@@ -182,7 +181,7 @@ src/main/resources/
 ## 8. 行动项
 
 - [x] ✅ **已完成**：修复 AuthController 硬编码占位符登录（2026-04-30）
-- [x] ✅ **已完成**：接入真实用户表（V4__user_table.sql）
+- [x] ✅ **已完成**：接入真实用户表（依赖 allinone V15，user-service 无独立迁移）
 - [ ] **待定**：实现 KeyManagementService（密钥自动轮换）
 - [ ] **待定**：实现 Refresh Token 机制
 - [ ] **持续**：所有 API 必须通过 Spring Security 认证

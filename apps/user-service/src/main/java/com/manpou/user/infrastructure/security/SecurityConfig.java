@@ -2,6 +2,7 @@ package com.manpou.user.infrastructure.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -41,6 +42,7 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/health").permitAll()     // 健康检查
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()  // API 文档
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")  // 管理员接口
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/audit-logs").permitAll()  // allinone 内部写入，secret 在 controller 层校验
                 .anyRequest().authenticated()                         // 其他需认证
             )
             // JWT 认证过滤器

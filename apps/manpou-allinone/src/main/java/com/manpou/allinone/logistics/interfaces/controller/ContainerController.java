@@ -1,5 +1,6 @@
 package com.manpou.allinone.logistics.interfaces.controller;
 
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,12 +39,14 @@ public class ContainerController {
     @PostMapping
     @Idempotent(ttl = 86400)
     @PreAuthorize("hasAuthority('container:create')")
+      @AuditLog(module = "logistics", action = "CREATE", resourceType = "container", resourceId = "#_return")
     public Result<Long> create(@Valid @RequestBody ContainerCreateCmd cmd) {
         return Result.ok(useCase.create(cmd));
     }
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('container:update')")
+    @AuditLog(module = "logistics", action = "UPDATE", resourceType = "container", resourceId = "#id")
     public Result<Void> update(@PathVariable("id") Long id,
                                @RequestBody ContainerUpdateCmd cmd) {
         useCase.update(id, cmd);
@@ -52,6 +55,7 @@ public class ContainerController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('container:delete')")
+    @AuditLog(module = "logistics", action = "DELETE", resourceType = "container", resourceId = "#id")
     public Result<Void> delete(@PathVariable("id") Long id) {
         useCase.delete(id);
         return Result.ok();

@@ -4,6 +4,7 @@ import com.manpou.allinone.customs.application.dto.*;
 import com.manpou.allinone.customs.application.usecase.JapanCustomsUseCase;
 
 import java.util.List;
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
 import jakarta.validation.Valid;
@@ -40,6 +41,7 @@ public class JapanCustomsController {
     }
 
     @PostMapping
+      @AuditLog(module = "japan_customs", action = "CREATE", resourceType = "japan_customs", resourceId = "#_return")
     @Idempotent(ttl = 24 * 60 * 60)
     @PreAuthorize("hasAuthority('japan_customs:create')")
     public Result<Long> create(@Valid @RequestBody JapanCustomsCreateCmd cmd) {
@@ -47,6 +49,7 @@ public class JapanCustomsController {
     }
 
     @PostMapping("/batch")
+      @AuditLog(module = "japan_customs", action = "CREATE", resourceType = "japan_customs", resourceId = "#_return")
     @Idempotent(ttl = 24 * 60 * 60)
     @PreAuthorize("hasAuthority('japan_customs:create')")
     public Result<List<Long>> batchCreate(@Valid @RequestBody JapanCustomsBatchCreateCmd cmd) {
@@ -54,6 +57,7 @@ public class JapanCustomsController {
     }
 
     @PutMapping("/{id}")
+    @AuditLog(module = "japan_customs", action = "UPDATE", resourceType = "japan_customs", resourceId = "#id")
     @PreAuthorize("hasAuthority('japan_customs:update')")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody JapanCustomsUpdateCmd cmd) {
@@ -62,6 +66,7 @@ public class JapanCustomsController {
     }
 
     @PatchMapping("/{id}/start")
+    @AuditLog(module = "japan_customs", action = "UPDATE", resourceType = "japan_customs", resourceId = "#id")
     @PreAuthorize("hasAuthority('japan_customs:update')")
     public Result<Void> start(@PathVariable Long id) {
         japanCustomsUseCase.startClearance(id);
@@ -69,6 +74,7 @@ public class JapanCustomsController {
     }
 
     @PatchMapping("/{id}/complete")
+    @AuditLog(module = "japan_customs", action = "UPDATE", resourceType = "japan_customs", resourceId = "#id")
     @PreAuthorize("hasAuthority('japan_customs:update')")
     public Result<Void> complete(@PathVariable Long id,
                                   @Valid @RequestBody JapanCustomsCompleteCmd cmd) {
@@ -77,6 +83,7 @@ public class JapanCustomsController {
     }
 
     @PatchMapping("/{id}/fail")
+    @AuditLog(module = "japan_customs", action = "UPDATE", resourceType = "japan_customs", resourceId = "#id")
     @PreAuthorize("hasAuthority('japan_customs:update')")
     public Result<Void> fail(@PathVariable Long id,
                               @Valid @RequestBody JapanCustomsFailCmd cmd) {
@@ -85,6 +92,7 @@ public class JapanCustomsController {
     }
 
     @DeleteMapping("/{id}")
+    @AuditLog(module = "japan_customs", action = "DELETE", resourceType = "japan_customs", resourceId = "#id")
     @PreAuthorize("hasAuthority('japan_customs:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         japanCustomsUseCase.delete(id);

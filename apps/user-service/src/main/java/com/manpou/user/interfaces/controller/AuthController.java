@@ -2,6 +2,8 @@ package com.manpou.user.interfaces.controller;
 
 import com.manpou.common.result.Result;
 import com.manpou.common.security.TokenConstants;
+import com.manpou.user.application.service.AuditLogService;
+import com.manpou.user.domain.model.AuditLog;
 import com.manpou.user.domain.model.Permission;
 import com.manpou.user.domain.model.Role;
 import com.manpou.user.domain.model.User;
@@ -10,6 +12,7 @@ import com.manpou.user.domain.repository.RoleRepository;
 import com.manpou.user.domain.repository.UserRepository;
 import com.manpou.user.infrastructure.security.JwtKeyManager;
 import com.manpou.user.infrastructure.security.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +40,7 @@ public class AuthController {
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     /**
      * 获取当前活跃公钥（前端用于验签 RS256 Token）。
@@ -75,7 +79,7 @@ public class AuthController {
      * 用户登录。
      */
     @PostMapping("/login")
-    public Result<LoginVO> login(@Valid @RequestBody LoginCmd cmd) {
+    public Result<LoginVO> login(@Valid @RequestBody LoginCmd cmd, HttpServletRequest request) {
         User user = userRepository.findByUsername(cmd.getUsername())
             .orElseThrow(() -> {
                 log.warn("Login failed: user not found, username={}", cmd.getUsername());
@@ -128,7 +132,64 @@ public class AuthController {
         log.info("User {} logged in, roles={}, permissions={}, kid={}",
             user.getUsername(), roleCodes, permissionCodes.size(), kid);
 
+        // 记录登录日志
+        auditLogin(String.valueOf(user.getId()), user.getUsername(), user.getNameCn(), request);
+
         return Result.ok(new LoginVO(token, TokenConstants.ACCESS_TOKEN_TTL_SECONDS, TokenConstants.BEARER_PREFIX, kid));
+    }
+
+    // ==================== 审计日志 ====================
+
+    private void auditLogin(String userId, String username, String userName, HttpServletRequest request) {
+        try {
+            AuditLog al = new AuditLog();
+            al.setTraceId(getCurrentTraceId());
+            al.setUserId(userId);
+            al.setUsername(username);
+            al.setOperatorName(userName);
+            al.setModule("auth");
+            al.setAction("LOGIN");
+            al.setHttpMethod("POST");
+            al.setHttpUrl("/api/v1/auth/login");
+            al.setIpAddress(getClientIp(request));
+            al.setUserAgent(truncate(request.getHeader("User-Agent"), 512));
+            auditLogService.save(al);
+        } catch (Exception ex) {
+            log.warn("[AuditLog] LOGIN audit failed: userId={}, error={}", userId, ex.getMessage());
+        }
+    }
+
+    private String getCurrentTraceId() {
+        // 从 W3C traceparent header 提取 trace-id
+        String tp = org.springframework.web.context.request.RequestContextHolder
+            .getRequestAttributes() != null
+            ? ((org.springframework.web.context.request.ServletRequestAttributes)
+                org.springframework.web.context.request.RequestContextHolder.getRequestAttributes())
+                .getRequest().getHeader("traceparent")
+            : null;
+        if (tp != null && tp.length() >= 35) {
+            return tp.substring(3, 35); // 跳过 "00-" 前缀
+        }
+        return null;
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        // 多级代理时取第一个 IP
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0].trim();
+        }
+        return ip;
+    }
+
+    private String truncate(String s, int max) {
+        return s == null ? null : (s.length() > max ? s.substring(0, max) : s);
     }
 
     // ==================== DTO ====================

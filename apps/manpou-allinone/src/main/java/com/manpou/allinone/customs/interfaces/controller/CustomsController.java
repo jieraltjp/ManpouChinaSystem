@@ -6,6 +6,7 @@ import com.manpou.allinone.customs.application.dto.CustomsPageQuery;
 import com.manpou.allinone.customs.application.dto.CustomsQuery;
 import com.manpou.allinone.customs.application.dto.CustomsUpdateCmd;
 import com.manpou.allinone.customs.application.usecase.CustomsUseCase;
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,6 +41,7 @@ public class CustomsController {
     }
 
     @PostMapping
+      @AuditLog(module = "customs", action = "CREATE", resourceType = "customs", resourceId = "#_return")
     @Idempotent(ttl = 24 * 60 * 60)
     @PreAuthorize("hasAuthority('customs:create')")
     public Result<Long> create(@Valid @RequestBody CustomsCreateCmd cmd) {
@@ -53,6 +55,7 @@ public class CustomsController {
      * 一个 LogisticsPlan 对应一条 DomesticCustomsRecord。
      */
     @PostMapping("/batch")
+      @AuditLog(module = "customs", action = "CREATE", resourceType = "customs", resourceId = "#_return")
     @PreAuthorize("hasAuthority('customs:create')")
     public Result<List<Long>> batchCreate(@Valid @RequestBody CustomsBatchCreateCmd cmd) {
         List<Long> ids = customsUseCase.batchCreate(cmd);
@@ -60,6 +63,7 @@ public class CustomsController {
     }
 
     @PutMapping("/{id}")
+    @AuditLog(module = "customs", action = "UPDATE", resourceType = "customs", resourceId = "#id")
     @PreAuthorize("hasAuthority('customs:update')")
     public Result<Void> update(@PathVariable Long id, @Valid @RequestBody CustomsUpdateCmd cmd) {
         customsUseCase.update(id, cmd);
@@ -67,6 +71,7 @@ public class CustomsController {
     }
 
     @PatchMapping("/{id}/submit")
+    @AuditLog(module = "customs", action = "UPDATE", resourceType = "customs", resourceId = "#id")
     @PreAuthorize("hasAuthority('customs:update')")
     public Result<Void> submit(@PathVariable Long id) {
         customsUseCase.submit(id);
@@ -74,6 +79,7 @@ public class CustomsController {
     }
 
     @PatchMapping("/{id}/clear")
+    @AuditLog(module = "customs", action = "UPDATE", resourceType = "customs", resourceId = "#id")
     @PreAuthorize("hasAuthority('customs:update')")
     public Result<Void> clear(@PathVariable Long id) {
         customsUseCase.clear(id);
@@ -81,6 +87,7 @@ public class CustomsController {
     }
 
     @PatchMapping("/{id}/reject")
+    @AuditLog(module = "customs", action = "UPDATE", resourceType = "customs", resourceId = "#id")
     @PreAuthorize("hasAuthority('customs:update')")
     public Result<Void> reject(@PathVariable Long id, @RequestBody Map<String, String> body) {
         customsUseCase.reject(id, body.get("reason"));
@@ -88,6 +95,7 @@ public class CustomsController {
     }
 
     @DeleteMapping("/{id}")
+    @AuditLog(module = "customs", action = "DELETE", resourceType = "customs", resourceId = "#id")
     @PreAuthorize("hasAuthority('customs:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         customsUseCase.delete(id);

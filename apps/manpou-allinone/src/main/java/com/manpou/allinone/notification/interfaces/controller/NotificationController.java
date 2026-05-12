@@ -5,6 +5,7 @@ import com.manpou.allinone.notification.application.dto.NotificationPageQuery;
 import com.manpou.allinone.notification.application.dto.NotificationQuery;
 import com.manpou.allinone.notification.application.dto.NotificationUpdateCmd;
 import com.manpou.allinone.notification.application.usecase.NotificationUseCase;
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,6 +50,7 @@ public class NotificationController {
      * 客户端需在请求头携带 X-Idempotency-Key: {uuid}
      */
     @PostMapping
+      @AuditLog(module = "notification", action = "CREATE", resourceType = "notification", resourceId = "#_return")
     @Idempotent(ttl = 24 * 60 * 60)
     @PreAuthorize("hasAuthority('notification:create')")
     public Result<Long> create(@Valid @RequestBody NotificationCreateCmd cmd) {
@@ -60,6 +62,7 @@ public class NotificationController {
      * 更新Notification。
      */
     @PutMapping("/{id}")
+    @AuditLog(module = "notification", action = "UPDATE", resourceType = "notification", resourceId = "#id")
     @PreAuthorize("hasAuthority('notification:update')")
     public Result<Void> update(@PathVariable Long id,
                                @Valid @RequestBody NotificationUpdateCmd cmd) {
@@ -71,6 +74,7 @@ public class NotificationController {
      * 删除Notification（逻辑删除）。
      */
     @DeleteMapping("/{id}")
+    @AuditLog(module = "notification", action = "DELETE", resourceType = "notification", resourceId = "#id")
     @PreAuthorize("hasAuthority('notification:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         notificationUseCase.delete(id);

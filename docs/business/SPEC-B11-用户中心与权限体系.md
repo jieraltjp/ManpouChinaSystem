@@ -1,11 +1,12 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.6.0
+> **版本**: 1.8.0
 > **创建**: 2026-04-30
-> **更新**: 2026-05-11（v1.7.0：补充 warehouse/notification 模块（V15）；V16新增role:delete；DB 权限102条；代码 Set 66条）
-> **状态**: ⚠️ Phase 2 部分完成；⚠️ Phase 3 部分完成；Phase 4-6 待开发
+> **更新**: 2026-05-11（v1.8.0：审计修正——DB 权限67条（V15实际）；ADMIN is_editable=0；BCrypt hash 修正；移除 warehouse/notification（V15无）；迁移体系改为 allinone V15/V16）
+> **状态**: ✅ Phase 2 完成；✅ Phase 3 完成（JwtAuthenticationFilter + 17 Controller @PreAuthorize + 前端按钮 v-if + 路由守卫）；Phase 4-6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
+> **权限代码对齐**: `docs/permission/`（PERMISSION-CODE-ALIGNMENT.md / ALL_PERMISSIONS.md / ROLE-MATRIX.md / AUDIT-LOG-SPEC.md）
 
 ---
 
@@ -21,7 +22,7 @@
 
 本设计覆盖：
 - 用户管理（账号/密码/姓名/邮箱/手机/头像/组织/职务/海关资质）
-- 角色与权限管理（4 级角色 + 66 条权限编码（代码 Set）；DB 实际 102 条）
+- 角色与权限管理（4 级角色 + 63 条权限编码（代码 Set）；DB 实际 67 条（V15 INSERT 覆盖 ID 1~94+114））
 - 操作日志（CREATE/UPDATE/DELETE/STATUS_CHANGE/LOGIN 全链路记录）
 - 个人中心（信息修改/密码修改/偏好设置）
 - **用户注册 + 管理员审核（方案B：JWT 跨服务验证）**
@@ -267,9 +268,9 @@ CREATE TABLE user (
   KEY idx_status (status)
 );
 
--- 预置管理员（密码: Admin@12345，status=APPROVED 跳过审核）
+-- 预置管理员（密码: admin123，BCrypt strength=12，status=APPROVED 跳过审核）
 INSERT INTO user (user_code, username, password_hash, name_cn, email, company_id, status, create_by) VALUES
-('U-0001', 'admin', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VttQj6L5kMn.lu', '系统管理员', 'admin@manpou.cn', 1, 1, 'SYSTEM');
+('U-0001', 'admin', '$2a$12$t7mRpfsCDNFgj6LET1Y47eH7J2.MJ5i5nAYwYL6SfKdWE7LN.vqUG', '系统管理员', 'admin@manpou.cn', 1, 1, 'SYSTEM');
 ```
 
 #### `V7.1__user_position.sql`（替代 JSON）
@@ -335,9 +336,9 @@ CREATE TABLE role_permission (
   KEY idx_permission (permission_id)
 );
 
--- 预置角色（isEditable=1，均可编辑）
+-- 预置角色（ADMIN is_editable=0 不可编辑；MANAGER/OPERATOR/VIEWER is_editable=1 可编辑）
 INSERT INTO role (role_code, role_name_cn, role_name_jp, role_type, is_editable) VALUES
-('ADMIN',   '系统管理员',   'システム管理者',    'SYSTEM',   1),
+('ADMIN',   '系统管理员',   'システム管理者',    'SYSTEM',   0),
 ('MANAGER', '运营主管',     '運営マネージャー', 'BUSINESS', 1),
 ('OPERATOR','普通运营',     '一般運営者',       'BUSINESS', 1),
 ('VIEWER',  '查看者',       '閲覧者',           'BUSINESS', 1);
@@ -562,7 +563,7 @@ public boolean canLogin(User user) {
 
 ## 4. 权限编码规范
 
-### 4.1 权限编码定义（66 条，ALL_PERMISSIONS Set；DB 实际 102 条 V8 93 + V15 8 + V16 1）
+### 4.1 权限编码定义（63 条 ALL_PERMISSIONS Set；DB 实际 67 条 V15 覆盖 ID 1~94+114）
 
 **格式**: `{模块}:{动作}`
 > ⚠️ 以下权限在早期 SPEC 设计时被标记"已剔除"，但实际 V8 迁移中已实现：`order:read`、`permission:read`、`audit:export`、`customs:approve`、`tax_refund:complete`。
@@ -658,23 +659,13 @@ public boolean canLogin(User user) {
 | `audit:read` | 查看操作日志 | 操作ログを表示 | READ |
 | `audit:export` | 导出操作日志 | 操作ログをエクスポート | EXPORT |
 
-#### 仓储模块（warehouse）
-
-| 权限编码 | 中文名 | 日文名 | 动作 |
-|---------|--------|--------|------|
-| `warehouse:read` | 查看仓储记录 | 倉庫記録を表示 | READ |
-| `warehouse:create` | 创建仓储记录 | 倉庫記録を作成 | CREATE |
-| `warehouse:update` | 编辑仓储记录 | 倉庫記録を編集 | UPDATE |
-| `warehouse:delete` | 删除仓储记录 | 倉庫記録を削除 | DELETE |
-
 #### 通知模块（notification）
 
-| 权限编码 | 中文名 | 日文名 | 动作 |
-|---------|--------|--------|------|
-| `notification:read` | 查看通知 | 通知を表示 | READ |
-| `notification:create` | 创建通知 | 通知を作成 | CREATE |
-| `notification:update` | 编辑通知 | 通知を編集 | UPDATE |
-| `notification:delete` | 删除通知 | 通知を削除 | DELETE |
+| 权限编码 | 中文名 | 日文名 | 动作 | 说明 |
+|---------|--------|--------|------|------|
+| `notification:delete` | 删除通知 | 通知を削除 | DELETE | V15 仅此一条；完整 CRUD 待实现 |
+
+> ⚠️ `warehouse:*`（仓储模块）和 `notification:read/create/update` 当前未在 V15 中实现，属于 Phase 5+ 规划。
 
 ---
 
@@ -803,7 +794,7 @@ public Result<DemandVO> update(@PathVariable Long id, @RequestBody @Valid Demand
 | 依赖倒置？ | ✅ | domain 层只引用 common.enums/exception |
 | 领域语言？ | ✅ | 权限模块使用业务语言（角色/权限/审批），非技术语言 |
 | 日志？ | ✅ | 操作日志全链路记录，含 traceId |
-| 提交？ | ✅ | 按 Flyway 版本顺序：V4→V5→V6→V7→V7.1→V8→V9→V10→V11→V12→V13→V14→V15→V16 |
+| 提交？ | ✅ | allinone V15→V16；user-service 无迁移 |
 | 单体优先？ | ✅ | 认证在 user-service（18081），业务在 manpou-allinone（18090） |
 | i18n？ | ✅ | 所有 UI 文本使用 i18n key，中日双语 |
 | 密码安全？ | ✅ | BCrypt 哈希，强度 12，永不明文传输/存储 |

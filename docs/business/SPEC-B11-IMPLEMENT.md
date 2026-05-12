@@ -1,11 +1,11 @@
 # SPEC-B11 — 用户中心与权限体系 · 实现设计
 
-> **版本**: 1.3.0
+> **版本**: 1.4.0
 > **创建**: 2026-05-01
-> **更新**: 2026-05-08（v1.3.1：Phase 3 前端完成——UserPage.vue 按钮 v-if + router 角色守卫 + LoginPage 重定向）
+> **更新**: 2026-05-11（v1.4.0：审计修正——迁移体系改为 allinone V15/V16（user-service 无迁移）；ADMIN is_editable=0；BCrypt hash 修正）
 > **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；Phase 4-6 待开发
-> **前置**: SPEC-B11 v1.1.0 · user-service Flyway V14 已完成 · Vite proxy 已配置
-> **关联**: UI-17 · UI-18 · UI-19 · UI-20 · docs/ui/pages/14-user-management.md · docs/ui/pages/15-role-management.md
+> **前置**: SPEC-B11 v1.8.0 · Vite proxy 已配置 · allinone V15/V16 已就绪
+> **关联**: UI-17 · UI-18 · UI-19 · UI-20 · docs/ui/pages/14-user-management.md · docs/ui/pages/15-role-management.md · `docs/permission/`（权限代码对齐文档）
 > **INTJ 编号**: DOC-B11-IMPL-001
 
 ---
@@ -305,7 +305,7 @@ GET /api/v1/permissions/tree
 
 ### Phase 1 — 数据库 + 登录 ✅ 2026-04-30
 
-1. Flyway V4~V10 迁移（company/department/position/user/role/permission/audit_log）
+1. Flyway V15~V16 迁移（allinone 统一管理：V15=32表+种子数据，V16=procurement_snapshot；user-service 无迁移，依赖 allinone 同一 DB）
 2. JWT 跨服务验证（user-service 签发，allinone 验签）
 3. Vite proxy 配置（`/api/v1/auth` → user-service）
 4. BCrypt hash 正确 seed（admin/admin123）
@@ -325,7 +325,7 @@ GET /api/v1/permissions/tree
 
 **缺口 1（allinone JwtAuthenticationFilter）：**
 - `claims.roles()` → `ROLE_USER/ADMIN`，`claims.permissions()` **完全忽略**
-- 修复：复制 `ALL_PERMISSIONS` 常量（66条），提取 permissions 到 authorities，ADMIN `*:*` 展开
+- 修复：复制 `ALL_PERMISSIONS` 常量（63条，与 V15 DB 实际对齐），提取 permissions 到 authorities，ADMIN `*:*` 展开
 - 文件：`JwtAuthenticationFilter.java`
 
 **缺口 2（allinone 业务 Controller）：**
@@ -333,9 +333,9 @@ GET /api/v1/permissions/tree
 - 修复：按 HTTP 方法 + 业务语义加注解（GET:read / POST:create / PUT-PATCH:update / DELETE:delete）
 
 **实现完成清单：**
-1. allinone `JwtAuthenticationFilter` ✅ 提取 permissions（66条，与 user-service 同步）
+1. allinone `JwtAuthenticationFilter` ✅ 提取 permissions（63条，与 V15 DB 实际对齐）
 2. allinone 17个业务 Controller 加 `@PreAuthorize` ✅
-3. user-service `ALL_PERMISSIONS` 同步补充 warehouse/notification 权限 ✅
+3. user-service `ALL_PERMISSIONS` 与 V15 DB 对齐（warehouse/notification 移除；补充 japan_customs:start/complete, user:approve, permission:read, audit:export）✅
 
 ### Phase 4 — 操作日志（前端）⚠️ 待开发
 
@@ -370,20 +370,14 @@ GET /api/v1/permissions/tree
 
 ## 6. 数据库 Flyway 现状
 
-| 版本 | 内容 | 状态 |
-|------|------|------|
-| V4 | company 表 | ✅ |
-| V5 | department 表 | ✅ |
-| V6 | position 表 | ✅ |
-| V7 | user 表（含 BaseEntity 审计列） | ✅ |
-| V7_1 | user_position 表（M-N 规范化职务关联） | ✅ |
-| V8 | role / permission / user_role / role_permission | ✅ |
-| V9 | audit_log 表 | ✅ |
-| V10 | admin 用户 seed | ✅ |
-| V11 | 补充 BaseEntity 审计列（修复 schema 不一致） | ✅ |
-| V12 | admin 用户数据补全 + MANAGER/OPERATOR/VIEWER 角色权限分配 | ✅ |
-| V13 | 重复脚本（同 V12，可忽略） | ✅ |
-| V14 | 修正预置角色 isEditable=1 | ✅ |
+> ⚠️ V4~V14 历史迁移已全部删除（杂乱无章，V15 已包含全部表结构）。user-service 无迁移文件。
+
+| 版本 | 文件 | 内容 | 状态 |
+|------|------|------|------|
+| V15 | `V15__baseline_schema.sql` | 32 表 DDL + 种子数据（67 条权限 + 4 角色 + admin 用户 + 职务 + 组织） | ✅ |
+| V16 | `V16__procurement_snapshot.sql` | procurement_snapshot 表（幂等兜底） | ✅ |
+
+> DB 实际权限：67 条（ID 1~94 + 114）。BCrypt hash: `$2a$12$t7mRpfsCDNFgj6LET1Y47eH7J2.MJ5i5nAYwYL6SfKdWE7LN.vqUG`（admin/admin123）
 
 ---
 
@@ -423,7 +417,7 @@ proxy: {
 
 | 约束 | 说明 |
 |------|------|
-| 预置角色允许编辑 | isEditable=1，所有角色均可编辑名称/描述/权限，删除也无限制 |
+| 预置角色编辑约束 | ADMIN is_editable=0 不可编辑名称/角色类型；MANAGER/OPERATOR/VIEWER is_editable=1 可编辑 |
 | 用户分配角色 | UserRoleRepository 维护关联表（deleteByUserId / insertUserRole / findRoleIdsByUserId） |
 | 前端权限控制 | ✅ Phase 3 完成——allinone JwtAuthenticationFilter 提取 permissions + 17个 Controller @PreAuthorize + 前端按钮 v-if + 路由角色守卫 |
 | 审计日志记录 | audit_log 表已建，但 Service 层尚未接入（Phase 4） |
@@ -441,7 +435,7 @@ proxy: {
 | RolePage.vue | P0 | ✅ 已完成 |
 | 路由注册 | P0 | ✅ 已完成（/system/user + /system/role） |
 | i18n key | P0 | ✅ 已完成 |
-| allinone JwtAuthenticationFilter 提取 permissions | P0 | ✅ 已完成（66条，与 user-service 同步） |
+| allinone JwtAuthenticationFilter 提取 permissions | P0 | ✅ 已完成（63条，与 V15 DB 实际对齐） |
 | allinone 17个业务 Controller 加 @PreAuthorize | P0 | ✅ 已完成（demand/procurement/shipment/qc/logistics/consolidation/container/customs/japan_customs/tax_refund/sales/warehouse/notification/order/product/factory） |
 | 前端权限控制（JWT payload 渲染） | P1 | ⚠️ 待开发 |
 | 前端删除用户按钮 | P1 | ⚠️ 待开发（UserPage.vue 缺少） |
@@ -466,4 +460,4 @@ proxy: {
 
 ---
 
-*文档版本: 1.3.0 · 状态: Phase 2 ✅ Phase 3 ✅ · 2026-05-08*
+*文档版本: 1.4.0 · 状态: Phase 2 ✅ Phase 3 ✅ · 2026-05-11*

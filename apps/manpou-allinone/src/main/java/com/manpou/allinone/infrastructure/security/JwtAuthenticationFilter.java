@@ -31,7 +31,7 @@ import java.util.Set;
  * 从 JWT Claims 中同时提取 roles 和 permissions，构建完整的 Spring Security authorities。
  * roles → {@code ROLE_<role>} 格式，支持 hasRole() 检查；
  * permissions → 直接作为 authority，支持 hasAuthority('xxx:create') 检查。
- * ADMIN 角色的 *:* 权限展开为所有具体权限（58条，与 user-service ALL_PERMISSIONS 同步）。
+ * ADMIN 角色的 *:* 权限展开为所有具体权限（63条，与 V15 DB 实际对齐）。
  */
 @Slf4j
 @Component
@@ -41,8 +41,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     /**
-     * ADMIN 角色 *:* 展开后的所有具体权限（66条，与 user-service JwtAuthenticationFilter.ALL_PERMISSIONS 同步）。
-     * 按 SPEC-B11 v1.2.0 定义，新增 warehouse/notification（Phase 3 权限控制）。
+     * ADMIN 角色 *:* 展开后的所有具体权限（63条，与 V15 DB 实际 67 条对齐）。
+     * warehouse/notification 全套 CRUD 已移除（V15 DB 不存在）；已补充 DB 有但 Set 缺的：
+     *   japan_customs:start/complete, user:approve, permission:read, audit:export。
      */
     private static final Set<String> ALL_PERMISSIONS = Set.of(
         "demand:create", "demand:read", "demand:update", "demand:delete",
@@ -54,15 +55,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "container:create", "container:read", "container:update", "container:delete",
         "customs:create", "customs:read", "customs:update", "customs:delete",
         "japan_customs:create", "japan_customs:read", "japan_customs:update", "japan_customs:delete",
+        "japan_customs:start", "japan_customs:complete",
         "tax_refund:create", "tax_refund:read", "tax_refund:update", "tax_refund:delete",
         "sales:create", "sales:read", "sales:update", "sales:delete",
         "factory:create", "factory:read", "factory:update", "factory:delete",
         "product:create", "product:read", "product:update", "product:delete",
-        "warehouse:create", "warehouse:read", "warehouse:update", "warehouse:delete",
-        "notification:create", "notification:read", "notification:update", "notification:delete",
-        "user:create", "user:read", "user:update", "user:delete", "user:reset_password",
+        "order:read",
+        "user:create", "user:read", "user:update", "user:delete", "user:approve", "user:reset_password",
         "role:create", "role:read", "role:update", "role:delete", "role:assign",
-        "audit:read"
+        "permission:read",
+        "audit:read", "audit:export"
     );
 
     private final JwtService jwtService;

@@ -94,6 +94,8 @@ jwt:
 # 选择配置源：properties(默认) / local(开发/CI) / nacos(生产)
 # ============================================================
 app:
+  audit-log:
+    secret: ${AUDIT_LOG_SECRET:}              # allinone 写入日志的校验密钥
   config:
     source: ${CONFIG_SOURCE:properties}       # 配置源类型
     local:
