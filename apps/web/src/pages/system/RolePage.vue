@@ -282,7 +282,7 @@ loadRoles()
 .role-item:hover .role-actions { opacity:1; }
 .btn-blue { color:#409EFF; }
 
-.perm-tree-wrap { max-height:500px; overflow:auto; }
+.perm-tree-wrap { height: calc(100vh - 280px); overflow: auto; }
 .perm-node { display:flex; gap:8px; align-items:center; }
 .perm-label { }
 .perm-code { font-size:11px; color:#909399; font-family:monospace; }

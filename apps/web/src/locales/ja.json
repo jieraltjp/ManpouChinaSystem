@@ -30,7 +30,7 @@
     "role": "役割管理",
     "cosTest": "COS テスト",
     "auditLog": "操作ログ",
-    "profile": "プロフィール"
+    "profileLabel": "プロフィール"
   },
   "auth": {
     "login": "ログイン",
@@ -1365,7 +1365,8 @@
     "success": "操作完了",
     "button": {
       "search": "検索",
-      "reset": "リセット"
+      "reset": "リセット",
+      "save": "保存"
     },
     "loading": "読み込み中...",
     "noData": "データがありません",
@@ -2139,6 +2140,9 @@
       "passwordMismatch": "パスワードが一致しません",
       "passwordWrong": "以前のパスワードが正しくありません",
       "passwordWeak": "パスワード強度が不足しています"
+    },
+    "menuLabels": {
+      "profile": "プロフィール"
     }
   }
 }

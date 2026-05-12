@@ -30,7 +30,7 @@
     "role": "角色管理",
     "cosTest": "COS 测试",
     "auditLog": "操作日志",
-    "profile": "个人中心"
+    "profileLabel": "个人中心"
   },
   "auth": {
     "login": "登录",
@@ -1414,7 +1414,8 @@
     "success": "操作成功",
     "button": {
       "search": "查询",
-      "reset": "重置"
+      "reset": "重置",
+      "save": "保存"
     },
     "loading": "加载中...",
     "noData": "暂无数据",
@@ -2139,6 +2140,9 @@
       "passwordMismatch": "两次密码不一致",
       "passwordWrong": "旧密码错误",
       "passwordWeak": "密码强度不足"
+    },
+    "menuLabels": {
+      "profile": "个人中心"
     }
   }
 }

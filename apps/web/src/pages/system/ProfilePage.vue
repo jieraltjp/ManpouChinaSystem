@@ -102,7 +102,7 @@
                            : $t('profile.strength.strong') }}
                       </span>
                     </div>
-                    <div class="password-rules">{{ $t('profile.security.rules')[0] }}，{{ $t('profile.security.rules')[1] }}</div>
+                    <div class="password-rules">{{ passwordRules[0] }}，{{ passwordRules[1] }}</div>
                   </el-form-item>
                   <el-form-item :label="$t('profile.security.confirmPassword')" prop="confirmPassword">
                     <el-input v-model="pwdForm.confirmPassword" type="password" show-password maxlength="20" />
@@ -257,6 +257,11 @@ const passwordStrength = computed(() => {
   if (/[A-Z]/.test(p) && /[a-z]/.test(p)) score += 33
   if (/\d/.test(p)) score += 34
   return score
+})
+
+const passwordRules = computed(() => {
+  const rules = t('profile.security.rules')
+  return Array.isArray(rules) ? rules : []
 })
 
 const strengthColor = computed(() => {

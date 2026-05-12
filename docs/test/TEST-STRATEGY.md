@@ -1,8 +1,8 @@
 # 测试策略与框架选型
 
-> **版本**: 2.0.0
+> **版本**: 2.1.0
 > **创建**: 2026-04-21
-> **更新**: 2026-05-01
+> **更新**: 2026-05-12
 > **维护**: MANPOU 开发团队
 
 ---
@@ -12,7 +12,7 @@
 本项目（ManpouChinaSystem）技术栈为 **Java 21 / Spring Boot 3**（后端）+ **Vue 3 / TypeScript**（前端），Phase 0 为单体架构（manpou-allinone），Phase 1 按 Kafka Topic 拆分为微服务。
 
 **现状**：
-- 后端：JUnit 5 + AssertJ + Spring Test + ArchUnit 已就绪；Testcontainers BOM 在父 pom.xml 中，但未在 manpou-allinone 子模块显式引入；前端测试完全空白
+- 后端：JUnit 5 + AssertJ + Spring Test + ArchUnit 已就绪；8个 UseCase 测试类（含 Container/ConsolidationPool）；Testcontainers BOM 在父 pom.xml 中，但未在 manpou-allinone 子模块显式引入；前端测试完全空白
 
 **推荐**：后端补 Testcontainers + REST Assured，前端引入 Vitest + Testing Library + Playwright。
 
@@ -28,7 +28,7 @@
 | AssertJ | 3.25.3 | ✅ 就绪 | 广泛使用 `assertThat(...).isEqualTo()` |
 | Mockito | 5.11.0 | ✅ 已引入 | 通过 spring-boot-starter-test 间接引入 |
 | Spring Test | 3.2.5 | ✅ 就绪 | `@SpringBootTest` + `@Transactional` |
-| ArchUnit | 1.3.2 | ✅ 就绪 | 9个模块均有 `LayeredArchitectureTest` |
+| ArchUnit | 1.3.2 | ✅ 就绪 | 9个模块均有 `LayeredArchitectureTest` + 循环依赖检测 |
 | Testcontainers | 1.19.7 (BOM) | ⚠️ BOM已配置 | 父 pom.xml dependencyManagement 有 BOM，需在子模块添加具体 artifact 依赖 |
 | H2 Database | 2.2.224 | ✅ 就绪 | 内存测试数据库 |
 
@@ -41,10 +41,12 @@
 | `QcRecordUseCaseTest` | manpou-allinone | CRUD / FSM | ✅ 10个用例 |
 | `LogisticsPlanUseCaseTest` | manpou-allinone | CRUD / FSM | ✅ 12个用例 |
 | `ReplenishmentDemandUseCaseTest` | manpou-allinone | CRUD | ✅ 10个用例 |
+| `ContainerUseCaseTest` | manpou-allinone | CRUD | ✅ 20个用例 |
+| `ConsolidationPoolUseCaseTest` | manpou-allinone | CRUD / FSM | ✅ 25个用例 |
 | `LayeredArchitectureTest` | 各微服务 | DDD 分层约束 | ✅ 9个模块 |
 | `JwtValidatorTest` | api-gateway | JWT Claims 验证 | ✅ |
 
-**待补充**：Container、ConsolidationPool、Customs、Finance 模块的 UseCase 测试。
+**待补充**：Customs、Finance 模块的 UseCase 测试。
 
 ### 1.3 前端现状
 
@@ -208,8 +210,6 @@ public abstract class IntegrationTestBase {
 
 | 模块 | 优先级 | 测试类 |
 |------|--------|--------|
-| Container | P1 | `ContainerUseCaseTest` |
-| ConsolidationPool | P1 | `ConsolidationPoolUseCaseTest` |
 | Customs | P2 | `CustomsDeclarationUseCaseTest` |
 | Finance | P2 | `FinanceSettlementUseCaseTest` |
 
@@ -492,16 +492,17 @@ curl -s -X POST http://localhost:18090/api/v1/auth/login \
 
 ### 本周
 
+- [x] 后端：编写 `ContainerUseCaseTest`（参考现有 5 个测试类的模式）✅
+- [x] 后端：编写 `ConsolidationPoolUseCaseTest` ✅
 - [ ] 后端：在 `manpou-allinone/pom.xml` 中添加 Testcontainers MySQL 依赖
 - [ ] 后端：创建 `IntegrationTestBase` 基类
-- [ ] 后端：编写 `ContainerUseCaseTest`（参考现有 5 个测试类的模式）
 - [ ] 前端：在 `apps/web` 安装 Vitest + Testing Library + Playwright
 - [ ] 前端：配置 `vitest.config.ts` 和 `playwright.config.ts`
 - [ ] 前端：编写 `useAuth` store 的第一个测试
 
 ### 本月
 
-- [ ] 后端：补充 `ConsolidationPoolUseCaseTest`、`CustomsDeclarationUseCaseTest`、`FinanceSettlementUseCaseTest`
+- [ ] 后端：补充 `CustomsDeclarationUseCaseTest`、`FinanceSettlementUseCaseTest`
 - [ ] 后端：引入 Testcontainers Kafka，编写消息集成测试
 - [ ] 前端：覆盖所有 Composables 测试（useOrderOverview、usePermission）
 - [ ] 前端：覆盖 auth store 测试

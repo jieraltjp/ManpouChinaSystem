@@ -123,7 +123,7 @@
           </el-menu-item>
           <el-menu-item index="/system/profile">
             <el-icon><User /></el-icon>
-            <template #title>{{ $t('menu.profile') }}</template>
+            <template #title>{{ $t('menu.profileLabel') }}</template>
           </el-menu-item>
         </el-sub-menu>
       </el-menu>
@@ -184,7 +184,7 @@
                 <!-- 个人中心 -->
                 <div class="panel-logout" @click="router.push('/system/profile')">
                   <el-icon><User /></el-icon>
-                  {{ $t('menu.profile') }}
+                  {{ $t('menu.profileLabel') }}
                 </div>
 
                 <el-divider style="margin: 8px 0" />
