@@ -35,11 +35,12 @@
 | UI-16 | [pages/13-procurement-overview.md](pages/13-procurement-overview.md) | `/base/overview/procurement/:procurementId` | — | ✅ |
 | — | [pages/17-shipment-batch.md](pages/17-shipment-batch.md) | `/procurement/shipment-batch` | — | ✅ |
 | — | [pages/18-consolidation-pool.md](pages/18-consolidation-pool.md) | `/procurement/consolidation-pool` | — | ✅ |
-| — | [pages/19-container.md](pages/19-container.md) | `/procurement/container` | — | ✅ |
+| — | [pages/19-container.md](pages/19-container.md) | `/base/container` | — | 📋 待更新 v2.0 |
 | UI-17 | [pages/14-user-management.md](pages/14-user-management.md) | `/system/user` | B-11 | ✅ 前端完成（权限控制 Phase 3 待 allinone） |
 | UI-18 | [pages/15-role-management.md](pages/15-role-management.md) | `/system/role` | B-11 | ✅ 前端完成（权限控制 Phase 3 待 allinone） |
 | UI-19 | [pages/16-audit-log.md](pages/16-audit-log.md) | `/system/audit-log` | B-11 | 📋 待开发 |
 | UI-20 | [pages/17-profile.md](pages/17-profile.md) | `/profile` | B-11 | 📋 待开发 |
+| UI-21 | [pages/20-ship.md](pages/20-ship.md) | `/base/ship` | B-12 | 📋 待开发 |
 | — | [05-UI改版方案-橙色商业主题.md](05-UI改版方案-橙色商业主题.md) | — | — | ✅ |
 | — | [ARCHITECTURE.md](ARCHITECTURE.md) | — | — | ✅ |
 
@@ -88,3 +89,4 @@
 | 07 | B-07 退税 | UI-10 07-tax-refund | DB-07 tax-refund |
 | 08 | B-08 运营销售 | UI-11 08-sales | DB-08 sales |
 | 09 | B-09 订单总览 | UI-12 09-order-overview | DB-09 order-overview |
+| B-12 | B-12 货柜与船只管理 | UI-21 20-ship | DB-14 container-ship |

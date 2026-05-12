@@ -1,8 +1,8 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.9.0
+> **版本**: 1.10.0
 > **创建**: 2026-04-30
-> **更新**: 2026-05-12（v1.9.0：Phase 4 操作日志完成——@AuditLog AOP + AuditLogClient + 前端 AuditLogPage + 链路验证；ALL_PERMISSIONS 修正为63条）
+> **更新**: 2026-05-12（v1.10.0：新增 ship:* 权限编码（ID 100~103）；container:* 已在 logistics 节标注（ID 104~107）；待 V17 Flyway seed 追加；对应 SPEC-B12）
 > **状态**: ✅ Phase 2 完成；✅ Phase 3 完成（JwtAuthenticationFilter + 21 Controller @PreAuthorize + 前端按钮 v-if + 路由守卫）；✅ Phase 4 完成（操作日志全链路）；Phase 5-6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
@@ -606,6 +606,17 @@ public boolean canLogin(User user) {
 | `container:update` | 编辑货柜 | コンテナを編集 | UPDATE |
 | `container:delete` | 删除货柜 | コンテナを削除 | DELETE |
 
+#### 船只管理模块（ship，B-12 新增，V18 ID 115~118）
+
+| 权限编码 | 中文名 | 日文名 | 动作 | ID |
+|---------|--------|--------|------|-----|
+| `ship:read` | 查看船只 | 船舶を表示 | READ | 115 |
+| `ship:create` | 创建船只 | 船舶を作成 | CREATE | 116 |
+| `ship:update` | 编辑船只 | 船舶を編集 | UPDATE | 117 |
+| `ship:delete` | 删除船只 | 船舶を削除 | DELETE | 118 |
+
+> 注：`container:read/create/update/delete`（ID 29-32）已存在于 V15 baseline。`ship:*`（ID 115~118）为 V18 新增，V15 baseline 尚未包含。
+
 #### 报关模块（customs）
 
 | 权限编码 | 中文名 | 日文名 | 动作 |
@@ -614,6 +625,12 @@ public boolean canLogin(User user) {
 | `customs:create` | 创建报关单 | 通関書類を作成 | CREATE |
 | `customs:update` | 编辑报关单 | 通関書類を編集 | UPDATE |
 | `customs:delete` | 删除报关单 | 通関書類を削除 | DELETE |
+| `customs:approve` | 审批报关单 | 通関書類を承認 | APPROVE |
+
+#### 日本清关模块（japan_customs）
+
+| 权限编码 | 中文名 | 日文名 | 动作 |
+|---------|--------|--------|------|
 | `japan_customs:read` | 查看日本清关 | 日本通関を表示 | READ |
 | `japan_customs:create` | 创建日本清关 | 日本通関を作成 | CREATE |
 | `japan_customs:start` | 启动清关 | 通関を開始 | START |
@@ -627,6 +644,7 @@ public boolean canLogin(User user) {
 | `tax_refund:read` | 查看退税记录 | 退税記録を表示 | READ |
 | `tax_refund:create` | 创建退税记录 | 退税記録を作成 | CREATE |
 | `tax_refund:update` | 编辑退税记录 | 退税記録を編集 | UPDATE |
+| `tax_refund:complete` | 完成退税 | 退税を完了 | COMPLETE |
 | `tax_refund:delete` | 删除退税记录 | 退税記録を削除 | DELETE |
 | `sales:read` | 查看销售记录 | 販売記録を表示 | READ |
 | `sales:create` | 创建销售记录 | 販売記録を作成 | CREATE |
@@ -661,6 +679,15 @@ public boolean canLogin(User user) {
 | `audit:read` | 查看操作日志 | 操作ログを表示 | READ |
 | `audit:export` | 导出操作日志 | 操作ログをエクスポート | EXPORT |
 
+#### 仓储模块（warehouse）
+
+| 权限编码 | 中文名 | 日文名 | 动作 | 说明 |
+|---------|--------|--------|------|------|
+| `warehouse:read` | 查看仓储记录 | 倉庫記録を表示 | READ | |
+| `warehouse:create` | 创建仓储记录 | 倉庫記録を作成 | CREATE | |
+| `warehouse:update` | 编辑仓储记录 | 倉庫記録を編集 | UPDATE | |
+| `warehouse:delete` | 删除仓储记录 | 倉庫記録を削除 | DELETE | |
+
 #### 通知模块（notification）
 
 | 权限编码 | 中文名 | 日文名 | 动作 | 说明 |
@@ -670,7 +697,7 @@ public boolean canLogin(User user) {
 | `notification:update` | 编辑通知 | 通知を編集 | UPDATE | |
 | `notification:delete` | 删除通知 | 通知を削除 | DELETE | |
 
-> ⚠️ `warehouse:*`（仓储模块）当前未在 V15 中实现，属于 Phase 5+ 规划。
+> ⚠️ warehouse CRUD（ID 101-104）和 notification CRUD（ID 111-114）已在 V15 DB，但未加入 ALL_PERMISSIONS Set，仅 ADMIN（`*:*`）可用。MANAGER/OPERATOR/VIEWER 无权限。
 
 ---
 
@@ -691,12 +718,14 @@ public boolean canLogin(User user) {
 | logistics | ✅ | ✅ | ✅ | ✅ | — |
 | consolidation | ✅ | ✅ | ✅ | ✅ | — |
 | container | ✅ | ✅ | ✅ | ✅ | — |
-| customs | ✅ | ✅ | ✅ | ✅ | — |
+| customs | ✅ | ✅ | ✅ | ✅ | ✅ approve |
 | japan_customs | ✅ | ✅ | — | ✅ | ✅ start/complete |
-| tax_refund | ✅ | ✅ | ✅ | ✅ | — |
+| tax_refund | ✅ | ✅ | ✅ | ✅ | ✅ complete |
 | sales | ✅ | ✅ | ✅ | ✅ | — |
 | factory | ✅ | ✅ | ✅ | ✅ | — |
 | product | ✅ | ✅ | ✅ | ✅ | — |
+| warehouse | ✅ | ✅ | ✅ | ✅ | — |
+| notification | ✅ | ✅ | ✅ | ✅ | — |
 | user | ✅ | — | — | — | — |
 | role | ✅ | — | — | — | — |
 | audit | ✅ | — | — | — | — |
@@ -705,30 +734,32 @@ public boolean canLogin(User user) {
 
 | 模块 | read | create | update | delete | 审批/流转 |
 |------|:----:|:------:|:------:|:------:|:---------:|
-| demand | ✅ | ✅ | ✅ own | — | — |
-| procurement | ✅ | ✅ | ✅ own | — | — |
-| shipment | ✅ | ✅ | ✅ own | — | — |
-| qc | ✅ | ✅ | ✅ own | — | — |
-| logistics | ✅ | ✅ | ✅ own | — | — |
-| consolidation | ✅ | ✅ | ✅ own | — | — |
-| container | ✅ | ✅ | ✅ own | — | — |
+| demand | ✅ | ✅ | ✅ | — | — |
+| procurement | ✅ | ✅ | ✅ | — | — |
+| shipment | ✅ | ✅ | ✅ | — | — |
+| qc | ✅ | ✅ | ✅ | — | — |
+| logistics | ✅ | ✅ | ✅ | — | — |
+| consolidation | ✅ | ✅ | ✅ | — | — |
+| container | ✅ | ✅ | ✅ | — | — |
 | customs | ✅ | ✅ | — | — | — |
 | japan_customs | ✅ | ✅ | — | — | — |
-| tax_refund | ✅ | ✅ | ✅ own | — | — |
+| tax_refund | ✅ | ✅ | ✅ | — | — |
 | sales | ✅ | ✅ | ✅ | — | — |
-| factory | ✅ | ✅ | ✅ own | — | — |
-| product | ✅ | ✅ | ✅ own | — | — |
-
-> **own** = 只能操作本人创建的数据（`createBy = 当前用户`）
+| factory | ✅ | ✅ | ✅ | — | — |
+| product | ✅ | ✅ | ✅ | — | — |
+| order | ✅ | — | — | — | — |
+| warehouse | ❌ | ❌ | ❌ | ❌ | — |
+| notification | ❌ | ❌ | ❌ | ❌ | — |
 
 ### 5.4 VIEWER（查看者）
 
 | 模块 | read |
 |------|:----:|
-| 所有业务模块 | ✅ |
-| user | ❌ |
-| role | ❌ |
-| audit | ❌ |
+| demand/procurement/shipment/qc/logistics/consolidation/container | ✅ |
+| customs/japan_customs/tax_refund/sales/factory/product/order | ✅ |
+| warehouse | ❌ |
+| notification | ❌ |
+| user/role/permission/audit | ❌ |
 
 ---
 
@@ -864,7 +895,8 @@ Phase 5: 个人中心（P2）
   前端: 修改密码
   前端: 偏好设置（语言/时区）
   后端: notification CRUD 端点已实现（无前端 UI）
-  ⚠️ warehouse:* 仓储模块（Phase 5+）
+  后端: warehouse CRUD 端点已实现（无前端 UI，DB 有但 ALL_PERMISSIONS Set 无）
+  ⚠️ warehouse/notification 前端 UI（Phase 5）
 
 Phase 6: 用户注册 + 管理员审核（P1）
   后端: POST /auth/register（public 接口，提交审核）

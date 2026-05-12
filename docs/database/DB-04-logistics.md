@@ -71,7 +71,9 @@ CREATE TABLE logistics_plan (
 
 ---
 
-## 2. container（货柜）✅已实现
+## 2. container（货柜）✅已实现 → ⚠️ v2.0 待扩展（见 DB-14）
+
+> ⚠️ 本节仅记录 v1.5.0 已有字段。v2.0 扩展字段（ship_id / time_slot / arrival_location / remarks）见 `DB-14-container-ship.md`。
 
 **对应**: `Container` 聚合根（v1.5.0，V46）
 
