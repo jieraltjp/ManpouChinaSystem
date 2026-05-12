@@ -258,11 +258,12 @@ function onLogout() {
   height: 100vh;
 }
 
-/* ── 侧边栏 ── */
+/* ── 侧边栏：限制视口高度，超出自动滚动 ── */
 .sidebar {
   background: linear-gradient(180deg, #1E2533 0%, #252D3D 100%);
   transition: width 0.3s;
-  overflow: visible;      /* 移出溢出控制，让绝对定位的 arrow 完整显示 */
+  overflow-y: auto;        /* 菜单项超出视口时滚动 */
+  overflow-x: hidden;      /* 水平溢出截断 */
   box-shadow: 2px 0 16px rgba(0,0,0,0.18);
   border-right: none;
 }
@@ -288,7 +289,6 @@ function onLogout() {
 .sidebar-menu {
   border-right: none;
   background: transparent;
-  overflow-x: hidden;   /* 水平截断在这里处理，arrow 不受影响 */
 }
 
 /* 子菜单标题行 */
