@@ -88,7 +88,9 @@ if (claims.permissions() != null) {
 }
 ```
 
-### 修复 2：17个 Controller 加 @PreAuthorize
+### 修复 2：21个 Controller 加 @PreAuthorize
+
+> ⚠️ 注：初始修复时统计为 17 个，后续审计修正为 21 个（含 ReplenishmentDemand/DemandProcurementMapping 等遗漏）。
 
 | HTTP 方法 | 注解 |
 |-----------|------|

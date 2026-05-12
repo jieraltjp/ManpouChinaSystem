@@ -380,7 +380,7 @@ GET /api/v1/permissions/tree
 
 | 版本 | 文件 | 内容 | 状态 |
 |------|------|------|------|
-| V15 | `V15__baseline_schema.sql` | 32 表 DDL + 种子数据（67 条权限 + 4 角色 + admin 用户 + 职务 + 组织） | ✅ |
+| V15 | `V15__baseline_schema.sql` | 32 表 DDL + 种子数据（78 条权限 + 4 角色 + admin 用户 + 职务 + 组织） | ✅ |
 | V16 | `V16__procurement_snapshot.sql` | procurement_snapshot 表（幂等兜底） | ✅ |
 
 > DB 实际权限：67 条（ID 1~94 + 114）。BCrypt hash: `$2a$12$t7mRpfsCDNFgj6LET1Y47eH7J2.MJ5i5nAYwYL6SfKdWE7LN.vqUG`（admin/admin123）
