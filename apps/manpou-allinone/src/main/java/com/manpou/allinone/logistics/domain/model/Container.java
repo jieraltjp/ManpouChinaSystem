@@ -12,12 +12,14 @@ import java.time.LocalDate;
 /**
  * 货柜聚合根（v1.5.0，SPEC-B00 Issue #8）。
  * 由 ConsolidationPool 触发装柜后创建。
+ * v2.0 扩展（SPEC-B12）：新增 shipId / timeSlot / arrivalLocation / remarks。
  */
 @Entity
 @Table(name = "container", indexes = {
         @Index(name = "uk_container_no", columnList = "container_no", unique = true),
         @Index(name = "idx_container_status", columnList = "status"),
         @Index(name = "idx_container_pool", columnList = "pool_id"),
+        @Index(name = "idx_container_ship_id", columnList = "ship_id"),
 })
 @Access(AccessType.FIELD)
 @Getter
@@ -54,7 +56,20 @@ public class Container extends BaseEntity {
     private LocalDate departureDate;           // 离港日期
 
     @Column(name = "arrival_date")
-    private LocalDate arrivalDate;              // 到港日期
+    private LocalDate arrivalDate;             // 到港日期
+
+    // ===== v2.0 扩展字段（SPEC-B12）=====
+    @Column(name = "ship_id")
+    private Long shipId;                      // 关联船只（NULL=待配船）
+
+    @Column(name = "time_slot", length = 32)
+    private String timeSlot;                  // 时间段，如 2026-W24
+
+    @Column(name = "arrival_location", length = 128)
+    private String arrivalLocation;           // 到岗地点/最终送达地址
+
+    @Column(name = "remarks", length = 512)
+    private String remarks;                    // 备注
 
     // ===== 领域方法 =====
 
@@ -73,5 +88,42 @@ public class Container extends BaseEntity {
                     String.format("状态「%s」不允许跳转至「%s」", status.name(), newStatus.name()));
         }
         this.status = newStatus;
+    }
+
+    /**
+     * 分配船只（关联船只后自动推进状态至 LOADED）。
+     * v2.0 SPEC-B12
+     */
+    public void assignShip(Long newShipId, LocalDate loadDate) {
+        if (this.shipId != null) {
+            throw new BusinessException("logistics.container_already_assigned",
+                    "货柜已关联船只，请先解除关联");
+        }
+        this.shipId = newShipId;
+        if (loadDate != null) {
+            this.loadDate = loadDate;
+        }
+        if (this.loadDate != null && this.status == ContainerStatus.CREATED) {
+            this.status = ContainerStatus.LOADED;
+        }
+    }
+
+    /**
+     * 解除船只关联（回退至 CREATED）。
+     * v2.0 SPEC-B12
+     */
+    public void unassignShip() {
+        if (this.shipId == null) {
+            return; // 已无关联，无操作
+        }
+        if (this.status == ContainerStatus.DEPARTED || this.status == ContainerStatus.ARRIVED) {
+            throw new BusinessException("logistics.container_cannot_unassign",
+                    "货柜已离港或到港，禁止解除船只关联");
+        }
+        this.shipId = null;
+        this.loadDate = null;
+        if (this.status == ContainerStatus.LOADED) {
+            this.status = ContainerStatus.CREATED;
+        }
     }
 }

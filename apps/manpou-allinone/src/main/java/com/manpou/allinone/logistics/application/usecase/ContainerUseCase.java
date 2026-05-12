@@ -2,6 +2,7 @@ package com.manpou.allinone.logistics.application.usecase;
 
 import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.logistics.application.assembler.ContainerAssembler;
+import com.manpou.allinone.logistics.application.dto.AssignShipCmd;
 import com.manpou.allinone.logistics.application.dto.ContainerCreateCmd;
 import com.manpou.allinone.logistics.application.dto.ContainerPageQuery;
 import com.manpou.allinone.logistics.application.dto.ContainerQuery;
@@ -10,9 +11,11 @@ import com.manpou.allinone.logistics.domain.model.Container;
 import com.manpou.allinone.logistics.domain.model.ContainerStatus;
 import com.manpou.allinone.logistics.domain.model.ConsolidationPool;
 import com.manpou.allinone.logistics.domain.model.LogisticsPlan;
+import com.manpou.allinone.logistics.domain.model.Ship;
 import com.manpou.allinone.logistics.domain.repository.ContainerRepository;
 import com.manpou.allinone.logistics.domain.repository.ConsolidationPoolRepository;
 import com.manpou.allinone.logistics.domain.repository.LogisticsPlanRepository;
+import com.manpou.allinone.logistics.domain.repository.ShipRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,22 +32,30 @@ public class ContainerUseCase {
     private final ContainerRepository containerRepository;
     private final ConsolidationPoolRepository poolRepository;
     private final LogisticsPlanRepository logisticsPlanRepository;
+    private final ShipRepository shipRepository;
     private final ContainerAssembler assembler;
 
     @Transactional(readOnly = true)
     public Page<ContainerPageQuery> pageQuery(ContainerQuery query) {
         PageRequest pageRequest = PageRequest.of(
-                query.getPage(), Math.min(query.getPageSize(), 100),
-                Sort.by(Sort.Direction.DESC, "createTime"));
-        Page<Container> page;
-        if (query.getStatus() != null) {
-            page = containerRepository.findByStatusAndDeletedIsFalse(query.getStatus(), pageRequest);
+                query.getPage(), Math.min(query.getPageSize(), 100));
+
+        Page<Object[]> page;
+        if (query.getShipId() != null) {
+            // 按船只筛选：用标准 finder，Assembler 单个转换
+            Page<Container> containers = containerRepository.findByShipIdAndDeletedIsFalse(query.getShipId(), pageRequest);
+            return containers.map(assembler::toDto);
+        } else if (query.getStatus() != null) {
+            Page<Container> containers = containerRepository.findByStatusAndDeletedIsFalse(query.getStatus(), pageRequest);
+            return containers.map(assembler::toDto);
         } else if (query.getPoolId() != null) {
-            page = containerRepository.findByPoolIdAndDeletedIsFalse(query.getPoolId(), pageRequest);
+            Page<Container> containers = containerRepository.findByPoolIdAndDeletedIsFalse(query.getPoolId(), pageRequest);
+            return containers.map(assembler::toDto);
         } else {
-            page = containerRepository.findAllByDeletedIsFalse(pageRequest);
+            // 默认：JOIN 查询获取 shipName / shipNumber
+            page = containerRepository.findAllWithShip(pageRequest);
+            return page.map(assembler::toDtoFromArray);
         }
-        return page.map(assembler::toDto);
     }
 
     @Transactional(readOnly = true)
@@ -117,6 +128,34 @@ public class ContainerUseCase {
 
         log.info("[Container] plan added, traceId={}, containerId={}, planId={}, totalCbm={}",
                 null, containerId, logisticsPlanId, container.getTotalCbm());
+    }
+
+    /**
+     * 分配船只（v2.0 SPEC-B12）。
+     */
+    @Transactional
+    public void assignShip(Long containerId, AssignShipCmd cmd) {
+        Container container = containerRepository.findByIdAndDeletedIsFalse(containerId)
+                .orElseThrow(() -> new BusinessException("logistics.container_not_found", "货柜不存在"));
+        Ship ship = shipRepository.findByIdAndDeletedIsFalse(cmd.getShipId())
+                .orElseThrow(() -> new BusinessException("logistics.ship_not_found", "船只不存在"));
+
+        container.assignShip(cmd.getShipId(), cmd.getLoadDate());
+        containerRepository.save(container);
+        log.info("[Container] ship assigned, containerId={}, shipId={}, shipName={}, status={}",
+                containerId, cmd.getShipId(), ship.getShipName(), container.getStatus());
+    }
+
+    /**
+     * 解除船只关联（v2.0 SPEC-B12）。
+     */
+    @Transactional
+    public void unassignShip(Long containerId) {
+        Container container = containerRepository.findByIdAndDeletedIsFalse(containerId)
+                .orElseThrow(() -> new BusinessException("logistics.container_not_found", "货柜不存在"));
+        container.unassignShip();
+        containerRepository.save(container);
+        log.info("[Container] ship unassigned, containerId={}, status={}", containerId, container.getStatus());
     }
 
     /**

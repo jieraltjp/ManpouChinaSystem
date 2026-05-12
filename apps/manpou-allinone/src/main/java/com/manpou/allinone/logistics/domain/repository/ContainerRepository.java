@@ -27,4 +27,14 @@ public interface ContainerRepository {
     Page<Container> findByStatusAndDeletedIsFalse(ContainerStatus status, Pageable pageable);
 
     Page<Container> findByPoolIdAndDeletedIsFalse(Long poolId, Pageable pageable);
+
+    Page<Container> findByShipIdAndDeletedIsFalse(Long shipId, Pageable pageable);
+
+    long countByShipIdAndDeletedIsFalse(Long shipId);
+
+    /**
+     * 分页查询，包含 ship 关联信息（shipName / shipNumber）。
+     * 返回 Object[]，由 Assembler 转换。
+     */
+    Page<Object[]> findAllWithShip(Pageable pageable);
 }

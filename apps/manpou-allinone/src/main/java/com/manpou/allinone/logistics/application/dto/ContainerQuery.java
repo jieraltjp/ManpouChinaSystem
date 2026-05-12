@@ -12,4 +12,5 @@ public class ContainerQuery {
     private ContainerStatus status;
     private String containerNo;
     private Long poolId;
+    private Long shipId;                   // v2.0 船只筛选
 }

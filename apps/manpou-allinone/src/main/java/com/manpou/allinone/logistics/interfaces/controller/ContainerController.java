@@ -4,6 +4,7 @@ import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
 import org.springframework.security.access.prepost.PreAuthorize;
+import com.manpou.allinone.logistics.application.dto.AssignShipCmd;
 import com.manpou.allinone.logistics.application.dto.ContainerCreateCmd;
 import com.manpou.allinone.logistics.application.dto.ContainerPageQuery;
 import com.manpou.allinone.logistics.application.dto.ContainerQuery;
@@ -66,6 +67,23 @@ public class ContainerController {
     public Result<Void> addPlan(@PathVariable("id") Long containerId,
                                 @PathVariable("planId") Long planId) {
         useCase.addPlan(containerId, planId);
+        return Result.ok();
+    }
+
+    @PutMapping("/{id}/assign-ship")
+    @PreAuthorize("hasAuthority('container:update')")
+    @AuditLog(module = "container", action = "ASSIGN_SHIP", resourceType = "container", resourceId = "#id")
+    public Result<Void> assignShip(@PathVariable("id") Long containerId,
+                                   @Valid @RequestBody AssignShipCmd cmd) {
+        useCase.assignShip(containerId, cmd);
+        return Result.ok();
+    }
+
+    @PutMapping("/{id}/unassign-ship")
+    @PreAuthorize("hasAuthority('container:update')")
+    @AuditLog(module = "container", action = "UNASSIGN_SHIP", resourceType = "container", resourceId = "#id")
+    public Result<Void> unassignShip(@PathVariable("id") Long containerId) {
+        useCase.unassignShip(containerId);
         return Result.ok();
     }
 }
