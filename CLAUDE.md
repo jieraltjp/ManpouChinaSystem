@@ -26,8 +26,8 @@ cd apps/manpou-allinone && mvn package -DskipTests
 # 启动（开发端口 18090）
 cd apps/manpou-allinone && mvn spring-boot:run
 
-# 运行单个测试
-mvn test -Dtest=ProcurementUseCaseTest
+# 运行单个测试（需在 manpou-allinone 目录执行）
+cd apps/manpou-allinone && mvn test -Dtest=ProcurementUseCaseTest
 
 # 构建依赖项（首次或依赖变更后）
 cd apps/manpou-allinone && mvn dependency:resolve
@@ -151,7 +151,7 @@ apps/web/src/
 
 ## 项目规范（铁律）
 
-**写代码前必查** `docs/lessons/` 是否有相关 lesson。
+**写代码前必查** `docs/lessons/README.md` 是否有相关 lesson（全量索引按场景分类）。
 
 ### 后端铁律
 
@@ -162,6 +162,9 @@ apps/web/src/
 | 4 | BusinessException 添加前搜索全项目确认 code 不冲突 |
 | 34 | 接口变更 = 后端 VO + 前端类型 + 模板 + i18n 同步修改 |
 | 38 | 业务逻辑入口处校验，零值/空值必须防御 |
+| 76 | allinone 代码变更后：先停进程→等5秒→删JAR→重打包→启动验证 |
+| 83 | `@PreAuthorize` 必须加在 Controller 层，内部方法调用绕过 AOP 代理 |
+| 85 | SpEL `#_return` 仅支持 `Result<T>` 单值，不支持 `ResponseEntity/Result<List>` |
 
 ### 前端铁律
 
@@ -169,8 +172,17 @@ apps/web/src/
 |---|------|
 | 40 | `vue-tsc --noEmit` 必须通过（strict + noUnusedLocals） |
 | 44 | i18n JSON 大型文件用专用编辑器，防重复 key |
+| 50 | API 响应必须防御性取值 `data?.content ?? []` |
 | 52 | 样式修复后立即 commit，禁止与代码修复分开提交 |
 | 54 | 多文件样式修复必须用 grep 全局扫描受影响文件 |
+
+### 安全铁律
+
+| # | 规则 |
+|---|------|
+| 75 | JWT 新增 claim 必须两端同步；新增 Controller 必须加 `@PreAuthorize` |
+| 78 | 权限三角（前端/后端/DB）必须完全一致 |
+| 79 | JWT 密钥来源必须统一——env var > classpath > DB，禁止混用 |
 
 ---
 
@@ -209,3 +221,5 @@ apps/web/src/
 - 所有领域模块的 `KeyManagementService` 必须用 `@Service("xxxKeyManagementService")` 显式命名，否则 Spring Bean 冲突
 - 前端 `npm run build` 后需检查产物时间戳，确认是最新构建再部署
 - Git 提交前先运行 `mvn compile` 和 `npm run type-check`，确保无编译错误
+- **AppLayout.vue 菜单是硬编码的**，非动态生成，新增页面必须同时修改 `AppLayout.vue` 和 `router/index.ts`
+- `libs/manpou-common` 是 allinone 的共享依赖，变更后需先 `mvn install -pl libs/manpou-common` 再编译 allinone
