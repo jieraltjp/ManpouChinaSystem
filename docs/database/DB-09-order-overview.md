@@ -1,9 +1,9 @@
 # DB-09 — 订单总览数据库设计
 
-> **版本**: 2.3.0
-> **更新**: 2026-05-11（v2.3.1：新增 V49__procurement_snapshot_table.sql Flyway迁移；Entity通过ddl-auto建表现已被正式迁移覆盖；见 docs/pro/PRODUCTION-DEPLOY.md 部署指南）
+> **版本**: 2.4.0
+> **更新**: 2026-05-12（v2.4.0：Phase1 已完成；ConsolidationPoolItem 设计变更已同步；procurement_snapshot aspirational 字段移至 Phase2）
 > **创建**: 2026-04-22
-> **状态**: 🔄 Phase1 开发中
+> **状态**: ✅ Phase1 已完成 · Phase2（step5-8）待实现
 > **业务步号**: 09（订单总览 — 核心视图）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B09-订单总览-API设计.md`
 > **对应 UI 文档**: `docs/ui/pages/09-order-overview.md`
@@ -217,54 +217,46 @@ WHERE d.is_deleted = FALSE;
 
 ## 4. procurement_snapshot 表（发注单快照）
 
-> ⚠️ Entity存在（`ProcurementSnapshot.java`），开发期由JPA `ddl-auto: update`自动建表；
-> ⚠️ 无Flyway迁移脚本，生产环境部署需额外执行建表语句或启用ddl-auto。
+> ✅ **V49 已实现**：`procurement_snapshot` 表及 Entity 已完整实现（V49 + ProcurementSnapshot.java）。
 > Entity: `com.manpou.allinone.order.domain.model.ProcurementSnapshot`
 
-### 4.1 完整字段清单
+### 4.1 Phase1 已实现字段清单
 
 | 分类 | 字段名 | 类型 | 说明 | 状态 |
 |------|--------|------|------|------|
-| **主键** | `id` | BIGINT | 自增主键 | ✅ 已有 |
-| **关联** | `procurement_id` | BIGINT | 发注单ID（唯一） | ✅ 已有 |
-| **工厂-基本信息** | `factory_id` | BIGINT | 工厂ID | ✅ 已有 |
-| | `factory_code` | VARCHAR(32) | 工厂编号 | ✅ 已有 |
-| | `factory_name` | VARCHAR(128) | 工厂名称 | ✅ 已有 |
-| **工厂-地理** | `factory_province` | VARCHAR(64) | 省 | ✅ 已有 |
-| | `factory_city` | VARCHAR(64) | 市 | ⚠️ 缺 |
-| | `factory_county` | VARCHAR(64) | 县/区 | ⚠️ 缺 |
-| | `factory_rough_location` | VARCHAR(500) | 详细地址 | ⚠️ 缺 |
-| | `factory_longitude` | DECIMAL(11,8) | 经度 | ⚠️ 缺 |
-| | `factory_latitude` | DECIMAL(11,8) | 纬度 | ⚠️ 缺 |
-| **工厂-联系** | `factory_contact_name` | VARCHAR(64) | 联系人 | ✅ 已有 |
-| | `factory_contact_phone` | VARCHAR(32) | 手机号 | ✅ 已有 |
-| | `factory_contact_wechat` | VARCHAR(64) | 微信号 | ⚠️ 缺 |
-| | `factory_contact_qq` | VARCHAR(32) | QQ号 | ⚠️ 缺 |
-| **工厂-合作** | `factory_category` | VARCHAR(32) | 分类（枚举） | ⚠️ 缺 |
-| | `factory_cooperation_status` | VARCHAR(32) | 合作状态 | ⚠️ 缺 |
-| | `factory_payment_terms` | VARCHAR(64) | 账期 | ⚠️ 缺 |
-| **商品-基本信息** | `product_master_code` | VARCHAR(32) | 主货号 | ⚠️ 缺 |
-| | `product_sub_code` | VARCHAR(64) | 子货号 | ⚠️ 缺 |
-| | `product_jan_code` | VARCHAR(64) | JAN码 | ⚠️ 缺 |
-| | `product_name_zh` | VARCHAR(255) | 中文名称 | ✅ 已有 |
-| | `product_name_ja` | VARCHAR(128) | 日文名称 | ✅ 已有 |
-| | `product_name_en` | VARCHAR(255) | 英文名称 | ⚠️ 缺 |
-| **商品-属性** | `product_category` | VARCHAR(32) | 分类 | ✅ 已有 |
-| | `product_origin` | VARCHAR(100) | 原产国 | ⚠️ 缺 |
-| | `product_material` | VARCHAR(64) | 材质 | ⚠️ 缺 |
-| | `product_unit` | VARCHAR(50) | 计量单位 | ⚠️ 缺 |
-| **商品-报关** | `product_hs_code` | VARCHAR(20) | 中国HS编码 | ⚠️ 缺 |
-| | `product_hs_code_jp` | VARCHAR(20) | 日本HS编码 | ⚠️ 缺 |
-| **商品-价格** | `product_unit_price_rmb` | DECIMAL(12,4) | 单价(CNY) | ⚠️ 缺 |
-| | `product_tax_point` | DECIMAL(5,4) | 票点 | ⚠️ 缺 |
-| **商品-图片** | `product_image_url` | VARCHAR(512) | 商品图片URL | ⚠️ 缺 |
+| **主键** | `id` | BIGINT | 自增主键 | ✅ V49 |
+| **关联** | `procurement_id` | BIGINT | 发注单ID（UNIQUE） | ✅ V49 |
+| **工厂-基本信息** | `factory_id` | BIGINT | 工厂ID | ✅ V49 |
+| | `factory_code` | VARCHAR(32) | 工厂编号 | ✅ V49 |
+| | `factory_name` | VARCHAR(128) | 工厂名称 | ✅ V49 |
+| **工厂-地理** | `factory_province` | VARCHAR(64) | 省 | ✅ V49 |
+| | `factory_city` | VARCHAR(64) | 市 | ✅ V49 |
+| **工厂-联系** | `factory_contact_name` | VARCHAR(64) | 联系人 | ✅ V49 |
+| | `factory_contact_phone` | VARCHAR(32) | 手机号 | ✅ V49 |
+| **商品-基本信息** | `product_name_zh` | VARCHAR(255) | 中文名称 | ✅ V49 |
+| | `product_name_ja` | VARCHAR(128) | 日文名称 | ✅ V49 |
+| **商品-属性** | `product_category` | VARCHAR(32) | 分类 | ✅ V49 |
 
-> **图例**: ✅ = 已有字段（JPA ddl-auto），⚠️ = 缺失字段（需补充建表迁移）
+### 4.2 Phase2 预留字段（待扩展）
 
-### 4.2 待创建 Flyway 迁移（V*__procurement_snapshot_table.sql）
+以下字段为 aspirational 设计，Phase1 **未实现**（无需建表迁移）：
 
-> ✅ **已修复**：V49__procurement_snapshot_table.sql（Flyway 迁移脚本）已创建，Entity 覆盖完整字段。
-> ⚠️ V40 实际创建的是 `shipment_batch` 表（出货批次），不是 procurement_snapshot。
+| 分类 | 字段名 | 说明 |
+|------|--------|------|
+| 工厂-地理 | `factory_county` | 县/区 |
+| 工厂-地理 | `factory_rough_location` | 详细地址 |
+| 工厂-联系 | `factory_contact_wechat` | 微信号 |
+| 工厂-联系 | `factory_contact_qq` | QQ号 |
+| 工厂-合作 | `factory_category` | 合作分类枚举 |
+| 工厂-合作 | `factory_cooperation_status` | 合作状态 |
+| 工厂-合作 | `factory_payment_terms` | 账期 |
+| 商品-基本信息 | `product_master_code` | 主货号 |
+| 商品-报关 | `product_hs_code` | 中国HS编码 |
+| 商品-报关 | `product_hs_code_jp` | 日本HS编码 |
+| 商品-价格 | `product_unit_price_rmb` | 单价(CNY) |
+| 商品-价格 | `product_tax_point` | 票点 |
+
+> ⚠️ Phase2 扩展需新建 Flyway 迁移脚本添加上述字段
 
 ---
 
@@ -320,11 +312,11 @@ GET /api/v1/orders/chain/{demandId}
 | 4 | `OrderChainUseCase` | ✅ 已建 | 业务逻辑 |
 | 5 | `OrderChainController` | ✅ 已建 | `/api/v1/orders/chain` |
 | 6 | `OrderChainVO` / `OrderChainDetailVO` | ✅ 已建 | 响应对象 |
-| 7 | 前端 API 层 `orderChain.ts` | 🔲 待建 | |
-| 8 | 前端 `OrderOverviewPage.vue` 单列表 | 🔲 待改 | 移除双 Tab，改为单列表 |
+| 7 | 前端 API 层 `orderChain.ts` | ✅ 已建 | |
+| 8 | 前端 `OrderOverviewPage.vue` 单列表 | ✅ 已建 | |
 
 > **Phase 1 JOIN 范围**（FROM replenishment_demand LEFT JOIN ...）：
-> `procurement` → `factory` → `qc_record` → `logistics_plan`
+> `procurement` → `procurement_snapshot` → `qc_record` → `logistics_plan`
 > step5-step8 列在 Phase 1 视图中返回 NULL 占位。
 
 ### Phase 2：步骤 5~8（国内报关 → 日本清关 → 退税 → 运营销售）
@@ -455,7 +447,6 @@ SELECT
 FROM replenishment_demand d
   LEFT JOIN procurement p ON p.id = d.linked_procurement_id AND p.is_deleted = b'0'
   -- 工厂+商品快照（通过 procurement.id → procurement_snapshot.procurement_id）
-  -- ⚠️ procurement_snapshot 无 Flyway 建表迁移，生产部署需补充
   LEFT JOIN procurement_snapshot sn ON sn.procurement_id = p.id
   -- 步骤3：验货记录（通过 procurement.id）
   LEFT JOIN qc_record q ON q.procurement_id = p.id AND q.is_deleted = b'0'

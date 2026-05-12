@@ -121,6 +121,10 @@
             <el-icon><Document /></el-icon>
             <template #title>{{ $t('menu.auditLog') }}</template>
           </el-menu-item>
+          <el-menu-item index="/system/profile">
+            <el-icon><User /></el-icon>
+            <template #title>{{ $t('menu.profile') }}</template>
+          </el-menu-item>
         </el-sub-menu>
       </el-menu>
     </el-aside>
@@ -173,6 +177,14 @@
                     <el-option value="CST" :label="$t('common.timezone.CST')" />
                     <el-option value="JST" :label="$t('common.timezone.JST')" />
                   </el-select>
+                </div>
+
+                <el-divider style="margin: 8px 0" />
+
+                <!-- 个人中心 -->
+                <div class="panel-logout" @click="router.push('/system/profile')">
+                  <el-icon><User /></el-icon>
+                  {{ $t('menu.profile') }}
                 </div>
 
                 <el-divider style="margin: 8px 0" />

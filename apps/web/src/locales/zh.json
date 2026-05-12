@@ -29,7 +29,8 @@
     "user": "用户管理",
     "role": "角色管理",
     "cosTest": "COS 测试",
-    "auditLog": "操作日志"
+    "auditLog": "操作日志",
+    "profile": "个人中心"
   },
   "auth": {
     "login": "登录",
@@ -2073,6 +2074,71 @@
     "message": {
       "loadFailed": "加载日志列表失败",
       "detailLoadFailed": "加载日志详情失败"
+    }
+  },
+  "profile": {
+    "title": "个人中心",
+    "tab": {
+      "info": "基本信息",
+      "security": "账户安全",
+      "preferences": "偏好设置"
+    },
+    "info": {
+      "nameCn": "中文姓名",
+      "nameJp": "日文姓名",
+      "email": "邮箱",
+      "phone": "手机号",
+      "avatar": "头像",
+      "company": "所属公司",
+      "department": "所属部门",
+      "positions": "职务",
+      "status": "账号状态",
+      "createdAt": "创建时间",
+      "lastLogin": "最后登录",
+      "roles": "角色",
+      "uploadAvatar": "上传头像",
+      "uploadTip": "支持 JPG/PNG，最大 2MB"
+    },
+    "security": {
+      "changePassword": "修改密码",
+      "oldPassword": "旧密码",
+      "newPassword": "新密码",
+      "confirmPassword": "确认密码",
+      "passwordStrength": "密码强度",
+      "loginHistory": "登录历史",
+      "device": "设备",
+      "passwordRules": "密码规则",
+      "rules": [
+        "长度 8-20 位",
+        "必须包含大写字母、小写字母和数字",
+        "不能与当前密码相同"
+      ]
+    },
+    "preferences": {
+      "language": "界面语言",
+      "timezone": "界面时区",
+      "dateFormat": "日期格式",
+      "numberFormat": "数字格式",
+      "tableDensity": "表格密度"
+    },
+    "status": {
+      "NORMAL": "正常",
+      "DISABLED": "已禁用"
+    },
+    "strength": {
+      "weak": "弱",
+      "medium": "中",
+      "strong": "强"
+    },
+    "message": {
+      "loadFailed": "加载用户信息失败",
+      "updateSuccess": "保存成功",
+      "updateFailed": "保存失败",
+      "passwordChangeSuccess": "密码修改成功",
+      "passwordChangeFailed": "密码修改失败",
+      "passwordMismatch": "两次密码不一致",
+      "passwordWrong": "旧密码错误",
+      "passwordWeak": "密码强度不足"
     }
   }
 }

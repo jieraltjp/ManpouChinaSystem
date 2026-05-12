@@ -409,7 +409,7 @@
         <!-- 元数据 -->
         <el-descriptions-item :label="$t('inspection.dialog.createBy')">{{ currentRow.createBy || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('inspection.dialog.createTime')">
-          {{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
+          {{ currentRow.createTime ? new Date(currentRow.createTime).toLocaleString(localeRef === 'ja' ? 'ja-JP' : 'zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '-' }}
         </el-descriptions-item>
       </el-descriptions>
     </el-drawer>

@@ -1,8 +1,9 @@
 # DB-13 — 订单快照表设计（procurement_snapshot）
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-28
-> **状态**: 🔄 设计中
+> **更新**: 2026-05-12（v1.1.0：Phase1 完成——V49 建表迁移 + ProcurementSnapshot Entity 已实现；aspirational Phase2 字段移至预留清单）
+> **状态**: ✅ Phase1 已实现 · Phase2（扩展字段）待实现
 > **关联文档**: `DB-09-order-overview.md` · `DB-02-procurement-order.md` · `DB-10-factory.md` · `DB-11-product.md`
 
 ---
@@ -151,14 +152,24 @@ LEFT JOIN procurement_snapshot sn ON sn.procurement_id = p.id
 
 | # | 项目 | 状态 | 说明 |
 |---|------|------|------|
-| 1 | `procurement_snapshot` 建表 SQL | 🔲 待建 | |
-| 2 | `ProcurementSnapshot` JPA Entity | 🔲 待建 | order/domain/model |
-| 3 | `ProcurementSnapshotRepository` | 🔲 待建 | |
-| 4 | `ProcurementUseCase` 创建时自动填充快照 | 🔲 待改 | |
-| 5 | `ProcurementUpdateCmd` / Assembler 支持编辑快照字段 | 🔲 待改 | |
-| 6 | `v_order_chain_v1` 视图改造（替换为快照表 JOIN） | 🔲 待改 | |
-| 7 | 前端发注单编辑页支持修改快照字段 | 🔲 待改 | |
-| 8 | DB-09 文档同步更新 | 🔲 待改 | |
+| 1 | `procurement_snapshot` 建表 SQL | ✅ V49 已完成 | 11个基本字段 |
+| 2 | `ProcurementSnapshot` JPA Entity | ✅ 已完成 | order/domain/model |
+| 3 | `ProcurementSnapshotRepository` | ✅ 已完成 | order/domain/repository |
+| 4 | `ProcurementUseCase` 创建时自动填充快照 | 🔲 待确认 | 需验证是否已集成 |
+| 5 | `ProcurementUpdateCmd` / Assembler 支持编辑快照字段 | 🔲 待确认 | Phase2 扩展字段 |
+| 6 | `v_order_chain_v1` 视图 JOIN procurement_snapshot | ✅ 已完成 | Phase1 视图已使用快照 |
+| 7 | 前端发注单编辑页支持修改快照字段 | 🔲 待确认 | Phase2 需求 |
+| 8 | DB-09 文档同步更新 | ✅ 已完成 | v2.4.0 |
+
+### 5.1 Phase2 扩展计划（待实现）
+
+| # | 项目 | 状态 |
+|---|------|------|
+| A | 新增 `factory_county` / `factory_rough_location` 字段 | 🔲 待建 Flyway |
+| B | 新增 `factory_contact_wechat` / `factory_contact_qq` 字段 | 🔲 待建 Flyway |
+| C | 新增 `factory_category` / `factory_cooperation_status` / `factory_payment_terms` | 🔲 待建 Flyway |
+| D | 新增 `product_hs_code` / `product_hs_code_jp` / `product_unit_price_rmb` | 🔲 待建 Flyway |
+| E | 前端发注单编辑页支持修改上述扩展字段 | 🔲 待实现 |
 
 ---
 

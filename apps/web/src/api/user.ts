@@ -166,3 +166,42 @@ export function resetUserPassword(id: number): Promise<PasswordResetVO> {
 export function assignUserRoles(id: number, cmd: UserRolesCmd): Promise<void> {
   return client.put(`/users/${id}/roles`, cmd).then(() => undefined)
 }
+
+// ===== 个人中心 =====
+
+export interface ProfileUpdateCmd {
+  nameCn?: string
+  nameJp?: string
+  phone?: string
+  language?: string
+  timezone?: string
+}
+
+export interface ChangePasswordCmd {
+  oldPassword: string
+  newPassword: string
+}
+
+/**
+ * 获取当前登录用户信息
+ * GET /api/v1/users/me
+ */
+export function getCurrentUser(): Promise<UserVO> {
+  return client.get<UserVO>('/users/me').then(r => r.data)
+}
+
+/**
+ * 更新当前登录用户信息
+ * PUT /api/v1/users/me
+ */
+export function updateCurrentUser(cmd: ProfileUpdateCmd): Promise<UserVO> {
+  return client.put<UserVO>('/users/me', cmd).then(r => r.data)
+}
+
+/**
+ * 修改密码
+ * PUT /api/v1/auth/password
+ */
+export function changePassword(cmd: ChangePasswordCmd): Promise<void> {
+  return client.put('/auth/password', cmd).then(() => undefined)
+}

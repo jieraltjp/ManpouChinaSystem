@@ -1,8 +1,8 @@
 # DB-04 — 调配计划数据库设计
 
-> **版本**: 1.7.0
+> **版本**: 1.8.0
 > **创建**: 2026-04-22
-> **更新**: 2026-05-11（v1.7.0：container_type DEFAULT 'GP20'（JPA @Enumerated存储枚举名）；V46已同步；V43修复is_deleted WHERE条件bug）
+> **更新**: 2026-05-12（v1.8.0：ConsolidationPoolItem 已废弃；实际设计采用 LogisticsPlan.poolId FK + planCount 聚合计数器）
 > **状态**: ✅ 已实现
 > **业务步号**: 04（调配计划）
 > **对应业务文档**: `SPEC-B00-全链路总览.md` · `SPEC-B04-调配计划-步骤4.md`
@@ -18,7 +18,7 @@
 | 1 | `logistics_plan` | LogisticsPlan | ✅ 已实现 |
 | 2 | `container` | Container | ✅ 已实现 |
 | 3 | `consolidation_pool` | ConsolidationPool | ✅ 已实现 |
-| 4 | `consolidation_pool_item` | ConsolidationPoolItem | ✅ 已实现 |
+| 4 | `consolidation_pool_item` | ConsolidationPoolItem | ❌ 未实现（设计变更：采用 LogisticsPlan.poolId FK 代替显式关联表） |
 
 ---
 
@@ -126,6 +126,20 @@ CREATE TABLE consolidation_pool (
 
 > ⚠️ Entity中不存在：`departure_port`、`arrival_port`、`plan_type`、`container_id`（containerId字段）、`remarks`
 
+### 3.1 consolidation_pool_item（已废弃设计）
+
+> ⚠️ **v1.7.0 设计变更**：原计划使用 `consolidation_pool_item` 显式关联表，**实际实现**采用 `LogisticsPlan.pool_id` FK + `planCount` 聚合计数器，**无需此表**。
+
+实际关联关系：
+```
+consolidation_pool
+  └── poolId → LogisticsPlan.pool_id（软外键，planCount 记录总数）
+```
+
+- `ConsolidationPoolUseCase.addPlan()` 设置 `plan.poolId = poolId`
+- `ConsolidationPoolUseCase.removePlan()` 设置 `plan.poolId = null`
+- 无需 `consolidation_pool_item` 中间表
+
 ---
 
 ## 代码实现状态
@@ -143,4 +157,5 @@ CREATE TABLE consolidation_pool (
 - [x] ✅ `LogisticsPlanPage.vue` 页面（v1.2.0 验货记录下拉替代采购单下拉）
 - [x] ✅ `Container` 聚合根实体（V46，字段：containerNo/containerType/totalCbm/totalWeightKg/planCount/poolId/status/loadDate/departureDate/arrivalDate）
 - [x] ✅ `ConsolidationPool` 聚合根实体（V45，字段：poolCode/destinationPort/totalCbm/totalWeightKg/planCount/containerThresholdCbm/status）
-- [ ] 🔴 `ConsolidationPoolItem` 聚合根实体（不存在，无对应迁移脚本）
+- [x] ✅ `ConsolidationPoolUseCase.addPlan/removePlan`（通过 LogisticsPlan.poolId 软关联）
+- [ ] 🔴 `consolidation_pool_item` 表已废弃（采用 LogisticsPlan.poolId FK 代替显式关联表）

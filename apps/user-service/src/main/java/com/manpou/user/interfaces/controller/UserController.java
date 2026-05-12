@@ -95,4 +95,24 @@ public class UserController {
         userService.assignRoles(id, cmd.getRoleIds());
         return Result.ok();
     }
+
+    // ===== 个人中心 =====
+
+    /**
+     * 获取当前登录用户信息。
+     * GET /api/v1/users/me
+     */
+    @GetMapping("/me")
+    public Result<UserVO> getCurrentUser() {
+        return Result.ok(userService.getCurrentUser());
+    }
+
+    /**
+     * 更新当前登录用户信息。
+     * PUT /api/v1/users/me
+     */
+    @PutMapping("/me")
+    public Result<UserVO> updateCurrentUser(@RequestBody UserUpdateCmd cmd) {
+        return Result.ok(userService.updateCurrentUser(cmd));
+    }
 }

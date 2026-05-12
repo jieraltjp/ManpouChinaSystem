@@ -190,6 +190,12 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/pages/system/AuditLogPage.vue'),
             meta: { titleKey: 'menu.auditLog', requiresAuth: true, roles: ['ADMIN', 'MANAGER'] },
           },
+          {
+            path: 'profile',
+            name: 'Profile',
+            component: () => import('@/pages/system/ProfilePage.vue'),
+            meta: { titleKey: 'menu.profile', requiresAuth: true },
+          },
         ],
       },
     ],

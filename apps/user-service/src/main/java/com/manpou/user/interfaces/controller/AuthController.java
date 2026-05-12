@@ -2,7 +2,9 @@ package com.manpou.user.interfaces.controller;
 
 import com.manpou.common.result.Result;
 import com.manpou.common.security.TokenConstants;
+import com.manpou.user.application.dto.ChangePasswordCmd;
 import com.manpou.user.application.service.AuditLogService;
+import com.manpou.user.application.service.UserService;
 import com.manpou.user.domain.model.AuditLog;
 import com.manpou.user.domain.model.Permission;
 import com.manpou.user.domain.model.Role;
@@ -41,6 +43,7 @@ public class AuthController {
     private final PermissionRepository permissionRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuditLogService auditLogService;
+    private final UserService userService;
 
     /**
      * 获取当前活跃公钥（前端用于验签 RS256 Token）。
@@ -136,6 +139,16 @@ public class AuthController {
         auditLogin(String.valueOf(user.getId()), user.getUsername(), user.getNameCn(), request);
 
         return Result.ok(new LoginVO(token, TokenConstants.ACCESS_TOKEN_TTL_SECONDS, TokenConstants.BEARER_PREFIX, kid));
+    }
+
+    /**
+     * 修改当前用户密码。
+     * PUT /api/v1/auth/password
+     */
+    @PutMapping("/password")
+    public Result<Void> changePassword(@Valid @RequestBody ChangePasswordCmd cmd) {
+        userService.changePassword(cmd.getOldPassword(), cmd.getNewPassword());
+        return Result.ok();
     }
 
     // ==================== 审计日志 ====================

@@ -115,7 +115,7 @@ import { useI18n } from 'vue-i18n'
 import { pageAuditLogs } from '@/api/auditLog'
 import type { AuditLogVO } from '@/api/auditLog'
 
-const { t, locale: localeRef } = useI18n()
+const { locale: localeRef } = useI18n()
 
 function formatTime(ts: string | undefined | null): string {
   if (!ts) return '-'

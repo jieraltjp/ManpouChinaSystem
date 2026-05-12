@@ -251,6 +251,56 @@ public class UserService {
     }
 
     /**
+     * 获取当前登录用户信息（从 JWT 上下文）。
+     */
+    @Transactional(readOnly = true)
+    public UserVO getCurrentUser() {
+        String userIdStr = com.manpou.user.infrastructure.security.JwtContextHolder.getUserId();
+        if (userIdStr == null) {
+            throw new BusinessException("auth.unauthorized", "未登录");
+        }
+        Long userId = Long.parseLong(userIdStr);
+        return getById(userId);
+    }
+
+    /**
+     * 更新当前登录用户信息。
+     */
+    @Transactional
+    public UserVO updateCurrentUser(UserUpdateCmd cmd) {
+        String userIdStr = com.manpou.user.infrastructure.security.JwtContextHolder.getUserId();
+        if (userIdStr == null) {
+            throw new BusinessException("auth.unauthorized", "未登录");
+        }
+        Long userId = Long.parseLong(userIdStr);
+        return update(userId, cmd);
+    }
+
+    /**
+     * 修改当前用户密码。
+     */
+    @Transactional
+    public void changePassword(String oldPassword, String newPassword) {
+        String userIdStr = com.manpou.user.infrastructure.security.JwtContextHolder.getUserId();
+        if (userIdStr == null) {
+            throw new BusinessException("auth.unauthorized", "未登录");
+        }
+        Long userId = Long.parseLong(userIdStr);
+        User user = userRepository.findById(userId)
+            .filter(u -> !Boolean.TRUE.equals(u.getIsDeleted()))
+            .orElseThrow(() -> new BusinessException("user.notFound", "用户不存在"));
+
+        if (!passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
+            throw new BusinessException("auth.wrongPassword", "旧密码错误");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        user.setUpdateTime(LocalDateTime.now());
+        userRepository.save(user);
+        log.info("Password changed for user: id={}", userId);
+    }
+
+    /**
      * 分配角色。
      */
     @Transactional
