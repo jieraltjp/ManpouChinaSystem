@@ -41,7 +41,7 @@
         </el-card>
       </div>
 
-      <!-- 右侧：权限配置 -->
+      <!-- 右侧：权限配置（方案B：扁平化权限表格） -->
       <div class="permission-panel">
         <el-card shadow="never" class="perm-card">
           <template #header>
@@ -56,24 +56,30 @@
             {{ $t('role.permission.selectTip') }}
           </div>
           <div v-else-if="permLoading" v-loading="permLoading" style="height:300px" />
-          <div v-else class="perm-tree-wrap">
-            <el-tree
-              ref="permTreeRef"
-              :data="permTreeData"
-              :props="{ label: 'label', children: 'children', disabled: () => selectedRole?.isEditable === 0 }"
-              node-key="id"
-              show-checkbox
-              default-expand-all
-              :expand-on-click-node="false"
-              @check="onPermCheck"
+          <div v-else class="perm-table">
+            <div
+              v-for="mod in permTreeData"
+              :key="mod.id"
+              class="perm-row"
             >
-              <template #default="{ data }">
-                <span class="perm-node">
-                  <span class="perm-label">{{ data.label }}</span>
-                  <span class="perm-code">{{ data.code }}</span>
-                </span>
-              </template>
-            </el-tree>
+              <div class="perm-row-module">{{ mod.label }}</div>
+              <div class="perm-row-items">
+                <label
+                  v-for="p in mod.children"
+                  :key="p.id"
+                  class="perm-item"
+                  :class="{ disabled: selectedRole?.isEditable === 0 }"
+                >
+                  <input
+                    type="checkbox"
+                    :checked="checkedPermIds.has(p.id)"
+                    :disabled="selectedRole?.isEditable === 0"
+                    @change="togglePerm(p.id, ($event.target as HTMLInputElement).checked)"
+                  />
+                  <span class="perm-item-label">{{ p.label }}</span>
+                </label>
+              </div>
+            </div>
           </div>
         </el-card>
       </div>
@@ -110,7 +116,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, nextTick } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Plus, Lock } from '@element-plus/icons-vue'
 import { useI18n } from 'vue-i18n'
@@ -134,10 +140,9 @@ interface PermNode {
 const allRoles = ref<RoleVO[]>([])
 const selectedRole = ref<RoleVO | null>(null)
 const permTreeData = ref<PermNode[]>([])
-const permTreeRef = ref()
 const permLoading = ref(false)
 const permSaving = ref(false)
-const checkedPermIds = ref<number[]>([])
+const checkedPermIds = ref<Set<number>>(new Set())
 
 const editVisible = ref(false)
 const editMode = ref<'create' | 'update'>('create')
@@ -173,11 +178,7 @@ async function loadPermissionTree() {
       })),
     }))
 
-    // 回显已有权限
-    checkedPermIds.value = role.permissions?.map(p => p.id) ?? []
-    nextTick(() => {
-      permTreeRef.value?.setCheckedKeys(checkedPermIds.value)
-    })
+    checkedPermIds.value = new Set(role.permissions?.map(p => p.id) ?? [])
   } catch {
     // error handled
   } finally {
@@ -185,20 +186,23 @@ async function loadPermissionTree() {
   }
 }
 
+function togglePerm(id: number, checked: boolean) {
+  const next = new Set(checkedPermIds.value)
+  if (checked) next.add(id)
+  else next.delete(id)
+  checkedPermIds.value = next
+}
+
 function onSelectRole(role: RoleVO) {
   selectedRole.value = role
   loadPermissionTree()
-}
-
-function onPermCheck(_node: PermNode, { checkedKeys }: { checkedKeys: number[] }) {
-  checkedPermIds.value = checkedKeys
 }
 
 async function onSavePermissions() {
   if (!selectedRole.value) return
   permSaving.value = true
   try {
-    await roleApi.assignRolePermissions(selectedRole.value.id, { permissionIds: checkedPermIds.value })
+    await roleApi.assignRolePermissions(selectedRole.value.id, { permissionIds: Array.from(checkedPermIds.value) })
     ElMessage.success(t('role.message.permissionSaved'))
   } catch {
     // error handled
@@ -282,8 +286,39 @@ loadRoles()
 .role-item:hover .role-actions { opacity:1; }
 .btn-blue { color:#409EFF; }
 
-.perm-tree-wrap { height: calc(100vh - 280px); overflow: auto; }
-.perm-node { display:flex; gap:8px; align-items:center; }
-.perm-label { }
-.perm-code { font-size:11px; color:#909399; font-family:monospace; }
+.perm-table { height: calc(100vh - 260px); overflow: auto; }
+.perm-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.perm-row:last-child { border-bottom: none; }
+.perm-row-module {
+  flex-shrink: 0;
+  width: 100px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #303133;
+  padding-top: 2px;
+}
+.perm-row-items {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.perm-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #606266;
+  white-space: nowrap;
+}
+.perm-item input { cursor: pointer; }
+.perm-item.disabled { cursor: not-allowed; color: #c0c4cc; }
+.perm-item-label { }
 </style>
