@@ -108,7 +108,13 @@ private String extractReturnId(Object returnValue) {
 
 ## 状态
 
-- [ ] `SalesRecordController.create()` → 改为 `Result<Long>`
-- [ ] `TaxRefundController.create()` → 改为 `Result<Long>`
-- [ ] `CustomsController.batchCreate()` → 改为 `Result<Long>` 或移除 `#_return`
-- [ ] `JapanCustomsController.batchCreate()` → 同上
+> **已修复** — commit `fc29f4f`
+
+- [x] `extractReturnId` 支持 `Result<List<Long>>` 取首元素
+- [x] `extractReturnId` 支持 `ResponseEntity<T>` 取 body
+- [ ] `SalesRecordController.create()` → 返回 `ResponseEntity<Long>`，`extractReturnId` 已处理 ✅
+- [ ] `TaxRefundController.create()` → 返回 `ResponseEntity<Long>`，`extractReturnId` 已处理 ✅
+- [x] `CustomsController.batchCreate()` → `Result<List<Long>>`，取首元素 ✅
+- [x] `JapanCustomsController.batchCreate()` → `Result<List<Long>>`，取首元素 ✅
+
+**无需改返回类型**，统一在 `extractReturnId` 层处理多类型。

@@ -66,4 +66,13 @@ private Object sanitizeImpl(Object value, int depth, Set<Object> visited) {
 
 **cycle 检测的 visited 集合必须在每条路径独立维护**。全局 visited 集合在树结构上正确，在 DAG 上产生 false positive。这是数据结构知识的经典陷阱。
 
-**当前状态**: 接受为已知限制，记录在案。
+## 状态
+
+> **已修复** — commit `fc29f4f`
+
+- [x] `sanitizeImpl` 重写为 `path` + `seen` 双集合
+- [x] `path`：当前递归路径，检测真循环（回溯时 remove）
+- [x] `seen`：全局已访问集合，防止跨分支重复处理
+- [x] DAG 共享节点不再误判为 `[cyclic]`，而是标记为 `[shared]`
+
+**方案**：采用方案 1 思路（每分支独立）——`path` 追踪当前路径（真循环），`seen` 追踪全局（去重）。
