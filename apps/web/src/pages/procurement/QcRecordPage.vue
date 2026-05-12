@@ -116,7 +116,6 @@
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="boxCount" :label="$t('inspection.column.boxCount')" min-width="70" align="right" />
         <el-table-column prop="qcDate" :label="$t('inspection.column.qcDate')" min-width="120" />
         <el-table-column prop="result" :label="$t('inspection.column.result')" min-width="90" align="center">
           <template #default="{ row }">

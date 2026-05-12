@@ -1,9 +1,9 @@
 # SPEC-B11 — 用户中心与权限体系 · 实现设计
 
-> **版本**: 1.4.0
+> **版本**: 1.5.0
 > **创建**: 2026-05-01
-> **更新**: 2026-05-11（v1.4.0：审计修正——迁移体系改为 allinone V15/V16（user-service 无迁移）；ADMIN is_editable=0；BCrypt hash 修正）
-> **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；Phase 4-6 待开发
+> **更新**: 2026-05-12（v1.5.0：Phase 4 操作日志完成——链路验证通过；ALL_PERMISSIONS 修正为63条）
+> **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；✅ Phase 4 操作日志完成；Phase 5-6 待开发
 > **前置**: SPEC-B11 v1.8.0 · Vite proxy 已配置 · allinone V15/V16 已就绪
 > **关联**: UI-17 · UI-18 · UI-19 · UI-20 · docs/ui/pages/14-user-management.md · docs/ui/pages/15-role-management.md · `docs/permission/`（权限代码对齐文档）
 > **INTJ 编号**: DOC-B11-IMPL-001
@@ -334,15 +334,20 @@ GET /api/v1/permissions/tree
 
 **实现完成清单：**
 1. allinone `JwtAuthenticationFilter` ✅ 提取 permissions（63条，与 V15 DB 实际对齐）
-2. allinone 17个业务 Controller 加 `@PreAuthorize` ✅
-3. user-service `ALL_PERMISSIONS` 与 V15 DB 对齐（warehouse/notification 移除；补充 japan_customs:start/complete, user:approve, permission:read, audit:export）✅
+2. allinone 21个业务 Controller 加 `@PreAuthorize` ✅
+3. user-service `ALL_PERMISSIONS` 与 V15 DB 对齐（warehouse CRUD 移除；notification CRUD 在 DB 中但未入 Set；补充 japan_customs:start/complete, user:approve, permission:read, audit:export）✅
+4. Phase 3 遗留缺口：
+   - AuditLogPage.vue 缺少 `hasPermission('audit:read')` 检查（依赖路由 roles 兜底）
+   - CosTestPage.vue 缺少 roles 限制（后端 /api/v1/test/** 为 permitAll，生产环境风险）
 
-### Phase 4 — 操作日志（前端）⚠️ 待开发
+### Phase 4 — 操作日志 ✅ 完成（2026-05-12）
 
-1. `api/auditLog.ts`
-2. `pages/system/AuditLogPage.vue`（UI-19）
-3. 路由注册（`/system/audit-log`）
-4. i18n key 补充
+1. `api/auditLog.ts` ✅
+2. `pages/system/AuditLogPage.vue` ✅
+3. 路由注册（`/system/audit-log`，roles=ADMIN/MANAGER）✅
+4. i18n key 补充 ✅
+5. @AuditLog AOP 链路验证通过 ✅
+⚠️ audit:export（CSV 导出）未实现
 
 ### Phase 5 — 个人中心 ⚠️ 待开发
 
@@ -352,8 +357,9 @@ GET /api/v1/permissions/tree
 4. 修改个人信息 API（`PUT /api/v1/auth/profile`）
 5. 修改密码 API（`PUT /api/v1/auth/password`）
 6. i18n key 补充（`profile.*`）
+⚠️ notification CRUD 后端已实现（无前端 UI）
 
-### Phase 6 — 注册 + 审核流程 ⚠️ 待开发
+### Phase 6 — 注册 + 审核流程 ⚠️ 待开发（后端部分实现）
 
 **后端 API：**
 1. `POST /api/v1/auth/register`（用户注册，自动创建 `registrationStatus=PENDING`）
@@ -419,7 +425,7 @@ proxy: {
 |------|------|
 | 预置角色编辑约束 | ADMIN is_editable=0 不可编辑名称/角色类型；MANAGER/OPERATOR/VIEWER is_editable=1 可编辑 |
 | 用户分配角色 | UserRoleRepository 维护关联表（deleteByUserId / insertUserRole / findRoleIdsByUserId） |
-| 前端权限控制 | ✅ Phase 3 完成——allinone JwtAuthenticationFilter 提取 permissions + 17个 Controller @PreAuthorize + 前端按钮 v-if + 路由角色守卫 |
+| 前端权限控制 | ✅ Phase 3 完成——allinone JwtAuthenticationFilter 提取 permissions + 21个 Controller @PreAuthorize + 前端按钮 v-if + 路由角色守卫 |
 | 审计日志记录 | audit_log 表已建，但 Service 层尚未接入（Phase 4） |
 
 ---
@@ -436,7 +442,7 @@ proxy: {
 | 路由注册 | P0 | ✅ 已完成（/system/user + /system/role） |
 | i18n key | P0 | ✅ 已完成 |
 | allinone JwtAuthenticationFilter 提取 permissions | P0 | ✅ 已完成（63条，与 V15 DB 实际对齐） |
-| allinone 17个业务 Controller 加 @PreAuthorize | P0 | ✅ 已完成（demand/procurement/shipment/qc/logistics/consolidation/container/customs/japan_customs/tax_refund/sales/warehouse/notification/order/product/factory） |
+| allinone 21个业务 Controller 加 @PreAuthorize | P0 | ✅ 已完成（demand/procurement/shipment/qc/logistics/consolidation/container/customs/japan_customs/tax_refund/sales/warehouse/notification/order/product/factory） |
 | 前端权限控制（JWT payload 渲染） | P1 | ⚠️ 待开发 |
 | 前端删除用户按钮 | P1 | ⚠️ 待开发（UserPage.vue 缺少） |
 | 前端筛选器（roleId/departmentId/companyId） | P1 | ⚠️ 待开发（UserPage.vue 缺少） |

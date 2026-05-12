@@ -1,8 +1,8 @@
-# Lesson 80-83: 操作日志切面审计日志体系（2026-05-12）
+# Lesson 80-84: 操作日志切面审计日志体系（2026-05-12）
 
 > **日期**: 2026-05-12
-> **触发**: 审计日志中 username 全为 null，所有日志记录都像"登录检查"
-> **相关 Commit**: `958c669`
+> **触发**: 审计日志页面只能看到 LOGIN 记录，业务操作日志全无
+> **相关 Commit**: 本次会话——链路诊断 + 修复 + 验证
 
 ---
 
@@ -205,3 +205,74 @@ curl -X POST -H "Authorization: Bearer $TOKEN" ...
 ### 预防
 
 新增 `@PreAuthorize` 时，确认加在 Controller 层。Service 层注解作为补充说明，不作主要依赖。
+
+---
+
+## Lesson 84: 代码变更后 allinone 未重启导致审计日志链路诊断失效
+
+### 问题
+
+审计日志页面只能看到 LOGIN 记录，所有业务操作（CREATE/UPDATE/DELETE）日志全无。
+已添加 DEBUG 日志到 AuditLogAspect 和 AuditLogClient，调用测试端点，但日志中没有任何 `[AuditLog]` 记录。
+
+### 根因
+
+allinone 进程使用的是旧编译代码（不含 DEBUG 日志和测试端点）。代码已改但进程未重启，变更从未生效。
+
+### 诊断方法
+
+1. 检查日志文件中是否有新增的 DEBUG 日志（grep `[AuditLog]`）
+2. 若无日志但端点返回成功 → 进程未重启或启动的是旧 JAR
+3. 验证 JAR 时间戳：`ls -lt target/manpou-allinone-*.jar`
+4. 进程 PID 对应启动命令是否指向新 JAR
+
+### 正确重启流程
+
+```bash
+# 杀进程（用 PID，不用端口，端口可能 TIME_WAIT）
+taskkill //F //PID <PID>
+
+# 等文件句柄释放
+sleep 5
+
+# 删除旧 JAR（避免锁定）
+rm target/manpou-allinone-*.jar
+
+# 重新打包
+mvn package -DskipTests
+
+# 启动
+nohup java -Xms512m -Xmx1024m -jar target/manpou-allinone-*.jar \
+  --server.port=18090 > /tmp/allinone-new.log 2>&1 &
+
+# 验证 DEBUG 日志出现
+sleep 15 && grep "[AuditLog] aspect AROUND START" /tmp/allinone-new.log
+```
+
+### 验证端到端链路
+
+```bash
+# 1. 获取 admin token
+TOKEN=$(curl -s -X POST http://localhost:18081/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}' | grep -o '"accessToken":"[^"]*"' | cut -d'"' -f4)
+
+# 2. 触发测试端点
+curl -X POST http://localhost:18090/api/v1/procurements/test-audit \
+  -H "Authorization: Bearer $TOKEN"
+
+# 3. 检查 allinone 日志
+grep "AuditLog" /tmp/allinone-new.log
+
+# 4. 确认入库
+curl "http://localhost:18081/api/v1/audit-logs?page=0&size=10" \
+  -H "Authorization: Bearer $TOKEN" | grep '"action":"TEST"'
+```
+
+### 预防
+
+| 规范 | 做法 |
+|------|------|
+| 代码变更后必须重启 | 遵循 restart 流程，杀进程→等5秒→删JAR→打包→启动 |
+| 禁止 `mvn -q` 静默打包 | 去掉 `-q`，repackage 错误必须可见 |
+| 验证日志已生效 | 重启后触发测试端点，确认 `[AuditLog] aspect AROUND START` 出现 |

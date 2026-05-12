@@ -1,12 +1,13 @@
 # 权限代码文档对齐审计
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-05-12
-> **目的**: 确保 V15 DB（67条）、ALL_PERMISSIONS Set（63条）、SPEC-B11 文档三方一致
+> **更新**: 2026-05-12（v1.1.0：补充 Phase 4 状态；明确 ADMIN `*:*` 展开逻辑；确认 MANAGER 含 audit:read）
+> **目的**: 确保 V15 DB（78条）、ALL_PERMISSIONS Set（63条）、SPEC-B11 文档三方一致
 
 ---
 
-## 1. V15 DB 实际数据（67条）
+## 1. V15 DB 实际数据（78条）
 
 来源：`allinone/src/main/resources/db/migration/V15__baseline_schema.sql` 第 877-976 行。
 
@@ -92,14 +93,17 @@
 
 与 V15 DB 差异分析：
 
-### 2.1 DB 有、Set 缺（4条）
+### 2.1 DB 有、Set 缺（5条）
 
 | permission_code | DB ID | 说明 |
 |----------------|-------|------|
 | customs:approve | 45 | DB 有，Set 无 → `@PreAuthorize` 无法生效 |
-| notification:delete | 114 | DB 有，Set 无 → Phase 6 注册审核会用到 |
+| notification:read | 111 | DB 有，Set 无 |
+| notification:create | 112 | DB 有，Set 无 |
+| notification:update | 113 | DB 有，Set 无 |
+| notification:delete | 114 | DB 有，Set 无 |
 
-**结论**：这 2 条通过运行时 DB 查询填充（`user-service` 从 DB 读 permissions 写入 JWT），不影响 ADMIN 展开。
+**结论**：这 5 条通过运行时 DB 查询填充（`user-service` 从 DB 读 permissions 写入 JWT），不影响 ADMIN 展开。
 
 ### 2.2 Set 有、DB 缺（0条） ✅
 
@@ -119,7 +123,7 @@
 
 | 项目 | SPEC-B11 旧值 | 修正后 | 状态 |
 |------|-------------|--------|------|
-| DB 权限条数 | 102 | 67 | ✅ 已修正 |
+| DB 权限条数 | 102 | 78 | ✅ 已修正 |
 | ALL_PERMISSIONS 条数 | 66 | 63 | ✅ 已修正 |
 | BCrypt hash | 旧值 | `$2a$12$t7mRpfsCDNFgj6LET1Y47eH7J2.MJ5i5nAYwYL6SfKdWE7LN.vqUG` | ✅ 已修正 |
 | ADMIN is_editable | 1 | 0 | ✅ 已修正 |
@@ -132,8 +136,27 @@
 
 | permission_code | DB ID | 说明 | 补入 Set 时机 |
 |----------------|-------|------|--------------|
-| customs:approve | 45 | Phase 4+ 日本清关审批流 | Phase 4 |
-| notification:delete | 114 | Phase 5 个人中心通知 | Phase 5 |
-| warehouse:read/create/update/delete | — | Phase 5+ 仓储模块 | Phase 5 |
-| notification:read/create/update | — | Phase 5+ 通知模块 | Phase 5 |
+| customs:approve | 45 | 国内报关审批（@PreAuthorize 已加在 CustomsController）| Phase 5 |
+| notification:read | 111 | DB 有，Set 无 | Phase 5 |
+| notification:create | 112 | DB 有，Set 无 | Phase 5 |
+| notification:update | 113 | DB 有，Set 无 | Phase 5 |
+| notification:delete | 114 | DB 有，Set 无 | Phase 5 |
+| warehouse:read/create/update/delete | — | Phase 5+ 仓储模块 | Phase 5+ |
 | user:approve | 85 | Phase 6 注册审核 | Phase 6 |
+
+---
+
+## 5. Phase 4 状态（2026-05-12）
+
+| 组件 | 状态 | 说明 |
+|------|------|------|
+| @AuditLog + Aspect | ✅ | allinone 链路验证通过（TEST 记录已入库）|
+| AuditLogPage.vue | ✅ | 前端路由 roles=ADMIN/MANAGER |
+| audit:export | ⚠️ 未实现 | user-service 需新增 GET /audit-logs/export |
+| AuditLogPage.vue 权限检查 | ⚠️ 缺口 | 缺少 `hasPermission('audit:read')` 前端守卫 |
+
+---
+
+## 6. ADMIN `*:*` 展开逻辑
+
+ADMIN 用户 JWT payload 中 `permissions: ["*:*"]`（由 user-service AuthController 签发时设置），allinone JwtAuthenticationFilter 在解析时将 `*:*` 展开为 ALL_PERMISSIONS Set（63条）全部授权，无需 DB 查询。MANAGER/OPERATOR/VIEWER 则通过 `role_permission` 表查询实际权限写入 JWT。

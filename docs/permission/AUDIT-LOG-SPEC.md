@@ -1,8 +1,9 @@
 # 操作日志规格
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-05-12
-> **Phase**: Phase 4 待开发
+> **更新**: 2026-05-12（v1.1.0：Phase 4 已完成，链路验证通过；audit:export 未实现）
+> **Phase**: ✅ Phase 4 完成
 
 ---
 
@@ -167,9 +168,23 @@ CREATE TABLE IF NOT EXISTS `audit_log` (
 
 | 组件 | 状态 | 说明 |
 |------|------|------|
-| `audit_log` 表 | ✅ | V15 已创建 |
-| 后端 API | ⚠️ 待开发 | AuditLogController |
-| `@AuditLog` 注解 + AOP | ⚠️ 待开发 | 注解 + Aspect |
-| 前端 AuditLogPage.vue | ⚠️ 待开发 | UI-19 |
-| 前端路由注册 | ⚠️ 待开发 | /system/audit-log |
-| i18n key 补充 | ⚠️ 待开发 | auditLog.* |
+| `audit_log` 表 | ✅ | allinone V15，user-service 写入 |
+| `@AuditLog` 注解 | ✅ | allinone/common/annotation/AuditLog.java |
+| AuditLogAspect AOP | ✅ | allinone/infrastructure/aspect/AuditLogAspect.java（DEBUG 日志已启用）|
+| AuditLogClient HTTP 客户端 | ✅ | allinone/infrastructure/client/AuditLogClient.java → user-service |
+| 测试端点 | ✅ | POST /api/v1/procurements/test-audit（链路验证通过）|
+| 后端 AuditLogController | ✅ | user-service（audit:read @PreAuthorize）|
+| 前端 AuditLogPage.vue | ✅ | pages/system/AuditLogPage.vue |
+| 前端路由 | ✅ | /system/audit-log（roles=ADMIN/MANAGER） |
+| 前端 API + i18n | ✅ | api/auditLog.ts + i18n auditLog.* |
+| audit:export（CSV 导出） | ⚠️ 未实现 | user-service 需新增端点 |
+
+---
+
+## 7. 已知缺口
+
+| 缺口 | 风险 | 修复 |
+|------|------|------|
+| AuditLogPage.vue 无 `hasPermission('audit:read')` | 自定义角色绕过路由守卫可见页面 | 加 `v-if="hasPermission('audit:read')"` |
+| CosTestPage.vue 无 roles 限制 | 登录用户均可访问开发调试接口 | 生产环境移除路由或加 ADMIN 限制 |
+| application-production.yml USER_SERVICE_URL | 需配置正确 | `USER_SERVICE_URL=http://user-service:18081`（K8s/Docker）|

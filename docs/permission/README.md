@@ -10,7 +10,7 @@
 
 | 文件 | 内容 |
 |------|------|
-| [PERMISSION-CODE-ALIGNMENT.md](./PERMISSION-CODE-ALIGNMENT.md) | 权限代码文档对齐审计：V15 DB 67条 vs ALL_PERMISSIONS Set 63条差异分析 |
+| [PERMISSION-CODE-ALIGNMENT.md](./PERMISSION-CODE-ALIGNMENT.md) | 权限代码文档对齐审计：V15 DB 78条 vs ALL_PERMISSIONS Set 63条差异分析 |
 | [ALL_PERMISSIONS.md](./ALL_PERMISSIONS.md) | ALL_PERMISSIONS Set（63条）与代码文件映射 |
 | [ROLE-MATRIX.md](./ROLE-MATRIX.md) | 4级角色权限矩阵（ADMIN/MANAGER/OPERATOR/VIEWER） |
 | [AUDIT-LOG-SPEC.md](./AUDIT-LOG-SPEC.md) | 操作日志规格：触发规则/字段/接口/Phase 状态 |
@@ -46,14 +46,14 @@ ALL_PERMISSIONS Set 是权限体系的唯一真实来源（Source of Truth），
 
 ## Phase 状态
 
-| Phase | 内容 | 状态 |
-|-------|------|------|
-| Phase 1 | DB + 登录 | ✅ |
-| Phase 2 | 用户CRUD + 角色管理 | ✅ |
-| Phase 3 | 权限控制（@PreAuthorize） | ✅ |
-| Phase 4 | 操作日志（前端） | ⚠️ 待开发 |
-| Phase 5 | 个人中心 | ⚠️ 待开发 |
-| Phase 6 | 注册 + 审核 | ⚠️ 待开发 |
+| Phase | 内容 | 状态 | 说明 |
+|-------|------|:----:|------|
+| Phase 1 | DB + 登录 | ✅ | |
+| Phase 2 | 用户CRUD + 角色管理 | ✅ | |
+| Phase 3 | 权限控制（@PreAuthorize） | ✅ | 22 Controller + 前端按钮守卫 |
+| Phase 4 | 操作日志 | ✅ | @AuditLog AOP + AuditLogPage + 链路验证通过 |
+| Phase 5 | 个人中心 | ⚠️ | |
+| Phase 6 | 注册 + 审核 | ⚠️ | |
 
 ---
 

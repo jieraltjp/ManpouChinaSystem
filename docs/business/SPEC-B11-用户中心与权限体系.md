@@ -1,9 +1,9 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.8.0
+> **版本**: 1.9.0
 > **创建**: 2026-04-30
-> **更新**: 2026-05-11（v1.8.0：审计修正——DB 权限67条（V15实际）；ADMIN is_editable=0；BCrypt hash 修正；移除 warehouse/notification（V15无）；迁移体系改为 allinone V15/V16）
-> **状态**: ✅ Phase 2 完成；✅ Phase 3 完成（JwtAuthenticationFilter + 17 Controller @PreAuthorize + 前端按钮 v-if + 路由守卫）；Phase 4-6 待开发
+> **更新**: 2026-05-12（v1.9.0：Phase 4 操作日志完成——@AuditLog AOP + AuditLogClient + 前端 AuditLogPage + 链路验证；ALL_PERMISSIONS 修正为63条）
+> **状态**: ✅ Phase 2 完成；✅ Phase 3 完成（JwtAuthenticationFilter + 21 Controller @PreAuthorize + 前端按钮 v-if + 路由守卫）；✅ Phase 4 完成（操作日志全链路）；Phase 5-6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
 > **权限代码对齐**: `docs/permission/`（PERMISSION-CODE-ALIGNMENT.md / ALL_PERMISSIONS.md / ROLE-MATRIX.md / AUDIT-LOG-SPEC.md）
@@ -22,7 +22,7 @@
 
 本设计覆盖：
 - 用户管理（账号/密码/姓名/邮箱/手机/头像/组织/职务/海关资质）
-- 角色与权限管理（4 级角色 + 63 条权限编码（代码 Set）；DB 实际 67 条（V15 INSERT 覆盖 ID 1~94+114））
+- 角色与权限管理（4 级角色 + 63 条权限编码（代码 Set）；DB 实际 78 条（V15 INSERT ID: 1~4,5~8,9~12,13~16,21~24,25~28,29~32,41~45,46~50,61~65,66~69,70~73,74~77,78,81~86,87~91,92,93~94,111~114））
 - 操作日志（CREATE/UPDATE/DELETE/STATUS_CHANGE/LOGIN 全链路记录）
 - 个人中心（信息修改/密码修改/偏好设置）
 - **用户注册 + 管理员审核（方案B：JWT 跨服务验证）**
@@ -563,10 +563,10 @@ public boolean canLogin(User user) {
 
 ## 4. 权限编码规范
 
-### 4.1 权限编码定义（63 条 ALL_PERMISSIONS Set；DB 实际 67 条 V15 覆盖 ID 1~94+114）
+### 4.1 权限编码定义（63 条 ALL_PERMISSIONS Set；DB 实际 78 条 V15）
 
 **格式**: `{模块}:{动作}`
-> ⚠️ 以下权限在早期 SPEC 设计时被标记"已剔除"，但实际 V8 迁移中已实现：`order:read`、`permission:read`、`audit:export`、`customs:approve`、`tax_refund:complete`。
+> ⚠️ 以下权限在早期 SPEC 设计时被标记"已剔除"，但实际 V8 迁移中已实现：`order:read`（ID 78）、`permission:read`（ID 92）、`audit:export`（ID 94）、`customs:approve`（ID 45）、`tax_refund:complete`（ID 64）。
 
 #### 发注管理模块（procurement）
 
@@ -640,6 +640,7 @@ public boolean canLogin(User user) {
 | `product:create` | 创建商品 | 商品を作成 | CREATE |
 | `product:update` | 编辑商品 | 商品を編集 | UPDATE |
 | `product:delete` | 删除商品 | 商品を削除 | DELETE |
+| `order:read` | 查看订单总览 | 注文一覧を表示 | READ |
 
 #### 系统管理模块
 
@@ -656,6 +657,7 @@ public boolean canLogin(User user) {
 | `role:update` | 编辑角色 | 役割を編集 | UPDATE |
 | `role:delete` | 删除角色 | 役割を削除 | DELETE |
 | `role:assign` | 分配角色 | 役割を割り当て | ADMIN |
+| `permission:read` | 查看权限 | 権限を表示 | READ |
 | `audit:read` | 查看操作日志 | 操作ログを表示 | READ |
 | `audit:export` | 导出操作日志 | 操作ログをエクスポート | EXPORT |
 
@@ -663,9 +665,12 @@ public boolean canLogin(User user) {
 
 | 权限编码 | 中文名 | 日文名 | 动作 | 说明 |
 |---------|--------|--------|------|------|
-| `notification:delete` | 删除通知 | 通知を削除 | DELETE | V15 仅此一条；完整 CRUD 待实现 |
+| `notification:read` | 查看通知 | 通知を表示 | READ | |
+| `notification:create` | 创建通知 | 通知を作成 | CREATE | |
+| `notification:update` | 编辑通知 | 通知を編集 | UPDATE | |
+| `notification:delete` | 删除通知 | 通知を削除 | DELETE | |
 
-> ⚠️ `warehouse:*`（仓储模块）和 `notification:read/create/update` 当前未在 V15 中实现，属于 Phase 5+ 规划。
+> ⚠️ `warehouse:*`（仓储模块）当前未在 V15 中实现，属于 Phase 5+ 规划。
 
 ---
 
@@ -803,7 +808,7 @@ public Result<DemandVO> update(@PathVariable Long id, @RequestBody @Valid Demand
 | 注册审核？ | ✅ | PENDING → APPROVED/REJECTED 状态机，完整流程 + 登录双重校验 |
 | 数据库范式？ | ✅ | position_ids JSON → user_position 中间表（M-N 规范化） |
 | 幂等性？ | ✅ | approve/reject 改为 PUT，审核操作幂等 |
-| 权限完整性？ | ✅ | 代码 ALL_PERMISSIONS Set 66条（DB V8+V15+V16 共102条） |
+| 权限完整性？ | ✅ | 代码 ALL_PERMISSIONS Set 63条（V15 DB 实际78条）；ADMIN `*:*` 特殊处理 |
 | 审计日志？ | ✅ | REGISTER/REGISTRATION_APPROVED/REJECTED action 已补充 |
 
 ---
@@ -836,24 +841,30 @@ Phase 2: 用户 CRUD + 角色管理（P0）
   前端: 权限树（只读）
   前端: 待审核用户列表 + 审核弹窗
 
-Phase 3: 权限控制 ✅ 完成（⚠️ 部分）
-  ✅ allinone JwtAuthenticationFilter：提取 permissions（DB 102条），ADMIN `*:*` 展开为 ALL_PERMISSIONS（66条代码 Set）
-  ✅ allinone 21个业务 Controller 加 @PreAuthorize（共123个注解）
-  ⚠️ 前端: 路由守卫仅支持角色检查（roles），不支持细粒度权限
-  ⚠️ 前端: 按钮级 hasPermission() 仅在 UserPage.vue 实现，其他页面未集成
-  🔲 前端: 菜单按权限动态显示/隐藏（未实现）
+Phase 3: 权限控制 ✅ 完成
+  ✅ allinone JwtAuthenticationFilter：提取 permissions，ADMIN `*:*` 展开为 ALL_PERMISSIONS（63条）
+  ✅ allinone 21个业务 Controller 加 @PreAuthorize
+  ✅ 前端: UserPage.vue / RolePage.vue / FactoryPage.vue / ProductPage.vue 按钮级 hasPermission()
+  ✅ 前端: 路由守卫 roles 检查（ADMIN/MANAGER）
+  ⚠️ 前端: AuditLogPage.vue 缺少 hasPermission('audit:read') 检查（依赖路由 roles 兜底）
+  ⚠️ 前端: CosTestPage.vue 缺少 roles 限制（后端 /api/v1/test/** 为 permitAll）
 
-Phase 4: 操作日志（P1）
-  V9
-  后端: @AuditLog AOP + 切面
-  后端: 登录/登出日志
-  前端: 操作日志查询页面
-  前端: 日志导出
+Phase 4: 操作日志 ✅ 完成（2026-05-12）
+  后端: @AuditLog 注解（allinone/common/annotation/AuditLog.java）
+  后端: AuditLogAspect AOP 切面（allinone/infrastructure/aspect/AuditLogAspect.java）
+  后端: AuditLogClient HTTP 客户端（allinone/infrastructure/client/AuditLogClient.java）→ user-service audit_log 表
+  后端: 测试端点 POST /api/v1/procurements/test-audit（ProcurementController）
+  前端: 操作日志查询页面（pages/system/AuditLogPage.vue）
+  前端: 路由 /system/audit-log（router/index.ts，roles=ADMIN/MANAGER）
+  前端: API api/auditLog.ts + i18n auditLog.*
+  ⚠️ audit:export（CSV 导出）未实现
 
 Phase 5: 个人中心（P2）
   前端: 个人中心页
   前端: 修改密码
   前端: 偏好设置（语言/时区）
+  后端: notification CRUD 端点已实现（无前端 UI）
+  ⚠️ warehouse:* 仓储模块（Phase 5+）
 
 Phase 6: 用户注册 + 管理员审核（P1）
   后端: POST /auth/register（public 接口，提交审核）
@@ -862,6 +873,7 @@ Phase 6: 用户注册 + 管理员审核（P1）
   后端: 注册拒绝时记录 reject_reason
   前端: 登录页增加「注册账号」入口
   前端: 审核通过/拒绝 通知（可邮件，可前端提示）
+  ⚠️ user:approve 端点已实现（无前端审核 UI）
 ```
 
 ---

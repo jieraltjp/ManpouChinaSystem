@@ -122,11 +122,6 @@
             {{ row.estimatedPriceJpy ? row.estimatedPriceJpy.toLocaleString() : '-' }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('order.column.billingType')" min-width="110" align="center">
-          <template #default="{ row }">
-            {{ billingTypeLabel(row.billingType) }}
-          </template>
-        </el-table-column>
         <el-table-column prop="leadTimeDays" :label="$t('order.column.leadTimeDays')" min-width="100" align="center">
           <template #default="{ row }">{{ row.leadTimeDays ? `${row.leadTimeDays}天` : '-' }}</template>
         </el-table-column>

@@ -142,14 +142,17 @@ public class AuditLogAspect {
 
     /**
      * 从方法返回值中提取 ID。
-     * 支持 Result<T> → 取 .getData()；直接返回 Long/Integer 也支持。
+     * 支持 Result<T> → 取 .payload；直接返回 Long/Integer 也支持。
      */
+    @SuppressWarnings("unchecked")
     private String extractReturnId(Object returnValue) {
         if (returnValue == null) return null;
         try {
-            if (returnValue instanceof com.manpou.allinone.common.result.Result<?> r) {
-                Object data = r.getData();
-                return data != null ? String.valueOf(data) : null;
+            if (returnValue instanceof com.manpou.allinone.common.result.Result) {
+                com.manpou.allinone.common.result.Result<Object> r =
+                        (com.manpou.allinone.common.result.Result<Object>) returnValue;
+                Object payload = r.getPayload();
+                return payload != null ? String.valueOf(payload) : null;
             }
             return String.valueOf(returnValue);
         } catch (Exception ex) {

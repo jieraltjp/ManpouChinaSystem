@@ -874,7 +874,7 @@ VALUES
 (3, 'OPERATOR','普通运营',   '一般運営者',        'BUSINESS', 1, 1, NOW(3), NOW(3), 0, 'SYSTEM', 'SYSTEM'),
 (4, 'VIEWER',  '查看者',     '閲覧者',            'BUSINESS', 1, 1, NOW(3), NOW(3), 0, 'SYSTEM', 'SYSTEM');
 
--- 权限（67条，ID: 1-4,5-8,9-12,13-16,21-24,25-28,29-32,41-45,46-50,61-65,66-69,70-73,74-77,78,81-86,87-91,92,93-94,114；INSERT IGNORE 幂等）
+-- 权限（78条，ID: 1-4,5-8,9-12,13-16,21-24,25-28,29-32,41-45,46-50,61-65,66-69,70-73,74-77,78,81-86,87-91,92,93-94,111-114；INSERT IGNORE 幂等）
 INSERT IGNORE INTO permission (id, permission_code, permission_name_cn, permission_name_jp, module, action_, sort_order, status, create_time, is_deleted, create_by, update_by) VALUES
 -- demand CRUD
 (1,  'demand:read',    '查看补货需求', '補充需要を表示', 'demand',        'READ',    1,  1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
