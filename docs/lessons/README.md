@@ -2,7 +2,7 @@
 
 > 项目：ManpouChinaSystem
 > 生成：2026-04-27
-> 更新：2026-05-07（新增审计报告索引）
+> 更新：2026-05-12（新增 Lesson 80-83：操作日志切面审计）
 > 来源：全面审计会话（Lombok-Decoupling-DI-Lessons.md v54 lessons 拆分）
 
 ---
@@ -22,6 +22,7 @@
 | [LESSON-COS-URL-QUERY-PARAM.md](./LESSON-COS-URL-QUERY-PARAM.md) | CosService.upload() 返回 URL 含 query param，提取方法未同步剥离 → COS 预览 404 | 77 |
 | [LESSON-PERMISSION-AUDIT-2026-05-08.md](./LESSON-PERMISSION-AUDIT-2026-05-08.md) | 权限三角审计：前端/后端/DB 完全一致，8条孤岛权限无影响 | 78 |
 | [LESSON-JWT-KEY-ENV.md](./LESSON-JWT-KEY-ENV.md) | JWT 密钥 DB/classpath 来源不一致导致 allinone 401，改为 env var 加载 | 79 |
+| [LESSON-AUDIT-LOG-2026-05-12.md](./LESSON-AUDIT-LOG-2026-05-12.md) | @EnableAsync 缺失 / 审计日志写错 DB / UserContext 缺 getUsername / @PreAuthorize 内部调用绕过 | 80–83 |
 | [LESSON-55-56.md](./LESSON-55-56.md) | el-input-number 列宽 + dialog 紧凑设计 | 55, 56 |
 | [LESSON-57.md](./LESSON-57.md) | 业务锚点变更：procurementId → qcRecordId | 57 |
 | [LESSON-58.md](./LESSON-58.md) | el-input-number 按钮截断：padding 计算漏扣 | 58 |
@@ -31,9 +32,9 @@
 
 ---
 
-## 铁律总表（76 条）
+## 铁律总表（70 条）
 
-### 后端（17 条）
+### 后端（21 条）
 
 | # | 铁律 | 违反后果 |
 |---|------|---------|
@@ -52,6 +53,10 @@
 | 33 | 业务链起点 = Overview 入口锚点 | Demand 新建后不可见 |
 | 34 | 接口变更 = 后端 VO + 前端类型 + 模板 + i18n 同步 | undefined 显示 |
 | 38 | 业务逻辑校验在入口处，零值/空值必须防御 | 脏数据 |
+| 80 | `@EnableAsync` 缺失导致 `@Async` 方法同步执行——新增异步方法时同步检查启动类注解 | 异步变同步，事务污染 |
+| 81 | 跨服务审计日志查不到时先确认写入方数据库——user-service 写 user_service DB，allinone 写 manpou DB | 查错库浪费时间 |
+| 82 | 接口新增方法时必须检查所有实现类——`UserContext` 新增 `getUsername()` → `JwtClaims` + `JwtContextHolder` 同步实现 | 接口实现缺失，运行时 NPE |
+| 83 | `@PreAuthorize` 必须加在 Controller 层，内部方法调用绕过 AOP 代理 | 权限控制形同虚设 |
 
 ### 运维/部署（9 条）
 
@@ -149,6 +154,7 @@
 | user-service JWT 跨服务 / Flyway+JPA schema 对齐 | LESSONS-USER-SERVICE.md → Lesson 62-67 |
 | allinone 跨服务 JWT 401 / Map 反序列化 | LESSONS-JWT-CROSS-SERVICE.md → Lesson 68 |
 | allinone JWT 遗漏 permissions / Controller 零注解 | LESSON-75.md |
+| @EnableAsync 缺失 / UserContext 缺 getUsername / 审计日志写错 DB / @PreAuthorize 内部调用绕过 | LESSON-AUDIT-LOG-2026-05-12.md |
 
 
 ---
@@ -173,4 +179,11 @@
 | 69 | 2026-04-30 allinone JwtService.parseToken 双重 parse bug（RS256 无公钥 parse 失败） |
 | 75 | 2026-05-08 allinone JWT 遗漏 permissions + 17个 Controller 零注解，导致 Phase 3 权限控制形同虚设 |
 | 76 | 2026-05-08 allinone 重启流程——`-q` 掩盖 repackage 失败 + 进程未杀干净导致旧 JAR 启动 |
+| 77 | 2026-05-08 CosService.upload() URL 含 query param，提取时未剥离 → COS 预览 404 |
+| 78 | 2026-05-08 权限三角审计：前端/后端/DB 完全一致，8条孤岛权限无影响 |
+| 79 | 2026-05-08 JWT 密钥 DB/classpath 来源不一致导致 allinone 401，改为 env var 加载 |
+| 80 | 2026-05-12 user-service `@EnableAsync` 缺失导致 `saveAsync` 同步执行，审计日志延迟写入 |
+| 81 | 2026-05-12 审计日志写入 `user_service` DB（非 `manpou` DB），跨库查询找不到记录 |
+| 82 | 2026-05-12 `UserContext` 接口缺失 `getUsername()`，`JwtClaims` 有值但无法传递到审计日志 |
+| 83 | 2026-05-12 `@PreAuthorize` 在内部方法调用时绕过 Spring AOP 代理——仅 Controller 层注解有效 |
 
