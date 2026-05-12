@@ -1,8 +1,10 @@
-# Lesson 80-84: 操作日志切面审计日志体系（2026-05-12）
+# Lesson 80-87: 操作日志切面审计日志体系（2026-05-12）
 
 > **日期**: 2026-05-12
 > **触发**: 审计日志页面只能看到 LOGIN 记录，业务操作日志全无
-> **相关 Commit**: 本次会话——链路诊断 + 修复 + 验证
+> **相关 Commit**: 本次会话——链路诊断 + 修复 + 验证 + 二次审计
+>
+> **Lesson 85-87 为 2026-05-12 下午二次审计新增**：#_return 返回类型耦合、visited DAG false positive、operatorName null
 
 ---
 
@@ -276,3 +278,52 @@ curl "http://localhost:18081/api/v1/audit-logs?page=0&size=10" \
 | 代码变更后必须重启 | 遵循 restart 流程，杀进程→等5秒→删JAR→打包→启动 |
 | 禁止 `mvn -q` 静默打包 | 去掉 `-q`，repackage 错误必须可见 |
 | 验证日志已生效 | 重启后触发测试端点，确认 `[AuditLog] aspect AROUND START` 出现 |
+
+---
+
+## Lesson 85: `#_return` 对 `ResponseEntity` / `Result<List>` 返回类型静默失效
+
+详见 `docs/lessons/LESSON-85.md`
+
+### 摘要
+
+以下端点使用 `resourceId="#_return"` 但返回类型不兼容：
+
+| Controller | 方法 | 返回类型 | resourceId 结果 |
+|---|---|---|---|
+| `SalesRecordController` | `create()` | `ResponseEntity<Long>` | `"<200 OK,123,[]>"` ❌ |
+| `TaxRefundController` | `create()` | `ResponseEntity<Long>` | `"<200 OK,123,[]>"` ❌ |
+| `CustomsController` | `batchCreate()` | `Result<List<Long>>` | `"[1, 2, 3]"` ❌ |
+| `JapanCustomsController` | `batchCreate()` | `Result<List<Long>>` | `"[1, 2, 3]"` ❌ |
+
+`extractReturnId` 只处理 `Result<T>`，其他类型降级到 `String.valueOf()` 导致无意义的字符串。
+
+### 修复
+
+统一改用 `Result<Long>`，或增强 `extractReturnId` 支持 `ResponseEntity`。
+
+---
+
+## Lesson 86: `sanitizeImpl` visited 集合导致 DAG 结构误判为 cyclic
+
+详见 `docs/lessons/LESSON-86.md`
+
+### 摘要
+
+`visited` IdentityHashMap 在递归时不回溯删除节点，导致 DAG（非树形有向无环图）结构中的共享节点在第二个分支被误判为 cyclic。
+
+**当前状态**: 接受为已知限制，实际业务 DTO 未触发。
+
+---
+
+## Lesson 87: 操作日志 `operatorName` 始终 null — JWT 未携带姓名 claim
+
+详见 `docs/lessons/LESSON-87.md`
+
+### 摘要
+
+`JwtContextHolder.getUsername()` 取到值，但 `operatorName` 硬编码 null。
+
+根因：JWT payload 只有 `username`，缺少 `realName` / `companyId` / `departmentId` claim。
+
+修复需三端同步：user-service 签发 → allinone JwtContextHolder 解析 → Aspect 使用。
