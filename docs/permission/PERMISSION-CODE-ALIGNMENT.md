@@ -115,7 +115,7 @@
 |------|---------|-----------|---------|
 | allinone JwtAuthenticationFilter | 63 | ✅ | 2026-05-12 |
 | user-service JwtAuthenticationFilter | 63 | ✅ | 2026-05-12 |
-| V15 permission 表 | 67 | — | — |
+| V15 permission 表 | 78 | — | — |
 
 ---
 

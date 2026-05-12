@@ -24,7 +24,7 @@
 ALL_PERMISSIONS Set 是权限体系的唯一真实来源（Source of Truth），V15 DB seed 是数据来源。
 - `allinone`: `infrastructure/security/JwtAuthenticationFilter.java` ALL_PERMISSIONS（63条）
 - `user-service`: `infrastructure/security/JwtAuthenticationFilter.java` ALL_PERMISSIONS（63条，两端必须同步）
-- V15 DB: `permission` 表 67 条种子数据
+- V15 DB: `permission` 表 78 条种子数据
 
 ### 原则二：DB 优先于代码
 
