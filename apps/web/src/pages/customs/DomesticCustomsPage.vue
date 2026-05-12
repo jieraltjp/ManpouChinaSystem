@@ -382,7 +382,6 @@ const tableData = ref<CustomsVO[]>([])
 
 const route = useRoute()
 const { t, locale: localeRef } = useI18n()
-const currentLocale = computed(() => localeRef.value)
 
 function formatTime(ts: string | undefined | null): string {
   if (!ts) return '-'

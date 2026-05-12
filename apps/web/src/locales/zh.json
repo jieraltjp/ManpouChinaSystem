@@ -1986,15 +1986,28 @@
       "factory": "工厂管理",
       "product": "商品管理",
       "user": "用户管理",
-      "role": "角色管理"
+      "role": "角色管理",
+      "logistics": "物流管理",
+      "replenishment": "补货需求",
+      "japan_customs": "日本报关",
+      "customs": "报关管理",
+      "sales": "销售管理",
+      "qc": "验货管理",
+      "tax_refund": "退税管理",
+      "shipment": "发货管理",
+      "warehouse": "仓储管理",
+      "notification": "通知管理",
+      "finance": "财务管理"
     },
     "actionTag": {
       "LOGIN": "登录",
+      "LOGOUT": "退出",
       "CREATE": "新建",
       "UPDATE": "更新",
       "DELETE": "删除",
       "APPROVE": "审批",
-      "REJECT": "驳回"
+      "REJECT": "驳回",
+      "AUTH_DENIED": "权限不足"
     },
     "message": {
       "loadFailed": "加载日志列表失败",

@@ -1986,15 +1986,28 @@
       "factory": "工場管理",
       "product": "商品管理",
       "user": "ユーザー管理",
-      "role": "役割管理"
+      "role": "役割管理",
+      "logistics": "物流管理",
+      "replenishment": "補充需求",
+      "japan_customs": "日本通関",
+      "customs": "通関管理",
+      "sales": "販売管理",
+      "qc": "検品管理",
+      "tax_refund": "退税管理",
+      "shipment": "出荷管理",
+      "warehouse": "倉庫管理",
+      "notification": "通知管理",
+      "finance": "財務管理"
     },
     "actionTag": {
       "LOGIN": "ログイン",
+      "LOGOUT": "ログアウト",
       "CREATE": "新規作成",
       "UPDATE": "更新",
       "DELETE": "削除",
       "APPROVE": "承認",
-      "REJECT": "却下"
+      "REJECT": "却下",
+      "AUTH_DENIED": "権限不足"
     },
     "message": {
       "loadFailed": "ログ一覧の読み込みに失敗しました",
