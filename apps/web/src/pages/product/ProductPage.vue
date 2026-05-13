@@ -17,6 +17,7 @@
 
     <!-- 筛选 -->
     <el-card class="filter-card" shadow="never">
+      <el-row :gutter="16">
       <el-form :inline="true" :model="filterForm">
         <el-form-item :label="$t('product.filter.masterCode')">
           <el-input v-model="filterForm.masterCode" :placeholder="$t('product.filter.masterCodePlaceholder')" clearable style="width:160px" />
@@ -41,6 +42,7 @@
           </el-button>
         </el-form-item>
       </el-form>
+      </el-row>
     </el-card>
 
     <!-- 表格 -->

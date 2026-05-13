@@ -214,12 +214,20 @@ public class ProductUseCase {
 
     /**
      * 获取商品关联的工厂列表（含工厂详情）。
+     * 优化：批量查询工厂，避免 N+1。
      */
     @Transactional(readOnly = true)
     public List<ProductFactoryVO> getProductFactories(Long productId) {
         List<ProductFactory> links = productFactoryJpaRepository.findByProductId(productId);
+        if (links.isEmpty()) {
+            return List.of();
+        }
+        // 批量一次查出所有工厂
+        var factoryMap = factoryRepository.findAllByIdInAndDeletedIsFalse(
+                links.stream().map(ProductFactory::getFactoryId).toList()
+        );
         return links.stream().map(link -> {
-            var factory = factoryRepository.findByIdAndDeletedIsFalse(link.getFactoryId()).orElse(null);
+            var factory = factoryMap.get(link.getFactoryId());
             return ProductFactoryVO.builder()
                     .productId(link.getProductId())
                     .factoryId(link.getFactoryId())

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -36,4 +37,7 @@ public interface FactoryRepository {
     long countByCooperationStatusAndDeletedIsFalse(CooperationStatus status);
 
     long countByDeletedIsFalse();
+
+    /** 批量查询（Map：id → Factory） */
+    Map<Long, Factory> findAllByIdInAndDeletedIsFalse(List<Long> ids);
 }

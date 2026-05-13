@@ -8,7 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * JPA 持久化适配器（基础设施层）。
@@ -34,4 +37,11 @@ public interface FactoryJpaAdapter extends FactoryRepository, org.springframewor
 
     @Override
     long countByDeletedIsFalse();
+
+    @Override
+    default Map<Long, Factory> findAllByIdInAndDeletedIsFalse(List<Long> ids) {
+        return findAllById(ids).stream()
+                .filter(f -> !f.isDeleted())
+                .collect(Collectors.toMap(Factory::getId, f -> f));
+    }
 }
