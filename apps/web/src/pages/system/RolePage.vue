@@ -68,7 +68,7 @@
                   v-for="p in mod.children"
                   :key="p.id"
                   class="perm-item"
-                  :class="{ disabled: selectedRole?.isEditable === 0 }"
+                  :class="{ checked: checkedPermIds.has(p.id), disabled: selectedRole?.isEditable === 0 }"
                 >
                   <input
                     type="checkbox"
@@ -269,11 +269,12 @@ loadRoles()
 
 <style scoped>
 .role-page { height: calc(100vh - 120px); }
-.role-layout { display:flex; gap:16px; height: calc(100% - 60px); }
-.role-list-panel { width: 280px; flex-shrink: 0; }
+.role-layout { display:flex; gap:16px; height: 100%; }
+.role-list-panel { width: 280px; flex-shrink: 0; height: 100%; }
 .list-card { height: 100%; }
-.perm-card { flex: 1; }
-.perm-header { display:flex; justify-content:space-between; align-items:center; }
+.permission-panel { flex: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; }
+.perm-card { flex: 1; display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.perm-header { display:flex; justify-content:space-between; align-items:center; flex-shrink: 0; }
 .perm-empty { text-align:center; color:#909399; padding:60px 0; }
 
 .role-item { padding:10px 12px; border-radius:6px; cursor:pointer; border-bottom:1px solid #f0f0f0; transition:background .15s; }
@@ -286,28 +287,33 @@ loadRoles()
 .role-item:hover .role-actions { opacity:1; }
 .btn-blue { color:#409EFF; }
 
-.perm-table { height: calc(100vh - 260px); overflow: auto; }
+.perm-table { flex: 1; min-height: 0; overflow: auto; }
 .perm-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 8px 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0 16px;
+  padding: 8px 12px;
   border-bottom: 1px solid #f0f0f0;
+  min-height: 36px;
 }
 .perm-row:last-child { border-bottom: none; }
+.perm-row:nth-child(even) { background: #fafafa; }
 .perm-row-module {
-  flex-shrink: 0;
-  width: 100px;
   font-size: 13px;
   font-weight: 600;
   color: #303133;
-  padding-top: 2px;
+  white-space: nowrap;
+  padding-right: 8px;
+  border-right: 2px solid var(--color-primary);
+  min-width: 72px;
+  max-width: 96px;
+  line-height: 1.4;
 }
 .perm-row-items {
-  flex: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px 8px;
 }
 .perm-item {
   display: inline-flex;
@@ -315,10 +321,26 @@ loadRoles()
   gap: 4px;
   cursor: pointer;
   font-size: 13px;
-  color: #606266;
+  color: var(--text-secondary);
+  background: #f5f7fa;
+  border-radius: var(--radius-sm);
+  padding: 3px 10px;
+  transition: all var(--transition-fast);
+  border: 1px solid var(--border-color);
   white-space: nowrap;
+  user-select: none;
 }
-.perm-item input { cursor: pointer; }
-.perm-item.disabled { cursor: not-allowed; color: #c0c4cc; }
-.perm-item-label { }
+.perm-item:hover {
+  background: var(--color-primary-pale);
+  border-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+.perm-item input { cursor: pointer; accent-color: var(--color-primary); width: 13px; height: 13px; }
+.perm-item.checked {
+  background: var(--color-primary-pale);
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+  font-weight: 500;
+}
+.perm-item.disabled { cursor: not-allowed; color: #c0c4cc; background: #f5f5f5; border-color: #e8e8e8; }
 </style>

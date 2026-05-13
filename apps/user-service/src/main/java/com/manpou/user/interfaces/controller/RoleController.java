@@ -31,7 +31,7 @@ public class RoleController {
     /**
      * 角色详情（含权限列表）。
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     public Result<RoleVO> getById(@PathVariable Long id) {
         return Result.ok(roleService.getById(id));
     }
@@ -48,7 +48,7 @@ public class RoleController {
     /**
      * 更新角色。
      */
-    @PutMapping("/{id}")
+    @PutMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('role:update')")
     public Result<RoleVO> update(@PathVariable Long id,
                                   @RequestBody RoleUpdateCmd cmd) {
@@ -58,7 +58,7 @@ public class RoleController {
     /**
      * 删除角色。
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('role:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         roleService.delete(id);
@@ -68,7 +68,7 @@ public class RoleController {
     /**
      * 分配权限。
      */
-    @PutMapping("/{id}/permissions")
+    @PutMapping("/{id:\\d+}/permissions")
     @PreAuthorize("hasAuthority('role:assign')")
     public Result<RoleVO> assignPermissions(@PathVariable Long id,
                                            @RequestBody RolePermissionsCmd cmd) {
@@ -78,7 +78,7 @@ public class RoleController {
     /**
      * 更新角色属性（仅 isEditable / description）。
      */
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id:\\d+}")
     @PreAuthorize("hasRole('ADMIN')")
     public Result<RoleVO> patch(@PathVariable Long id,
                                 @RequestBody RolePatchCmd cmd) {

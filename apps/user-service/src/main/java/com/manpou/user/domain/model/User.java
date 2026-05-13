@@ -36,7 +36,7 @@ public class User extends BaseEntity {
     @Column(name = "phone")
     private String phone;
 
-    @Column(name = "avatar_url")
+    @Column(name = "avatar_url", columnDefinition = "MEDIUMTEXT")
     private String avatarUrl;
 
     @Column(name = "company_id")

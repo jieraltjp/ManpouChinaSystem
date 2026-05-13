@@ -144,18 +144,41 @@
           <!-- 用户设置面板 -->
           <el-dropdown trigger="click" placement="bottom-end">
             <span class="user-info">
-              <el-avatar :size="32" icon="UserFilled" />
-              <span class="username">{{ auth.claims?.username || $t('common.user') }}</span>
+              <el-avatar
+                :size="32"
+                :src="userInfo?.avatarUrl ? `data:image/jpeg;base64,${userInfo.avatarUrl}` : undefined"
+                icon="UserFilled"
+              />
+              <span class="username">
+                {{ currentLocale === 'ja'
+                    ? (userInfo?.nameJp || userInfo?.nameCn || auth.claims?.username)
+                    : (userInfo?.nameCn || userInfo?.nameJp || auth.claims?.username)
+                    || $t('common.user') }}
+              </span>
               <el-icon><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
               <div class="user-panel">
                 <!-- 用户信息区 -->
                 <div class="panel-user-info">
-                  <el-avatar :size="40" icon="UserFilled" />
+                  <el-avatar
+                    :size="40"
+                    :src="userInfo?.avatarUrl ? `data:image/jpeg;base64,${userInfo.avatarUrl}` : undefined"
+                    icon="UserFilled"
+                  />
                   <div class="panel-user-text">
-                    <div class="panel-username">{{ auth.claims?.username || $t('common.user') }}</div>
-                    <div class="panel-role">{{ auth.claims?.roles?.[0] || '—' }}</div>
+                    <div class="panel-username">
+                      {{ currentLocale === 'ja'
+                          ? (userInfo?.nameJp || userInfo?.nameCn || auth.claims?.username)
+                          : (userInfo?.nameCn || userInfo?.nameJp || auth.claims?.username)
+                          || $t('common.user') }}
+                    </div>
+                    <div class="panel-role">
+                      {{ currentLocale === 'ja'
+                          ? (userInfo?.roles?.[0]?.roleNameJp || userInfo?.roles?.[0]?.roleNameCn)
+                          : (userInfo?.roles?.[0]?.roleNameCn || userInfo?.roles?.[0]?.roleNameJp)
+                          || '—' }}
+                    </div>
                   </div>
                 </div>
 
@@ -209,12 +232,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, DocumentCopy, Box, Goods, OfficeBuilding, Menu, Document, Money, Tickets, TrendCharts, Setting, User, Key, Cloudy, Ship } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
+import { getCurrentUser } from '@/api/user'
 import type { Locale } from '@/locales'
+import type { UserVO } from '@/api/user'
 
 const auth = useAuthStore()
 const route = useRoute()
@@ -225,6 +250,17 @@ const isCollapsed = ref(false)
 const activeMenu = computed(() => route.path)
 const currentLocale = ref<Locale>((localStorage.getItem('locale') as Locale) || 'zh')
 const currentTimezone = ref(localStorage.getItem('timezone') || 'CST')
+const userInfo = ref<UserVO | null>(null)
+
+onMounted(async () => {
+  if (auth.token) {
+    try {
+      userInfo.value = await getCurrentUser()
+    } catch {
+      // ignore: header falls back to JWT claims
+    }
+  }
+})
 
 /** 当前页面标题（根据路由匹配 menu i18n key） */
 const routeTitleMap: Record<string, string> = {

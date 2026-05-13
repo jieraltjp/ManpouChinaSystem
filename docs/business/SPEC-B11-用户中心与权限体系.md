@@ -1,8 +1,8 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.10.0
+> **版本**: 1.11.0
 > **创建**: 2026-04-30
-> **更新**: 2026-05-12（v1.10.0：新增 ship:* 权限编码（ID 100~103）；container:* 已在 logistics 节标注（ID 104~107）；待 V17 Flyway seed 追加；对应 SPEC-B12）
+> **更新**: 2026-05-12（v1.11.0：头像上传功能上线；avatar_url VARCHAR(512)→MEDIUMTEXT；前端 Canvas 压缩→base64 存储；V17 迁移已创建）
 > **状态**: ✅ Phase 2 完成；✅ Phase 3 完成（JwtAuthenticationFilter + 21 Controller @PreAuthorize + 前端按钮 v-if + 路由守卫）；✅ Phase 4 完成（操作日志全链路）；Phase 5-6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
@@ -234,7 +234,7 @@ CREATE TABLE user (
   name_jp          VARCHAR(64)  COMMENT '日文姓名',
   email            VARCHAR(128) NOT NULL UNIQUE,
   phone            VARCHAR(32)  COMMENT '手机号',
-  avatar_url       VARCHAR(512) COMMENT '头像URL',
+  avatar_url       MEDIUMTEXT  COMMENT '头像Base64（JPEG@0.75，200×200，约25~30KB）或外部URL；V17扩展自VARCHAR(512)'
 
   -- 组织信息（JOIN 查询，冗余字段已移除）
   company_id       BIGINT       COMMENT '所属公司 FK → company.id',
@@ -459,7 +459,7 @@ public boolean canLogin(User user) {
   "name": "系统管理员",
   "email": "admin@manpou.cn",
   "phone": "13800138000",
-  "avatarUrl": "https://...",
+  "avatarUrl": "/9j/4AAQSkZJRgABAQAAAQABAAD...", // 裸base64（不含data:image/jpeg;base64,前缀）
   "companyId": 1,
   "companyName": "漫普贸易（中国）有限公司",
   "departmentId": 1,

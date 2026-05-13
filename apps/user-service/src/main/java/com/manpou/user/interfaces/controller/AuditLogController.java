@@ -41,7 +41,7 @@ public class AuditLogController {
     /**
      * 查询操作日志详情。
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('audit:read')")
     public Result<AuditLogVO> getById(@PathVariable Long id) {
         return Result.ok(auditLogService.getById(id));

@@ -5,11 +5,27 @@
       <div class="profile-left">
         <el-card shadow="never">
           <div class="avatar-section">
-            <div class="avatar-wrap">
-              <el-avatar :src="userInfo?.avatarUrl ?? ''" :size="100" fit="cover">
+            <div class="avatar-wrap" :class="{ 'is-uploading': avatarUploading }" title="点击更换头像">
+              <input
+                ref="fileInputRef"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                style="display:none"
+                @change="onAvatarFileChange"
+              />
+              <el-avatar
+                :src="pendingAvatar ?? (userInfo?.avatarUrl ? `data:image/jpeg;base64,${userInfo.avatarUrl}` : '')"
+                :size="100"
+                fit="cover"
+                @click="onAvatarClick"
+              >
                 {{ avatarText }}
               </el-avatar>
+              <div v-if="avatarUploading" class="avatar-loading">
+                <el-icon class="is-loading"><Loading /></el-icon>
+              </div>
             </div>
+            <div class="avatar-hint">{{ $t('profile.avatar.hint') }}</div>
             <div class="user-name">{{ currentLocale === 'ja' ? userInfo?.nameJp : userInfo?.nameCn || userInfo?.username }}</div>
             <div class="user-role">
               <el-tag v-for="r in userInfo?.roles?.slice(0, 2)" :key="r.id" size="small" type="info">
@@ -151,6 +167,7 @@ import { ElMessage } from 'element-plus'
 import { getCurrentUser, updateCurrentUser, changePassword, type ProfileUpdateCmd, type ChangePasswordCmd } from '@/api/user'
 import type { UserVO } from '@/api/user'
 import { useI18n } from 'vue-i18n'
+import { compressAvatar } from '@/composables/useAvatarCompress'
 
 const { locale, t } = useI18n()
 const currentLocale = computed(() => locale.value)
@@ -168,6 +185,45 @@ function formatTime(ts: string | undefined | null): string {
     year: 'numeric', month: '2-digit', day: '2-digit',
     hour: '2-digit', minute: '2-digit',
   })
+}
+
+// 头像上传
+const AVATAR_ERROR_MAP: Record<string, string> = {
+  INVALID_TYPE: 'profile.avatar.invalidType',
+  FILE_TOO_LARGE: 'profile.avatar.fileTooLarge',
+  LOAD_ERROR: 'profile.avatar.loadError',
+}
+
+const fileInputRef = ref<HTMLInputElement | null>(null)
+const avatarUploading = ref(false)
+const pendingAvatar = ref<string | null>(null)
+
+function onAvatarClick() {
+  fileInputRef.value?.click()
+}
+
+async function onAvatarFileChange(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  ;(e.target as HTMLInputElement).value = '' // 允许重复选同一文件
+
+  const previewUrl = URL.createObjectURL(file)
+  pendingAvatar.value = previewUrl
+
+  try {
+    const { base64 } = await compressAvatar(file)
+    avatarUploading.value = true
+    userInfo.value = await updateCurrentUser({ avatarUrl: base64 } as ProfileUpdateCmd)
+    ElMessage.success(String(t('profile.avatar.uploadSuccess')))
+  } catch (err: unknown) {
+    const msg = (err as Error)?.message ?? ''
+    const i18nKey = AVATAR_ERROR_MAP[msg] ?? 'profile.message.updateFailed'
+    ElMessage.error(String(t(i18nKey)))
+  } finally {
+    URL.revokeObjectURL(previewUrl)
+    pendingAvatar.value = null
+    avatarUploading.value = false
+  }
 }
 
 const activeTab = ref('info')
@@ -354,6 +410,38 @@ onMounted(() => {
   color: var(--el-color-primary);
   font-size: 36px;
   font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.avatar-wrap :deep(.el-avatar:hover) {
+  opacity: 0.85;
+}
+
+.avatar-wrap.is-uploading :deep(.el-avatar) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.avatar-loading {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--el-color-primary);
+}
+
+.avatar-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.avatar-hint {
+  font-size: 11px;
+  color: var(--el-text-color-placeholder);
+  text-align: center;
 }
 
 .user-name {

@@ -1,14 +1,14 @@
 # 页面规格 — 个人中心
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **创建**: 2026-04-30
-> **更新**: 2026-05-01（v1.0.0：Phase 5 前端待开发）
+> **更新**: 2026-05-12（v1.1.0：头像上传实现；Canvas 200×200 JPEG@0.75 → base64；DB V17 MEDIUMTEXT）
 > **路由**: `/profile`
-> **组件**: `apps/web/src/pages/profile/ProfilePage.vue`
+> **组件**: `apps/web/src/pages/system/ProfilePage.vue`（实际路径）
 > **对应后端**: `GET/PUT /api/v1/users/me` · `PUT /api/v1/auth/password`
-> **对应 DB**: SPEC-B11 V7（user 表）
+> **对应 DB**: SPEC-B11 V17（user.avatar_url → MEDIUMTEXT）
 > **依赖文档**: `SPEC-B11-用户中心与权限体系.md` · `SPEC-B11-IMPLEMENT.md`
-> **状态**: 🔄 Phase5 前端待开发
+> **状态**: ✅ 已上线
 
 ---
 
@@ -97,9 +97,9 @@ Tab 3 - 偏好设置：
 
 | Tab | 功能 | 描述 |
 |-----|------|------|
-| 基本信息 | 头像上传 | 点击头像区域唤起文件选择，支持 JPG/PNG，最大 2MB |
-| 基本信息 | 修改个人信息 | 中文姓名、日文姓名、手机号、海关资质 |
-| 基本信息 | 保存修改 | 调 `PUT /api/v1/auth/profile` |
+| 基本信息 | 头像上传 | 点击头像区域唤起文件选择；Canvas 压缩 200×200 JPEG@0.75 → base64；支持 JPG/PNG/WEBP，原始文件最大 5MB；调用 `PUT /api/v1/users/me` 保存 |
+| 基本信息 | 修改个人信息 | 中文姓名、日文姓名、手机号 |
+| 基本信息 | 保存修改 | 调 `PUT /api/v1/users/me` |
 | 账户安全 | 修改密码 | 验证旧密码后修改，调 `PUT /api/v1/auth/password` |
 | 账户安全 | 密码强度指示 | 实时显示密码强度（弱/中/强） |
 | 账户安全 | 登录历史 | 显示最近 10 次登录记录（时间/IP/设备） |
@@ -122,6 +122,11 @@ Tab 3 - 偏好设置：
 | `profile.info.email` | 邮箱 | メール |
 | `profile.info.phone` | 手机号 | 電話番号 |
 | `profile.info.avatar` | 头像 | アバター |
+| `profile.avatar.hint` | 点击更换头像（200×200 JPG） | アバターをクリックして変更（200×200 JPG） |
+| `profile.avatar.uploadSuccess` | 头像上传成功 | アバターをアップロードしました |
+| `profile.avatar.invalidType` | 仅支持 JPG、PNG、WebP 格式 | JPG、PNG、WebP形式のみ対応しています |
+| `profile.avatar.fileTooLarge` | 文件大小不能超过 5MB | ファイルサイズは5MB以下にしてください |
+| `profile.avatar.loadError` | 图片加载失败，请重试 | 画像読み込みに失敗しました。再試行してください |
 | `profile.info.company` | 所属公司 | 所属会社 |
 | `profile.info.department` | 所属部门 | 所属部門 |
 | `profile.info.positions` | 职务 | 役職 |

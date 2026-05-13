@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,7 @@ import java.util.List;
  * 安全说明：此接口必须仅对管理员开放（通过 RBAC 权限控制）。
  * 详见 docs/pro/02-user-service.md §认证授权
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/admin/keys")
 @RequiredArgsConstructor

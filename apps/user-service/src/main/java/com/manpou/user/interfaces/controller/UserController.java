@@ -31,7 +31,7 @@ public class UserController {
     /**
      * 获取用户详情。
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     public Result<UserVO> getById(@PathVariable Long id) {
         return Result.ok(userService.getById(id));
     }
@@ -48,7 +48,7 @@ public class UserController {
     /**
      * 更新用户。
      */
-    @PutMapping("/{id}")
+    @PutMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('user:update')")
     public Result<UserVO> update(@PathVariable Long id,
                                   @RequestBody UserUpdateCmd cmd) {
@@ -58,7 +58,7 @@ public class UserController {
     /**
      * 删除用户（软删除）。
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('user:delete')")
     public Result<Void> delete(@PathVariable Long id) {
         userService.delete(id);
@@ -68,7 +68,7 @@ public class UserController {
     /**
      * 启用/禁用用户。
      */
-    @PutMapping("/{id}/status")
+    @PutMapping("/{id:\\d+}/status")
     @PreAuthorize("hasAuthority('user:update')")
     public Result<Void> updateStatus(@PathVariable Long id,
                                      @RequestBody UserStatusCmd cmd) {
@@ -79,7 +79,7 @@ public class UserController {
     /**
      * 重置密码。
      */
-    @PutMapping("/{id}/password/reset")
+    @PutMapping("/{id:\\d+}/password/reset")
     @PreAuthorize("hasAuthority('user:reset_password')")
     public Result<PasswordResetVO> resetPassword(@PathVariable Long id) {
         return Result.ok(userService.resetPassword(id));
@@ -88,7 +88,7 @@ public class UserController {
     /**
      * 分配角色。
      */
-    @PutMapping("/{id}/roles")
+    @PutMapping("/{id:\\d+}/roles")
     @PreAuthorize("hasAuthority('user:update')")
     public Result<Void> assignRoles(@PathVariable Long id,
                                     @RequestBody UserRolesCmd cmd) {

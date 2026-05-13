@@ -175,6 +175,7 @@ export interface ProfileUpdateCmd {
   phone?: string
   language?: string
   timezone?: string
+  avatarUrl?: string
 }
 
 export interface ChangePasswordCmd {

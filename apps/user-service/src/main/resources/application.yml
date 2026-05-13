@@ -47,7 +47,7 @@ spring:
 
   # Flyway 数据库迁移
   flyway:
-    enabled: false  # 禁用：DB 已由 JPA ddl-auto 或手动维护，V8 checksum 不匹配
+    enabled: false  # 禁用：DB 已由 JPA ddl-auto 或手动维护；avatar 列由 allinone V17 维护，AdminController 一次性修复
 
   # Redis（可选）
   data:
