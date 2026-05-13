@@ -265,7 +265,8 @@
       "Bash(SSH_ASKPASS=/d/Programme/java/ManpouChinaSystem/askpass.sh DISPLAY=dummy git push *)",
       "Bash(SSH_ASKPASS=/d/Programme/java/ManpouChinaSystem/askpass.sh DISPLAY=dummy scp *)",
       "Read(//tmp/**)",
-      "Bash(tasklist *)"
+      "Bash(tasklist *)",
+      "Bash(cmd.exe *)"
     ]
   }
 }
