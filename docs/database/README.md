@@ -28,7 +28,8 @@
 | DB-09 | [DB-09-order-overview.md](DB-09-order-overview.md) | 09 | ✅ | 聚合查询设计（无新表） |
 | DB-11 | [DB-11-product.md](DB-11-product.md) | — | ✅ | product + product_factory 表 |
 | DB-12 | [DB-12-procurement-factory-link.md](DB-12-procurement-factory-link.md) | — | ✅ | procurement ↔ factory 关联 |
-| DB-14 | [DB-14-container-ship.md](DB-14-container-ship.md) | B-12 | 📋 设计中 | ship 表 + container 扩展（V17） |
+| DB-13 | [DB-13-procurement-snapshot.md](DB-13-procurement-snapshot.md) | — | ✅ | procurement_snapshot 表（幂等快照） |
+| DB-14 | [DB-14-container-ship.md](DB-14-container-ship.md) | B-12 | ✅ | ship 表 + container 扩展（V18），Phase 1/2/3 完成 |
 | — | [DB-漫普中国系统数据库设计.md](DB-漫普中国系统数据库设计.md) | — | ✅ | 系统总览 |
 | — | [DB-发注管理数据库设计-步骤1-4.md](DB-发注管理数据库设计-步骤1-4.md) | — | ✅ | 历史文档（步骤1-4合并版） |
 

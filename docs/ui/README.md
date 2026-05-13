@@ -35,12 +35,12 @@
 | UI-16 | [pages/13-procurement-overview.md](pages/13-procurement-overview.md) | `/base/overview/procurement/:procurementId` | — | ✅ |
 | — | [pages/17-shipment-batch.md](pages/17-shipment-batch.md) | `/procurement/shipment-batch` | — | ✅ |
 | — | [pages/18-consolidation-pool.md](pages/18-consolidation-pool.md) | `/procurement/consolidation-pool` | — | ✅ |
-| — | [pages/19-container.md](pages/19-container.md) | `/base/container` | — | 📋 待更新 v2.0 |
+| — | [pages/19-container.md](pages/19-container.md) | `/procurement/container` | — | ✅ |
 | UI-17 | [pages/14-user-management.md](pages/14-user-management.md) | `/system/user` | B-11 | ✅ 前端完成（权限控制 Phase 3 待 allinone） |
 | UI-18 | [pages/15-role-management.md](pages/15-role-management.md) | `/system/role` | B-11 | ✅ 前端完成（权限控制 Phase 3 待 allinone） |
-| UI-19 | [pages/16-audit-log.md](pages/16-audit-log.md) | `/system/audit-log` | B-11 | 📋 待开发 |
-| UI-20 | [pages/17-profile.md](pages/17-profile.md) | `/profile` | B-11 | 📋 待开发 |
-| UI-21 | [pages/20-ship.md](pages/20-ship.md) | `/base/ship` | B-12 | 📋 待开发 |
+| UI-19 | [pages/16-audit-log.md](pages/16-audit-log.md) | `/system/audit-log` | B-11 | ✅ |
+| UI-20 | [pages/17-profile.md](pages/17-profile.md) | `/profile` | B-11 | ✅ |
+| UI-21 | [pages/20-ship.md](pages/20-ship.md) | `/base/ship` | B-12 | ✅ |
 | — | [05-UI改版方案-橙色商业主题.md](05-UI改版方案-橙色商业主题.md) | — | — | ✅ |
 | — | [ARCHITECTURE.md](ARCHITECTURE.md) | — | — | ✅ |
 
@@ -59,6 +59,7 @@
 | 04 | `/procurement/logistics-plan` | LogisticsPlanPage.vue | UI-07 |
 | — | `/procurement/consolidation-pool` | ConsolidationPoolPage.vue | 18-consolidation-pool.md ✅ |
 | — | `/procurement/container` | ContainerPage.vue | 19-container.md ✅ |
+| — | `/base/ship` | ShipPage.vue | 20-ship.md ✅ |
 | 05 | `/procurement/domestic-customs` | DomesticCustomsPage.vue | UI-08 |
 | 06 | `/procurement/japan-customs` | JapanCustomsRecordPage.vue | UI-09 |
 | — | `/finance/tax-refund-record` | TaxRefundRecordPage.vue | UI-10 |
@@ -71,8 +72,8 @@
 | B-11 | `/system/user` | UserPage.vue | UI-17 ✅ |
 | B-11 | `/system/role` | RolePage.vue | UI-18 ✅ |
 | B-11 | `/system/cos-test` | CosTestPage.vue | — |
-| B-11 | `/system/audit-log` | AuditLogPage.vue | UI-19 📋 |
-| B-11 | `/profile` | ProfilePage.vue | UI-20 📋 |
+| B-11 | `/system/audit-log` | AuditLogPage.vue | UI-19 ✅ |
+| B-11 | `/profile` | ProfilePage.vue | UI-20 ✅ |
 
 ---
 

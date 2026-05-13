@@ -23,7 +23,7 @@
 ManpouChinaSystem/
 ├── apps/
 │   ├── java-service/         # [Parent POM] 所有 Java 服务的父 pom
-│   ├── manpou-allinone/      # 8 领域合一 jar（端口 18090）⚡ Phase 0
+│   ├── manpou-allinone/      # 12 领域合一 jar（端口 18090）⚡ Phase 0
 │   ├── user-service/         # 用户认证 + 权限管理（端口 18081）
 │   ├── procurement-service/  # 发注管理（端口 18083）
 │   ├── warehouse-service/    # 仓储管理（端口 18084）⚡ 后期独立
@@ -60,7 +60,7 @@ ManpouChinaSystem/
 | Java 框架 | Spring Boot | 3.2.5 |
 | Java 微服务生态 | Spring Cloud Alibaba | 2023.0.1.2 |
 | ORM | Spring Data JPA + Hibernate | - |
-| 数据库 | MySQL 8.x（开发/生产） | 8.0 |
+| 数据库 | MySQL 8.x（开发）/ TiDB v8（生产） | 8.0 |
 | 数据库迁移 | Flyway | 10.10.0 |
 | 前端框架 | Vue | 3.4+ |
 | 前端构建 | Vite | 5.3+ |
@@ -80,7 +80,7 @@ ManpouChinaSystem/
 | 服务 | 端口 | 上下文路径 | 备注 |
 |------|------|-----------|------|
 | api-gateway | 18080 | / | 统一入口 |
-| **manpou-allinone** | **18090** | / | ⚡ Phase 0：8 领域合一（procurement/factory/qc/logistics/replenishment/product/customs/finance） |
+| **manpou-allinone** | **18090** | / | ⚡ Phase 0：12 领域合一（procurement/factory/qc/logistics/replenishment/product/customs/finance/notification/sales/warehouse/order/ship） |
 | user-service | 18081 | / | JWT 认证 |
 | warehouse-service | 18084 | / | ⚡ 后期独立 |
 | customs-service | 18085 | / | ⚡ 后期独立 |
@@ -132,7 +132,7 @@ docker-compose -f docker-compose.yml up -d
 - **密钥管理**：JWT 签名密钥表（signing_key 表）+ 自动轮换
 - **登录入口**：
   - 登录统一：`POST /api/v1/auth/login` → user-service (18081)
-  - manpou-allinone (18090)：8 领域（procurement/factory/qc/logistics/replenishment/product/customs/finance），无登录端点（仅 `/public-key`）
+  - manpou-allinone (18090)：12 领域（procurement/factory/qc/logistics/replenishment/product/customs/finance/notification/sales/warehouse/order/ship），无登录端点（仅 `/public-key`）
   - 前端统一入口：api-gateway (18080) → 各服务
 
 ---
@@ -213,5 +213,5 @@ docker-compose -f docker-compose.yml up -d
 | `docs/ui/README.md` | 前端 UI 文档入口 |
 | `docs/ui/ARCHITECTURE.md` | 系统架构图（Mermaid） |
 | `docs/pro/05-procurement-service.md` | 发注服务文档 |
-| `docs/pro/19-manpou-allinone.md` | 8 领域合一单体 |
+| `docs/pro/19-manpou-allinone.md` | 12 领域合一单体 |
 | `docs/pro/20-ubuntu-deploy-dev.md` | Ubuntu 轻量部署指南 |

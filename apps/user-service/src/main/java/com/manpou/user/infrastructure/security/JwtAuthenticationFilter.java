@@ -34,9 +34,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
 
-    /** ADMIN 角色 *:* 展开后的所有具体权限（63条）。
-     * V15 DB 实际 78 条（warehouse CRUD ID 101-104 + notification CRUD ID 111-114 未入 Set）。
-     * japan_customs:update 通过 V17 迁补入 DB（ID 51）。
+    /** ADMIN 角色 *:* 展开后的所有具体权限（66条）。
+     * DB 82 条（V15基线78 + V18 ship 4 + V19 japan_customs:update 1，warehouse/notification/japan_customs:delete 未入 Set）。
+     * V19 修复：japan_customs:update ID=92（原 V17 ID=70 与 factory:create 冲突）。
      */
     private static final Set<String> ALL_PERMISSIONS = Set.of(
         "demand:create", "demand:read", "demand:update", "demand:delete",
@@ -46,10 +46,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "logistics:create", "logistics:read", "logistics:update", "logistics:delete",
         "consolidation:create", "consolidation:read", "consolidation:update", "consolidation:delete",
         "container:create", "container:read", "container:update", "container:delete",
-        "customs:create", "customs:read", "customs:update", "customs:delete",
+        "ship:create", "ship:read", "ship:update", "ship:delete",
+        "customs:create", "customs:read", "customs:update", "customs:delete", "customs:approve",
         "japan_customs:create", "japan_customs:read", "japan_customs:update", "japan_customs:delete",
         "japan_customs:start", "japan_customs:complete",
-        "tax_refund:create", "tax_refund:read", "tax_refund:update", "tax_refund:delete",
+        "tax_refund:create", "tax_refund:read", "tax_refund:update", "tax_refund:complete", "tax_refund:delete",
         "sales:create", "sales:read", "sales:update", "sales:delete",
         "factory:create", "factory:read", "factory:update", "factory:delete",
         "product:create", "product:read", "product:update", "product:delete",

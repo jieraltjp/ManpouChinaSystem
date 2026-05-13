@@ -1,7 +1,7 @@
 # ManpouChinaSystem 文档导航
 
 > **维护原则**：文档在哪里（文件系统）= 文档是什么（内容职责），路径即语义
-> **最后更新**：2026-04-20
+> **最后更新**：2026-05-13
 
 ---
 
@@ -9,14 +9,18 @@
 
 ```
 docs/
-├── README.md                    ← 本文件 · 全局导航索引
+├── index.md                    ← 本文件 · 全局导航索引
 ├── pro/                         ← 项目专属文档（每个服务一篇）
-├── design/                      ← 构建指南（Step 1-6 · 过程文档）
+├── design/                      ← 构建指南（Step 1-7 · 过程文档）
 ├── role/                        ← 角色视角分析（6 角色 · 受众文档）
 ├── ui/                          ← 前端 UI 文档 + 架构图
-├── business/                    ← 业务 API 文档（发注管理等）
+├── business/                    ← 业务 SPEC + API 文档
 ├── database/                    ← 数据库设计文档（表结构/ER 图）
-└── check/                       ← 审计报告（自动生成）
+├── lessons/                     ← 工程教训库（Lesson 1-87）
+├── permission/                  ← 权限体系与 AuditLog 文档
+├── ops/                         ← 运维/故障排查文档
+├── test/                        ← 测试策略与用例文档
+└── check/                       ← 审计报告（历史积累）
 ```
 
 ---
@@ -47,8 +51,9 @@ docs/
 | 16 | `16-config-center.md` | `config/` | Checkstyle + Nacos 配置模板 |
 | 17 | `17-服务间认证.md` | — | JWT Token 透明传递、RS256 验签机制 |
 | 18 | `18-可插拔基础设施.md` | — | Docker/Redis/Kafka/Nacos 可选接入原则 |
-| 19 | `19-manpou-allinone.md` | `apps/manpou-allinone/` | 7 领域合一单体、Phase 0 策略 |
+| 19 | `19-manpou-allinone.md` | `apps/manpou-allinone/` | 12 领域合一单体、Phase 0 策略 |
 | 20 | `20-ubuntu-deploy-dev.md` | — | Ubuntu 轻量部署、Systemd 服务、Phase 0 三服务 |
+| — | `PRODUCTION-DEPLOY.md` | — | 生产部署指南（迁移体系、秘钥管理、监控） |
 
 ---
 
@@ -66,6 +71,9 @@ docs/
 | `04-前端项目生成.md` | Step 4 | Vue 3 + Vite + Element Plus 配置 |
 | `05-领域模块开发.md` | Step 5 | 业务模块详细开发指南 |
 | `06-配置与部署.md` | Step 6 | Docker Compose、CI/CD、Helm 部署 |
+| `07-Element-Plus-表格布局规范.md` | 规范 | el-table/el-dialog 紧凑设计规范 |
+| `ARCHITECTURE-Lombok-Decoupling.md` | 架构 | Lombok 与 Spring DI 解耦教训 |
+| `FEATURE-货号自动补全与多子货号选择.md` | 特性 | 商品子货号自动补全交互设计 |
 
 ---
 
