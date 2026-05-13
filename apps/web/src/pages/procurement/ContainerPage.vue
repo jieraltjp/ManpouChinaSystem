@@ -245,9 +245,6 @@ onMounted(loadData)
             <el-option v-for="s in shipOptions" :key="s.id" :value="s.id" :label="`${s.shipName} (${s.shipNumber})`" />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('logistics.container.filter.containerNo')">
-          <el-input v-model="filterForm.containerNo" :placeholder="$t('logistics.container.filter.containerNoHint')" clearable style="width:180px" />
-        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSearch">{{ $t('logistics.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('logistics.filter.reset') }}</el-button>

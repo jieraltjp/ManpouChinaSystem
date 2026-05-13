@@ -574,16 +574,16 @@ async function fetchCategory(productCode: string) {
 async function fetchProductCategories(rows: ProcurementPageVO[]) {
   const codes = [...new Set(rows.map(r => r.productCode).filter(Boolean))]
   if (!codes.length) return
-  const results = await Promise.allSettled(
-    codes.map(code => productApi.getByCode(code))
-  )
-  const map: Record<string, string> = {}
-  results.forEach((r, i) => {
-    if (r.status === 'fulfilled') {
-      map[codes[i]] = r.value.data?.category || '-'
+  try {
+    const res = await productApi.batchGetCategories(codes)
+    const map: Record<string, string> = {}
+    for (const item of (res.data ?? [])) {
+      map[item.masterCode] = item.category || '-'
     }
-  })
-  productCategoryMap.value = { ...productCategoryMap.value, ...map }
+    productCategoryMap.value = { ...productCategoryMap.value, ...map }
+  } catch (e) {
+    console.warn('[ProcurementPage] fetch categories failed', e)
+  }
 }
 
 /** 选中需求 → 自动带入 productCode / subProductCode / destination / japanLead / quantity + category */
@@ -1007,9 +1007,7 @@ function billingTypeLabel(val: string | undefined): string {
 }
 
 onMounted(() => {
-  loadData()
-  loadFactories()
-  loadDemands()
+  Promise.all([loadData(), loadFactories(), loadDemands()])
   // 处理来自 DemandPage "转采购" 的 query params
   if (route.query.demandId) {
     convertingDemandId.value = Number(route.query.demandId)

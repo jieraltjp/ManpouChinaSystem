@@ -3,9 +3,11 @@ package com.manpou.allinone.product.application.usecase;
 import com.manpou.allinone.common.exception.BusinessException;
 
 import java.util.List;
+import java.util.Map;
 import com.manpou.allinone.common.filter.TraceFilter;
 import com.manpou.allinone.product.application.assembler.ProductAssembler;
 import com.manpou.allinone.product.application.dto.MasterCodeSuggestVO;
+import com.manpou.allinone.product.application.dto.ProductCategoryVO;
 import com.manpou.allinone.product.application.dto.ProductCreateCmd;
 import com.manpou.allinone.product.application.dto.ProductFactoryVO;
 import com.manpou.allinone.product.application.dto.ProductPageQuery;
@@ -208,6 +210,32 @@ public class ProductUseCase {
                 .map(row -> SubCodeSuggestVO.builder()
                         .subCode((String) row[0])
                         .colorName((String) row[1])
+                        .build())
+                .toList();
+    }
+
+    /**
+     * 批量获取商品类别（解决前端 DemandPage/ProcurementPage N+1 问题）。
+     * 一次 SQL 查询返回所有主货号的类别，避免逐个 GET /code/{masterCode} 调用。
+     */
+    @Transactional(readOnly = true)
+    public List<ProductCategoryVO> batchGetCategories(List<String> masterCodes) {
+        if (masterCodes == null || masterCodes.isEmpty()) {
+            return List.of();
+        }
+        var uniqueCodes = masterCodes.stream().distinct().toList();
+        Map<String, String> categoryMap = productJpaRepository
+                .findCategoryByMasterCodes(uniqueCodes)
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        row -> (String) row[0],
+                        row -> (String) row[1],
+                        (v1, v2) -> v1
+                ));
+        return uniqueCodes.stream()
+                .map(code -> ProductCategoryVO.builder()
+                        .masterCode(code)
+                        .category(categoryMap.get(code))
                         .build())
                 .toList();
     }

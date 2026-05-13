@@ -146,7 +146,7 @@
             <span class="user-info">
               <el-avatar
                 :size="32"
-                :src="userInfo?.avatarUrl ? `data:image/jpeg;base64,${userInfo.avatarUrl}` : undefined"
+                :src="avatarDataUrl"
                 icon="UserFilled"
               />
               <span class="username">
@@ -163,7 +163,7 @@
                 <div class="panel-user-info">
                   <el-avatar
                     :size="40"
-                    :src="userInfo?.avatarUrl ? `data:image/jpeg;base64,${userInfo.avatarUrl}` : undefined"
+                    :src="avatarDataUrl"
                     icon="UserFilled"
                   />
                   <div class="panel-user-text">
@@ -251,6 +251,11 @@ const activeMenu = computed(() => route.path)
 const currentLocale = ref<Locale>((localStorage.getItem('locale') as Locale) || 'zh')
 const currentTimezone = ref(localStorage.getItem('timezone') || 'CST')
 const userInfo = ref<UserVO | null>(null)
+
+/** 头像 data URL（computed 避免内联拼接触发全局重渲染） */
+const avatarDataUrl = computed(() =>
+  userInfo.value?.avatarUrl ? `data:image/jpeg;base64,${userInfo.value.avatarUrl}` : undefined
+)
 
 onMounted(async () => {
   if (auth.token) {

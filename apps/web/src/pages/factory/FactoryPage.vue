@@ -323,7 +323,10 @@ async function loadData() {
   } finally {
     loading.value = false
   }
-  loadStats()
+}
+
+async function loadAll() {
+  await Promise.all([loadData(), loadStats()])
 }
 
 async function loadStats() {
@@ -335,7 +338,7 @@ async function loadStats() {
 
 function onSearch() {
   pagination.page = 1
-  loadData()
+  loadAll()
 }
 
 function onReset() {
@@ -345,8 +348,7 @@ function onReset() {
   filterForm.city = ''
   filterForm.county = ''
   pagination.page = 1
-  loadData()
-  loadStats()
+  loadAll()
 }
 
 function onNew() {
@@ -393,7 +395,7 @@ async function onDelete(row: FactoryPageVO) {
   )
   await factoryApi.delete(row.id)
   ElMessage.success(t('factory.message.deleteSuccess'))
-  loadData()
+  loadAll()
 }
 
 async function onSubmit() {
@@ -409,8 +411,7 @@ async function onSubmit() {
       ElMessage.success(t('factory.message.createSuccess'))
     }
     formVisible.value = false
-    loadData()
-    loadStats()
+    loadAll()
   } finally {
     submitting.value = false
   }
@@ -437,7 +438,7 @@ function statusTagType(status?: CooperationStatus) {
   }
 }
 
-loadData()
+loadAll()
 </script>
 
 <style scoped>

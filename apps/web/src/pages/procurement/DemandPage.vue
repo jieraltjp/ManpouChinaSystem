@@ -430,18 +430,16 @@ function getCategoryLabel(code: string): string {
 async function fetchProductCategories(rows: DemandPageVO[]) {
   const codes = [...new Set(rows.map(r => r.productCode).filter(Boolean))]
   if (!codes.length) return
-  const results = await Promise.allSettled(
-    codes.map(code => productApi.getByCode(code))
-  )
-  const map: Record<string, string> = {}
-  results.forEach((r, i) => {
-    if (r.status === 'fulfilled') {
-      map[codes[i]] = r.value.data?.category || '-'
-    } else {
-      console.warn('[DemandPage] fetch category failed for', codes[i], r.reason)
+  try {
+    const res = await productApi.batchGetCategories(codes)
+    const map: Record<string, string> = {}
+    for (const item of (res.data ?? [])) {
+      map[item.masterCode] = item.category || '-'
     }
-  })
-  productCategoryMap.value = { ...productCategoryMap.value, ...map }
+    productCategoryMap.value = { ...productCategoryMap.value, ...map }
+  } catch (e) {
+    console.warn('[DemandPage] fetch categories failed', e)
+  }
 }
 
 const pendingCount = computed(() => tableData.value.filter(r => !r.linkedProcurementId).length)

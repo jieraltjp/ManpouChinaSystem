@@ -165,6 +165,11 @@ export interface ProductFactoryVO {
   cooperationStatus?: string
 }
 
+export interface ProductCategoryVO {
+  masterCode: string
+  category?: string
+}
+
 export const productApi = {
   list(params: { page?: number; pageSize?: number; masterCode?: string; keyword?: string; hsCode?: string; hsCodeJp?: string; factoryName?: string }) {
     return client.get<ProductPageResponse>('/products', { params })
@@ -196,5 +201,9 @@ export const productApi = {
   },
   getProductFactories(id: number) {
     return client.get<ProductFactoryVO[]>(`/products/${id}/factories`)
+  },
+  /** 批量获取商品类别（替代逐个 getByCode 调用，解决 N+1） */
+  batchGetCategories(masterCodes: string[]) {
+    return client.post<ProductCategoryVO[]>('/products/batch-categories', masterCodes)
   },
 }

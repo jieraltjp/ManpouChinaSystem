@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * JPA 持久化适配器（基础设施层）。
@@ -63,4 +64,8 @@ public interface ProductJpaRepository extends ProductRepository, JpaRepository<P
     /** 按主货号查询所有子货号候选项（用于多选） */
     @Query("SELECT p.subCode, p.colorName FROM Product p WHERE p.masterCode = :masterCode AND p.deleted = false AND p.subCode IS NOT NULL AND p.subCode != '' ORDER BY p.subCode")
     List<Object[]> findSubCodesByMasterCode(@Param("masterCode") String masterCode);
+
+    /** 批量查询主货号对应的类别（distinct master_code） */
+    @Query("SELECT DISTINCT p.masterCode, p.category FROM Product p WHERE p.masterCode IN :masterCodes AND p.deleted = false")
+    List<Object[]> findCategoryByMasterCodes(@Param("masterCodes") List<String> masterCodes);
 }

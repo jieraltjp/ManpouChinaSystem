@@ -1,6 +1,7 @@
 package com.manpou.allinone.product.interfaces.controller;
 
 import com.manpou.allinone.product.application.dto.MasterCodeSuggestVO;
+import com.manpou.allinone.product.application.dto.ProductCategoryVO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.manpou.allinone.product.application.dto.ProductCreateCmd;
 import com.manpou.allinone.product.application.dto.ProductPageQuery;
@@ -88,6 +89,16 @@ public class ProductController {
     @PreAuthorize("hasAuthority('product:read')")
     public Result<List<ProductFactoryVO>> getProductFactories(@PathVariable Long id) {
         return Result.ok(productUseCase.getProductFactories(id));
+    }
+
+    /**
+     * 批量获取商品类别（解决 N+1：替代逐个 GET /code/{masterCode} 调用）。
+     * POST /api/v1/products/batch-categories
+     */
+    @PostMapping("/batch-categories")
+    @PreAuthorize("hasAuthority('product:read')")
+    public Result<List<ProductCategoryVO>> batchGetCategories(@RequestBody List<String> masterCodes) {
+        return Result.ok(productUseCase.batchGetCategories(masterCodes));
     }
 
     /**
