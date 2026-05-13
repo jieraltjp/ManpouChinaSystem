@@ -3,7 +3,7 @@
 > **版本**: 1.6.0
 > **创建**: 2026-05-01
 > **更新**: 2026-05-12（v1.6.0：V17 修复 japan_customs:update 缺失 Bug；JapanCustomsController @PreAuthorize 修正；Phase 3 缺口全部闭合）
-> **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；✅ Phase 4 操作日志完成；Phase 5-6 待开发
+> **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；✅ Phase 4 操作日志完成；✅ Phase 5 个人中心完成；Phase 6 待开发
 > **前置**: SPEC-B11 v1.8.0 · Vite proxy 已配置 · allinone V15/V16/V17 已就绪
 > **关联**: UI-17 · UI-18 · UI-19 · UI-20 · docs/ui/pages/14-user-management.md · docs/ui/pages/15-role-management.md · `docs/permission/`（权限代码对齐文档）
 > **INTJ 编号**: DOC-B11-IMPL-001
@@ -350,14 +350,15 @@ GET /api/v1/permissions/tree
 5. @AuditLog AOP 链路验证通过 ✅
 ⚠️ audit:export（CSV 导出）未实现
 
-### Phase 5 — 个人中心 ⚠️ 待开发
+### Phase 5 — 个人中心 ✅ 完成
 
-1. `pages/profile/ProfilePage.vue`（UI-20）
-2. 路由注册（`/profile`）
-3. 当前用户信息 API（`GET /api/v1/users/me`）
-4. 修改个人信息 API（`PUT /api/v1/auth/profile`）
-5. 修改密码 API（`PUT /api/v1/auth/password`）
-6. i18n key 补充（`profile.*`）
+1. ✅ `pages/system/ProfilePage.vue`（UI-20，路由 `/profile`）
+2. ✅ 当前用户信息 API（`GET /api/v1/users/me`）
+3. ✅ 修改个人信息 API（`PUT /api/v1/users/me`，含 avatar 上传）
+4. ✅ 修改密码 API（`PUT /api/v1/auth/password`）
+5. ✅ i18n key 补充（`profile.*`）
+6. ✅ 头像上传：Canvas 压缩（200×200 JPEG@0.75）→ base64 存储 → `user.avatar_url MEDIUMTEXT`
+7. ✅ AppLayout.vue 头部/面板显示 base64 头像，日语/中文姓名根据 locale 切换
 ⚠️ notification CRUD 后端已实现（无前端 UI）
 ⚠️ warehouse CRUD 后端已实现（无前端 UI，DB 有但 ALL_PERMISSIONS Set 无）
 
@@ -450,7 +451,7 @@ proxy: {
 | 前端删除用户按钮 | P1 | ⚠️ 待开发（UserPage.vue 缺少） |
 | 前端筛选器（roleId/departmentId/companyId） | P1 | ⚠️ 待开发（UserPage.vue 缺少） |
 | AuditLogPage.vue | P1 | ⚠️ 待开发 |
-| ProfilePage.vue | P1 | ⚠️ 待开发 |
+| ProfilePage.vue | P1 | ✅ 完成（头像上传+Canvas压缩+base64存储） |
 | 用户分配角色（完整实现） | P1 | ✅ 已完成（UserRoleRepository） |
 | Phase 6 注册+审核（全栈） | P2 | ⚠️ 待开发 |
 

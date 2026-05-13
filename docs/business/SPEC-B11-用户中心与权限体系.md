@@ -3,7 +3,7 @@
 > **版本**: 1.11.0
 > **创建**: 2026-04-30
 > **更新**: 2026-05-12（v1.11.0：头像上传功能上线；avatar_url VARCHAR(512)→MEDIUMTEXT；前端 Canvas 压缩→base64 存储；V17 迁移已创建）
-> **状态**: ✅ Phase 2 完成；✅ Phase 3 完成（JwtAuthenticationFilter + 21 Controller @PreAuthorize + 前端按钮 v-if + 路由守卫）；✅ Phase 4 完成（操作日志全链路）；Phase 5-6 待开发
+> **状态**: ✅ Phase 2 完成；✅ Phase 3 完成；✅ Phase 4 完成（操作日志全链路）；✅ Phase 5 完成（头像上传）；Phase 6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
 > **权限代码对齐**: `docs/permission/`（PERMISSION-CODE-ALIGNMENT.md / ALL_PERMISSIONS.md / ROLE-MATRIX.md / AUDIT-LOG-SPEC.md）
