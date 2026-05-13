@@ -1,13 +1,13 @@
 # 权限代码文档对齐审计
 
-> **版本**: 1.2.0
+> **版本**: 1.3.0
 > **创建**: 2026-05-12
-> **更新**: 2026-05-12（v1.3.0：V17 补入 japan_customs:update (ID=51)；JapanCustomsController @PreAuthorize 修正；JwtAuthenticationFilter 两端注释更新）
-> **目的**: 确保 V15+V17 DB（79条）、ALL_PERMISSIONS Set（63条）、SPEC-B11 文档三方一致
+> **更新**: 2026-05-13（DB总计82条：V15基线78 + V18 ship 4 + V19 japan_customs:update ID=119）
+> **目的**: 确保 DB（82条）、ALL_PERMISSIONS Set（71条）、SPEC-B11 文档三方一致
 
 ---
 
-## 1. DB 实际数据（79条，V15 78条 + V17 1条）
+## 1. DB 实际数据（82条，V15 78条 + V18 ship 4条 + V19 japan_customs:update 1条）
 
 来源：`allinone/src/main/resources/db/migration/V15__baseline_schema.sql` 第 877-976 行。
 
@@ -112,15 +112,15 @@ customs:approve 在 CustomsController 有 @PreAuthorize，MANAGER/OPERATOR/VIEWE
 
 ### 2.2 Set 有、DB 缺（0条） ✅
 
-> v1.3.0：japan_customs:update 已通过 V17 补入 DB（ID=51），此前此项在 Set 和 @PreAuthorize 引用中存在但 DB 缺失。
+> v1.3.0：japan_customs:update 已通过 V19 补入 DB（ID=119），此前在 Set 和 @PreAuthorize 引用中存在但 DB 缺失（原 V17 错误写成 ID=70 和 ID=92）。
 
 ### 2.3 两端对齐状态
 
 | 组件 | Set 条数 | 与 DB 对齐 | 最后审计 |
 |------|---------|-----------|---------|
-| allinone JwtAuthenticationFilter | 63 | ✅ | 2026-05-12 |
-| user-service JwtAuthenticationFilter | 63 | ✅ | 2026-05-12 |
-| V15+V17 permission 表 | 79 | — | — |
+| allinone JwtAuthenticationFilter | 71 | ✅ | 2026-05-13 |
+| user-service JwtAuthenticationFilter | 66 | ✅ | 2026-05-13 |
+| V15+V18+V19 permission 表 | 82 | — | — |
 
 ---
 
@@ -156,7 +156,7 @@ customs:approve 在 CustomsController 有 @PreAuthorize，MANAGER/OPERATOR/VIEWE
 
 | permission_code | DB ID | 修复版本 | 说明 |
 |----------------|-------|---------|------|
-| japan_customs:update | 51 | **V17 ✅** | Set 有、DB 无 → V17 INSERT (ID=51)；JapanCustomsController @PreAuthorize 改为语义对应（start→japan_customs:start，complete→japan_customs:complete） |
+| japan_customs:update | 119 | **V19 ✅** | Set 有、DB 无 → V19 INSERT (ID=119)；JapanCustomsController @PreAuthorize 改为语义对应（start→japan_customs:start，complete→japan_customs:complete） |
 
 ---
 

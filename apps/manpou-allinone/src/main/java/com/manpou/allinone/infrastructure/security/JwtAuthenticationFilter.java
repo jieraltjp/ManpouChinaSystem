@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /**
      * ADMIN 角色 *:* 展开后的所有具体权限（74条）。
      * DB 82 条（V15基线78 + V18 ship 4 + V19 japan_customs:update 1，warehouse/notification/japan_customs:delete 未入 Set）。
-     * V17~V19 重编号修复：原 V17（japan_customs:update ID=70）与 factory:create 冲突，现为 V19（ID=92）。
+     * V19 修复：japan_customs:update ID=119（原 V17 ID=70 与 factory:create 冲突，又错误写成 ID=92 与 permission:read 冲突）。
      */
     private static final Set<String> ALL_PERMISSIONS = Set.of(
         "demand:create", "demand:read", "demand:update", "demand:delete",

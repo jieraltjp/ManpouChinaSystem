@@ -10,8 +10,8 @@
 
 | 文件 | 内容 |
 |------|------|
-| [PERMISSION-CODE-ALIGNMENT.md](./PERMISSION-CODE-ALIGNMENT.md) | 权限代码文档对齐审计：V15 DB 78条 vs ALL_PERMISSIONS Set 63条差异分析 |
-| [ALL_PERMISSIONS.md](./ALL_PERMISSIONS.md) | ALL_PERMISSIONS Set（63条）与代码文件映射 |
+| [PERMISSION-CODE-ALIGNMENT.md](./PERMISSION-CODE-ALIGNMENT.md) | 权限代码文档对齐审计：DB 82条 vs ALL_PERMISSIONS Set 71条差异分析 |
+| [ALL_PERMISSIONS.md](./ALL_PERMISSIONS.md) | ALL_PERMISSIONS Set（71条）与代码文件映射 |
 | [ROLE-MATRIX.md](./ROLE-MATRIX.md) | 4级角色权限矩阵（ADMIN/MANAGER/OPERATOR/VIEWER） |
 | [AUDIT-LOG-SPEC.md](./AUDIT-LOG-SPEC.md) | 操作日志规格：触发规则/字段/接口/Phase 状态 |
 
@@ -22,9 +22,9 @@
 ### 原则一：代码即文档
 
 ALL_PERMISSIONS Set 是权限体系的唯一真实来源（Source of Truth），V15 DB seed 是数据来源。
-- `allinone`: `infrastructure/security/JwtAuthenticationFilter.java` ALL_PERMISSIONS（63条）
-- `user-service`: `infrastructure/security/JwtAuthenticationFilter.java` ALL_PERMISSIONS（63条，两端必须同步）
-- V15 DB: `permission` 表 78 条种子数据
+- `allinone`: `infrastructure/security/JwtAuthenticationFilter.java` ALL_PERMISSIONS（71条）
+- `user-service`: `infrastructure/security/JwtAuthenticationFilter.java` ALL_PERMISSIONS（66条，差异为 ship CRUD）
+- DB: `permission` 表 82 条（V15基线78 + V18 ship 4 + V19 japan_customs:update 1）
 
 ### 原则二：DB 优先于代码
 

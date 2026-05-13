@@ -63,7 +63,7 @@
 | customs:approve | ● | ● | ○ | ○ |
 | japan_customs:read | ● | ● | ● | ● |
 | japan_customs:create | ● | ● | ● | ○ |
-| japan_customs:start | ● | ● | ● | ○ |
+| japan_customs:start | ● | ● | ○ | ○ |
 | japan_customs:complete | ● | ● | ○ | ○ |
 | japan_customs:delete | ● | ● | ● | ○ |
 | tax_refund:read | ● | ● | ● | ● |

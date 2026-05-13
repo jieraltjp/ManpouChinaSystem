@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS `audit_log` (
 }
 ```
 
-### 前端（Phase 4 待开发）
+### 前端（Phase 4 ✅ 已完成：AuditLogPage.vue + 链路验证通过）
 
 - `api/auditLog.ts`
 - `pages/system/AuditLogPage.vue`（UI-19）
