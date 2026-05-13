@@ -1,10 +1,10 @@
 # SPEC-B11 — 用户中心与权限体系 · 实现设计
 
-> **版本**: 1.6.0
+> **版本**: 1.7.0
 > **创建**: 2026-05-01
-> **更新**: 2026-05-12（v1.6.0：V17 修复 japan_customs:update 缺失 Bug；JapanCustomsController @PreAuthorize 修正；Phase 3 缺口全部闭合）
+> **更新**: 2026-05-13（v1.7.0：修正 Flyway 版本（V17=头像、V18=ship、V19=japan_customs）；Phase 5 头像上传上线；DB 权限 83 条；Controller 示例更新）
 > **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；✅ Phase 4 操作日志完成；✅ Phase 5 个人中心完成；Phase 6 待开发
-> **前置**: SPEC-B11 v1.8.0 · Vite proxy 已配置 · allinone V15/V16/V17 已就绪
+> **前置**: SPEC-B11 v1.8.0 · Vite proxy 已配置 · allinone V15/V16/V17/V18/V19 已就绪
 > **关联**: UI-17 · UI-18 · UI-19 · UI-20 · docs/ui/pages/14-user-management.md · docs/ui/pages/15-role-management.md · `docs/permission/`（权限代码对齐文档）
 > **INTJ 编号**: DOC-B11-IMPL-001
 
@@ -385,9 +385,12 @@ GET /api/v1/permissions/tree
 |------|------|------|------|
 | V15 | `V15__baseline_schema.sql` | 32 表 DDL + 种子数据（78 条权限 + 4 角色 + admin 用户 + 职务 + 组织） | ✅ |
 | V16 | `V16__procurement_snapshot.sql` | procurement_snapshot 表（幂等兜底） | ✅ |
-| V17 | `V17__japan_customs_update_permission.sql` | INSERT japan_customs:update (ID=51) 修复 Set/DB 不一致 | ✅ |
+| V17 | `V17__user_avatar_mediumtext.sql` | user.avatar_url → MEDIUMTEXT（头像 base64 存储） | ✅ |
+| V18 | `V18__ship_and_container_extension.sql` | ship 表 + container 扩展字段 + ship 权限 4 条（ID 115~118） | ✅ |
+| V19 | `V19__japan_customs_update_permission.sql` | INSERT japan_customs:update（ID=119）修复 Set/DB 不一致 | ✅ |
 
-> DB 实际权限：79 条（V15 78条 + V17 1条）。BCrypt hash: `$2a$12$t7mRpfsCDNFgj6LET1Y47eH7J2.MJ5i5nAYwYL6SfKdWE7LN.vqUG`（admin/admin123）
+> DB 实际权限：83 条（V15:78 + V18:4 + V19:1）；ALL_PERMISSIONS Set: allinone 71条 / user-service 66条。
+> BCrypt hash: `$2a$12$t7mRpfsCDNFgj6LET1Y47eH7J2.MJ5i5nAYwYL6SfKdWE7LN.vqUG`（admin/admin123）
 
 ---
 

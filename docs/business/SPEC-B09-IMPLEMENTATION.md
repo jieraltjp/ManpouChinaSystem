@@ -1,8 +1,8 @@
 # SPEC-B09 — 订单总览 · 实现设计
 
-> **版本**: 1.4.0
+> **版本**: 1.5.0
 > **创建**: 2026-04-22
-> **更新**: 2026-04-24（v1.4.0：v2.0.0 数据模型迁移 — Demand subProductItems JSON → 直接字段；新增 DemandOverviewVO 独立 DTO；前端所有枚举值 i18n 本地化）
+> **更新**: 2026-05-13（v1.5.0：补充双锚点 6 个端点（/procurement/* + /demands/*）；Controller 示例同步更新）
 > **状态**: 🟢 已完成
 > **前置**: SPEC-B09-API设计 · DB-09 · docs/ui/pages/09-order-overview.md · SPEC-B09-全链路子货号追踪分析.md
 > **INTJ 编号**: DOC-B09-IMPL-001
@@ -273,18 +273,26 @@ GET /api/v1/orders/procurement/selector?page=0&pageSize=20&keyword=
 @RequiredArgsConstructor
 public class OrderOverviewController {
 
-    private final OrderOverviewUseCase orderOverviewUseCase;
-    private final ProcurementUseCase procurementUseCase;  // 复用选择器
+    // Procurement 锚点
+    @GetMapping("/procurement/{procurementId}/overview")
+    public Result<OrderOverviewPageVO> getOverview(@PathVariable Long procurementId) { ... }
 
-    @GetMapping("/{procurementId}/overview")
-    public Result<OrderOverviewPageVO> getOverview(@PathVariable Long procurementId) {
-        return Result.ok(orderOverviewUseCase.getOverview(procurementId));
-    }
+    @GetMapping("/procurement/selector")
+    public Result<Page<OrderProcurementSelectorDTO>> selector(ProcurementQuery query) { ... }
 
-    @GetMapping("/selector")
-    public Result<Page<ProcurementPageVO>> selector(ProcurementQuery query) {
-        return Result.ok(procurementUseCase.pageQuery(query));
-    }
+    // Demand 锚点（v1.6.0）
+    @GetMapping("/demands")
+    public Result<Page<OrderDemandSelectorDTO>> listDemands(...) { ... }
+
+    @GetMapping("/demands/{demandId}/overview")
+    public Result<DemandOverviewVO> getDemandOverview(@PathVariable Long demandId) { ... }
+
+    // v_order_chain 视图
+    @GetMapping("/chain")
+    public Result<Page<OrderChainVO>> listChain(...) { ... }
+
+    @GetMapping("/chain/{demandId}")
+    public Result<OrderChainDetailVO> getChainDetail(@PathVariable Long demandId) { ... }
 }
 ```
 

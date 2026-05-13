@@ -52,7 +52,7 @@ ALL_PERMISSIONS Set 是权限体系的唯一真实来源（Source of Truth），
 | Phase 2 | 用户CRUD + 角色管理 | ✅ | |
 | Phase 3 | 权限控制（@PreAuthorize） | ✅ | 22 Controller + 前端按钮守卫 |
 | Phase 4 | 操作日志 | ✅ | @AuditLog AOP + AuditLogPage + 链路验证通过 |
-| Phase 5 | 个人中心 | ⚠️ | |
+| Phase 5 | 个人中心（头像上传+Canvas压缩） | ✅ | SPEC-B11 Phase 5 完成 |
 | Phase 6 | 注册 + 审核 | ⚠️ | |
 
 ---

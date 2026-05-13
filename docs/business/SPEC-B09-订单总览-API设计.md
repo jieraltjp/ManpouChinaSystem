@@ -42,7 +42,7 @@ replenishment_demand (锚点)
 
 ## 2. 核心接口（双锚点）
 
-`OrderOverviewController.java` 暴露 **5 个端点**，分属两个架构入口：
+`OrderOverviewController.java` 暴露 **6 个端点**，分属两个架构入口：
 
 | 锚点 | 端点 | 用途 |
 |------|------|------|

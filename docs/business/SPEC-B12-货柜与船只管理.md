@@ -1,8 +1,8 @@
 # SPEC-B12 — 货柜与船只管理
 
-> **版本**: v1.3.0
-> **日期**: 2026-05-12
-> **状态**: ✅ Phase 1/2/3 实施完成
+> **版本**: v1.4.0
+> **日期**: 2026-05-13
+> **状态**: ✅ Phase 1/2/3 实施完成；⚠️ `GET /ships/{id}/containers` 端点未实现（前端 ContainerPage 已按 shipId 筛选，无需此端点）
 > **对应 UI**: UI-19（货柜管理 v2.0）· UI-20（船只管理）
 > **对应 DB**: V18（ship 表 + container 扩展）
 > **对应前端**: `pages/logistics/ShipPage.vue` · `pages/procurement/ContainerPage.vue`（已扩展）
@@ -177,7 +177,7 @@ CREATED ──→ LOADED ──→ DEPARTED ──→ ARRIVED
 | `POST` | `/api/v1/ships` | `ship:create` | 创建船只 |
 | `PUT` | `/api/v1/ships/{id}` | `ship:update` | 编辑船只 |
 | `DELETE` | `/api/v1/ships/{id}` | `ship:delete` | 删除船只（需无关联货柜） |
-| `GET` | `/api/v1/ships/{id}/containers` | `ship:read` | 查询某船所有货柜 |
+| ⚠️ `GET` | `/api/v1/ships/{id}/containers` | `ship:read` | ⚠️ 未实现（前端 ContainerPage 可按 shipId 筛选，无需此端点） |
 
 ### 5.2 货柜管理（Container 扩展）
 

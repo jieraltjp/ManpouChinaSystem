@@ -1,13 +1,13 @@
 # 权限代码文档对齐审计
 
-> **版本**: 1.3.0
+> **版本**: 1.4.0
 > **创建**: 2026-05-12
-> **更新**: 2026-05-13（DB总计82条：V15基线78 + V18 ship 4 + V19 japan_customs:update ID=119）
-> **目的**: 确保 DB（82条）、ALL_PERMISSIONS Set（71条）、SPEC-B11 文档三方一致
+> **更新**: 2026-05-13（DB总计83条：V15基线78 + V18 ship 4 + V19 japan_customs:update ID=119）
+> **目的**: 确保 DB（83条）、ALL_PERMISSIONS Set（71条）、SPEC-B11 文档三方一致
 
 ---
 
-## 1. DB 实际数据（82条，V15 78条 + V18 ship 4条 + V19 japan_customs:update 1条）
+## 1. DB 实际数据（83条，V15 78条 + V18 ship 4条 + V19 japan_customs:update 1条）
 
 来源：`allinone/src/main/resources/db/migration/V15__baseline_schema.sql` 第 877-976 行。
 
