@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.manpou.allinone.common.annotation.AuditLog;
+
 import java.util.List;
 
 /**
@@ -33,6 +35,7 @@ public class KeyManagementController {
      */
     @PostMapping("/rotate")
     @PreAuthorize("hasRole('ADMIN')")
+    @AuditLog(module = "admin", action = "ROTATE_KEY")
     @Operation(
         summary = "轮换签名密钥",
         description = "停用当前 ACTIVE 密钥，生成并激活新密钥。旧密钥保留用于验签历史 Token。"

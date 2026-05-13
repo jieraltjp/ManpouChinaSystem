@@ -64,6 +64,7 @@ public class ContainerController {
 
     @PostMapping("/{id}/plans/{planId}")
     @PreAuthorize("hasAuthority('container:update')")
+    @AuditLog(module = "container", action = "ADD_PLAN", resourceType = "container", resourceId = "#containerId")
     public Result<Void> addPlan(@PathVariable("id") Long containerId,
                                 @PathVariable("planId") Long planId) {
         useCase.addPlan(containerId, planId);

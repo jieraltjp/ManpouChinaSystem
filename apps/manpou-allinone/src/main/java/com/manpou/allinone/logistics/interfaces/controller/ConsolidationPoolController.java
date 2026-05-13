@@ -63,6 +63,7 @@ public class ConsolidationPoolController {
 
     @PostMapping("/{id}/plans/{planId}")
     @PreAuthorize("hasAuthority('consolidation:update')")
+    @AuditLog(module = "consolidation", action = "ADD_PLAN", resourceType = "consolidation_pool", resourceId = "#poolId")
     public Result<Void> addPlan(@PathVariable("id") Long poolId,
                                 @PathVariable("planId") Long planId) {
         useCase.addPlan(poolId, planId);
@@ -71,6 +72,7 @@ public class ConsolidationPoolController {
 
     @DeleteMapping("/{id}/plans/{planId}")
     @PreAuthorize("hasAuthority('consolidation:update')")
+    @AuditLog(module = "consolidation", action = "REMOVE_PLAN", resourceType = "consolidation_pool", resourceId = "#poolId")
     public Result<Void> removePlan(@PathVariable("id") Long poolId,
                                    @PathVariable("planId") Long planId) {
         useCase.removePlan(poolId, planId);
