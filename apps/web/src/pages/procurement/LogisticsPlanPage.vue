@@ -311,8 +311,7 @@ async function loadData() {
     const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
-  } catch (e) {
-    console.error('[LogisticsPlanPage] loadData failed', e)
+  } catch {
     ElMessage.error(t('logistics.message.loadFailed'))
   } finally {
     loading.value = false
@@ -341,8 +340,7 @@ async function loadQcRecordOptions() {
     // 只过滤 result=PASS，status 不限制（DB 里 status=PENDING 也是合法验货记录）
     const res = await inspectionApi.list({ page: 0, pageSize: 100, result: 'PASS' })
     qcRecordOptions.value = res.data?.content ?? []
-  } catch (e) {
-    console.error('[LogisticsPlanPage] loadQcRecordOptions failed', e)
+  } catch {
     qcRecordOptions.value = []
   } finally {
     qcRecordLoading.value = false
@@ -360,8 +358,7 @@ async function loadFactoryOptions() {
   try {
     const res = await factoryApi.list({ page: 0, pageSize: 200 })
     factoryOptions.value = res.data?.content ?? []
-  } catch (e) {
-    console.error('[LogisticsPlanPage] loadFactoryOptions failed', e)
+  } catch {
     factoryOptions.value = []
   }
 }
@@ -421,7 +418,6 @@ async function onSubmit() {
         actualShipDate: form.actualShipDate || undefined,
         remarks: form.remarks || undefined,
       }
-      console.log('[LogisticsPlanPage] update payload:', JSON.stringify(payload))
       await logisticsApi.update(editId.value, payload)
       ElMessage.success(t('logistics.message.updateSuccess'))
     } else {
@@ -448,8 +444,7 @@ async function onSubmit() {
     dialogVisible.value = false
     editId.value = null
     loadData()
-  } catch (e) {
-    console.error('[LogisticsPlanPage] onSubmit failed', e)
+  } catch {
     ElMessage.error(t(editId.value ? 'logistics.message.updateFailed' : 'logistics.message.createFailed'))
   } finally {
     submitting.value = false
@@ -510,8 +505,7 @@ async function onDelete(row: LogisticsPlanVO) {
     await logisticsApi.delete(row.id)
     ElMessage.success(t('logistics.message.deleteSuccess'))
     loadData()
-  } catch (e) {
-    console.error('[LogisticsPlanPage] delete failed', e)
+  } catch {
     ElMessage.error(t('logistics.message.deleteFailed') || t('common.error.actionFailed'))
   }
 }

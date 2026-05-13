@@ -471,8 +471,7 @@ async function loadData() {
     const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
-  } catch (e: unknown) {
-    console.error('[DomesticCustomsPage] loadData failed', e)
+  } catch {
     ElMessage.error(t('customs.message.loadFailed'))
   } finally {
     loading.value = false
@@ -586,8 +585,7 @@ async function onBatchSubmit() {
     ElMessage.success(t('customs.message.batchCreateSuccess', { n: ids.length }))
     dialogVisible.value = false
     loadData()
-  } catch (e) {
-    console.error('[DomesticCustomsPage] onBatchSubmit failed', e)
+  } catch {
     ElMessage.error(t('customs.message.createFailed'))
   } finally {
     submitting.value = false
@@ -605,8 +603,7 @@ async function onSubmit(row: CustomsVO) {
     await customsApi.submit(row.id)
     ElMessage.success(t('customs.message.submitSuccess'))
     loadData()
-  } catch (e) {
-    console.error('[DomesticCustomsPage] submit failed', e)
+  } catch {
     ElMessage.error(t('customs.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -619,8 +616,7 @@ async function onClear(row: CustomsVO) {
     await customsApi.clear(row.id)
     ElMessage.success(t('customs.message.clearSuccess'))
     loadData()
-  } catch (e) {
-    console.error('[DomesticCustomsPage] clear failed', e)
+  } catch {
     ElMessage.error(t('customs.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -641,8 +637,7 @@ async function onRejectConfirm() {
     ElMessage.success(t('customs.message.rejectSuccess'))
     rejectDialogVisible.value = false
     loadData()
-  } catch (e) {
-    console.error('[DomesticCustomsPage] reject failed', e)
+  } catch {
     ElMessage.error(t('customs.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -663,8 +658,7 @@ async function onDelete(row: CustomsVO) {
     await customsApi.delete(row.id)
     ElMessage.success(t('customs.message.deleteSuccess'))
     loadData()
-  } catch (e) {
-    console.error('[DomesticCustomsPage] delete failed', e)
+  } catch {
     ElMessage.error(t('customs.message.actionFailed'))
   } finally {
     actionLoading.value = ''

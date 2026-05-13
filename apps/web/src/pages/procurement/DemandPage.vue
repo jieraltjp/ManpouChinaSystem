@@ -437,8 +437,7 @@ async function fetchProductCategories(rows: DemandPageVO[]) {
       map[item.masterCode] = item.category || '-'
     }
     productCategoryMap.value = { ...productCategoryMap.value, ...map }
-  } catch (e) {
-    console.warn('[DemandPage] fetch categories failed', e)
+  } catch {
   }
 }
 

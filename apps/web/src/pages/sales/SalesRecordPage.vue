@@ -387,8 +387,7 @@ async function loadData() {
     const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
-  } catch (e: unknown) {
-    console.error('[SalesRecordPage] loadData failed', e)
+  } catch {
     ElMessage.error(t('sales.message.loadFailed'))
   } finally {
     loading.value = false
@@ -447,8 +446,7 @@ async function onCreateConfirm() {
     ElMessage.success(t('sales.message.createSuccess'))
     createDialogVisible.value = false
     loadData()
-  } catch (e) {
-    console.error('[SalesRecordPage] create failed', e)
+  } catch {
     ElMessage.error(t('sales.message.createFailed'))
   } finally {
     saveLoading.value = false
@@ -473,8 +471,7 @@ async function onStockConfirm() {
     ElMessage.success(t('sales.message.updateSuccess'))
     stockDialogVisible.value = false
     loadData()
-  } catch (e) {
-    console.error('[SalesRecordPage] updateStock failed', e)
+  } catch {
     ElMessage.error(t('sales.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -488,8 +485,7 @@ async function onDiscontinue(row: SalesRecordVO) {
     await salesOperationsApi.discontinue(row.id)
     ElMessage.success(t('sales.message.discontinueSuccess'))
     loadData()
-  } catch (e) {
-    console.error('[SalesRecordPage] discontinue failed', e)
+  } catch {
     ElMessage.error(t('sales.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -502,8 +498,7 @@ async function onRelist(row: SalesRecordVO) {
     await salesOperationsApi.relist(row.id)
     ElMessage.success(t('sales.message.relistSuccess'))
     loadData()
-  } catch (e) {
-    console.error('[SalesRecordPage] relist failed', e)
+  } catch {
     ElMessage.error(t('sales.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -523,8 +518,7 @@ async function onDelete(row: SalesRecordVO) {
     await salesOperationsApi.delete(row.id)
     ElMessage.success(t('sales.message.deleteSuccess'))
     loadData()
-  } catch (e) {
-    console.error('[SalesRecordPage] delete failed', e)
+  } catch {
     ElMessage.error(t('sales.message.actionFailed'))
   } finally {
     actionLoading.value = ''

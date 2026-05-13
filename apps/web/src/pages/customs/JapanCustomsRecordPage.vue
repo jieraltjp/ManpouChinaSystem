@@ -485,8 +485,7 @@ async function searchBatchContainers(keyword: string) {
     batchContainerOptions.value = list
       .filter(r => r.containerNo && !seen.has(r.containerNo) && seen.add(r.containerNo))
       .map(r => r.containerNo as string)
-  } catch (e) {
-    console.error('[JapanCustomsRecordPage] search batch containers failed', e)
+  } catch {
   } finally {
     batchContainerLoading.value = false
   }
@@ -501,8 +500,7 @@ async function onBatchContainerSelect(val: string) {
   try {
     const res = await customsApi.list({ status: 'CLEARED', containerNo: val, page: 0, pageSize: 50 })
     batchDomesticList.value = res.data?.content ?? []
-  } catch (e) {
-    console.error('[JapanCustomsRecordPage] load batch domestic list failed', e)
+  } catch {
   } finally {
     batchTableLoading.value = false
   }
@@ -523,8 +521,7 @@ async function onBatchSubmit() {
     ElMessage.success(t('japanCustoms.batchDialog.createSuccess', { n: batchSelectedIds.value.length }))
     createDialogVisible.value = false
     loadData()
-  } catch (e) {
-    console.error('[JapanCustomsRecordPage] batch create failed', e)
+  } catch {
     ElMessage.error(t('japanCustoms.message.actionFailed'))
   } finally {
     batchSubmitting.value = false
@@ -549,8 +546,7 @@ async function loadData() {
     const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
-  } catch (e: unknown) {
-    console.error('[JapanCustomsRecordPage] loadData failed', e)
+  } catch {
     ElMessage.error(t('japanCustoms.message.loadFailed'))
   } finally {
     loading.value = false
@@ -579,8 +575,7 @@ async function onStart(row: JapanCustomsVO) {
     await japanCustomsApi.start(row.id)
     ElMessage.success(t('japanCustoms.message.startSuccess'))
     loadData()
-  } catch (e) {
-    console.error('[JapanCustomsRecordPage] start failed', e)
+  } catch {
     ElMessage.error(t('japanCustoms.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -607,8 +602,7 @@ async function onCompleteConfirm() {
     ElMessage.success(t('japanCustoms.message.completeSuccess'))
     completeDialogVisible.value = false
     loadData()
-  } catch (e) {
-    console.error('[JapanCustomsRecordPage] complete failed', e)
+  } catch {
     ElMessage.error(t('japanCustoms.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -630,8 +624,7 @@ async function onFailConfirm() {
     ElMessage.success(t('japanCustoms.message.failSuccess'))
     failDialogVisible.value = false
     loadData()
-  } catch (e) {
-    console.error('[JapanCustomsRecordPage] fail failed', e)
+  } catch {
     ElMessage.error(t('japanCustoms.message.actionFailed'))
   } finally {
     actionLoading.value = ''
@@ -652,8 +645,7 @@ async function onDelete(row: JapanCustomsVO) {
     await japanCustomsApi.delete(row.id)
     ElMessage.success(t('japanCustoms.message.deleteSuccess'))
     loadData()
-  } catch (e) {
-    console.error('[JapanCustomsRecordPage] delete failed', e)
+  } catch {
     ElMessage.error(t('japanCustoms.message.actionFailed'))
   } finally {
     actionLoading.value = ''

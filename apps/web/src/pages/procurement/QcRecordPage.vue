@@ -401,7 +401,6 @@
                 fit="cover"
                 class="drawer-image-thumb"
                 :lazy="false"
-                @error="(e: Event) => console.error('[QC-Image] load failed, id=' + img.id + ', url=' + img.url, e)"
               />
             </div>
           </template>
@@ -570,8 +569,7 @@ async function loadData() {
     const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
-  } catch (e: unknown) {
-    console.error('[QcRecordPage] loadData failed', e)
+  } catch {
     ElMessage.error(t('inspection.message.loadFailed'))
   } finally {
     loading.value = false
@@ -694,7 +692,6 @@ async function onSubmit() {
       // 4. 上传新增的本地文件
       const newLocalFiles = uploadFileList.value.filter(f => f.raw)
       if (newLocalFiles.length) {
-        console.log('[QC-Image] editing record ' + currentRow.value.id + ', uploading ' + newLocalFiles.length + ' new images')
         await inspectionApi.uploadImages(
           newLocalFiles.map(f => f.raw!),
           currentRow.value.id,
@@ -736,12 +733,10 @@ async function onSubmit() {
       // 批量上传
       const newLocalFiles = uploadFileList.value.filter(f => f.raw)
       if (newLocalFiles.length && newQcRecordId) {
-        console.log('[QC-Image] uploading ' + newLocalFiles.length + ' images for new record id=' + newQcRecordId)
-        const upRes = await inspectionApi.uploadImages(
+        await inspectionApi.uploadImages(
           newLocalFiles.map(f => f.raw!),
           newQcRecordId,
         )
-        console.log('[QC-Image] upload result', upRes.data)
       }
 
       ElMessage.success(t('inspection.message.createSuccess'))
@@ -762,10 +757,8 @@ function onView(row: QcRecordVO) {
   drawerImages.value = []
   if (row.id) {
     inspectionApi.listImages(row.id).then(res => {
-      console.log('[QC-Image] onView loaded, qcRecordId=' + row.id + ', count=' + (res.data?.length ?? 0), res.data)
       drawerImages.value = res.data ?? []
-    }).catch((err: unknown) => {
-      console.error('[QC-Image] onView failed, qcRecordId=' + row.id, err)
+    }).catch(() => {
       drawerImages.value = []
     })
   }
@@ -806,15 +799,13 @@ function onEdit(row: QcRecordVO) {
   uploadFileList.value = []
   if (row.id) {
     inspectionApi.listImages(row.id).then(res => {
-      console.log('[QC-Image] onEdit loaded, qcRecordId=' + row.id + ', count=' + (res.data?.length ?? 0), res.data)
       uploadFileList.value = (res.data ?? []).map((img: QcImageVO) => ({
         id: img.id,
         name: img.originalName,
         url: img.url,
         status: 'uploaded' as const,
       }))
-    }).catch((err: unknown) => {
-      console.error('[QC-Image] onEdit failed, qcRecordId=' + row.id, err)
+    }).catch(() => {
       uploadFileList.value = []
     })
   }
@@ -842,8 +833,7 @@ async function onDelete(row: QcRecordVO) {
     await inspectionApi.delete(row.id)
     ElMessage.success(t('inspection.message.deleteSuccess'))
     loadData()
-  } catch (e) {
-    console.error('[QcRecordPage] delete failed', e)
+  } catch {
     ElMessage.error(t('inspection.message.deleteFailed') || t('inspection.message.actionFailed'))
   }
 }

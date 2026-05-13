@@ -581,8 +581,7 @@ async function fetchProductCategories(rows: ProcurementPageVO[]) {
       map[item.masterCode] = item.category || '-'
     }
     productCategoryMap.value = { ...productCategoryMap.value, ...map }
-  } catch (e) {
-    console.warn('[ProcurementPage] fetch categories failed', e)
+  } catch {
   }
 }
 
