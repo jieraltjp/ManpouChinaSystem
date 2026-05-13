@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div v-if="hasPermission('audit:read')" class="page">
     <!-- 筛选栏 -->
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filterForm">
@@ -106,16 +106,18 @@
       </template>
     </el-drawer>
   </div>
-</template>
+  <el-empty v-else :description="$t('auditLog.noPermission')" />
 
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
+import { usePermission } from '@/composables/usePermission'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { pageAuditLogs } from '@/api/auditLog'
 import type { AuditLogVO } from '@/api/auditLog'
 
 const { locale: localeRef } = useI18n()
+const { hasPermission } = usePermission()
 
 function formatTime(ts: string | undefined | null): string {
   if (!ts) return '-'

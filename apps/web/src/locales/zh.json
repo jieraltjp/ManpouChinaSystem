@@ -2075,7 +2075,8 @@
     "message": {
       "loadFailed": "加载日志列表失败",
       "detailLoadFailed": "加载日志详情失败"
-    }
+    },
+    "noPermission": "无权限访问该页面"
   },
   "profile": {
     "title": "个人中心",
@@ -2099,6 +2100,13 @@
       "roles": "角色",
       "uploadAvatar": "上传头像",
       "uploadTip": "支持 JPG/PNG，最大 2MB"
+    },
+    "avatar": {
+      "hint": "点击更换头像（200×200 JPG）",
+      "uploadSuccess": "头像上传成功",
+      "invalidType": "仅支持 JPG、PNG、WebP 格式",
+      "fileTooLarge": "文件大小不能超过 5MB",
+      "loadError": "图片加载失败，请重试"
     },
     "security": {
       "changePassword": "修改密码",

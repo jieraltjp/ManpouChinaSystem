@@ -2075,7 +2075,8 @@
     "message": {
       "loadFailed": "ログ一覧の読み込みに失敗しました",
       "detailLoadFailed": "ログ詳細の読み込みに失敗しました"
-    }
+    },
+    "noPermission": "このページにアクセスする権限がありません"
   },
   "profile": {
     "title": "プロフィール",
@@ -2099,6 +2100,13 @@
       "roles": "役割",
       "uploadAvatar": "アバターをアップロード",
       "uploadTip": "JPG/PNG対応、最大2MB"
+    },
+    "avatar": {
+      "hint": "アバターをクリックして変更（200×200 JPG）",
+      "uploadSuccess": "アバターをアップロードしました",
+      "invalidType": "JPG、PNG、WebP形式のみ対応しています",
+      "fileTooLarge": "ファイルサイズは5MB以下にしてください",
+      "loadError": "画像読み込みに失敗しました。再試行してください"
     },
     "security": {
       "changePassword": "パスワード変更",
