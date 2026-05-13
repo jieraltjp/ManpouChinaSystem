@@ -24,6 +24,7 @@ public class UserController {
      * 分页查询用户列表。
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('user:read')")
     public Result<UserPageVO> pageQuery(UserPageQuery query) {
         return Result.ok(userService.pageQuery(query));
     }
@@ -32,6 +33,7 @@ public class UserController {
      * 获取用户详情。
      */
     @GetMapping("/{id:\\d+}")
+    @PreAuthorize("hasAuthority('user:read')")
     public Result<UserVO> getById(@PathVariable Long id) {
         return Result.ok(userService.getById(id));
     }
@@ -103,6 +105,7 @@ public class UserController {
      * GET /api/v1/users/me
      */
     @GetMapping("/me")
+    @PreAuthorize("hasAuthority('user:read')")
     public Result<UserVO> getCurrentUser() {
         return Result.ok(userService.getCurrentUser());
     }

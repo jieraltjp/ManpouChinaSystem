@@ -24,6 +24,7 @@ public class RoleController {
      * 角色列表。
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('role:read')")
     public Result<List<RoleSimpleVO>> listAll() {
         return Result.ok(roleService.listAll());
     }
@@ -32,6 +33,7 @@ public class RoleController {
      * 角色详情（含权限列表）。
      */
     @GetMapping("/{id:\\d+}")
+    @PreAuthorize("hasAuthority('role:read')")
     public Result<RoleVO> getById(@PathVariable Long id) {
         return Result.ok(roleService.getById(id));
     }
