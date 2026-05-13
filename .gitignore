@@ -31,6 +31,8 @@ apps/*/*/target/
 # 本地/开发环境配置文件（含密码/内网IP，不提交）
 apps/manpou-allinone/src/main/resources/application-*.yml
 apps/manpou-allinone/src/main/resources/application-*.yaml
+apps/user-service/src/main/resources/application-*.yml
+apps/user-service/src/main/resources/application-*.yaml
 *.class
 *.log
 *.jar

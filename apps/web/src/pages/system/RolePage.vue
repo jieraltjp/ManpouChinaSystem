@@ -163,8 +163,10 @@ async function loadPermissionTree() {
   if (!selectedRole.value) return
   permLoading.value = true
   try {
-    const modules = await roleApi.getPermissionTree()
-    const role = await roleApi.getRole(selectedRole.value.id)
+    const [modules, role] = await Promise.all([
+      roleApi.getPermissionTree(),
+      roleApi.getRole(selectedRole.value.id),
+    ])
     selectedRole.value = role
 
     permTreeData.value = modules.map(mod => ({
