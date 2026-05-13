@@ -170,6 +170,7 @@
         "extra": "補充情報"
       },
       "batchHint": "同一主品番の複数子品番を各自的数量・出荷先で一度に作成する場合に使用",
+      "batchDevNote": "（一括入力機能開発中）",
       "selectMasterCodeFirst": "先に主品番を選択してください",
       "addSubItem": "子品番を追加",
       "subProductItemCount": "{count}件のサブ品番",
@@ -2024,6 +2025,7 @@
       "resourceType": "リソースタイプ",
       "resourceId": "リソースID",
       "ipAddress": "IP アドレス",
+      "traceId": "链路 ID",
       "detail": "詳細"
     },
     "filter": {

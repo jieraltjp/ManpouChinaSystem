@@ -1,11 +1,7 @@
-/**
- * 财务管理 API 客户端。
- *
- * 后端现状：FinanceExample 存根（仅 name/status 字段）
- * Phase 7 扩展：增加 taxType, totalCostRmb, actualPaidRmb, currency 等财务字段
- *
- * 文档: docs/business/SPEC-B07-退税-步骤7.md
- */
+// ⚠️ 已废弃 — 财务存根文件，勿在新代码中使用。
+// 历史原因：FinanceExample 存根阶段遗留（仅 name/status 字段）。
+// 当前实现：TaxRefundController 已迁至 taxRefund.ts。
+// 此文件不被任何 .vue 引用，可安全删除。
 import client from './client'
 
 /** 财务状态枚举 */

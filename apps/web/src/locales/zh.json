@@ -170,6 +170,7 @@
         "extra": "补充信息"
       },
       "batchHint": "一次创建多条需求单，适用于同一主货号下多个子货号各有不同数量/目的地的情况",
+      "batchDevNote": "（批量录入功能开发中）",
       "selectMasterCodeFirst": "请先选择主货号",
       "addSubItem": "添加子货号",
       "subProductItemCount": "{count}个子货号",
@@ -2024,6 +2025,7 @@
       "resourceType": "资源类型",
       "resourceId": "资源ID",
       "ipAddress": "IP 地址",
+      "traceId": "链路 ID",
       "detail": "详情"
     },
     "filter": {

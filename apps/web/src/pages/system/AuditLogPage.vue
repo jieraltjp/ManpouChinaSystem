@@ -95,7 +95,7 @@
         <el-descriptions-item :label="$t('auditLog.column.resourceType')">{{ currentLog?.resourceType || '—' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('auditLog.column.resourceId')">{{ currentLog?.resourceId || '—' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('auditLog.column.ipAddress')">{{ currentLog?.ipAddress }}</el-descriptions-item>
-        <el-descriptions-item :label="'traceId'">{{ currentLog?.traceId || '—' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('auditLog.column.traceId')">{{ currentLog?.traceId || '—' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('auditLog.column.detail')">
           <pre v-if="formattedDetail" class="detail-json">{{ formattedDetail }}</pre>
           <span v-else>—</span>
@@ -116,7 +116,7 @@ import { useI18n } from 'vue-i18n'
 import { pageAuditLogs } from '@/api/auditLog'
 import type { AuditLogVO } from '@/api/auditLog'
 
-const { locale: localeRef } = useI18n()
+const { locale: localeRef, t } = useI18n()
 const { hasPermission } = usePermission()
 
 function formatTime(ts: string | undefined | null): string {
@@ -173,7 +173,7 @@ async function loadData() {
     tableData.value = res.content ?? []
     pagination.total = res.totalElements ?? 0
   } catch {
-    ElMessage.error('auditLog.message.loadFailed')
+    ElMessage.error(t('auditLog.message.loadFailed'))
   } finally {
     loading.value = false
   }

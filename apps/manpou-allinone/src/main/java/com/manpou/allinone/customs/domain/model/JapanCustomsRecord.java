@@ -84,7 +84,7 @@ public class JapanCustomsRecord extends BaseEntity {
     @Column(name = "arrival_port", length = 64)
     private String arrivalPort;     // 目的港
 
-    @Column(name = "declared_weight_kg", precision = 10, scale = 3)
+    @Column(name = "declared_weight_kg", precision = 10, scale = 4)
     private BigDecimal declaredWeightKg; // 申报重量（kg）
 
     @Column(name = "declared_volume_cbm", precision = 10, scale = 4)

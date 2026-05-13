@@ -5,7 +5,7 @@
       <div class="profile-left">
         <el-card shadow="never">
           <div class="avatar-section">
-            <div class="avatar-wrap" :class="{ 'is-uploading': avatarUploading }" title="点击更换头像">
+            <div class="avatar-wrap" :class="{ 'is-uploading': avatarUploading }" :title="$t('profile.avatar.hint')">
               <input
                 ref="fileInputRef"
                 type="file"
@@ -137,14 +137,14 @@
               <el-form ref="prefFormRef" :model="prefForm" label-width="140" class="profile-form">
                 <el-form-item :label="$t('profile.preferences.language')">
                   <el-radio-group v-model="prefForm.language">
-                    <el-radio value="zh">中文</el-radio>
-                    <el-radio value="ja">日本語</el-radio>
+                    <el-radio value="zh">{{ $t('auth.languageZh') }}</el-radio>
+                    <el-radio value="ja">{{ $t('auth.languageJa') }}</el-radio>
                   </el-radio-group>
                 </el-form-item>
                 <el-form-item :label="$t('profile.preferences.timezone')">
                   <el-select v-model="prefForm.timezone" style="width:220px">
-                    <el-option value="Asia/Shanghai" label="中国时区 (UTC+8)" />
-                    <el-option value="Asia/Tokyo" label="日本时区 (UTC+9)" />
+                    <el-option value="Asia/Shanghai" :label="$t('dashboard.timezone.CST')" />
+                    <el-option value="Asia/Tokyo" :label="$t('dashboard.timezone.JST')" />
                   </el-select>
                 </el-form-item>
                 <el-form-item>

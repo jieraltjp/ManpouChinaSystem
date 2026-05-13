@@ -347,7 +347,7 @@
       <!-- ========== 批量录入模式 ========== -->
       <div v-else class="batch-mode">
         <p class="batch-hint">{{ $t('demand.dialog.batchHint') }}</p>
-        <p class="batch-hint batch-hint--muted">（批量录入功能开发中）</p>
+        <p class="batch-hint batch-hint--muted">{{ $t('demand.dialog.batchDevNote') }}</p>
       </div>
 
       <template #footer>
