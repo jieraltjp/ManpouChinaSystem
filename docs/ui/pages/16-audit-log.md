@@ -8,7 +8,7 @@
 > **对应后端**: `GET /api/v1/audit-logs`（分页查询）
 > **对应 DB**: SPEC-B11 V9（audit_log 表）
 > **依赖文档**: `SPEC-B11-用户中心与权限体系.md` · `SPEC-B11-IMPLEMENT.md`
-> **状态**: 🔄 Phase4 前端待开发
+> **状态**: ✅ Phase4 已完成（2026-05-12）
 
 ---
 

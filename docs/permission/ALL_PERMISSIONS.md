@@ -72,14 +72,14 @@ audit:                       audit:read, audit:export                           
 
 ---
 
-## DB 权限总览（82条）
+## DB 权限总览（83条）
 
 | 范围 | 条数 | 说明 |
 |------|------|------|
 | ALL_PERMISSIONS Set | 71条 | ADMIN `*:*` 展开包含 |
 | warehouse CRUD | 4条 | DB 有，Set 无（未实现） |
 | notification CRUD | 4条 | DB 有，Set 无（未实现） |
-| DB 总计 | 82条 | V15基线78 + V18 ship 4 |
+| DB 总计 | 83条 | V15基线78 + V18 ship 4 + V19 japan_customs:update 1 |
 
 ---
 

@@ -201,9 +201,9 @@
 
 ---
 
-### 步骤5 — 国内报关（DomesticCustomsRecord）⚠️ Phase2
+### 步骤5 — 国内报关（DomesticCustomsRecord）✅
 
-> **Phase 2 实现**：当前 Phase1 步骤5-8 在详情抽屉中显示占位符
+> **已完成**（Phase 3 完善）：DomesticCustomsPage.vue 已完整实现，包含 batch 批量提交、状态推进
 
 | 字段 | 说明 |
 |------|------|
@@ -218,9 +218,9 @@
 
 ---
 
-### 步骤6 — 日本清关（JapanCustomsRecord）⚠️ Phase2
+### 步骤6 — 日本清关（JapanCustomsRecord）✅
 
-> **Phase 2 实现**：当前 Phase1 步骤5-8 在详情抽屉中显示占位符
+> **已完成**（Phase 3 完善）：JapanCustomsRecordPage.vue 已完整实现，包含 batch 批量创建、start/complete/fail 状态推进
 
 | 字段 | 说明 |
 |------|------|
@@ -235,9 +235,9 @@
 
 ---
 
-### 步骤7 — 退税（TaxRefundRecord）⚠️ Phase2
+### 步骤7 — 退税（TaxRefundRecord）✅
 
-> **Phase 2 实现**：当前 Phase1 步骤5-8 在详情抽屉中显示占位符
+> **已完成**（Phase 3 完善）：TaxRefundRecordPage.vue 已完整实现，包含 submit/complete/noRefund 状态推进
 
 | 字段 | 说明 |
 |------|------|
@@ -250,9 +250,9 @@
 
 ---
 
-### 步骤8 — 运营销售（SalesRecord）⚠️ Phase2
+### 步骤8 — 运营销售（SalesRecord）✅
 
-> **Phase 2 实现**：当前 Phase1 步骤5-8 在详情抽屉中显示占位符
+> **已完成**（Phase 3 完善）：SalesRecordPage.vue 已完整实现，包含 create/updateStock/discontinue/relist 状态推进
 
 | 字段 | 说明 |
 |------|------|

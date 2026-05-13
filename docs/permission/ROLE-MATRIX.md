@@ -117,7 +117,7 @@
 ## V15 SQL 实现
 
 ```sql
--- ADMIN (role_id=1): 全部权限（78条，含 warehouse/notification）
+-- ADMIN (role_id=1): 全部权限（83条，V15:78 + V18:4 + V19:1）
 INSERT IGNORE INTO role_permission (role_id, permission_id)
 SELECT 1, id FROM permission WHERE is_deleted = 0;
 

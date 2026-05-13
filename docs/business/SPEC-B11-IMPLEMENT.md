@@ -1,8 +1,8 @@
 # SPEC-B11 — 用户中心与权限体系 · 实现设计
 
-> **版本**: 1.7.0
+> **版本**: 1.7.1
 > **创建**: 2026-05-01
-> **更新**: 2026-05-13（v1.7.0：修正 Flyway 版本（V17=头像、V18=ship、V19=japan_customs）；Phase 5 头像上传上线；DB 权限 83 条；Controller 示例更新）
+> **更新**: 2026-05-13（v1.7.1：文档审计修正；footer 版本同步为 1.7.1）
 > **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；✅ Phase 4 操作日志完成；✅ Phase 5 个人中心完成；Phase 6 待开发
 > **前置**: SPEC-B11 v1.8.0 · Vite proxy 已配置 · allinone V15/V16/V17/V18/V19 已就绪
 > **关联**: UI-17 · UI-18 · UI-19 · UI-20 · docs/ui/pages/14-user-management.md · docs/ui/pages/15-role-management.md · `docs/permission/`（权限代码对齐文档）
@@ -473,4 +473,4 @@ proxy: {
 
 ---
 
-*文档版本: 1.4.0 · 状态: Phase 2 ✅ Phase 3 ✅ · 2026-05-11*
+*文档版本: 1.7.1 · 状态: Phase 5 ✅ · 2026-05-13*

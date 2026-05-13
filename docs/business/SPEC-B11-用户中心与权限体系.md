@@ -1,8 +1,8 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.12.0
+> **版本**: 1.13.0
 > **创建**: 2026-04-30
-> **更新**: 2026-05-13（v1.12.0：补充 DB 83 条权限明细（V15:78+V18:4+V19:1）；修正 Flyway 版本说明；Phase 5 完成）
+> **更新**: 2026-05-13（v1.13.0：修正权限编码口径（ALL_PERMISSIONS Set: allinone 71条/user-service 66条；DB 83条）；文档审计修正）
 > **状态**: ✅ Phase 2 完成；✅ Phase 3 完成；✅ Phase 4 完成（操作日志全链路）；✅ Phase 5 完成（头像上传）；Phase 6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
@@ -563,7 +563,7 @@ public boolean canLogin(User user) {
 
 ## 4. 权限编码规范
 
-### 4.1 权限编码定义（63 条 ALL_PERMISSIONS Set；DB 实际 78 条 V15）
+### 4.1 权限编码定义（ALL_PERMISSIONS Set: allinone 71条 / user-service 66条；DB 实际 83 条 V15:78 + V18:4 + V19:1）
 
 **格式**: `{模块}:{动作}`
 > ⚠️ 以下权限在早期 SPEC 设计时被标记"已剔除"，但实际 V8 迁移中已实现：`order:read`（ID 78）、`permission:read`（ID 92）、`audit:export`（ID 94）、`customs:approve`（ID 45）、`tax_refund:complete`（ID 64）。
@@ -839,7 +839,7 @@ public Result<DemandVO> update(@PathVariable Long id, @RequestBody @Valid Demand
 | 注册审核？ | ✅ | PENDING → APPROVED/REJECTED 状态机，完整流程 + 登录双重校验 |
 | 数据库范式？ | ✅ | position_ids JSON → user_position 中间表（M-N 规范化） |
 | 幂等性？ | ✅ | approve/reject 改为 PUT，审核操作幂等 |
-| 权限完整性？ | ✅ | 代码 ALL_PERMISSIONS Set 63条（V15 DB 实际78条）；ADMIN `*:*` 特殊处理 |
+| 权限完整性？ | ✅ | 代码 ALL_PERMISSIONS Set allinone 71条/user-service 66条；DB 实际 83 条（V15:78+V18:4+V19:1）；ADMIN `*:*` 特殊处理 |
 | 审计日志？ | ✅ | REGISTER/REGISTRATION_APPROVED/REJECTED action 已补充 |
 
 ---
@@ -910,4 +910,4 @@ Phase 6: 用户注册 + 管理员审核（P1）
 
 ---
 
-*上一页：[SPEC-B10-商品目录](./SPEC-B10-商品目录-产品管理.md) | 下一步：Phase 4 操作日志（UI-19 待开发，Phase 4 未启动）*
+*上一页：[SPEC-B10-商品目录](./SPEC-B10-商品目录-产品管理.md) | 下一步：Phase 6 注册+审核（待开发）*

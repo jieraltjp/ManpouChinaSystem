@@ -1,8 +1,9 @@
 # DB-14 — 货柜与船只数据库设计
 
-> **版本**: v1.0.0
+> **版本**: v1.1.0
 > **创建**: 2026-05-12
-> **状态**: 📋 设计中（对应 SPEC-B12 · 对应 Flyway V18）
+> **更新**: 2026-05-13（Phase 1/2/3 已完成）
+> **状态**: ✅ 已完成（对应 SPEC-B12 · 对应 Flyway V18/V19）
 > **业务步号**: B-12
 > **对应业务文档**: `SPEC-B12-货柜与船只管理.md`
 > **对应 UI 文档**: `docs/ui/pages/19-container.md` · `docs/ui/pages/20-ship.md`
@@ -226,12 +227,12 @@ CROSS JOIN (SELECT id FROM permission WHERE code LIKE 'ship:%') p;
 
 | 组件 | 状态 | 说明 |
 |------|------|------|
-| `Ship` Entity | 📋 待实现 | 继承 BaseEntity |
-| `ShipRepository` | 📋 待实现 | 继承 JpaRepository + JpaSpecificationExecutor |
-| `Container` Entity 扩展 | 📋 待实现 | 新增 ship / timeSlot / arrivalLocation / remarks 字段 |
-| `ContainerRepository` 扩展 | 📋 待实现 | 新增 findByShipId() |
-| `ShipService` | 📋 待实现 | CRUD + assign/unassign |
-| `ShipController` | 📋 待实现 | REST API |
-| `ContainerService` 扩展 | 📋 待实现 | assignShip / unassignShip |
-| `@PreAuthorize` 注解 | 📋 待实现 | 8 个端点 |
-| `@AuditLog` 注解 | 📋 待实现 | 6 个写操作 |
+| `Ship` Entity | ✅ 已完成 | 继承 BaseEntity |
+| `ShipRepository` | ✅ 已完成 | 继承 JpaRepository + JpaSpecificationExecutor |
+| `Container` Entity 扩展 | ✅ 已完成 | 新增 ship / timeSlot / arrivalLocation / remarks 字段 |
+| `ContainerRepository` 扩展 | ✅ 已完成 | 新增 findByShipId() |
+| `ShipService` | ✅ 已完成 | CRUD + assign/unassign |
+| `ShipController` | ✅ 已完成 | REST API |
+| `ContainerService` 扩展 | ✅ 已完成 | assignShip / unassignShip |
+| `@PreAuthorize` 注解 | ✅ 已完成 | 8 个端点 |
+| `@AuditLog` 注解 | ✅ 已完成 | 6 个写操作 |
