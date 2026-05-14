@@ -120,7 +120,7 @@ customs:approve 在 CustomsController 有 @PreAuthorize，MANAGER/OPERATOR/VIEWE
 |------|---------|-----------|---------|
 | allinone JwtAuthenticationFilter | 71 | ✅ | 2026-05-13 |
 | user-service JwtAuthenticationFilter | 66 | ✅ | 2026-05-13 |
-| V15+V18+V19 permission 表 | 82 | — | — |
+| V15+V18+V19 permission 表 | 83 | — | — |
 
 ---
 

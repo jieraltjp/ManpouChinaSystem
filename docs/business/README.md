@@ -32,7 +32,7 @@
 | B-07 | [SPEC-B07-退税-步骤7.md](./SPEC-B07-退税-步骤7.md) | TaxRefundRecord ✅（v1.2.0） |
 | B-08 | [SPEC-B08-运营销售-步骤8.md](./SPEC-B08-运营销售-步骤8.md) | SalesRecord ✅（v1.3.0） |
 | B-09 | [SPEC-B09-订单总览-API设计.md](./SPEC-B09-订单总览-API设计.md) | **核心视图**：聚合接口设计 ✅ |
-| B-10 | [SPEC-B10-商品目录-产品管理.md](./SPEC-B10-商品目录-产品管理.md) | Product + product_factory 多对多设计 🟡 |
+| B-10 | [SPEC-B10-商品目录-产品管理.md](./SPEC-B10-商品目录-产品管理.md) | Product + product_factory 多对多设计 ✅ |
 | B-11 | [SPEC-B11-用户中心与权限体系.md](./SPEC-B11-用户中心与权限体系.md) | 用户管理+角色权限+操作日志+个人中心 📋 |
 | B-12 | [SPEC-B12-货柜与船只管理.md](./SPEC-B12-货柜与船只管理.md) | 货柜管理+船只管理+柜-船关联+状态机 ✅ |
 | B-API | [API-发注管理.md](./API-发注管理.md) | REST 接口契约 |
@@ -57,5 +57,5 @@
 | 07 | B-07 退税 | 07-tax-refund.md | DB-07 tax-refund |
 | 08 | B-08 运营销售 | 08-sales.md | DB-08 sales |
 | 09 | B-09 订单总览 | 09-order-overview.md | DB-09 order-overview |
-| B-11 | B-11 用户中心与权限体系 | UI-17~20 | V4~V9 |
+| B-11 | B-11 用户中心与权限体系 | UI-17~20 | V15/V18/V19 |
 | B-12 | B-12 货柜与船只管理 | UI-19（container v2.0）+ UI-21（ship） | DB-14 ship+container 扩展 |

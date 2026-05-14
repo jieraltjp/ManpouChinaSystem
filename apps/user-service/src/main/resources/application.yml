@@ -49,7 +49,7 @@ spring:
   flyway:
     enabled: false  # 禁用：DB 已由 JPA ddl-auto 或手动维护；avatar 列由 allinone V17 维护，AdminController 一次性修复
 
-  # Redis（可选）
+  # Redis（暂无使用，待安装 Redis 后启用）
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -110,5 +110,9 @@ management:
     web.exposure.include: health,info,metrics,prometheus
   endpoint:
     health.show-details: when_authorized
+    health.redis.enabled: false    # Redis 未安装时排除健康检查
+  health:
+    redis:
+      enabled: false               # 禁用 Redis 健康指标
   metrics.tags:
     service: ${spring.application.name}

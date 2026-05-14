@@ -10,7 +10,7 @@
 |---|---|---|---|
 | `manpou-allinone` | `18090` | Spring Boot | 后端主服务（JAR: `apps/manpou-allinone/target/*.jar`） |
 | `web` | `13000` | Vite Dev Server | 前端（`apps/web/`） |
-| `user-service` | `18081` | Spring Boot | 用户服务（当前未启用） |
+| `user-service` | `18081` | Spring Boot | 用户服务（用户/角色/权限/AuditLog，Phase 2-5 完成） |
 
 **基础设施（Docker，Phase B）：**
 

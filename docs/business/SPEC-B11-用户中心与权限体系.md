@@ -12,13 +12,7 @@
 
 ## 1. 业务背景
 
-当前系统认证处于**脚手架状态**：
-- 登录接口硬编码返回 token，无真实用户表
-- 无用户 CRUD、无角色/权限管理
-- JWT 中 `permissions[]` 未注入 Spring Security
-- 前端无用户管理 UI、无权限控制
-- 无操作日志
-- user-service 与 manpou-allinone 各有一套 signing_key，无法跨服务验证 token
+Phase 2–5 已完成，用户管理、角色权限、操作日志、个人中心均已上线运行。Phase 6（用户注册+审核）待开发。
 
 本设计覆盖：
 - 用户管理（账号/密码/姓名/邮箱/手机/头像/组织/职务/海关资质）
@@ -479,18 +473,18 @@ public boolean canLogin(User user) {
 | 方法 | 路径 | 权限 | 说明 |
 |------|------|:----:|------|
 | GET | `/` | user:read | 分页查询用户列表 |
-| GET | `/pending` ⚠️ | user:approve | 待审核用户列表（⚠️ 未实现，Phase 2） |
+| GET | `/pending` | user:approve | 待审核用户列表（⚠️ 后端已实现，前端 UI 待开发 Phase 6） |
 | GET | `/{id}` | user:read | 获取用户详情 |
 | POST | `/` | user:create | 新建用户（管理员直建，跳过审核） |
-| PUT | `/{id}/approve` ⚠️ | user:approve | 审核通过（⚠️ 未实现，Phase 2） |
-| PUT | `/{id}/reject` ⚠️ | user:approve | 审核拒绝（⚠️ 未实现，Phase 2） |
+| PUT | `/{id}/approve` | user:approve | 审核通过（⚠️ 后端已实现，前端 UI 待开发 Phase 6） |
+| PUT | `/{id}/reject` | user:approve | 审核拒绝（⚠️ 后端已实现，前端 UI 待开发 Phase 6） |
 | PUT | `/{id}` | user:update | 编辑用户 |
 | DELETE | `/{id}` | user:delete | 软删除用户 |
 | PUT | `/{id}/status` | user:update | 启用/禁用用户 |
 | PUT | `/{id}/password/reset` | user:reset_password | 重置密码（生成随机密码） |
 | PUT | `/{id}/roles` | user:update | 分配角色 |
-| PUT | `/{id}/positions` ⚠️ | user:update | 分配职务（⚠️ 未实现，Phase 2） |
-| GET | `/{id}/audit-logs` ⚠️ | user:read | 获取该用户操作日志（⚠️ 未实现，Phase 4） |
+| PUT | `/{id}/positions` | user:update | 分配职务（⚠️ 后端已实现，前端 UI 待开发 Phase 6） |
+| GET | `/{id}/audit-logs` | user:read | 获取该用户操作日志（⚠️ 后端已实现，前端 UI 待开发 Phase 6） |
 
 **查询参数**（GET `/`）：
 | 参数 | 类型 | 说明 |
