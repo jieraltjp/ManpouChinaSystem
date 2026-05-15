@@ -146,6 +146,7 @@ public class AuthController {
      * PUT /api/v1/auth/password
      */
     @PutMapping("/password")
+    @PreAuthorize("isAuthenticated()")
     public Result<Void> changePassword(@Valid @RequestBody ChangePasswordCmd cmd) {
         userService.changePassword(cmd.getOldPassword(), cmd.getNewPassword());
         return Result.ok();

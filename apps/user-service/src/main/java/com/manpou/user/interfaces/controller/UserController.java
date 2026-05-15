@@ -115,6 +115,7 @@ public class UserController {
      * PUT /api/v1/users/me
      */
     @PutMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     public Result<UserVO> updateCurrentUser(@RequestBody UserUpdateCmd cmd) {
         return Result.ok(userService.updateCurrentUser(cmd));
     }

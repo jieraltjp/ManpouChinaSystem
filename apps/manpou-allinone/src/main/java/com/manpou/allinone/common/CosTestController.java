@@ -4,6 +4,7 @@ import com.manpou.allinone.common.config.CosConfig;
 import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.common.service.CosService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,7 +13,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * COS 腾讯云对象存储测试接口（无需认证，仅供开发调试）。
+ * COS 腾讯云对象存储测试接口（仅供开发调试）。
+ * ⚠️ 所有端点必须 ADMIN 角色才可访问。
  *
  * 使用说明：
  * 1. 确保环境变量 COS_SECRET_ID / COS_SECRET_KEY 已配置
@@ -35,6 +37,7 @@ public class CosTestController {
      * GET /api/v1/test/cos/status
      */
     @GetMapping("/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public Result<Map<String, Object>> status() {
         Map<String, Object> info = new LinkedHashMap<>();
         info.put("enabled", cosConfig.isEnabled());
@@ -55,6 +58,7 @@ public class CosTestController {
      * Form: file (MultipartFile)
      */
     @PostMapping("/upload")
+    @PreAuthorize("hasRole('ADMIN')")
     public Result<Map<String, Object>> upload(@RequestParam("file") MultipartFile file) {
         log.info("[COS-Test] upload called, filename={}, size={}", file.getOriginalFilename(), file.getSize());
         String url = cosService.upload(file);
@@ -72,6 +76,7 @@ public class CosTestController {
      * DELETE /api/v1/test/cos/delete?url=...
      */
     @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN')")
     public Result<Void> delete(@RequestParam("url") String url) {
         log.info("[COS-Test] delete called, url={}", url);
         cosService.delete(url);
