@@ -1,8 +1,8 @@
 # SPEC-B11 — 用户中心与权限体系 · 实现设计
 
-> **版本**: 1.7.1
+> **版本**: 1.8.0
 > **创建**: 2026-05-01
-> **更新**: 2026-05-13（v1.7.1：文档审计修正；footer 版本同步为 1.7.1）
+> **更新**: 2026-05-14（v1.8.0：迁移体系修正（V15~V20）；P1表格权限数量修正（63→71）；AuditLogPage/前端JWT渲染状态修正）
 > **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；✅ Phase 4 操作日志完成；✅ Phase 5 个人中心完成；Phase 6 待开发
 > **前置**: SPEC-B11 v1.8.0 · Vite proxy 已配置 · allinone V15/V16/V17/V18/V19/V20 已就绪
 > **关联**: UI-17 · UI-18 · UI-19 · UI-20 · docs/ui/pages/14-user-management.md · docs/ui/pages/15-role-management.md · `docs/permission/`（权限代码对齐文档）
@@ -305,7 +305,7 @@ GET /api/v1/permissions/tree
 
 ### Phase 1 — 数据库 + 登录 ✅ 2026-04-30
 
-1. Flyway V15~V16 迁移（allinone 统一管理：V15=32表+种子数据，V16=procurement_snapshot；user-service 无迁移，依赖 allinone 同一 DB）
+1. Flyway V15~V20 迁移（allinone 统一管理：V15=32表+种子数据，V16=procurement_snapshot，V17=头像字段，V18=ship+container，V19=权限补全，V20=FK索引；user-service 无迁移，依赖 allinone 同一 DB）
 2. JWT 跨服务验证（user-service 签发，allinone 验签）
 3. Vite proxy 配置（`/api/v1/auth` → user-service）
 4. BCrypt hash 正确 seed（admin/admin123）
@@ -448,12 +448,12 @@ proxy: {
 | RolePage.vue | P0 | ✅ 已完成 |
 | 路由注册 | P0 | ✅ 已完成（/system/user + /system/role） |
 | i18n key | P0 | ✅ 已完成 |
-| allinone JwtAuthenticationFilter 提取 permissions | P0 | ✅ 已完成（63条，与 V15 DB 实际对齐） |
+| allinone JwtAuthenticationFilter 提取 permissions | P0 | ✅ 已完成（71条，与 DB 83条对齐，warehouse/notification 9条未入 Set） |
 | allinone 21个业务 Controller 加 @PreAuthorize | P0 | ✅ 已完成（demand/procurement/shipment/qc/logistics/consolidation/container/customs/japan_customs/tax_refund/sales/warehouse/notification/order/product/factory） |
-| 前端权限控制（JWT payload 渲染） | P1 | ⚠️ 待开发 |
-| 前端删除用户按钮 | P1 | ⚠️ 待开发（UserPage.vue 缺少） |
-| 前端筛选器（roleId/departmentId/companyId） | P1 | ⚠️ 待开发（UserPage.vue 缺少） |
-| AuditLogPage.vue | P1 | ⚠️ 待开发 |
+| 前端权限控制（JWT payload 渲染） | P1 | ✅ 已完成（usePermission 从 JWT claims.permissions 读取） |
+| 前端删除用户按钮 | P1 | ⚠️ 待开发（UserPage.vue 暂无删除入口） |
+| 前端筛选器（roleId/departmentId/companyId） | P1 | ⚠️ 待开发（UserPage.vue 当前仅 keyword + status 筛选） |
+| AuditLogPage.vue | P1 | ✅ 已完成（hasPermission('audit:read') + 链路验证通过） |
 | ProfilePage.vue | P1 | ✅ 完成（头像上传+Canvas压缩+base64存储） |
 | 用户分配角色（完整实现） | P1 | ✅ 已完成（UserRoleRepository） |
 | Phase 6 注册+审核（全栈） | P2 | ⚠️ 待开发 |

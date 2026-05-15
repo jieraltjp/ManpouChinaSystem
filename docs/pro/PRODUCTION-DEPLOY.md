@@ -85,7 +85,7 @@ spring:
     validate-on-migrate: true
 ```
 
-`flyway_schema_history` 最终记录：`V1~V14（baseline） + V15 + V16`
+`flyway_schema_history` 最终记录：`V15 + V16 + V17 + V18 + V19 + V20`（V1~V14 已删除）
 
 ### 2.3 验证迁移结果
 
@@ -93,7 +93,7 @@ spring:
 SELECT version, description, installed_rank, applied_on, success
 FROM flyway_schema_history ORDER BY installed_rank;
 
--- 预期：V1~V14（baseline） + V15 + V16，全部 success=1
+-- 预期：V15~V20，全部 success=1
 ```
 
 ---

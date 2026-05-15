@@ -13,7 +13,7 @@
 | 端口 | 18081 |
 | 包名 | `com.manpou.user` |
 | 描述 | 用户认证（JWT RS256）+ 权限管理 |
-| 当前状态 | Phase 2-3 已完成（用户CRUD + 角色权限管理） |
+| 当前状态 | Phase 2-5 已完成（用户CRUD + 角色权限管理 + 操作日志 + 个人中心）；Phase 6 ⚠️ 后端已实现，前端待开发 |
 
 ---
 
@@ -26,7 +26,7 @@
 | Spring Data JPA | ORM |
 | JJWT 0.12.5 | RS256 JWT 签名/验证 |
 | H2（开发）/ MySQL 8（生产） | 数据库 |
-| Flyway | 数据库迁移（生产启用） |
+| Flyway | 数据库迁移（生产禁用，使用 JPA `ddl-auto: none`） |
 
 ---
 
@@ -38,31 +38,37 @@ src/main/java/com/manpou/user/
 ├── interfaces/
 │   └── controller/
 │       ├── AuthController.java          # 登录/公钥
-│       ├── ExampleController.java        # 示例 CRUD
-│       └── KeyManagementController.java # 密钥管理（管理员）
+│       ├── UserController.java         # 用户 CRUD
+│       ├── RoleController.java         # 角色管理
+│       ├── PermissionController.java   # 权限树
+│       ├── AuditLogController.java     # 操作日志接收
+│       └── AdminController.java        # 管理员（DB 迁移）
 ├── application/
 │   ├── dto/
-│   │   ├── ExampleCreateCmd.java
-│   │   ├── ExamplePageQuery.java
-│   │   ├── ExampleQuery.java
-│   │   └── ExampleUpdateCmd.java
-│   ├── usecase/
-│   │   └── ExampleUseCase.java           # 示例业务编排
-│   ├── assembler/
-│   │   └── ExampleAssembler.java         # DTO ↔ Entity 转换
-│   └── KeyManagementService.java         # 密钥轮换服务
+│   │   ├── User*.java                 # 用户相关 DTO（Create/Update/PageQuery/PageVO/VO）
+│   │   ├── Role*.java                 # 角色相关 DTO（Create/Update/Patch/Permissions/VO）
+│   │   ├── Permission*.java           # 权限 DTO（VO/TreeVO）
+│   │   ├── AuditLog*.java             # 审计日志 DTO（Cmd/Query/VO/PageVO）
+│   │   └── PasswordReset*.java        # 密码重置 DTO
+│   ├── service/
+│   │   ├── UserService.java          # 用户业务逻辑
+│   │   ├── RoleService.java          # 角色业务逻辑
+│   │   └── AuditLogService.java      # 审计日志服务
+│   └── KeyManagementService.java      # 密钥轮换服务
 ├── domain/
 │   ├── model/
-│   │   ├── BaseEntity.java               # 审计基类
-│   │   ├── Example.java                   # 示例实体
-│   │   ├── ExampleStatus.java            # 示例状态枚举
-│   │   ├── SigningKey.java               # JWT 签名密钥实体
-│   │   └── SigningKeyStatus.java        # 密钥状态枚举
-│   ├── port/
-│   │   └── SigningKeyPort.java           # 密钥仓储端口（Hexagonal）
+│   │   ├── BaseEntity.java            # 审计基类
+│   │   ├── User.java                  # 用户实体
+│   │   ├── Role.java                 # 角色实体
+│   │   ├── Permission.java            # 权限实体
+│   │   ├── AuditLog.java             # 操作日志实体
+│   │   ├── SigningKey.java           # JWT 签名密钥实体
+│   │   └── SigningKeyStatus.java     # 密钥状态枚举
 │   └── repository/
-│       ├── ExampleRepository.java
-│       ├── JpaRepository.java
+│       ├── UserRepository.java
+│       ├── RoleRepository.java
+│       ├── PermissionRepository.java
+│       ├── AuditLogRepository.java
 │       └── SigningKeyRepository.java
 ├── infrastructure/
 │   ├── config/
@@ -119,10 +125,16 @@ src/main/resources/
 | POST | `/api/v1/auth/login` | ❌ | 用户登录 |
 | GET | `/api/v1/admin/keys` | ADMIN | 获取所有密钥（仅管理员） |
 | POST | `/api/v1/admin/keys/rotate` | ADMIN | 轮换签名密钥 |
-| GET | `/api/v1/examples` | USER | 示例列表 |
-| POST | `/api/v1/examples` | USER | 创建示例 |
-| PUT | `/api/v1/examples/{id}` | USER | 更新示例 |
-| DELETE | `/api/v1/examples/{id}` | USER | 删除示例 |
+| POST | `/api/v1/admin/db/migrate-avatar` | ADMIN | 修复 user.avatar 列类型（一次性迁移） |
+| GET | `/api/v1/users` | user:read | 分页查询用户列表 |
+| GET | `/api/v1/users/{id}` | user:read | 获取用户详情 |
+| GET | `/api/v1/users/me` | user:read | 获取当前用户信息 |
+| POST | `/api/v1/users` | user:create | 新建用户 |
+| PUT | `/api/v1/users/{id}` | user:update | 编辑用户 |
+| DELETE | `/api/v1/users/{id}` | user:delete | 软删除用户 |
+| GET | `/api/v1/roles` | role:read | 分页查询角色列表 |
+| GET | `/api/v1/roles/{id}` | role:read | 获取角色详情 |
+| GET | `/api/v1/permissions/tree` | permission:read | 按模块分组的权限树 |
 
 ---
 

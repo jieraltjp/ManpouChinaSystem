@@ -139,12 +139,12 @@ docker-compose -f docker-compose.yml up -d
 
 ## 7. 测试覆盖
 
-| 层级 | 状态 |
-|------|------|
-| ArchUnit 架构测试 | ✅ 8 个独立服务全部通过（manpou-allinone 待补充） |
-| 单元测试 | 🔴 暂无 |
-| 集成测试 | 🔴 暂无 |
-| E2E 测试 | 🔴 暂无 |
+| 层级 | 状态 | 说明 |
+|------|:----:|------|
+| ArchUnit 架构测试 | ✅ 已有 | manpou-allinone 12 个测试类；user-service 1 个测试类 |
+| 单元测试 | ✅ 已有 | 详见 `docs/test/TEST-STRATEGY.md`（v2.1.0） |
+| 集成测试 | 🔴 待建设 | 需 Docker/Testcontainers |
+| E2E 测试 | 🔴 待建设 | 需 Playwright |
 
 ---
 

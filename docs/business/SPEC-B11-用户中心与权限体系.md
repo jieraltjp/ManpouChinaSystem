@@ -1,8 +1,8 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.13.0
+> **版本**: 1.14.0
 > **创建**: 2026-04-30
-> **更新**: 2026-05-13（v1.13.0：修正权限编码口径（ALL_PERMISSIONS Set: allinone 71条/user-service 66条；DB 83条）；文档审计修正）
+> **更新**: 2026-05-14（v1.14.0：迁移体系重构（V15-V20）；Phase 3/4 前端权限/日志页状态修正；历史迁移章节加注废弃说明）
 > **状态**: ✅ Phase 2 完成；✅ Phase 3 完成；✅ Phase 4 完成（操作日志全链路）；✅ Phase 5 完成（头像上传）；Phase 6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
 > **依赖**: docs/pro/02-user-service.md（user-service 端口 18081）
@@ -140,7 +140,11 @@ user ──── (N) audit_log
 
 ### 2.2 表结构
 
-#### `V4__company.sql`
+> ⚠️ **迁移体系重构**：V4~V14 历史迁移已全部删除（杂乱无章）。公司/部门/职务/用户/角色/权限等表结构现统一在 `V15__baseline_schema.sql` 中。以下为历史迁移参考（仅供参考，实际以 V15 为准）。
+
+#### 历史迁移（已废弃，仅供参考）
+
+##### `V4__company.sql`
 
 ```sql
 CREATE TABLE company (
@@ -165,7 +169,7 @@ INSERT INTO company (company_code, company_name_cn, company_name_jp, company_typ
 ('HAIT-001', '漫普贸易（中国）有限公司', 'マンプ貿易（中国）有限公司', 'TRADER');
 ```
 
-#### `V5__department.sql`
+##### 历史迁移：`V5__department.sql`
 
 ```sql
 CREATE TABLE department (
@@ -185,7 +189,7 @@ CREATE TABLE department (
 );
 ```
 
-#### `V6__position.sql`
+##### 历史迁移：`V6__position.sql`
 
 ```sql
 CREATE TABLE position (
@@ -214,7 +218,7 @@ INSERT INTO position (position_code, position_name_cn, position_name_jp, level_,
 ('CUSTOMS_REP','报关员',   '通関士',      40,  NULL);
 ```
 
-#### `V7__user.sql`
+##### 历史迁移：`V7__user.sql`
 
 ```sql
 CREATE TABLE user (
@@ -267,7 +271,7 @@ INSERT INTO user (user_code, username, password_hash, name_cn, email, company_id
 ('U-0001', 'admin', '$2a$12$t7mRpfsCDNFgj6LET1Y47eH7J2.MJ5i5nAYwYL6SfKdWE7LN.vqUG', '系统管理员', 'admin@manpou.cn', 1, 1, 'SYSTEM');
 ```
 
-#### `V7.1__user_position.sql`（替代 JSON）
+##### 历史迁移：`V7.1__user_position.sql`（替代 JSON）
 
 ```sql
 -- 用户-职务关联表（M-N 规范化，替代原 JSON 字段）
@@ -281,7 +285,7 @@ CREATE TABLE user_position (
 );
 ```
 
-#### `V8__role_permission.sql`
+##### 历史迁移：`V8__role_permission.sql`
 
 ```sql
 CREATE TABLE role (
@@ -338,7 +342,7 @@ INSERT INTO role (role_code, role_name_cn, role_name_jp, role_type, is_editable)
 ('VIEWER',  '查看者',       '閲覧者',           'BUSINESS', 1);
 ```
 
-#### `V9__audit_log.sql`
+##### 历史迁移：`V9__audit_log.sql`
 
 ```sql
 CREATE TABLE audit_log (
@@ -849,7 +853,7 @@ Phase 0: JWT 跨服务验证整合（P0 — 阻塞所有后续）
   ✅ 验证：登录 → 前端获取 token → allinone 业务请求成功
 
 Phase 1: 数据库 + 登录修复（P0）
-  V4 → V5 → V6 → V7 → V7.1 → V8
+  V15 → V16 → V17 → V18 → V19 → V20
   后端: 真实用户表（company/department/position/user/user_position/role/permission）
   后端: AuthController 接入 BCrypt 校验
   后端: JWT 增强 payload（userCode/roles/permissions）
@@ -860,37 +864,36 @@ Phase 2: 用户 CRUD + 角色管理（P0）
   后端: User CRUD API（POST/GET/PUT/DELETE）
   后端: Role CRUD API
   后端: Company/Department/Position API
-  后端: user:approve 审核 API（GET /pending、POST /approve、POST /reject）
+  后端: user:approve 审核 API（GET /pending、POST /approve、POST /reject，后端已实现）
   前端: 用户管理页面
   前端: 角色管理页面
   前端: 权限树（只读）
-  前端: 待审核用户列表 + 审核弹窗
+  ⚠️ 前端: 待审核用户列表 + 审核弹窗（Phase 6 前端 UI）
 
 Phase 3: 权限控制 ✅ 完成
-  ✅ allinone JwtAuthenticationFilter：提取 permissions，ADMIN `*:*` 展开为 ALL_PERMISSIONS（63条）
+  ✅ allinone JwtAuthenticationFilter：提取 permissions，ADMIN `*:*` 展开为 ALL_PERMISSIONS（71条；DB 83条中 warehouse/notification 9条未入 Set）
   ✅ allinone 21个业务 Controller 加 @PreAuthorize
   ✅ 前端: UserPage.vue / RolePage.vue / FactoryPage.vue / ProductPage.vue 按钮级 hasPermission()
   ✅ 前端: 路由守卫 roles 检查（ADMIN/MANAGER）
-  ⚠️ 前端: AuditLogPage.vue 缺少 hasPermission('audit:read') 检查（依赖路由 roles 兜底）
+  ✅ 前端: AuditLogPage.vue 已有 hasPermission('audit:read') 守卫
   ⚠️ 前端: CosTestPage.vue 缺少 roles 限制（后端 /api/v1/test/** 为 permitAll）
 
 Phase 4: 操作日志 ✅ 完成（2026-05-12）
   后端: @AuditLog 注解（allinone/common/annotation/AuditLog.java）
   后端: AuditLogAspect AOP 切面（allinone/infrastructure/aspect/AuditLogAspect.java）
   后端: AuditLogClient HTTP 客户端（allinone/infrastructure/client/AuditLogClient.java）→ user-service audit_log 表
-  后端: 测试端点 POST /api/v1/procurements/test-audit（ProcurementController）
-  前端: 操作日志查询页面（pages/system/AuditLogPage.vue）
-  前端: 路由 /system/audit-log（router/index.ts，roles=ADMIN/MANAGER）
-  前端: API api/auditLog.ts + i18n auditLog.*
+  ✅ 前端: 操作日志查询页面（pages/system/AuditLogPage.vue，hasPermission('audit:read')守卫）
+  ✅ 前端: 路由 /system/audit-log（router/index.ts，roles=ADMIN/MANAGER）
+  ✅ 前端: API api/auditLog.ts + i18n auditLog.*
   ⚠️ audit:export（CSV 导出）未实现
 
-Phase 5: 个人中心（P2）
-  前端: 个人中心页
-  前端: 修改密码
-  前端: 偏好设置（语言/时区）
+Phase 5: 个人中心 ✅ 已完成（2026-05-12）
+  ✅ 前端: 个人中心页（ProfilePage.vue：基本信息/密码修改/偏好设置）
+  ✅ 前端: 修改密码（ChangePasswordCmd + 强度校验）
+  ✅ 前端: 偏好设置（语言/时区）
   后端: notification CRUD 端点已实现（无前端 UI）
   后端: warehouse CRUD 端点已实现（无前端 UI，DB 有但 ALL_PERMISSIONS Set 无）
-  ⚠️ warehouse/notification 前端 UI（Phase 5）
+  ⚠️ warehouse/notification 前端 UI（独立功能，待排期）
 
 Phase 6: 用户注册 + 管理员审核（P1）
   后端: POST /auth/register（public 接口，提交审核）
@@ -899,7 +902,7 @@ Phase 6: 用户注册 + 管理员审核（P1）
   后端: 注册拒绝时记录 reject_reason
   前端: 登录页增加「注册账号」入口
   前端: 审核通过/拒绝 通知（可邮件，可前端提示）
-  ⚠️ user:approve 端点已实现（无前端审核 UI）
+  ⚠️ user:approve 端点已实现（无前端审核 UI，待 Phase 6 开发）
 ```
 
 ---
