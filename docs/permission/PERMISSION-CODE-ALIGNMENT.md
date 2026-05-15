@@ -87,11 +87,11 @@
 
 ---
 
-## 2. ALL_PERMISSIONS Set（63条）
+## 2. ALL_PERMISSIONS Set（allinone 71条 / user-service 66条）
 
 来源：`allinone/infrastructure/security/JwtAuthenticationFilter.java` 和 `user-service/infrastructure/security/JwtAuthenticationFilter.java`。
 
-与 V15 DB 差异分析：
+与 DB 83条差异分析（allinone Set = 71，user-service Set = 66）：
 
 ### 2.1 DB 有、Set 缺（11条）
 

@@ -19,6 +19,10 @@
 |------|------|------|
 | **V15** | `V15__baseline_schema.sql` | 32 张表 DDL + 全部种子数据（幂等；不含 flyway_schema_history 和 procurement_snapshot） |
 | **V16** | `V16__procurement_snapshot.sql` | 发注单快照表（幂等兜底） |
+| **V17** | `V17__user_avatar_mediumtext.sql` | user 表 avatar 字段扩展为 MEDIUMTEXT |
+| **V18** | `V18__ship_and_container_extension.sql` | ship/container/consolidation_pool 表结构 + 权限种子（ship CRUD） |
+| **V19** | `V19__japan_customs_update_permission.sql` | 补充 japan_customs:update 权限（ID=119） |
+| **V20** | `V20__missing_fk_indexes.sql` | logistics_plan / japan_customs_record 外键索引补建 |
 
 **已删除**：V1~V49 共 35 个旧迁移文件（历史包袱，V15 已包含全部表结构）。
 

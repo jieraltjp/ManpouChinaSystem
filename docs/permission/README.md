@@ -61,5 +61,5 @@ ALL_PERMISSIONS Set 是权限体系的唯一真实来源（Source of Truth），
 
 - `docs/business/SPEC-B11-用户中心与权限体系.md` — 业务设计
 - `docs/business/SPEC-B11-IMPLEMENT.md` — 实现设计
-- `docs/pro/PRODUCTION-DEPLOY.md` — 生产部署（V15/V16）
+- `docs/pro/PRODUCTION-DEPLOY.md` — 生产部署（V15-V20）
 - `docs/lessons/LESSONS-USER-SERVICE.md` — 工程教训

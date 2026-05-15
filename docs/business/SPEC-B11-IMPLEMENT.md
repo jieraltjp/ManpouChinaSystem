@@ -4,7 +4,7 @@
 > **创建**: 2026-05-01
 > **更新**: 2026-05-13（v1.7.1：文档审计修正；footer 版本同步为 1.7.1）
 > **状态**: ✅ Phase 2 完成；✅ Phase 3 权限控制完成；✅ Phase 4 操作日志完成；✅ Phase 5 个人中心完成；Phase 6 待开发
-> **前置**: SPEC-B11 v1.8.0 · Vite proxy 已配置 · allinone V15/V16/V17/V18/V19 已就绪
+> **前置**: SPEC-B11 v1.8.0 · Vite proxy 已配置 · allinone V15/V16/V17/V18/V19/V20 已就绪
 > **关联**: UI-17 · UI-18 · UI-19 · UI-20 · docs/ui/pages/14-user-management.md · docs/ui/pages/15-role-management.md · `docs/permission/`（权限代码对齐文档）
 > **INTJ 编号**: DOC-B11-IMPL-001
 
@@ -325,7 +325,7 @@ GET /api/v1/permissions/tree
 
 **缺口 1（allinone JwtAuthenticationFilter）：**
 - `claims.roles()` → `ROLE_USER/ADMIN`，`claims.permissions()` **完全忽略**
-- 修复：复制 `ALL_PERMISSIONS` 常量（63条，与 V15 DB 实际对齐），提取 permissions 到 authorities，ADMIN `*:*` 展开
+- 修复：复制 `ALL_PERMISSIONS` 常量（71条，与 DB 83条对齐，warehouse/notification 9条未入 Set），提取 permissions 到 authorities，ADMIN `*:*` 展开
 - 文件：`JwtAuthenticationFilter.java`
 
 **缺口 2（allinone 业务 Controller）：**
@@ -333,7 +333,7 @@ GET /api/v1/permissions/tree
 - 修复：按 HTTP 方法 + 业务语义加注解（GET:read / POST:create / PUT-PATCH:update / DELETE:delete）
 
 **实现完成清单：**
-1. allinone `JwtAuthenticationFilter` ✅ 提取 permissions（63条，与 V15 DB 实际对齐）
+1. allinone `JwtAuthenticationFilter` ✅ 提取 permissions（71条，与 DB 83条对齐，warehouse/notification 9条未入 Set）
 2. allinone 21个业务 Controller 加 `@PreAuthorize` ✅
 3. user-service `ALL_PERMISSIONS` 与 V15 DB 对齐（warehouse CRUD 在 DB 中但未入 Set；notification CRUD 同理；补充 japan_customs:start/complete, user:approve, permission:read, audit:export）✅
 4. Phase 3 遗留缺口：
