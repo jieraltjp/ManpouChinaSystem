@@ -2154,5 +2154,34 @@
     "menuLabels": {
       "profile": "プロフィール"
     }
+  },
+  "cosTest": {
+    "title": "COS テンセントクラウドテスト",
+    "statusTitle": "設定状態",
+    "refresh": "更新",
+    "enabled": "有効",
+    "disabled": "無効",
+    "secretIdConfigured": "SecretId 設定済み",
+    "secretKeyConfigured": "SecretKey 設定済み",
+    "yes": "はい",
+    "no": "いいえ",
+    "bucket": "Bucket",
+    "region": "Region",
+    "domain": "Domain",
+    "prefix": "保存パス接頭辞",
+    "maxFileSize": "最大ファイルサイズ",
+    "clickRefresh": "「更新」をクリックして設定状態を読み込む",
+    "uploadTitle": "アップロードテスト",
+    "uploadHint": "JPG / PNG / WEBP対応、最大5MB",
+    "dragHint": "画像をここにドラッグ、または<em>クリックして選択</em>",
+    "devOnly": "開発・デバッグのみ",
+    "uploadToCos": "COSにアップロード",
+    "clear": "クリア",
+    "uploadSuccess": "アップロード成功",
+    "filename": "ファイル名",
+    "filesize": "ファイルサイズ",
+    "cosUrl": "COS URL",
+    "deleteFromCos": "COSから削除",
+    "deleteSuccess": "削除成功"
   }
 }

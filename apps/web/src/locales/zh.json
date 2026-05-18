@@ -2154,5 +2154,34 @@
     "menuLabels": {
       "profile": "个人中心"
     }
+  },
+  "cosTest": {
+    "title": "COS 腾讯云测试",
+    "statusTitle": "配置状态",
+    "refresh": "刷新",
+    "enabled": "已启用",
+    "disabled": "未启用",
+    "secretIdConfigured": "SecretId 已配置",
+    "secretKeyConfigured": "SecretKey 已配置",
+    "yes": "是",
+    "no": "否",
+    "bucket": "Bucket",
+    "region": "Region",
+    "domain": "Domain",
+    "prefix": "存储路径前缀",
+    "maxFileSize": "最大文件大小",
+    "clickRefresh": "点击「刷新」加载配置状态",
+    "uploadTitle": "上传测试",
+    "uploadHint": "支持 JPG / PNG / WEBP，单文件最大 5MB",
+    "dragHint": "拖拽图片到此处，或点击选择",
+    "devOnly": "仅供开发调试使用",
+    "uploadToCos": "上传到 COS",
+    "clear": "清除",
+    "uploadSuccess": "上传成功",
+    "filename": "文件名称",
+    "filesize": "文件大小",
+    "cosUrl": "COS URL",
+    "deleteFromCos": "从 COS 删除",
+    "deleteSuccess": "删除成功"
   }
 }
