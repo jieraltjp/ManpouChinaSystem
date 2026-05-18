@@ -5,6 +5,9 @@
  */
 import { ref, computed, watch, type Ref } from 'vue'
 import { orderOverviewApi, type OrderOverviewVO } from '@/api/orderOverview'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 export function useOrderOverview(procurementId: Ref<number>) {
   const overview = ref<OrderOverviewVO | null>(null)
@@ -18,7 +21,7 @@ export function useOrderOverview(procurementId: Ref<number>) {
       const res = await orderOverviewApi.getOverview(procurementId.value)
       overview.value = res.data
     } catch (e: unknown) {
-      error.value = (e as Error).message ?? '加载订单总览失败'
+      error.value = (e as Error).message ?? t('common.message.loadFailed')
     } finally {
       loading.value = false
     }

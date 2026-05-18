@@ -1,2187 +1,2192 @@
 {
-  "app": {
-    "name": "マンプ（中国）管理システム",
-    "logo": "マンプ中国",
-    "logoShort": "MC",
-    "logout": "ログアウト"
-  },
-  "menu": {
-    "dashboard": "ダッシュボード",
-    "procurement-all": "発注管理",
-    "demand": "01 補充需要",
-    "procurement": "02 発注書",
-    "qcRecord": "03 検品記録",
-    "logisticsPlan": "04 配送計画",
-    "consolidationPool": "05 コンソリ池",
-    "container": "06 コンテナ管理",
-    "ship": "船舶管理",
-    "domesticCustoms": "05 国内通関",
-    "japanCustomsRecord": "06 日本通関",
-    "finance": "財務管理",
-    "taxRefundRecord": "07 輸出退税",
-    "sales": "運営販売",
-    "salesRecord": "08 運営販売",
-    "factory": "工場管理",
-    "product": "商品ディレクトリ",
-    "base": "基礎データ",
-    "orderOverview": "注文一覧",
-    "system": "システム管理",
-    "user": "ユーザー管理",
-    "role": "役割管理",
-    "cosTest": "COS テスト",
-    "auditLog": "操作ログ",
-    "profileLabel": "プロフィール"
-  },
-  "auth": {
-    "login": "ログイン",
-    "title": "マンプ（中国）管理システム",
-    "subtitle": "Manpou China System",
-    "welcomeTitle": "跨境貿易発注管理",
-    "welcomeDesc": "発注・倉庫・通関・物流・退税の全过程をカバーし、効率的な運営を実現。",
-    "features": [
-      "発注管理 — 注文の全工程を追跡",
-      "スマート倉庫 — リアルタイム在庫同期",
-      "通関物流 — 一体化した合规通関"
-    ],
-    "language": "言語",
-    "languageZh": "中文",
-    "languageJa": "日本語",
-    "username": "ユーザー名",
-    "password": "パスワード",
-    "usernamePlaceholder": "ユーザー名を入力",
-    "passwordPlaceholder": "パスワードを入力",
-    "usernameRequired": "ユーザー名は必須です",
-    "passwordRequired": "パスワードは必須です",
-    "loginFailed": "ログイン失敗。ユーザー名とパスワードを確認してください"
-  },
-  "dashboard": {
-    "title": "ダッシュボード",
-    "welcome": "おかえりなさい",
-    "stat": {
-      "currentUser": "現在のユーザー",
-      "role": "役割",
-      "tenant": "テナント",
-      "tokenRemaining": "トークン残り"
-    },
-    "jwt": {
-      "title": "JWT Claims",
-      "userIdSub": "User ID (sub)",
-      "tenantId": "Tenant ID",
-      "roles": "役割",
-      "permissions": "権限",
-      "issuedAt": "Issued At",
-      "expiresAt": "Expires At"
-    },
-    "shortcut": {
-      "title": "クイックアクセス",
-      "orderManagement": "発注書管理",
-      "factoryManagement": "工場管理",
-      "relogin": "再ログイン"
-    },
-    "token": {
-      "expired": "期限切れ"
-    }
-  },
-  "demand": {
-    "title": "補充需要管理",
-    "newButton": "新規需要",
-    "newDialogTitle": "新規需要 — 補充需要",
-    "editDialogTitle": "需要編集",
-    "drawerTitle": "需要詳細",
-    "stat": {
-      "total": "全需要",
-      "pending": "確認待ち",
-      "confirmed": "確認済み"
-    },
-    "filter": {
-      "demandType": "需要タイプ",
-      "productCode": "品番",
-      "all": "すべて",
-      "search": "検索",
-      "reset": "リセット"
-    },
-    "column": {
-      "demandCode": "需要番号",
-      "demandType": "タイプ",
-      "productCode": "主品番",
-      "subProductCode": "子品番",
-      "imageUrl": "商品画像",
-      "category": "商品分類",
-      "subProductItems": "子品番明細",
-      "quantity": "数量",
-      "destination": "出荷先",
-      "japanLead": "日本担当",
-      "remarks": "備考",
-      "status": "ステータス",
-      "createTime": "作成日時",
-      "createBy": "作成者",
-      "action": "操作"
-    },
-    "type": {
-      "replenishment": "補充",
-      "newPurchase": "新品",
-      "REPLENISHMENT": "補充",
-      "NEW_PURCHASE": "新品"
-    },
-    "status": {
-      "PENDING": "確認待ち",
-      "CONFIRMED": "確認済み"
-    },
-    "action": {
-      "edit": "編集",
-      "delete": "削除"
-    },
-    "message": {
-      "createSuccess": "需要の入力が完了しました",
-      "updateSuccess": "更新が完了しました",
-      "loadFailed": "読み込みに失敗しました，再試行してください",
-      "deleteSuccess": "削除が完了しました",
-      "deleteConfirm": "需要「{code}」を削除しますか？",
-      "deleteConfirmTitle": "削除確認",
-      "unlinkedSuccess": "関連を解除しました，需要は未確認状態に戻りました",
-      "pleaseLinkInProcurement": "発注書ページで関連付けてください"
-    },
-    "dialog": {
-      "demandType": "需要タイプ",
-      "productCode": "主品番",
-      "productCodePlaceholder": "例：odn012",
-      "subProductCode": "子品番（カラー）",
-      "selectSubCode": "先に主品番を選択してください",
-      "subProductCodePlaceholder": "例：re / wh / bk",
-      "subProductItems": "子品番明細",
-      "quantity": "需要数量",
-      "destination": "出荷先",
-      "destinationPlaceholder": "例：名古屋 / 久留米",
-      "japanLead": "日本担当",
-      "japanLeadPlaceholder": "日本担当氏名",
-      "remarks": "備考",
-      "remarksPlaceholder": "備考を入力",
-      "cancel": "キャンセル",
-      "save": "保存",
-      "colorCount": "{count}色展開",
-      "selectColorVariant": "カラーを選択",
-      "entryMode": {
-        "single": "単一入力",
-        "batch": "一括入力"
-      },
-      "section": {
-        "basic": "基本情報",
-        "detail": "需要明细",
-        "extra": "補充情報"
-      },
-      "batchHint": "同一主品番の複数子品番を各自的数量・出荷先で一度に作成する場合に使用",
-      "batchDevNote": "（一括入力機能開発中）",
-      "selectMasterCodeFirst": "先に主品番を選択してください",
-      "addSubItem": "子品番を追加",
-      "subProductItemCount": "{count}件のサブ品番",
-      "unitTai": "台",
-      "col": {
-        "subCode": "子品番",
-        "quantity": "数量",
-        "destination": "出荷先",
-        "action": "操作"
-      },
-      "linkedDialog": {
-        "title": "関連発注書リスト",
-        "column": {
-          "id": "ID",
-          "factoryName": "関連工場",
-          "productCode": "主品番",
-          "subProductCode": "子品番",
-          "quantity": "数量",
-          "destination": "出荷先",
-          "status": "ステータス"
-        },
-        "noData": "データがありません"
-      }
-    },
-    "validation": {
-      "demandTypeRequired": "需要タイプを選択してください",
-      "productCodeRequired": "主品番は必須です",
-      "quantityRequired": "需要数量は必須です",
-      "subProductItemsRequired": "子品番明細を1件以上入力してください"
-    }
-  },
-  "order": {
-    "title": "発注書管理",
-    "newButton": "新規購入",
-    "newDialogTitle": "新規購入",
-    "editDialogTitle": "購入編集",
-    "drawerTitle": "発注書詳細",
-    "stat": {
-      "total": "発注書総数",
-      "active": "進行中",
-      "completed": "完了",
-      "returned": "退货"
-    },
-    "filter": {
-      "productCode": "商品コード",
-      "productCodePlaceholder": "例：de077",
-      "status": "ステータス",
-      "customerCompany": "顧客会社名",
-      "customerCompanyPlaceholder": "顧客会社名",
-      "all": "すべて",
-      "search": "検索",
-      "reset": "リセット"
-    },
-    "column": {
-      "productCode": "主品番",
-      "subProductCode": "子品番",
-      "category": "商品分類",
-      "factoryName": "関連工場",
-      "priceRmb": "元建て単価",
-      "exchangeRate": "為替レート",
-      "taxPoint": "インボイス係数",
-      "quantity": "数量",
-      "shipmentQuantity": "出荷数量",
-      "estimatedPriceJpy": "見積もり卸値(JPY)",
-      "billingType": "通関タイプ",
-      "customerCompany": "顧客会社名",
-      "productLead": "商品担当",
-      "plannedShipDate": "計画出荷日",
-      "leadTimeDays": "リードタイム(日)",
-      "status": "ステータス",
-      "updateBy": "更新者",
-      "updateTime": "更新日時",
-      "action": "操作"
-    },
-    "status": {
-      "未定": "未定",
-      "予定": "予定",
-      "OEM": "OEM",
-      "発注待": "発注待",
-      "永康": "永康",
-      "直送": "直送",
-      "倉庫着": "倉庫着",
-      "検品": "検品",
-      "現地検品": "現地検品",
-      "エア便": "エア便",
-      "メーカー直送": "メーカー直送",
-      "輸出": "輸出",
-      "国内通関": "国内通関",
-      "通関": "通関",
-      "日本着": "日本着",
-      "日本通関完了": "日本通関完了",
-      "会計": "会計",
-      "完了": "完了",
-      "退货": "退货",
-      "已下单": "出荷済み",
-      "已出货": "出荷済"
-    },
-    "billingType": {
-      "ZHE_LU_KAI_PIAO": "浙魯開票",
-      "CHAO_HUI_TUI_SHUI": "超慧退税",
-      "NO_REFUND": "退税なし",
-      "OTHER": "その他"
-    },
-    "drawer": {
-      "factory": "関連工場",
-      "productCode": "商品コード",
-      "subProductCode": "子品番",
-      "category": "商品分類",
-      "quantity": "数量",
-      "material": "材質",
-      "requiresQc": "検品要",
-      "priceRmb": "元建て単価",
-      "exchangeRate": "為替レート",
-      "taxPoint": "インボイス係数",
-      "estimatedPriceJpy": "見積もり卸値(JPY)",
-      "billingType": "通関タイプ",
-      "customsRemarks": "通関備考",
-      "instructionManual": "説明書",
-      "status": "ステータス",
-      "customerCompany": "顧客会社名",
-      "orderDate": "発注日",
-      "factoryShipDate": "工場出荷日",
-      "plannedShipDate": "計画出荷日",
-      "actualShipDate": "実際出荷日",
-      "leadTimeDays": "リードタイム(日)",
-      "cartonNotes": "カートン備考",
-      "afterSalesDeadline": "售后截止日",
-      "productLead": "商品担当",
-      "japanLead": "日本担当",
-      "chinaLead": "中国担当",
-      "destination": "出荷先",
-      "createBy": "作成者",
-      "createTime": "作成日時",
-      "updateBy": "更新者",
-      "updateTime": "更新日時",
-      "yes": "はい",
-      "no": "いいえ",
-      "close": "閉じる",
-      "edit": "編集"
-    },
-    "dialog": {
-      "linkedDemand": "関連需要",
-      "linkedDemandPlaceholder": "補充需要から商品情報を反映（任意）",
-      "selectFactory": "工場選択",
-      "selectFactoryPlaceholder": "工場を選択してください",
-      "factoryNew": "新規",
-      "factoryEdit": "選択中の工場を編集",
-      "productCode": "商品コード",
-      "productCodePlaceholder": "例：de077",
-      "subProductCode": "子品番",
-      "subProductCodePlaceholder": "例：re/wh/bk（カラー）",
-      "category": "商品分類",
-      "categoryPlaceholder": "（自動入力）",
-      "quantity": "数量",
-      "material": "材質",
-      "materialPlaceholder": "例：plastic/metal",
-      "requiresQc": "検品要",
-      "priceRmb": "元建て単価",
-      "exchangeRate": "為替レート",
-      "taxPoint": "インボイス係数",
-      "estimatedPricePreview": "見積もり卸値",
-      "billingType": "通関タイプ",
-      "billingTypePlaceholder": "通関タイプを選択",
-      "customsRemarks": "通関備考",
-      "customsRemarksPlaceholder": "通関備考",
-      "instructionManual": "説明書",
-      "instructionManualPlaceholder": "説明書備考",
-      "customerCompany": "顧客会社名",
-      "customerCompanyPlaceholder": "顧客会社名",
-      "destination": "出荷先",
-      "destinationPlaceholder": "例：名古屋倉庫",
-      "productLead": "商品担当",
-      "productLeadPlaceholder": "商品担当",
-      "japanLead": "日本担当",
-      "japanLeadPlaceholder": "日本担当",
-      "chinaLead": "中国担当",
-      "chinaLeadPlaceholder": "中国担当",
-      "orderDate": "発注日",
-      "factoryShipDate": "工場出荷日",
-      "plannedShipDate": "計画出荷日",
-      "actualShipDate": "実際出荷日",
-      "leadTimeDays": "リードタイム(日)",
-      "leadTimeDaysPlaceholder": "30/45/60",
-      "cartonNotes": "カートン備考",
-      "cartonNotesPlaceholder": "カートン備考情報",
-      "afterSalesDeadline": "售后截止日",
-      "status": "ステータス",
-      "cancel": "キャンセル",
-      "save": "保存"
-    },
-    "factoryDialog": {
-      "newTitle": "工場新規追加",
-      "editTitle": "工場編集",
-      "factoryName": "工場名称",
-      "factoryNamePlaceholder": "工場正式名称",
-      "province": "省",
-      "provincePlaceholder": "省/自治区",
-      "city": "都市",
-      "cityPlaceholder": "市",
-      "county": "区/県",
-      "countyPlaceholder": "区/県",
-      "roughLocation": "詳細住所",
-      "roughLocationPlaceholder": "工業区/鎮/パーク/番地",
-      "contactName": "担当者",
-      "contactNamePlaceholder": "担当者氏名",
-      "contactPhone": "連絡先",
-      "contactPhonePlaceholder": "携帯または電話",
-      "wechat": "WeChat",
-      "wechatPlaceholder": "WeChat番号",
-      "qq": "QQ番号",
-      "qqPlaceholder": "QQ番号",
-      "cooperationStatus": "協力ステータス",
-      "cancel": "キャンセル",
-      "save": "保存"
-    },
-    "cooperationStatus": {
-      "ACTIVE": "協力中",
-      "SUSPENDED": "一時停止",
-      "ELIMINATED": "廃止",
-      "POTENTIAL": "潜在協力"
-    },
-    "validation": {
-      "factoryRequired": "工場を選択してください",
-      "productCodeRequired": "商品コードは必須です",
-      "productCodeMaxLength": "商品コードは最大32文字",
-      "quantityRequired": "数量は必須です",
-      "quantityPositive": "数量は正の整数である必要があります",
-      "priceRmbRequired": "元建て単価は必須です",
-      "priceRmbNonNegative": "元建て単価は負の数にできません",
-      "exchangeRateRequired": "為替レートは必須です",
-      "exchangeRatePositive": "為替レートは正の数である必要があります",
-      "taxPointRequired": "インボイス係数は必須です",
-      "taxPointPositive": "インボイス係数は正の数である必要があります",
-      "customerCompanyMaxLength": "顧客会社名は最大128文字",
-      "destinationMaxLength": "出荷先は最大128文字",
-      "factoryNameRequired": "工場名称は必須です"
-    },
-    "message": {
-      "createSuccess": "発注書の作成が完了しました",
-      "createSuccessConverting": "発注書を作成しました。需要と関連付け中...",
-      "demandConverted": "需要を発注書に変換しました",
-      "updateSuccess": "更新が完了しました",
-      "deleteSuccess": "削除が完了しました",
-      "deleteConfirm": "発注書「{productCode}」（{quantity}個）を削除しますか？",
-      "deleteConfirmTitle": "削除確認",
-      "factoryCreateSuccess": "工場の作成が完了しました",
-      "detail": "詳細",
-      "statusUpdated": "ステータスが更新されました",
-      "statusUpdateFailed": "ステータスの更新に失敗しました",
-      "qcRecordLinked": "QC記録が既にリンクされています。ステータスを変更できません",
-      "batchLinked": "出荷バッチが既に存在するため、ステータスを変更できません"
-    },
-    "common": {
-      "yes": "はい",
-      "no": "いいえ",
-      "RMB": "RMB"
-    },
-    "action": {
-      "shipmentBatch": "出荷バッチ"
-    }
-  },
-  "inspection": {
-    "title": "検品記録",
-    "newButton": "新規検品",
-    "newDialogTitle": "新規検品",
-    "stat": {
-      "total": "検品記録総数",
-      "pass": "合格",
-      "fail": "不合格"
-    },
-    "filter": {
-      "qcCode": "検品番号",
-      "qcCodePlaceholder": "例：Q-20260421-001",
-      "procurementId": "発注番号",
-      "procurementIdPlaceholder": "発注番号で検索",
-      "shipmentBatchId": "出荷ロット",
-      "shipmentBatchIdPlaceholder": "出荷ロットを選択",
-      "result": "検品結果",
-      "status": "ステータス",
-      "all": "すべて",
-      "search": "検索",
-      "reset": "リセット"
-    },
-    "column": {
-      "qcCode": "検品番号",
-      "shipmentBatchId": "出荷ロット",
-      "procurementId": "発注番号",
-      "productCode": "品番",
-      "subProductCode": "子品番",
-      "sellerName": "出荷元名",
-      "quantity": "出荷数量",
-      "orderQuantity": "受注数量",
-      "inspectionCount": "検査数",
-      "passedCount": "合格数",
-      "defectiveCount": "不良数",
-      "boxCount": "カートン数",
-      "qcDate": "検品日",
-      "result": "結果",
-      "status": "ステータス",
-      "taxRefund": "退税",
-      "action": "操作"
-    },
-    "result": {
-      "pass": "合格",
-      "fail": "不合格"
-    },
-    "qcType": {
-      "onsite": "現地検品",
-      "remote": "リモート検品"
-    },
-    "qcStatus": {
-      "pending": "確認待ち",
-      "completed": "完了",
-      "returnRequested": "退货"
-    },
-    "action": {
-      "detail": "詳細",
-      "edit": "編集",
-      "delete": "削除"
-    },
-    "dialog": {
-      "shipmentBatch": "出荷ロット",
-      "shipmentBatchPlaceholder": "出荷ロットを選択",
-      "procurement": "関連発注書",
-      "procurementPlaceholder": "発注書を選択してください",
-      "inspectionInfo": "検品情報",
-      "productCode": "品番",
-      "productCodePlaceholder": "主品番",
-      "subProductCode": "子品番",
-      "subProductCodePlaceholder": "子品番/枝番",
-      "qcType": "検品タイプ",
-      "qcDate": "検品日",
-      "inspectionCount": "検査数",
-      "passedCount": "合格数",
-      "defectiveCount": "不良数",
-      "result": "検品結果",
-      "qcStatus": "検品ステータス",
-      "boxCount": "カートン数",
-      "cargoInfo": "貨物情報",
-      "boxLengthCm": "カートン長(cm)",
-      "boxWidthCm": "カートン幅(cm)",
-      "boxHeightCm": "カートン高(cm)",
-      "netWeightPerUnit": "正味重量",
-      "grossWeight": "総重量",
-      "taxInclusivePrice": "税込価格",
-      "quantity": "数量",
-      "taxRefund": "退税の有無",
-      "material": "材質",
-      "materialPlaceholder": "例：綿/テトロン/ボール紙",
-      "destination": "出荷先",
-      "destinationPlaceholder": "例：東京/大阪",
-      "qcStandard": "検品基準",
-      "qcStandardPlaceholder": "検収基準の説明",
-      "remarks": "備考",
-      "remarksPlaceholder": "備考情報",
-      "images": "欠陥写真",
-      "imagesPlaceholder": "写真のURL、改行区切り（JSON配列形式）",
-      "imagesTip": "JPG/PNG/WEBP対応、1枚最大5MB、最大9枚",
-      "imageSizeWarning": "画像のサイズは5MBを超えることはできません",
-      "imageCountWarning": "最大9枚の画像をアップロードできます",
-      "imageUploadWarning": "一部の画像アップロードに失敗しました",
-      "selectPlaceholder": "選択してください",
-      "datePlaceholder": "日付を選択",
-      "boxDimension": "カートンサイズ",
-      "createBy": "作成者",
-      "createTime": "作成日時"
-    },
-    "yes": "はい",
-    "no": "いいえ",
-    "drawerTitle": "検品詳細",
-    "validation": {
-      "shipmentBatchRequired": "出荷ロットを選択してください",
-      "productCodeRequired": "品番を入力してください",
-      "inspectionCountRequired": "検査数を入力してください",
-      "passedCountExceeds": "合格数は検査数を超えることはできません"
-    },
-    "message": {
-      "loadFailed": "検品記録の読み込みに失敗しました",
-      "createSuccess": "検品記録の作成が完了しました",
-      "createFailed": "検品記録の作成に失敗しました",
-      "updateSuccess": "検品記録の更新が完了しました",
-      "deleteSuccess": "検品記録の削除が完了しました",
-      "deleteConfirm": "この検品記録を削除してもよろしいですか？",
-      "deleteConfirmTitle": "削除確認"
-    }
-  },
-  "logistics": {
-    "title": "配送計画",
-    "newButton": "新規追加",
-    "stat": {
-      "total": "全配送",
-      "booked": "予約済み",
-      "inTransit": "輸送中"
-    },
-    "filter": {
-      "planType": "配送タイプ",
-      "status": "ステータス",
-      "all": "すべて",
-      "search": "検索",
-      "reset": "リセット"
-    },
-    "planType": {
-      "SEA": "海上輸送",
-      "AIR": "航空輸送",
-      "CONSOLIDATION": "合体"
-    },
-    "status": {
-      "PLANNED": "計画中",
-      "BOOKED": "予約済み",
-      "IN_TRANSIT": "輸送中",
-      "DELIVERED": "配達済み"
-    },
-    "column": {
-      "planCode": "配送番号",
-      "containerNo": "コンテナ番号",
-      "qcCode": "検査番号",
-      "factoryName": "関連工場",
-      "productCode": "品番",
-      "subProductCode": "枝番",
-      "planType": "配送タイプ",
-      "cargoWeightKg": "貨物重量",
-      "cargoVolumeCbm": "容積",
-      "requiresQc": "検品要",
-      "status": "ステータス",
-      "action": "操作",
-      "createTime": "作成日時",
-      "actions": "操作"
-    },
-    "action": {
-      "detail": "詳細",
-      "edit": "編集",
-      "delete": "削除"
-    },
-    "message": {
-      "loadFailed": "配送計画の読み込みに失敗しました",
-      "createSuccess": "配送計画の作成が完了しました",
-      "createFailed": "配送計画の作成に失敗しました",
-      "updateSuccess": "配送計画の更新が完了しました",
-      "updateFailed": "配送計画の更新に失敗しました",
-      "deleteConfirm": "配送計画「{code}」を削除しますか？",
-      "deleteSuccess": "配送計画の削除が完了しました",
-      "deleteFailed": "配送計画の削除に失敗しました"
-    },
-    "requiresQc": {
-      "yes": "検品要",
-      "no": "不要"
-    },
-    "dialog": {
-      "newTitle": "新規追加",
-      "editTitle": "編集",
-      "qcRecord": "関連検査記録",
-      "qcRecordPlaceholder": "検査番号または品番を検索",
-      "factory": "関連工場",
-      "factoryPlaceholder": "工場を選択（検査記録から自動代入）",
-      "containerNo": "コンテナ番号",
-      "containerNoPlaceholder": "同じバッチの貨物には同じコンテナ番号を入力",
-      "procurement": "関連発注書",
-      "procurementPlaceholder": "発注書を選択してください",
-      "cargoInfo": "貨物情報",
-      "productCode": "品番",
-      "productCodePlaceholder": "主品番",
-      "subProductCode": "子品番",
-      "subProductCodePlaceholder": "子品番/枝番",
-      "planType": "配送タイプ",
-      "selectPlaceholder": "選択してください",
-      "requiresQc": "検品要",
-      "cargoLengthCm": "貨物長(cm)",
-      "cargoWidthCm": "貨物幅(cm)",
-      "cargoHeightCm": "貨物高(cm)",
-      "cargoWeightKg": "貨物重量(kg)",
-      "quantity": "数量",
-      "shipPlan": "出荷計画",
-      "estimatedShipDate": "予定出荷日",
-      "actualShipDate": "実際出荷日",
-      "remarks": "備考",
-      "remarksPlaceholder": "備考情報",
-      "cargoDimension": "貨物サイズ",
-      "createTime": "作成日時",
-      "updateTime": "更新日時",
-      "datePlaceholder": "日付を選択",
-      "cancel": "キャンセル",
-      "save": "保存"
-    },
-    "drawerTitle": "配送詳細",
-    "validation": {
-      "qcRecordRequired": "関連検査記録を選択してください",
-      "procurementRequired": "関連発注書を選択してください",
-      "productCodeRequired": "品番を入力してください",
-      "planTypeRequired": "配送タイプを選択してください"
-    },
-    "poolStatus": {
-      "OPEN": "開放中",
-      "PENDING": "積載待ち",
-      "LOADED": "積載済",
-      "SHIPPED": "出荷済"
-    },
-    "containerStatus": {
-      "CREATED": "作成済",
-      "LOADED": "積載済",
-      "DEPARTED": "出発済",
-      "ARRIVED": "到着済"
-    },
-    "container": {
-      "type": {
-        "GP20": "20GP普通",
-        "GP40": "40GP普通",
-        "HC40": "40HC背高",
-        "HC45": "45HC背高"
-      },
-      "newButton": "新規コンテナ",
-      "editTitle": "コンテナ編集",
-      "deleteConfirm": "コンテナ「{code}」を削除しますか？",
-      "containerNoRequired": "コンテナ番号は必須です",
-      "containerNoPlaceholder": "例: TEMU1234567",
-      "filter": {
-        "status": "コンテナステータス",
-        "containerNo": "コンテナ番号",
-        "containerNoHint": "コンテナ番号を入力",
-        "ship": "関連船舶",
-        "shipHint": "船舶を選択"
-      },
-      "column": {
-        "containerNo": "コンテナ番号",
-        "containerType": "サイズ",
-        "totalCbm": "積載容量",
-        "totalWeightKg": "積載重量",
-        "planCount": "計画数",
-        "status": "ステータス",
-        "loadDate": "積載日",
-        "departureDate": "出発日",
-        "arrivalDate": "到着日",
-        "shipName": "船名",
-        "shipNumber": "船号",
-        "timeSlot": "時間帯",
-        "arrivalLocation": " 도착場所",
-        "remarks": "備考"
-      },
-      "dialog": {
-        "assignShip": "船舶を割当",
-        "shipName": "関連船舶",
-        "shipPlaceholder": "船舶を選択してください",
-        "timeSlot": "時間帯",
-        "timeSlotPlaceholder": "例: 2026-W24",
-        "arrivalLocation": "到着場所",
-        "arrivalLocationPlaceholder": "例: 東京倉庫A",
-        "remarks": "備考",
-        "remarksPlaceholder": "備考情報"
-      },
-      "assignSuccess": "船舶割当成功",
-      "unassignSuccess": "船舶を解除しました"
-    },
-    "ship": {
-      "title": "船舶管理",
-      "newButton": "新規船舶追加",
-      "editTitle": "船舶編集",
-      "deleteConfirm": "船舶「{name}」（船号：{number}）を削除しますか？船舶には {count} 個のコンテナがあります。",
-      "deleteSuccess": "船舶を削除しました",
-      "nameRequired": "船名は必須です",
-      "numberRequired": "船号は必須です",
-      "numberExists": "船号は既に存在します",
-      "hasContainers": "この船舶には {count} 個のコンテナがあります。先に解除してください",
-      "filter": {
-        "shipName": "船名",
-        "shipNameHint": "船名を入力",
-        "shipNumber": "船号",
-        "shipNumberHint": "船号を入力",
-        "arrivalPort": "目的港",
-        "arrivalPortHint": "目的港を入力"
-      },
-      "column": {
-        "shipName": "船名",
-        "shipNumber": "船号",
-        "carrier": "船会社",
-        "departurePort": "出発港",
-        "arrivalPort": "目的港",
-        "containerCount": "コンテナ数",
-        "createTime": "作成日時"
-      },
-      "dialog": {
-        "shipName": "船名",
-        "shipNamePlaceholder": "例: 日章丸",
-        "shipNumber": "船号",
-        "shipNumberPlaceholder": "例: V2026A",
-        "carrier": "船会社",
-        "carrierPlaceholder": "例: 中遠海運",
-        "departurePort": "出発港",
-        "departurePortPlaceholder": "例: 上海港",
-        "arrivalPort": "目的港",
-        "arrivalPortPlaceholder": "例: 東京港"
-      }
-    },
-    "pool": {
-      "newButton": "新規コンソリデーションプール",
-      "editTitle": "プール編集",
-      "deleteConfirm": "プール「{code}」を削除しますか？",
-      "createContainer": "コンテナ作成",
-      "createContainerConfirm": "プール「{poolCode}」のコンテナを作成しますか？",
-      "containerCreated": "コンテナ作成成功",
-      "destinationRequired": "寄港地は必須です",
-      "destinationPlaceholder": "例: Tokyo, Yokohama",
-      "filter": {
-        "status": "ステータス",
-        "destinationPort": "寄港地",
-        "destinationHint": "寄港地を入力"
-      },
-      "column": {
-        "poolCode": "プール番号",
-        "destinationPort": "寄港地",
-        "totalCbm": "総容量",
-        "totalWeightKg": "総重量",
-        "planCount": "計画数",
-        "threshold": "トリガー閾値",
-        "status": "ステータス"
-      },
-      "action": {
-        "createContainer": "コンテナ作成"
-      }
-    }
-  },
-  "factory": {
-    "title": "工場管理",
-    "newButton": "新規入力",
-    "stat": {
-      "total": "工場総数",
-      "active": "協力中",
-      "potential": "潜在協力"
-    },
-    "filter": {
-      "factoryName": "工場名称",
-      "factoryNamePlaceholder": "工場名称を入力",
-      "cooperationStatus": "協力状態",
-      "cooperationStatusPlaceholder": "協力状態を選択",
-      "province": "省",
-      "provincePlaceholder": "省",
-      "city": "都市",
-      "cityPlaceholder": "都市",
-      "county": "区/県",
-      "countyPlaceholder": "区/県",
-      "all": "すべて",
-      "search": "検索",
-      "reset": "リセット"
-    },
-    "column": {
-      "factoryCode": "工場番号",
-      "factoryName": "工場名称",
-      "province": "省",
-      "city": "都市",
-      "county": "区/県",
-      "roughLocation": "詳細住所",
-      "contactName": "連絡先",
-      "contactPhone": "連絡先電話",
-      "contactWechat": "WeChat",
-      "contactQq": "QQ番号",
-      "cooperationStatus": "協力状態",
-      "paymentTerms": "支払条件",
-      "action": "操作"
-    },
-    "action": {
-      "detail": "詳細",
-      "edit": "編集",
-      "delete": "削除"
-    },
-    "drawer": {
-      "title": "工場詳細",
-      "section": {
-        "basic": "基本情報",
-        "location": "地理情報",
-        "contact": "連絡先情報",
-        "cooperation": "協力情報",
-        "audit": "監査情報"
-      },
-      "factoryCode": "工場番号",
-      "factoryName": "工場名称",
-      "fullLocation": "詳細住所",
-      "province": "省",
-      "city": "都市",
-      "county": "区/県",
-      "roughLocation": "詳細住所",
-      "longitude": "経度",
-      "latitude": "緯度",
-      "paymentTerms": "支払条件",
-      "address": "住所",
-      "contactName": "連絡先",
-      "contactPhone": "連絡先電話",
-      "contactWechat": "WeChat",
-      "contactQq": "QQ番号",
-      "cooperationStatus": "協力状態",
-      "createBy": "作成者",
-      "notes": "備考",
-      "createTime": "作成日時",
-      "updateTime": "更新日時",
-      "close": "閉じる",
-      "edit": "編集"
-    },
-    "dialog": {
-      "section": {
-        "basic": "基本信息",
-        "location": "地理情報",
-        "contact": "連絡先情報",
-        "cooperation": "協力情報"
-      },
-      "newTitle": "新規工場追加",
-      "editTitle": "工場編集",
-      "factoryName": "工場名称",
-      "factoryNamePlaceholder": "工場正式名称",
-      "cooperationStatus": "協力状態",
-      "cooperationStatusPlaceholder": "状態を選択",
-      "paymentTerms": "支払条件",
-      "paymentTermsPlaceholder": "支払条件を選択",
-      "province": "省",
-      "provincePlaceholder": "省/自治区",
-      "city": "都市",
-      "cityPlaceholder": "市",
-      "county": "区/県",
-      "countyPlaceholder": "区/県",
-      "roughLocation": "詳細住所",
-      "roughLocationPlaceholder": "工業区/鎮/パーク/番地",
-      "contactName": "連絡先",
-      "contactNamePlaceholder": "連絡先氏名",
-      "contactPhone": "連絡先電話",
-      "contactPhonePlaceholder": "携帯または電話",
-      "contactWechat": "WeChat",
-      "contactWechatPlaceholder": "WeChat番号",
-      "contactQq": "QQ番号",
-      "contactQqPlaceholder": "QQ番号",
-      "notes": "備考",
-      "notesPlaceholder": "備考情報",
-      "cancel": "キャンセル",
-      "save": "保存"
-    },
-    "cooperationStatus": {
-      "ACTIVE": "協力中",
-      "SUSPENDED": "一時停止",
-      "ELIMINATED": "廃止",
-      "POTENTIAL": "潜在協力"
-    },
-    "paymentTerms": {
-      "CASH": "現金払い",
-      "NET_30": "月締め30日",
-      "NET_60": "月締め60日",
-      "NET_90": "月締め90日",
-      "CREDIT": "信用支払"
-    },
-    "validation": {
-      "factoryNameRequired": "工場名称は必須です"
-    },
-    "message": {
-      "deleteConfirm": "工場「{name}」（{code}）を削除しますか？",
-      "deleteConfirmTitle": "削除確認",
-      "deleteSuccess": "削除が完了しました",
-      "createSuccess": "工場の作成が完了しました",
-      "updateSuccess": "更新が完了しました"
-    }
-  },
-  "product": {
-    "title": "商品ディレクトリ",
-    "newButton": "新規追加",
-    "stat": {
-      "total": "商品総数"
-    },
-    "filter": {
-      "masterCode": "主品番",
-      "masterCodePlaceholder": "主品番",
-      "keyword": "キーワード",
-      "keywordPlaceholder": "中文/英文名称",
-      "hsCode": "中国HSコード",
-      "hsCodePlaceholder": "中国HSコード",
-      "hsCodeJp": "日本HSコード",
-      "hsCodeJpPlaceholder": "日本HSコード",
-      "factoryName": "工場",
-      "factoryNamePlaceholder": "工場名称",
-      "search": "検索",
-      "reset": "リセット"
-    },
-    "column": {
-      "masterCode": "主品番",
-      "subCode": "子品番",
-      "nameZh": "中文名称",
-      "nameEn": "英文名称",
-      "hsCode": "中国HSコード",
-      "unitPriceRmb": "税込単価(CNY)",
-      "origin": "原産地",
-      "material": "材質",
-      "unit": "単位",
-      "linkedFactories": "関連工場",
-      "action": "操作",
-      "image": "画像",
-      "janCode": "JANコード",
-      "nameJa": "日本語名称",
-      "materialJa": "日本語材質",
-      "category": "分類",
-      "status": "状態",
-      "quantities": "在庫",
-      "cartonQty": "箱数",
-      "hsCodeJp": "日本HSコード",
-      "taxPoint": "インボイス係数",
-      "taxRate": "消費税率",
-      "requiresQc": "品質検査要"
-    },
-    "action": {
-      "detail": "詳細",
-      "edit": "編集",
-      "delete": "削除"
-    },
-    "factoryUnit": "社",
-    "category": {
-      "OEM": "卸売",
-      "ORDINARY": "普通",
-      "FACTORY_DIRECT": "輸出"
-    },
-    "drawer": {
-      "title": "商品詳細",
-      "masterCode": "主品番",
-      "subCode": "子品番",
-      "nameZh": "中文名称",
-      "nameEn": "英文名称",
-      "nameJa": "日本語名称",
-      "hsCode": "HSコード",
-      "unitPriceRmb": "税込単価(CNY)",
-      "taxPoint": "インボイス係数",
-      "taxRate": "消費税率",
-      "netWeight": "正味重量",
-      "grossWeight": "総重量",
-      "lengthCm": "長さ(cm)",
-      "widthCm": "幅(cm)",
-      "heightCm": "高さ(cm)",
-      "declarationElements": "申告要素",
-      "origin": "原産地",
-      "material": "材質",
-      "unit": "単位",
-      "category": "商品分類",
-      "colorName": "カラー名称",
-      "warehouse": "倉庫所属",
-      "requiresQc": "品質検査要",
-      "imageUrl": "商品画像",
-      "remarks": "備考",
-      "lastUsedDate": "最終使用",
-      "unitsPerPackage": "ケース入数",
-      "createTime": "作成日時",
-      "updateTime": "更新日時",
-      "close": "閉じる",
-      "edit": "編集",
-      "section": {
-        "basicInfo": "基本情報",
-        "specInfo": "仕様情報",
-        "factories": "関連工場",
-        "packageInfo": "外箱情報",
-        "warehouseInfo": "倉庫情報"
-      },
-      "noFactories": "関連工場なし",
-      "preferred": "優先",
-      "factoryCode": "工場番号",
-      "factoryLocation": "所在地",
-      "contact": "担当者",
-      "moq": "最小注文数",
-      "leadTimeDays": "リードタイム",
-      "unitPrice": "単価",
-      "days": "日",
-      "janCode": "JANコード",
-      "materialJa": "日本語材質",
-      "status": "商品状態",
-      "quantities": "在庫数量",
-      "cartonQty": "箱数",
-      "amountRmb": "金額(CNY)",
-      "hsCodeJp": "日本HSコード",
-      "volumeCbm": "容積(m³)",
-      "packageLengthCm": "外箱長(cm)",
-      "packageWidthCm": "外箱幅(cm)",
-      "packageHeightCm": "外箱高(cm)",
-      "packageVolumeCbm": "外箱容積(m³)",
-      "packageWeightKg": "外箱重量(kg)"
-    },
-    "dialog": {
-      "newTitle": "新規商品追加",
-      "editTitle": "商品編集",
-      "masterCode": "主品番",
-      "masterCodePlaceholder": "例：odn001",
-      "subCode": "子品番",
-      "subCodePlaceholder": "例：re/wh/bk",
-      "nameZh": "中文名称",
-      "nameZhPlaceholder": "中文名称",
-      "nameEn": "英文名称",
-      "nameEnPlaceholder": "English name",
-      "hsCode": "HSコード",
-      "hsCodePlaceholder": "HSコード",
-      "unitPriceRmb": "税込単価(CNY)",
-      "netWeight": "正味重量(kg)",
-      "grossWeight": "総重量(kg)",
-      "lengthCm": "長さ(cm)",
-      "widthCm": "幅(cm)",
-      "heightCm": "高さ(cm)",
-      "origin": "原産地",
-      "originPlaceholder": "例：中国",
-      "material": "材質",
-      "materialPlaceholder": "例：plastic/metal",
-      "unit": "単位",
-      "unitPlaceholder": "例：個/套/箱",
-      "nameJa": "日本語名称",
-      "nameJaPlaceholder": "日本語名称",
-      "taxPoint": "インボイス係数",
-      "taxPointPlaceholder": "デフォルト 1.1",
-      "taxRate": "消費税率",
-      "taxRatePlaceholder": "デフォルト 0.1",
-      "declarationElements": "申告要素",
-      "declarationElementsPlaceholder": "材質|住所|ブランド",
-      "remarks": "備考",
-      "remarksPlaceholder": "備考情報",
-      "cancel": "キャンセル",
-      "save": "保存",
-      "janCode": "JANコード",
-      "janCodePlaceholder": "バーコード",
-      "materialJa": "日本語材質",
-      "materialJaPlaceholder": "日本語材質",
-      "category": "商品分類",
-      "status": "商品状態",
-      "quantities": "在庫数量",
-      "cartonQty": "箱数",
-      "netWeightPlaceholder": "正味重量",
-      "grossWeightPlaceholder": "総重量",
-      "hsCodeJp": "日本HSコード",
-      "hsCodeJpPlaceholder": "税番",
-      "warehouse": "倉庫所属",
-      "warehousePlaceholder": "倉庫",
-      "requiresQc": "品質検査要",
-      "colorName": "カラー名称",
-      "colorNamePlaceholder": "例：赤色",
-      "imageUrl": "商品画像",
-      "imageUrlPlaceholder": "画像URL"
-    },
-    "validation": {
-      "masterCodeRequired": "主品番は必須です",
-      "nameZhRequired": "中文名称は必須です"
-    },
-    "message": {
-      "deleteConfirm": "商品「{code}」を削除しますか？",
-      "deleteConfirmTitle": "削除確認",
-      "deleteSuccess": "削除が完了しました",
-      "createSuccess": "作成が完了しました",
-      "updateSuccess": "更新が完了しました"
-    }
-  },
-  "orderOverview": {
-    "title": "注文一覧",
-    "back": "一覧に戻る",
-    "print": "印刷",
-    "loadFailed": "注文概要の読み込みに失敗しました",
-    "retry": "再試行",
-    "tab": {
-      "demands": "需要一覧",
-      "procurements": "発注一覧"
-    },
-    "filter": {
-      "keyword": "キーワード",
-      "keywordPlaceholder": "品番/工場名",
-      "search": "検索",
-      "reset": "リセット",
-      "status": "ステータス"
-    },
-    "stepNames": [
-      "補充",
-      "発注",
-      "検品",
-      "调配",
-      "国報",
-      "日報",
-      "退税",
-      "運営"
-    ],
-    "status": {
-      "all": "すべて",
-      "pending": "未処理",
-      "converted": "変換済み",
-      "cancelled": "キャンセル済み"
-    },
-    "column": {
-      "id": "ID",
-      "productCode": "品番",
-      "factoryName": "工場",
-      "status": "ステータス",
-      "orderDate": "発注日",
-      "destination": "送り先",
-      "action": "操作",
-      "demandCode": "需要番号",
-      "demandType": "需要タイプ",
-      "subProductCode": "枝番",
-      "quantity": "数量",
-      "subProductItems": "サブ品番明細",
-      "japanLead": "担当者",
-      "stepStatus": "ステップ進捗",
-      "factoryProvince": "工場省份",
-      "factoryCity": "工場都市",
-      "productNameZh": "商品名（中国語）",
-      "productNameJa": "商品名（日本語）",
-      "productCategory": "商品カテゴリ",
-      "demandStatus": "需要ステータス",
-      "linkedProcurementId": "関連発注書",
-      "demandCreateTime": "作成日時",
-      "createTime": "作成日時"
-    },
-    "step": {
-      "1": "需要",
-      "2": "発注",
-      "3": "検品",
-      "4": "配車"
-    },
-    "action": {
-      "overview": "総览",
-      "view": "詳細",
-      "viewDetail": "完全総览を見る"
-    },
-    "drawerTitle": "需要詳細",
-    "step1": {
-      "title": "ステップ1：補充需要",
-      "demandCode": "需要番号",
-      "demandType": "需要タイプ",
-      "productCode": "品番",
-      "subProductItems": "サブ品番明細",
-      "japanLead": "担当者",
-      "status": "ステータス"
-    },
-    "step2": {
-      "title": "ステップ2：発注書情報",
-      "procurementCode": "発注番号",
-      "factoryName": "工場",
-      "productCode": "品番",
-      "subProductCode": "サブ品番",
-      "quantity": "数量",
-      "priceRmb": "単価(CNY)",
-      "taxPoint": "インボイス係数",
-      "billingType": "通関タイプ",
-      "estimatedPriceJpy": "見積もり卸値(JPY)",
-      "orderDate": "発注日",
-      "plannedShipDate": "納期",
-      "actualShipDate": "実際出荷日",
-      "status": "ステータス"
-    },
-    "step3": {
-      "title": "ステップ3：検品記録",
-      "qcCode": "検品番号",
-      "result": "結果",
-      "qcResult": {
-        "PASS": "合格",
-        "FAIL": "不合格"
-      },
-      "inspectionCount": "検品数",
-      "passedCount": "合格数",
-      "defectiveCount": "不良数",
-      "qcDate": "検品日",
-      "status": "ステータス"
-    },
-    "step4": {
-      "title": "ステップ4：配送計画",
-      "planCode": "配送番号",
-      "planType": "輸送方法",
-      "cargoVolume": "容積(CBM)",
-      "cargoWeight": "重量(kg)",
-      "estimatedShipDate": "予定出荷日",
-      "actualShipDate": "実際出荷日",
-      "status": "ステータス"
-    },
-    "step5": {
-      "title": "ステップ5：国内通関",
-      "customsCode": "通関番号",
-      "containerNo": "コンテナ番号",
-      "productCode": "品番",
-      "estimatedValueCny": "申告価格(CNY)",
-      "createTime": "作成日時",
-      "status": "ステータス"
-    },
-    "step6": {
-      "title": "ステップ6：日本通関",
-      "containerNo": "コンテナ番号",
-      "customsEntryNo": "入境通関番号",
-      "arrivalDate": "到着日",
-      "clearanceDate": "通関完了日",
-      "customsBroker": "通関業者",
-      "importDutyPaid": "輸入関税(JPY)",
-      "consumptionTaxPaid": "消費税(JPY)",
-      "arrivalPort": "仕向港",
-      "status": "ステータス"
-    },
-    "step7": {
-      "title": "ステップ7：退税",
-      "refundCode": "退税番号",
-      "billingType": "通関タイプ",
-      "estimatedRefundRmb": "理論退税額",
-      "actualRefundRmb": "実際退税額",
-      "refundDate": "退税日",
-      "status": "ステータス"
-    },
-    "step8": {
-      "title": "ステップ8：運営販売",
-      "recordCode": "販売番号",
-      "salesChannel": "販売チャネル",
-      "listingDate": "上架日",
-      "initialStock": "初期在庫",
-      "currentStock": "現在庫",
-      "salesQuantity": "累計販売数",
-      "returnRate": "退货率",
-      "sellingPriceJpy": "販売価格(JPY)",
-      "status": "ステータス"
-    },
-    "stepStatusUI": {
-      "notStarted": "記録なし",
-      "placeholder": "未実装",
-      "status": {
-        "notStarted": "未着手",
-        "completed": "完了",
-        "inProgress": "進行中"
-      }
-    },
-    "enum": {
-      "procurement": {
-        "未定": "未定",
-        "予定": "予定",
-        "OEM": "OEM",
-        "発注待": "発注待",
-        "永康": "永康",
-        "直送": "直送",
-        "倉庫着": "倉庫着",
-        "現地検品": "現地検品",
-        "検品": "検品",
-        "エア便": "エア便",
-        "メーカー直送": "メーカー直送",
-        "輸出": "輸出",
-        "国内通関": "国内通関",
-        "通関": "通関",
-        "日本着": "日本着",
-        "日本通関完了": "日本通関完了",
-        "会計": "会計",
-        "完了": "完了",
-        "退货": "退货"
-      },
-      "logistics": {
-        "PLANNED": "作成済",
-        "BOOKED": "予約済",
-        "IN_TRANSIT": "輸送中",
-        "DELIVERED": "配達済"
-      },
-      "domesticCustoms": {
-        "PENDING": "未提出",
-        "SUBMITTED": "提出済",
-        "CLEARED": "通関済",
-        "REJECTED": "却下済"
-      },
-      "japanCustoms": {
-        "PENDING": "未通関",
-        "IN_PROGRESS": "通関中",
-        "CLEARED": "通関完了",
-        "FAILED": "通関失敗"
-      },
-      "taxRefund": {
-        "APPLYING": "申請中",
-        "COMPLETED": "完了",
-        "NO_REFUND": "退税なし"
-      },
-      "sales": {
-        "LISTED": "上架中",
-        "LOW_STOCK": "在庫警告",
-        "OUT_OF_STOCK": "在庫切れ",
-        "DISCONTINUED": "販売停止"
-      },
-      "planType": {
-        "SEA": "船便",
-        "AIR": "航空便"
-      },
-      "billingType": {
-        "ZHE_LU_KAI_PIAO": "浙魯開票",
-        "CHAO_HUI_TUI_SHUI": "超慧退税",
-        "NO_REFUND": "退税なし",
-        "OTHER": "その他"
-      },
-      "salesChannel": {
-        "AMAZON": "Amazon",
-        "MERCALI": "メルカリ",
-        "SELF_SITE": "自社サイト",
-        "OTHER": "その他"
-      }
-    }
-  },
-  "common": {
-    "all": "すべて",
-    "search": "検索",
-    "reset": "リセット",
-    "cancel": "キャンセル",
-    "save": "保存",
-    "confirm": "確認",
-    "delete": "削除",
-    "edit": "編集",
-    "view": "詳細",
-    "warning": "警告",
-    "close": "閉じる",
-    "success": "操作完了",
-    "button": {
-      "search": "検索",
-      "reset": "リセット",
-      "save": "保存"
-    },
-    "loading": "読み込み中...",
-    "noData": "データがありません",
-    "back": "戻る",
-    "locale": {
-      "zh": "中文",
-      "ja": "日本語"
-    },
-    "timezone": {
-      "label": "タイムゾーン",
-      "CST": "中国標準時 (UTC+8)",
-      "JST": "日本標準時 (UTC+9)"
-    },
-    "user": "ユーザー",
-    "units": {
-      "kg": "kg",
-      "cm": "cm",
-      "m3": "m³",
-      "cny": "¥",
-      "jpy": "JPY",
-      "rmb": "RMB"
-    },
-    "format": {
-      "times": "×",
-      "dash": "—",
-      "perUnit": "/個"
-    },
-    "currency": {
-      "cny": "¥"
-    },
-    "error": {
-      "network": "ネットワークエラー、再試行してください",
-      "tokenExpired": "ログイン期限切れです。再度ログインしてください",
-      "forbidden": "このリソースにアクセスする権限がありません",
-      "actionFailed": "操作に失敗しました",
-      "server": "サーバーエラー：",
-      "loadFailed": "読み込みに失敗しました。再試行してください"
-    },
-    "action": {
-      "back": "戻る",
-      "retry": "再試行"
-    },
-    "yes": "はい",
-    "no": "いいえ"
-  },
-  "validation": {
-    "required": "この項目は必須です"
-  },
-  "customs": {
-    "title": "国内通関",
-    "newButton": "新規通関",
-    "batchButton": "コンテナ一括作成",
-    "newDialogTitle": "コンテナ一括通関書類作成",
-    "drawerTitle": "通関書類詳細",
-    "rejectDialogTitle": "通関書類却下",
-    "stat": {
-      "total": "通関書類総数",
-      "pending": "未提出",
-      "submitted": "提出済",
-      "cleared": "通関済"
-    },
-    "filter": {
-      "customsCode": "通関書類番号",
-      "customsCodePlaceholder": "通関書類番号を入力",
-      "containerNo": "コンテナ番号",
-      "containerNoPlaceholder": "コンテナ番号を入力",
-      "procurementId": "仕入書類番号",
-      "procurementIdPlaceholder": "仕入書類ID",
-      "status": "ステータス"
-    },
-    "column": {
-      "customsCode": "通関書類番号",
-      "containerNo": "コンテナ番号",
-      "procurementId": "仕入書類番号",
-      "productCode": "商品コード",
-      "subProductCode": "枝番",
-      "quantity": "数量",
-      "estimatedValueCny": "想定価格(CNY)",
-      "status": "ステータス",
-      "createTime": "作成日時",
-      "action": "操作",
-      "factoryId": "工場ID"
-    },
-    "status": {
-      "pending": "未提出",
-      "submitted": "提出済",
-      "cleared": "通関済",
-      "rejected": "却下済",
-      "created": "通関済",
-      "notCreated": "未通関"
-    },
-    "viewMode": {
-      "list": "リスト表示",
-      "byContainer": "コンテナ別"
-    },
-    "group": {
-      "ungrouped": "未分類",
-      "records": "{n}件"
-    },
-    "action": {
-      "detail": "詳細",
-      "submit": "提出",
-      "clear": "通関",
-      "reject": "却下"
-    },
-    "dialog": {
-      "procurementId": "仕入書類番号",
-      "procurementIdPlaceholder": "仕入書類IDを入力",
-      "containerNo": "コンテナ番号",
-      "containerNoPlaceholder": "コンテナ番号を入力",
-      "productCode": "商品コード",
-      "productCodePlaceholder": "商品コードを入力",
-      "subProductCode": "枝番",
-      "subProductCodePlaceholder": "枝番を入力",
-      "quantity": "数量",
-      "estimatedValueCny": "想定価格(CNY)",
-      "estimatedValueCnyPlaceholder": "想定価格を入力",
-      "factoryId": "工場ID",
-      "factoryIdPlaceholder": "工場IDを入力",
-      "remarks": "備考",
-      "remarksPlaceholder": "備考を入力",
-      "createBy": "作成者",
-      "createTime": "作成日時",
-      "updateTime": "更新日時"
-    },
-    "rejectDialog": {
-      "reasonLabel": "却下理由",
-      "reasonPlaceholder": "却下理由を入力"
-    },
-    "validation": {
-      "productCodeRequired": "商品コードは必須です",
-      "containerNoRequired": "コンテナ番号は必須です",
-      "selectAtLeastOne": "少なくとも1つの配送計画を選択してください"
-    },
-    "batch": {
-      "selectedCount": "{n}件選択済",
-      "selectedPlans": "選択した計画",
-      "totalValue": "合計金額",
-      "items": "件",
-      "createButton": "一括作成 ({n})"
-    },
-    "message": {
-      "loadFailed": "通関書類一覧の読み込みに失敗しました",
-      "createSuccess": "通関書類を作成しました",
-      "batchCreateSuccess": "一括作成成功、{n}件の通関書類を作成しました",
-      "createFailed": "通関書類の作成に失敗しました",
-      "submitSuccess": "通関書類を提出しました",
-      "clearSuccess": "通関書類を通関しました",
-      "rejectSuccess": "通関書類を却下しました",
-      "deleteSuccess": "通関書類を削除しました",
-      "actionFailed": "操作に失敗しました",
-      "deleteConfirm": "この通関書類を削除しますか？"
-    }
-  },
-  "japanCustoms": {
-    "title": "日本通関",
-    "drawerTitle": "通関詳細",
-    "completeDialogTitle": "通関完了",
-    "failDialogTitle": "通関失敗をマーク",
-    "stat": {
-      "total": "通関書類総数",
-      "pending": "未通関",
-      "inProgress": "通関中",
-      "cleared": "通関済",
-      "failed": "通関失敗"
-    },
-    "filter": {
-      "containerNo": "コンテナ番号",
-      "containerNoPlaceholder": "コンテナ番号を入力",
-      "entryNo": "入境通関番号",
-      "entryNoPlaceholder": "入境通関番号を入力",
-      "domesticCustomsId": "国内通関",
-      "status": "ステータス"
-    },
-    "column": {
-      "containerNo": "コンテナ番号",
-      "entryNo": "入境通関番号",
-      "domesticCustomsId": "国内通関",
-      "procurementId": "仕入書類番号",
-      "productCode": "品番",
-      "subProductCode": "子品番",
-      "arrivalPort": "到着港",
-      "arrivalDate": "到着日",
-      "broker": "通関業者",
-      "brokerPhone": "業者電話",
-      "brokerContact": "業者連絡先",
-      "weight": "申告重量",
-      "volume": "申告容積",
-      "importDuty": "輸入関税",
-      "consumptionTax": "消費税",
-      "clearanceDate": "通関日",
-      "status": "ステータス",
-      "remarks": "備考",
-      "action": "操作",
-      "createBy": "作成者",
-      "createTime": "作成日時"
-    },
-    "status": {
-      "pending": "未通関",
-      "inProgress": "通関中",
-      "cleared": "通関済",
-      "failed": "通関失敗"
-    },
-    "viewMode": {
-      "list": "リスト表示",
-      "byContainer": "コンテナ別"
-    },
-    "group": {
-      "ungrouped": "未分類",
-      "records": "{n}件"
-    },
-    "action": {
-      "newCustoms": "新規通関",
-      "batchImport": "一括インポート",
-      "detail": "詳細",
-      "start": "開始",
-      "complete": "完了",
-      "fail": "失敗"
-    },
-    "newDialogTitle": "新規通関",
-    "batchDialogTitle": "コンテナ一括通関作成",
-    "placeholder": {
-      "containerNo": "コンテナ番号を入力"
-    },
-    "dialog": {
-      "modeSingle": "個別",
-      "modeBatch": "一括",
-      "selectDomesticTip": "国内通関を選択（通関済）：",
-      "containerNoPlaceholder": "コンテナ番号で検索...",
-      "noDomesticTip": "利用可能な国内通関記録がありません",
-      "selectedDomestic": "選択した国内通関",
-      "changeDomestic": "再選択"
-    },
-    "batchDialog": {
-      "containerNo": "コンテナ番号",
-      "containerNoPlaceholder": "コンテナ番号で検索...",
-      "selectedCount": "{n}件選択済",
-      "noDataTip": "このコンテナには通関済の国内通関記録がありません",
-      "createButton": "一括作成 ({n})",
-      "createSuccess": "一括作成完了、{n}件の通関記録を作成しました"
-    },
-    "validation": {
-      "containerNoRequired": "コンテナ番号は必須です",
-      "domesticCustomsIdRequired": "国内通関番号は必須です"
-    },
-    "completeDialog": {
-      "importDuty": "輸入関税（JPY）",
-      "consumptionTax": "消費税（JPY）",
-      "clearanceDate": "通関完了日"
-    },
-    "failDialog": {
-      "reasonLabel": "失敗理由",
-      "reasonPlaceholder": "失敗理由を入力"
-    },
-    "message": {
-      "loadFailed": "通関書類一覧の読み込みに失敗しました",
-      "startSuccess": "通関を開始しました",
-      "completeSuccess": "通関が完了しました",
-      "failSuccess": "失敗をマークしました",
-      "deleteSuccess": "削除しました",
-      "actionFailed": "操作に失敗しました",
-      "deleteConfirm": "この通関記録を削除しますか？",
-      "createSuccess": "作成しました",
-      "createFailed": "作成に失敗しました"
-    }
-  },
-  "taxRefund": {
-    "title": "輸出退税",
-    "newButton": "新規退税記録",
-    "newDialogTitle": "新規退税記録",
-    "editDialogTitle": "退税記録を編集",
-    "drawerTitle": "退税詳細",
-    "completeDialogTitle": "退税完了",
-    "stat": {
-      "total": "退税申請総数",
-      "applying": "退税中",
-      "completed": "完了",
-      "noRefund": "退税なし"
-    },
-    "filter": {
-      "procurementId": "発注番号",
-      "status": "ステータス"
-    },
-    "column": {
-      "refundCode": "退税番号",
-      "procurementId": "発注番号",
-      "japanCustomsId": "日本通関番号",
-      "billingType": "請求タイプ",
-      "taxPoint": "税率",
-      "priceRmb": "単価(RMB)",
-      "quantity": "数量",
-      "estimatedRefundRmb": "見積退税額",
-      "actualRefundRmb": "実際退税額",
-      "refundDate": "退税日",
-      "refundBank": "退税銀行",
-      "status": "ステータス",
-      "remarks": "備考",
-      "action": "操作",
-      "createBy": "作成者",
-      "createTime": "作成日時"
-    },
-    "status": {
-      "applying": "退税中",
-      "completed": "完了",
-      "noRefund": "退税なし"
-    },
-    "action": {
-      "detail": "詳細",
-      "complete": "完了",
-      "noRefund": "退税なし",
-      "edit": "編集",
-      "delete": "削除"
-    },
-    "dialog": {
-      "procurement": "関連発注書",
-      "procurementPlaceholder": "発注書を検索（品番または番号を入力）",
-      "japanCustomsId": "日本通関記録",
-      "japanCustomsIdPlaceholder": "日本通関記録IDを入力（任意）",
-      "billingType": "請求タイプ",
-      "priceRmb": "仕入単価(RMB)",
-      "taxPoint": "税率",
-      "quantity": "仕入数量",
-      "exchangeRate": "為替レート",
-      "estimatedRefundPreview": "理論退税額",
-      "estimatedRefundHint": "= 単価 × 数量 × (税率 - 1)",
-      "remarks": "備考",
-      "remarksPlaceholder": "任意、備考情報"
-    },
-    "completeDialog": {
-      "actualRefundRmb": "実際退税金額（RMB）",
-      "refundDate": "退税日",
-      "refundDateRequired": "退税日を選択してください",
-      "refundBank": "退税銀行",
-      "refundBankPlaceholder": "退税銀行を入力（任意）"
-    },
-    "validation": {
-      "procurementRequired": "関連発注書を選択してください"
-    },
-    "message": {
-      "loadFailed": "退税申請一覧の読み込みに失敗しました",
-      "createSuccess": "退税記録の作成が完了しました",
-      "updateSuccess": "退税記録の更新が完了しました",
-      "deleteSuccess": "退税記録の削除が完了しました",
-      "completeSuccess": "退税が完了しました",
-      "noRefundSuccess": "退税なしとマークしました",
-      "deleteConfirm": "この退税記録を削除してもよろしいですか？",
-      "deleteConfirmTitle": "削除確認",
-      "actionFailed": "操作に失敗しました"
-    },
-    "enum": {
-      "billingType": {
-        "ZHE_LU_KAI_PIAO": "浙魯開票",
-        "CHAO_HUI_TUI_SHUI": "超慧退税",
-        "NO_REFUND": "退税なし",
-        "OTHER": "その他"
-      }
-    }
-  },
-  "sales": {
-    "title": "運営販売管理",
-    "newButton": "新規上架",
-    "newDialogTitle": "新規上架",
-    "drawerTitle": "販売詳細",
-    "stockDialogTitle": "在庫更新",
-    "alertButton": "在庫アラート",
-    "alertDialogTitle": "在庫アラート一覧",
-    "stat": {
-      "total": "販売商品数",
-      "listed": "通常販売",
-      "lowStock": "在庫警告",
-      "outOfStock": "在庫切れ",
-      "discontinued": "販売終了"
-    },
-    "filter": {
-      "productCode": "品番",
-      "productCodePlaceholder": "品番を入力",
-      "salesChannel": "販売チャネル",
-      "status": "ステータス"
-    },
-    "channel": {
-      "amazon": "Amazon",
-      "mercali": "メルカリ",
-      "selfSite": "自社サイト",
-      "other": "その他"
-    },
-    "column": {
-      "recordCode": "販売番号",
-      "procurementId": "発注番号",
-      "productCode": "品番",
-      "subProductCode": "子品番",
-      "salesChannel": "販売チャネル",
-      "currentStock": "現在庫",
-      "initialStock": "初期在庫",
-      "safetyStock": "安全在庫",
-      "salesQuantity": "累計販売数",
-      "returnedQuantity": "退货数",
-      "returnRate": "退货率",
-      "sellingPriceJpy": "販売価格(JPY)",
-      "listingDate": "上架日",
-      "status": "ステータス",
-      "remarks": "備考",
-      "action": "操作",
-      "createBy": "作成者",
-      "createTime": "作成日時"
-    },
-    "status": {
-      "listed": "通常販売",
-      "lowStock": "在庫警告",
-      "outOfStock": "在庫切れ",
-      "discontinued": "販売終了"
-    },
-    "action": {
-      "detail": "詳細",
-      "updateStock": "在庫",
-      "discontinue": "終了",
-      "relist": "再上架"
-    },
-    "form": {
-      "procurementId": "関連発注番号",
-      "productCode": "主品番",
-      "productCodePlaceholder": "例：de077",
-      "subProductCode": "子品番",
-      "salesChannel": "販売チャネル",
-      "listingDate": "上架日",
-      "initialStock": "初期在庫",
-      "safetyStock": "安全在庫",
-      "sellingPriceJpy": "販売価格（JPY）",
-      "remarks": "備考"
-    },
-    "stockDialog": {
-      "sold": "販売数",
-      "returned": "退货数"
-    },
-    "message": {
-      "loadFailed": "販売一覧の読み込みに失敗しました",
-      "createSuccess": "上架が完了しました",
-      "createFailed": "上架に失敗しました",
-      "updateSuccess": "在庫を更新しました",
-      "discontinueSuccess": "販売を終了しました",
-      "relistSuccess": "再上架しました",
-      "deleteSuccess": "削除しました",
-      "actionFailed": "操作に失敗しました",
-      "deleteConfirm": "この販売記録を削除しますか？"
-    },
-    "validation": {
-      "salesChannelRequired": "販売チャネルを選択してください"
-    }
-  },
-  "shipmentBatch": {
-    "title": "出荷バッチ管理",
-    "action": {
-      "create": "新規出荷バッチ"
-    },
-    "filter": {
-      "status": "ステータス"
-    },
-    "column": {
-      "batchCode": "バッチ番号",
-      "shipmentQuantity": "出荷数量",
-      "factoryShipDate": "工場出荷日",
-      "actualShipDate": "実際倉庫到着日",
-      "status": "ステータス",
-      "remarks": "備考",
-      "createBy": "作成者",
-      "createTime": "作成日時"
-    },
-    "status": {
-      "待验货": "検査待ち",
-      "验货中": "検査中",
-      "已验货": "検査済",
-      "已取消": "キャンセル済"
-    },
-    "dialog": {
-      "createTitle": "新規出荷バッチ",
-      "editTitle": "出荷バッチ編集",
-      "procurementId": "発注番号",
-      "batchCode": "バッチ番号",
-      "batchCodePlaceholder": "SB-20260501-001",
-      "shipmentQuantity": "出荷数量",
-      "factoryShipDate": "工場出荷日",
-      "actualShipDate": "実際倉庫到着日",
-      "status": "ステータス",
-      "remarks": "備考",
-      "cancel": "キャンセル",
-      "save": "保存"
-    },
-    "validation": {
-      "batchCodeRequired": "バッチ番号は必須です",
-      "quantityRequired": "出荷数量は必須です"
-    },
-    "message": {
-      "createSuccess": "出荷バッチを作成しました",
-      "deleteSuccess": "出荷バッチを削除しました",
-      "deleteConfirm": "出荷バッチ「{batchCode}」を削除しますか？",
-      "deleteConfirmTitle": "削除確認"
-    }
-  },
-  "user": {
-    "title": "ユーザー管理",
-    "newButton": "ユーザーを追加",
-    "exportButton": "Excel出力",
-    "stat": {
-      "total": "ユーザー総数",
-      "normal": "正常",
-      "disabled": "無効",
-      "todayLogin": "本日ログイン"
-    },
-    "filter": {
-      "keyword": "名前/アカウント/メール",
-      "company": "所属会社",
-      "department": "所属部門",
-      "role": "役割",
-      "status": "ステータス"
-    },
-    "column": {
-      "userCode": "ユーザーコード",
-      "username": "ログインアカウント",
-      "nameCn": "中国語名",
-      "nameJp": "日本語名",
-      "email": "メール",
-      "phone": "電話番号",
-      "company": "所属会社",
-      "department": "所属部門",
-      "positions": "役職",
-      "roles": "役割",
-      "status": "ステータス",
-      "lastLoginTime": "最終ログイン",
-      "lastLoginIp": "ログインIP",
-      "createTime": "作成日時",
-      "action": "操作"
-    },
-    "status": {
-      "normal": "正常",
-      "disabled": "無効"
-    },
-    "action": {
-      "detail": "詳細",
-      "edit": "編集",
-      "delete": "削除",
-      "disable": "無効",
-      "enable": "有効化",
-      "resetPassword": "パスワードリセット",
-      "assignRole": "役割を割り当て"
-    },
-    "dialog": {
-      "createTitle": "ユーザーの追加",
-      "editTitle": "ユーザーの編集",
-      "detailTitle": "ユーザー詳細",
-      "roleTitle": "役割を割り当て",
-      "passwordTitle": "パスワードリセット",
-      "userCode": "ユーザーコード",
-      "username": "ログインアカウント",
-      "nameCn": "中国語名",
-      "nameJp": "日本語名",
-      "email": "メール",
-      "phone": "電話番号",
-      "avatar": "アバター",
-      "company": "所属会社",
-      "department": "所属部門",
-      "positions": "役職",
-      "role": "役割",
-      "password": "初期パスワード",
-      "newPassword": "新しいパスワード",
-      "confirmPassword": "パスワード確認",
-      "oldPassword": "以前のパスワード",
-      "cancel": "キャンセル",
-      "save": "保存"
-    },
-    "validation": {
-      "usernameRequired": "ログインアカウントは必須です",
-      "emailRequired": "メールは必須です",
-      "emailFormat": "メールの形式が正しくありません",
-      "passwordRequired": "パスワードは必須です",
-      "passwordMismatch": "パスワードが一致しません",
-      "companyRequired": "会社を選択してください",
-      "departmentRequired": "部門を選択してください"
-    },
-    "message": {
-      "createSuccess": "ユーザーが作成されました",
-      "updateSuccess": "ユーザーが更新されました",
-      "deleteSuccess": "ユーザーが削除されました",
-      "resetPasswordSuccess": "パスワードがリセットされました。大切に保管してください",
-      "deleteConfirm": "ユーザー「{username}」を削除しますか？",
-      "deleteConfirmTitle": "削除の確認"
-    }
-  },
-  "role": {
-    "title": "役割管理",
-    "newButton": "役割を追加",
-    "column": {
-      "roleCode": "役割コード",
-      "roleNameCn": "中国語名",
-      "roleNameJp": "日本語名",
-      "roleType": "役割タイプ",
-      "description": "説明",
-      "userCount": "メンバー数",
-      "createTime": "作成日時"
-    },
-    "type": {
-      "SYSTEM": "システム組み込み",
-      "BUSINESS": "ビジネス役割"
-    },
-    "action": {
-      "edit": "編集",
-      "delete": "削除",
-      "config": "権限を設定"
-    },
-    "dialog": {
-      "createTitle": "役割を追加",
-      "editTitle": "役割を編集",
-      "roleCode": "役割コード",
-      "roleNameCn": "役割名（中国語）",
-      "roleNameJp": "役割名（日本語）",
-      "roleType": "役割タイプ",
-      "description": "説明",
-      "cancel": "キャンセル",
-      "save": "保存設定"
-    },
-    "module": {
-      "procurement": "発注管理",
-      "logistics": "物流管理",
-      "customs": "通関管理",
-      "finance": "財務管理",
-      "sales": "販売管理",
-      "product": "商品管理",
-      "system": "システム管理"
-    },
-    "permission": {
-      "selectTip": "左側の役割を選択して権限を設定してください"
-    },
-    "message": {
-      "createSuccess": "役割が作成されました",
-      "updateSuccess": "役割が更新されました",
-      "deleteSuccess": "役割が削除されました",
-      "deleteConfirm": "役割「{name}」を削除しますか？",
-      "deleteConfirmTitle": "削除の確認",
-      "deleteSystemRole": "システム組み込みの役割は削除できません",
-      "permissionSaved": "権限設定が保存されました"
-    },
-    "validation": {
-      "roleCodeRequired": "役割コードは必須です",
-      "roleNameCnRequired": "役割名は必須です"
-    }
-  },
-  "auditLog": {
-    "title": "操作ログ",
-    "column": {
-      "createTime": "操作時間",
-      "username": "アカウント",
-      "operatorName": "操作者",
-      "module": "モジュール",
-      "action": "アクション",
-      "httpMethod": "メソッド",
-      "httpUrl": "URL",
-      "resourceType": "リソースタイプ",
-      "resourceId": "リソースID",
-      "ipAddress": "IP アドレス",
-      "traceId": "链路 ID",
-      "detail": "詳細"
-    },
-    "filter": {
-      "userId": "操作者アカウント",
-      "module": "モジュール",
-      "action": "アクション",
-      "resourceType": "リソースタイプ",
-      "startTime": "開始時間",
-      "endTime": "終了時間",
-      "reset": "リセット",
-      "search": "検索"
-    },
-    "action": {
-      "viewDetail": "詳細を見る"
-    },
-    "detail": {
-      "title": "ログ詳細",
-      "close": "閉じる"
-    },
-    "module": {
-      "auth": "認証",
-      "procurement": "発注管理",
-      "factory": "工場管理",
-      "product": "商品管理",
-      "user": "ユーザー管理",
-      "role": "役割管理",
-      "logistics": "物流管理",
-      "replenishment": "補充需求",
-      "japan_customs": "日本通関",
-      "customs": "通関管理",
-      "sales": "販売管理",
-      "qc": "検品管理",
-      "tax_refund": "退税管理",
-      "shipment": "出荷管理",
-      "warehouse": "倉庫管理",
-      "notification": "通知管理",
-      "finance": "財務管理"
-    },
-    "actionTag": {
-      "LOGIN": "ログイン",
-      "LOGOUT": "ログアウト",
-      "CREATE": "新規作成",
-      "UPDATE": "更新",
-      "DELETE": "削除",
-      "APPROVE": "承認",
-      "REJECT": "却下",
-      "AUTH_DENIED": "権限不足"
-    },
-    "message": {
-      "loadFailed": "ログ一覧の読み込みに失敗しました",
-      "detailLoadFailed": "ログ詳細の読み込みに失敗しました"
-    },
-    "noPermission": "このページにアクセスする権限がありません"
-  },
-  "profile": {
-    "title": "プロフィール",
-    "tab": {
-      "info": "基本情報",
-      "security": "アカウントセキュリティ",
-      "preferences": "環境設定"
-    },
-    "info": {
-      "nameCn": "中国語名",
-      "nameJp": "日本語名",
-      "email": "メール",
-      "phone": "電話番号",
-      "avatar": "アバター",
-      "company": "所属会社",
-      "department": "所属部門",
-      "positions": "役職",
-      "status": "アカウントステータス",
-      "createdAt": "作成日時",
-      "lastLogin": "最終ログイン",
-      "roles": "役割",
-      "uploadAvatar": "アバターをアップロード",
-      "uploadTip": "JPG/PNG対応、最大2MB"
-    },
-    "avatar": {
-      "hint": "アバターをクリックして変更（200×200 JPG）",
-      "uploadSuccess": "アバターをアップロードしました",
-      "invalidType": "JPG、PNG、WebP形式のみ対応しています",
-      "fileTooLarge": "ファイルサイズは5MB以下にしてください",
-      "loadError": "画像読み込みに失敗しました。再試行してください"
-    },
-    "security": {
-      "changePassword": "パスワード変更",
-      "oldPassword": "以前のパスワード",
-      "newPassword": "新しいパスワード",
-      "confirmPassword": "パスワード確認",
-      "passwordStrength": "パスワード強度",
-      "loginHistory": "ログイン履歴",
-      "device": "デバイス",
-      "passwordRules": "パスワードルール",
-      "rules": [
-        "8-20文字",
-        "大文字、小文字、数字を含む必要あり",
-        "現在のパスワードと同じにはできません"
-      ]
-    },
-    "preferences": {
-      "language": "インターフェース言語",
-      "timezone": "インターフェースタイムゾーン",
-      "dateFormat": "日付形式",
-      "numberFormat": "数字形式",
-      "tableDensity": "テーブル密度"
-    },
-    "status": {
-      "NORMAL": "正常",
-      "DISABLED": "無効"
-    },
-    "strength": {
-      "weak": "弱い",
-      "medium": "中",
-      "strong": "強い"
-    },
-    "message": {
-      "loadFailed": "ユーザー情報の読み込みに失敗しました",
-      "updateSuccess": "保存しました",
-      "updateFailed": "保存に失敗しました",
-      "passwordChangeSuccess": "パスワードを変更しました",
-      "passwordChangeFailed": "パスワード変更に失敗しました",
-      "passwordMismatch": "パスワードが一致しません",
-      "passwordWrong": "以前のパスワードが正しくありません",
-      "passwordWeak": "パスワード強度が不足しています"
-    },
-    "menuLabels": {
-      "profile": "プロフィール"
-    }
-  },
-  "cosTest": {
-    "title": "COS テンセントクラウドテスト",
-    "statusTitle": "設定状態",
-    "refresh": "更新",
-    "enabled": "有効",
-    "disabled": "無効",
-    "secretIdConfigured": "SecretId 設定済み",
-    "secretKeyConfigured": "SecretKey 設定済み",
-    "yes": "はい",
-    "no": "いいえ",
-    "bucket": "Bucket",
-    "region": "Region",
-    "domain": "Domain",
-    "prefix": "保存パス接頭辞",
-    "maxFileSize": "最大ファイルサイズ",
-    "clickRefresh": "「更新」をクリックして設定状態を読み込む",
-    "uploadTitle": "アップロードテスト",
-    "uploadHint": "JPG / PNG / WEBP対応、最大5MB",
-    "dragHint": "画像をここにドラッグ、または<em>クリックして選択</em>",
-    "devOnly": "開発・デバッグのみ",
-    "uploadToCos": "COSにアップロード",
-    "clear": "クリア",
-    "uploadSuccess": "アップロード成功",
-    "filename": "ファイル名",
-    "filesize": "ファイルサイズ",
-    "cosUrl": "COS URL",
-    "deleteFromCos": "COSから削除",
-    "deleteSuccess": "削除成功"
-  }
+	"app": {
+		"name": "マンプ（中国）管理システム",
+		"logo": "マンプ中国",
+		"logoShort": "MC",
+		"logout": "ログアウト"
+	},
+	"menu": {
+		"dashboard": "ダッシュボード",
+		"procurement-all": "発注管理",
+		"demand": "01 補充需要",
+		"procurement": "02 発注書",
+		"qcRecord": "03 検品記録",
+		"logisticsPlan": "04 配送計画",
+		"consolidationPool": "05 コンソリ池",
+		"container": "06 コンテナ管理",
+		"ship": "船舶管理",
+		"domesticCustoms": "05 国内通関",
+		"japanCustomsRecord": "06 日本通関",
+		"finance": "財務管理",
+		"taxRefundRecord": "07 輸出退税",
+		"sales": "運営販売",
+		"salesRecord": "08 運営販売",
+		"factory": "工場管理",
+		"product": "商品ディレクトリ",
+		"base": "基礎データ",
+		"orderOverview": "注文一覧",
+		"system": "システム管理",
+		"user": "ユーザー管理",
+		"role": "役割管理",
+		"cosTest": "COS テスト",
+		"auditLog": "操作ログ",
+		"profileLabel": "プロフィール"
+	},
+	"auth": {
+		"login": "ログイン",
+		"title": "マンプ（中国）管理システム",
+		"subtitle": "Manpou China System",
+		"welcomeTitle": "跨境貿易発注管理",
+		"welcomeDesc": "発注・倉庫・通関・物流・退税の全过程をカバーし、効率的な運営を実現。",
+		"features": [
+			"発注管理 — 注文の全工程を追跡",
+			"スマート倉庫 — リアルタイム在庫同期",
+			"通関物流 — 一体化した合规通関"
+		],
+		"language": "言語",
+		"languageZh": "中文",
+		"languageJa": "日本語",
+		"username": "ユーザー名",
+		"password": "パスワード",
+		"usernamePlaceholder": "ユーザー名を入力",
+		"passwordPlaceholder": "パスワードを入力",
+		"usernameRequired": "ユーザー名は必須です",
+		"passwordRequired": "パスワードは必須です",
+		"loginFailed": "ログイン失敗。ユーザー名とパスワードを確認してください"
+	},
+	"dashboard": {
+		"title": "ダッシュボード",
+		"welcome": "おかえりなさい",
+		"stat": {
+			"currentUser": "現在のユーザー",
+			"role": "役割",
+			"tenant": "テナント",
+			"tokenRemaining": "トークン残り"
+		},
+		"jwt": {
+			"title": "JWT Claims",
+			"userIdSub": "User ID (sub)",
+			"tenantId": "Tenant ID",
+			"roles": "役割",
+			"permissions": "権限",
+			"issuedAt": "Issued At",
+			"expiresAt": "Expires At"
+		},
+		"shortcut": {
+			"title": "クイックアクセス",
+			"orderManagement": "発注書管理",
+			"factoryManagement": "工場管理",
+			"relogin": "再ログイン"
+		},
+		"token": {
+			"expired": "期限切れ"
+		}
+	},
+	"demand": {
+		"title": "補充需要管理",
+		"newButton": "新規需要",
+		"newDialogTitle": "新規需要 — 補充需要",
+		"editDialogTitle": "需要編集",
+		"drawerTitle": "需要詳細",
+		"stat": {
+			"total": "全需要",
+			"pending": "確認待ち",
+			"confirmed": "確認済み"
+		},
+		"filter": {
+			"demandType": "需要タイプ",
+			"productCode": "品番",
+			"all": "すべて",
+			"search": "検索",
+			"reset": "リセット"
+		},
+		"column": {
+			"demandCode": "需要番号",
+			"demandType": "タイプ",
+			"productCode": "主品番",
+			"subProductCode": "子品番",
+			"imageUrl": "商品画像",
+			"category": "商品分類",
+			"subProductItems": "子品番明細",
+			"quantity": "数量",
+			"destination": "出荷先",
+			"japanLead": "日本担当",
+			"remarks": "備考",
+			"status": "ステータス",
+			"createTime": "作成日時",
+			"createBy": "作成者",
+			"action": "操作"
+		},
+		"type": {
+			"replenishment": "補充",
+			"newPurchase": "新品",
+			"REPLENISHMENT": "補充",
+			"NEW_PURCHASE": "新品"
+		},
+		"status": {
+			"PENDING": "確認待ち",
+			"CONFIRMED": "確認済み"
+		},
+		"action": {
+			"edit": "編集",
+			"delete": "削除"
+		},
+		"message": {
+			"createSuccess": "需要の入力が完了しました",
+			"updateSuccess": "更新が完了しました",
+			"loadFailed": "読み込みに失敗しました，再試行してください",
+			"deleteSuccess": "削除が完了しました",
+			"deleteConfirm": "需要「{code}」を削除しますか？",
+			"deleteConfirmTitle": "削除確認",
+			"unlinkedSuccess": "関連を解除しました，需要は未確認状態に戻りました",
+			"pleaseLinkInProcurement": "発注書ページで関連付けてください"
+		},
+		"dialog": {
+			"demandType": "需要タイプ",
+			"productCode": "主品番",
+			"productCodePlaceholder": "例：odn012",
+			"subProductCode": "子品番（カラー）",
+			"selectSubCode": "先に主品番を選択してください",
+			"subProductCodePlaceholder": "例：re / wh / bk",
+			"subProductItems": "子品番明細",
+			"quantity": "需要数量",
+			"destination": "出荷先",
+			"destinationPlaceholder": "例：名古屋 / 久留米",
+			"japanLead": "日本担当",
+			"japanLeadPlaceholder": "日本担当氏名",
+			"remarks": "備考",
+			"remarksPlaceholder": "備考を入力",
+			"cancel": "キャンセル",
+			"save": "保存",
+			"colorCount": "{count}色展開",
+			"selectColorVariant": "カラーを選択",
+			"entryMode": {
+				"single": "単一入力",
+				"batch": "一括入力"
+			},
+			"section": {
+				"basic": "基本情報",
+				"detail": "需要明细",
+				"extra": "補充情報"
+			},
+			"batchHint": "同一主品番の複数子品番を各自的数量・出荷先で一度に作成する場合に使用",
+			"batchDevNote": "（一括入力機能開発中）",
+			"selectMasterCodeFirst": "先に主品番を選択してください",
+			"addSubItem": "子品番を追加",
+			"subProductItemCount": "{count}件のサブ品番",
+			"unitTai": "台",
+			"col": {
+				"subCode": "子品番",
+				"quantity": "数量",
+				"destination": "出荷先",
+				"action": "操作"
+			},
+			"linkedDialog": {
+				"title": "関連発注書リスト",
+				"column": {
+					"id": "ID",
+					"factoryName": "関連工場",
+					"productCode": "主品番",
+					"subProductCode": "子品番",
+					"quantity": "数量",
+					"destination": "出荷先",
+					"status": "ステータス"
+				},
+				"noData": "データがありません"
+			}
+		},
+		"validation": {
+			"demandTypeRequired": "需要タイプを選択してください",
+			"productCodeRequired": "主品番は必須です",
+			"quantityRequired": "需要数量は必須です",
+			"subProductItemsRequired": "子品番明細を1件以上入力してください"
+		}
+	},
+	"order": {
+		"title": "発注書管理",
+		"newButton": "新規購入",
+		"newDialogTitle": "新規購入",
+		"editDialogTitle": "購入編集",
+		"drawerTitle": "発注書詳細",
+		"stat": {
+			"total": "発注書総数",
+			"active": "進行中",
+			"completed": "完了",
+			"returned": "退货"
+		},
+		"filter": {
+			"productCode": "商品コード",
+			"productCodePlaceholder": "例：de077",
+			"status": "ステータス",
+			"customerCompany": "顧客会社名",
+			"customerCompanyPlaceholder": "顧客会社名",
+			"all": "すべて",
+			"search": "検索",
+			"reset": "リセット"
+		},
+		"column": {
+			"productCode": "主品番",
+			"subProductCode": "子品番",
+			"category": "商品分類",
+			"factoryName": "関連工場",
+			"priceRmb": "元建て単価",
+			"exchangeRate": "為替レート",
+			"taxPoint": "インボイス係数",
+			"quantity": "数量",
+			"shipmentQuantity": "出荷数量",
+			"estimatedPriceJpy": "見積もり卸値(JPY)",
+			"billingType": "通関タイプ",
+			"customerCompany": "顧客会社名",
+			"productLead": "商品担当",
+			"plannedShipDate": "計画出荷日",
+			"leadTimeDays": "リードタイム(日)",
+			"status": "ステータス",
+			"updateBy": "更新者",
+			"updateTime": "更新日時",
+			"action": "操作"
+		},
+		"status": {
+			"未定": "未定",
+			"予定": "予定",
+			"OEM": "OEM",
+			"発注待": "発注待",
+			"永康": "永康",
+			"直送": "直送",
+			"倉庫着": "倉庫着",
+			"検品": "検品",
+			"現地検品": "現地検品",
+			"エア便": "エア便",
+			"メーカー直送": "メーカー直送",
+			"輸出": "輸出",
+			"国内通関": "国内通関",
+			"通関": "通関",
+			"日本着": "日本着",
+			"日本通関完了": "日本通関完了",
+			"会計": "会計",
+			"完了": "完了",
+			"退货": "退货",
+			"已下单": "出荷済み",
+			"已出货": "出荷済"
+		},
+		"billingType": {
+			"ZHE_LU_KAI_PIAO": "浙魯開票",
+			"CHAO_HUI_TUI_SHUI": "超慧退税",
+			"NO_REFUND": "退税なし",
+			"OTHER": "その他"
+		},
+		"drawer": {
+			"factory": "関連工場",
+			"productCode": "商品コード",
+			"subProductCode": "子品番",
+			"category": "商品分類",
+			"quantity": "数量",
+			"material": "材質",
+			"requiresQc": "検品要",
+			"priceRmb": "元建て単価",
+			"exchangeRate": "為替レート",
+			"taxPoint": "インボイス係数",
+			"estimatedPriceJpy": "見積もり卸値(JPY)",
+			"billingType": "通関タイプ",
+			"customsRemarks": "通関備考",
+			"instructionManual": "説明書",
+			"status": "ステータス",
+			"customerCompany": "顧客会社名",
+			"orderDate": "発注日",
+			"factoryShipDate": "工場出荷日",
+			"plannedShipDate": "計画出荷日",
+			"actualShipDate": "実際出荷日",
+			"leadTimeDays": "リードタイム(日)",
+			"cartonNotes": "カートン備考",
+			"afterSalesDeadline": "售后截止日",
+			"productLead": "商品担当",
+			"japanLead": "日本担当",
+			"chinaLead": "中国担当",
+			"destination": "出荷先",
+			"createBy": "作成者",
+			"createTime": "作成日時",
+			"updateBy": "更新者",
+			"updateTime": "更新日時",
+			"yes": "はい",
+			"no": "いいえ",
+			"close": "閉じる",
+			"edit": "編集"
+		},
+		"dialog": {
+			"linkedDemand": "関連需要",
+			"linkedDemandPlaceholder": "補充需要から商品情報を反映（任意）",
+			"selectFactory": "工場選択",
+			"selectFactoryPlaceholder": "工場を選択してください",
+			"factoryNew": "新規",
+			"factoryEdit": "選択中の工場を編集",
+			"productCode": "商品コード",
+			"productCodePlaceholder": "例：de077",
+			"subProductCode": "子品番",
+			"subProductCodePlaceholder": "例：re/wh/bk（カラー）",
+			"category": "商品分類",
+			"categoryPlaceholder": "（自動入力）",
+			"quantity": "数量",
+			"material": "材質",
+			"materialPlaceholder": "例：plastic/metal",
+			"requiresQc": "検品要",
+			"priceRmb": "元建て単価",
+			"exchangeRate": "為替レート",
+			"taxPoint": "インボイス係数",
+			"estimatedPricePreview": "見積もり卸値",
+			"billingType": "通関タイプ",
+			"billingTypePlaceholder": "通関タイプを選択",
+			"customsRemarks": "通関備考",
+			"customsRemarksPlaceholder": "通関備考",
+			"instructionManual": "説明書",
+			"instructionManualPlaceholder": "説明書備考",
+			"customerCompany": "顧客会社名",
+			"customerCompanyPlaceholder": "顧客会社名",
+			"destination": "出荷先",
+			"destinationPlaceholder": "例：名古屋倉庫",
+			"productLead": "商品担当",
+			"productLeadPlaceholder": "商品担当",
+			"japanLead": "日本担当",
+			"japanLeadPlaceholder": "日本担当",
+			"chinaLead": "中国担当",
+			"chinaLeadPlaceholder": "中国担当",
+			"orderDate": "発注日",
+			"factoryShipDate": "工場出荷日",
+			"plannedShipDate": "計画出荷日",
+			"actualShipDate": "実際出荷日",
+			"leadTimeDays": "リードタイム(日)",
+			"leadTimeDaysPlaceholder": "30/45/60",
+			"cartonNotes": "カートン備考",
+			"cartonNotesPlaceholder": "カートン備考情報",
+			"afterSalesDeadline": "售后截止日",
+			"status": "ステータス",
+			"cancel": "キャンセル",
+			"save": "保存"
+		},
+		"factoryDialog": {
+			"newTitle": "工場新規追加",
+			"editTitle": "工場編集",
+			"factoryName": "工場名称",
+			"factoryNamePlaceholder": "工場正式名称",
+			"province": "省",
+			"provincePlaceholder": "省/自治区",
+			"city": "都市",
+			"cityPlaceholder": "市",
+			"county": "区/県",
+			"countyPlaceholder": "区/県",
+			"roughLocation": "詳細住所",
+			"roughLocationPlaceholder": "工業区/鎮/パーク/番地",
+			"contactName": "担当者",
+			"contactNamePlaceholder": "担当者氏名",
+			"contactPhone": "連絡先",
+			"contactPhonePlaceholder": "携帯または電話",
+			"wechat": "WeChat",
+			"wechatPlaceholder": "WeChat番号",
+			"qq": "QQ番号",
+			"qqPlaceholder": "QQ番号",
+			"cooperationStatus": "協力ステータス",
+			"cancel": "キャンセル",
+			"save": "保存"
+		},
+		"cooperationStatus": {
+			"ACTIVE": "協力中",
+			"SUSPENDED": "一時停止",
+			"ELIMINATED": "廃止",
+			"POTENTIAL": "潜在協力"
+		},
+		"validation": {
+			"factoryRequired": "工場を選択してください",
+			"productCodeRequired": "商品コードは必須です",
+			"productCodeMaxLength": "商品コードは最大32文字",
+			"quantityRequired": "数量は必須です",
+			"quantityPositive": "数量は正の整数である必要があります",
+			"priceRmbRequired": "元建て単価は必須です",
+			"priceRmbNonNegative": "元建て単価は負の数にできません",
+			"exchangeRateRequired": "為替レートは必須です",
+			"exchangeRatePositive": "為替レートは正の数である必要があります",
+			"taxPointRequired": "インボイス係数は必須です",
+			"taxPointPositive": "インボイス係数は正の数である必要があります",
+			"customerCompanyMaxLength": "顧客会社名は最大128文字",
+			"destinationMaxLength": "出荷先は最大128文字",
+			"factoryNameRequired": "工場名称は必須です"
+		},
+		"message": {
+			"createSuccess": "発注書の作成が完了しました",
+			"createSuccessConverting": "発注書を作成しました。需要と関連付け中...",
+			"demandConverted": "需要を発注書に変換しました",
+			"updateSuccess": "更新が完了しました",
+			"deleteSuccess": "削除が完了しました",
+			"deleteConfirm": "発注書「{productCode}」（{quantity}個）を削除しますか？",
+			"deleteConfirmTitle": "削除確認",
+			"factoryCreateSuccess": "工場の作成が完了しました",
+			"detail": "詳細",
+			"statusUpdated": "ステータスが更新されました",
+			"statusUpdateFailed": "ステータスの更新に失敗しました",
+			"qcRecordLinked": "QC記録が既にリンクされています。ステータスを変更できません",
+			"batchLinked": "出荷バッチが既に存在するため、ステータスを変更できません"
+		},
+		"common": {
+			"yes": "はい",
+			"no": "いいえ",
+			"RMB": "RMB"
+		},
+		"action": {
+			"shipmentBatch": "出荷バッチ"
+		}
+	},
+	"inspection": {
+		"title": "検品記録",
+		"newButton": "新規検品",
+		"newDialogTitle": "新規検品",
+		"stat": {
+			"total": "検品記録総数",
+			"pass": "合格",
+			"fail": "不合格"
+		},
+		"filter": {
+			"qcCode": "検品番号",
+			"qcCodePlaceholder": "例：Q-20260421-001",
+			"procurementId": "発注番号",
+			"procurementIdPlaceholder": "発注番号で検索",
+			"shipmentBatchId": "出荷ロット",
+			"shipmentBatchIdPlaceholder": "出荷ロットを選択",
+			"result": "検品結果",
+			"status": "ステータス",
+			"all": "すべて",
+			"search": "検索",
+			"reset": "リセット"
+		},
+		"column": {
+			"qcCode": "検品番号",
+			"shipmentBatchId": "出荷ロット",
+			"procurementId": "発注番号",
+			"productCode": "品番",
+			"subProductCode": "子品番",
+			"sellerName": "出荷元名",
+			"quantity": "出荷数量",
+			"orderQuantity": "受注数量",
+			"inspectionCount": "検査数",
+			"passedCount": "合格数",
+			"defectiveCount": "不良数",
+			"boxCount": "カートン数",
+			"qcDate": "検品日",
+			"result": "結果",
+			"status": "ステータス",
+			"taxRefund": "退税",
+			"action": "操作"
+		},
+		"result": {
+			"pass": "合格",
+			"fail": "不合格"
+		},
+		"qcType": {
+			"onsite": "現地検品",
+			"remote": "リモート検品"
+		},
+		"qcStatus": {
+			"pending": "確認待ち",
+			"completed": "完了",
+			"returnRequested": "退货"
+		},
+		"action": {
+			"detail": "詳細",
+			"edit": "編集",
+			"delete": "削除"
+		},
+		"dialog": {
+			"shipmentBatch": "出荷ロット",
+			"shipmentBatchPlaceholder": "出荷ロットを選択",
+			"procurement": "関連発注書",
+			"procurementPlaceholder": "発注書を選択してください",
+			"inspectionInfo": "検品情報",
+			"productCode": "品番",
+			"productCodePlaceholder": "主品番",
+			"subProductCode": "子品番",
+			"subProductCodePlaceholder": "子品番/枝番",
+			"qcType": "検品タイプ",
+			"qcDate": "検品日",
+			"inspectionCount": "検査数",
+			"passedCount": "合格数",
+			"defectiveCount": "不良数",
+			"result": "検品結果",
+			"qcStatus": "検品ステータス",
+			"boxCount": "カートン数",
+			"cargoInfo": "貨物情報",
+			"boxLengthCm": "カートン長(cm)",
+			"boxWidthCm": "カートン幅(cm)",
+			"boxHeightCm": "カートン高(cm)",
+			"netWeightPerUnit": "正味重量",
+			"grossWeight": "総重量",
+			"taxInclusivePrice": "税込価格",
+			"quantity": "数量",
+			"taxRefund": "退税の有無",
+			"material": "材質",
+			"materialPlaceholder": "例：綿/テトロン/ボール紙",
+			"destination": "出荷先",
+			"destinationPlaceholder": "例：東京/大阪",
+			"qcStandard": "検品基準",
+			"qcStandardPlaceholder": "検収基準の説明",
+			"remarks": "備考",
+			"remarksPlaceholder": "備考情報",
+			"images": "欠陥写真",
+			"imagesPlaceholder": "写真のURL、改行区切り（JSON配列形式）",
+			"imagesTip": "JPG/PNG/WEBP対応、1枚最大5MB、最大9枚",
+			"imageSizeWarning": "画像のサイズは5MBを超えることはできません",
+			"imageCountWarning": "最大9枚の画像をアップロードできます",
+			"imageUploadWarning": "一部の画像アップロードに失敗しました",
+			"selectPlaceholder": "選択してください",
+			"datePlaceholder": "日付を選択",
+			"boxDimension": "カートンサイズ",
+			"createBy": "作成者",
+			"createTime": "作成日時"
+		},
+		"yes": "はい",
+		"no": "いいえ",
+		"drawerTitle": "検品詳細",
+		"validation": {
+			"shipmentBatchRequired": "出荷ロットを選択してください",
+			"productCodeRequired": "品番を入力してください",
+			"inspectionCountRequired": "検査数を入力してください",
+			"passedCountExceeds": "合格数は検査数を超えることはできません"
+		},
+		"message": {
+			"loadFailed": "検品記録の読み込みに失敗しました",
+			"createSuccess": "検品記録の作成が完了しました",
+			"createFailed": "検品記録の作成に失敗しました",
+			"updateSuccess": "検品記録の更新が完了しました",
+			"deleteSuccess": "検品記録の削除が完了しました",
+			"deleteConfirm": "この検品記録を削除してもよろしいですか？",
+			"deleteConfirmTitle": "削除確認"
+		}
+	},
+	"logistics": {
+		"title": "配送計画",
+		"newButton": "新規追加",
+		"stat": {
+			"total": "全配送",
+			"booked": "予約済み",
+			"inTransit": "輸送中"
+		},
+		"filter": {
+			"planType": "配送タイプ",
+			"status": "ステータス",
+			"all": "すべて",
+			"search": "検索",
+			"reset": "リセット"
+		},
+		"planType": {
+			"SEA": "海上輸送",
+			"AIR": "航空輸送",
+			"CONSOLIDATION": "合体"
+		},
+		"status": {
+			"PLANNED": "計画中",
+			"BOOKED": "予約済み",
+			"IN_TRANSIT": "輸送中",
+			"DELIVERED": "配達済み"
+		},
+		"column": {
+			"planCode": "配送番号",
+			"containerNo": "コンテナ番号",
+			"qcCode": "検査番号",
+			"factoryName": "関連工場",
+			"productCode": "品番",
+			"subProductCode": "枝番",
+			"planType": "配送タイプ",
+			"cargoWeightKg": "貨物重量",
+			"cargoVolumeCbm": "容積",
+			"requiresQc": "検品要",
+			"status": "ステータス",
+			"action": "操作",
+			"createTime": "作成日時",
+			"actions": "操作"
+		},
+		"action": {
+			"detail": "詳細",
+			"edit": "編集",
+			"delete": "削除"
+		},
+		"message": {
+			"loadFailed": "配送計画の読み込みに失敗しました",
+			"createSuccess": "配送計画の作成が完了しました",
+			"createFailed": "配送計画の作成に失敗しました",
+			"updateSuccess": "配送計画の更新が完了しました",
+			"updateFailed": "配送計画の更新に失敗しました",
+			"deleteConfirm": "配送計画「{code}」を削除しますか？",
+			"deleteSuccess": "配送計画の削除が完了しました",
+			"deleteFailed": "配送計画の削除に失敗しました"
+		},
+		"requiresQc": {
+			"yes": "検品要",
+			"no": "不要"
+		},
+		"dialog": {
+			"newTitle": "新規追加",
+			"editTitle": "編集",
+			"qcRecord": "関連検査記録",
+			"qcRecordPlaceholder": "検査番号または品番を検索",
+			"factory": "関連工場",
+			"factoryPlaceholder": "工場を選択（検査記録から自動代入）",
+			"containerNo": "コンテナ番号",
+			"containerNoPlaceholder": "同じバッチの貨物には同じコンテナ番号を入力",
+			"procurement": "関連発注書",
+			"procurementPlaceholder": "発注書を選択してください",
+			"cargoInfo": "貨物情報",
+			"productCode": "品番",
+			"productCodePlaceholder": "主品番",
+			"subProductCode": "子品番",
+			"subProductCodePlaceholder": "子品番/枝番",
+			"planType": "配送タイプ",
+			"selectPlaceholder": "選択してください",
+			"requiresQc": "検品要",
+			"cargoLengthCm": "貨物長(cm)",
+			"cargoWidthCm": "貨物幅(cm)",
+			"cargoHeightCm": "貨物高(cm)",
+			"cargoWeightKg": "貨物重量(kg)",
+			"quantity": "数量",
+			"shipPlan": "出荷計画",
+			"estimatedShipDate": "予定出荷日",
+			"actualShipDate": "実際出荷日",
+			"remarks": "備考",
+			"remarksPlaceholder": "備考情報",
+			"cargoDimension": "貨物サイズ",
+			"createTime": "作成日時",
+			"updateTime": "更新日時",
+			"datePlaceholder": "日付を選択",
+			"cancel": "キャンセル",
+			"save": "保存"
+		},
+		"drawerTitle": "配送詳細",
+		"validation": {
+			"qcRecordRequired": "関連検査記録を選択してください",
+			"procurementRequired": "関連発注書を選択してください",
+			"productCodeRequired": "品番を入力してください",
+			"planTypeRequired": "配送タイプを選択してください"
+		},
+		"poolStatus": {
+			"OPEN": "開放中",
+			"PENDING": "積載待ち",
+			"LOADED": "積載済",
+			"SHIPPED": "出荷済"
+		},
+		"containerStatus": {
+			"CREATED": "作成済",
+			"LOADED": "積載済",
+			"DEPARTED": "出発済",
+			"ARRIVED": "到着済"
+		},
+		"container": {
+			"type": {
+				"GP20": "20GP普通",
+				"GP40": "40GP普通",
+				"HC40": "40HC背高",
+				"HC45": "45HC背高"
+			},
+			"newButton": "新規コンテナ",
+			"editTitle": "コンテナ編集",
+			"deleteConfirm": "コンテナ「{code}」を削除しますか？",
+			"containerNoRequired": "コンテナ番号は必須です",
+			"containerNoPlaceholder": "例: TEMU1234567",
+			"filter": {
+				"status": "コンテナステータス",
+				"containerNo": "コンテナ番号",
+				"containerNoHint": "コンテナ番号を入力",
+				"ship": "関連船舶",
+				"shipHint": "船舶を選択"
+			},
+			"column": {
+				"containerNo": "コンテナ番号",
+				"containerType": "サイズ",
+				"totalCbm": "積載容量",
+				"totalWeightKg": "積載重量",
+				"planCount": "計画数",
+				"status": "ステータス",
+				"loadDate": "積載日",
+				"departureDate": "出発日",
+				"arrivalDate": "到着日",
+				"shipName": "船名",
+				"shipNumber": "船号",
+				"timeSlot": "時間帯",
+				"arrivalLocation": " 도착場所",
+				"remarks": "備考"
+			},
+			"dialog": {
+				"assignShip": "船舶を割当",
+				"shipName": "関連船舶",
+				"shipPlaceholder": "船舶を選択してください",
+				"timeSlot": "時間帯",
+				"timeSlotPlaceholder": "例: 2026-W24",
+				"arrivalLocation": "到着場所",
+				"arrivalLocationPlaceholder": "例: 東京倉庫A",
+				"remarks": "備考",
+				"remarksPlaceholder": "備考情報"
+			},
+			"assignSuccess": "船舶割当成功",
+			"unassignSuccess": "船舶を解除しました"
+		},
+		"ship": {
+			"title": "船舶管理",
+			"newButton": "新規船舶追加",
+			"editTitle": "船舶編集",
+			"deleteConfirm": "船舶「{name}」（船号：{number}）を削除しますか？船舶には {count} 個のコンテナがあります。",
+			"deleteSuccess": "船舶を削除しました",
+			"nameRequired": "船名は必須です",
+			"numberRequired": "船号は必須です",
+			"numberExists": "船号は既に存在します",
+			"hasContainers": "この船舶には {count} 個のコンテナがあります。先に解除してください",
+			"filter": {
+				"shipName": "船名",
+				"shipNameHint": "船名を入力",
+				"shipNumber": "船号",
+				"shipNumberHint": "船号を入力",
+				"arrivalPort": "目的港",
+				"arrivalPortHint": "目的港を入力"
+			},
+			"column": {
+				"shipName": "船名",
+				"shipNumber": "船号",
+				"carrier": "船会社",
+				"departurePort": "出発港",
+				"arrivalPort": "目的港",
+				"containerCount": "コンテナ数",
+				"createTime": "作成日時"
+			},
+			"dialog": {
+				"shipName": "船名",
+				"shipNamePlaceholder": "例: 日章丸",
+				"shipNumber": "船号",
+				"shipNumberPlaceholder": "例: V2026A",
+				"carrier": "船会社",
+				"carrierPlaceholder": "例: 中遠海運",
+				"departurePort": "出発港",
+				"departurePortPlaceholder": "例: 上海港",
+				"arrivalPort": "目的港",
+				"arrivalPortPlaceholder": "例: 東京港"
+			}
+		},
+		"pool": {
+			"newButton": "新規コンソリデーションプール",
+			"editTitle": "プール編集",
+			"deleteConfirm": "プール「{code}」を削除しますか？",
+			"createContainer": "コンテナ作成",
+			"createContainerConfirm": "プール「{poolCode}」のコンテナを作成しますか？",
+			"containerCreated": "コンテナ作成成功",
+			"destinationRequired": "寄港地は必須です",
+			"destinationPlaceholder": "例: Tokyo, Yokohama",
+			"filter": {
+				"status": "ステータス",
+				"destinationPort": "寄港地",
+				"destinationHint": "寄港地を入力"
+			},
+			"column": {
+				"poolCode": "プール番号",
+				"destinationPort": "寄港地",
+				"totalCbm": "総容量",
+				"totalWeightKg": "総重量",
+				"planCount": "計画数",
+				"threshold": "トリガー閾値",
+				"status": "ステータス"
+			},
+			"action": {
+				"createContainer": "コンテナ作成"
+			}
+		}
+	},
+	"factory": {
+		"title": "工場管理",
+		"newButton": "新規入力",
+		"stat": {
+			"total": "工場総数",
+			"active": "協力中",
+			"potential": "潜在協力"
+		},
+		"filter": {
+			"factoryName": "工場名称",
+			"factoryNamePlaceholder": "工場名称を入力",
+			"cooperationStatus": "協力状態",
+			"cooperationStatusPlaceholder": "協力状態を選択",
+			"province": "省",
+			"provincePlaceholder": "省",
+			"city": "都市",
+			"cityPlaceholder": "都市",
+			"county": "区/県",
+			"countyPlaceholder": "区/県",
+			"all": "すべて",
+			"search": "検索",
+			"reset": "リセット"
+		},
+		"column": {
+			"factoryCode": "工場番号",
+			"factoryName": "工場名称",
+			"province": "省",
+			"city": "都市",
+			"county": "区/県",
+			"roughLocation": "詳細住所",
+			"contactName": "連絡先",
+			"contactPhone": "連絡先電話",
+			"contactWechat": "WeChat",
+			"contactQq": "QQ番号",
+			"cooperationStatus": "協力状態",
+			"paymentTerms": "支払条件",
+			"action": "操作"
+		},
+		"action": {
+			"detail": "詳細",
+			"edit": "編集",
+			"delete": "削除"
+		},
+		"drawer": {
+			"title": "工場詳細",
+			"section": {
+				"basic": "基本情報",
+				"location": "地理情報",
+				"contact": "連絡先情報",
+				"cooperation": "協力情報",
+				"audit": "監査情報"
+			},
+			"factoryCode": "工場番号",
+			"factoryName": "工場名称",
+			"fullLocation": "詳細住所",
+			"province": "省",
+			"city": "都市",
+			"county": "区/県",
+			"roughLocation": "詳細住所",
+			"longitude": "経度",
+			"latitude": "緯度",
+			"paymentTerms": "支払条件",
+			"address": "住所",
+			"contactName": "連絡先",
+			"contactPhone": "連絡先電話",
+			"contactWechat": "WeChat",
+			"contactQq": "QQ番号",
+			"cooperationStatus": "協力状態",
+			"createBy": "作成者",
+			"notes": "備考",
+			"createTime": "作成日時",
+			"updateTime": "更新日時",
+			"close": "閉じる",
+			"edit": "編集"
+		},
+		"dialog": {
+			"section": {
+				"basic": "基本信息",
+				"location": "地理情報",
+				"contact": "連絡先情報",
+				"cooperation": "協力情報"
+			},
+			"newTitle": "新規工場追加",
+			"editTitle": "工場編集",
+			"factoryName": "工場名称",
+			"factoryNamePlaceholder": "工場正式名称",
+			"cooperationStatus": "協力状態",
+			"cooperationStatusPlaceholder": "状態を選択",
+			"paymentTerms": "支払条件",
+			"paymentTermsPlaceholder": "支払条件を選択",
+			"province": "省",
+			"provincePlaceholder": "省/自治区",
+			"city": "都市",
+			"cityPlaceholder": "市",
+			"county": "区/県",
+			"countyPlaceholder": "区/県",
+			"roughLocation": "詳細住所",
+			"roughLocationPlaceholder": "工業区/鎮/パーク/番地",
+			"contactName": "連絡先",
+			"contactNamePlaceholder": "連絡先氏名",
+			"contactPhone": "連絡先電話",
+			"contactPhonePlaceholder": "携帯または電話",
+			"contactWechat": "WeChat",
+			"contactWechatPlaceholder": "WeChat番号",
+			"contactQq": "QQ番号",
+			"contactQqPlaceholder": "QQ番号",
+			"notes": "備考",
+			"notesPlaceholder": "備考情報",
+			"cancel": "キャンセル",
+			"save": "保存"
+		},
+		"cooperationStatus": {
+			"ACTIVE": "協力中",
+			"SUSPENDED": "一時停止",
+			"ELIMINATED": "廃止",
+			"POTENTIAL": "潜在協力"
+		},
+		"paymentTerms": {
+			"CASH": "現金払い",
+			"NET_30": "月締め30日",
+			"NET_60": "月締め60日",
+			"NET_90": "月締め90日",
+			"CREDIT": "信用支払"
+		},
+		"validation": {
+			"factoryNameRequired": "工場名称は必須です"
+		},
+		"message": {
+			"deleteConfirm": "工場「{name}」（{code}）を削除しますか？",
+			"deleteConfirmTitle": "削除確認",
+			"deleteSuccess": "削除が完了しました",
+			"createSuccess": "工場の作成が完了しました",
+			"updateSuccess": "更新が完了しました"
+		}
+	},
+	"product": {
+		"title": "商品ディレクトリ",
+		"newButton": "新規追加",
+		"stat": {
+			"total": "商品総数"
+		},
+		"filter": {
+			"masterCode": "主品番",
+			"masterCodePlaceholder": "主品番",
+			"keyword": "キーワード",
+			"keywordPlaceholder": "中文/英文名称",
+			"hsCode": "中国HSコード",
+			"hsCodePlaceholder": "中国HSコード",
+			"hsCodeJp": "日本HSコード",
+			"hsCodeJpPlaceholder": "日本HSコード",
+			"factoryName": "工場",
+			"factoryNamePlaceholder": "工場名称",
+			"search": "検索",
+			"reset": "リセット"
+		},
+		"column": {
+			"masterCode": "主品番",
+			"subCode": "子品番",
+			"nameZh": "中文名称",
+			"nameEn": "英文名称",
+			"hsCode": "中国HSコード",
+			"unitPriceRmb": "税込単価(CNY)",
+			"origin": "原産地",
+			"material": "材質",
+			"unit": "単位",
+			"linkedFactories": "関連工場",
+			"action": "操作",
+			"image": "画像",
+			"janCode": "JANコード",
+			"nameJa": "日本語名称",
+			"materialJa": "日本語材質",
+			"category": "分類",
+			"status": "状態",
+			"quantities": "在庫",
+			"cartonQty": "箱数",
+			"hsCodeJp": "日本HSコード",
+			"taxPoint": "インボイス係数",
+			"taxRate": "消費税率",
+			"requiresQc": "品質検査要"
+		},
+		"action": {
+			"detail": "詳細",
+			"edit": "編集",
+			"delete": "削除"
+		},
+		"factoryUnit": "社",
+		"category": {
+			"OEM": "卸売",
+			"ORDINARY": "普通",
+			"FACTORY_DIRECT": "輸出"
+		},
+		"drawer": {
+			"title": "商品詳細",
+			"masterCode": "主品番",
+			"subCode": "子品番",
+			"nameZh": "中文名称",
+			"nameEn": "英文名称",
+			"nameJa": "日本語名称",
+			"hsCode": "HSコード",
+			"unitPriceRmb": "税込単価(CNY)",
+			"taxPoint": "インボイス係数",
+			"taxRate": "消費税率",
+			"netWeight": "正味重量",
+			"grossWeight": "総重量",
+			"lengthCm": "長さ(cm)",
+			"widthCm": "幅(cm)",
+			"heightCm": "高さ(cm)",
+			"declarationElements": "申告要素",
+			"origin": "原産地",
+			"material": "材質",
+			"unit": "単位",
+			"category": "商品分類",
+			"colorName": "カラー名称",
+			"warehouse": "倉庫所属",
+			"requiresQc": "品質検査要",
+			"imageUrl": "商品画像",
+			"remarks": "備考",
+			"lastUsedDate": "最終使用",
+			"unitsPerPackage": "ケース入数",
+			"createTime": "作成日時",
+			"updateTime": "更新日時",
+			"close": "閉じる",
+			"edit": "編集",
+			"section": {
+				"basicInfo": "基本情報",
+				"specInfo": "仕様情報",
+				"factories": "関連工場",
+				"packageInfo": "外箱情報",
+				"warehouseInfo": "倉庫情報"
+			},
+			"noFactories": "関連工場なし",
+			"preferred": "優先",
+			"factoryCode": "工場番号",
+			"factoryLocation": "所在地",
+			"contact": "担当者",
+			"moq": "最小注文数",
+			"leadTimeDays": "リードタイム",
+			"unitPrice": "単価",
+			"days": "日",
+			"janCode": "JANコード",
+			"materialJa": "日本語材質",
+			"status": "商品状態",
+			"quantities": "在庫数量",
+			"cartonQty": "箱数",
+			"amountRmb": "金額(CNY)",
+			"hsCodeJp": "日本HSコード",
+			"volumeCbm": "容積(m³)",
+			"packageLengthCm": "外箱長(cm)",
+			"packageWidthCm": "外箱幅(cm)",
+			"packageHeightCm": "外箱高(cm)",
+			"packageVolumeCbm": "外箱容積(m³)",
+			"packageWeightKg": "外箱重量(kg)"
+		},
+		"dialog": {
+			"newTitle": "新規商品追加",
+			"editTitle": "商品編集",
+			"masterCode": "主品番",
+			"masterCodePlaceholder": "例：odn001",
+			"subCode": "子品番",
+			"subCodePlaceholder": "例：re/wh/bk",
+			"nameZh": "中文名称",
+			"nameZhPlaceholder": "中文名称",
+			"nameEn": "英文名称",
+			"nameEnPlaceholder": "English name",
+			"hsCode": "HSコード",
+			"hsCodePlaceholder": "HSコード",
+			"unitPriceRmb": "税込単価(CNY)",
+			"netWeight": "正味重量(kg)",
+			"grossWeight": "総重量(kg)",
+			"lengthCm": "長さ(cm)",
+			"widthCm": "幅(cm)",
+			"heightCm": "高さ(cm)",
+			"origin": "原産地",
+			"originPlaceholder": "例：中国",
+			"material": "材質",
+			"materialPlaceholder": "例：plastic/metal",
+			"unit": "単位",
+			"unitPlaceholder": "例：個/套/箱",
+			"nameJa": "日本語名称",
+			"nameJaPlaceholder": "日本語名称",
+			"taxPoint": "インボイス係数",
+			"taxPointPlaceholder": "デフォルト 1.1",
+			"taxRate": "消費税率",
+			"taxRatePlaceholder": "デフォルト 0.1",
+			"declarationElements": "申告要素",
+			"declarationElementsPlaceholder": "材質|住所|ブランド",
+			"remarks": "備考",
+			"remarksPlaceholder": "備考情報",
+			"cancel": "キャンセル",
+			"save": "保存",
+			"janCode": "JANコード",
+			"janCodePlaceholder": "バーコード",
+			"materialJa": "日本語材質",
+			"materialJaPlaceholder": "日本語材質",
+			"category": "商品分類",
+			"status": "商品状態",
+			"quantities": "在庫数量",
+			"cartonQty": "箱数",
+			"netWeightPlaceholder": "正味重量",
+			"grossWeightPlaceholder": "総重量",
+			"hsCodeJp": "日本HSコード",
+			"hsCodeJpPlaceholder": "税番",
+			"warehouse": "倉庫所属",
+			"warehousePlaceholder": "倉庫",
+			"requiresQc": "品質検査要",
+			"colorName": "カラー名称",
+			"colorNamePlaceholder": "例：赤色",
+			"imageUrl": "商品画像",
+			"imageUrlPlaceholder": "画像URL"
+		},
+		"validation": {
+			"masterCodeRequired": "主品番は必須です",
+			"nameZhRequired": "中文名称は必須です"
+		},
+		"message": {
+			"deleteConfirm": "商品「{code}」を削除しますか？",
+			"deleteConfirmTitle": "削除確認",
+			"deleteSuccess": "削除が完了しました",
+			"createSuccess": "作成が完了しました",
+			"updateSuccess": "更新が完了しました"
+		}
+	},
+	"orderOverview": {
+		"title": "注文一覧",
+		"back": "一覧に戻る",
+		"print": "印刷",
+		"loadFailed": "注文概要の読み込みに失敗しました",
+		"retry": "再試行",
+		"tab": {
+			"demands": "需要一覧",
+			"procurements": "発注一覧"
+		},
+		"filter": {
+			"keyword": "キーワード",
+			"keywordPlaceholder": "品番/工場名",
+			"search": "検索",
+			"reset": "リセット",
+			"status": "ステータス"
+		},
+		"stepNames": [
+			"補充",
+			"発注",
+			"検品",
+			"调配",
+			"国報",
+			"日報",
+			"退税",
+			"運営"
+		],
+		"status": {
+			"all": "すべて",
+			"pending": "未処理",
+			"converted": "変換済み",
+			"cancelled": "キャンセル済み"
+		},
+		"column": {
+			"id": "ID",
+			"productCode": "品番",
+			"factoryName": "工場",
+			"status": "ステータス",
+			"orderDate": "発注日",
+			"destination": "送り先",
+			"action": "操作",
+			"demandCode": "需要番号",
+			"demandType": "需要タイプ",
+			"subProductCode": "枝番",
+			"quantity": "数量",
+			"subProductItems": "サブ品番明細",
+			"japanLead": "担当者",
+			"stepStatus": "ステップ進捗",
+			"factoryProvince": "工場省份",
+			"factoryCity": "工場都市",
+			"productNameZh": "商品名（中国語）",
+			"productNameJa": "商品名（日本語）",
+			"productCategory": "商品カテゴリ",
+			"demandStatus": "需要ステータス",
+			"linkedProcurementId": "関連発注書",
+			"demandCreateTime": "作成日時",
+			"createTime": "作成日時"
+		},
+		"step": {
+			"1": "需要",
+			"2": "発注",
+			"3": "検品",
+			"4": "配車"
+		},
+		"action": {
+			"overview": "総览",
+			"view": "詳細",
+			"viewDetail": "完全総览を見る"
+		},
+		"drawerTitle": "需要詳細",
+		"step1": {
+			"title": "ステップ1：補充需要",
+			"demandCode": "需要番号",
+			"demandType": "需要タイプ",
+			"productCode": "品番",
+			"subProductItems": "サブ品番明細",
+			"japanLead": "担当者",
+			"status": "ステータス"
+		},
+		"step2": {
+			"title": "ステップ2：発注書情報",
+			"procurementCode": "発注番号",
+			"factoryName": "工場",
+			"productCode": "品番",
+			"subProductCode": "サブ品番",
+			"quantity": "数量",
+			"priceRmb": "単価(CNY)",
+			"taxPoint": "インボイス係数",
+			"billingType": "通関タイプ",
+			"estimatedPriceJpy": "見積もり卸値(JPY)",
+			"orderDate": "発注日",
+			"plannedShipDate": "納期",
+			"actualShipDate": "実際出荷日",
+			"status": "ステータス"
+		},
+		"step3": {
+			"title": "ステップ3：検品記録",
+			"qcCode": "検品番号",
+			"result": "結果",
+			"qcResult": {
+				"PASS": "合格",
+				"FAIL": "不合格"
+			},
+			"inspectionCount": "検品数",
+			"passedCount": "合格数",
+			"defectiveCount": "不良数",
+			"qcDate": "検品日",
+			"status": "ステータス"
+		},
+		"step4": {
+			"title": "ステップ4：配送計画",
+			"planCode": "配送番号",
+			"planType": "輸送方法",
+			"cargoVolume": "容積(CBM)",
+			"cargoWeight": "重量(kg)",
+			"estimatedShipDate": "予定出荷日",
+			"actualShipDate": "実際出荷日",
+			"status": "ステータス"
+		},
+		"step5": {
+			"title": "ステップ5：国内通関",
+			"customsCode": "通関番号",
+			"containerNo": "コンテナ番号",
+			"productCode": "品番",
+			"estimatedValueCny": "申告価格(CNY)",
+			"createTime": "作成日時",
+			"status": "ステータス"
+		},
+		"step6": {
+			"title": "ステップ6：日本通関",
+			"containerNo": "コンテナ番号",
+			"customsEntryNo": "入境通関番号",
+			"arrivalDate": "到着日",
+			"clearanceDate": "通関完了日",
+			"customsBroker": "通関業者",
+			"importDutyPaid": "輸入関税(JPY)",
+			"consumptionTaxPaid": "消費税(JPY)",
+			"arrivalPort": "仕向港",
+			"status": "ステータス"
+		},
+		"step7": {
+			"title": "ステップ7：退税",
+			"refundCode": "退税番号",
+			"billingType": "通関タイプ",
+			"estimatedRefundRmb": "理論退税額",
+			"actualRefundRmb": "実際退税額",
+			"refundDate": "退税日",
+			"status": "ステータス"
+		},
+		"step8": {
+			"title": "ステップ8：運営販売",
+			"recordCode": "販売番号",
+			"salesChannel": "販売チャネル",
+			"listingDate": "上架日",
+			"initialStock": "初期在庫",
+			"currentStock": "現在庫",
+			"salesQuantity": "累計販売数",
+			"returnRate": "退货率",
+			"sellingPriceJpy": "販売価格(JPY)",
+			"status": "ステータス"
+		},
+		"stepStatusUI": {
+			"notStarted": "記録なし",
+			"placeholder": "未実装",
+			"status": {
+				"notStarted": "未着手",
+				"completed": "完了",
+				"inProgress": "進行中"
+			}
+		},
+		"enum": {
+			"procurement": {
+				"未定": "未定",
+				"予定": "予定",
+				"OEM": "OEM",
+				"発注待": "発注待",
+				"永康": "永康",
+				"直送": "直送",
+				"倉庫着": "倉庫着",
+				"現地検品": "現地検品",
+				"検品": "検品",
+				"エア便": "エア便",
+				"メーカー直送": "メーカー直送",
+				"輸出": "輸出",
+				"国内通関": "国内通関",
+				"通関": "通関",
+				"日本着": "日本着",
+				"日本通関完了": "日本通関完了",
+				"会計": "会計",
+				"完了": "完了",
+				"退货": "退货"
+			},
+			"logistics": {
+				"PLANNED": "作成済",
+				"BOOKED": "予約済",
+				"IN_TRANSIT": "輸送中",
+				"DELIVERED": "配達済"
+			},
+			"domesticCustoms": {
+				"PENDING": "未提出",
+				"SUBMITTED": "提出済",
+				"CLEARED": "通関済",
+				"REJECTED": "却下済"
+			},
+			"japanCustoms": {
+				"PENDING": "未通関",
+				"IN_PROGRESS": "通関中",
+				"CLEARED": "通関完了",
+				"FAILED": "通関失敗"
+			},
+			"taxRefund": {
+				"APPLYING": "申請中",
+				"COMPLETED": "完了",
+				"NO_REFUND": "退税なし"
+			},
+			"sales": {
+				"LISTED": "上架中",
+				"LOW_STOCK": "在庫警告",
+				"OUT_OF_STOCK": "在庫切れ",
+				"DISCONTINUED": "販売停止"
+			},
+			"planType": {
+				"SEA": "船便",
+				"AIR": "航空便"
+			},
+			"billingType": {
+				"ZHE_LU_KAI_PIAO": "浙魯開票",
+				"CHAO_HUI_TUI_SHUI": "超慧退税",
+				"NO_REFUND": "退税なし",
+				"OTHER": "その他"
+			},
+			"salesChannel": {
+				"AMAZON": "Amazon",
+				"MERCALI": "メルカリ",
+				"SELF_SITE": "自社サイト",
+				"OTHER": "その他"
+			}
+		}
+	},
+	"common": {
+		"all": "すべて",
+		"search": "検索",
+		"reset": "リセット",
+		"cancel": "キャンセル",
+		"save": "保存",
+		"confirm": "確認",
+		"delete": "削除",
+		"edit": "編集",
+		"view": "詳細",
+		"warning": "警告",
+		"close": "閉じる",
+		"success": "操作完了",
+		"button": {
+			"search": "検索",
+			"reset": "リセット",
+			"save": "保存"
+		},
+		"loading": "読み込み中...",
+		"noData": "データがありません",
+		"back": "戻る",
+		"locale": {
+			"zh": "中文",
+			"ja": "日本語"
+		},
+		"timezone": {
+			"label": "タイムゾーン",
+			"CST": "中国標準時 (UTC+8)",
+			"JST": "日本標準時 (UTC+9)"
+		},
+		"user": "ユーザー",
+		"units": {
+			"kg": "kg",
+			"cm": "cm",
+			"m3": "m³",
+			"cny": "¥",
+			"jpy": "JPY",
+			"rmb": "RMB",
+			"day": "日",
+			"dayPlural": "日"
+		},
+		"format": {
+			"times": "×",
+			"dash": "—",
+			"perUnit": "/個"
+		},
+		"currency": {
+			"cny": "¥"
+		},
+		"error": {
+			"network": "ネットワークエラー、再試行してください",
+			"tokenExpired": "ログイン期限切れです。再度ログインしてください",
+			"forbidden": "このリソースにアクセスする権限がありません",
+			"actionFailed": "操作に失敗しました",
+			"server": "サーバーエラー：",
+			"loadFailed": "読み込みに失敗しました。再試行してください"
+		},
+		"action": {
+			"back": "戻る",
+			"retry": "再試行"
+		},
+		"yes": "はい",
+		"no": "いいえ",
+		"message": {
+			"loadFailed": "読み込みに失敗しました。再試行してください。"
+		}
+	},
+	"validation": {
+		"required": "この項目は必須です"
+	},
+	"customs": {
+		"title": "国内通関",
+		"newButton": "新規通関",
+		"batchButton": "コンテナ一括作成",
+		"newDialogTitle": "コンテナ一括通関書類作成",
+		"drawerTitle": "通関書類詳細",
+		"rejectDialogTitle": "通関書類却下",
+		"stat": {
+			"total": "通関書類総数",
+			"pending": "未提出",
+			"submitted": "提出済",
+			"cleared": "通関済"
+		},
+		"filter": {
+			"customsCode": "通関書類番号",
+			"customsCodePlaceholder": "通関書類番号を入力",
+			"containerNo": "コンテナ番号",
+			"containerNoPlaceholder": "コンテナ番号を入力",
+			"procurementId": "仕入書類番号",
+			"procurementIdPlaceholder": "仕入書類ID",
+			"status": "ステータス"
+		},
+		"column": {
+			"customsCode": "通関書類番号",
+			"containerNo": "コンテナ番号",
+			"procurementId": "仕入書類番号",
+			"productCode": "商品コード",
+			"subProductCode": "枝番",
+			"quantity": "数量",
+			"estimatedValueCny": "想定価格(CNY)",
+			"status": "ステータス",
+			"createTime": "作成日時",
+			"action": "操作",
+			"factoryId": "工場ID"
+		},
+		"status": {
+			"pending": "未提出",
+			"submitted": "提出済",
+			"cleared": "通関済",
+			"rejected": "却下済",
+			"created": "通関済",
+			"notCreated": "未通関"
+		},
+		"viewMode": {
+			"list": "リスト表示",
+			"byContainer": "コンテナ別"
+		},
+		"group": {
+			"ungrouped": "未分類",
+			"records": "{n}件"
+		},
+		"action": {
+			"detail": "詳細",
+			"submit": "提出",
+			"clear": "通関",
+			"reject": "却下"
+		},
+		"dialog": {
+			"procurementId": "仕入書類番号",
+			"procurementIdPlaceholder": "仕入書類IDを入力",
+			"containerNo": "コンテナ番号",
+			"containerNoPlaceholder": "コンテナ番号を入力",
+			"productCode": "商品コード",
+			"productCodePlaceholder": "商品コードを入力",
+			"subProductCode": "枝番",
+			"subProductCodePlaceholder": "枝番を入力",
+			"quantity": "数量",
+			"estimatedValueCny": "想定価格(CNY)",
+			"estimatedValueCnyPlaceholder": "想定価格を入力",
+			"factoryId": "工場ID",
+			"factoryIdPlaceholder": "工場IDを入力",
+			"remarks": "備考",
+			"remarksPlaceholder": "備考を入力",
+			"createBy": "作成者",
+			"createTime": "作成日時",
+			"updateTime": "更新日時"
+		},
+		"rejectDialog": {
+			"reasonLabel": "却下理由",
+			"reasonPlaceholder": "却下理由を入力"
+		},
+		"validation": {
+			"productCodeRequired": "商品コードは必須です",
+			"containerNoRequired": "コンテナ番号は必須です",
+			"selectAtLeastOne": "少なくとも1つの配送計画を選択してください"
+		},
+		"batch": {
+			"selectedCount": "{n}件選択済",
+			"selectedPlans": "選択した計画",
+			"totalValue": "合計金額",
+			"items": "件",
+			"createButton": "一括作成 ({n})"
+		},
+		"message": {
+			"loadFailed": "通関書類一覧の読み込みに失敗しました",
+			"createSuccess": "通関書類を作成しました",
+			"batchCreateSuccess": "一括作成成功、{n}件の通関書類を作成しました",
+			"createFailed": "通関書類の作成に失敗しました",
+			"submitSuccess": "通関書類を提出しました",
+			"clearSuccess": "通関書類を通関しました",
+			"rejectSuccess": "通関書類を却下しました",
+			"deleteSuccess": "通関書類を削除しました",
+			"actionFailed": "操作に失敗しました",
+			"deleteConfirm": "この通関書類を削除しますか？"
+		}
+	},
+	"japanCustoms": {
+		"title": "日本通関",
+		"drawerTitle": "通関詳細",
+		"completeDialogTitle": "通関完了",
+		"failDialogTitle": "通関失敗をマーク",
+		"stat": {
+			"total": "通関書類総数",
+			"pending": "未通関",
+			"inProgress": "通関中",
+			"cleared": "通関済",
+			"failed": "通関失敗"
+		},
+		"filter": {
+			"containerNo": "コンテナ番号",
+			"containerNoPlaceholder": "コンテナ番号を入力",
+			"entryNo": "入境通関番号",
+			"entryNoPlaceholder": "入境通関番号を入力",
+			"domesticCustomsId": "国内通関",
+			"status": "ステータス"
+		},
+		"column": {
+			"containerNo": "コンテナ番号",
+			"entryNo": "入境通関番号",
+			"domesticCustomsId": "国内通関",
+			"procurementId": "仕入書類番号",
+			"productCode": "品番",
+			"subProductCode": "子品番",
+			"arrivalPort": "到着港",
+			"arrivalDate": "到着日",
+			"broker": "通関業者",
+			"brokerPhone": "業者電話",
+			"brokerContact": "業者連絡先",
+			"weight": "申告重量",
+			"volume": "申告容積",
+			"importDuty": "輸入関税",
+			"consumptionTax": "消費税",
+			"clearanceDate": "通関日",
+			"status": "ステータス",
+			"remarks": "備考",
+			"action": "操作",
+			"createBy": "作成者",
+			"createTime": "作成日時"
+		},
+		"status": {
+			"pending": "未通関",
+			"inProgress": "通関中",
+			"cleared": "通関済",
+			"failed": "通関失敗"
+		},
+		"viewMode": {
+			"list": "リスト表示",
+			"byContainer": "コンテナ別"
+		},
+		"group": {
+			"ungrouped": "未分類",
+			"records": "{n}件"
+		},
+		"action": {
+			"newCustoms": "新規通関",
+			"batchImport": "一括インポート",
+			"detail": "詳細",
+			"start": "開始",
+			"complete": "完了",
+			"fail": "失敗"
+		},
+		"newDialogTitle": "新規通関",
+		"batchDialogTitle": "コンテナ一括通関作成",
+		"placeholder": {
+			"containerNo": "コンテナ番号を入力"
+		},
+		"dialog": {
+			"modeSingle": "個別",
+			"modeBatch": "一括",
+			"selectDomesticTip": "国内通関を選択（通関済）：",
+			"containerNoPlaceholder": "コンテナ番号で検索...",
+			"noDomesticTip": "利用可能な国内通関記録がありません",
+			"selectedDomestic": "選択した国内通関",
+			"changeDomestic": "再選択"
+		},
+		"batchDialog": {
+			"containerNo": "コンテナ番号",
+			"containerNoPlaceholder": "コンテナ番号で検索...",
+			"selectedCount": "{n}件選択済",
+			"noDataTip": "このコンテナには通関済の国内通関記録がありません",
+			"createButton": "一括作成 ({n})",
+			"createSuccess": "一括作成完了、{n}件の通関記録を作成しました"
+		},
+		"validation": {
+			"containerNoRequired": "コンテナ番号は必須です",
+			"domesticCustomsIdRequired": "国内通関番号は必須です"
+		},
+		"completeDialog": {
+			"importDuty": "輸入関税（JPY）",
+			"consumptionTax": "消費税（JPY）",
+			"clearanceDate": "通関完了日"
+		},
+		"failDialog": {
+			"reasonLabel": "失敗理由",
+			"reasonPlaceholder": "失敗理由を入力"
+		},
+		"message": {
+			"loadFailed": "通関書類一覧の読み込みに失敗しました",
+			"startSuccess": "通関を開始しました",
+			"completeSuccess": "通関が完了しました",
+			"failSuccess": "失敗をマークしました",
+			"deleteSuccess": "削除しました",
+			"actionFailed": "操作に失敗しました",
+			"deleteConfirm": "この通関記録を削除しますか？",
+			"createSuccess": "作成しました",
+			"createFailed": "作成に失敗しました"
+		}
+	},
+	"taxRefund": {
+		"title": "輸出退税",
+		"newButton": "新規退税記録",
+		"newDialogTitle": "新規退税記録",
+		"editDialogTitle": "退税記録を編集",
+		"drawerTitle": "退税詳細",
+		"completeDialogTitle": "退税完了",
+		"stat": {
+			"total": "退税申請総数",
+			"applying": "退税中",
+			"completed": "完了",
+			"noRefund": "退税なし"
+		},
+		"filter": {
+			"procurementId": "発注番号",
+			"status": "ステータス"
+		},
+		"column": {
+			"refundCode": "退税番号",
+			"procurementId": "発注番号",
+			"japanCustomsId": "日本通関番号",
+			"billingType": "請求タイプ",
+			"taxPoint": "税率",
+			"priceRmb": "単価(RMB)",
+			"quantity": "数量",
+			"estimatedRefundRmb": "見積退税額",
+			"actualRefundRmb": "実際退税額",
+			"refundDate": "退税日",
+			"refundBank": "退税銀行",
+			"status": "ステータス",
+			"remarks": "備考",
+			"action": "操作",
+			"createBy": "作成者",
+			"createTime": "作成日時"
+		},
+		"status": {
+			"applying": "退税中",
+			"completed": "完了",
+			"noRefund": "退税なし"
+		},
+		"action": {
+			"detail": "詳細",
+			"complete": "完了",
+			"noRefund": "退税なし",
+			"edit": "編集",
+			"delete": "削除"
+		},
+		"dialog": {
+			"procurement": "関連発注書",
+			"procurementPlaceholder": "発注書を検索（品番または番号を入力）",
+			"japanCustomsId": "日本通関記録",
+			"japanCustomsIdPlaceholder": "日本通関記録IDを入力（任意）",
+			"billingType": "請求タイプ",
+			"priceRmb": "仕入単価(RMB)",
+			"taxPoint": "税率",
+			"quantity": "仕入数量",
+			"exchangeRate": "為替レート",
+			"estimatedRefundPreview": "理論退税額",
+			"estimatedRefundHint": "= 単価 × 数量 × (税率 - 1)",
+			"remarks": "備考",
+			"remarksPlaceholder": "任意、備考情報"
+		},
+		"completeDialog": {
+			"actualRefundRmb": "実際退税金額（RMB）",
+			"refundDate": "退税日",
+			"refundDateRequired": "退税日を選択してください",
+			"refundBank": "退税銀行",
+			"refundBankPlaceholder": "退税銀行を入力（任意）"
+		},
+		"validation": {
+			"procurementRequired": "関連発注書を選択してください"
+		},
+		"message": {
+			"loadFailed": "退税申請一覧の読み込みに失敗しました",
+			"createSuccess": "退税記録の作成が完了しました",
+			"updateSuccess": "退税記録の更新が完了しました",
+			"deleteSuccess": "退税記録の削除が完了しました",
+			"completeSuccess": "退税が完了しました",
+			"noRefundSuccess": "退税なしとマークしました",
+			"deleteConfirm": "この退税記録を削除してもよろしいですか？",
+			"deleteConfirmTitle": "削除確認",
+			"actionFailed": "操作に失敗しました"
+		},
+		"enum": {
+			"billingType": {
+				"ZHE_LU_KAI_PIAO": "浙魯開票",
+				"CHAO_HUI_TUI_SHUI": "超慧退税",
+				"NO_REFUND": "退税なし",
+				"OTHER": "その他"
+			}
+		}
+	},
+	"sales": {
+		"title": "運営販売管理",
+		"newButton": "新規上架",
+		"newDialogTitle": "新規上架",
+		"drawerTitle": "販売詳細",
+		"stockDialogTitle": "在庫更新",
+		"alertButton": "在庫アラート",
+		"alertDialogTitle": "在庫アラート一覧",
+		"stat": {
+			"total": "販売商品数",
+			"listed": "通常販売",
+			"lowStock": "在庫警告",
+			"outOfStock": "在庫切れ",
+			"discontinued": "販売終了"
+		},
+		"filter": {
+			"productCode": "品番",
+			"productCodePlaceholder": "品番を入力",
+			"salesChannel": "販売チャネル",
+			"status": "ステータス"
+		},
+		"channel": {
+			"amazon": "Amazon",
+			"mercali": "メルカリ",
+			"selfSite": "自社サイト",
+			"other": "その他"
+		},
+		"column": {
+			"recordCode": "販売番号",
+			"procurementId": "発注番号",
+			"productCode": "品番",
+			"subProductCode": "子品番",
+			"salesChannel": "販売チャネル",
+			"currentStock": "現在庫",
+			"initialStock": "初期在庫",
+			"safetyStock": "安全在庫",
+			"salesQuantity": "累計販売数",
+			"returnedQuantity": "退货数",
+			"returnRate": "退货率",
+			"sellingPriceJpy": "販売価格(JPY)",
+			"listingDate": "上架日",
+			"status": "ステータス",
+			"remarks": "備考",
+			"action": "操作",
+			"createBy": "作成者",
+			"createTime": "作成日時"
+		},
+		"status": {
+			"listed": "通常販売",
+			"lowStock": "在庫警告",
+			"outOfStock": "在庫切れ",
+			"discontinued": "販売終了"
+		},
+		"action": {
+			"detail": "詳細",
+			"updateStock": "在庫",
+			"discontinue": "終了",
+			"relist": "再上架"
+		},
+		"form": {
+			"procurementId": "関連発注番号",
+			"productCode": "主品番",
+			"productCodePlaceholder": "例：de077",
+			"subProductCode": "子品番",
+			"salesChannel": "販売チャネル",
+			"listingDate": "上架日",
+			"initialStock": "初期在庫",
+			"safetyStock": "安全在庫",
+			"sellingPriceJpy": "販売価格（JPY）",
+			"remarks": "備考"
+		},
+		"stockDialog": {
+			"sold": "販売数",
+			"returned": "退货数"
+		},
+		"message": {
+			"loadFailed": "販売一覧の読み込みに失敗しました",
+			"createSuccess": "上架が完了しました",
+			"createFailed": "上架に失敗しました",
+			"updateSuccess": "在庫を更新しました",
+			"discontinueSuccess": "販売を終了しました",
+			"relistSuccess": "再上架しました",
+			"deleteSuccess": "削除しました",
+			"actionFailed": "操作に失敗しました",
+			"deleteConfirm": "この販売記録を削除しますか？"
+		},
+		"validation": {
+			"salesChannelRequired": "販売チャネルを選択してください"
+		}
+	},
+	"shipmentBatch": {
+		"title": "出荷バッチ管理",
+		"action": {
+			"create": "新規出荷バッチ"
+		},
+		"filter": {
+			"status": "ステータス"
+		},
+		"column": {
+			"batchCode": "バッチ番号",
+			"shipmentQuantity": "出荷数量",
+			"factoryShipDate": "工場出荷日",
+			"actualShipDate": "実際倉庫到着日",
+			"status": "ステータス",
+			"remarks": "備考",
+			"createBy": "作成者",
+			"createTime": "作成日時"
+		},
+		"status": {
+			"待验货": "検査待ち",
+			"验货中": "検査中",
+			"已验货": "検査済",
+			"已取消": "キャンセル済"
+		},
+		"dialog": {
+			"createTitle": "新規出荷バッチ",
+			"editTitle": "出荷バッチ編集",
+			"procurementId": "発注番号",
+			"batchCode": "バッチ番号",
+			"batchCodePlaceholder": "SB-20260501-001",
+			"shipmentQuantity": "出荷数量",
+			"factoryShipDate": "工場出荷日",
+			"actualShipDate": "実際倉庫到着日",
+			"status": "ステータス",
+			"remarks": "備考",
+			"cancel": "キャンセル",
+			"save": "保存"
+		},
+		"validation": {
+			"batchCodeRequired": "バッチ番号は必須です",
+			"quantityRequired": "出荷数量は必須です"
+		},
+		"message": {
+			"createSuccess": "出荷バッチを作成しました",
+			"deleteSuccess": "出荷バッチを削除しました",
+			"deleteConfirm": "出荷バッチ「{batchCode}」を削除しますか？",
+			"deleteConfirmTitle": "削除確認"
+		}
+	},
+	"user": {
+		"title": "ユーザー管理",
+		"newButton": "ユーザーを追加",
+		"exportButton": "Excel出力",
+		"stat": {
+			"total": "ユーザー総数",
+			"normal": "正常",
+			"disabled": "無効",
+			"todayLogin": "本日ログイン"
+		},
+		"filter": {
+			"keyword": "名前/アカウント/メール",
+			"company": "所属会社",
+			"department": "所属部門",
+			"role": "役割",
+			"status": "ステータス"
+		},
+		"column": {
+			"userCode": "ユーザーコード",
+			"username": "ログインアカウント",
+			"nameCn": "中国語名",
+			"nameJp": "日本語名",
+			"email": "メール",
+			"phone": "電話番号",
+			"company": "所属会社",
+			"department": "所属部門",
+			"positions": "役職",
+			"roles": "役割",
+			"status": "ステータス",
+			"lastLoginTime": "最終ログイン",
+			"lastLoginIp": "ログインIP",
+			"createTime": "作成日時",
+			"action": "操作"
+		},
+		"status": {
+			"normal": "正常",
+			"disabled": "無効"
+		},
+		"action": {
+			"detail": "詳細",
+			"edit": "編集",
+			"delete": "削除",
+			"disable": "無効",
+			"enable": "有効化",
+			"resetPassword": "パスワードリセット",
+			"assignRole": "役割を割り当て"
+		},
+		"dialog": {
+			"createTitle": "ユーザーの追加",
+			"editTitle": "ユーザーの編集",
+			"detailTitle": "ユーザー詳細",
+			"roleTitle": "役割を割り当て",
+			"passwordTitle": "パスワードリセット",
+			"userCode": "ユーザーコード",
+			"username": "ログインアカウント",
+			"nameCn": "中国語名",
+			"nameJp": "日本語名",
+			"email": "メール",
+			"phone": "電話番号",
+			"avatar": "アバター",
+			"company": "所属会社",
+			"department": "所属部門",
+			"positions": "役職",
+			"role": "役割",
+			"password": "初期パスワード",
+			"newPassword": "新しいパスワード",
+			"confirmPassword": "パスワード確認",
+			"oldPassword": "以前のパスワード",
+			"cancel": "キャンセル",
+			"save": "保存"
+		},
+		"validation": {
+			"usernameRequired": "ログインアカウントは必須です",
+			"emailRequired": "メールは必須です",
+			"emailFormat": "メールの形式が正しくありません",
+			"passwordRequired": "パスワードは必須です",
+			"passwordMismatch": "パスワードが一致しません",
+			"companyRequired": "会社を選択してください",
+			"departmentRequired": "部門を選択してください"
+		},
+		"message": {
+			"createSuccess": "ユーザーが作成されました",
+			"updateSuccess": "ユーザーが更新されました",
+			"deleteSuccess": "ユーザーが削除されました",
+			"resetPasswordSuccess": "パスワードがリセットされました。大切に保管してください",
+			"deleteConfirm": "ユーザー「{username}」を削除しますか？",
+			"deleteConfirmTitle": "削除の確認"
+		}
+	},
+	"role": {
+		"title": "役割管理",
+		"newButton": "役割を追加",
+		"column": {
+			"roleCode": "役割コード",
+			"roleNameCn": "中国語名",
+			"roleNameJp": "日本語名",
+			"roleType": "役割タイプ",
+			"description": "説明",
+			"userCount": "メンバー数",
+			"createTime": "作成日時"
+		},
+		"type": {
+			"SYSTEM": "システム組み込み",
+			"BUSINESS": "ビジネス役割"
+		},
+		"action": {
+			"edit": "編集",
+			"delete": "削除",
+			"config": "権限を設定"
+		},
+		"dialog": {
+			"createTitle": "役割を追加",
+			"editTitle": "役割を編集",
+			"roleCode": "役割コード",
+			"roleNameCn": "役割名（中国語）",
+			"roleNameJp": "役割名（日本語）",
+			"roleType": "役割タイプ",
+			"description": "説明",
+			"cancel": "キャンセル",
+			"save": "保存設定"
+		},
+		"module": {
+			"procurement": "発注管理",
+			"logistics": "物流管理",
+			"customs": "通関管理",
+			"finance": "財務管理",
+			"sales": "販売管理",
+			"product": "商品管理",
+			"system": "システム管理"
+		},
+		"permission": {
+			"selectTip": "左側の役割を選択して権限を設定してください"
+		},
+		"message": {
+			"createSuccess": "役割が作成されました",
+			"updateSuccess": "役割が更新されました",
+			"deleteSuccess": "役割が削除されました",
+			"deleteConfirm": "役割「{name}」を削除しますか？",
+			"deleteConfirmTitle": "削除の確認",
+			"deleteSystemRole": "システム組み込みの役割は削除できません",
+			"permissionSaved": "権限設定が保存されました"
+		},
+		"validation": {
+			"roleCodeRequired": "役割コードは必須です",
+			"roleNameCnRequired": "役割名は必須です"
+		}
+	},
+	"auditLog": {
+		"title": "操作ログ",
+		"column": {
+			"createTime": "操作時間",
+			"username": "アカウント",
+			"operatorName": "操作者",
+			"module": "モジュール",
+			"action": "アクション",
+			"httpMethod": "メソッド",
+			"httpUrl": "URL",
+			"resourceType": "リソースタイプ",
+			"resourceId": "リソースID",
+			"ipAddress": "IP アドレス",
+			"traceId": "链路 ID",
+			"detail": "詳細"
+		},
+		"filter": {
+			"userId": "操作者アカウント",
+			"module": "モジュール",
+			"action": "アクション",
+			"resourceType": "リソースタイプ",
+			"startTime": "開始時間",
+			"endTime": "終了時間",
+			"reset": "リセット",
+			"search": "検索"
+		},
+		"action": {
+			"viewDetail": "詳細を見る"
+		},
+		"detail": {
+			"title": "ログ詳細",
+			"close": "閉じる"
+		},
+		"module": {
+			"auth": "認証",
+			"procurement": "発注管理",
+			"factory": "工場管理",
+			"product": "商品管理",
+			"user": "ユーザー管理",
+			"role": "役割管理",
+			"logistics": "物流管理",
+			"replenishment": "補充需求",
+			"japan_customs": "日本通関",
+			"customs": "通関管理",
+			"sales": "販売管理",
+			"qc": "検品管理",
+			"tax_refund": "退税管理",
+			"shipment": "出荷管理",
+			"warehouse": "倉庫管理",
+			"notification": "通知管理",
+			"finance": "財務管理"
+		},
+		"actionTag": {
+			"LOGIN": "ログイン",
+			"LOGOUT": "ログアウト",
+			"CREATE": "新規作成",
+			"UPDATE": "更新",
+			"DELETE": "削除",
+			"APPROVE": "承認",
+			"REJECT": "却下",
+			"AUTH_DENIED": "権限不足"
+		},
+		"message": {
+			"loadFailed": "ログ一覧の読み込みに失敗しました",
+			"detailLoadFailed": "ログ詳細の読み込みに失敗しました"
+		},
+		"noPermission": "このページにアクセスする権限がありません"
+	},
+	"profile": {
+		"title": "プロフィール",
+		"tab": {
+			"info": "基本情報",
+			"security": "アカウントセキュリティ",
+			"preferences": "環境設定"
+		},
+		"info": {
+			"nameCn": "中国語名",
+			"nameJp": "日本語名",
+			"email": "メール",
+			"phone": "電話番号",
+			"avatar": "アバター",
+			"company": "所属会社",
+			"department": "所属部門",
+			"positions": "役職",
+			"status": "アカウントステータス",
+			"createdAt": "作成日時",
+			"lastLogin": "最終ログイン",
+			"roles": "役割",
+			"uploadAvatar": "アバターをアップロード",
+			"uploadTip": "JPG/PNG対応、最大2MB"
+		},
+		"avatar": {
+			"hint": "アバターをクリックして変更（200×200 JPG）",
+			"uploadSuccess": "アバターをアップロードしました",
+			"invalidType": "JPG、PNG、WebP形式のみ対応しています",
+			"fileTooLarge": "ファイルサイズは5MB以下にしてください",
+			"loadError": "画像読み込みに失敗しました。再試行してください"
+		},
+		"security": {
+			"changePassword": "パスワード変更",
+			"oldPassword": "以前のパスワード",
+			"newPassword": "新しいパスワード",
+			"confirmPassword": "パスワード確認",
+			"passwordStrength": "パスワード強度",
+			"loginHistory": "ログイン履歴",
+			"device": "デバイス",
+			"passwordRules": "パスワードルール",
+			"rules": [
+				"8-20文字",
+				"大文字、小文字、数字を含む必要あり",
+				"現在のパスワードと同じにはできません"
+			]
+		},
+		"preferences": {
+			"language": "インターフェース言語",
+			"timezone": "インターフェースタイムゾーン",
+			"dateFormat": "日付形式",
+			"numberFormat": "数字形式",
+			"tableDensity": "テーブル密度"
+		},
+		"status": {
+			"NORMAL": "正常",
+			"DISABLED": "無効"
+		},
+		"strength": {
+			"weak": "弱い",
+			"medium": "中",
+			"strong": "強い"
+		},
+		"message": {
+			"loadFailed": "ユーザー情報の読み込みに失敗しました",
+			"updateSuccess": "保存しました",
+			"updateFailed": "保存に失敗しました",
+			"passwordChangeSuccess": "パスワードを変更しました",
+			"passwordChangeFailed": "パスワード変更に失敗しました",
+			"passwordMismatch": "パスワードが一致しません",
+			"passwordWrong": "以前のパスワードが正しくありません",
+			"passwordWeak": "パスワード強度が不足しています"
+		},
+		"menuLabels": {
+			"profile": "プロフィール"
+		}
+	},
+	"cosTest": {
+		"title": "COS テンセントクラウドテスト",
+		"statusTitle": "設定状態",
+		"refresh": "更新",
+		"enabled": "有効",
+		"disabled": "無効",
+		"secretIdConfigured": "SecretId 設定済み",
+		"secretKeyConfigured": "SecretKey 設定済み",
+		"yes": "はい",
+		"no": "いいえ",
+		"bucket": "Bucket",
+		"region": "Region",
+		"domain": "Domain",
+		"prefix": "保存パス接頭辞",
+		"maxFileSize": "最大ファイルサイズ",
+		"clickRefresh": "「更新」をクリックして設定状態を読み込む",
+		"uploadTitle": "アップロードテスト",
+		"uploadHint": "JPG / PNG / WEBP対応、最大5MB",
+		"dragHint": "画像をここにドラッグ、または<em>クリックして選択</em>",
+		"devOnly": "開発・デバッグのみ",
+		"uploadToCos": "COSにアップロード",
+		"clear": "クリア",
+		"uploadSuccess": "アップロード成功",
+		"filename": "ファイル名",
+		"filesize": "ファイルサイズ",
+		"cosUrl": "COS URL",
+		"deleteFromCos": "COSから削除",
+		"deleteSuccess": "削除成功"
+	}
 }

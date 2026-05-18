@@ -123,7 +123,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="leadTimeDays" :label="$t('order.column.leadTimeDays')" min-width="100" align="center">
-          <template #default="{ row }">{{ row.leadTimeDays ? `${row.leadTimeDays}天` : '-' }}</template>
+          <template #default="{ row }">{{ formatLeadTime(row.leadTimeDays) }}</template>
         </el-table-column>
         <el-table-column prop="status" :label="$t('order.column.status')" min-width="110" align="center">
           <template #default="{ row }">
@@ -193,7 +193,7 @@
         <el-descriptions-item :label="$t('order.drawer.factoryShipDate')">{{ currentRow.factoryShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.plannedShipDate')">{{ currentRow.plannedShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.actualShipDate')">{{ currentRow.actualShipDate || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('order.drawer.leadTimeDays')">{{ currentRow.leadTimeDays ? `${currentRow.leadTimeDays}天` : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.leadTimeDays')">{{ formatLeadTime(currentRow.leadTimeDays) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.cartonNotes')">{{ currentRow.cartonNotes || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.afterSalesDeadline')">{{ currentRow.afterSalesDeadline || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.productLead')">{{ currentRow.productLead || '-' }}</el-descriptions-item>
@@ -378,9 +378,7 @@
           <el-col :span="8">
             <el-form-item :label="$t('order.dialog.leadTimeDays')">
               <el-select v-model="formData.leadTimeDays" style="width: 100%" clearable>
-                <el-option :value="30" label="30天" />
-                <el-option :value="45" label="45天" />
-                <el-option :value="60" label="60天" />
+                <el-option v-for="opt in leadTimeOptions" :key="opt.value" :value="opt.value" :label="opt.label" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -506,6 +504,12 @@ const { hasPermission } = usePermission()
 const ORDER_STATUS_ORDERED = '已下单'
 const ORDER_STATUS_SHIPPED = '已出货'
 const ORDER_STATUS_RETURNED = '退货'
+
+const leadTimeOptions = [
+  { value: 30, label: `30${t('common.units.day')}` },
+  { value: 45, label: `45${t('common.units.day')}` },
+  { value: 60, label: `60${t('common.units.day')}` },
+]
 
 const deletableStatuses = [ORDER_STATUS_ORDERED]
 const ORDER_STATUSES = [ORDER_STATUS_ORDERED, ORDER_STATUS_SHIPPED]
@@ -979,6 +983,11 @@ function statusLabelByValue(status: string): string {
 
 function statusType(row: ProcurementPageVO): string {
   return (row.batchCount ?? 0) > 0 ? 'success' : 'warning'
+}
+
+function formatLeadTime(days: number | undefined | null): string {
+  if (!days) return '-'
+  return `${days}${t('common.units.day')}`
 }
 
 async function onToggleStatus(row: ProcurementPageVO) {
