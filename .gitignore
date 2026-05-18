@@ -140,6 +140,8 @@ docker-compose.override.yml
 application-local.yaml
 application-local*.yml
 application-local*.yaml
+**/application-local.yml
+apps/*/src/main/resources/application-local.yml
 *.env.local
 *.env.*.local
 secret*.yml
