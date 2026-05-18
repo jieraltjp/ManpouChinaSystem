@@ -55,8 +55,12 @@ public class AuditLogController {
     public Result<Void> receiveFromAllinone(
             @RequestBody AuditLogReceiveCmd cmd,
             @RequestHeader(value = "X-AuditLog-Secret", required = false) String secret) {
-        if (auditLogSecret != null && !auditLogSecret.isBlank()
-                && !auditLogSecret.equals(secret)) {
+        // 未配置 secret 时拒绝所有写入，防止开放漏洞
+        if (auditLogSecret == null || auditLogSecret.isBlank()) {
+            log.warn("[AuditLog] audit-log secret not configured, rejecting write");
+            return Result.fail("auditLog.unauthorized", "AuditLog secret not configured");
+        }
+        if (!auditLogSecret.equals(secret)) {
             log.warn("[AuditLog] unauthorized POST attempt from {}", secret);
             return Result.fail("auditLog.unauthorized", "Unauthorized");
         }
