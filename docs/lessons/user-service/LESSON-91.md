@@ -45,19 +45,39 @@ flyway:
 
 ## 修复
 
-**1. 创建 Flyway 迁移脚本** `user-service/src/main/resources/db/migration/V3__add_language_timezone.sql`：
+**最终方案：`ApplicationRunner` 启动时执行 DDL**（优于 Flyway，避免迁移文件管理复杂性）：
 
-```sql
-ALTER TABLE `user` ADD COLUMN `language` VARCHAR(10) DEFAULT 'zh' COMMENT '界面语言 zh/ja';
-ALTER TABLE `user` ADD COLUMN `timezone` VARCHAR(50) DEFAULT 'Asia/Shanghai' COMMENT '界面时区';
+`UserServiceApplication.java` 添加静态内部类 `DatabaseInitializer`：
+
+```java
+@Slf4j
+@Component
+@RequiredArgsConstructor
+static class DatabaseInitializer {
+    private final JdbcTemplate jdbc;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void init() {
+        addColumnIfNotExists("language", "VARCHAR(10) DEFAULT 'zh' COMMENT '界面语言'");
+        addColumnIfNotExists("timezone", "VARCHAR(50) DEFAULT 'Asia/Shanghai' COMMENT '界面时区'");
+        alterColumnIfTooSmall("avatar_url", "MEDIUMTEXT DEFAULT NULL COMMENT '头像Base64或URL'");
+    }
+
+    private void addColumnIfNotExists(String column, String definition) {
+        try {
+            jdbc.execute("ALTER TABLE `user` ADD COLUMN " + column + " " + definition);
+            log.info("Added column: {}", column);
+        } catch (Exception e) {
+            log.debug("Column {} already exists or error: {}", column, e.getMessage());
+        }
+    }
+}
 ```
 
-**2. 启用 Flyway** `application.yml`：
-
+`application.yml`：Flyway 禁用，改由 ApplicationRunner 管理列：
 ```yaml
 flyway:
-  enabled: true
-  baseline-on-migrate: true  # V1/V2 已有表结构，基线化后只执行 V3
+  enabled: false
 ```
 
 ---
@@ -66,5 +86,5 @@ flyway:
 
 | 场景 | 检查项 |
 |------|--------|
-| 新增 Entity 字段 | 确认目标服务 ddl-auto 设置；若为 none，手动建列或启用 Flyway 迁移 |
-| user-service 新字段 | 始终通过 Flyway 迁移脚本添加，禁止 AdminController 一次性修复 |
+| 新增 Entity 字段 | 确认目标服务 ddl-auto 设置；若为 none，在 DatabaseInitializer 中添加 ALTER TABLE |
+| user-service 新字段 | 在 DatabaseInitializer.init() 中添加 `addColumnIfNotExists` 调用 |
