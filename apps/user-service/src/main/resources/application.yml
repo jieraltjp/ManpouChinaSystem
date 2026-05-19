@@ -48,7 +48,8 @@ spring:
 
   # Flyway 数据库迁移
   flyway:
-    enabled: false  # 禁用：DB 已由 JPA ddl-auto 或手动维护；avatar 列由 allinone V17 维护，AdminController 一次性修复
+    enabled: true
+    baseline-on-migrate: true  # V1/V2 已有表结构，基线化后只执行 V3
 
   # Redis（暂无使用，待安装 Redis 后启用）
   data:
