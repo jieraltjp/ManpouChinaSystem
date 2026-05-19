@@ -2160,6 +2160,12 @@
 			"profile": "プロフィール"
 		}
 	},
+	"dashboard": {
+		"timezone": {
+			"CST": "中国標準時 (UTC+8)",
+			"JST": "日本標準時 (UTC+9)"
+		}
+	},
 	"cosTest": {
 		"title": "COS テンセントクラウドテスト",
 		"statusTitle": "設定状態",

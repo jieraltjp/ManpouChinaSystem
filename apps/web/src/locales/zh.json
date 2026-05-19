@@ -2160,6 +2160,12 @@
 			"profile": "个人中心"
 		}
 	},
+	"dashboard": {
+		"timezone": {
+			"CST": "中国标准时间 (UTC+8)",
+			"JST": "日本标准时间 (UTC+9)"
+		}
+	},
 	"cosTest": {
 		"title": "COS 腾讯云测试",
 		"statusTitle": "配置状态",

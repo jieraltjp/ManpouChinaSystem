@@ -30,6 +30,7 @@
 | COS 图片预览 404 | [77](#77-cos-url-含-query-param-导致预览-404) |
 | JPQL 枚举强转 String ClassCastException | [88](#88-jpql-返回枚举字段强转为-string-导致-classcastexception) |
 | Avast SSL 拦截导致 COS TLS 握手失败 | [89](#89-avast-ssl-扫描拦截导致腾讯云-cos-tls-握手失败) |
+| i18n key 缺失运行时[intlify] Not found | [90](#90-i18n-key-缺失运行时-intlify-not-found) |
 | client.ts 解包导致页面无数据 | [74](#74-clientts-resultt-解包一致性问题) |
 | #_return SpEL 不生效 | [85](#85-return-对-responseentityresultlist-静默失效) |
 | sanitizeImpl cyclic 误判 | [86](#86-sanitizeimpl-visited-集合误判-dag-为-cyclic) |
@@ -394,3 +395,4 @@ docs/lessons/
 | 87 | 2026-05-12 JWT 缺少 realName/companyId/departmentId claim → operatorName 始终 null |
 | 88 | 2026-05-19 JPQL 枚举字段 (ProductCategory) 返回 Object[] 强转为 String → ClassCastException 500 |
 | 89 | 2026-05-19 Avast 企业版 SSL 扫描拦截 → COS SDK PKIX 验证失败，TLS 握手无法建立 |
+| 90 | 2026-05-19 `dashboard.timezone.CST/JST` i18n key 缺失 → [intlify] Not found 运行时错误 |
