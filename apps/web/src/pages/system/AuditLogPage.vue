@@ -107,6 +107,7 @@
     </el-drawer>
   </div>
   <el-empty v-else :description="$t('auditLog.noPermission')" />
+</template>
 
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'

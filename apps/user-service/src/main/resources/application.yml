@@ -46,10 +46,9 @@ spring:
         order_inserts: true
         order_updates: true
 
-  # Flyway 数据库迁移
+  # Flyway 数据库迁移（已禁用，列管理由 ApplicationRunner 处理）
   flyway:
-    enabled: true
-    baseline-on-migrate: true  # V1/V2 已有表结构，基线化后只执行 V3
+    enabled: false
 
   # Redis（暂无使用，待安装 Redis 后启用）
   data:
@@ -97,7 +96,7 @@ jwt:
 # ============================================================
 app:
   audit-log:
-    secret: ${AUDIT_LOG_SECRET:}              # allinone 写入日志的校验密钥
+    secret: ${AUDIT_LOG_SECRET:CHANGE-ME-AUDIT-SECRET}  # allinone 写入日志的校验密钥
   config:
     source: ${CONFIG_SOURCE:properties}       # 配置源类型
     local:
