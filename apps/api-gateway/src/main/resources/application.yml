@@ -6,6 +6,11 @@ spring:
     name: api-gateway
   main:
     web-application-type: reactive
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 
   # Nacos 配置中心（本地 dev 无 Docker 时禁用检查；生产启用需设置 spring.profiles.active=dev）
   cloud:
@@ -136,5 +141,7 @@ management:
     tags:
       service: ${spring.application.name}
   health:
+    redis:
+      enabled: false   # 本地无 Redis 时排除健康检查
     circuitbreakers:
       enabled: true

@@ -268,5 +268,6 @@
       "Bash(tasklist *)",
       "Bash(cmd.exe *)"
     ]
-  }
+  },
+  "enabledPlugins": {}
 }

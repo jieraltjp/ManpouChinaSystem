@@ -33,12 +33,12 @@ spring:
 
   # JPA 配置
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: none  # 禁用 Hibernate schema 管理，依赖 Flyway 或手动维护
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
         jdbc:
           batch_size: 50
