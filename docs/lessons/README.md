@@ -29,6 +29,7 @@
 | nativeQuery + Pageable ORDER BY 500 | [60](#60-nativequery--pageable-order-by-陷阱) |
 | COS 图片预览 404 | [77](#77-cos-url-含-query-param-导致预览-404) |
 | JPQL 枚举强转 String ClassCastException | [88](#88-jpql-返回枚举字段强转为-string-导致-classcastexception) |
+| Avast SSL 拦截导致 COS TLS 握手失败 | [89](#89-avast-ssl-扫描拦截导致腾讯云-cos-tls-握手失败) |
 | client.ts 解包导致页面无数据 | [74](#74-clientts-resultt-解包一致性问题) |
 | #_return SpEL 不生效 | [85](#85-return-对-responseentityresultlist-静默失效) |
 | sanitizeImpl cyclic 误判 | [86](#86-sanitizeimpl-visited-集合误判-dag-为-cyclic) |
@@ -121,6 +122,7 @@
 | 86 | sanitizeImpl visited 集合误判 DAG 为 cyclic | [backend/LESSON-86.md](./backend/LESSON-86.md) |
 | 87 | 操作日志 operatorName 始终 null | [audit/LESSON-87.md](./audit/LESSON-87.md) |
 | 88 | JPQL 返回枚举字段强转为 String 导致 ClassCastException | [backend/LESSON-88.md](./backend/LESSON-88.md) |
+| 89 | Avast SSL 扫描拦截导致腾讯云 COS TLS 握手失败 | [ops/LESSON-89.md](./ops/LESSON-89.md) |
 
 > 注：Lesson 15, 19, 22-23, 35-36, 61 未分配，保持编号连续便于追溯历史。
 
@@ -160,6 +162,7 @@
 | 26 | 打包禁止 `-q` + 确保无旧进程锁 JAR | JAR 不可用 |
 | 27 | 运行时依赖不能是 test scope | 启动失败 |
 | 28 | 编译与启动必须分离，错误必须可见 | 错误被掩盖 |
+| 89 | 新增第三方 HTTPS 调用先 curl -v 验证 TLS 连通性 | Avast SSL 拦截导致 COS 500 |
 
 ### 数据库 — database/
 
@@ -337,6 +340,9 @@
 ### 88. JPQL 返回枚举字段强转为 String ClassCastException {#88-jpql-返回枚举字段强转为-string-classcastexception}
 文件：[backend/LESSON-88.md](./backend/LESSON-88.md)
 
+### 89. Avast SSL 扫描拦截导致腾讯云 COS TLS 握手失败 {#89-avast-ssl-扫描拦截导致腾讯云-cos-tls-握手失败}
+文件：[ops/LESSON-89.md](./ops/LESSON-89.md)
+
 ---
 
 ## 目录结构
@@ -344,7 +350,7 @@
 ```
 docs/lessons/
 ├── backend/        ← Java / Spring / JPA / DDD（L1-6, 10, 25, 29-30, 34, 38, 76, 85-86, 88）
-├── ops/            ← 构建 / 部署 / 环境 / 运维（L7, 9, 17-18, 20, 26-28）
+├── ops/            ← 构建 / 部署 / 环境 / 运维（L7, 9, 17-18, 20, 26-28, 89）
 ├── database/       ← 数据库 / Flyway / Schema（L8, 13, 31-32, 39, 45, 51, 59, 60）
 ├── frontend/       ← 前端 Vue / TS / i18n / Element Plus（L11-12, 14, 16, 21, 24, 33-34, 37, 40-60, 74, 77）
 ├── security/       ← JWT / 权限 / 认证（L68-69, 72-73, 75, 78-79）
@@ -387,3 +393,4 @@ docs/lessons/
 | 86 | 2026-05-12 sanitizeImpl visited 集合误判 DAG 结构为 cyclic |
 | 87 | 2026-05-12 JWT 缺少 realName/companyId/departmentId claim → operatorName 始终 null |
 | 88 | 2026-05-19 JPQL 枚举字段 (ProductCategory) 返回 Object[] 强转为 String → ClassCastException 500 |
+| 89 | 2026-05-19 Avast 企业版 SSL 扫描拦截 → COS SDK PKIX 验证失败，TLS 握手无法建立 |
