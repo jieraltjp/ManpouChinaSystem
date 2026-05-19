@@ -28,6 +28,7 @@
 | Flyway 版本冲突 / 部分失败 | [45](#45-flyway-迁移版本号不得重复), [64](#64-flyway-部分失败后须-repair-再重跑) |
 | nativeQuery + Pageable ORDER BY 500 | [60](#60-nativequery--pageable-order-by-陷阱) |
 | COS 图片预览 404 | [77](#77-cos-url-含-query-param-导致预览-404) |
+| JPQL 枚举强转 String ClassCastException | [88](#88-jpql-返回枚举字段强转为-string-导致-classcastexception) |
 | client.ts 解包导致页面无数据 | [74](#74-clientts-resultt-解包一致性问题) |
 | #_return SpEL 不生效 | [85](#85-return-对-responseentityresultlist-静默失效) |
 | sanitizeImpl cyclic 误判 | [86](#86-sanitizeimpl-visited-集合误判-dag-为-cyclic) |
@@ -119,6 +120,7 @@
 | 85 | `#_return` 对 ResponseEntity/Result\<List\> 静默失效 | [backend/LESSON-85.md](./backend/LESSON-85.md) |
 | 86 | sanitizeImpl visited 集合误判 DAG 为 cyclic | [backend/LESSON-86.md](./backend/LESSON-86.md) |
 | 87 | 操作日志 operatorName 始终 null | [audit/LESSON-87.md](./audit/LESSON-87.md) |
+| 88 | JPQL 返回枚举字段强转为 String 导致 ClassCastException | [backend/LESSON-88.md](./backend/LESSON-88.md) |
 
 > 注：Lesson 15, 19, 22-23, 35-36, 61 未分配，保持编号连续便于追溯历史。
 
@@ -332,13 +334,16 @@
 ### 87. operatorName 始终 null {#87-operatorname-始终-null}
 文件：[audit/LESSON-87.md](./audit/LESSON-87.md)
 
+### 88. JPQL 返回枚举字段强转为 String ClassCastException {#88-jpql-返回枚举字段强转为-string-classcastexception}
+文件：[backend/LESSON-88.md](./backend/LESSON-88.md)
+
 ---
 
 ## 目录结构
 
 ```
 docs/lessons/
-├── backend/        ← Java / Spring / JPA / DDD（L1-6, 10, 25, 29-30, 34, 38, 76, 85-86）
+├── backend/        ← Java / Spring / JPA / DDD（L1-6, 10, 25, 29-30, 34, 38, 76, 85-86, 88）
 ├── ops/            ← 构建 / 部署 / 环境 / 运维（L7, 9, 17-18, 20, 26-28）
 ├── database/       ← 数据库 / Flyway / Schema（L8, 13, 31-32, 39, 45, 51, 59, 60）
 ├── frontend/       ← 前端 Vue / TS / i18n / Element Plus（L11-12, 14, 16, 21, 24, 33-34, 37, 40-60, 74, 77）
@@ -381,3 +386,4 @@ docs/lessons/
 | 85 | 2026-05-12 `#_return` 对 ResponseEntity/Result\<List\> 静默失效 |
 | 86 | 2026-05-12 sanitizeImpl visited 集合误判 DAG 结构为 cyclic |
 | 87 | 2026-05-12 JWT 缺少 realName/companyId/departmentId claim → operatorName 始终 null |
+| 88 | 2026-05-19 JPQL 枚举字段 (ProductCategory) 返回 Object[] 强转为 String → ClassCastException 500 |

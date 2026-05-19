@@ -15,6 +15,7 @@ import com.manpou.allinone.product.application.dto.ProductQuery;
 import com.manpou.allinone.product.application.dto.ProductUpdateCmd;
 import com.manpou.allinone.product.application.dto.SubCodeSuggestVO;
 import com.manpou.allinone.product.domain.model.Product;
+import com.manpou.allinone.product.domain.model.ProductCategory;
 import com.manpou.allinone.product.domain.model.ProductFactory;
 import com.manpou.allinone.product.infrastructure.persistence.jpa.ProductFactoryJpaRepository;
 import com.manpou.allinone.product.domain.repository.ProductRepository;
@@ -229,7 +230,7 @@ public class ProductUseCase {
                 .stream()
                 .collect(java.util.stream.Collectors.toMap(
                         row -> (String) row[0],
-                        row -> (String) row[1],
+                        row -> row[1] == null ? null : ((ProductCategory) row[1]).name(),
                         (v1, v2) -> v1
                 ));
         return uniqueCodes.stream()

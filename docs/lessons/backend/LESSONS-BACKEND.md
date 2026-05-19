@@ -2,7 +2,7 @@
 
 > 项目：ManpouChinaSystem
 > 覆盖范围：Java 编译 / Spring DI / JPA / DDD 分层 / 业务校验
-> Lesson 编号：1–6, 10, 25, 29–34, 38（共 17 条）
+> Lesson 编号：1–6, 10, 25, 29–34, 38, 88（共 18 条）
 
 ---
 
