@@ -53,7 +53,7 @@
         </el-table-column>
         <el-table-column :label="$t('order.column.action')" min-width="180" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="onEdit(row)" v-if="hasPermission('shipment:update')">{{ $t('demand.action.edit') }}</el-button>
+            <el-button link class="btn-blue" size="small" @click="onEdit(row)" v-if="hasPermission('shipment:update')">{{ $t('demand.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click="onDelete(row)"
               :disabled="!deletableStatuses.includes(row.status)" v-if="hasPermission('shipment:delete')">{{ $t('common.delete') }}</el-button>
           </template>

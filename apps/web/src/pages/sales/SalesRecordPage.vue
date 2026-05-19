@@ -271,7 +271,7 @@
         </el-table-column>
         <el-table-column :label="$t('sales.column.action')" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="onView(row); alertDialogVisible = false">{{ $t('sales.action.detail') }}</el-button>
+            <el-button link class="btn-blue" size="small" @click="onView(row); alertDialogVisible = false">{{ $t('sales.action.detail') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
