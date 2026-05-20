@@ -1,10 +1,11 @@
 # SPEC-B13 — 直接采购功能设计
 
-> **版本**: 1.1.0
+> **版本**: 1.2.0
+> **更新**: 2026-05-20（v1.2.0：商品货号改为搜索下拉，选中后自动填充商品信息；Synthetic Demand 复用 demand 链路）
 > **更新**: 2026-05-20（v1.1.0：直接采购复用现有 demand 链路，自动生成空需求记录；新增 ProductType 四种商品类型）
 > **创建**: 2026-05-20
 > **状态**: 📋 设计中
-> **业务背景**: 发注单需支持：无需求直接采购（自动生成空需求记录）以及样品/自用/配件/无关采购 四种商品类型。
+> **业务背景**: 发注单需支持：无需求直接采购（自动生成空需求记录）以及样品/自用/配件/无关采购 四种商品类型；商品货号改为搜索下拉提升录入效率。
 
 ---
 
@@ -38,9 +39,19 @@ public enum ProductCategory {
 
 ### 1.3 问题
 
-1. 直接采购无显式入口，用户不清楚应不选需求还是有专门操作
-2. 样品/自用/配件/无关联采购 无商品类型区分，无法统计
-3. 直接采购在数据上没有需求记录，散单无法与需求采购统一管理
+1. **商品货号手工录入**：当前 `productCode` 为普通文本框，用户需记忆或复制货号，容易出错
+2. 直接采购无显式入口，用户不清楚应不选需求还是有专门操作
+3. 样品/自用/配件/无关联采购 无商品类型区分，无法统计
+4. 直接采购在数据上没有需求记录，散单无法与需求采购统一管理
+
+### 1.4 现有 API 支撑（已有，无需新增）
+
+```typescript
+// product.ts — 已有完整支撑
+productApi.suggestMasterCodes(keyword)  // 货号模糊搜索 → MasterCodeSuggestVO[]
+productApi.getByCode(masterCode)        // 获取商品详情 → ProductPageVO
+productApi.suggestSubCodes(masterCode)   // 子货号搜索
+```
 
 ---
 
@@ -207,7 +218,47 @@ GET /api/v1/procurements?productType=SAMPLE&...
 
 ## 5. 前端设计
 
-### 5.1 新建弹窗 — 商品类型选择
+### 5.1 商品货号搜索下拉（核心 UX 变更）
+
+**现有**：`productCode` 为普通 `el-input`，手工输入。
+
+**改为**：`el-select` + `filterable` + `remote` + `remote-method`，调用 `productApi.suggestMasterCodes()`。
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  商品货号                                              │
+│  ┌─────────────────────────────────────────────────┐  │
+│  │ 🔍 搜索货号...（输入即搜）                      │  │
+│  └─────────────────────────────────────────────────┘  │
+│  ↓ 展开下拉                                          │
+│  ┌─────────────────────────────────────────────────┐  │
+│  │ ny612         ny浴衣 collection 2色           │  │
+│  │ ny007         ny休闲短裤 collection 3色       │  │
+│  │ ad009         ad运动鞋 basic line             │  │
+│  │ de077         de家居服 premium line           │  │
+│  └─────────────────────────────────────────────────┘  │
+│                                                         │
+│  主货号/子货号/分类 → 自动填充（选中后）               │
+└─────────────────────────────────────────────────────────┘
+```
+
+**交互逻辑**：
+
+| 步骤 | 行为 |
+|------|------|
+| 用户聚焦/输入 | 调用 `productApi.suggestMasterCodes(keyword)`，返回匹配列表 |
+| 选择货号后 | 调用 `productApi.getByCode(masterCode)`，自动填充：<br>`category`（分类）、`subProductCode`（子货号）、`material`（材质）、`requiresQc`（是否检测）、`priceRmb`（单价）、`taxPoint`（票点）|
+| 手工修改已填充字段 | 允许，覆盖自动填充值 |
+| 搜索无结果 | 显示"未找到商品，请手工输入货号"提示，`productCode` 降级为文本框 |
+
+**下拉选项展示**：
+
+```
+label = `${masterCode}  ${nameZh || nameEn || ''}  ${colorCount > 1 ? `[${colorCount}色]` : ''}`
+value = masterCode
+```
+
+### 5.2 新建弹窗 — 商品类型选择 + 需求关联
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -216,11 +267,14 @@ GET /api/v1/procurements?productType=SAMPLE&...
 │  商品类型:                                                 │
 │  [普通采购] [样品] [自用] [配件] [无关联]                    │
 │                                                             │
-│  选择「样品/自用/配件/无关联」时：                           │
-│    → 自动生成关联需求（无需手动选择需求）                    │
-│    → 系统将创建一条空需求记录并关联到本采购单                │
+│  关联需求（仅普通采购显示）:                                │
+│  [下拉选择 PENDING 需求 ▼]   ← 现有需求选择器              │
 │                                                             │
-│  [--- 下方为现有表单字段（不变）---]                        │
+│  直接采购（样品/自用/配件/无关联）时：                      │
+│    → 无需选择需求，系统自动生成空需求记录                    │
+│    → 商品货号请使用上方搜索下拉选择                         │
+│                                                             │
+│  [--- 商品信息区域（productCode 改为搜索下拉）---]          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -231,7 +285,7 @@ GET /api/v1/procurements?productType=SAMPLE&...
 | 选择"普通采购" | 显示现有需求选择器（下拉选 PENDING 需求），保持现有流程 |
 | 选择"样品/自用/配件/无关联" | 隐藏需求选择器，后端自动生成空需求并关联 |
 | 选择普通采购 + 选需求后 | 自动代入 productCode/subProductCode/destination/japanLead（现有逻辑） |
-| 选择非普通类型 | productCode 等字段由用户手动填写（无需求代入） |
+| 选择非普通类型 | productCode 使用搜索下拉（来自商品目录），自动填充相关信息 |
 
 ### 5.2 列表 — 商品类型筛选
 
@@ -333,9 +387,10 @@ ELSE:
 | 文件 | 变更类型 |
 |------|----------|
 | `api/procurement.ts` — 接口类型 | 新增 `ProductType`、`syntheticDemand`、`demandCode` |
-| `pages/procurement/ProcurementPage.vue` | 商品类型单选；普通采购显示需求选择器；列表需求列扩展 |
-| `locales/zh.json` | 新增 `order.productType.*` |
-| `locales/ja.json` | 新增 `order.productType.*` |
+| `api/procurement.ts` — `CreateProcurementRequest` | 新增 `productType` |
+| `pages/procurement/ProcurementPage.vue` | **productCode 改为搜索下拉**（el-select filterable remote）；商品类型单选；普通采购显示需求选择器；列表来源列扩展 |
+| `locales/zh.json` | 新增 `order.productType.*`、`order.dialog.productCodeSearchPlaceholder` |
+| `locales/ja.json` | 新增 `order.productType.*`、`order.dialog.productCodeSearchPlaceholder` |
 
 ### 文档
 
@@ -361,17 +416,25 @@ ELSE:
 9. 编译验证
 
 ### Phase 2（前端）
-1. API 类型更新
-2. 商品类型单选组件
-3. 条件显示需求选择器（仅普通采购显示）
-4. 列表需求列扩展（区分 auto-generated）
-5. 商品类型筛选
-6. i18n
-7. TypeScript 编译通过
+1. API 类型更新（`ProductType`、新增字段）
+2. **商品货号搜索下拉**（核心）：
+   - `el-select` + `filterable` + `remote` + `remote-method`
+   - `remote-method` 调用 `productApi.suggestMasterCodes(query)`
+   - 选择后调用 `productApi.getByCode(masterCode)` 自动填充 category/subProductCode/material/requiresQc/priceRmb/taxPoint
+   - 无匹配时降级为普通文本框
+3. 商品类型单选组件（5选1）
+4. 条件显示需求选择器（仅普通采购显示）
+5. 列表来源列扩展（区分 auto-generated `[自动生成]` vs `DM-xxx`）
+6. 商品类型筛选下拉
+7. i18n 新增 key
+8. `npm run type-check` 通过
 
 ### Phase 3（验证）
-1. 普通采购（选需求）→ 正常关联，demand.status → CONFIRMED
-2. 直接采购（样品/自用/配件/无关联）→ 自动生成 synthetic demand，需求列显示"[自动生成]"
-3. 删除直接采购 → synthetic demand 同步删除
-4. 删除普通采购 → demand.status 恢复 PENDING
-5. 按商品类型筛选正确
+1. 货号搜索下拉 → 输入 "ny" 返回匹配列表，选择后自动填充字段
+2. 手工修改已填充字段 → 覆盖自动值成功
+3. 货号搜索无结果 → 降级文本框，提示"未找到商品"
+4. 普通采购（选需求）→ 正常关联，demand.status → CONFIRMED
+5. 直接采购（样品/自用/配件/无关联）→ 自动生成 synthetic demand，需求列显示"[自动生成]"
+6. 删除直接采购 → synthetic demand 同步删除
+7. 删除普通采购 → demand.status 恢复 PENDING
+8. 按商品类型筛选正确
