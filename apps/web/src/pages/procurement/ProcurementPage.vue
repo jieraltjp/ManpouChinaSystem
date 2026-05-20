@@ -64,7 +64,7 @@
         </el-form-item>
         <el-form-item :label="$t('order.filter.productType')">
           <el-select v-model="filterForm.productType" :placeholder="$t('order.filter.all')" clearable style="width: 130px">
-            <el-option v-for="opt in productTypeOptions" :key="opt.value" :label="$t(opt.labelKey)" :value="opt.value" />
+            <el-option v-for="opt in productCategoryOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -220,22 +220,25 @@
     <!-- 新建/编辑弹窗 -->
     <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? $t('order.newDialogTitle') : $t('order.editDialogTitle')" width="900px">
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="88px">
-        <!-- 商品类型（创建时可选） -->
-        <el-form-item v-if="dialogMode === 'create'" :label="$t('order.dialog.productType')">
-          <el-radio-group v-model="productType" size="default">
-            <el-radio-button v-for="opt in productTypeOptions" :key="opt.value" :value="opt.value">
-              {{ $t(opt.labelKey) }}
-            </el-radio-button>
+        <!-- 采购方式：关联补货 / 不关联补货 -->
+        <el-form-item v-if="dialogMode === 'create'" :label="$t('order.dialog.procurementMethod')">
+          <el-radio-group v-model="isLinkedProcurement" size="default">
+            <el-radio-button :value="true">{{ $t('order.dialog.linkedProcurement') }}</el-radio-button>
+            <el-radio-button :value="false">{{ $t('order.dialog.unlinkedProcurement') }}</el-radio-button>
           </el-radio-group>
-          <div v-if="!isNormalProcurement" class="form-tip">
-            {{ $t('order.dialog.productTypeTip') }}
-          </div>
         </el-form-item>
 
-        <!-- 关联需求（仅普通采购显示） -->
-        <el-form-item v-if="dialogMode === 'create' && isNormalProcurement" :label="$t('order.dialog.linkedDemand')">
+        <!-- 关联需求（仅关联补货时显示） -->
+        <el-form-item v-if="dialogMode === 'create' && isLinkedProcurement" :label="$t('order.dialog.linkedDemand')">
           <el-select v-model="selectedDemandId" :placeholder="$t('order.dialog.linkedDemandPlaceholder')" clearable filterable style="width:100%" @change="onDemandChange">
             <el-option v-for="d in demandOptions" :key="d.id" :label="`${d.demandCode} | ${d.productCode} | ${d.demandType === 'NEW_PURCHASE' ? $t('demand.type.newPurchase') : $t('demand.type.replenishment')} | ${$t('demand.status.' + d.status as any)}`" :value="d.id" />
+          </el-select>
+        </el-form-item>
+
+        <!-- 商品分类（仅不关联补货时显示） -->
+        <el-form-item v-if="dialogMode === 'create' && !isLinkedProcurement" :label="$t('order.dialog.productCategory')">
+          <el-select v-model="formData.productCategory" :placeholder="$t('order.dialog.productCategoryPlaceholder')" clearable style="width: 100%">
+            <el-option v-for="opt in productCategoryOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
           </el-select>
         </el-form-item>
 
@@ -611,16 +614,18 @@ const formRef = ref<FormInstance>()
 // 转采购模式：记录当前需求ID，提交后调用 convert API
 const convertingDemandId = ref<number | null>(null)
 
-/** 商品类型（发注单维度） */
+/** 采购方式：关联补货 / 不关联补货 */
 export type ProductType = 'NORMAL' | 'SAMPLE' | 'SELF_USE' | 'PARTS' | 'INDEPENDENT'
-const productTypeOptions: { value: ProductType; labelKey: string }[] = [
-  { value: 'NORMAL', labelKey: 'order.productType.normal' },
-  { value: 'SAMPLE', labelKey: 'order.productType.sample' },
-  { value: 'SELF_USE', labelKey: 'order.productType.selfUse' },
-  { value: 'PARTS', labelKey: 'order.productType.parts' },
-  { value: 'INDEPENDENT', labelKey: 'order.productType.independent' },
+const isLinkedProcurement = ref(true)
+
+/** 商品分类下拉（仅不关联补货时显示） */
+const productCategoryOptions: { value: ProductType; label: string }[] = [
+  { value: 'NORMAL', label: '普通采购' },
+  { value: 'SAMPLE', label: '样品' },
+  { value: 'SELF_USE', label: '自用' },
+  { value: 'PARTS', label: '配件' },
+  { value: 'INDEPENDENT', label: '无关联' },
 ]
-const productType = ref<ProductType>('NORMAL')
 
 /** 商品货号搜索下拉 */
 const productCodeSearchResults = ref<MasterCodeSuggestVO[]>([])
@@ -799,8 +804,6 @@ async function doCreateProcurement(req: CreateProcurementRequest) {
   loadData()
 }
 
-/** 是否普通采购（显示需求选择器） */
-const isNormalProcurement = computed(() => productType.value === 'NORMAL')
 const route = useRoute()
 const router = useRouter()
 const { t, locale: localeRef } = useI18n()
@@ -900,12 +903,12 @@ async function fetchProductCategories(rows: ProcurementPageVO[]) {
   }
 }
 
-/** 选中需求 → 自动带入 productCode / subProductCode / destination / japanLead / quantity + category + 强制普通采购 */
+/** 选中需求 → 自动带入 productCode / subProductCode / destination / japanLead / quantity + category + 切换为关联补货 */
 function onDemandChange(demandId: number | null) {
   if (!demandId) return
   const d = demandOptions.value.find(x => x.id === demandId)
   if (!d) return
-  productType.value = 'NORMAL'
+  isLinkedProcurement.value = true
   formData.productCode = d.productCode
   formData.subProductCode = d.subProductCode || ''
   formData.destination = d.destination || ''
@@ -1035,7 +1038,7 @@ const previewPriceJpy = computed(() => {
   return Math.round(base * 100) / 100
 })
 
-const defaultFormData = (): CreateProcurementRequest & { status?: string; category?: string } => ({
+const defaultFormData = (): CreateProcurementRequest & { status?: string; category?: string; productCategory?: ProductType } => ({
   factoryId: undefined,
   productCode: '',
   subProductCode: '',
@@ -1062,8 +1065,9 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string; catego
   destination: '',
   status: ORDER_STATUS_ORDERED,
   category: '',
+  productCategory: undefined,
 })
-const formData = reactive<CreateProcurementRequest & { status?: string; category?: string }>(defaultFormData())
+const formData = reactive<CreateProcurementRequest & { status?: string; category?: string; productCategory?: ProductType }>(defaultFormData())
 
 const formRules = {
   factoryId: [{ required: true, message: () => t('order.validation.factoryRequired'), trigger: 'change' }],
@@ -1129,7 +1133,7 @@ function onReset() {
 
 function onNew() {
   dialogMode.value = 'create'
-  productType.value = 'NORMAL'
+  isLinkedProcurement.value = true
   selectedDemandId.value = null
   subCodeOptions.value = []
   Object.assign(formData, defaultFormData())
@@ -1145,7 +1149,8 @@ function onView(row: ProcurementPageVO) {
 function onEdit(row: ProcurementPageVO | null) {
   dialogMode.value = 'update'
   currentRow.value = row
-  productType.value = (row as any)?.productType || 'NORMAL'
+  isLinkedProcurement.value = row?.productType === 'NORMAL' || !row?.productType
+  formData.productCategory = (row as any)?.productType || undefined
   selectedDemandId.value = null
   Object.assign(formData, {
     factoryId: row?.factoryId ?? undefined,
@@ -1205,9 +1210,19 @@ async function onSubmit() {
     submitting.value = true
     try {
       if (dialogMode.value === 'create') {
+        if (isLinkedProcurement.value && !selectedDemandId.value) {
+          ElMessage.warning(t('order.validation.demandRequired'))
+          submitting.value = false
+          return
+        }
+        if (!isLinkedProcurement.value && !formData.productCategory) {
+          ElMessage.warning(t('order.validation.productCategoryRequired'))
+          submitting.value = false
+          return
+        }
         const req: CreateProcurementRequest = {
           factoryId: formData.factoryId || undefined,
-          productType: productType.value || undefined,
+          productType: isLinkedProcurement.value ? 'NORMAL' : formData.productCategory,
           productCode: formData.productCode,
           subProductCode: formData.subProductCode || undefined,
           material: formData.material || undefined,
@@ -1253,6 +1268,7 @@ async function onSubmit() {
       } else if (currentRow.value) {
         const req: UpdateProcurementRequest = {
           factoryId: formData.factoryId || undefined,
+          productType: isLinkedProcurement.value ? 'NORMAL' : formData.productCategory,
           productCode: formData.productCode,
           subProductCode: formData.subProductCode || undefined,
           material: formData.material || undefined,
