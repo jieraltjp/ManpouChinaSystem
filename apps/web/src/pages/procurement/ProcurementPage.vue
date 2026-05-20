@@ -258,7 +258,7 @@
 
         <!-- 商品信息 -->
         <el-row :gutter="16">
-          <el-col :span="8">
+          <el-col :span="7">
             <el-form-item :label="$t('order.dialog.productCode')" prop="productCode">
               <el-select
                 v-model="formData.productCode"
@@ -280,7 +280,7 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="10">
             <el-form-item :label="$t('order.dialog.subProductCode')">
               <div class="factory-select-row">
                 <el-select
@@ -313,7 +313,7 @@
               </div>
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="7">
             <el-form-item :label="$t('order.dialog.category')">
               <el-input v-model="formData.category" :placeholder="$t('order.dialog.categoryPlaceholder')" readonly />
             </el-form-item>
@@ -1247,7 +1247,7 @@ async function onSubmit() {
           japanLead: formData.japanLead || undefined,
           chinaLead: formData.chinaLead || undefined,
           destination: formData.destination || undefined,
-          status: formData.status || undefined,
+          // status 不传，使用数据库默认值 '未定'
         }
         // 检查商品目录中是否已存在此货号，不存在则弹出快速新建弹窗
         try {
