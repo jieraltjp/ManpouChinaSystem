@@ -147,21 +147,22 @@ done
 
 ## 无 REST API 表的手动 SQL
 
-`procurement_snapshot`、`logistics_plan`、`qc_image` 无批量删除接口，
-通过 Flyway V 基线化处理（生产禁止）或手动 SQL：
+`procurement_snapshot`、`logistics_plan`、`qc_image` 无批量删除接口，通过 MySQL 直接清空。
 
-```sql
--- ⚠️ 生产环境禁止执行，仅开发/测试使用
+**注意**：`TRUNCATE` 需要 `DROP` 权限，allinone 用 `root` 用户连接：
 
--- 清空 qc_image
-TRUNCATE TABLE qc_image;
-
--- 清空 procurement_snapshot
-TRUNCATE TABLE procurement_snapshot;
-
--- 清空 logistics_plan
-TRUNCATE TABLE logistics_plan;
+```bash
+"D:/Soft/laragon/bin/mysql/mysql-8.0.30-winx64/bin/mysql.exe" \
+  -h 192.168.13.202 -P 23306 -u root -pmanpou23306 \
+  -e "DELETE FROM manpou.demand_procurement_mapping;
+      DELETE FROM manpou.domestic_customs_record;
+      DELETE FROM manpou.japan_customs_record;
+      DELETE FROM manpou.procurement_snapshot;
+      DELETE FROM manpou.logistics_plan;
+      DELETE FROM manpou.qc_image;"
 ```
+
+**⚠️ 生产环境禁止执行，仅开发/测试使用。**
 
 ---
 
