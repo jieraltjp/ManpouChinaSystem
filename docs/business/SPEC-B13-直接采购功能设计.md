@@ -1,6 +1,7 @@
 # SPEC-B13 — 直接采购功能设计
 
-> **版本**: 1.4.0
+> **版本**: 1.5.0
+> **更新**: 2026-05-20（v1.5.0：子货号改为搜索下拉 + 新建/编辑按钮 ✅）
 > **更新**: 2026-05-20（v1.4.0：提交时检测商品目录，货号不存在则弹出快速新建商品弹窗 ✅）
 > **更新**: 2026-05-20（v1.3.0：前端 Phase 2 完成 ✅ — productCode 搜索下拉 + 商品类型单选 + 筛选栏）
 > **更新**: 2026-05-20（v1.2.0：商品货号改为搜索下拉，选中后自动填充商品信息；Synthetic Demand 复用 demand 链路）
@@ -249,9 +250,23 @@ GET /api/v1/procurements?productType=SAMPLE&...
 | 步骤 | 行为 |
 |------|------|
 | 用户聚焦/输入 | 调用 `productApi.suggestMasterCodes(keyword)`，返回匹配列表 |
-| 选择货号后 | 调用 `productApi.getByCode(masterCode)`，自动填充：<br>`category`（分类）、`subProductCode`（子货号）、`material`（材质）、`requiresQc`（是否检测）、`priceRmb`（单价）、`taxPoint`（票点）|
+| 选择货号后 | 调用 `productApi.getByCode(masterCode)`，自动填充：<br>`category`（分类）、`material`（材质）、`requiresQc`（是否检测）、`priceRmb`（单价）、`taxPoint`（票点）；同时加载该货号的子货号下拉 |
 | 手工修改已填充字段 | 允许，覆盖自动填充值 |
 | 搜索无结果 | 用户仍可自由输入新货号（el-select filterable 支持手动输入）|
+
+**子货号搜索下拉（v1.5.0 ✅）**：
+
+```
+主货号选择后 → 调用 productApi.suggestSubCodes(masterCode)
+→ 填充子货号下拉列表（subCode + colorName）
+→ 用户可搜索/选择已有子货号
+→ 也可点击"新建"添加新的色款变体
+```
+
+| 按钮 | 效果 |
+|------|------|
+| 新建 | 弹出子货号快速创建弹窗：masterCode（只读自动填入）/ subCode（必填）/ colorName（可选）→ 调用 `productApi.create()` |
+| 编辑 | 预留（当前仅支持新建） |
 
 **商品不存在时快速新建（v1.4.0 ✅）**：
 
@@ -437,15 +452,29 @@ ELSE:
    - `el-select` + `filterable` + `remote` + `remote-method`
    - `remote-method` 调用 `productApi.suggestMasterCodes(query)`
    - 选择后调用 `productApi.getByCode(masterCode)` 自动填充 category/material/requiresQc/priceRmb/taxPoint
+   - 同时调用 `productApi.suggestSubCodes(masterCode)` 加载子货号下拉
    - 搜索无结果时用户仍可自由输入新货号
-3. ✅ 商品类型单选组件（5选1，`el-radio-button`）
-4. ✅ 条件显示需求选择器（仅普通采购 NORMAL 显示）
-5. ✅ **提交时检测商品目录，货号不存在则弹出快速新建商品弹窗**
+3. ✅ **子货号搜索下拉**：el-select（filterable remote）+ "新建"按钮（创建色款变体）+ "编辑"按钮（预留）
+4. ✅ 商品类型单选组件（5选1，`el-radio-button`）
+5. ✅ 条件显示需求选择器（仅普通采购 NORMAL 显示）
+6. ✅ **提交时检测商品目录，货号不存在则弹出快速新建商品弹窗**
    - `onSubmit` → `productApi.getByCode(productCode)` → 404 → 弹出 `productCreateDialog`
    - 新建商品成功后继续提交采购单
-6. ⏳ 列表来源列扩展（区分 auto-generated `[自动生成]` vs `DM-xxx`）— 后端未完成，暂挂
-7. ✅ 商品类型筛选下拉
-8. ✅ i18n 新增 key（zh.json / ja.json）
-9. ✅ `npm run type-check` 通过
+7. ⏳ 列表来源列扩展（区分 auto-generated `[自动生成]` vs `DM-xxx`）— 后端未完成，暂挂
+8. ✅ 商品类型筛选下拉
+9. ✅ i18n 新增 key（zh.json / ja.json）
+10. ✅ `npm run type-check` 通过
 
-> ⚠️ Phase 2 第6项（列表来源列）依赖后端 `demandCode` / `syntheticDemand` 字段，待 Phase 1 后端完成后补充。
+> ⚠️ Phase 2 第7项（列表来源列）依赖后端 `demandCode` / `syntheticDemand` 字段，待 Phase 1 后端完成后补充。
+
+### Phase 3（验证）
+1. 货号搜索下拉 → 输入 "ny" 返回匹配列表，选择后自动填充字段 + 加载子货号下拉
+2. 子货号搜索下拉 → 选择主货号后显示子货号列表，可搜索/选择
+3. 子货号点击"新建" → 弹出创建弹窗 → 填写后创建成功 → 刷新下拉并自动选中
+4. 手工修改已填充字段 → 覆盖自动值成功
+5. 输入新货号 → 提交 → 弹出快速新建商品弹窗 → 创建后继续提交采购单
+6. 普通采购（选需求）→ 正常关联，demand.status → CONFIRMED
+7. 直接采购（样品/自用/配件/无关联）→ 自动生成 synthetic demand，需求列显示"[自动生成]"
+8. 删除直接采购 → synthetic demand 同步删除
+9. 删除普通采购 → demand.status 恢复 PENDING
+10. 按商品类型筛选正确
