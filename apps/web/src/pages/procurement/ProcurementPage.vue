@@ -282,7 +282,35 @@
           </el-col>
           <el-col :span="8">
             <el-form-item :label="$t('order.dialog.subProductCode')">
-              <el-input v-model="formData.subProductCode" :placeholder="$t('order.dialog.subProductCodePlaceholder')" />
+              <div class="factory-select-row">
+                <el-select
+                  v-model="formData.subProductCode"
+                  filterable
+                  remote
+                  reserve-keyword
+                  :remote-method="subCodeRemoteSearch"
+                  :loading="subCodeLoading"
+                  :placeholder="$t('order.dialog.subProductCodePlaceholder')"
+                  style="flex:1"
+                  :disabled="!formData.productCode"
+                  @change="onSubCodeSelect"
+                >
+                  <el-option
+                    v-for="item in subCodeOptions"
+                    :key="item.subCode"
+                    :label="`${item.subCode}${item.colorName ? ' — ' + item.colorName : ''}`"
+                    :value="item.subCode"
+                  />
+                </el-select>
+                <el-button size="small" :disabled="!formData.productCode" @click="onSubCodeNew">
+                  <el-icon><Plus /></el-icon>{{ $t('order.dialog.subCodeNew') }}
+                </el-button>
+                <el-tooltip :content="$t('order.dialog.subCodeEdit')" placement="top">
+                  <el-button size="small" :disabled="!formData.subProductCode" @click="onSubCodeEdit">
+                    <el-icon><Edit /></el-icon>
+                  </el-button>
+                </el-tooltip>
+              </div>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -532,6 +560,30 @@
         <el-button type="primary" :loading="productCreateSubmitting" @click="onProductCreateSubmit">{{ $t('order.productCreateDialog.createAndContinue') }}</el-button>
       </template>
     </el-dialog>
+
+    <!-- 子货号搜索下拉 + 新建/编辑弹窗 -->
+    <el-dialog
+      v-model="subCodeDialogVisible"
+      :title="subCodeDialogMode === 'create' ? $t('order.subCodeDialog.newTitle') : $t('order.subCodeDialog.editTitle')"
+      width="420px"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="subCodeForm" label-width="90px">
+        <el-form-item :label="$t('product.dialog.masterCode')">
+          <el-input v-model="subCodeForm.masterCode" readonly disabled />
+        </el-form-item>
+        <el-form-item :label="$t('product.dialog.subCode')" prop="subCode">
+          <el-input v-model="subCodeForm.subCode" :placeholder="$t('product.dialog.subCodePlaceholder')" maxlength="64" />
+        </el-form-item>
+        <el-form-item :label="$t('product.dialog.colorName')">
+          <el-input v-model="subCodeForm.colorName" :placeholder="$t('product.dialog.colorNamePlaceholder')" maxlength="64" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="subCodeDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="subCodeDialogSubmitting" @click="onSubCodeSubmit">{{ $t('order.factoryDialog.save') }}</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -589,6 +641,99 @@ const productCreateRules = {
 /** pendingCreateProcurement: 商品新建成功后待提交的采购请求数据 */
 let pendingCreateReq: CreateProcurementRequest | null = null
 
+/** 子货号搜索下拉 */
+const subCodeOptions = ref<{ subCode: string; colorName?: string }[]>([])
+const subCodeLoading = ref(false)
+
+/** 子货号新建/编辑弹窗 */
+const subCodeDialogVisible = ref(false)
+const subCodeDialogMode = ref<'create' | 'update'>('create')
+const subCodeDialogSubmitting = ref(false)
+const subCodeForm = reactive({
+  masterCode: '',
+  subCode: '',
+  colorName: '',
+})
+
+async function subCodeRemoteSearch(query: string) {
+  if (!formData.productCode) {
+    subCodeOptions.value = []
+    return
+  }
+  if (!query) {
+    // 空查询时也加载全部子货号
+    query = ''
+  }
+  subCodeLoading.value = true
+  try {
+    const res = await productApi.suggestSubCodes(formData.productCode)
+    subCodeOptions.value = res.data ?? []
+  } catch {
+    subCodeOptions.value = []
+  } finally {
+    subCodeLoading.value = false
+  }
+}
+
+function onSubCodeSelect(subCode: string) {
+  if (!subCode) return
+  const found = subCodeOptions.value.find(s => s.subCode === subCode)
+  if (found?.colorName) {
+    // auto-fill colorName if available (future use)
+  }
+}
+
+function onSubCodeNew() {
+  subCodeDialogMode.value = 'create'
+  subCodeForm.masterCode = formData.productCode
+  subCodeForm.subCode = ''
+  subCodeForm.colorName = ''
+  subCodeDialogVisible.value = true
+}
+
+function onSubCodeEdit() {
+  if (!formData.subProductCode) return
+  subCodeDialogMode.value = 'update'
+  subCodeForm.masterCode = formData.productCode
+  subCodeForm.subCode = formData.subProductCode
+  subCodeForm.colorName = ''
+  subCodeDialogVisible.value = true
+}
+
+async function onSubCodeSubmit() {
+  if (!subCodeForm.subCode) {
+    ElMessage.warning(t('order.validation.subCodeRequired'))
+    return
+  }
+  subCodeDialogSubmitting.value = true
+  try {
+    if (subCodeDialogMode.value === 'create') {
+      await productApi.create({
+        masterCode: subCodeForm.masterCode,
+        subCode: subCodeForm.subCode,
+        colorName: subCodeForm.colorName || undefined,
+      } as CreateProductRequest)
+      ElMessage.success(t('order.subCodeDialog.createSuccess'))
+      // 刷新子货号下拉
+      await subCodeRemoteSearch('')
+      formData.subProductCode = subCodeForm.subCode
+    } else {
+      // 更新：需要先找到这个产品的 ID
+      // subCode 相同 masterCode 下的产品 ID，通过 suggestSubCodes 找到
+      const found = subCodeOptions.value.find(s => s.subCode === subCodeForm.subCode)
+      if (found) {
+        // 编辑模式暂不支持（需要 product ID），仅提示
+        ElMessage.info(t('order.subCodeDialog.updateNotSupported'))
+      }
+    }
+    subCodeDialogVisible.value = false
+  } catch {
+    // error handled by interceptor
+  } finally {
+    subCodeDialogSubmitting.value = false
+  }
+}
+
 async function productCodeRemoteSearch(query: string) {
   if (!query || query.length < 1) {
     productCodeSearchResults.value = []
@@ -607,6 +752,11 @@ async function productCodeRemoteSearch(query: string) {
 
 function onProductCodeSelect(masterCode: string) {
   if (!masterCode) return
+  // 清空子货号
+  formData.subProductCode = ''
+  subCodeOptions.value = []
+  // 加载 subCode 候选项
+  subCodeRemoteSearch('')
   productApi.getByCode(masterCode).then(res => {
     const p = res.data
     if (!p) return
@@ -997,6 +1147,7 @@ function onNew() {
   dialogMode.value = 'create'
   productType.value = 'NORMAL'
   selectedDemandId.value = null
+  subCodeOptions.value = []
   Object.assign(formData, defaultFormData())
   dialogVisible.value = true
 }
