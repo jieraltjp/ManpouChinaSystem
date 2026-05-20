@@ -218,7 +218,7 @@
     </el-drawer>
 
     <!-- 新建/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? $t('order.newDialogTitle') : $t('order.editDialogTitle')" width="900px">
+    <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? $t('order.newDialogTitle') : $t('order.editDialogTitle')" width="900px" :close-on-click-modal="false" center>
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="88px">
         <!-- 采购方式：关联补货 / 不关联补货 -->
         <el-form-item v-if="dialogMode === 'create'" :label="$t('order.dialog.procurementMethod')">
@@ -232,13 +232,6 @@
         <el-form-item v-if="dialogMode === 'create' && isLinkedProcurement" :label="$t('order.dialog.linkedDemand')">
           <el-select v-model="selectedDemandId" :placeholder="$t('order.dialog.linkedDemandPlaceholder')" clearable filterable style="width:100%" @change="onDemandChange">
             <el-option v-for="d in demandOptions" :key="d.id" :label="`${d.demandCode} | ${d.productCode} | ${d.demandType === 'NEW_PURCHASE' ? $t('demand.type.newPurchase') : $t('demand.type.replenishment')} | ${$t('demand.status.' + d.status as any)}`" :value="d.id" />
-          </el-select>
-        </el-form-item>
-
-        <!-- 商品分类（仅不关联补货时显示） -->
-        <el-form-item v-if="dialogMode === 'create' && !isLinkedProcurement" :label="$t('order.dialog.productCategory')">
-          <el-select v-model="formData.productCategory" :placeholder="$t('order.dialog.productCategoryPlaceholder')" clearable style="width: 100%">
-            <el-option v-for="opt in productCategoryOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
           </el-select>
         </el-form-item>
 
@@ -467,7 +460,7 @@
     </el-dialog>
 
     <!-- 工厂新建/编辑弹窗 -->
-    <el-dialog v-model="factoryDialogVisible" :title="factoryDialogMode === 'create' ? $t('order.factoryDialog.newTitle') : $t('order.factoryDialog.editTitle')" width="640px">
+    <el-dialog v-model="factoryDialogVisible" :title="factoryDialogMode === 'create' ? $t('order.factoryDialog.newTitle') : $t('order.factoryDialog.editTitle')" width="640px" :close-on-click-modal="false" center>
       <el-form ref="factoryFormRef" :model="factoryFormData" :rules="factoryFormRules" label-width="110px">
         <el-form-item :label="$t('order.factoryDialog.factoryName')" prop="factoryName">
           <el-input v-model="factoryFormData.factoryName" :placeholder="$t('order.factoryDialog.factoryNamePlaceholder')" />
@@ -537,6 +530,7 @@
       :title="$t('order.productCreateDialog.title')"
       width="560px"
       :close-on-click-modal="false"
+      center
     >
       <el-form ref="productCreateFormRef" :model="productCreateForm" :rules="productCreateRules" label-width="100px">
         <el-row :gutter="12">
@@ -616,8 +610,11 @@ const convertingDemandId = ref<number | null>(null)
 export type ProductType = 'NORMAL' | 'SAMPLE' | 'SELF_USE' | 'PARTS' | 'INDEPENDENT'
 const isLinkedProcurement = ref(true)
 
-/** 商品分类下拉（仅不关联补货时显示） */
-const productCategoryOptions: { value: ProductType; label: string }[] = [
+/** 商品分类下拉（7项：OEM/普货/出口 + 普通采购/样品/自用/配件/无关联） */
+const productCategoryOptions: { value: ProductType | 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT'; label: string }[] = [
+  { value: 'OEM', label: '批发' },
+  { value: 'ORDINARY', label: '普货' },
+  { value: 'FACTORY_DIRECT', label: '出口' },
   { value: 'NORMAL', label: '普通采购' },
   { value: 'SAMPLE', label: '样品' },
   { value: 'SELF_USE', label: '自用' },
@@ -1065,7 +1062,7 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string; catego
   category: '',
   productCategory: undefined,
 })
-const formData = reactive<CreateProcurementRequest & { status?: string; category?: string; productCategory?: ProductType }>(defaultFormData())
+const formData = reactive<CreateProcurementRequest & { status?: string; category?: string; productCategory?: ProductType | 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT' }>(defaultFormData())
 
 const formRules = {
   factoryId: [{ required: true, message: () => t('order.validation.factoryRequired'), trigger: 'change' }],
@@ -1213,14 +1210,9 @@ async function onSubmit() {
           submitting.value = false
           return
         }
-        if (!isLinkedProcurement.value && !formData.productCategory) {
-          ElMessage.warning(t('order.validation.productCategoryRequired'))
-          submitting.value = false
-          return
-        }
         const req: CreateProcurementRequest = {
           factoryId: formData.factoryId || undefined,
-          productType: isLinkedProcurement.value ? 'NORMAL' : formData.productCategory,
+          productType: 'NORMAL',
           productCode: formData.productCode,
           subProductCode: formData.subProductCode || undefined,
           material: formData.material || undefined,
@@ -1266,7 +1258,7 @@ async function onSubmit() {
       } else if (currentRow.value) {
         const req: UpdateProcurementRequest = {
           factoryId: formData.factoryId || undefined,
-          productType: isLinkedProcurement.value ? 'NORMAL' : formData.productCategory,
+          productType: isLinkedProcurement.value ? 'NORMAL' : undefined,
           productCode: formData.productCode,
           subProductCode: formData.subProductCode || undefined,
           material: formData.material || undefined,
