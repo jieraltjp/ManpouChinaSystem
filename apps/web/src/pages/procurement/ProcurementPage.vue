@@ -566,9 +566,7 @@
           <el-col :span="12">
             <el-form-item :label="$t('product.dialog.category')">
               <el-select v-model="productCreateForm.category" clearable style="width:100%">
-                <el-option value="OEM" :label="$t('product.category.OEM')" />
-                <el-option value="ORDINARY" :label="$t('product.category.ORDINARY')" />
-                <el-option value="FACTORY_DIRECT" :label="$t('product.category.FACTORY_DIRECT')" />
+                <el-option v-for="opt in productCategoryOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -639,7 +637,7 @@ const productCreateForm = reactive({
   masterCode: '',
   subCode: '',
   nameZh: '',
-  category: '' as 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT' | '',
+  category: '' as ProductType | '',
   material: '',
   requiresQc: false,
 })
@@ -687,7 +685,7 @@ function onSubCodeNew() {
   productCreateForm.masterCode = formData.productCode
   productCreateForm.subCode = ''
   productCreateForm.nameZh = ''
-  productCreateForm.category = '' as 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT' | ''
+  productCreateForm.category = '' as ProductType | ''
   productCreateForm.material = ''
   productCreateForm.requiresQc = false
   productCreateDialogVisible.value = true
@@ -1257,7 +1255,7 @@ async function onSubmit() {
           productCreateForm.masterCode = formData.productCode
           productCreateForm.subCode = ''
           productCreateForm.nameZh = ''
-          productCreateForm.category = '' as 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT' | ''
+          productCreateForm.category = '' as ProductType | ''
           productCreateForm.material = ''
           productCreateForm.requiresQc = false
           productCreateDialogVisible.value = true

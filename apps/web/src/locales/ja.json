@@ -1009,7 +1009,12 @@
     "category": {
       "OEM": "卸売",
       "ORDINARY": "普通",
-      "FACTORY_DIRECT": "輸出"
+      "FACTORY_DIRECT": "輸出",
+      "NORMAL": "普通購入",
+      "SAMPLE": "サンプル",
+      "SELF_USE": "自社用",
+      "PARTS": "部品",
+      "INDEPENDENT": "無関連"
     },
     "drawer": {
       "title": "商品詳細",

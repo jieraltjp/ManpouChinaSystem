@@ -1176,7 +1176,12 @@
     "category": {
       "OEM": "批发",
       "ORDINARY": "普货",
-      "FACTORY_DIRECT": "出口"
+      "FACTORY_DIRECT": "出口",
+      "NORMAL": "普通采购",
+      "SAMPLE": "样品",
+      "SELF_USE": "自用",
+      "PARTS": "配件",
+      "INDEPENDENT": "无关联"
     },
     "factoryUnit": "家",
     "validation": {
