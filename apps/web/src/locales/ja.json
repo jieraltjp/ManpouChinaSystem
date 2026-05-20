@@ -434,8 +434,7 @@
       "taxPointPositive": "インボイス係数は正の数である必要があります",
       "customerCompanyMaxLength": "顧客会社名は最大128文字",
       "destinationMaxLength": "出荷先は最大128文字",
-      "factoryNameRequired": "工場名称は必須です",
-      "subCodeRequired": "子品番は必須です"
+      "factoryNameRequired": "工場名称は必須です"
     },
     "message": {
       "createSuccess": "発注書の作成が完了しました",
@@ -1137,6 +1136,7 @@
     },
     "validation": {
       "masterCodeRequired": "主品番は必須です",
+      "subCodeRequired": "子品番は必須です",
       "categoryRequired": "商品分類を選択してください"
     },
     "message": {

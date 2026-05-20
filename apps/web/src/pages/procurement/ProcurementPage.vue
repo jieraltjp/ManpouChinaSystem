@@ -643,6 +643,7 @@ const productCreateForm = reactive({
 })
 const productCreateRules = {
   masterCode: [{ required: true, message: () => t('product.validation.masterCodeRequired'), trigger: 'blur' }],
+  subCode: [{ required: true, message: () => t('product.validation.subCodeRequired'), trigger: 'blur' }],
   category: [{ required: true, message: () => t('product.validation.categoryRequired'), trigger: 'change' }],
 }
 

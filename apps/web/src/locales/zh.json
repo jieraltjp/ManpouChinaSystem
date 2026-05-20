@@ -434,8 +434,7 @@
       "taxPointPositive": "票点必须为正数",
       "customerCompanyMaxLength": "客户公司最多 128 字符",
       "destinationMaxLength": "发送目的地最多 128 字符",
-      "factoryNameRequired": "工厂名称不能为空",
-      "subCodeRequired": "子货号不能为空"
+      "factoryNameRequired": "工厂名称不能为空"
     },
     "message": {
       "createSuccess": "发注单创建成功",
@@ -1186,6 +1185,7 @@
     "factoryUnit": "家",
     "validation": {
       "masterCodeRequired": "主货号不能为空",
+      "subCodeRequired": "子货号不能为空",
       "categoryRequired": "请选择商品分类"
     },
     "message": {
