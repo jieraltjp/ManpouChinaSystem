@@ -25,7 +25,8 @@ public class ProductQueryPortImpl implements ProductQueryPort {
 
     @Override
     public Optional<Product> findByMasterCode(String masterCode) {
-        return productRepository.findByMasterCodeAndDeletedIsFalse(masterCode);
+        // 用 master-level 查询（sub_code IS NULL），避免 master_code 重复导致 NonUniqueResultException
+        return productRepository.findByMasterCodeAndSubCodeIsNullAndDeletedIsFalse(masterCode);
     }
 
     @Override
