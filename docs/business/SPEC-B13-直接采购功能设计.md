@@ -1,6 +1,7 @@
 # SPEC-B13 — 直接采购功能设计
 
-> **版本**: 1.2.0
+> **版本**: 1.3.0
+> **更新**: 2026-05-20（v1.3.0：前端 Phase 2 完成 ✅ — productCode 搜索下拉 + 商品类型单选 + 筛选栏）
 > **更新**: 2026-05-20（v1.2.0：商品货号改为搜索下拉，选中后自动填充商品信息；Synthetic Demand 复用 demand 链路）
 > **更新**: 2026-05-20（v1.1.0：直接采购复用现有 demand 链路，自动生成空需求记录；新增 ProductType 四种商品类型）
 > **创建**: 2026-05-20
@@ -416,25 +417,17 @@ ELSE:
 9. 编译验证
 
 ### Phase 2（前端）
-1. API 类型更新（`ProductType`、新增字段）
-2. **商品货号搜索下拉**（核心）：
+1. ✅ API 类型更新（`ProductType`、新增字段）
+2. ✅ **商品货号搜索下拉**（核心）：
    - `el-select` + `filterable` + `remote` + `remote-method`
    - `remote-method` 调用 `productApi.suggestMasterCodes(query)`
-   - 选择后调用 `productApi.getByCode(masterCode)` 自动填充 category/subProductCode/material/requiresQc/priceRmb/taxPoint
+   - 选择后调用 `productApi.getByCode(masterCode)` 自动填充 category/material/requiresQc/priceRmb/taxPoint
    - 无匹配时降级为普通文本框
-3. 商品类型单选组件（5选1）
-4. 条件显示需求选择器（仅普通采购显示）
-5. 列表来源列扩展（区分 auto-generated `[自动生成]` vs `DM-xxx`）
-6. 商品类型筛选下拉
-7. i18n 新增 key
-8. `npm run type-check` 通过
+3. ✅ 商品类型单选组件（5选1，`el-radio-button`）
+4. ✅ 条件显示需求选择器（仅普通采购 NORMAL 显示）
+5. ⏳ 列表来源列扩展（区分 auto-generated `[自动生成]` vs `DM-xxx`）— 后端未完成，暂挂
+6. ✅ 商品类型筛选下拉
+7. ✅ i18n 新增 key（zh.json / ja.json）
+8. ✅ `npm run type-check` 通过
 
-### Phase 3（验证）
-1. 货号搜索下拉 → 输入 "ny" 返回匹配列表，选择后自动填充字段
-2. 手工修改已填充字段 → 覆盖自动值成功
-3. 货号搜索无结果 → 降级文本框，提示"未找到商品"
-4. 普通采购（选需求）→ 正常关联，demand.status → CONFIRMED
-5. 直接采购（样品/自用/配件/无关联）→ 自动生成 synthetic demand，需求列显示"[自动生成]"
-6. 删除直接采购 → synthetic demand 同步删除
-7. 删除普通采购 → demand.status 恢复 PENDING
-8. 按商品类型筛选正确
+> ⚠️ Phase 2 第5项（列表来源列）依赖后端 `demandCode` / `syntheticDemand` 字段，待 Phase 1 后端完成后补充。
