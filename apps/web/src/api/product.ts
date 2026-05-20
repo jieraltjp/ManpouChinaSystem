@@ -4,7 +4,7 @@
  */
 import client from './client'
 
-export type ProductCategory = 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT'
+export type ProductCategory = 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT' | 'NORMAL' | 'SAMPLE' | 'SELF_USE' | 'PARTS' | 'INDEPENDENT'
 
 export interface ProductPageVO {
   id: number
