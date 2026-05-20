@@ -404,7 +404,10 @@
     "productCreateDialog": {
       "title": "商品未找到 — 快速新建商品",
       "createSuccess": "商品创建成功",
-      "createAndContinue": "创建并继续"
+      "createAndContinue": "创建并继续",
+      "tip": "主货号可留空（系统将自动生成）；子货号用于标识同一主货号下的颜色/规格变体。",
+      "masterCodePlaceholder": "输入主货号或留空自动生成",
+      "subCodePlaceholder": "输入子货号（如色款编号）"
     },
     "cooperationStatus": {
       "ACTIVE": "合作中",
@@ -452,12 +455,7 @@
     "action": {
       "shipmentBatch": "出货批次"
     },
-    "subCodeDialog": {
-      "newTitle": "新建子货号",
-      "editTitle": "编辑子货号",
-      "createSuccess": "子货号创建成功",
-      "updateNotSupported": "子货号编辑功能开发中"
-    }
+    "subCodeDialog": {}
   },
   "shipmentBatch": {
     "title": "出货批次管理",

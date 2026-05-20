@@ -404,7 +404,10 @@
     "productCreateDialog": {
       "title": "商品が見つかりません — 新規商品作成",
       "createSuccess": "商品作成成功",
-      "createAndContinue": "作成して続ける"
+      "createAndContinue": "作成して続ける",
+      "tip": "主品番は空欄可（システムが自動生成）。子品番は同一主品番内のカラー／仕様バリエーションを示します。",
+      "masterCodePlaceholder": "主品番を入力または空欄で自動生成",
+      "subCodePlaceholder": "子品番を入力（カラー番号等）"
     },
     "cooperationStatus": {
       "ACTIVE": "協力中",
@@ -452,12 +455,7 @@
     "action": {
       "shipmentBatch": "出荷バッチ"
     },
-    "subCodeDialog": {
-      "newTitle": "子品番新規作成",
-      "editTitle": "子品番編集",
-      "createSuccess": "子品番作成成功",
-      "updateNotSupported": "子品番編集機能は開発中です"
-    }
+    "subCodeDialog": {}
   },
   "inspection": {
     "title": "検品記録",

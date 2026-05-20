@@ -1,7 +1,8 @@
 # SPEC-B13 — 直接采购功能设计
 
-> **版本**: 1.5.0
-> **更新**: 2026-05-20（v1.5.0：子货号改为搜索下拉 + 新建/编辑按钮 ✅）
+> **版本**: 1.6.0
+> **更新**: 2026-05-20（v1.6.0：商品创建弹窗与子货号新建弹窗合并为统一弹窗（主货号/子货号/名称/分类/材质/质检），移除独立 subCodeDialog ✅）
+> **更新**: 2026-05-20（v1.5.0：子货号改为搜索下拉 + 新建按钮 ✅）
 > **更新**: 2026-05-20（v1.4.0：提交时检测商品目录，货号不存在则弹出快速新建商品弹窗 ✅）
 > **更新**: 2026-05-20（v1.3.0：前端 Phase 2 完成 ✅ — productCode 搜索下拉 + 商品类型单选 + 筛选栏）
 > **更新**: 2026-05-20（v1.2.0：商品货号改为搜索下拉，选中后自动填充商品信息；Synthetic Demand 复用 demand 链路）
@@ -419,9 +420,9 @@ ELSE:
 |------|----------|
 | `api/procurement.ts` — 接口类型 | 新增 `ProductType`、`syntheticDemand`、`demandCode` |
 | `api/procurement.ts` — `CreateProcurementRequest` | 新增 `productType` |
-| `pages/procurement/ProcurementPage.vue` | **productCode 改为搜索下拉**（el-select filterable remote）；商品类型单选；普通采购显示需求选择器；列表来源列扩展 |
-| `locales/zh.json` | 新增 `order.productType.*`、`order.dialog.productCodeSearchPlaceholder` |
-| `locales/ja.json` | 新增 `order.productType.*`、`order.dialog.productCodeSearchPlaceholder` |
+| `pages/procurement/ProcurementPage.vue` | **productCode 改为搜索下拉**（el-select filterable remote）；商品类型单选；普通采购显示需求选择器；**合并商品创建弹窗**（主货号/子货号/名称/分类/材质/质检）；列表来源列扩展 |
+| `locales/zh.json` | 新增 `order.productType.*`、`order.dialog.productCodeSearchPlaceholder`、`order.productCreateDialog.*` |
+| `locales/ja.json` | 新增 `order.productType.*`、`order.dialog.productCodeSearchPlaceholder`、`order.productCreateDialog.*` |
 
 ### 文档
 
@@ -454,23 +455,27 @@ ELSE:
    - 选择后调用 `productApi.getByCode(masterCode)` 自动填充 category/material/requiresQc/priceRmb/taxPoint
    - 同时调用 `productApi.suggestSubCodes(masterCode)` 加载子货号下拉
    - 搜索无结果时用户仍可自由输入新货号
-3. ✅ **子货号搜索下拉**：el-select（filterable remote）+ "新建"按钮（创建色款变体）+ "编辑"按钮（预留）
-4. ✅ 商品类型单选组件（5选1，`el-radio-button`）
-5. ✅ 条件显示需求选择器（仅普通采购 NORMAL 显示）
-6. ✅ **提交时检测商品目录，货号不存在则弹出快速新建商品弹窗**
+3. ✅ **子货号搜索下拉**：el-select（filterable remote）+ "新建"按钮
+4. ✅ **商品快速创建弹窗（合并版）**：子货号"新建"按钮与商品不存在时触发的弹窗统一为 `productCreateDialog`
+   - 字段：主货号（可留空自动生成）/ 子货号 / 商品名称（必填）/ 分类 / 材质 / 需要检测
+   - 新建后：自动刷新子货号下拉并选中；或自动刷新商品下拉并自动填充商品信息
+   - 移除旧的独立 `subCodeDialog`（含新建/编辑两个入口）
+5. ✅ 商品类型单选组件（5选1，`el-radio-button`）
+6. ✅ 条件显示需求选择器（仅普通采购 NORMAL 显示）
+7. ✅ **提交时检测商品目录，货号不存在则弹出快速新建商品弹窗**
    - `onSubmit` → `productApi.getByCode(productCode)` → 404 → 弹出 `productCreateDialog`
    - 新建商品成功后继续提交采购单
-7. ⏳ 列表来源列扩展（区分 auto-generated `[自动生成]` vs `DM-xxx`）— 后端未完成，暂挂
-8. ✅ 商品类型筛选下拉
-9. ✅ i18n 新增 key（zh.json / ja.json）
-10. ✅ `npm run type-check` 通过
+8. ⏳ 列表来源列扩展（区分 auto-generated `[自动生成]` vs `DM-xxx`）— 后端未完成，暂挂
+9. ✅ 商品类型筛选下拉
+10. ✅ i18n 新增 key（zh.json / ja.json）
+11. ✅ `npm run type-check` 通过
 
 > ⚠️ Phase 2 第7项（列表来源列）依赖后端 `demandCode` / `syntheticDemand` 字段，待 Phase 1 后端完成后补充。
 
 ### Phase 3（验证）
 1. 货号搜索下拉 → 输入 "ny" 返回匹配列表，选择后自动填充字段 + 加载子货号下拉
 2. 子货号搜索下拉 → 选择主货号后显示子货号列表，可搜索/选择
-3. 子货号点击"新建" → 弹出创建弹窗 → 填写后创建成功 → 刷新下拉并自动选中
+3. 子货号点击"新建" → 弹出统一商品创建弹窗 → 填写后创建成功 → 刷新下拉并自动选中
 4. 手工修改已填充字段 → 覆盖自动值成功
 5. 输入新货号 → 提交 → 弹出快速新建商品弹窗 → 创建后继续提交采购单
 6. 普通采购（选需求）→ 正常关联，demand.status → CONFIRMED

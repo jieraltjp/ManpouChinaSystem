@@ -305,11 +305,6 @@
                 <el-button size="small" :disabled="!formData.productCode" @click="onSubCodeNew">
                   <el-icon><Plus /></el-icon>{{ $t('order.dialog.subCodeNew') }}
                 </el-button>
-                <el-tooltip :content="$t('order.dialog.subCodeEdit')" placement="top">
-                  <el-button size="small" :disabled="!formData.subProductCode" @click="onSubCodeEdit">
-                    <el-icon><Edit /></el-icon>
-                  </el-button>
-                </el-tooltip>
               </div>
             </el-form-item>
           </el-col>
@@ -533,55 +528,61 @@
       </template>
     </el-dialog>
 
-    <!-- 快速新建商品弹窗（发注单中新建商品） -->
+    <!-- 商品快速创建弹窗（发注单中新建商品/子货号，入口统一） -->
     <el-dialog
       v-model="productCreateDialogVisible"
       :title="$t('order.productCreateDialog.title')"
-      width="500px"
+      width="560px"
       :close-on-click-modal="false"
     >
       <el-form ref="productCreateFormRef" :model="productCreateForm" :rules="productCreateRules" label-width="100px">
-        <el-form-item :label="$t('product.dialog.masterCode')">
-          <el-input v-model="productCreateForm.masterCode" readonly disabled />
-        </el-form-item>
+        <el-row :gutter="12">
+          <el-col :span="12">
+            <el-form-item :label="$t('product.dialog.masterCode')" prop="masterCode">
+              <el-input
+                v-model="productCreateForm.masterCode"
+                :placeholder="$t('order.productCreateDialog.masterCodePlaceholder')"
+                maxlength="32"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('product.dialog.subCode')">
+              <el-input
+                v-model="productCreateForm.subCode"
+                :placeholder="$t('order.productCreateDialog.subCodePlaceholder')"
+                maxlength="64"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item :label="$t('product.dialog.nameZh')" prop="nameZh">
           <el-input v-model="productCreateForm.nameZh" :placeholder="$t('product.dialog.nameZhPlaceholder')" maxlength="255" />
         </el-form-item>
-        <el-form-item :label="$t('product.dialog.category')">
-          <el-select v-model="productCreateForm.category" clearable style="width:100%">
-            <el-option value="OEM" :label="$t('product.category.OEM')" />
-            <el-option value="ORDINARY" :label="$t('product.category.ORDINARY')" />
-            <el-option value="FACTORY_DIRECT" :label="$t('product.category.FACTORY_DIRECT')" />
-          </el-select>
+        <el-row :gutter="12">
+          <el-col :span="12">
+            <el-form-item :label="$t('product.dialog.category')">
+              <el-select v-model="productCreateForm.category" clearable style="width:100%">
+                <el-option value="OEM" :label="$t('product.category.OEM')" />
+                <el-option value="ORDINARY" :label="$t('product.category.ORDINARY')" />
+                <el-option value="FACTORY_DIRECT" :label="$t('product.category.FACTORY_DIRECT')" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('product.dialog.material')">
+              <el-input v-model="productCreateForm.material" :placeholder="$t('product.dialog.materialPlaceholder')" maxlength="64" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item :label="$t('product.dialog.requiresQc')">
+          <el-switch v-model="productCreateForm.requiresQc" />
         </el-form-item>
       </el-form>
+      <div class="product-create-tip">{{ $t('order.productCreateDialog.tip') }}</div>
       <template #footer>
         <el-button @click="productCreateDialogVisible = false">{{ $t('common.cancel') }}</el-button>
         <el-button type="primary" :loading="productCreateSubmitting" @click="onProductCreateSubmit">{{ $t('order.productCreateDialog.createAndContinue') }}</el-button>
-      </template>
-    </el-dialog>
-
-    <!-- 子货号搜索下拉 + 新建/编辑弹窗 -->
-    <el-dialog
-      v-model="subCodeDialogVisible"
-      :title="subCodeDialogMode === 'create' ? $t('order.subCodeDialog.newTitle') : $t('order.subCodeDialog.editTitle')"
-      width="420px"
-      :close-on-click-modal="false"
-    >
-      <el-form :model="subCodeForm" label-width="90px">
-        <el-form-item :label="$t('product.dialog.masterCode')">
-          <el-input v-model="subCodeForm.masterCode" readonly disabled />
-        </el-form-item>
-        <el-form-item :label="$t('product.dialog.subCode')" prop="subCode">
-          <el-input v-model="subCodeForm.subCode" :placeholder="$t('product.dialog.subCodePlaceholder')" maxlength="64" />
-        </el-form-item>
-        <el-form-item :label="$t('product.dialog.colorName')">
-          <el-input v-model="subCodeForm.colorName" :placeholder="$t('product.dialog.colorNamePlaceholder')" maxlength="64" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="subCodeDialogVisible = false">{{ $t('common.cancel') }}</el-button>
-        <el-button type="primary" :loading="subCodeDialogSubmitting" @click="onSubCodeSubmit">{{ $t('order.factoryDialog.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -596,7 +597,7 @@ import { Plus, Clock, CircleCheck, Warning, Document, Edit } from '@element-plus
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest, BILLING_TYPE_OPTIONS } from '@/api/procurement'
 import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest } from '@/api/factory'
 import { demandApi, type DemandPageVO } from '@/api/demand'
-import { productApi, type MasterCodeSuggestVO, type CreateProductRequest, type ProductCategory } from '@/api/product'
+import { productApi, type MasterCodeSuggestVO, type CreateProductRequest } from '@/api/product'
 import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
@@ -631,8 +632,11 @@ const productCreateFormRef = ref<FormInstance>()
 const productCreateSubmitting = ref(false)
 const productCreateForm = reactive({
   masterCode: '',
+  subCode: '',
   nameZh: '',
   category: '' as 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT' | '',
+  material: '',
+  requiresQc: false,
 })
 const productCreateRules = {
   nameZh: [{ required: true, message: () => t('product.validation.nameZhRequired'), trigger: 'blur' }],
@@ -644,16 +648,6 @@ let pendingCreateReq: CreateProcurementRequest | null = null
 /** 子货号搜索下拉 */
 const subCodeOptions = ref<{ subCode: string; colorName?: string }[]>([])
 const subCodeLoading = ref(false)
-
-/** 子货号新建/编辑弹窗 */
-const subCodeDialogVisible = ref(false)
-const subCodeDialogMode = ref<'create' | 'update'>('create')
-const subCodeDialogSubmitting = ref(false)
-const subCodeForm = reactive({
-  masterCode: '',
-  subCode: '',
-  colorName: '',
-})
 
 async function subCodeRemoteSearch(query: string) {
   if (!formData.productCode) {
@@ -683,56 +677,17 @@ function onSubCodeSelect(subCode: string) {
   }
 }
 
+/** 新建子货号 → 打开统一商品创建弹窗（带 masterCode 预填） */
 function onSubCodeNew() {
-  subCodeDialogMode.value = 'create'
-  subCodeForm.masterCode = formData.productCode
-  subCodeForm.subCode = ''
-  subCodeForm.colorName = ''
-  subCodeDialogVisible.value = true
+  productCreateForm.masterCode = formData.productCode
+  productCreateForm.subCode = ''
+  productCreateForm.nameZh = ''
+  productCreateForm.category = '' as 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT' | ''
+  productCreateForm.material = ''
+  productCreateForm.requiresQc = false
+  productCreateDialogVisible.value = true
 }
 
-function onSubCodeEdit() {
-  if (!formData.subProductCode) return
-  subCodeDialogMode.value = 'update'
-  subCodeForm.masterCode = formData.productCode
-  subCodeForm.subCode = formData.subProductCode
-  subCodeForm.colorName = ''
-  subCodeDialogVisible.value = true
-}
-
-async function onSubCodeSubmit() {
-  if (!subCodeForm.subCode) {
-    ElMessage.warning(t('order.validation.subCodeRequired'))
-    return
-  }
-  subCodeDialogSubmitting.value = true
-  try {
-    if (subCodeDialogMode.value === 'create') {
-      await productApi.create({
-        masterCode: subCodeForm.masterCode,
-        subCode: subCodeForm.subCode,
-        colorName: subCodeForm.colorName || undefined,
-      } as CreateProductRequest)
-      ElMessage.success(t('order.subCodeDialog.createSuccess'))
-      // 刷新子货号下拉
-      await subCodeRemoteSearch('')
-      formData.subProductCode = subCodeForm.subCode
-    } else {
-      // 更新：需要先找到这个产品的 ID
-      // subCode 相同 masterCode 下的产品 ID，通过 suggestSubCodes 找到
-      const found = subCodeOptions.value.find(s => s.subCode === subCodeForm.subCode)
-      if (found) {
-        // 编辑模式暂不支持（需要 product ID），仅提示
-        ElMessage.info(t('order.subCodeDialog.updateNotSupported'))
-      }
-    }
-    subCodeDialogVisible.value = false
-  } catch {
-    // error handled by interceptor
-  } finally {
-    subCodeDialogSubmitting.value = false
-  }
-}
 
 async function productCodeRemoteSearch(query: string) {
   if (!query || query.length < 1) {
@@ -777,16 +732,45 @@ async function onProductCreateSubmit() {
   if (!valid) return
   productCreateSubmitting.value = true
   try {
+    const createdMasterCode = productCreateForm.masterCode || productCreateForm.subCode
     await productApi.create({
-      masterCode: productCreateForm.masterCode,
+      masterCode: productCreateForm.masterCode || undefined,
+      subCode: productCreateForm.subCode || undefined,
       nameZh: productCreateForm.nameZh || undefined,
-      category: (productCreateForm.category || undefined) as ProductCategory | undefined,
+      category: (productCreateForm.category || undefined) as any,
+      material: productCreateForm.material || undefined,
+      requiresQc: productCreateForm.requiresQc || undefined,
     } as CreateProductRequest)
     // 刷新商品分类缓存
-    productCategoryMap.value = { ...productCategoryMap.value, [productCreateForm.masterCode]: productCreateForm.category || 'ORDINARY' }
+    if (createdMasterCode) {
+      productCategoryMap.value = { ...productCategoryMap.value, [createdMasterCode]: productCreateForm.category || 'ORDINARY' }
+    }
     ElMessage.success(t('order.productCreateDialog.createSuccess'))
     productCreateDialogVisible.value = false
-    // 继续提交采购单
+    // 子货号新建 → 刷新子货号下拉并自动选中
+    if (productCreateForm.subCode) {
+      await subCodeRemoteSearch('')
+      formData.subProductCode = productCreateForm.subCode
+    }
+    // 主货号新建（无子货号）→ 刷新商品下拉并自动选中
+    if (productCreateForm.masterCode && !productCreateForm.subCode) {
+      await productCodeRemoteSearch(productCreateForm.masterCode)
+      formData.productCode = productCreateForm.masterCode
+      // 自动填充商品信息
+      productApi.getByCode(productCreateForm.masterCode).then(res => {
+        const p = res.data
+        if (!p) return
+        if (p.category) {
+          productCategoryMap.value = { ...productCategoryMap.value, [productCreateForm.masterCode]: p.category }
+          formData.category = getCategoryLabel(productCreateForm.masterCode)
+        }
+        if (p.material) formData.material = p.material
+        if (p.requiresQc != null) formData.requiresQc = p.requiresQc
+        if (p.unitPriceRmb != null) formData.priceRmb = p.unitPriceRmb
+        if (p.taxPoint != null) formData.taxPoint = p.taxPoint
+      }).catch(() => { /* ignore */ })
+    }
+    // 继续提交采购单（仅当从 onSubmit 触发时）
     if (pendingCreateReq) {
       await doCreateProcurement(pendingCreateReq)
       pendingCreateReq = null
@@ -1256,8 +1240,11 @@ async function onSubmit() {
           // 商品不存在，弹出快速新建弹窗
           pendingCreateReq = req
           productCreateForm.masterCode = formData.productCode
+          productCreateForm.subCode = ''
           productCreateForm.nameZh = ''
-          productCreateForm.category = '' as ProductCategory | ''
+          productCreateForm.category = '' as 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT' | ''
+          productCreateForm.material = ''
+          productCreateForm.requiresQc = false
           productCreateDialogVisible.value = true
           submitting.value = false
           return
@@ -1537,4 +1524,16 @@ defineExpose({ prefillFromDemand })
 
 .status-toggle { }
 .status-toggle.is-link { cursor: pointer; }
+
+/* ── 商品快速创建弹窗提示 ── */
+.product-create-tip {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
+  line-height: 1.5;
+  padding: 6px 10px;
+  background: #f5f7fa;
+  border-radius: 4px;
+  border: 1px solid #ebeef5;
+}
 </style>
