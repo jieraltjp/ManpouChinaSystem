@@ -57,22 +57,26 @@ for id in $(curl -s "$BASE/qc-records?page=0&pageSize=500" -H "Authorization: Be
   echo " qc_record $id done"
 done
 
-# 3. japan_customs_record（依赖 logistics_plan）
-for id in $(curl -s "$BASE/customs/japan?page=0&pageSize=500" -H "Authorization: Bearer $TOKEN" \
+# 3. domestic_customs_record
+for id in $(curl -s "$BASE/customs?page=0&pageSize=500" -H "Authorization: Bearer $TOKEN" \
   | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{JSON.parse(d).data.content.forEach(x=>console.log(x.id))}catch(e){}})" ); do
-  curl -s -X DELETE "$BASE/customs/japan/$id" -H "Authorization: Bearer $TOKEN"
-  echo " japan_customs $id done"
-done
-
-# 4. domestic_customs_record
-for id in $(curl -s "$BASE/customs/domestic?page=0&pageSize=500" -H "Authorization: Bearer $TOKEN" \
-  | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{JSON.parse(d).data.content.forEach(x=>console.log(x.id))}catch(e){}})" ); do
-  curl -s -X DELETE "$BASE/customs/domestic/$id" -H "Authorization: Bearer $TOKEN"
+  curl -s -X DELETE "$BASE/customs/$id" -H "Authorization: Bearer $TOKEN"
   echo " domestic_customs $id done"
 done
 
-# 5. demand_procurement_mapping（无 REST API，由 ApplicationRunner 启动时自动清理）
-# 无需手动执行，DatabaseInitializer 会处理
+# 4. japan_customs_record
+for id in $(curl -s "$BASE/japan-customs?page=0&pageSize=500" -H "Authorization: Bearer $TOKEN" \
+  | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{JSON.parse(d).data.content.forEach(x=>console.log(x.id))}catch(e){}})" ); do
+  curl -s -X DELETE "$BASE/japan-customs/$id" -H "Authorization: Bearer $TOKEN"
+  echo " japan_customs $id done"
+done
+
+# 5. demand_procurement_mapping
+for id in $(curl -s "$BASE/demand-mappings?page=0&pageSize=500" -H "Authorization: Bearer $TOKEN" \
+  | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{JSON.parse(d).data.content.forEach(x=>console.log(x.id))}catch(e){}})" ); do
+  curl -s -X DELETE "$BASE/demand-mappings/$id" -H "Authorization: Bearer $TOKEN"
+  echo " demand_mapping $id done"
+done
 
 # 6. logistics_plan（无 REST API，需确认是否有数据）
 
@@ -105,7 +109,7 @@ done
 ```bash
 echo "=== 验证 ==="
 for ep in demands procurements shipments qc-records containers logistics/ships \
-         customs/domestic customs/japan replenishment/demands audit-logs; do
+         customs/domestic customs japan-customs replenishment/demands audit-logs; do
   count=$(curl -s "$BASE/$ep?page=0&pageSize=1" -H "Authorization: Bearer $TOKEN" \
     | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).data.totalElements||0)}catch(e){console.log('ERR')}})")
   [ "$count" != "0" ] && echo "⚠ $ep: $count 条" || echo "✅ $ep: 0 条"
@@ -129,12 +133,12 @@ done
 | audit_log | DELETE `/audit-logs/{id}` | 逐条 |
 | qc_record | DELETE `/qc-records/{id}` | 逐条 |
 | qc_image | DELETE `/qc/images/{id}` | 逐条 |
-| domestic_customs_record | DELETE `/customs/domestic/{id}` | 逐条 |
-| japan_customs_record | DELETE `/customs/japan/{id}` | 逐条 |
+| domestic_customs_record | DELETE `/customs/{id}` | 逐条 |
+| japan_customs_record | DELETE `/japan-customs/{id}` | 逐条 |
 | replenishment_demand | DELETE `/replenishment/demands/{id}` | 逐条 |
 | demand | DELETE `/demands/{id}` | 逐条（仅未定/発注待） |
 | procurement | DELETE `/procurements/{id}` | 逐条（仅未定/発注待） |
-| demand_procurement_mapping | 无 REST API | 由 DatabaseInitializer 自动清理 |
+| demand_procurement_mapping | DELETE `/demand-mappings/{id}` | 逐条 |
 | logistics_plan | 无 REST API | 需手动 SQL |
 | procurement_snapshot | 无 REST API | 需手动 SQL |
 | qc_image（无主键） | 由 qc_record 联动删除 | 无需单独处理 |
@@ -143,7 +147,7 @@ done
 
 ## 无 REST API 表的手动 SQL
 
-`procurement_snapshot`、`logistics_plan`、`qc_image`、`demand_procurement_mapping` 无批量删除接口，
+`procurement_snapshot`、`logistics_plan`、`qc_image` 无批量删除接口，
 通过 Flyway V 基线化处理（生产禁止）或手动 SQL：
 
 ```sql
@@ -154,9 +158,6 @@ TRUNCATE TABLE qc_image;
 
 -- 清空 procurement_snapshot
 TRUNCATE TABLE procurement_snapshot;
-
--- 清空 demand_procurement_mapping
-TRUNCATE TABLE demand_procurement_mapping;
 
 -- 清空 logistics_plan
 TRUNCATE TABLE logistics_plan;
@@ -195,8 +196,8 @@ delete_all() {
 delete_all "audit-logs"
 delete_all "qc-records"
 delete_all "qc/images"
-delete_all "customs/domestic"
-delete_all "customs/japan"
+delete_all "customs"
+delete_all "japan-customs"
 delete_all "replenishment/demands"
 
 echo "清理 demands（仅未定/発注待）..."
