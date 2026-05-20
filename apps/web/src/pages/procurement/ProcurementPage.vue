@@ -557,7 +557,7 @@
         <!-- 分类（默认普货） -->
         <el-form-item :label="$t('product.dialog.category')" prop="category">
           <el-select v-model="productCreateForm.category" style="width:100%">
-            <el-option v-for="opt in productCategoryOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+            <el-option v-for="opt in productCategoryForCreate" :key="opt.value" :label="opt.label" :value="opt.value" />
           </el-select>
         </el-form-item>
         <!-- 补充字段 -->
@@ -625,6 +625,13 @@ const productCategoryOptions: { value: ProductType | 'OEM' | 'ORDINARY' | 'FACTO
   { value: 'INDEPENDENT', label: '无关联' },
 ]
 
+/** 商品创建弹窗的分类下拉（仅限后端 ProductCategory 枚举合法值） */
+const productCategoryForCreate: { value: 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT'; label: string }[] = [
+  { value: 'OEM', label: '批发' },
+  { value: 'ORDINARY', label: '普货' },
+  { value: 'FACTORY_DIRECT', label: '厂家出口' },
+]
+
 /** 商品货号搜索下拉 */
 const productCodeSearchResults = ref<MasterCodeSuggestVO[]>([])
 const productCodeLoading = ref(false)
@@ -637,7 +644,7 @@ const productCreateForm = reactive({
   masterCode: '',
   subCode: '',
   nameZh: '',
-  category: 'ORDINARY' as ProductType | 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT',
+  category: 'ORDINARY' as 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT',
   material: '',
   requiresQc: false,
 })
