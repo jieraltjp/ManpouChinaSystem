@@ -68,7 +68,7 @@ public class Product extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category", length = 20)
-    private ProductCategory category; // OEM / ORDINARY / FACTORY_DIRECT
+    private ProductCategory category; // 7项：OEM/普货/厂家出口/普通采购/样品/自用/配件/无关联
 
     @Column(name = "status", length = 32)
     private String status;           // 商品区分（通常/予約）

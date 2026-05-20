@@ -1,0 +1,8 @@
+-- V21: 将 product.category 枚举扩展为 7 项
+-- 原值：OEM, ORDINARY, FACTORY_DIRECT
+-- 新增：NORMAL, SAMPLE, SELF_USE, PARTS, INDEPENDENT
+-- 历史数据中原有记录的 category 保持不变
+
+ALTER TABLE product
+  MODIFY COLUMN `category` enum('OEM','ORDINARY','FACTORY_DIRECT','NORMAL','SAMPLE','SELF_USE','PARTS','INDEPENDENT')
+  DEFAULT NULL;
