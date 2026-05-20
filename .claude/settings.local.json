@@ -266,7 +266,14 @@
       "Bash(SSH_ASKPASS=/d/Programme/java/ManpouChinaSystem/askpass.sh DISPLAY=dummy scp *)",
       "Read(//tmp/**)",
       "Bash(tasklist *)",
-      "Bash(cmd.exe *)"
+      "Bash(cmd.exe *)",
+      "Bash(nohup mvn *)",
+      "Bash(echo \"Allinone starting, PID: $!\")",
+      "Bash(printenv)",
+      "Bash(openssl s_client -connect cos.ap-tokyo.myqcloud.com:443)",
+      "Bash(keytool *)",
+      "Bash(echo \"allinone PID: $!\")",
+      "Bash(echo \"restarted PID: $!\")"
     ]
   },
   "enabledPlugins": {}
