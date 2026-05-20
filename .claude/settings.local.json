@@ -273,7 +273,8 @@
       "Bash(openssl s_client -connect cos.ap-tokyo.myqcloud.com:443)",
       "Bash(keytool *)",
       "Bash(echo \"allinone PID: $!\")",
-      "Bash(echo \"restarted PID: $!\")"
+      "Bash(echo \"restarted PID: $!\")",
+      "Bash(export PYTHONIOENCODING=utf-8)"
     ]
   },
   "enabledPlugins": {}

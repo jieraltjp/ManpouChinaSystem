@@ -157,7 +157,9 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(cmd.getPassword()));
         user.setNameCn(cmd.getNameCn());
         user.setNameJp(cmd.getNameJp());
-        user.setEmail(cmd.getEmail());
+        // 空字符串视为 null，避免 UNIQUE 约束冲突
+        String email = cmd.getEmail();
+        user.setEmail(email != null && !email.isBlank() ? email : null);
         user.setPhone(cmd.getPhone());
         user.setAvatarUrl(cmd.getAvatarUrl());
         user.setCompanyId(cmd.getCompanyId());

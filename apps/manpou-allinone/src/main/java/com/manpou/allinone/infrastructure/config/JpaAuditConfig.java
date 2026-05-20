@@ -1,6 +1,7 @@
 package com.manpou.allinone.infrastructure.config;
 
 import com.manpou.allinone.common.time.Clock;
+import com.manpou.allinone.infrastructure.security.JwtContextHolder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -32,14 +33,22 @@ public class JpaAuditConfig {
     @Bean
     public AuditorAware<String> auditorProvider() {
         return () -> {
+            // 优先从 JWT 上下文获取（Vite 代理直连 allinone 时有效）
+            String username = JwtContextHolder.getUsername();
+            if (username != null && !username.isBlank()) {
+                return Optional.of(username);
+            }
+            // 兜底：从 X-User-Id 请求头获取（经 API Gateway 时有效）
             ServletRequestAttributes attrs =
                     (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            if (attrs == null) {
-                return Optional.of("system");
+            if (attrs != null) {
+                HttpServletRequest request = attrs.getRequest();
+                String userId = request.getHeader("X-User-Id");
+                if (userId != null && !userId.isBlank()) {
+                    return Optional.of(userId);
+                }
             }
-            HttpServletRequest request = attrs.getRequest();
-            String userId = request.getHeader("X-User-Id");
-            return Optional.ofNullable(userId != null ? userId : "system");
+            return Optional.of("system");
         };
     }
 
