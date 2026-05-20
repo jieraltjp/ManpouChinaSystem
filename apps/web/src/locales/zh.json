@@ -399,6 +399,11 @@
 			"cancel": "取消",
 			"save": "保存"
 		},
+		"productCreateDialog": {
+			"title": "商品未找到 — 快速新建商品",
+			"createSuccess": "商品创建成功",
+			"createAndContinue": "创建并继续"
+		},
 		"cooperationStatus": {
 			"ACTIVE": "合作中",
 			"SUSPENDED": "已暂停",

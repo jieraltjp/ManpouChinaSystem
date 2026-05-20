@@ -504,6 +504,34 @@
         <el-button type="primary" :loading="factorySubmitting" @click="onFactorySubmit">{{ $t('order.factoryDialog.save') }}</el-button>
       </template>
     </el-dialog>
+
+    <!-- 快速新建商品弹窗（发注单中新建商品） -->
+    <el-dialog
+      v-model="productCreateDialogVisible"
+      :title="$t('order.productCreateDialog.title')"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <el-form ref="productCreateFormRef" :model="productCreateForm" :rules="productCreateRules" label-width="100px">
+        <el-form-item :label="$t('product.dialog.masterCode')">
+          <el-input v-model="productCreateForm.masterCode" readonly disabled />
+        </el-form-item>
+        <el-form-item :label="$t('product.dialog.nameZh')" prop="nameZh">
+          <el-input v-model="productCreateForm.nameZh" :placeholder="$t('product.dialog.nameZhPlaceholder')" maxlength="255" />
+        </el-form-item>
+        <el-form-item :label="$t('product.dialog.category')">
+          <el-select v-model="productCreateForm.category" clearable style="width:100%">
+            <el-option value="OEM" :label="$t('product.category.OEM')" />
+            <el-option value="ORDINARY" :label="$t('product.category.ORDINARY')" />
+            <el-option value="FACTORY_DIRECT" :label="$t('product.category.FACTORY_DIRECT')" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="productCreateDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="productCreateSubmitting" @click="onProductCreateSubmit">{{ $t('order.productCreateDialog.createAndContinue') }}</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -516,7 +544,7 @@ import { Plus, Clock, CircleCheck, Warning, Document, Edit } from '@element-plus
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest, BILLING_TYPE_OPTIONS } from '@/api/procurement'
 import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest } from '@/api/factory'
 import { demandApi, type DemandPageVO } from '@/api/demand'
-import { productApi, type MasterCodeSuggestVO } from '@/api/product'
+import { productApi, type MasterCodeSuggestVO, type CreateProductRequest, type ProductCategory } from '@/api/product'
 import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
@@ -544,6 +572,22 @@ const productType = ref<ProductType>('NORMAL')
 /** 商品货号搜索下拉 */
 const productCodeSearchResults = ref<MasterCodeSuggestVO[]>([])
 const productCodeLoading = ref(false)
+
+/** 快速新建商品弹窗 */
+const productCreateDialogVisible = ref(false)
+const productCreateFormRef = ref<FormInstance>()
+const productCreateSubmitting = ref(false)
+const productCreateForm = reactive({
+  masterCode: '',
+  nameZh: '',
+  category: '' as 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT' | '',
+})
+const productCreateRules = {
+  nameZh: [{ required: true, message: () => t('product.validation.nameZhRequired'), trigger: 'blur' }],
+}
+
+/** pendingCreateProcurement: 商品新建成功后待提交的采购请求数据 */
+let pendingCreateReq: CreateProcurementRequest | null = null
 
 async function productCodeRemoteSearch(query: string) {
   if (!query || query.length < 1) {
@@ -575,6 +619,50 @@ function onProductCodeSelect(masterCode: string) {
     if (p.unitPriceRmb != null) formData.priceRmb = p.unitPriceRmb
     if (p.taxPoint != null) formData.taxPoint = p.taxPoint
   }).catch(() => { /* ignore */ })
+}
+
+async function onProductCreateSubmit() {
+  if (!productCreateFormRef.value) return
+  const valid = await productCreateFormRef.value.validate().catch(() => false)
+  if (!valid) return
+  productCreateSubmitting.value = true
+  try {
+    await productApi.create({
+      masterCode: productCreateForm.masterCode,
+      nameZh: productCreateForm.nameZh || undefined,
+      category: (productCreateForm.category || undefined) as ProductCategory | undefined,
+    } as CreateProductRequest)
+    // 刷新商品分类缓存
+    productCategoryMap.value = { ...productCategoryMap.value, [productCreateForm.masterCode]: productCreateForm.category || 'ORDINARY' }
+    ElMessage.success(t('order.productCreateDialog.createSuccess'))
+    productCreateDialogVisible.value = false
+    // 继续提交采购单
+    if (pendingCreateReq) {
+      await doCreateProcurement(pendingCreateReq)
+      pendingCreateReq = null
+    }
+  } catch {
+    // error handled by interceptor
+  } finally {
+    productCreateSubmitting.value = false
+  }
+}
+
+/**
+ * 直接提交采购单（内部方法，由 onSubmit 或 onProductCreateSubmit 调用）。
+ */
+async function doCreateProcurement(req: CreateProcurementRequest) {
+  const res = await procurementApi.create(req)
+  const newProcurementId = res.data as number
+  const savedMsg = convertingDemandId.value !== null ? t('order.message.createSuccessConverting') : t('order.message.createSuccess')
+  ElMessage.success(savedMsg)
+  if (convertingDemandId.value !== null) {
+    await demandApi.link(convertingDemandId.value, newProcurementId)
+    ElMessage.success(t('order.message.demandConverted'))
+    convertingDemandId.value = null
+  }
+  dialogVisible.value = false
+  loadData()
 }
 
 /** 是否普通采购（显示需求选择器） */
@@ -1010,16 +1098,20 @@ async function onSubmit() {
           destination: formData.destination || undefined,
           status: formData.status || undefined,
         }
-        const res = await procurementApi.create(req)
-        const newProcurementId = res.data as number
-        const savedMsg = convertingDemandId.value !== null ? t('order.message.createSuccessConverting') : t('order.message.createSuccess')
-        ElMessage.success(savedMsg)
-        // 若为转采购模式，则关联需求单（v2.2.0）
-        if (convertingDemandId.value !== null) {
-          await demandApi.link(convertingDemandId.value, newProcurementId)
-          ElMessage.success(t('order.message.demandConverted'))
-          convertingDemandId.value = null
+        // 检查商品目录中是否已存在此货号，不存在则弹出快速新建弹窗
+        try {
+          await productApi.getByCode(formData.productCode)
+        } catch {
+          // 商品不存在，弹出快速新建弹窗
+          pendingCreateReq = req
+          productCreateForm.masterCode = formData.productCode
+          productCreateForm.nameZh = ''
+          productCreateForm.category = '' as ProductCategory | ''
+          productCreateDialogVisible.value = true
+          submitting.value = false
+          return
         }
+        await doCreateProcurement(req)
       } else if (currentRow.value) {
         const req: UpdateProcurementRequest = {
           factoryId: formData.factoryId || undefined,

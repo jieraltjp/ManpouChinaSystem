@@ -399,6 +399,11 @@
 			"cancel": "キャンセル",
 			"save": "保存"
 		},
+		"productCreateDialog": {
+			"title": "商品が見つかりません — 新規商品作成",
+			"createSuccess": "商品作成成功",
+			"createAndContinue": "作成して続ける"
+		},
 		"cooperationStatus": {
 			"ACTIVE": "協力中",
 			"SUSPENDED": "一時停止",
