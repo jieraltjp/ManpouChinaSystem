@@ -1,6 +1,7 @@
 # SPEC-B13 — 直接采购功能设计
 
-> **版本**: 1.3.0
+> **版本**: 1.4.0
+> **更新**: 2026-05-20（v1.4.0：提交时检测商品目录，货号不存在则弹出快速新建商品弹窗 ✅）
 > **更新**: 2026-05-20（v1.3.0：前端 Phase 2 完成 ✅ — productCode 搜索下拉 + 商品类型单选 + 筛选栏）
 > **更新**: 2026-05-20（v1.2.0：商品货号改为搜索下拉，选中后自动填充商品信息；Synthetic Demand 复用 demand 链路）
 > **更新**: 2026-05-20（v1.1.0：直接采购复用现有 demand 链路，自动生成空需求记录；新增 ProductType 四种商品类型）
@@ -250,7 +251,21 @@ GET /api/v1/procurements?productType=SAMPLE&...
 | 用户聚焦/输入 | 调用 `productApi.suggestMasterCodes(keyword)`，返回匹配列表 |
 | 选择货号后 | 调用 `productApi.getByCode(masterCode)`，自动填充：<br>`category`（分类）、`subProductCode`（子货号）、`material`（材质）、`requiresQc`（是否检测）、`priceRmb`（单价）、`taxPoint`（票点）|
 | 手工修改已填充字段 | 允许，覆盖自动填充值 |
-| 搜索无结果 | 显示"未找到商品，请手工输入货号"提示，`productCode` 降级为文本框 |
+| 搜索无结果 | 用户仍可自由输入新货号（el-select filterable 支持手动输入）|
+
+**商品不存在时快速新建（v1.4.0 ✅）**：
+
+```
+提交采购单 → productApi.getByCode(productCode) → 404 或异常
+→ 弹出快速新建商品弹窗（仅 masterCode / nameZh / category）
+→ 创建成功后 → 自动继续提交采购单
+```
+
+| 字段 | 说明 |
+|------|------|
+| masterCode | 自动代入，禁用只读 |
+| nameZh | 必填，商品中文名称 |
+| category | 可选，OEM / 普货 / 厂家出口 |
 
 **下拉选项展示**：
 
@@ -422,12 +437,15 @@ ELSE:
    - `el-select` + `filterable` + `remote` + `remote-method`
    - `remote-method` 调用 `productApi.suggestMasterCodes(query)`
    - 选择后调用 `productApi.getByCode(masterCode)` 自动填充 category/material/requiresQc/priceRmb/taxPoint
-   - 无匹配时降级为普通文本框
+   - 搜索无结果时用户仍可自由输入新货号
 3. ✅ 商品类型单选组件（5选1，`el-radio-button`）
 4. ✅ 条件显示需求选择器（仅普通采购 NORMAL 显示）
-5. ⏳ 列表来源列扩展（区分 auto-generated `[自动生成]` vs `DM-xxx`）— 后端未完成，暂挂
-6. ✅ 商品类型筛选下拉
-7. ✅ i18n 新增 key（zh.json / ja.json）
-8. ✅ `npm run type-check` 通过
+5. ✅ **提交时检测商品目录，货号不存在则弹出快速新建商品弹窗**
+   - `onSubmit` → `productApi.getByCode(productCode)` → 404 → 弹出 `productCreateDialog`
+   - 新建商品成功后继续提交采购单
+6. ⏳ 列表来源列扩展（区分 auto-generated `[自动生成]` vs `DM-xxx`）— 后端未完成，暂挂
+7. ✅ 商品类型筛选下拉
+8. ✅ i18n 新增 key（zh.json / ja.json）
+9. ✅ `npm run type-check` 通过
 
-> ⚠️ Phase 2 第5项（列表来源列）依赖后端 `demandCode` / `syntheticDemand` 字段，待 Phase 1 后端完成后补充。
+> ⚠️ Phase 2 第6项（列表来源列）依赖后端 `demandCode` / `syntheticDemand` 字段，待 Phase 1 后端完成后补充。
