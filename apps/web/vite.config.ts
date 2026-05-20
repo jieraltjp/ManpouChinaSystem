@@ -12,6 +12,7 @@ export default defineConfig({
   server: {
     port: 13000,
     host: '0.0.0.0',   // 监听所有网卡，支持 192.168.12.198 访问
+    allowedHosts: ['localhost', '127.0.0.1', 'manpouchina.manpou.site', '192.168.12.198', '192.168.13.123'],
     proxy: {
       // 认证请求：指向 user-service（签发 JWT + 提供公钥）
       // Vite proxy 按配置顺序匹配，/api/v1/auth 比 /api 更具体，优先匹配

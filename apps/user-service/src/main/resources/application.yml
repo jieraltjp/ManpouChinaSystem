@@ -20,7 +20,7 @@ spring:
 
   # 数据源（本地 MySQL 23306）
   datasource:
-    url: jdbc:mysql://192.168.13.202:23306/user_service?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://192.168.13.202:23306/manpou?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
     username: manpou
     password: manpou203
     driver-class-name: com.mysql.cj.jdbc.Driver
