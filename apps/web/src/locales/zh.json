@@ -1186,7 +1186,7 @@
     "factoryUnit": "家",
     "validation": {
       "masterCodeRequired": "主货号不能为空",
-      "nameZhRequired": "中文名称不能为空"
+      "categoryRequired": "请选择商品分类"
     },
     "message": {
       "deleteConfirm": "确认删除商品「{code}」？",

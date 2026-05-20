@@ -1137,7 +1137,7 @@
     },
     "validation": {
       "masterCodeRequired": "主品番は必須です",
-      "nameZhRequired": "中文名称は必須です"
+      "categoryRequired": "商品分類を選択してください"
     },
     "message": {
       "deleteConfirm": "商品「{code}」を削除しますか？",

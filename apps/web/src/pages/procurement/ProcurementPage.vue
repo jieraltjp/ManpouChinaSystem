@@ -533,6 +533,7 @@
       center
     >
       <el-form ref="productCreateFormRef" :model="productCreateForm" :rules="productCreateRules" label-width="100px">
+        <!-- 核心字段：主货号 + 子货号 -->
         <el-row :gutter="12">
           <el-col :span="12">
             <el-form-item :label="$t('product.dialog.masterCode')" prop="masterCode">
@@ -553,26 +554,28 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item :label="$t('product.dialog.nameZh')" prop="nameZh">
+        <!-- 分类（默认普货） -->
+        <el-form-item :label="$t('product.dialog.category')" prop="category">
+          <el-select v-model="productCreateForm.category" style="width:100%">
+            <el-option v-for="opt in productCategoryOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+          </el-select>
+        </el-form-item>
+        <!-- 补充字段 -->
+        <el-form-item :label="$t('product.dialog.nameZh')">
           <el-input v-model="productCreateForm.nameZh" :placeholder="$t('product.dialog.nameZhPlaceholder')" maxlength="255" />
         </el-form-item>
         <el-row :gutter="12">
-          <el-col :span="12">
-            <el-form-item :label="$t('product.dialog.category')">
-              <el-select v-model="productCreateForm.category" clearable style="width:100%">
-                <el-option v-for="opt in productCategoryOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
-              </el-select>
-            </el-form-item>
-          </el-col>
           <el-col :span="12">
             <el-form-item :label="$t('product.dialog.material')">
               <el-input v-model="productCreateForm.material" :placeholder="$t('product.dialog.materialPlaceholder')" maxlength="64" />
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('product.dialog.requiresQc')">
+              <el-switch v-model="productCreateForm.requiresQc" />
+            </el-form-item>
+          </el-col>
         </el-row>
-        <el-form-item :label="$t('product.dialog.requiresQc')">
-          <el-switch v-model="productCreateForm.requiresQc" />
-        </el-form-item>
       </el-form>
       <div class="product-create-tip">{{ $t('order.productCreateDialog.tip') }}</div>
       <template #footer>
@@ -634,12 +637,12 @@ const productCreateForm = reactive({
   masterCode: '',
   subCode: '',
   nameZh: '',
-  category: '' as ProductType | '',
+  category: 'ORDINARY' as ProductType | 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT',
   material: '',
   requiresQc: false,
 })
 const productCreateRules = {
-  nameZh: [{ required: true, message: () => t('product.validation.nameZhRequired'), trigger: 'blur' }],
+  category: [{ required: true, message: () => t('product.validation.categoryRequired'), trigger: 'change' }],
 }
 
 /** pendingCreateProcurement: 商品新建成功后待提交的采购请求数据 */
@@ -682,7 +685,7 @@ function onSubCodeNew() {
   productCreateForm.masterCode = formData.productCode
   productCreateForm.subCode = ''
   productCreateForm.nameZh = ''
-  productCreateForm.category = '' as ProductType | ''
+  productCreateForm.category = 'ORDINARY'
   productCreateForm.material = ''
   productCreateForm.requiresQc = false
   productCreateDialogVisible.value = true
@@ -1247,7 +1250,7 @@ async function onSubmit() {
           productCreateForm.masterCode = formData.productCode
           productCreateForm.subCode = ''
           productCreateForm.nameZh = ''
-          productCreateForm.category = '' as ProductType | ''
+          productCreateForm.category = 'ORDINARY'
           productCreateForm.material = ''
           productCreateForm.requiresQc = false
           productCreateDialogVisible.value = true
