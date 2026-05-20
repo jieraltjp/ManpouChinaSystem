@@ -302,7 +302,7 @@
                     :value="item.subCode"
                   />
                 </el-select>
-                <el-button size="small" :disabled="!formData.productCode" @click="onSubCodeNew">
+                <el-button size="small" @click="onSubCodeNew">
                   <el-icon><Plus /></el-icon>{{ $t('order.dialog.subCodeNew') }}
                 </el-button>
               </div>
