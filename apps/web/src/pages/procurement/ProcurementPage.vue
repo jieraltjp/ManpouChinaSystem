@@ -537,6 +537,7 @@ const tableRows = ref<ProcurementPageVO[]>([])
 // 工厂下拉
 const factoryOptions = ref<FactoryPageVO[]>([])
 async function loadFactories() {
+  if (!hasPermission('factory:read')) return
   try {
     const res = await factoryApi.list({ page: 0, pageSize: 200 })
     factoryOptions.value = (res.data as { content: FactoryPageVO[] })?.content ?? []
@@ -547,6 +548,7 @@ async function loadFactories() {
 const demandOptions = ref<DemandPageVO[]>([])
 const selectedDemandId = ref<number | null>(null)
 async function loadDemands() {
+  if (!hasPermission('demand:read')) return
   try {
     const res = await demandApi.list({ page: 0, pageSize: 200 })
     demandOptions.value = (res.data as { content: DemandPageVO[] })?.content ?? []
@@ -1017,7 +1019,11 @@ function billingTypeLabel(val: string | undefined): string {
 }
 
 onMounted(() => {
-  Promise.all([loadData(), loadFactories(), loadDemands()])
+  loadData()
+  // 工厂下拉：仅在有 factory:read 权限时加载
+  if (hasPermission('factory:read')) loadFactories()
+  // 需求下拉：仅在有 demand:read 权限时加载
+  if (hasPermission('demand:read')) loadDemands()
   // 处理来自 DemandPage "转采购" 的 query params
   if (route.query.demandId) {
     convertingDemandId.value = Number(route.query.demandId)

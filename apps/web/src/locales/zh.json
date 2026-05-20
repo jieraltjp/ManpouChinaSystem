@@ -55,8 +55,10 @@
 		"loginFailed": "登录失败，请检查用户名和密码"
 	},
 	"dashboard": {
-		"title": "仪表盘",
-		"welcome": "欢迎回来",
+		"timezone": {
+			"CST": "中国标准时间 (UTC+8)",
+			"JST": "日本标准时间 (UTC+9)"
+		},
 		"stat": {
 			"currentUser": "当前用户",
 			"role": "角色",
@@ -64,17 +66,17 @@
 			"tokenRemaining": "Token 剩余"
 		},
 		"jwt": {
-			"title": "JWT Claims",
-			"userIdSub": "User ID (sub)",
-			"tenantId": "Tenant ID",
+			"title": "JWT 详情",
+			"userIdSub": "用户ID (sub)",
+			"tenantId": "租户ID",
 			"roles": "角色",
-			"permissions": "权限",
-			"issuedAt": "Issued At",
-			"expiresAt": "Expires At"
+			"permissions": "权限列表",
+			"issuedAt": "签发时间",
+			"expiresAt": "过期时间"
 		},
 		"shortcut": {
 			"title": "快捷入口",
-			"orderManagement": "发注单管理",
+			"orderManagement": "发注管理",
 			"factoryManagement": "工厂管理",
 			"relogin": "重新登录"
 		},
@@ -1915,7 +1917,7 @@
 			"disable": "禁用",
 			"enable": "启用",
 			"resetPassword": "重置密码",
-				"copyPassword": "复制密码",
+			"copyPassword": "复制密码",
 			"assignRole": "分配角色"
 		},
 		"dialog": {
@@ -1937,11 +1939,10 @@
 			"role": "角色",
 			"password": "初始密码",
 			"newPassword": "新密码",
-				"newPasswordTip": "不填则保持原密码",
-				"oldPassword": "当前密码",
-				"oldPasswordTip": "请输入当前密码",
-			"confirmPassword": "确认密码",
+			"newPasswordTip": "不填则保持原密码",
 			"oldPassword": "旧密码",
+			"oldPasswordTip": "请输入当前密码",
+			"confirmPassword": "确认密码",
 			"cancel": "取消",
 			"save": "保存"
 		},
@@ -2121,11 +2122,10 @@
 		},
 		"security": {
 			"changePassword": "修改密码",
-			"oldPassword": "旧密码",
+			"oldPassword": "当前密码",
 			"newPassword": "新密码",
-				"newPasswordTip": "不填则保持原密码",
-				"oldPassword": "当前密码",
-				"oldPasswordTip": "请输入当前密码",
+			"newPasswordTip": "不填则保持原密码",
+			"oldPasswordTip": "请输入当前密码",
 			"confirmPassword": "确认密码",
 			"passwordStrength": "密码强度",
 			"loginHistory": "登录历史",
@@ -2165,12 +2165,6 @@
 		},
 		"menuLabels": {
 			"profile": "个人中心"
-		}
-	},
-	"dashboard": {
-		"timezone": {
-			"CST": "中国标准时间 (UTC+8)",
-			"JST": "日本标准时间 (UTC+9)"
 		}
 	},
 	"cosTest": {

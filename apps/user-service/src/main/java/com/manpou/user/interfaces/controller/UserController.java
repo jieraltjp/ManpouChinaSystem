@@ -105,7 +105,7 @@ public class UserController {
      * GET /api/v1/users/me
      */
     @GetMapping("/me")
-    @PreAuthorize("hasAuthority('user:read')")
+    @PreAuthorize("isAuthenticated()")
     public Result<UserVO> getCurrentUser() {
         return Result.ok(userService.getCurrentUser());
     }

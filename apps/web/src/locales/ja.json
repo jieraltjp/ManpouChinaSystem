@@ -55,26 +55,28 @@
 		"loginFailed": "ログイン失敗。ユーザー名とパスワードを確認してください"
 	},
 	"dashboard": {
-		"title": "ダッシュボード",
-		"welcome": "おかえりなさい",
+		"timezone": {
+			"CST": "中国標準時 (UTC+8)",
+			"JST": "日本標準時 (UTC+9)"
+		},
 		"stat": {
 			"currentUser": "現在のユーザー",
 			"role": "役割",
 			"tenant": "テナント",
-			"tokenRemaining": "トークン残り"
+			"tokenRemaining": "Token 残り時間"
 		},
 		"jwt": {
-			"title": "JWT Claims",
-			"userIdSub": "User ID (sub)",
-			"tenantId": "Tenant ID",
+			"title": "JWT 詳細",
+			"userIdSub": "ユーザーID (sub)",
+			"tenantId": "テナントID",
 			"roles": "役割",
-			"permissions": "権限",
-			"issuedAt": "Issued At",
-			"expiresAt": "Expires At"
+			"permissions": "権限リスト",
+			"issuedAt": "発行時間",
+			"expiresAt": "有効期限"
 		},
 		"shortcut": {
 			"title": "クイックアクセス",
-			"orderManagement": "発注書管理",
+			"orderManagement": "発注管理",
 			"factoryManagement": "工場管理",
 			"relogin": "再ログイン"
 		},
@@ -1936,11 +1938,10 @@
 			"role": "役割",
 			"password": "初期パスワード",
 			"newPassword": "新しいパスワード",
-				"newPasswordTip": "空欄の場合は元のパスワードを維持",
-				"oldPassword": "現在のパスワード",
-				"oldPasswordTip": "現在のパスワードを入力してください",
-			"confirmPassword": "パスワード確認",
+			"newPasswordTip": "空欄の場合は元のパスワードを維持",
 			"oldPassword": "以前のパスワード",
+			"oldPasswordTip": "現在のパスワードを入力してください",
+			"confirmPassword": "パスワード確認",
 			"cancel": "キャンセル",
 			"save": "保存"
 		},
@@ -2120,11 +2121,10 @@
 		},
 		"security": {
 			"changePassword": "パスワード変更",
-			"oldPassword": "以前のパスワード",
+			"oldPassword": "現在のパスワード",
 			"newPassword": "新しいパスワード",
-				"newPasswordTip": "空欄の場合は元のパスワードを維持",
-				"oldPassword": "現在のパスワード",
-				"oldPasswordTip": "現在のパスワードを入力してください",
+			"newPasswordTip": "空欄の場合は元のパスワードを維持",
+			"oldPasswordTip": "現在のパスワードを入力してください",
 			"confirmPassword": "パスワード確認",
 			"passwordStrength": "パスワード強度",
 			"loginHistory": "ログイン履歴",
@@ -2164,12 +2164,6 @@
 		},
 		"menuLabels": {
 			"profile": "プロフィール"
-		}
-	},
-	"dashboard": {
-		"timezone": {
-			"CST": "中国標準時 (UTC+8)",
-			"JST": "日本標準時 (UTC+9)"
 		}
 	},
 	"cosTest": {
