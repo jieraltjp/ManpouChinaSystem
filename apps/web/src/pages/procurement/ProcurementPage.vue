@@ -504,6 +504,8 @@ const { hasPermission } = usePermission()
 const ORDER_STATUS_ORDERED = '已下单'
 const ORDER_STATUS_SHIPPED = '已出货'
 const ORDER_STATUS_RETURNED = '退货'
+const ORDER_STATUS_DRAFT = '未定'       // 未定（可删除）
+const ORDER_STATUS_PENDING = '発注待'   // 発注待（可删除）
 
 const leadTimeOptions = [
   { value: 30, label: `30${t('common.units.day')}` },
@@ -511,7 +513,7 @@ const leadTimeOptions = [
   { value: 60, label: `60${t('common.units.day')}` },
 ]
 
-const deletableStatuses = [ORDER_STATUS_ORDERED]
+const deletableStatuses = [ORDER_STATUS_DRAFT, ORDER_STATUS_PENDING, ORDER_STATUS_ORDERED]
 const ORDER_STATUSES = [ORDER_STATUS_ORDERED, ORDER_STATUS_SHIPPED]
 
 const statusOptionsWithI18n = computed(() =>
