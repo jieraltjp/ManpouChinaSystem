@@ -73,7 +73,7 @@ export interface UserCreateCmd {
   password: string
   nameCn?: string
   nameJp?: string
-  email: string
+  email?: string
   phone?: string
   companyId?: number
   departmentId?: number
@@ -83,9 +83,12 @@ export interface UserCreateCmd {
 }
 
 export interface UserUpdateCmd {
+  username?: string
+  oldPassword?: string
+  newPassword?: string
   nameCn?: string
   nameJp?: string
-  email: string
+  email?: string
   phone?: string
   companyId?: number
   departmentId?: number

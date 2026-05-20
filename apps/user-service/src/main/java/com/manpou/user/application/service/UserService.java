@@ -147,7 +147,8 @@ public class UserService {
         if (userRepository.findByUsername(cmd.getUsername()).isPresent()) {
             throw new BusinessException("user.usernameExists", "登录账号已存在");
         }
-        if (userRepository.findByEmail(cmd.getEmail()).isPresent()) {
+        if (cmd.getEmail() != null && !cmd.getEmail().isBlank()
+            && userRepository.findByEmail(cmd.getEmail()).isPresent()) {
             throw new BusinessException("user.emailExists", "邮箱已被使用");
         }
 
@@ -189,6 +190,24 @@ public class UserService {
             .filter(u -> !Boolean.TRUE.equals(u.getIsDeleted()))
             .orElseThrow(() -> new BusinessException("user.notFound", "用户不存在"));
 
+        // 修改密码必须先校验旧密码
+        if (cmd.getNewPassword() != null && !cmd.getNewPassword().isBlank()) {
+            if (cmd.getOldPassword() == null || cmd.getOldPassword().isBlank()) {
+                throw new BusinessException("user.oldPasswordRequired", "请输入当前密码");
+            }
+            if (!passwordEncoder.matches(cmd.getOldPassword(), user.getPasswordHash())) {
+                throw new BusinessException("auth.wrongPassword", "当前密码错误");
+            }
+            user.setPasswordHash(passwordEncoder.encode(cmd.getNewPassword()));
+        }
+
+        // 修改账号需校验唯一性
+        if (cmd.getUsername() != null && !cmd.getUsername().equals(user.getUsername())) {
+            if (userRepository.findByUsername(cmd.getUsername()).isPresent()) {
+                throw new BusinessException("user.usernameExists", "登录账号已存在");
+            }
+            user.setUsername(cmd.getUsername());
+        }
         if (cmd.getNameCn() != null) user.setNameCn(cmd.getNameCn());
         if (cmd.getNameJp() != null) user.setNameJp(cmd.getNameJp());
         if (cmd.getPhone() != null) user.setPhone(cmd.getPhone());

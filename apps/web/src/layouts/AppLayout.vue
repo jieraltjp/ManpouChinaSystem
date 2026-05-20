@@ -20,39 +20,39 @@
         </el-menu-item>
 
         <!-- 发注管理 -->
-        <el-sub-menu index="procurement" :popper-class="'sidebar-popper'">
+        <el-sub-menu v-if="hasPermission('demand:read') || hasPermission('procurement:read') || hasPermission('qc:read') || hasPermission('logistics:read') || hasPermission('customs:read') || hasPermission('japan_customs:read')" index="procurement" :popper-class="'sidebar-popper'">
           <template #title>
             <el-icon><ShoppingCart /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.procurement-all') }}</span>
           </template>
-          <el-menu-item index="/procurement/demand">
+          <el-menu-item v-if="hasPermission('demand:read')" index="/procurement/demand">
             <el-icon><FolderOpened /></el-icon>
             <template #title>{{ $t('menu.demand') }}</template>
           </el-menu-item>
-          <el-menu-item index="/procurement/procurement">
+          <el-menu-item v-if="hasPermission('procurement:read')" index="/procurement/procurement">
             <el-icon><ShoppingCart /></el-icon>
             <template #title>{{ $t('menu.procurement') }}</template>
           </el-menu-item>
-          <el-menu-item index="/procurement/qc-record">
+          <el-menu-item v-if="hasPermission('qc:read')" index="/procurement/qc-record">
             <el-icon><CircleCheck /></el-icon>
             <template #title>{{ $t('menu.qcRecord') }}</template>
           </el-menu-item>
-          <el-menu-item index="/procurement/logistics-plan">
+          <el-menu-item v-if="hasPermission('logistics:read')" index="/procurement/logistics-plan">
             <el-icon><Van /></el-icon>
             <template #title>{{ $t('menu.logisticsPlan') }}</template>
           </el-menu-item>
-          <el-menu-item index="/procurement/domestic-customs">
+          <el-menu-item v-if="hasPermission('customs:read')" index="/procurement/domestic-customs">
             <el-icon><DocumentCopy /></el-icon>
             <template #title>{{ $t('menu.domesticCustoms') }}</template>
           </el-menu-item>
-          <el-menu-item index="/procurement/japan-customs">
+          <el-menu-item v-if="hasPermission('japan_customs:read')" index="/procurement/japan-customs">
             <el-icon><Box /></el-icon>
             <template #title>{{ $t('menu.japanCustomsRecord') }}</template>
           </el-menu-item>
         </el-sub-menu>
 
         <!-- 财务管理 -->
-        <el-sub-menu index="finance" :popper-class="'sidebar-popper'">
+        <el-sub-menu v-if="hasPermission('tax_refund:read')" index="finance" :popper-class="'sidebar-popper'">
           <template #title>
             <el-icon><Money /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.finance') }}</span>
@@ -64,7 +64,7 @@
         </el-sub-menu>
 
         <!-- 运营销售 -->
-        <el-sub-menu index="sales" :popper-class="'sidebar-popper'">
+        <el-sub-menu v-if="hasPermission('sales:read')" index="sales" :popper-class="'sidebar-popper'">
           <template #title>
             <el-icon><TrendCharts /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.sales') }}</span>
@@ -76,48 +76,44 @@
         </el-sub-menu>
 
         <!-- 基础数据 -->
-        <el-sub-menu index="base" :popper-class="'sidebar-popper'">
+        <el-sub-menu v-if="hasPermission('factory:read') || hasPermission('product:read') || hasPermission('order:read') || hasPermission('ship:read')" index="base" :popper-class="'sidebar-popper'">
           <template #title>
             <el-icon><Menu /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.base') }}</span>
           </template>
-          <el-menu-item index="/base/factory">
+          <el-menu-item v-if="hasPermission('factory:read')" index="/base/factory">
             <el-icon><OfficeBuilding /></el-icon>
             <template #title>{{ $t('menu.factory') }}</template>
           </el-menu-item>
-          <el-menu-item index="/base/product">
+          <el-menu-item v-if="hasPermission('product:read')" index="/base/product">
             <el-icon><Goods /></el-icon>
             <template #title>{{ $t('menu.product') }}</template>
           </el-menu-item>
-          <el-menu-item index="/base/overview">
+          <el-menu-item v-if="hasPermission('order:read')" index="/base/overview">
             <el-icon><Document /></el-icon>
             <template #title>{{ $t('menu.orderOverview') }}</template>
           </el-menu-item>
-          <el-menu-item index="/base/ship">
+          <el-menu-item v-if="hasPermission('ship:read')" index="/base/ship">
             <el-icon><Ship /></el-icon>
             <template #title>{{ $t('menu.ship') }}</template>
           </el-menu-item>
         </el-sub-menu>
 
         <!-- 系统管理 -->
-        <el-sub-menu index="system" :popper-class="'sidebar-popper'">
+        <el-sub-menu v-if="hasPermission('user:read') || hasPermission('role:read') || hasPermission('audit:read') || true" index="system" :popper-class="'sidebar-popper'">
           <template #title>
             <el-icon><Setting /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.system') }}</span>
           </template>
-          <el-menu-item index="/system/user">
+          <el-menu-item v-if="hasPermission('user:read')" index="/system/user">
             <el-icon><User /></el-icon>
             <template #title>{{ $t('menu.user') }}</template>
           </el-menu-item>
-          <el-menu-item index="/system/role">
+          <el-menu-item v-if="hasPermission('role:read')" index="/system/role">
             <el-icon><Key /></el-icon>
             <template #title>{{ $t('menu.role') }}</template>
           </el-menu-item>
-          <el-menu-item index="/system/cos-test">
-            <el-icon><Cloudy /></el-icon>
-            <template #title>{{ $t('menu.cosTest') }}</template>
-          </el-menu-item>
-          <el-menu-item index="/system/audit-log">
+          <el-menu-item v-if="hasPermission('audit:read')" index="/system/audit-log">
             <el-icon><Document /></el-icon>
             <template #title>{{ $t('menu.auditLog') }}</template>
           </el-menu-item>
@@ -234,9 +230,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, DocumentCopy, Box, Goods, OfficeBuilding, Menu, Document, Money, Tickets, TrendCharts, Setting, User, Key, Cloudy, Ship } from '@element-plus/icons-vue'
+import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, DocumentCopy, Box, Goods, OfficeBuilding, Menu, Document, Money, Tickets, TrendCharts, Setting, User, Key, Ship } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
+import { usePermission } from '@/composables/usePermission'
 import { getCurrentUser } from '@/api/user'
 import type { Locale } from '@/locales'
 import type { UserVO } from '@/api/user'
@@ -245,6 +242,7 @@ const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 const { locale, t } = useI18n()
+const { hasPermission } = usePermission()
 
 const isCollapsed = ref(false)
 const activeMenu = computed(() => route.path)

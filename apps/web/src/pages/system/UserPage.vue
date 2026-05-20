@@ -106,8 +106,8 @@
             <el-button v-if="hasPermission('user:update')" link :type="row.status === 1 ? 'danger' : 'success'" size="small" @click.stop="onToggleStatus(row)">
               {{ row.status === 1 ? $t('user.action.disable') : $t('user.action.enable') }}
             </el-button>
-            <el-button v-if="hasPermission('user:reset_password')" link class="btn-blue" size="small" @click.stop="onResetPwd(row)">
-              {{ $t('user.action.resetPassword') }}
+            <el-button v-if="hasPermission('user:delete')" link type="danger" size="small" @click.stop="onDelete(row)">
+              {{ $t('user.action.delete') }}
             </el-button>
           </template>
         </el-table-column>
@@ -154,10 +154,16 @@
     <el-dialog v-model="editVisible" :title="editMode === 'create' ? $t('user.dialog.createTitle') : $t('user.dialog.editTitle')" width="560px">
       <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="100px">
         <el-form-item :label="$t('user.dialog.username')" prop="username">
-          <el-input v-model="editForm.username" :placeholder="$t('user.dialog.username')" :disabled="editMode === 'update'" />
+          <el-input v-model="editForm.username" :placeholder="$t('user.dialog.username')" />
         </el-form-item>
         <el-form-item v-if="editMode === 'create'" :label="$t('user.dialog.password')" prop="password">
           <el-input v-model="editForm.password" type="password" :placeholder="$t('user.dialog.password')" show-password />
+        </el-form-item>
+        <el-form-item v-if="editMode === 'update'" :label="$t('user.dialog.oldPassword')" prop="oldPassword">
+          <el-input v-model="editForm.oldPassword" type="password" :placeholder="$t('user.dialog.oldPasswordTip')" show-password />
+        </el-form-item>
+        <el-form-item v-if="editMode === 'update'" :label="$t('user.dialog.newPassword')" prop="newPassword">
+          <el-input v-model="editForm.newPassword" type="password" :placeholder="$t('user.dialog.newPasswordTip')" show-password />
         </el-form-item>
         <el-form-item :label="$t('user.dialog.nameCn')" prop="nameCn">
           <el-input v-model="editForm.nameCn" :placeholder="$t('user.dialog.nameCn')" />
@@ -172,6 +178,26 @@
           <el-input v-model="editForm.phone" :placeholder="$t('user.dialog.phone')" />
         </el-form-item>
       </el-form>
+      <!-- 重置密码（仅编辑模式） -->
+      <div v-if="editMode === 'update'" style="margin-top:8px;padding:12px 0 0;border-top:1px solid #ebeef5">
+        <el-button type="warning" size="small" :loading="resetPwdLoading" @click="onResetPwdInDialog">
+          {{ $t('user.action.resetPassword') }}
+        </el-button>
+        <div v-if="resetPwdResult" style="margin-top:8px">
+          <el-alert type="success" :closable="false" show-icon>
+            <template #title>
+              <div>{{ $t('user.message.resetPasswordSuccess') }}</div>
+              <div style="font-family:monospace;font-size:16px;margin-top:4px;letter-spacing:2px">{{ resetPwdResult }}</div>
+            </template>
+          </el-alert>
+          <div style="margin-top:8px">
+            <el-button size="small" @click="copyPwd">
+              <el-icon><DocumentCopy /></el-icon> {{ $t('user.action.copyPassword') }}
+            </el-button>
+            <span v-if="pwdCopied" style="color:#67c23a;font-size:12px;margin-left:8px">✅</span>
+          </div>
+        </div>
+      </div>
       <template #footer>
         <el-button @click="editVisible = false">{{ $t('user.dialog.cancel') }}</el-button>
         <el-button type="primary" :loading="editSaving" @click="onSaveEdit">{{ $t('user.dialog.save') }}</el-button>
@@ -192,29 +218,13 @@
       </template>
     </el-dialog>
 
-    <!-- 重置密码弹窗 -->
-    <el-dialog v-model="pwdVisible" :title="$t('user.dialog.passwordTitle')" width="400px">
-      <el-alert v-if="newPassword" type="success" :closable="false">
-        <template #title>
-          <div>{{ $t('user.message.resetPasswordSuccess') }}</div>
-          <div style="font-family:monospace;font-size:18px;margin-top:8px;letter-spacing:2px">{{ newPassword }}</div>
-        </template>
-      </el-alert>
-      <div v-else style="text-align:center;color:#909399">—</div>
-      <template #footer>
-        <el-button @click="pwdVisible = false">{{ $t('user.dialog.cancel') }}</el-button>
-        <el-button v-if="hasPermission('user:reset_password')" type="primary" :loading="pwdLoading" @click="doResetPassword" :disabled="!!newPassword">
-          {{ $t('user.action.resetPassword') }}
-        </el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { User, Plus, Lock, Clock, CircleCheck } from '@element-plus/icons-vue'
+import { User, Plus, Lock, Clock, CircleCheck, DocumentCopy } from '@element-plus/icons-vue'
 import { useI18n } from 'vue-i18n'
 import * as userApi from '@/api/user'
 import * as roleApi from '@/api/role'
@@ -237,12 +247,13 @@ const editVisible = ref(false)
 const editMode = ref<'create' | 'update'>('create')
 const editSaving = ref(false)
 const editFormRef = ref<FormInstance>()
-const editForm = reactive<Partial<UserCreateCmd & UserUpdateCmd & { password: string }>>({})
+const resetPwdLoading = ref(false)
+const resetPwdResult = ref('')
+const pwdCopied = ref(false)
+const editForm = reactive<Partial<UserCreateCmd & UserUpdateCmd & { password: string; oldPassword: string; newPassword: string }>>({})
 const editRules: FormRules = {
   username: [{ required: true, message: t('user.validation.usernameRequired'), trigger: 'blur' }],
-  password: [{ required: true, message: t('user.validation.passwordRequired'), trigger: 'blur' }],
   email: [
-    { required: true, message: t('user.validation.emailRequired'), trigger: 'blur' },
     { type: 'email', message: t('user.validation.emailFormat'), trigger: 'blur' },
   ],
 }
@@ -255,10 +266,6 @@ const roleSaving = ref(false)
 const allRoles = ref<RoleVO[]>([])
 const selectedRoleIds = ref<number[]>([])
 const currentRoleUserId = ref<number | null>(null)
-
-const pwdVisible = ref(false)
-const pwdLoading = ref(false)
-const newPassword = ref('')
 
 // ===== 方法 =====
 async function loadUsers() {
@@ -306,11 +313,16 @@ async function onEdit(row: UserVO) {
   const full = await userApi.getUser(row.id)
   currentUser.value = full
   Object.assign(editForm, {
+    username: full.username ?? '',
     nameCn: full.nameCn ?? '',
     nameJp: full.nameJp ?? '',
     email: full.email ?? '',
     phone: full.phone ?? '',
+    oldPassword: '',
+    newPassword: '',
   })
+  resetPwdResult.value = ''
+  pwdCopied.value = false
   editVisible.value = true
 }
 
@@ -328,7 +340,16 @@ async function onSaveEdit() {
       await userApi.createUser(editForm as UserCreateCmd)
       ElMessage.success(t('user.message.createSuccess'))
     } else {
-      await userApi.updateUser(currentUser.value!.id, editForm as UserUpdateCmd)
+      const payload = {
+        username: editForm.username,
+        oldPassword: editForm.oldPassword || undefined,
+        newPassword: editForm.newPassword || undefined,
+        nameCn: editForm.nameCn,
+        nameJp: editForm.nameJp,
+        email: editForm.email,
+        phone: editForm.phone,
+      }
+      await userApi.updateUser(currentUser.value!.id, payload as UserUpdateCmd)
       ElMessage.success(t('user.message.updateSuccess'))
     }
     editVisible.value = false
@@ -338,6 +359,28 @@ async function onSaveEdit() {
   } finally {
     editSaving.value = false
   }
+}
+
+async function onResetPwdInDialog() {
+  if (!currentUser.value) return
+  resetPwdLoading.value = true
+  resetPwdResult.value = ''
+  try {
+    const res = await userApi.resetUserPassword(currentUser.value.id)
+    resetPwdResult.value = res.newPassword
+  } catch {
+    // error handled by interceptor
+  } finally {
+    resetPwdLoading.value = false
+  }
+}
+
+function copyPwd() {
+  if (!resetPwdResult.value) return
+  navigator.clipboard.writeText(resetPwdResult.value).then(() => {
+    pwdCopied.value = true
+    setTimeout(() => { pwdCopied.value = false }, 2000)
+  })
 }
 
 async function onToggleStatus(row: UserVO) {
@@ -377,22 +420,18 @@ async function onSaveRoles() {
   }
 }
 
-function onResetPwd(row: UserVO) {
-  currentUser.value = row
-  newPassword.value = ''
-  pwdVisible.value = true
-}
-
-async function doResetPassword() {
-  if (!currentUser.value) return
-  pwdLoading.value = true
+async function onDelete(row: UserVO) {
   try {
-    const res = await userApi.resetUserPassword(currentUser.value.id)
-    newPassword.value = res.newPassword
+    await ElMessageBox.confirm(
+      t('user.message.deleteConfirm').replace('{username}', row.username),
+      t('user.action.delete'),
+      { type: 'warning' }
+    )
+    await userApi.deleteUser(row.id)
+    ElMessage.success(t('common.success'))
+    loadUsers()
   } catch {
-    // error handled
-  } finally {
-    pwdLoading.value = false
+    // cancelled
   }
 }
 

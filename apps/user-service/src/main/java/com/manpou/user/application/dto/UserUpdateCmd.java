@@ -6,6 +6,9 @@ import java.util.List;
 
 @Data
 public class UserUpdateCmd {
+    private String username;
+    private String oldPassword;
+    private String newPassword;
     private String nameCn;
     private String nameJp;
     private String phone;

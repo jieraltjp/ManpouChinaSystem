@@ -36,55 +36,55 @@ const routes: RouteRecordRaw[] = [
             path: 'demand',
             name: 'Demand',
             component: () => import('@/pages/procurement/DemandPage.vue'),
-            meta: { titleKey: 'menu.demand', requiresAuth: true },
+            meta: { titleKey: 'menu.demand', requiresAuth: true, permission: 'demand:read' },
           },
           {
             path: 'procurement',
             name: 'ProcurementOrder',
             component: () => import('@/pages/procurement/ProcurementPage.vue'),
-            meta: { titleKey: 'menu.procurement', requiresAuth: true },
+            meta: { titleKey: 'menu.procurement', requiresAuth: true, permission: 'procurement:read' },
           },
           {
             path: 'shipment-batch',
             name: 'ShipmentBatch',
             component: () => import('@/pages/procurement/ShipmentBatchPage.vue'),
-            meta: { titleKey: 'menu.shipmentBatch', requiresAuth: true },
+            meta: { titleKey: 'menu.shipmentBatch', requiresAuth: true, permission: 'shipment:read' },
           },
           {
             path: 'qc-record',
             name: 'QcRecord',
             component: () => import('@/pages/procurement/QcRecordPage.vue'),
-            meta: { titleKey: 'menu.qcRecord', requiresAuth: true },
+            meta: { titleKey: 'menu.qcRecord', requiresAuth: true, permission: 'qc:read' },
           },
           {
             path: 'logistics-plan',
             name: 'LogisticsPlan',
             component: () => import('@/pages/procurement/LogisticsPlanPage.vue'),
-            meta: { titleKey: 'menu.logisticsPlan', requiresAuth: true },
+            meta: { titleKey: 'menu.logisticsPlan', requiresAuth: true, permission: 'logistics:read' },
           },
           {
             path: 'consolidation-pool',
             name: 'ConsolidationPool',
             component: () => import('@/pages/procurement/ConsolidationPoolPage.vue'),
-            meta: { titleKey: 'menu.consolidationPool', requiresAuth: true },
+            meta: { titleKey: 'menu.consolidationPool', requiresAuth: true, permission: 'consolidation:read' },
           },
           {
             path: 'container',
             name: 'Container',
             component: () => import('@/pages/procurement/ContainerPage.vue'),
-            meta: { titleKey: 'menu.container', requiresAuth: true },
+            meta: { titleKey: 'menu.container', requiresAuth: true, permission: 'container:read' },
           },
           {
             path: 'domestic-customs',
             name: 'DomesticCustoms',
             component: () => import('@/pages/customs/DomesticCustomsPage.vue'),
-            meta: { titleKey: 'menu.domesticCustoms', requiresAuth: true },
+            meta: { titleKey: 'menu.domesticCustoms', requiresAuth: true, permission: 'customs:read' },
           },
           {
             path: 'japan-customs',
             name: 'JapanCustomsRecord',
             component: () => import('@/pages/customs/JapanCustomsRecordPage.vue'),
-            meta: { titleKey: 'menu.japanCustomsRecord', requiresAuth: true },
+            meta: { titleKey: 'menu.japanCustomsRecord', requiresAuth: true, permission: 'japan_customs:read' },
           },
         ],
       },
@@ -98,7 +98,7 @@ const routes: RouteRecordRaw[] = [
             path: 'tax-refund-record',
             name: 'TaxRefundRecord',
             component: () => import('@/pages/finance/TaxRefundRecordPage.vue'),
-            meta: { titleKey: 'menu.taxRefundRecord', requiresAuth: true },
+            meta: { titleKey: 'menu.taxRefundRecord', requiresAuth: true, permission: 'tax_refund:read' },
           },
         ],
       },
@@ -112,7 +112,7 @@ const routes: RouteRecordRaw[] = [
             path: 'sales-record',
             name: 'SalesRecord',
             component: () => import('@/pages/sales/SalesRecordPage.vue'),
-            meta: { titleKey: 'menu.salesRecord', requiresAuth: true },
+            meta: { titleKey: 'menu.salesRecord', requiresAuth: true, permission: 'sales:read' },
           },
         ],
       },
@@ -126,37 +126,37 @@ const routes: RouteRecordRaw[] = [
             path: 'factory',
             name: 'Factory',
             component: () => import('@/pages/factory/FactoryPage.vue'),
-            meta: { titleKey: 'menu.factory', requiresAuth: true },
+            meta: { titleKey: 'menu.factory', requiresAuth: true, permission: 'factory:read' },
           },
           {
             path: 'product',
             name: 'Product',
             component: () => import('@/pages/product/ProductPage.vue'),
-            meta: { titleKey: 'menu.product', requiresAuth: true },
+            meta: { titleKey: 'menu.product', requiresAuth: true, permission: 'product:read' },
           },
           {
             path: 'ship',
             name: 'Ship',
             component: () => import('@/pages/logistics/ShipPage.vue'),
-            meta: { titleKey: 'menu.ship', requiresAuth: true },
+            meta: { titleKey: 'menu.ship', requiresAuth: true, permission: 'ship:read' },
           },
           {
             path: 'overview',
             name: 'OrderOverview',
             component: () => import('@/pages/procurement/OrderOverviewPage.vue'),
-            meta: { titleKey: 'menu.orderOverview', requiresAuth: true },
+            meta: { titleKey: 'menu.orderOverview', requiresAuth: true, permission: 'order:read' },
           },
           {
             path: 'overview/demand/:demandId',
             name: 'DemandOverview',
             component: () => import('@/pages/procurement/DemandOverviewPage.vue'),
-            meta: { titleKey: 'menu.orderOverview', requiresAuth: true },
+            meta: { titleKey: 'menu.orderOverview', requiresAuth: true, permission: 'order:read' },
           },
           {
             path: 'overview/procurement/:procurementId',
             name: 'ProcurementOverview',
             component: () => import('@/pages/procurement/ProcurementOverviewPage.vue'),
-            meta: { titleKey: 'menu.orderOverview', requiresAuth: true },
+            meta: { titleKey: 'menu.orderOverview', requiresAuth: true, permission: 'order:read' },
           },
         ],
       },
@@ -170,25 +170,19 @@ const routes: RouteRecordRaw[] = [
             path: 'user',
             name: 'SystemUser',
             component: () => import('@/pages/system/UserPage.vue'),
-            meta: { titleKey: 'menu.user', requiresAuth: true, roles: ['ADMIN', 'MANAGER'] },
+            meta: { titleKey: 'menu.user', requiresAuth: true, roles: ['ADMIN', 'MANAGER'], permission: 'user:read' },
           },
           {
             path: 'role',
             name: 'SystemRole',
             component: () => import('@/pages/system/RolePage.vue'),
-            meta: { titleKey: 'menu.role', requiresAuth: true, roles: ['ADMIN'] },
-          },
-          {
-            path: 'cos-test',
-            name: 'CosTest',
-            component: () => import('@/pages/system/CosTestPage.vue'),
-            meta: { titleKey: 'menu.cosTest', requiresAuth: true },
+            meta: { titleKey: 'menu.role', requiresAuth: true, roles: ['ADMIN'], permission: 'role:read' },
           },
           {
             path: 'audit-log',
             name: 'AuditLog',
             component: () => import('@/pages/system/AuditLogPage.vue'),
-            meta: { titleKey: 'menu.auditLog', requiresAuth: true, roles: ['ADMIN', 'MANAGER'] },
+            meta: { titleKey: 'menu.auditLog', requiresAuth: true, roles: ['ADMIN', 'MANAGER'], permission: 'audit:read' },
           },
           {
             path: 'profile',
@@ -226,6 +220,19 @@ router.beforeEach((to, _from, next) => {
     const userRoles = auth.claims?.roles ?? []
     const hasRole = allowedRoles.some(r => userRoles.includes(r))
     if (!hasRole) {
+      next({ name: 'ProcurementOrder' })
+      return
+    }
+  }
+
+  // 检查权限限制（meta.permission）
+  const requiredPerm = to.meta.permission as string | undefined
+  if (requiredPerm) {
+    const perms = auth.claims?.permissions ?? []
+    const hasWildcard = perms.includes('*:*')
+    const hasModuleWildcard = perms.includes(`${requiredPerm.split(':')[0]}:*`)
+    const hasExact = perms.includes(requiredPerm)
+    if (!hasWildcard && !hasModuleWildcard && !hasExact) {
       next({ name: 'ProcurementOrder' })
       return
     }

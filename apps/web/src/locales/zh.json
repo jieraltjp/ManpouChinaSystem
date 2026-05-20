@@ -1915,6 +1915,7 @@
 			"disable": "禁用",
 			"enable": "启用",
 			"resetPassword": "重置密码",
+				"copyPassword": "复制密码",
 			"assignRole": "分配角色"
 		},
 		"dialog": {
@@ -1936,6 +1937,9 @@
 			"role": "角色",
 			"password": "初始密码",
 			"newPassword": "新密码",
+				"newPasswordTip": "不填则保持原密码",
+				"oldPassword": "当前密码",
+				"oldPasswordTip": "请输入当前密码",
 			"confirmPassword": "确认密码",
 			"oldPassword": "旧密码",
 			"cancel": "取消",
@@ -2119,6 +2123,9 @@
 			"changePassword": "修改密码",
 			"oldPassword": "旧密码",
 			"newPassword": "新密码",
+				"newPasswordTip": "不填则保持原密码",
+				"oldPassword": "当前密码",
+				"oldPasswordTip": "请输入当前密码",
 			"confirmPassword": "确认密码",
 			"passwordStrength": "密码强度",
 			"loginHistory": "登录历史",
