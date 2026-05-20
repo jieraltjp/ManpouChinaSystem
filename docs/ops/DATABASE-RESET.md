@@ -141,25 +141,46 @@ done
 | demand_procurement_mapping | DELETE `/demand-mappings/{id}` | 逐条 |
 | logistics_plan | 无 REST API | 需手动 SQL |
 | procurement_snapshot | 无 REST API | 需手动 SQL |
-| qc_image（无主键） | 由 qc_record 联动删除 | 无需单独处理 |
+| qc_image | 无 REST API | 需手动 SQL（依赖 qc_record） |
+| audit_log | 无 REST API | 需手动 SQL |
+| demand | 无 REST API | 需手动 SQL |
+| procurement | 无 REST API | 需手动 SQL |
 
 ---
 
-## 无 REST API 表的手动 SQL
+## 无 REST API 表的手动 SQL（硬删除 + 重置 AUTO_INCREMENT）
 
-`procurement_snapshot`、`logistics_plan`、`qc_image` 无批量删除接口，通过 MySQL 直接清空。
+所有业务表均通过 MySQL 直接清空，REST API 删除为软删除（`is_deleted=1`）不彻底。
 
-**注意**：`TRUNCATE` 需要 `DROP` 权限，allinone 用 `root` 用户连接：
+**注意**：需要 `root` 用户，执行 `TRUNCATE` 并关闭外键约束，重置后需 `ANALYZE TABLE` 刷新 AUTO_INCREMENT 元数据：
 
 ```bash
 "D:/Soft/laragon/bin/mysql/mysql-8.0.30-winx64/bin/mysql.exe" \
   -h 192.168.13.202 -P 23306 -u root -pmanpou23306 \
-  -e "DELETE FROM manpou.demand_procurement_mapping;
-      DELETE FROM manpou.domestic_customs_record;
-      DELETE FROM manpou.japan_customs_record;
-      DELETE FROM manpou.procurement_snapshot;
-      DELETE FROM manpou.logistics_plan;
-      DELETE FROM manpou.qc_image;"
+  -e "SET FOREIGN_KEY_CHECKS = 0;
+      TRUNCATE TABLE manpou.qc_image;
+      TRUNCATE TABLE manpou.qc_record;
+      TRUNCATE TABLE manpou.procurement_snapshot;
+      TRUNCATE TABLE manpou.demand_procurement_mapping;
+      TRUNCATE TABLE manpou.domestic_customs_record;
+      TRUNCATE TABLE manpou.japan_customs_record;
+      TRUNCATE TABLE manpou.shipment_batch;
+      TRUNCATE TABLE manpou.replenishment_demand;
+      TRUNCATE TABLE manpou.sales_record;
+      TRUNCATE TABLE manpou.audit_log;
+      TRUNCATE TABLE manpou.procurement;
+      SET FOREIGN_KEY_CHECKS = 1;
+      ANALYZE TABLE manpou.qc_image;
+      ANALYZE TABLE manpou.qc_record;
+      ANALYZE TABLE manpou.procurement_snapshot;
+      ANALYZE TABLE manpou.demand_procurement_mapping;
+      ANALYZE TABLE manpou.domestic_customs_record;
+      ANALYZE TABLE manpou.japan_customs_record;
+      ANALYZE TABLE manpou.shipment_batch;
+      ANALYZE TABLE manpou.replenishment_demand;
+      ANALYZE TABLE manpou.sales_record;
+      ANALYZE TABLE manpou.audit_log;
+      ANALYZE TABLE manpou.procurement;"
 ```
 
 **⚠️ 生产环境禁止执行，仅开发/测试使用。**
