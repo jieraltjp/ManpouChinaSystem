@@ -8,6 +8,9 @@ import client from './client'
 /** 报关类型枚举 — 与后端 BillingType 完全对齐 */
 export type BillingType = 'ZHE_LU_KAI_PIAO' | 'CHAO_HUI_TUI_SHUI' | 'NO_REFUND' | 'OTHER'
 
+/** 商品类型枚举 — 发注单维度 */
+export type ProductType = 'NORMAL' | 'SAMPLE' | 'SELF_USE' | 'PARTS' | 'INDEPENDENT'
+
 export const BILLING_TYPE_OPTIONS: { value: BillingType; label: string }[] = [
   { value: 'ZHE_LU_KAI_PIAO', label: '浙鲁开票' },
   { value: 'CHAO_HUI_TUI_SHUI', label: '超慧退税' },
@@ -21,6 +24,9 @@ export interface ProcurementPageVO {
   factoryId?: number            // 关联工厂ID
   factoryName?: string          // 关联工厂名称（来自 DB-10 Factory 表，Assembler 查库填充）
   batchCount?: number         // 出货批次数量（Phase2：batchCount>0 → 已出货，SPEC-B11）
+  productType?: ProductType    // 商品类型（SPEC-B13）
+  demandCode?: string          // 关联需求单号（SPEC-B13）
+  syntheticDemand?: boolean     // 是否为系统自动生成的需求（SPEC-B13）
   productCode: string          // 主货号
   subProductCode?: string     // 子货号/枝番（颜色）
   material?: string            // 材质
@@ -64,6 +70,7 @@ export interface ProcurementPageResponse {
 /** 创建发注单请求 */
 export interface CreateProcurementRequest {
   factoryId?: number
+  productType?: ProductType
   productCode: string
   subProductCode?: string
   material?: string
@@ -93,6 +100,7 @@ export interface CreateProcurementRequest {
 /** 更新发注单请求 */
 export interface UpdateProcurementRequest {
   factoryId?: number
+  productType?: ProductType
   productCode?: string
   subProductCode?: string
   material?: string
@@ -120,7 +128,7 @@ export interface UpdateProcurementRequest {
 }
 
 export const procurementApi = {
-  list(params: { page?: number; pageSize?: number; status?: string; productCode?: string; customerCompany?: string; factoryId?: number }) {
+  list(params: { page?: number; pageSize?: number; status?: string; productCode?: string; customerCompany?: string; factoryId?: number; productType?: ProductType }) {
     return client.get<ProcurementPageResponse>('/procurements', { params })
   },
   get(id: number) {

@@ -216,12 +216,20 @@
 			"completed": "完了",
 			"returned": "退货"
 		},
+		"productType": {
+			"normal": "普通購入",
+			"sample": "サンプル",
+			"selfUse": "自社用",
+			"parts": "部品",
+			"independent": "無関連"
+		},
 		"filter": {
 			"productCode": "商品コード",
 			"productCodePlaceholder": "例：de077",
 			"status": "ステータス",
 			"customerCompany": "顧客会社名",
 			"customerCompanyPlaceholder": "顧客会社名",
+			"productType": "商品タイプ",
 			"all": "すべて",
 			"search": "検索",
 			"reset": "リセット"
@@ -320,8 +328,11 @@
 			"selectFactoryPlaceholder": "工場を選択してください",
 			"factoryNew": "新規",
 			"factoryEdit": "選択中の工場を編集",
+			"productType": "商品タイプ",
+			"productTypeTip": "システムが需要を自動生成するため、手動選択は不要です",
 			"productCode": "商品コード",
 			"productCodePlaceholder": "例：de077",
+			"productCodeSearchPlaceholder": "品番を検索...",
 			"subProductCode": "子品番",
 			"subProductCodePlaceholder": "例：re/wh/bk（カラー）",
 			"category": "商品分類",

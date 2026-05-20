@@ -216,12 +216,20 @@
 			"completed": "已完成",
 			"returned": "退货"
 		},
+		"productType": {
+			"normal": "普通采购",
+			"sample": "样品",
+			"selfUse": "自用",
+			"parts": "配件",
+			"independent": "无关联"
+		},
 		"filter": {
 			"productCode": "商品代码",
 			"productCodePlaceholder": "如 de077",
 			"status": "状态",
 			"customerCompany": "客户公司",
 			"customerCompanyPlaceholder": "客户公司",
+			"productType": "商品类型",
 			"all": "全部",
 			"search": "查询",
 			"reset": "重置"
@@ -320,8 +328,11 @@
 			"selectFactoryPlaceholder": "请选择工厂",
 			"factoryNew": "新建",
 			"factoryEdit": "编辑选中工厂",
+			"productType": "商品类型",
+			"productTypeTip": "系统将自动生成关联需求，无需手动选择",
 			"productCode": "商品代码",
 			"productCodePlaceholder": "如 de077",
+			"productCodeSearchPlaceholder": "搜索货号...",
 			"subProductCode": "子货号",
 			"subProductCodePlaceholder": "如 re/wh/bk（颜色）",
 			"category": "商品分类",

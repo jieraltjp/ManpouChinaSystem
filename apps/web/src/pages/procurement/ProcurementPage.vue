@@ -62,6 +62,11 @@
         <el-form-item :label="$t('order.filter.customerCompany')">
           <el-input v-model="filterForm.customerCompany" :placeholder="$t('order.filter.customerCompanyPlaceholder')" clearable style="width: 160px" />
         </el-form-item>
+        <el-form-item :label="$t('order.filter.productType')">
+          <el-select v-model="filterForm.productType" :placeholder="$t('order.filter.all')" clearable style="width: 130px">
+            <el-option v-for="opt in productTypeOptions" :key="opt.value" :label="$t(opt.labelKey)" :value="opt.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="loadData">{{ $t('order.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('order.filter.reset') }}</el-button>
@@ -215,8 +220,20 @@
     <!-- 新建/编辑弹窗 -->
     <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? $t('order.newDialogTitle') : $t('order.editDialogTitle')" width="900px">
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="88px">
-        <!-- 关联需求（创建时可选） -->
-        <el-form-item v-if="dialogMode === 'create'" :label="$t('order.dialog.linkedDemand')">
+        <!-- 商品类型（创建时可选） -->
+        <el-form-item v-if="dialogMode === 'create'" :label="$t('order.dialog.productType')">
+          <el-radio-group v-model="productType" size="default">
+            <el-radio-button v-for="opt in productTypeOptions" :key="opt.value" :value="opt.value">
+              {{ $t(opt.labelKey) }}
+            </el-radio-button>
+          </el-radio-group>
+          <div v-if="!isNormalProcurement" class="form-tip">
+            {{ $t('order.dialog.productTypeTip') }}
+          </div>
+        </el-form-item>
+
+        <!-- 关联需求（仅普通采购显示） -->
+        <el-form-item v-if="dialogMode === 'create' && isNormalProcurement" :label="$t('order.dialog.linkedDemand')">
           <el-select v-model="selectedDemandId" :placeholder="$t('order.dialog.linkedDemandPlaceholder')" clearable filterable style="width:100%" @change="onDemandChange">
             <el-option v-for="d in demandOptions" :key="d.id" :label="`${d.demandCode} | ${d.productCode} | ${d.demandType === 'NEW_PURCHASE' ? $t('demand.type.newPurchase') : $t('demand.type.replenishment')} | ${$t('demand.status.' + d.status as any)}`" :value="d.id" />
           </el-select>
@@ -243,7 +260,24 @@
         <el-row :gutter="16">
           <el-col :span="8">
             <el-form-item :label="$t('order.dialog.productCode')" prop="productCode">
-              <el-input v-model="formData.productCode" :placeholder="$t('order.dialog.productCodePlaceholder')" />
+              <el-select
+                v-model="formData.productCode"
+                filterable
+                remote
+                reserve-keyword
+                :remote-method="productCodeRemoteSearch"
+                :loading="productCodeLoading"
+                :placeholder="$t('order.dialog.productCodeSearchPlaceholder')"
+                style="width: 100%"
+                @change="onProductCodeSelect"
+              >
+                <el-option
+                  v-for="item in productCodeSearchResults"
+                  :key="item.masterCode"
+                  :label="`${item.masterCode}  ${item.nameZh || ''}`"
+                  :value="item.masterCode"
+                />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -482,7 +516,7 @@ import { Plus, Clock, CircleCheck, Warning, Document, Edit } from '@element-plus
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest, BILLING_TYPE_OPTIONS } from '@/api/procurement'
 import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest } from '@/api/factory'
 import { demandApi, type DemandPageVO } from '@/api/demand'
-import { productApi } from '@/api/product'
+import { productApi, type MasterCodeSuggestVO } from '@/api/product'
 import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
@@ -495,6 +529,56 @@ const formRef = ref<FormInstance>()
 
 // 转采购模式：记录当前需求ID，提交后调用 convert API
 const convertingDemandId = ref<number | null>(null)
+
+/** 商品类型（发注单维度） */
+export type ProductType = 'NORMAL' | 'SAMPLE' | 'SELF_USE' | 'PARTS' | 'INDEPENDENT'
+const productTypeOptions: { value: ProductType; labelKey: string }[] = [
+  { value: 'NORMAL', labelKey: 'order.productType.normal' },
+  { value: 'SAMPLE', labelKey: 'order.productType.sample' },
+  { value: 'SELF_USE', labelKey: 'order.productType.selfUse' },
+  { value: 'PARTS', labelKey: 'order.productType.parts' },
+  { value: 'INDEPENDENT', labelKey: 'order.productType.independent' },
+]
+const productType = ref<ProductType>('NORMAL')
+
+/** 商品货号搜索下拉 */
+const productCodeSearchResults = ref<MasterCodeSuggestVO[]>([])
+const productCodeLoading = ref(false)
+
+async function productCodeRemoteSearch(query: string) {
+  if (!query || query.length < 1) {
+    productCodeSearchResults.value = []
+    return
+  }
+  productCodeLoading.value = true
+  try {
+    const res = await productApi.suggestMasterCodes(query)
+    productCodeSearchResults.value = res.data ?? []
+  } catch {
+    productCodeSearchResults.value = []
+  } finally {
+    productCodeLoading.value = false
+  }
+}
+
+function onProductCodeSelect(masterCode: string) {
+  if (!masterCode) return
+  productApi.getByCode(masterCode).then(res => {
+    const p = res.data
+    if (!p) return
+    if (p.category) {
+      productCategoryMap.value = { ...productCategoryMap.value, [masterCode]: p.category }
+      formData.category = getCategoryLabel(masterCode)
+    }
+    if (p.material) formData.material = p.material
+    if (p.requiresQc != null) formData.requiresQc = p.requiresQc
+    if (p.unitPriceRmb != null) formData.priceRmb = p.unitPriceRmb
+    if (p.taxPoint != null) formData.taxPoint = p.taxPoint
+  }).catch(() => { /* ignore */ })
+}
+
+/** 是否普通采购（显示需求选择器） */
+const isNormalProcurement = computed(() => productType.value === 'NORMAL')
 const route = useRoute()
 const router = useRouter()
 const { t, locale: localeRef } = useI18n()
@@ -524,6 +608,7 @@ const filterForm = reactive({
   productCode: '',
   status: '',
   customerCompany: '',
+  productType: '' as ProductType | '',
 })
 
 const pagination = reactive({
@@ -593,11 +678,12 @@ async function fetchProductCategories(rows: ProcurementPageVO[]) {
   }
 }
 
-/** 选中需求 → 自动带入 productCode / subProductCode / destination / japanLead / quantity + category */
+/** 选中需求 → 自动带入 productCode / subProductCode / destination / japanLead / quantity + category + 强制普通采购 */
 function onDemandChange(demandId: number | null) {
   if (!demandId) return
   const d = demandOptions.value.find(x => x.id === demandId)
   if (!d) return
+  productType.value = 'NORMAL'
   formData.productCode = d.productCode
   formData.subProductCode = d.subProductCode || ''
   formData.destination = d.destination || ''
@@ -792,6 +878,7 @@ async function loadData() {
       status: filterForm.status || undefined,
       productCode: filterForm.productCode.trim() || undefined,
       customerCompany: filterForm.customerCompany.trim() || undefined,
+      productType: filterForm.productType || undefined,
     })
     const payload = res.data as { content: ProcurementPageVO[]; totalElements: number }
     tableRows.value = payload?.content ?? []
@@ -813,12 +900,14 @@ function onReset() {
   filterForm.productCode = ''
   filterForm.status = ''
   filterForm.customerCompany = ''
+  filterForm.productType = ''
   pagination.page = 1
   loadData()
 }
 
 function onNew() {
   dialogMode.value = 'create'
+  productType.value = 'NORMAL'
   selectedDemandId.value = null
   Object.assign(formData, defaultFormData())
   dialogVisible.value = true
@@ -833,6 +922,7 @@ function onView(row: ProcurementPageVO) {
 function onEdit(row: ProcurementPageVO | null) {
   dialogMode.value = 'update'
   currentRow.value = row
+  productType.value = (row as any)?.productType || 'NORMAL'
   selectedDemandId.value = null
   Object.assign(formData, {
     factoryId: row?.factoryId ?? undefined,
@@ -894,6 +984,7 @@ async function onSubmit() {
       if (dialogMode.value === 'create') {
         const req: CreateProcurementRequest = {
           factoryId: formData.factoryId || undefined,
+          productType: productType.value || undefined,
           productCode: formData.productCode,
           subProductCode: formData.subProductCode || undefined,
           material: formData.material || undefined,
@@ -1142,6 +1233,12 @@ defineExpose({ prefillFromDemand })
 }
 
 /* ── 价格预览 ── */
+.form-tip {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
+  line-height: 1.4;
+}
 .price-preview {
   display: flex;
   align-items: baseline;
