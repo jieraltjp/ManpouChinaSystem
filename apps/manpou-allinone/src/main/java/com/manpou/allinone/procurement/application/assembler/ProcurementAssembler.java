@@ -73,6 +73,8 @@ public class ProcurementAssembler {
                 .destination(entity.getDestination())
                 .customerCompany(entity.getCustomerCompany())
                 .status(entity.getStatus())
+                .returnReason(entity.getReturnReason())
+                .returnDate(entity.getReturnDate())
                 .createBy(entity.getCreateBy())
                 .createTime(entity.getCreateTime())
                 .updateBy(entity.getUpdateBy())
@@ -170,6 +172,6 @@ public class ProcurementAssembler {
         if (cmd.getChinaLead() != null) entity.setChinaLead(cmd.getChinaLead());
         if (cmd.getDestination() != null) entity.setDestination(cmd.getDestination());
         if (cmd.getCustomerCompany() != null) entity.setCustomerCompany(cmd.getCustomerCompany());
-        if (cmd.getStatus() != null) entity.updateStatus(cmd.getStatus());
+        if (cmd.getStatus() != null) entity.updateStatus(cmd.getStatus(), cmd.getReturnReason());
     }
 }

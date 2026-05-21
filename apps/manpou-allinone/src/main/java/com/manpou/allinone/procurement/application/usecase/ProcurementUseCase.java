@@ -174,6 +174,17 @@ public class ProcurementUseCase {
         // productCode/factoryId 变更后刷新快照
         createSnapshot(entity);
 
+        // 标记为退货时，联动 Demand → RETURNED（单向锚点）
+        if (cmd.getStatus() == com.manpou.allinone.procurement.domain.model.ShipmentStatus.退货) {
+            var linkedDemands = demandRepository.findByLinkedProcurementIdAndDeletedIsFalse(id);
+            for (var demand : linkedDemands) {
+                demand.setStatus(com.manpou.allinone.replenishment.domain.model.DemandStatus.RETURNED);
+                demandRepository.save(demand);
+                log.info("[Procurement] cascade set demand RETURNED, demandId={}, procurementId={}",
+                        demand.getId(), id);
+            }
+        }
+
         log.info("[Procurement] updated, traceId={}, id={}, productCode={}, status={}",
                 MDC.get(TraceFilter.TRACE_ID_KEY), id, entity.getProductCode(), entity.getStatus());
     }

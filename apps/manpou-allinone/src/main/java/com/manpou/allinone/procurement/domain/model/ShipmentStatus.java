@@ -63,9 +63,9 @@ public enum ShipmentStatus {
      */
     private static Map<ShipmentStatus, Set<ShipmentStatus>> transitions() {
         return Map.ofEntries(
-            // Phase2 简化状态：已下单 ↔ 已出货（QC 记录联动）
-            entry(已下单, Set.of(已下单, 已出货)),
-            entry(已出货, Set.of(已下单, 已出货, 倉庫着)),
+            // Phase2 简化状态：已下单 ↔ 已出货（QC 记录联动）/ 订货失败
+            entry(已下单, Set.of(已下单, 已出货, 退货)),
+            entry(已出货, Set.of(已下单, 已出货, 倉庫着, 退货)),
             entry(予定,   Set.of(未定, 予定, 発注待, OEM)),
 
             // 発注待分支：永康路径/直送路径/OEM 路径三选一
@@ -75,7 +75,7 @@ public enum ShipmentStatus {
             // 仓库路径
             entry(永康,   Set.of(未定, 予定, 倉庫着)),
             entry(直送,   Set.of(未定, 倉庫着)),
-            entry(倉庫着, Set.of(未定, 検品, 現地検品, 已下单, 已出货)),
+            entry(倉庫着, Set.of(未定, 検品, 現地検品, 已下单, 已出货, 退货)),
 
             // 验货分支
             entry(検品,      Set.of(未定, エア便, 輸出, 倉庫着)),

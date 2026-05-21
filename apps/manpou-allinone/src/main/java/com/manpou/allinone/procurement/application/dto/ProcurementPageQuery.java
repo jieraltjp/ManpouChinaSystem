@@ -68,6 +68,8 @@ public class ProcurementPageQuery {
 
     // ===== 状态 =====
     private ShipmentStatus status;    // 状态
+    private String returnReason;      // 退货原因
+    private LocalDateTime returnDate; // 退货时间
 
     // ===== 审计 =====
     private String createBy;

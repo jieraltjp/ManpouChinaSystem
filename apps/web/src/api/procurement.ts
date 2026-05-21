@@ -53,6 +53,7 @@ export interface ProcurementPageVO {
   destination?: string
   customerCompany?: string
   status: string
+  returnReason?: string  // 退货原因（订货失败时）
   createBy?: string
   createTime?: string
   updateBy?: string
@@ -126,6 +127,7 @@ export interface UpdateProcurementRequest {
   destination?: string
   customerCompany?: string
   status?: string
+  returnReason?: string  // 退货原因（标记为订货失败时）
 }
 
 export const procurementApi = {

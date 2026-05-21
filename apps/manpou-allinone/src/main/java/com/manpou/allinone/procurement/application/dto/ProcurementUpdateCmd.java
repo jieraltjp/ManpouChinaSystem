@@ -79,4 +79,11 @@ public class ProcurementUpdateCmd {
     private String customerCompany; // 客户公司
 
     private ShipmentStatus status;  // 状态推进
+
+    /**
+     * 退货原因（标记为订货失败时填写）。
+     * 仅在 status = 退货 时生效。
+     */
+    @Length(max = 512)
+    private String returnReason;
 }

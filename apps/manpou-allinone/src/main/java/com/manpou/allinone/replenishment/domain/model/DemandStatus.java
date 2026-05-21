@@ -7,5 +7,6 @@ package com.manpou.allinone.replenishment.domain.model;
  */
 public enum DemandStatus {
     PENDING,     // 待确认
-    CONFIRMED    // 已确认（已关联发注单）
+    CONFIRMED,   // 已确认（已关联发注单）
+    RETURNED     // 订货失败（终态，由 Procurement 退货联动触发）
 }

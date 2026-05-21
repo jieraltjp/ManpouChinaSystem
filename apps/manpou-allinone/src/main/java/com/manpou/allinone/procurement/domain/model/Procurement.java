@@ -117,6 +117,14 @@ public class Procurement extends BaseEntity {
     @Column(name = "status", nullable = false, length = 32)
     private ShipmentStatus status = ShipmentStatus.未定;
 
+    /** 退货原因（标记为订货失败时填写） */
+    @Column(name = "return_reason", length = 512)
+    private String returnReason;
+
+    /** 退货时间 */
+    @Column(name = "return_date")
+    private java.time.LocalDateTime returnDate;
+
     // ===== 领域方法 =====
 
     /**
@@ -138,8 +146,9 @@ public class Procurement extends BaseEntity {
 
     /**
      * 更新状态（终态禁止修改）。
+     * 标记为退货时同时设置退货原因和退货时间。
      */
-    public void updateStatus(ShipmentStatus newStatus) {
+    public void updateStatus(ShipmentStatus newStatus, String returnReason) {
         if (this.status.isTerminal()) {
             throw new com.manpou.allinone.common.exception.BusinessException(
                     "business.cannot_modify_closed",
@@ -151,6 +160,10 @@ public class Procurement extends BaseEntity {
                     String.format("状态「%s」不允许跳转至「%s」", this.status.name(), newStatus.name()));
         }
         this.status = newStatus;
+        if (newStatus == ShipmentStatus.退货) {
+            this.returnReason = returnReason;
+            this.returnDate = java.time.LocalDateTime.now();
+        }
     }
 
     /**

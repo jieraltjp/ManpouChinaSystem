@@ -127,7 +127,8 @@
     },
     "status": {
       "PENDING": "確認待ち",
-      "CONFIRMED": "確認済み"
+      "CONFIRMED": "確認済み",
+      "RETURNED": "注文件失敗"
     },
     "action": {
       "edit": "編集",
@@ -252,6 +253,7 @@
       "plannedShipDate": "計画出荷日",
       "leadTimeDays": "リードタイム(日)",
       "status": "ステータス",
+      "returnReason": "退货理由",
       "updateBy": "更新者",
       "updateTime": "更新日時",
       "action": "操作"
@@ -275,7 +277,7 @@
       "日本通関完了": "日本通関完了",
       "会計": "会計",
       "完了": "完了",
-      "退货": "退货",
+      "退货": "注文件失敗",
       "已下单": "出荷済み",
       "已出货": "出荷済"
     },
@@ -317,6 +319,7 @@
       "createTime": "作成日時",
       "updateBy": "更新者",
       "updateTime": "更新日時",
+      "returnReason": "退货理由",
       "yes": "はい",
       "no": "いいえ",
       "close": "閉じる",
@@ -379,7 +382,11 @@
       "save": "保存",
       "subCodeNew": "新規",
       "subCodeEdit": "子品番編集",
-      "productEdit": "編集"
+      "productEdit": "編集",
+      "markReturn": "注文件失敗としてマーク",
+      "returnReasonPlaceholder": "退货理由を入力してください...",
+      "returnConfirmTip": "マーク後、状態は元に戻せません。需要側に通知されます",
+      "returnReasonRequired": "退货理由を入力してください"
     },
     "factoryDialog": {
       "newTitle": "工場新規追加",
@@ -1249,7 +1256,8 @@
       "orderDate": "発注日",
       "plannedShipDate": "納期",
       "actualShipDate": "実際出荷日",
-      "status": "ステータス"
+      "status": "ステータス",
+      "returnReason": "退货理由"
     },
     "step3": {
       "title": "ステップ3：検品記録",

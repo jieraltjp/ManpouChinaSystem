@@ -96,6 +96,7 @@ export interface ProcurementVO {
   destination?: string
   customerCompany?: string
   status?: string
+  returnReason?: string
   createTime?: string
 }
 

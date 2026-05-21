@@ -127,6 +127,9 @@ public class OrderChainView {
     @Column(name = "procurement_status")
     private String procurementStatus;
 
+    @Column(name = "procurement_return_reason")
+    private String procurementReturnReason;
+
     @Column(name = "procurement_create_time")
     private LocalDateTime procurementCreateTime;
 

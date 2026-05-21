@@ -127,7 +127,8 @@
     },
     "status": {
       "PENDING": "待确认",
-      "CONFIRMED": "已确认"
+      "CONFIRMED": "已确认",
+      "RETURNED": "订货失败"
     },
     "action": {
       "edit": "编辑",
@@ -252,9 +253,8 @@
       "plannedShipDate": "计划出货日",
       "leadTimeDays": "交货周期(天)",
       "status": "状态",
+      "returnReason": "退货原因",
       "updateBy": "修改人",
-      "updateTime": "修改时间",
-      "action": "操作"
     },
     "status": {
       "未定": "未定",
@@ -275,7 +275,7 @@
       "日本通関完了": "日本通関完了",
       "会計": "会計",
       "完了": "完了",
-      "退货": "退货",
+      "退货": "订货失败",
       "已下单": "已下单",
       "已出货": "已出货"
     },
@@ -317,6 +317,7 @@
       "createTime": "创建时间",
       "updateBy": "修改人",
       "updateTime": "更新时间",
+      "returnReason": "退货原因",
       "yes": "是",
       "no": "否",
       "close": "关闭",
@@ -378,6 +379,12 @@
       "cartonNotesPlaceholder": "纸箱备注信息",
       "afterSalesDeadline": "售后截止日",
       "status": "状态",
+      "markReturn": "标记为订货失败",
+      "returnReasonPlaceholder": "请输入退货原因...",
+      "returnConfirmTip": "标记后状态不可逆，将同步告知需求侧",
+      "returnReasonRequired": "请输入退货原因",
+      "selectTargetStatus": "选择目标状态",
+      "selectStatusPlaceholder": "请选择状态",
       "cancel": "取消",
       "save": "保存"
     },
@@ -1298,7 +1305,8 @@
       "orderDate": "下单日",
       "plannedShipDate": "交货期",
       "actualShipDate": "实际出货日",
-      "status": "状态"
+      "status": "状态",
+      "returnReason": "退货原因"
     },
     "step3": {
       "title": "步骤3：验货记录",

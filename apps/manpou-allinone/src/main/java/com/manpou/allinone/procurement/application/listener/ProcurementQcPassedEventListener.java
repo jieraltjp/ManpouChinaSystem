@@ -88,7 +88,7 @@ public class ProcurementQcPassedEventListener {
             }
             var product = productQueryPort.findByMasterCode(evt.getProductCode()).orElse(null);
             ShipmentStatus suggested = resolveSuggestedStatus(current, qcRecord, product);
-            procurement.updateStatus(suggested);
+            procurement.updateStatus(suggested, null);
             procurementRepository.save(procurement);
             log.info("[Procurement] QC passed → auto-advanced, procurementId={}, {}→{}, qcType={}",
                     procurementId, current, suggested,

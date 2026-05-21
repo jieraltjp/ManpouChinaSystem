@@ -211,6 +211,9 @@
             {{ statusLabel(currentRow) }}
           </el-tag>
         </el-descriptions-item>
+        <el-descriptions-item v-if="currentRow.status === ORDER_STATUS_RETURNED" :label="$t('order.column.returnReason')" :span="2">
+          <span class="return-reason-text">{{ currentRow.returnReason || '-' }}</span>
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.customerCompany')">{{ currentRow.customerCompany || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.orderDate')">{{ currentRow.orderDate || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.factoryShipDate')">{{ currentRow.factoryShipDate || '-' }}</el-descriptions-item>
@@ -234,6 +237,27 @@
         <el-button v-if="hasPermission('procurement:update')" type="primary" @click="onEdit(currentRow)">{{ $t('order.drawer.edit') }}</el-button>
       </div>
     </el-drawer>
+
+    <!-- 订货失败（退货）原因弹窗 -->
+    <el-dialog v-model="returnReasonDialogVisible" :title="$t('order.dialog.markReturn')" width="480px" :close-on-click-modal="false" center>
+      <el-form :model="returnReasonForm" label-width="80px">
+        <el-form-item :label="$t('order.column.returnReason')">
+          <el-input
+            v-model="returnReasonForm.reason"
+            type="textarea"
+            :rows="3"
+            :placeholder="$t('order.dialog.returnReasonPlaceholder')"
+            maxlength="512"
+            show-word-limit
+          />
+        </el-form-item>
+        <div class="return-confirm-tip">{{ $t('order.dialog.returnConfirmTip') }}</div>
+      </el-form>
+      <template #footer>
+        <el-button @click="returnReasonDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="danger" @click="onConfirmReturn">{{ $t('common.confirm') }}</el-button>
+      </template>
+    </el-dialog>
 
     <!-- 新建/编辑弹窗 -->
     <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? $t('order.newDialogTitle') : $t('order.editDialogTitle')" width="900px" :close-on-click-modal="false" center>
@@ -583,6 +607,7 @@ import { usePermission } from '@/composables/usePermission'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, Clock, CircleCheck, Warning, Document, Edit } from '@element-plus/icons-vue'
+import { h } from 'vue'
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest, BILLING_TYPE_OPTIONS } from '@/api/procurement'
 import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest } from '@/api/factory'
 import { demandApi, type DemandPageVO } from '@/api/demand'
@@ -821,11 +846,16 @@ const leadTimeOptions = [
 ]
 
 const deletableStatuses = [ORDER_STATUS_DRAFT, ORDER_STATUS_PENDING, ORDER_STATUS_ORDERED]
-const ORDER_STATUSES = [ORDER_STATUS_ORDERED, ORDER_STATUS_SHIPPED]
+const ORDER_STATUSES = [ORDER_STATUS_ORDERED, ORDER_STATUS_SHIPPED, ORDER_STATUS_RETURNED]
 
 const statusOptionsWithI18n = computed(() =>
   ORDER_STATUSES.map(value => ({ value, label: statusLabelByValue(value) })),
 )
+
+// 退货原因弹窗
+const returnReasonDialogVisible = ref(false)
+const returnReasonForm = reactive({ reason: '' })
+const currentReturnRow = ref<ProcurementPageVO | null>(null)
 
 const filterForm = reactive({
   productCode: '',
@@ -1313,7 +1343,7 @@ async function onSubmit() {
 function statusLabel(row: ProcurementPageVO): string {
   // Phase2：根据批次数量派生（batchCount>0 → 已出货，SPEC-B11 §7.1）
   if ((row.batchCount ?? 0) > 0) return t('order.status.已出货')
-  return t('order.status.已下单')
+  return t(`order.status.${row.status}` as any, { default: row.status })
 }
 
 function statusLabelByValue(status: string): string {
@@ -1321,6 +1351,7 @@ function statusLabelByValue(status: string): string {
 }
 
 function statusType(row: ProcurementPageVO): string {
+  if (row.status === ORDER_STATUS_RETURNED) return 'danger'
   return (row.batchCount ?? 0) > 0 ? 'success' : 'warning'
 }
 
@@ -1330,15 +1361,56 @@ function formatLeadTime(days: number | undefined | null): string {
 }
 
 async function onToggleStatus(row: ProcurementPageVO) {
-  // 有批次 → 无法切换
-  if ((row.batchCount ?? 0) > 0) {
+  // 已终态或订货失败 → 无法切换
+  if (row.status === ORDER_STATUS_RETURNED || (row.batchCount ?? 0) > 0) {
     ElMessage.warning(t('order.message.batchLinked'))
     return
   }
-  const newStatus = row.status === ORDER_STATUS_ORDERED ? ORDER_STATUS_SHIPPED : ORDER_STATUS_ORDERED
+  // 选择目标状态
   try {
-    await procurementApi.update(row.id, { status: newStatus })
+    await ElMessageBox({
+      title: t('order.dialog.markReturn'),
+      message: h('p', null, [
+        h('span', null, t('order.dialog.selectTargetStatus')),
+        h('el-select', {
+          modelValue: '',
+          placeholder: t('order.dialog.selectStatusPlaceholder'),
+          style: 'width:100%;margin-top:8px',
+          onChange: async (val: string) => {
+            if (val === ORDER_STATUS_RETURNED) {
+              // 打开退货原因弹窗
+              returnReasonForm.reason = ''
+              currentReturnRow.value = row
+              returnReasonDialogVisible.value = true
+            } else if (val) {
+              await procurementApi.update(row.id, { status: val })
+              ElMessage.success(t('order.message.statusUpdated'))
+              loadData()
+            }
+          },
+        }, ORDER_STATUSES.map(s => h('el-option', { key: s, label: statusLabelByValue(s), value: s }))),
+      ]),
+      confirmButtonText: t('common.cancel'),
+      showCancelButton: false,
+      showClose: false,
+    })
+  } catch {
+    // 用户取消
+  }
+}
+
+async function onConfirmReturn() {
+  if (!returnReasonForm.reason.trim()) {
+    ElMessage.warning(t('order.dialog.returnReasonRequired'))
+    return
+  }
+  try {
+    await procurementApi.update(currentReturnRow.value!.id, {
+      status: ORDER_STATUS_RETURNED,
+      returnReason: returnReasonForm.reason.trim(),
+    })
     ElMessage.success(t('order.message.statusUpdated'))
+    returnReasonDialogVisible.value = false
     loadData()
   } catch {
     ElMessage.error(t('order.message.statusUpdateFailed'))
@@ -1576,5 +1648,16 @@ defineExpose({ prefillFromDemand })
 :deep(.el-drawer__body) {
   overflow-y: auto !important;
   overflow-x: hidden;
+}
+/* 退货原因 */
+.return-reason-text {
+  color: #F56C6C;
+  font-size: 13px;
+}
+.return-confirm-tip {
+  font-size: 12px;
+  color: #909399;
+  padding: 4px 0;
+  line-height: 1.5;
 }
 </style>

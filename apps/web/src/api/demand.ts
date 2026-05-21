@@ -6,7 +6,7 @@
 import client from './client'
 
 export type DemandType = 'REPLENISHMENT' | 'NEW_PURCHASE'
-export type DemandStatus = 'PENDING' | 'CONFIRMED'
+export type DemandStatus = 'PENDING' | 'CONFIRMED' | 'RETURNED'
 
 export interface DemandPageVO {
   id: number

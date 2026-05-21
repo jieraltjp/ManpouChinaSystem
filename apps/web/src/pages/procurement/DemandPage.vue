@@ -117,7 +117,7 @@
               :type="demandStatusType(row)"
               size="small"
               :disable-transitions="false"
-              class="status-toggle"
+              :class="{ 'status-toggle': row.status !== 'RETURNED' }"
               @click.stop="onToggleStatus(row)"
             >
               {{ demandStatusLabel(row) }}
@@ -640,6 +640,8 @@ async function onSubmit() {
 }
 
 function demandStatusLabel(row: DemandPageVO): string {
+  // 订货失败（联动触发，终态）
+  if (row.status === 'RETURNED') return t('demand.status.RETURNED')
   // 有 linkedProcurementId 即显示"已确认"（v2.2.0）
   if (row.linkedProcurementId) return t('demand.status.CONFIRMED')
   return t('demand.status.PENDING')
@@ -650,11 +652,14 @@ function demandTypeLabel(type: string): string {
 }
 
 function demandStatusType(row: DemandPageVO): string {
+  if (row.status === 'RETURNED') return 'danger'
   // 有 linkedProcurementId → success（绿）；否则 warning（橙）（v2.2.0）
   return row.linkedProcurementId ? 'success' : 'warning'
 }
 
 async function onToggleStatus(row: DemandPageVO) {
+  // 订货失败（终态）不允许操作
+  if (row.status === 'RETURNED') return
   if (row.linkedProcurementId) {
     // 已确认 → 点击取消关联（v2.2.0）
     try {

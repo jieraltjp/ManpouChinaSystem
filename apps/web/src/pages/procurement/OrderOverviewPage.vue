@@ -137,6 +137,9 @@
           <el-descriptions-item :label="$t('orderOverview.step2.plannedShipDate')">{{ formatDate(detailData.procurement.plannedShipDate) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.actualShipDate')">{{ formatDate(detailData.procurement.actualShipDate) }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.status')">{{ statusLabelByValue(detailData.procurement.status) }}</el-descriptions-item>
+          <el-descriptions-item v-if="detailData.procurement.status === '退货'" :label="$t('orderOverview.step2.returnReason')" :span="2">
+            <span class="return-reason-text">{{ detailData.procurement.returnReason || '-' }}</span>
+          </el-descriptions-item>
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
 
@@ -438,6 +441,7 @@ onMounted(() => {
 .detail-loading { display: flex; justify-content: center; align-items: center; min-height: 200px; }
 
 /* 商品图片缩略图 */
+.return-reason-text { color: #F56C6C; font-size: 13px; }
 .btn-blue { color: #409EFF !important; }
 .product-thumb {
   width: 40px;

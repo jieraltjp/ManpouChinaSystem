@@ -133,6 +133,7 @@ public class OrderChainUseCase {
                     .destination(v.getProcurementDestination())
                     .customerCompany(v.getProcurementCustomerCompany())
                     .status(v.getProcurementStatus())
+                    .returnReason(v.getProcurementReturnReason())
                     .createTime(v.getProcurementCreateTime())
                     .build();
 

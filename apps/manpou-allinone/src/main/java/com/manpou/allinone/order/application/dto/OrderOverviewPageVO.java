@@ -80,6 +80,7 @@ public class OrderOverviewPageVO {
         private String destination;
         private String customerCompany;
         private String status;
+        private String returnReason;     // 退货原因
         private java.time.LocalDateTime createTime;
     }
 
