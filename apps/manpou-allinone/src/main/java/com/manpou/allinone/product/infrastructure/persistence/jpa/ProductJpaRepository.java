@@ -65,7 +65,7 @@ public interface ProductJpaRepository extends ProductRepository, JpaRepository<P
     @Query("SELECT p.subCode, p.colorName FROM Product p WHERE p.masterCode = :masterCode AND p.deleted = false AND p.subCode IS NOT NULL AND p.subCode != '' ORDER BY p.subCode")
     List<Object[]> findSubCodesByMasterCode(@Param("masterCode") String masterCode);
 
-    /** 批量查询主货号对应的类别（distinct master_code） */
-    @Query("SELECT DISTINCT p.masterCode, p.category FROM Product p WHERE p.masterCode IN :masterCodes AND p.deleted = false")
+    /** 批量查询主货号对应的类别和图片（distinct master_code） */
+    @Query("SELECT DISTINCT p.masterCode, p.category, p.imageUrl FROM Product p WHERE p.masterCode IN :masterCodes AND p.deleted = false")
     List<Object[]> findCategoryByMasterCodes(@Param("masterCodes") List<String> masterCodes);
 }

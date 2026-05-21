@@ -232,7 +232,7 @@
     </el-card>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" :title="$t('japanCustoms.drawerTitle')" size="600px" direction="rtl">
+    <el-drawer v-model="drawerVisible" :title="$t('japanCustoms.drawerTitle')" size="600px" direction="rtl" bodyStyle="overflow-y: auto">
       <el-descriptions :column="2" border v-if="currentRow">
         <el-descriptions-item :label="$t('japanCustoms.column.containerNo')">{{ currentRow.containerNo ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.entryNo')">
@@ -705,4 +705,5 @@ watch(tableData, () => {
 .batch-label { font-weight: 600; font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
 .batch-hint { font-size: 12px; color: #67c23a; font-weight: 600; white-space: nowrap; }
 .batch-plan-table { margin-top: 8px; }
+:deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
 </style>

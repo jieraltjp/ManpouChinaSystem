@@ -95,6 +95,18 @@
             <span class="product-code">{{ row.subProductCode || '—' }}</span>
           </template>
         </el-table-column>
+        <el-table-column :label="$t('product.drawer.imageUrl')" width="70" align="center">
+          <template #default="{ row }">
+            <img
+              v-if="productImageMap[row.productCode]"
+              :src="productImageMap[row.productCode]"
+              class="product-thumb"
+              loading="lazy"
+              @error="e => (e.target as HTMLImageElement).style.display='none'"
+            />
+            <span v-else class="no-image">—</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('order.column.category')" min-width="100" align="center">
           <template #default="{ row }">
             <span>{{ getCategoryLabel(row.productCode) }}</span>
@@ -172,12 +184,18 @@
     </el-card>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" :title="$t('order.drawerTitle')" size="600px" direction="rtl">
+    <el-drawer v-model="drawerVisible" :title="$t('order.drawerTitle')" size="600px" direction="rtl" bodyStyle="overflow-y: auto !important">
       <el-descriptions :column="2" border v-if="currentRow">
         <el-descriptions-item :label="$t('order.drawer.factory')">{{ currentRow.factoryName || (currentRow.factoryId ? `ID:${currentRow.factoryId}` : '-') }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.productCode')">{{ currentRow.productCode }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.subProductCode')">{{ currentRow.subProductCode || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.category')">{{ getCategoryLabel(currentRow.productCode) }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('product.drawer.imageUrl')" :span="2">
+          <a v-if="productImageMap[currentRow.productCode]" :href="productImageMap[currentRow.productCode]" target="_blank">
+            <img :src="productImageMap[currentRow.productCode]" class="drawer-product-thumb" />
+          </a>
+          <span v-else>—</span>
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.quantity')">{{ currentRow.quantity }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.material')">{{ currentRow.material || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.requiresQc')">{{ currentRow.requiresQc ? $t('order.drawer.yes') : $t('order.drawer.no') }}</el-descriptions-item>
@@ -847,6 +865,7 @@ async function loadDemands() {
 
 // 商品分类映射（productCode → category）
 const productCategoryMap = ref<Record<string, string>>({})
+const productImageMap = ref<Record<string, string>>({})
 function getCategoryLabel(code: string): string {
   if (!code) return '-'
   const category = productCategoryMap.value[code]
@@ -874,11 +893,14 @@ async function fetchProductCategories(rows: ProcurementPageVO[]) {
   if (!codes.length) return
   try {
     const res = await productApi.batchGetCategories(codes)
-    const map: Record<string, string> = {}
+    const categoryMap: Record<string, string> = {}
+    const imageMap: Record<string, string> = {}
     for (const item of (res.data ?? [])) {
-      map[item.masterCode] = item.category || '-'
+      categoryMap[item.masterCode] = item.category || '-'
+      if (item.imageUrl) imageMap[item.masterCode] = item.imageUrl
     }
-    productCategoryMap.value = { ...productCategoryMap.value, ...map }
+    productCategoryMap.value = { ...productCategoryMap.value, ...categoryMap }
+    productImageMap.value = { ...productImageMap.value, ...imageMap }
   } catch {
   }
 }
@@ -1527,5 +1549,32 @@ defineExpose({ prefillFromDemand })
   background: #f5f7fa;
   border-radius: 4px;
   border: 1px solid #ebeef5;
+}
+
+/* ── 商品图片缩略图 ── */
+.product-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e0e6ed;
+  cursor: pointer;
+}
+.no-image {
+  color: #c0c4cc;
+  font-size: 18px;
+}
+.drawer-product-thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e0e6ed;
+  cursor: pointer;
+}
+/* 抽屉内容可滚动 */
+:deep(.el-drawer__body) {
+  overflow-y: auto !important;
+  overflow-x: hidden;
 }
 </style>

@@ -237,6 +237,7 @@
     "column": {
       "productCode": "主货号",
       "subProductCode": "子货号",
+      "imageUrl": "商品图片",
       "category": "商品分类",
       "factoryName": "关联工厂",
       "priceRmb": "人民币单价",
@@ -1258,7 +1259,8 @@
       "demandStatus": "需求状态",
       "linkedProcurementId": "关联发注单",
       "demandCreateTime": "创建时间",
-      "createTime": "创建时间"
+      "createTime": "创建时间",
+      "imageUrl": "商品图片"
     },
     "step": {
       "1": "需求",
@@ -1287,6 +1289,7 @@
       "factoryName": "工厂",
       "productCode": "货号",
       "subProductCode": "子货号",
+      "imageUrl": "商品图片",
       "quantity": "数量",
       "priceRmb": "单价(CNY)",
       "taxPoint": "票点",

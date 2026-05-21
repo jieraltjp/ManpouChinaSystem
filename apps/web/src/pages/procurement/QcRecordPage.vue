@@ -337,7 +337,7 @@
     </el-dialog>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" :title="$t('inspection.drawerTitle')" size="720px" direction="rtl">
+    <el-drawer v-model="drawerVisible" :title="$t('inspection.drawerTitle')" size="720px" direction="rtl" bodyStyle="overflow-y: auto">
       <el-descriptions :column="2" border v-if="currentRow" label-class-name="drawer-label">
         <!-- 基本信息 -->
         <el-descriptions-item :label="$t('inspection.column.qcCode')">{{ currentRow.qcCode }}</el-descriptions-item>
@@ -876,4 +876,5 @@ onMounted(() => {
 .drawer-image-thumb { width: 80px; height: 80px; border-radius: 4px; cursor: pointer; }
 .upload-tip { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
 .batch-info-tag { margin-top: 6px; display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
+:deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
 </style>

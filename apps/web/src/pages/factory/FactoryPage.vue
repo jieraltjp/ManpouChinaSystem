@@ -111,7 +111,7 @@
     </el-card>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="detailVisible" :title="$t('factory.drawer.title')" size="600px" direction="rtl">
+    <el-drawer v-model="detailVisible" :title="$t('factory.drawer.title')" size="600px" direction="rtl" bodyStyle="overflow-y: auto">
       <div v-if="currentRow" class="detail-grid">
         <div class="detail-section-title">{{ $t('factory.drawer.section.basic') }}</div>
         <div class="detail-item"><span class="detail-label">{{ $t('factory.drawer.factoryCode') }}</span><span class="detail-value">{{ currentRow.factoryCode }}</span></div>
@@ -498,4 +498,5 @@ loadAll()
   gap: 8px;
 }
 .btn-blue { color: #409EFF !important; }
+:deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
 </style>

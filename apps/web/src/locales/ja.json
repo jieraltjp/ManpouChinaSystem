@@ -237,6 +237,7 @@
     "column": {
       "productCode": "主品番",
       "subProductCode": "子品番",
+      "imageUrl": "商品画像",
       "category": "商品分類",
       "factoryName": "関連工場",
       "priceRmb": "元建て単価",
@@ -1209,7 +1210,8 @@
       "demandStatus": "需要ステータス",
       "linkedProcurementId": "関連発注書",
       "demandCreateTime": "作成日時",
-      "createTime": "作成日時"
+      "createTime": "作成日時",
+      "imageUrl": "商品画像"
     },
     "step": {
       "1": "需要",
@@ -1238,6 +1240,7 @@
       "factoryName": "工場",
       "productCode": "品番",
       "subProductCode": "サブ品番",
+      "imageUrl": "商品画像",
       "quantity": "数量",
       "priceRmb": "単価(CNY)",
       "taxPoint": "インボイス係数",

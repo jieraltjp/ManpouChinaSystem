@@ -113,7 +113,7 @@
     </el-card>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="detailVisible" :title="$t('product.drawer.title')" size="680px" direction="rtl">
+    <el-drawer v-model="detailVisible" :title="$t('product.drawer.title')" size="680px" direction="rtl" bodyStyle="overflow-y: auto">
       <div v-if="currentRow" class="drawer-content">
 
         <!-- 基本信息 -->
@@ -767,4 +767,5 @@ loadData()
   gap: 8px;
 }
 .btn-blue { color: #409EFF !important; }
+:deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
 </style>

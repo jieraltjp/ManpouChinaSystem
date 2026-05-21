@@ -225,19 +225,21 @@ public class ProductUseCase {
             return List.of();
         }
         var uniqueCodes = masterCodes.stream().distinct().toList();
-        Map<String, String> categoryMap = productJpaRepository
-                .findCategoryByMasterCodes(uniqueCodes)
-                .stream()
+        var rows = productJpaRepository.findCategoryByMasterCodes(uniqueCodes);
+        // 一次流式收集 category + imageUrl（避免 toMap 的 null key 问题）
+        java.util.Map<String, ProductCategoryVO> map = rows.stream()
+                .filter(row -> row[0] != null)
                 .collect(java.util.stream.Collectors.toMap(
                         row -> (String) row[0],
-                        row -> row[1] == null ? null : ((ProductCategory) row[1]).name(),
+                        row -> ProductCategoryVO.builder()
+                                .masterCode((String) row[0])
+                                .category(row[1] == null ? null : ((ProductCategory) row[1]).name())
+                                .imageUrl((String) row[2])
+                                .build(),
                         (v1, v2) -> v1
                 ));
         return uniqueCodes.stream()
-                .map(code -> ProductCategoryVO.builder()
-                        .masterCode(code)
-                        .category(categoryMap.get(code))
-                        .build())
+                .map(code -> map.getOrDefault(code, ProductCategoryVO.builder().masterCode(code).build()))
                 .toList();
     }
 

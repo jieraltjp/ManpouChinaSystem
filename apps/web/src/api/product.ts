@@ -168,6 +168,7 @@ export interface ProductFactoryVO {
 export interface ProductCategoryVO {
   masterCode: string
   category?: string
+  imageUrl?: string
 }
 
 export const productApi = {

@@ -157,7 +157,7 @@
     </el-card>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" :title="$t('sales.drawerTitle')" size="600px" direction="rtl">
+    <el-drawer v-model="drawerVisible" :title="$t('sales.drawerTitle')" size="600px" direction="rtl" bodyStyle="overflow-y: auto">
       <el-descriptions :column="2" border v-if="currentRow">
         <el-descriptions-item :label="$t('sales.column.recordCode')">
           <span class="code-badge">{{ currentRow.recordCode }}</span>
@@ -560,4 +560,5 @@ watch(tableData, () => {
 .stock-oos { color: #DC2626; font-weight: 700; }
 .text-danger { color: #DC2626; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
+:deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
 </style>

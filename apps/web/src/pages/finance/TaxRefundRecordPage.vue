@@ -131,7 +131,7 @@
     </el-card>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" :title="$t('taxRefund.drawerTitle')" size="600px" direction="rtl">
+    <el-drawer v-model="drawerVisible" :title="$t('taxRefund.drawerTitle')" size="600px" direction="rtl" bodyStyle="overflow-y: auto">
       <el-descriptions :column="2" border v-if="currentRow">
         <el-descriptions-item :label="$t('taxRefund.column.refundCode')">
           <span class="code-badge">{{ currentRow.refundCode }}</span>
@@ -629,4 +629,5 @@ watch(tableData, () => {
 .refund-value { font-size: 22px; font-weight: 800; color: #D97706; font-variant-numeric: tabular-nums; }
 .refund-unit { font-size: 13px; color: #92400e; font-weight: 600; }
 .refund-formula { font-size: 11px; color: #92400e; margin-left: 4px; }
+:deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
 </style>

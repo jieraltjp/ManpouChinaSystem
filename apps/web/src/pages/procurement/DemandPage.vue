@@ -148,7 +148,7 @@
     </el-card>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" :title="$t('demand.drawerTitle')" size="560px" direction="rtl">
+    <el-drawer v-model="drawerVisible" :title="$t('demand.drawerTitle')" size="560px" direction="rtl" bodyStyle="overflow-y: auto">
       <el-descriptions :column="2" border v-if="currentRow">
         <el-descriptions-item :label="$t('demand.column.demandCode')">{{ currentRow.demandCode }}</el-descriptions-item>
         <el-descriptions-item :label="$t('demand.column.demandType')">{{ demandTypeLabel(currentRow.demandType) }}</el-descriptions-item>
@@ -770,4 +770,5 @@ onMounted(() => loadData())
 .batch-mode { padding: 24px 0; text-align: center; }
 .batch-hint { color: #606266; font-size: 14px; margin: 0 0 4px; }
 .batch-hint--muted { color: #c0c4cc; font-size: 12px; }
+:deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
 </style>

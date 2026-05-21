@@ -21,8 +21,7 @@
     </el-card>
 
     <el-card class="table-card" shadow="never">
-      <div class="table-scroll-wrap">
-        <el-table v-loading="loading" :data="chainData" stripe table-layout="fixed" min-height="200">
+      <el-table v-loading="loading" :data="chainData" stripe style="width: 100%">
         <!-- 主货号 -->
         <el-table-column prop="demandProductCode" :label="$t('orderOverview.column.productCode')" min-width="140">
           <template #default="{ row }">
@@ -34,6 +33,19 @@
           <template #default="{ row }">
             <span v-if="row.demandSubProductCode" class="product-code">{{ row.demandSubProductCode }}</span>
             <span v-else>—</span>
+          </template>
+        </el-table-column>
+        <!-- 商品图片 -->
+        <el-table-column :label="$t('orderOverview.column.imageUrl')" width="70" align="center">
+          <template #default="{ row }">
+            <img
+              v-if="productImageMap[row.demandProductCode]"
+              :src="productImageMap[row.demandProductCode]"
+              class="product-thumb"
+              loading="lazy"
+              @error="e => (e.target as HTMLImageElement).style.display='none'"
+            />
+            <span v-else class="no-image">—</span>
           </template>
         </el-table-column>
         <!-- 工厂（快照） -->
@@ -71,7 +83,7 @@
           </template>
         </el-table-column>
       </el-table>
-      </div>
+
       <div class="pagination-wrap">
         <el-pagination
           background
@@ -85,7 +97,7 @@
     </el-card>
 
     <!-- 详情抽屉 -->
-    <el-drawer v-model="drawerVisible" :title="$t('orderOverview.drawerTitle')" direction="rtl" size="auto">
+    <el-drawer v-model="drawerVisible" :title="$t('orderOverview.drawerTitle')" direction="rtl" size="720px" bodyStyle="overflow-y: auto">
       <div v-if="detailLoading" class="detail-loading">
         <el-icon class="is-loading" :size="24"><Loading /></el-icon>
       </div>
@@ -111,6 +123,12 @@
           <el-descriptions-item :label="$t('orderOverview.step2.factoryName')">{{ detailData.factory?.factoryName || '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.productCode')">{{ detailData.procurement.productCode || '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.subProductCode')">{{ detailData.procurement.subProductCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step2.imageUrl')">
+            <a v-if="detailImageUrl" :href="detailImageUrl" target="_blank">
+              <img :src="detailImageUrl" class="drawer-product-thumb" />
+            </a>
+            <span v-else>—</span>
+          </el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.quantity')">{{ detailData.procurement.quantity ?? '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.priceRmb')">{{ detailData.procurement.priceRmb ? $t('common.currency.cny') + Number(detailData.procurement.priceRmb).toFixed(2) : '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.taxPoint')">{{ detailData.procurement.taxPoint ?? '-' }}</el-descriptions-item>
@@ -209,6 +227,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Loading } from '@element-plus/icons-vue'
 import { orderChainApi, type OrderChainVO, type OrderChainDetailVO } from '@/api/orderChain'
+import { productApi } from '@/api/product'
 
 const router = useRouter()
 const { locale, t } = useI18n()
@@ -222,6 +241,8 @@ const filter = reactive({ status: '', keyword: '' })
 const drawerVisible = ref(false)
 const currentRow = ref<OrderChainVO | null>(null)
 const detailLoading = ref(false)
+const detailImageUrl = ref<string>('')
+const productImageMap = ref<Record<string, string>>({})
 const detailData = ref<OrderChainDetailVO | null>(null)
 
 function formatDate(val: string | undefined | null): string {
@@ -335,6 +356,18 @@ async function loadChainList() {
     })
     chainData.value = res.data?.content ?? []
     total.value = res.data?.totalElements ?? 0
+    // 批量获取商品图片
+    const codes = [...new Set(chainData.value.map(r => r.demandProductCode).filter(Boolean))]
+    if (codes.length) {
+      try {
+        const r = await productApi.batchGetCategories(codes)
+        const imgMap: Record<string, string> = {}
+        for (const item of (r.data ?? [])) {
+          if (item.imageUrl) imgMap[item.masterCode] = item.imageUrl
+        }
+        productImageMap.value = { ...productImageMap.value, ...imgMap }
+      } catch { /* ignore */ }
+    }
   } finally {
     loading.value = false
   }
@@ -357,9 +390,18 @@ async function onView(row: OrderChainVO) {
   drawerVisible.value = true
   detailData.value = null
   detailLoading.value = true
+  detailImageUrl.value = ''
   try {
     const res = await orderChainApi.getChainDetail(row.demandId)
     detailData.value = res.data
+    // 获取商品图片
+    const productCode = res.data?.procurement?.productCode || res.data?.demand?.productCode
+    if (productCode) {
+      try {
+        const p = await productApi.getByCode(productCode)
+        if (p.data?.imageUrl) detailImageUrl.value = p.data.imageUrl
+      } catch { /* ignore */ }
+    }
   } catch {
     detailData.value = null
   } finally {
@@ -377,8 +419,8 @@ onMounted(() => {
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
 .filter-card { margin-bottom: 12px; }
 .table-card { margin-top: 0; }
+.table-card :deep(.el-table__row) { cursor: pointer; }
 .pagination-wrap { display: flex; justify-content: flex-end; margin-top: 12px; }
-.table-scroll-wrap { overflow-x: auto; }
 .product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
 .qty-value { color: #D97706; font-weight: 600; }
 .text-muted { color: #999; }
@@ -394,4 +436,28 @@ onMounted(() => {
 }
 .step-empty { color: #c0c4cc; font-size: 13px; padding: 8px 0; }
 .detail-loading { display: flex; justify-content: center; align-items: center; min-height: 200px; }
+
+/* 商品图片缩略图 */
+.btn-blue { color: #409EFF !important; }
+.product-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e0e6ed;
+  cursor: pointer;
+}
+.no-image {
+  color: #c0c4cc;
+  font-size: 18px;
+}
+.drawer-product-thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e0e6ed;
+  cursor: pointer;
+}
+:deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
 </style>
