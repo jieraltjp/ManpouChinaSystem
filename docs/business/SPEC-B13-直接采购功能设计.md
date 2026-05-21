@@ -1,6 +1,7 @@
 # SPEC-B13 — 直接采购功能设计
 
-> **版本**: 1.6.0
+> **版本**: 1.7.0
+> **更新**: 2026-05-21（v1.7.0：订货失败（退货）功能 ✅ — 联动 Demand 终态终态，单向锚点）
 > **更新**: 2026-05-20（v1.6.0：商品创建弹窗与子货号新建弹窗合并为统一弹窗（主货号/子货号/名称/分类/材质/质检），移除独立 subCodeDialog ✅）
 > **更新**: 2026-05-20（v1.5.0：子货号改为搜索下拉 + 新建按钮 ✅）
 > **更新**: 2026-05-20（v1.4.0：提交时检测商品目录，货号不存在则弹出快速新建商品弹窗 ✅）
@@ -9,7 +10,7 @@
 > **更新**: 2026-05-20（v1.1.0：直接采购复用现有 demand 链路，自动生成空需求记录；新增 ProductType 四种商品类型）
 > **创建**: 2026-05-20
 > **状态**: 📋 设计中
-> **业务背景**: 发注单需支持：无需求直接采购（自动生成空需求记录）以及样品/自用/配件/无关采购 四种商品类型；商品货号改为搜索下拉提升录入效率。
+> **业务背景**: 发注单需支持：无需求直接采购（自动生成空需求记录）以及样品/自用/配件/无关采购 四种商品类型；商品货号改为搜索下拉提升录入效率；发注单标记订货失败时联动 Demand 终态。
 
 ---
 
@@ -483,3 +484,238 @@ ELSE:
 8. 删除直接采购 → synthetic demand 同步删除
 9. 删除普通采购 → demand.status 恢复 PENDING
 10. 按商品类型筛选正确
+
+---
+
+## 9. 订货失败（退货）功能（v1.7.0）
+
+### 9.1 业务背景
+
+发注单在出货后可能因质量/交期等原因被标记为「订货失败」，需要：
+1. 记录失败原因（退货理由）
+2. 同步告知需求侧：该需求已失败
+3. 状态不可逆（终态）
+
+### 9.2 设计原则
+
+- **联动单向**：Procurement 标记订货失败 → Demand 自动联动变为 RETURNED（不需要用户手动操作 Demand）
+- **终态**：Procurement `退货 → 完了`，Demand `RETURNED` 也是终态，不可再流转
+- **显示名**：统一显示为「订货失败」（i18n key: `order.status.订货失败`）
+- **退货原因**：记录在 `procurement.return_reason`，Demand 无独立退货原因字段（联动追溯）
+
+### 9.3 状态建模
+
+```java
+// ShipmentStatus（已有 ✅）
+退货   // 订货失败（Phase2 简化路径下：已下单 ↔ 已出货 ↔ 退货）
+
+// DemandStatus（需扩展）
+PENDING,     // 待确认
+CONFIRMED,   // 已确认（已关联发注单）
+RETURNED     // 订货失败（终态，由 Procurement 退货联动触发）
+```
+
+**FSM 变更**（`ShipmentStatus.java`）：
+- `退货` 的可转换目标：`完了`（终态）
+- `已出货` 可直接转换到 `退货`
+- `完了` 为终态，禁止任何状态变更
+
+### 9.4 数据库变更（Flyway）
+
+```sql
+-- 新增 return_reason 字段
+ALTER TABLE procurement
+  ADD COLUMN return_reason VARCHAR(512) AFTER status;
+
+-- 新增 return_date 字段（记录退货时间）
+ALTER TABLE procurement
+  ADD COLUMN return_date DATETIME AFTER return_reason;
+```
+
+> `v_order_chain_v1` VIEW 无需变更，`step2_status` 保持不变（`procurement_id IS NOT NULL` → `COMPLETED`）。
+
+### 9.5 后端变更
+
+**Procurement Entity**（`Procurement.java`）：
+
+```java
+/**
+ * 退货原因。
+ * 标记为订货失败时填写，如"质量问题"、"交期延误"等。
+ */
+@Column(name = "return_reason", length = 512)
+private String returnReason;
+
+/**
+ * 退货时间。
+ */
+@Column(name = "return_date")
+private LocalDateTime returnDate;
+```
+
+**ProcurementUpdateCmd**（`ProcurementUpdateCmd.java`）：
+
+```java
+// 新增字段（edit 时可选填）
+private String returnReason;
+```
+
+**DemandStatus 枚举**（`DemandStatus.java`）：
+
+```java
+public enum DemandStatus {
+    PENDING,     // 待确认
+    CONFIRMED,   // 已确认（已关联发注单）
+    RETURNED     // 订货失败（终态，联动触发）
+}
+```
+
+**ProcurementUseCase.update 逻辑**（`ProcurementUseCase.java`）：
+
+```
+WHEN status → 退货:
+    1. 保存 returnReason + returnDate
+    2. 查找该 procurement 关联的所有 demand（linkedProcurementId = this.id AND is_deleted = false）
+    3. 对每条 demand: demand.status = RETURNED（调用 demandRepository.save()）
+    4. 日志记录联动更新的 demandId 列表
+```
+
+**OrderChainUseCase.toDetailVO**（`OrderChainUseCase.java`）：
+
+```java
+// ProcurementVO 新增字段透传
+.returnReason(v.getProcurementReturnReason())
+```
+
+### 9.6 前端 ProcurementPage 变更
+
+**状态切换交互**：
+
+```
+点击状态 tag → 切换: 已下单 ↔ 已出货
+点击状态 tag → 长按/右键 → 选择「订货失败」
+→ 弹出退货原因输入弹窗（el-dialog + el-input type="textarea"）
+→ 确认后调用 PATCH /api/v1/procurements/{id} { status: "退货", returnReason: "..." }
+```
+
+**退货原因输入弹窗**：
+
+```
+┌────────────────────────────────────────────┐
+│  标记为订货失败                        [×] │
+├────────────────────────────────────────────┤
+│  退货原因:                                 │
+│  ┌────────────────────────────────────┐   │
+│  │ 请输入退货原因...                   │   │
+│  └────────────────────────────────────┘   │
+│  提示：标记后状态不可逆，将同步告知需求侧   │
+│                                             │
+│              [取消]        [确认]           │
+└────────────────────────────────────────────┘
+```
+
+**列表状态标签**：
+
+| 状态 | 标签类型 | 说明 |
+|------|---------|------|
+| 已下单 | info | 蓝色 |
+| 已出货 | success | 绿色 |
+| 订货失败 | danger | 红色（醒目） |
+
+**抽屉步骤2区域新增**：
+
+```
+状态: 订货失败    ← el-tag type="danger"
+退货原因: 质量问题，交期延误超30天
+```
+
+### 9.7 前端 DemandPage 变更
+
+DemandPage 不需要独立操作入口（联动自动触发）。列表显示时：
+
+| Demand.status | 标签 | 说明 |
+|---------------|------|------|
+| PENDING | info | 蓝色 |
+| CONFIRMED | success | 绿色 |
+| RETURNED | danger | 红色，「订货失败」 |
+
+### 9.8 前端 OrderOverviewPage 变更
+
+`chainStatusType` / `chainStatusLabel` 感知 `procurementStatus = '退货'`：
+
+```typescript
+function chainStatusType(row: OrderChainVO): string {
+  if (row.step4Status === 'COMPLETED') return 'success'
+  // ...existing logic...
+  if (row.step2Status === 'COMPLETED' && row.procurementStatus === '退货') return 'danger'  // 新增
+  return 'info'
+}
+```
+
+抽屉步骤2区域：若 `status = '退货'` 且 `returnReason` 存在，显示红色标签 + 原因文本。
+
+### 9.9 i18n 变更
+
+**zh.json**：
+```json
+"order": {
+  "status": {
+    "订货失败": "订货失败"
+  },
+  "column": {
+    "returnReason": "退货原因"
+  },
+  "dialog": {
+    "markReturn": "标记为订货失败",
+    "returnReasonPlaceholder": "请输入退货原因...",
+    "returnConfirmTip": "标记后状态不可逆，将同步告知需求侧"
+  }
+},
+"demand": {
+  "status": {
+    "RETURNED": "订货失败"
+  }
+}
+```
+
+**ja.json**：
+```json
+"order": {
+  "status": {
+    "订货失败": "注文件失敗"
+  },
+  "column": {
+    "returnReason": "退货理由"
+  },
+  "dialog": {
+    "markReturn": "注文件失敗としてマーク",
+    "returnReasonPlaceholder": "退货理由を入力してください...",
+    "returnConfirmTip": "マーク後、状態は元に戻せません。需要側に通知されます"
+  }
+},
+"demand": {
+  "status": {
+    "RETURNED": "注文件失敗"
+  }
+}
+```
+
+### 9.10 实施清单
+
+| 层级 | 文件 | 变更 |
+|------|------|------|
+| DB | `V19__procurement_return_fields.sql` | 新增 Flyway：return_reason + return_date |
+| 后端 Entity | `Procurement.java` | 新增 returnReason + returnDate 字段 |
+| 后端 DTO | `ProcurementUpdateCmd.java` | 新增 returnReason |
+| 后端 DTO | `ProcurementPageVO.java` | 新增 returnReason + returnDate |
+| 后端 DTO | `ProcurementVO.java`（orderChain） | 新增 returnReason |
+| 后端 | `DemandStatus.java` | 新增 RETURNED 枚举值 |
+| 后端 | `ProcurementUseCase.update()` | 标记退货时联动 Demand → RETURNED |
+| 后端 | `OrderChainUseCase.toDetailVO()` | 透传 returnReason |
+| 后端 | `ShipmentStatus.java` | FSM: 退货 → 完了；已出货 → 退货 |
+| 前端 | `api/procurement.ts` | `UpdateProcurementRequest` / `ProcurementPageVO` 补字段 |
+| 前端 | `pages/procurement/ProcurementPage.vue` | 状态 tag 逻辑扩展 + 退货原因弹窗 + 抽屉退货原因行 |
+| 前端 | `pages/procurement/DemandPage.vue` | `demandStatusLabel` / `demandStatusType` 感知 RETURNED |
+| 前端 | `pages/procurement/OrderOverviewPage.vue` | `chainStatusType` 感知退货 + 抽屉显示 |
+| 前端 | `locales/zh.json` / `ja.json` | 订货失败/退货原因相关 i18n |
+| 文档 | 本文档 v1.7.0 | ✅ |
