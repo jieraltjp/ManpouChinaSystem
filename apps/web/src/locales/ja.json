@@ -377,7 +377,8 @@
       "cancel": "キャンセル",
       "save": "保存",
       "subCodeNew": "新規",
-      "subCodeEdit": "子品番編集"
+      "subCodeEdit": "子品番編集",
+      "productEdit": "編集"
     },
     "factoryDialog": {
       "newTitle": "工場新規追加",
@@ -406,8 +407,12 @@
     },
     "productCreateDialog": {
       "title": "商品が見つかりません — 新規商品作成",
+      "editTitle": "商品を編集",
       "createSuccess": "商品作成成功",
+      "editSuccess": "商品保存成功",
+      "loadError": "商品情報の読み込みに失敗しました",
       "createAndContinue": "作成して続ける",
+      "saveEdit": "編集を保存",
       "tip": "主品番は空欄可（システムが自動生成）。子品番は同一主品番内のカラー／仕様バリエーションを示します。",
       "masterCodePlaceholder": "主品番を入力または空欄で自動生成",
       "subCodePlaceholder": "子品番を入力（カラー番号等）"
@@ -1135,8 +1140,8 @@
       "imageUrlPlaceholder": "画像URL"
     },
     "validation": {
-      "masterCodeRequired": "主品番は必須です",
-      "subCodeRequired": "子品番は必須です",
+      "masterCodeRequired": "主品番碼度はです",
+      "subCodeRequired": "子品番碼度はです",
       "categoryRequired": "商品分類を選択してください"
     },
     "message": {
@@ -1144,7 +1149,8 @@
       "deleteConfirmTitle": "削除確認",
       "deleteSuccess": "削除が完了しました",
       "createSuccess": "作成が完了しました",
-      "updateSuccess": "更新が完了しました"
+      "updateSuccess": "更新が完了しました",
+      "loadError": "商品情報の読み込みに失敗しました"
     }
   },
   "orderOverview": {

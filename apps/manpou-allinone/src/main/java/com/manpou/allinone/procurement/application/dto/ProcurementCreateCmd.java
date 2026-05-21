@@ -19,6 +19,7 @@ import java.time.LocalDate;
 public class ProcurementCreateCmd {
 
     // ===== 关联 =====
+    private Long demandId;             // 关联需求ID（不关联补货时为 null，后端自动创建 demand）
     private Long factoryId;            // 关联工厂ID
 
     // ===== 商品信息 =====

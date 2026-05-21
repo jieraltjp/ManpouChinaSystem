@@ -340,6 +340,7 @@
       "subProductCodePlaceholder": "如 re/wh/bk（颜色）",
       "subCodeNew": "新建",
       "subCodeEdit": "编辑子货号",
+      "productEdit": "编辑",
       "category": "商品分类",
       "categoryPlaceholder": "（自动填入）",
       "quantity": "数量",
@@ -406,8 +407,12 @@
     },
     "productCreateDialog": {
       "title": "商品未找到 — 快速新建商品",
+      "editTitle": "编辑商品",
       "createSuccess": "商品创建成功",
+      "editSuccess": "商品保存成功",
+      "loadError": "加载商品信息失败",
       "createAndContinue": "创建并继续",
+      "saveEdit": "保存编辑",
       "tip": "主货号可留空（系统将自动生成）；子货号用于标识同一主货号下的颜色/规格变体。",
       "masterCodePlaceholder": "输入主货号或留空自动生成",
       "subCodePlaceholder": "输入子货号（如色款编号）"
@@ -1186,6 +1191,7 @@
     "validation": {
       "masterCodeRequired": "主货号不能为空",
       "subCodeRequired": "子货号不能为空",
+      "nameZhRequired": "中文名称不能为空",
       "categoryRequired": "请选择商品分类"
     },
     "message": {

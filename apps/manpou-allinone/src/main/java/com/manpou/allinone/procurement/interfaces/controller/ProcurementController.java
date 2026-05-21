@@ -86,4 +86,22 @@ public class ProcurementController {
         procurementUseCase.delete(id);
         return Result.ok("发注单删除成功", null);
     }
+
+    /**
+     * 去重目的地列表（用于表单历史记录下拉）。
+     */
+    @GetMapping("/suggest/destinations")
+    @PreAuthorize("hasAuthority('procurement:read')")
+    public Result<java.util.List<String>> suggestDestinations() {
+        return Result.ok(procurementUseCase.findDistinctDestinations());
+    }
+
+    /**
+     * 去重客户公司列表（用于表单历史记录下拉）。
+     */
+    @GetMapping("/suggest/customer-companies")
+    @PreAuthorize("hasAuthority('procurement:read')")
+    public Result<java.util.List<String>> suggestCustomerCompanies() {
+        return Result.ok(procurementUseCase.findDistinctCustomerCompanies());
+    }
 }

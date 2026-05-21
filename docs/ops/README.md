@@ -6,11 +6,34 @@
 
 ## 1. 服务拓扑
 
+### 服务器列表
+
+| 服务器 | IP | 说明 |
+|---|---|---|
+| **开发服务器**（内网） | `192.168.13.123` | 旧开发机，MySQL 在 `192.168.13.202:23306` |
+| **公网生产服务器** | `8.136.139.224` | Phase 0 部署目标，MySQL 8 本地安装 |
+
+### 公网服务器详情（8.136.139.224）
+
+| 项目 | 值 |
+|---|---|
+| OS | Ubuntu 22.04 LTS（阿里云轻量应用服务器） |
+| CPU/RAM | 2 vCPU / 3.4GB |
+| Disk | 40GB（已用 3.9GB） |
+| Java | OpenJDK 21.0.10（`/usr/lib/jvm/java-1.21.0-openjdk-amd64`） |
+| Maven | 3.6.3 |
+| Node.js | 20.20.2 |
+| MySQL | 8.0.46（本地，端口 3306，root 密码 `manpou23306`） |
+
+### 公网服务器服务端口
+
 | 服务 | 端口 | 类型 | 说明 |
 |---|---|---|---|
-| `manpou-allinone` | `18090` | Spring Boot | 后端主服务（JAR: `apps/manpou-allinone/target/*.jar`） |
-| `web` | `13000` | Vite Dev Server | 前端（`apps/web/`） |
-| `user-service` | `18081` | Spring Boot | 用户服务（用户/角色/权限/AuditLog，Phase 2-5 完成） |
+| `manpou-allinone` | `18090` | Spring Boot | 后端主服务 |
+| `user-service` | `18081` | Spring Boot | 用户/角色/权限服务 |
+| `web` | `13000` | Vite | 前端 |
+| MySQL | `3306` | MySQL 8 | 本地数据库 |
+| Apache2 | `80` | HTTP | 已有网站 |
 
 **基础设施（Docker，Phase B）：**
 
@@ -294,11 +317,13 @@ nohup npm run dev > /opt/ManpouChinaSystem/logs/web.log 2>&1 &
 |---------|------|--------|-------|
 | `local` | Windows 本地开发 | H2 内存 / 本地 MySQL | 本地 |
 | `development` | Ubuntu 开发服务器 | 远程 MySQL `192.168.13.202:23306` | Docker `localhost:6379` |
+| `production` | 公网服务器 `8.136.139.224` | MySQL 8 本地 `localhost:3306` | 暂未安装 |
 
-**配置文件：**
+**配置文件（`/opt/manpou/conf/`）：**
 
-- `application.yml` — 默认配置，包含 Redis、Nacos（均 disabled）、日志格式等公共配置
-- `application-development.yml` — Ubuntu Server 专用，覆盖数据库连接（远程 MySQL）、禁用 Redis auto-config（Nacos 暂未启用）
+- `application.yml` — 默认配置（禁用 Redis、Nacos）
+- `application-development.yml` — 开发服务器专用
+- `user-service.yml` — user-service 配置，指向本地 MySQL
 
 > Nacos 服务注册（`spring.cloud.nacos.discovery.enabled=true`）目前与 Phase 0 单体架构存在 auto-configuration 耦合问题，将在 Phase B 微服务拆分时一并解决。Phase B 启用时需同时配置 Nacos Config 初始化。详见 TROUBLESHOOT.md。
 
@@ -306,13 +331,14 @@ nohup npm run dev > /opt/ManpouChinaSystem/logs/web.log 2>&1 &
 
 ## 5. 启动后访问地址
 
-| 服务 | Windows 本地 | Ubuntu 服务器 |
-|---|---|---|
-| 前端页面 | http://localhost:13000 | http://192.168.13.123:13000 |
-| 后端 API | http://localhost:18090 | http://192.168.13.123:18090 |
-| Swagger 文档 | http://localhost:18090/swagger-ui/index.html | http://192.168.13.123:18090/swagger-ui/index.html |
-| Nacos（API） | http://localhost:8848/nacos | http://192.168.13.123:8848/nacos |
-| Nacos（控制台 /next/） | - | http://192.168.13.123:8080/next/（账号：nacos / manpou） |
+| 服务 | Windows 本地 | 开发服务器 | 公网服务器 |
+|---|---|---|---|
+| 前端页面 | http://localhost:13000 | http://192.168.13.123:13000 | http://8.136.139.224:13000 |
+| 后端 API | http://localhost:18090 | http://192.168.13.123:18090 | http://8.136.139.224:18090 |
+| Swagger 文档 | http://localhost:18090/swagger-ui/index.html | http://192.168.13.123:18090/swagger-ui/index.html | http://8.136.139.224:18090/swagger-ui/index.html |
+| user-service API | http://localhost:18081 | http://192.168.13.123:18081 | http://8.136.139.224:18081 |
+| Nacos（API） | http://localhost:8848/nacos | http://192.168.13.123:8848/nacos | http://8.136.139.224:8848/nacos（暂未安装） |
+| Nacos（控制台） | - | http://192.168.13.123:8080/next/（账号：nacos / manpou） | - |
 
 ---
 

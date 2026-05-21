@@ -301,6 +301,9 @@
                 <el-button size="small" @click="onSubCodeNew">
                   <el-icon><Plus /></el-icon>{{ $t('order.dialog.subCodeNew') }}
                 </el-button>
+                <el-button size="small" :disabled="!formData.productCode" @click="onProductEdit">
+                  <el-icon><Edit /></el-icon>{{ $t('order.dialog.productEdit') }}
+                </el-button>
               </div>
             </el-form-item>
           </el-col>
@@ -375,12 +378,32 @@
         <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item :label="$t('order.dialog.customerCompany')">
-              <el-input v-model="formData.customerCompany" :placeholder="$t('order.dialog.customerCompanyPlaceholder')" />
+              <el-select
+                v-model="formData.customerCompany"
+                :placeholder="$t('order.dialog.customerCompanyPlaceholder')"
+                filterable
+                allow-create
+                default-first-option
+                clearable
+                style="width: 100%"
+              >
+                <el-option v-for="v in customerCompanyOptions" :key="v" :label="v" :value="v" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item :label="$t('order.dialog.destination')">
-              <el-input v-model="formData.destination" :placeholder="$t('order.dialog.destinationPlaceholder')" />
+              <el-select
+                v-model="formData.destination"
+                :placeholder="$t('order.dialog.destinationPlaceholder')"
+                filterable
+                allow-create
+                default-first-option
+                clearable
+                style="width: 100%"
+              >
+                <el-option v-for="v in destinationOptions" :key="v" :label="v" :value="v" />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -524,65 +547,15 @@
       </template>
     </el-dialog>
 
-    <!-- 商品快速创建弹窗（发注单中新建商品/子货号，入口统一） -->
-    <el-dialog
-      v-model="productCreateDialogVisible"
-      :title="$t('order.productCreateDialog.title')"
-      width="560px"
-      :close-on-click-modal="false"
-      center
-    >
-      <el-form ref="productCreateFormRef" :model="productCreateForm" :rules="productCreateRules" label-width="100px">
-        <!-- 核心字段：主货号 + 子货号 -->
-        <el-row :gutter="12">
-          <el-col :span="12">
-            <el-form-item :label="$t('product.dialog.masterCode')" prop="masterCode">
-              <el-input
-                v-model="productCreateForm.masterCode"
-                :placeholder="$t('order.productCreateDialog.masterCodePlaceholder')"
-                maxlength="32"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('product.dialog.subCode')">
-              <el-input
-                v-model="productCreateForm.subCode"
-                :placeholder="$t('order.productCreateDialog.subCodePlaceholder')"
-                maxlength="64"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <!-- 分类（默认普货） -->
-        <el-form-item :label="$t('product.dialog.category')" prop="category">
-          <el-select v-model="productCreateForm.category" style="width:100%">
-            <el-option v-for="opt in productCategoryOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
-          </el-select>
-        </el-form-item>
-        <!-- 补充字段 -->
-        <el-form-item :label="$t('product.dialog.nameZh')">
-          <el-input v-model="productCreateForm.nameZh" :placeholder="$t('product.dialog.nameZhPlaceholder')" maxlength="255" />
-        </el-form-item>
-        <el-row :gutter="12">
-          <el-col :span="12">
-            <el-form-item :label="$t('product.dialog.material')">
-              <el-input v-model="productCreateForm.material" :placeholder="$t('product.dialog.materialPlaceholder')" maxlength="64" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('product.dialog.requiresQc')">
-              <el-switch v-model="productCreateForm.requiresQc" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div class="product-create-tip">{{ $t('order.productCreateDialog.tip') }}</div>
-      <template #footer>
-        <el-button @click="productCreateDialogVisible = false">{{ $t('common.cancel') }}</el-button>
-        <el-button type="primary" :loading="productCreateSubmitting" @click="onProductCreateSubmit">{{ $t('order.productCreateDialog.createAndContinue') }}</el-button>
-      </template>
-    </el-dialog>
+    <!-- 商品新建/编辑弹窗（复用 ProductFormDialog 完整版） -->
+    <ProductFormDialog
+      v-model="productFormDialogVisible"
+      :edit-mode="productEditMode"
+      :edit-id="productEditId"
+      :prefilled-master-code="productPrefillMasterCode"
+      :prefilled-sub-code="productPrefillSubCode"
+      @saved="onProductFormSaved"
+    />
   </div>
 </template>
 
@@ -595,8 +568,9 @@ import { Plus, Clock, CircleCheck, Warning, Document, Edit } from '@element-plus
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest, BILLING_TYPE_OPTIONS } from '@/api/procurement'
 import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest } from '@/api/factory'
 import { demandApi, type DemandPageVO } from '@/api/demand'
-import { productApi, type MasterCodeSuggestVO, type CreateProductRequest } from '@/api/product'
+import { productApi, type MasterCodeSuggestVO } from '@/api/product'
 import { useI18n } from 'vue-i18n'
+import ProductFormDialog from '@/components/product/ProductFormDialog.vue'
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -630,23 +604,12 @@ const productCategoryOptions: { value: ProductCategory; label: string }[] = [
 const productCodeSearchResults = ref<MasterCodeSuggestVO[]>([])
 const productCodeLoading = ref(false)
 
-/** 快速新建商品弹窗 */
-const productCreateDialogVisible = ref(false)
-const productCreateFormRef = ref<FormInstance>()
-const productCreateSubmitting = ref(false)
-const productCreateForm = reactive({
-  masterCode: '',
-  subCode: '',
-  nameZh: '',
-  category: 'ORDINARY' as ProductCategory,
-  material: '',
-  requiresQc: false,
-})
-const productCreateRules = {
-  masterCode: [{ required: true, message: () => t('product.validation.masterCodeRequired'), trigger: 'blur' }],
-  subCode: [{ required: true, message: () => t('product.validation.subCodeRequired'), trigger: 'blur' }],
-  category: [{ required: true, message: () => t('product.validation.categoryRequired'), trigger: 'change' }],
-}
+/** 商品弹窗（复用 ProductFormDialog） */
+const productFormDialogVisible = ref(false)
+const productEditMode = ref(false)   // true = 编辑模式，false = 新建模式
+const productEditId = ref<number | null>(null)  // 编辑时的主货号 ID（用于 PATCH）
+const productPrefillMasterCode = ref<string>('')
+const productPrefillSubCode = ref<string>('')
 
 /** pendingCreateProcurement: 商品新建成功后待提交的采购请求数据 */
 let pendingCreateReq: CreateProcurementRequest | null = null
@@ -654,6 +617,21 @@ let pendingCreateReq: CreateProcurementRequest | null = null
 /** 子货号搜索下拉 */
 const subCodeOptions = ref<{ subCode: string; colorName?: string }[]>([])
 const subCodeLoading = ref(false)
+
+/** 历史记录下拉：目的地 + 客户公司 */
+const destinationOptions = ref<string[]>([])
+const customerCompanyOptions = ref<string[]>([])
+
+async function loadSuggestOptions() {
+  try {
+    const [destRes, ccRes] = await Promise.all([
+      procurementApi.suggestDestinations(),
+      procurementApi.suggestCustomerCompanies(),
+    ])
+    destinationOptions.value = destRes.data ?? []
+    customerCompanyOptions.value = ccRes.data ?? []
+  } catch { /* ignore */ }
+}
 
 async function subCodeRemoteSearch(query: string) {
   if (!formData.productCode) {
@@ -683,17 +661,74 @@ function onSubCodeSelect(subCode: string) {
   }
 }
 
-/** 新建子货号 → 打开统一商品创建弹窗（带 masterCode 预填） */
+/** 新建子货号 → 打开商品弹窗（新建模式，预填 masterCode） */
 function onSubCodeNew() {
-  productCreateForm.masterCode = formData.productCode
-  productCreateForm.subCode = ''
-  productCreateForm.nameZh = ''
-  productCreateForm.category = 'ORDINARY'
-  productCreateForm.material = ''
-  productCreateForm.requiresQc = false
-  productCreateDialogVisible.value = true
+  productEditMode.value = false
+  productEditId.value = null
+  productPrefillMasterCode.value = formData.productCode
+  productPrefillSubCode.value = ''
+  productFormDialogVisible.value = true
 }
 
+/** 编辑商品 → 打开商品弹窗（编辑模式，通过 editId 加载完整数据） */
+async function onProductEdit() {
+  if (!formData.productCode) return
+  // 加载商品 ID
+  try {
+    const res = await productApi.getByCode(formData.productCode)
+    const p = res.data
+    if (!p) return
+    productEditId.value = p.id
+    productEditMode.value = true
+    productPrefillMasterCode.value = ''
+    productPrefillSubCode.value = ''
+    productFormDialogVisible.value = true
+  } catch {
+    ElMessage.error(t('order.productCreateDialog.loadError'))
+  }
+}
+
+/** 商品弹窗保存成功后回调 */
+async function onProductFormSaved(isNew: boolean, masterCode: string) {
+  if (isNew && masterCode) {
+    // 新建模式：刷新分类缓存 + 自动填充
+    productCategoryMap.value = { ...productCategoryMap.value, [masterCode]: 'ORDINARY' }
+    if (productPrefillSubCode.value) {
+      // 子货号新建
+      await subCodeRemoteSearch('')
+      formData.subProductCode = masterCode
+    } else {
+      // 主货号新建
+      await productCodeRemoteSearch(masterCode)
+      formData.productCode = masterCode
+      productApi.getByCode(masterCode).then(res => {
+        const p = res.data
+        if (!p) return
+        if (p.category) { productCategoryMap.value = { ...productCategoryMap.value, [masterCode]: p.category }; formData.category = getCategoryLabel(masterCode) }
+        if (p.material) formData.material = p.material
+        if (p.requiresQc != null) formData.requiresQc = p.requiresQc
+        if (p.unitPriceRmb != null) formData.priceRmb = p.unitPriceRmb
+        if (p.taxPoint != null) formData.taxPoint = p.taxPoint
+      }).catch(() => { /* ignore */ })
+    }
+    // 继续提交采购单（仅当从 onSubmit 触发时）
+    if (pendingCreateReq) {
+      await doCreateProcurement(pendingCreateReq)
+      pendingCreateReq = null
+    }
+  }
+  // 编辑模式：刷新分类 + 更新表单当前值
+  if (!isNew && masterCode) {
+    productCategoryMap.value = { ...productCategoryMap.value, [masterCode]: 'ORDINARY' }
+    productApi.getByCode(masterCode).then(res => {
+      const p = res.data
+      if (!p) return
+      if (p.category) { productCategoryMap.value = { ...productCategoryMap.value, [masterCode]: p.category }; formData.category = getCategoryLabel(masterCode) }
+      if (p.material) formData.material = p.material
+      if (p.requiresQc != null) formData.requiresQc = p.requiresQc
+    }).catch(() => { /* ignore */ })
+  }
+}
 
 async function productCodeRemoteSearch(query: string) {
   if (!query || query.length < 1) {
@@ -730,62 +765,6 @@ function onProductCodeSelect(masterCode: string) {
     if (p.unitPriceRmb != null) formData.priceRmb = p.unitPriceRmb
     if (p.taxPoint != null) formData.taxPoint = p.taxPoint
   }).catch(() => { /* ignore */ })
-}
-
-async function onProductCreateSubmit() {
-  if (!productCreateFormRef.value) return
-  const valid = await productCreateFormRef.value.validate().catch(() => false)
-  if (!valid) return
-  productCreateSubmitting.value = true
-  try {
-    const createdMasterCode = productCreateForm.masterCode || productCreateForm.subCode
-    await productApi.create({
-      masterCode: productCreateForm.masterCode || undefined,
-      subCode: productCreateForm.subCode || undefined,
-      nameZh: productCreateForm.nameZh || undefined,
-      category: (productCreateForm.category || undefined) as any,
-      material: productCreateForm.material || undefined,
-      requiresQc: productCreateForm.requiresQc || undefined,
-    } as CreateProductRequest)
-    // 刷新商品分类缓存
-    if (createdMasterCode) {
-      productCategoryMap.value = { ...productCategoryMap.value, [createdMasterCode]: productCreateForm.category || 'ORDINARY' }
-    }
-    ElMessage.success(t('order.productCreateDialog.createSuccess'))
-    productCreateDialogVisible.value = false
-    // 子货号新建 → 刷新子货号下拉并自动选中
-    if (productCreateForm.subCode) {
-      await subCodeRemoteSearch('')
-      formData.subProductCode = productCreateForm.subCode
-    }
-    // 主货号新建（无子货号）→ 刷新商品下拉并自动选中
-    if (productCreateForm.masterCode && !productCreateForm.subCode) {
-      await productCodeRemoteSearch(productCreateForm.masterCode)
-      formData.productCode = productCreateForm.masterCode
-      // 自动填充商品信息
-      productApi.getByCode(productCreateForm.masterCode).then(res => {
-        const p = res.data
-        if (!p) return
-        if (p.category) {
-          productCategoryMap.value = { ...productCategoryMap.value, [productCreateForm.masterCode]: p.category }
-          formData.category = getCategoryLabel(productCreateForm.masterCode)
-        }
-        if (p.material) formData.material = p.material
-        if (p.requiresQc != null) formData.requiresQc = p.requiresQc
-        if (p.unitPriceRmb != null) formData.priceRmb = p.unitPriceRmb
-        if (p.taxPoint != null) formData.taxPoint = p.taxPoint
-      }).catch(() => { /* ignore */ })
-    }
-    // 继续提交采购单（仅当从 onSubmit 触发时）
-    if (pendingCreateReq) {
-      await doCreateProcurement(pendingCreateReq)
-      pendingCreateReq = null
-    }
-  } catch {
-    // error handled by interceptor
-  } finally {
-    productCreateSubmitting.value = false
-  }
 }
 
 /**
@@ -1138,6 +1117,7 @@ function onNew() {
   selectedDemandId.value = null
   subCodeOptions.value = []
   Object.assign(formData, defaultFormData())
+  loadSuggestOptions()
   dialogVisible.value = true
 }
 
@@ -1180,6 +1160,7 @@ function onEdit(row: ProcurementPageVO | null) {
     destination: row?.destination ?? '',
     status: row?.status ?? ORDER_STATUS_ORDERED,
   })
+  loadSuggestOptions()
   dialogVisible.value = true
 }
 
@@ -1217,6 +1198,7 @@ async function onSubmit() {
           return
         }
         const req: CreateProcurementRequest = {
+          demandId: isLinkedProcurement.value ? (selectedDemandId.value || undefined) : undefined,
           factoryId: formData.factoryId || undefined,
           productType: 'NORMAL',
           productCode: formData.productCode,
@@ -1244,19 +1226,17 @@ async function onSubmit() {
           destination: formData.destination || undefined,
           // status 不传，使用数据库默认值 '未定'
         }
-        // 检查商品目录中是否已存在此货号，不存在则弹出快速新建弹窗
+        // 检查商品目录中是否已存在此货号，不存在则打开商品弹窗（新建模式）
         try {
           await productApi.getByCode(formData.productCode)
         } catch {
-          // 商品不存在，弹出快速新建弹窗
+          // 商品不存在，弹出 ProductFormDialog（新建模式）
           pendingCreateReq = req
-          productCreateForm.masterCode = formData.productCode
-          productCreateForm.subCode = ''
-          productCreateForm.nameZh = ''
-          productCreateForm.category = 'ORDINARY'
-          productCreateForm.material = ''
-          productCreateForm.requiresQc = false
-          productCreateDialogVisible.value = true
+          productEditMode.value = false
+          productEditId.value = null
+          productPrefillMasterCode.value = formData.productCode
+          productPrefillSubCode.value = ''
+          productFormDialogVisible.value = true
           submitting.value = false
           return
         }

@@ -69,6 +69,7 @@ export interface ProcurementPageResponse {
 
 /** 创建发注单请求 */
 export interface CreateProcurementRequest {
+  demandId?: number   // 关联需求ID（不关联补货时为 null，后端自动创建 demand）
   factoryId?: number
   productType?: ProductType
   productCode: string
@@ -142,6 +143,12 @@ export const procurementApi = {
   },
   delete(id: number) {
     return client.delete<{ code: string }>(`/procurements/${id}`)
+  },
+  suggestDestinations() {
+    return client.get<string[]>('/procurements/suggest/destinations')
+  },
+  suggestCustomerCompanies() {
+    return client.get<string[]>('/procurements/suggest/customer-companies')
   },
 }
 

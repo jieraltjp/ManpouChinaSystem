@@ -16,6 +16,10 @@ import com.manpou.allinone.procurement.application.dto.ProcurementUpdateCmd;
 import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.model.ShipmentStatus;
 import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
+import com.manpou.allinone.replenishment.application.assembler.ReplenishmentDemandAssembler;
+import com.manpou.allinone.replenishment.domain.model.DemandStatus;
+import com.manpou.allinone.replenishment.domain.model.ReplenishmentDemand;
+import com.manpou.allinone.replenishment.domain.repository.ReplenishmentDemandRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -25,6 +29,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 发注单用例服务。
@@ -41,6 +47,8 @@ public class ProcurementUseCase {
     private final FactoryRepository factoryRepository;
     private final ProductRepository productRepository;
     private final ProcurementSnapshotRepository snapshotRepository;
+    private final ReplenishmentDemandRepository demandRepository;
+    private final ReplenishmentDemandAssembler demandAssembler;
 
     /**
      * 分页查询。
@@ -78,6 +86,7 @@ public class ProcurementUseCase {
     /**
      * 创建发注单。
      * factoryId 为必填，且工厂必须存在且未被逻辑删除。
+     * demandId 不为空时关联已有需求；demandId 为空时不关联补货，自动创建 demand 记录供概览展示。
      */
     @Transactional
     @PreAuthorize("hasAuthority('procurement:create')")
@@ -98,12 +107,48 @@ public class ProcurementUseCase {
         // 自动填入快照（下单时刻的工厂+商品信息）
         createSnapshot(saved);
 
-        log.info("[Procurement] created, traceId={}, id={}, productCode={}, factoryId={}",
+        // 不关联补货时（demandId == null），自动创建 demand 记录，保证概览页面可见
+        if (cmd.getDemandId() == null) {
+            autoCreateDemandForDirectProcurement(saved);
+        } else {
+            // 关联补货：更新 demand 的 linked_procurement_id 和 status
+            demandRepository.findByIdAndDeletedIsFalse(cmd.getDemandId())
+                    .ifPresent(demand -> {
+                        demand.setStatus(DemandStatus.CONFIRMED);
+                        demand.setLinkedProcurementId(saved.getId());
+                        demandRepository.save(demand);
+                        log.info("[Procurement] linked demand, demandId={}, procurementId={}",
+                                cmd.getDemandId(), saved.getId());
+                    });
+        }
+
+        log.info("[Procurement] created, traceId={}, id={}, productCode={}, factoryId={}, demandId={}",
                 MDC.get(TraceFilter.TRACE_ID_KEY),
                 saved.getId(),
                 saved.getProductCode(),
-                saved.getFactoryId());
+                saved.getFactoryId(),
+                cmd.getDemandId());
         return saved.getId();
+    }
+
+    /**
+     * 不关联补货时自动创建 demand 记录（status=CONFIRMED，linked_procurement_id=当前采购单ID）。
+     * 使其出现在概览页面。
+     */
+    private void autoCreateDemandForDirectProcurement(Procurement procurement) {
+        ReplenishmentDemand demand = new ReplenishmentDemand();
+        demand.setDemandCode(demandAssembler.generateDemandCode());
+        demand.setDemandType(com.manpou.allinone.replenishment.domain.model.DemandType.NEW_PURCHASE);
+        demand.setProductCode(procurement.getProductCode());
+        demand.setSubProductCode(procurement.getSubProductCode());
+        demand.setQuantity(procurement.getQuantity());
+        demand.setDestination(procurement.getDestination());
+        demand.setJapanLead(procurement.getJapanLead());
+        demand.setStatus(DemandStatus.CONFIRMED);
+        demand.setLinkedProcurementId(procurement.getId());
+        demandRepository.save(demand);
+        log.info("[Procurement] auto-created demand for direct procurement, demandCode={}, procurementId={}",
+                demand.getDemandCode(), procurement.getId());
     }
 
     /**
@@ -136,6 +181,7 @@ public class ProcurementUseCase {
     /**
      * 逻辑删除。
      * 仅未定/発注待状态可删除。
+     * 同时删除自动创建的需求记录（直接采购场景）。
      */
     @Transactional
     public void delete(Long id) {
@@ -148,7 +194,29 @@ public class ProcurementUseCase {
         }
         entity.markDeleted();
         procurementRepository.save(entity);
+
+        // 删除自动创建的需求记录（直接采购场景：autoCreateDemandForDirectProcurement 创建的 demand）
+        List<ReplenishmentDemand> linkedDemands = demandRepository.findByLinkedProcurementIdAndDeletedIsFalse(id);
+        for (ReplenishmentDemand demand : linkedDemands) {
+            demand.markDeleted();
+            demandRepository.save(demand);
+            log.info("[Procurement] cascade deleted demand, demandId={}, procurementId={}",
+                    demand.getId(), id);
+        }
+
         log.info("[Procurement] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
+    }
+
+    /** 去重目的地列表（用于表单历史记录下拉） */
+    @Transactional(readOnly = true)
+    public List<String> findDistinctDestinations() {
+        return procurementRepository.findDistinctDestinations();
+    }
+
+    /** 去重客户公司列表（用于表单历史记录下拉） */
+    @Transactional(readOnly = true)
+    public List<String> findDistinctCustomerCompanies() {
+        return procurementRepository.findDistinctCustomerCompanies();
     }
 
     /**

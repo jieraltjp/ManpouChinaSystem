@@ -36,4 +36,10 @@ public interface ProcurementJpaRepository extends ProcurementRepository, JpaRepo
     boolean existsActiveByFactoryId(@Param("factoryId") Long factoryId);
 
     List<Procurement> findAllByIdInAndDeletedIsFalse(List<Long> ids);
+
+    @Query("SELECT DISTINCT p.destination FROM Procurement p WHERE p.deleted = false AND p.destination IS NOT NULL AND p.destination <> '' ORDER BY p.destination")
+    List<String> findDistinctDestinations();
+
+    @Query("SELECT DISTINCT p.customerCompany FROM Procurement p WHERE p.deleted = false AND p.customerCompany IS NOT NULL AND p.customerCompany <> '' ORDER BY p.customerCompany")
+    List<String> findDistinctCustomerCompanies();
 }
