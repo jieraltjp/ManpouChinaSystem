@@ -8,6 +8,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { containerApi, type ContainerVO, type ContainerStatus, type ContainerType, type AssignShipRequest } from '@/api/logistics'
 import { shipApi, type ShipVO } from '@/api/ship'
 import { usePermission } from '@/composables/usePermission'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { hasPermission } = usePermission()
 const { t, locale: localeRef } = useI18n()
@@ -21,6 +22,7 @@ function formatTime(ts: string | undefined | null): string {
 }
 
 const loading = ref(false)
+const excelViewMode = ref<'table' | 'copy'>('table')
 const tableData = ref<ContainerVO[]>([])
 const pagination = ref({ page: 0, pageSize: 20, total: 0 })
 
@@ -61,6 +63,23 @@ function containerStatusLabel(type: ContainerStatus) {
 function containerTypeLabel(type: ContainerType) {
   return t(`logistics.container.type.${type}`)
 }
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'containerNo', label: t('logistics.container.column.containerNo') },
+  { prop: 'containerType', label: t('logistics.container.column.containerType'), formatter: (row) => containerTypeLabel(row.containerType) },
+  { prop: 'totalCbm', label: t('logistics.container.column.totalCbm'), formatter: (row) => row.totalCbm != null ? row.totalCbm.toFixed(4) : '' },
+  { prop: 'totalWeightKg', label: t('logistics.container.column.totalWeightKg'), formatter: (row) => row.totalWeightKg != null ? row.totalWeightKg.toFixed(2) : '' },
+  { prop: 'planCount', label: t('logistics.container.column.planCount'), formatter: (row) => row.planCount != null ? String(row.planCount) : '' },
+  { prop: 'status', label: t('logistics.container.column.status'), formatter: (row) => containerStatusLabel(row.status) },
+  { prop: 'loadDate', label: t('logistics.container.column.loadDate'), formatter: (row) => row.loadDate || '' },
+  { prop: 'departureDate', label: t('logistics.container.column.departureDate'), formatter: (row) => row.departureDate || '' },
+  { prop: 'arrivalDate', label: t('logistics.container.column.arrivalDate'), formatter: (row) => row.arrivalDate || '' },
+  { prop: 'shipName', label: t('logistics.container.column.shipName'), formatter: (row) => row.shipName || '' },
+  { prop: 'timeSlot', label: t('logistics.container.column.timeSlot'), formatter: (row) => row.timeSlot || '' },
+  { prop: 'arrivalLocation', label: t('logistics.container.column.arrivalLocation'), formatter: (row) => row.arrivalLocation || '' },
+  { prop: 'createTime', label: t('logistics.column.createTime'), formatter: (row) => formatTime(row.createTime) },
+  { prop: 'action', label: t('logistics.column.actions'), excluded: true },
+]
 
 async function loadData() {
   loading.value = true
@@ -256,7 +275,15 @@ onMounted(loadData)
     </el-card>
 
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="containerNo" :label="$t('logistics.container.column.containerNo')" min-width="160" />
         <el-table-column :label="$t('logistics.container.column.containerType')" min-width="100" align="center">
           <template #default="{ row }">
@@ -313,6 +340,7 @@ onMounted(loadData)
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableData" />
 
       <el-pagination
         v-model:current-page="pagination.page"
@@ -385,3 +413,7 @@ onMounted(loadData)
     </el-dialog>
   </div>
 </template>
+
+<style scoped>
+.table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+</style>

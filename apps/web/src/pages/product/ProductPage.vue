@@ -47,7 +47,15 @@
 
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="masterCode" :label="$t('product.column.masterCode')" min-width="110" />
         <el-table-column prop="subCode" :label="$t('product.column.subCode')" min-width="120" />
         <el-table-column :label="$t('product.column.image')" min-width="70" align="center">
@@ -98,6 +106,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableData" />
 
       <!-- 分页 -->
       <div class="pagination-wrap">
@@ -431,6 +440,7 @@ import { Plus, Goods, Loading } from '@element-plus/icons-vue'
 import { productApi } from '@/api/product'
 import type { ProductPageVO, CreateProductRequest, UpdateProductRequest, ProductFactoryVO } from '@/api/product'
 import { usePermission } from '@/composables/usePermission'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { t, locale: localeRef } = useI18n()
 const { hasPermission } = usePermission()
@@ -447,6 +457,25 @@ const loading = ref(false)
 const submitting = ref(false)
 const factoriesLoading = ref(false)
 const tableData = ref<ProductPageVO[]>([])
+const excelViewMode = ref<'table' | 'copy'>('table')
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'masterCode', label: t('product.column.masterCode') },
+  { prop: 'subCode', label: t('product.column.subCode') },
+  { prop: 'janCode', label: t('product.column.janCode') },
+  { prop: 'nameZh', label: t('product.column.nameZh') },
+  { prop: 'nameJa', label: t('product.column.nameJa') },
+  { prop: 'nameEn', label: t('product.column.nameEn') },
+  { prop: 'origin', label: t('product.column.origin') },
+  { prop: 'category', label: t('product.column.category'), formatter: (row: ProductPageVO) => row.category ? t('product.category.' + row.category) : '' },
+  { prop: 'factoryNames', label: t('product.column.linkedFactories') },
+  { prop: 'unitPriceRmb', label: t('product.column.unitPriceRmb'), formatter: (row: ProductPageVO) => row.unitPriceRmb != null ? `${t('common.currency.cny')}${Number(row.unitPriceRmb).toFixed(2)}` : '' },
+  { prop: 'taxPoint', label: t('product.column.taxPoint'), formatter: (row: ProductPageVO) => row.taxPoint != null ? String(row.taxPoint) : '' },
+  { prop: 'material', label: t('product.column.material') },
+  { prop: 'requiresQc', label: t('product.column.requiresQc'), formatter: (row: ProductPageVO) => row.requiresQc ? t('product.column.requiresQc') : '' },
+  { prop: 'action', label: t('product.column.action'), excluded: true },
+]
+
 const productFactories = ref<ProductFactoryVO[]>([])
 const detailVisible = ref(false)
 const formVisible = ref(false)

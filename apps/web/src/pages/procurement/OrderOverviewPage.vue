@@ -21,7 +21,15 @@
     </el-card>
 
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="chainData" stripe style="width: 100%">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="chainData" stripe style="width: 100%">
         <!-- 主货号 -->
         <el-table-column prop="demandProductCode" :label="$t('orderOverview.column.productCode')" min-width="140">
           <template #default="{ row }">
@@ -83,6 +91,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="chainData" />
 
       <div class="pagination-wrap">
         <el-pagination
@@ -231,6 +240,7 @@ import { useI18n } from 'vue-i18n'
 import { Loading } from '@element-plus/icons-vue'
 import { orderChainApi, type OrderChainVO, type OrderChainDetailVO } from '@/api/orderChain'
 import { productApi } from '@/api/product'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const router = useRouter()
 const { locale, t } = useI18n()
@@ -247,6 +257,17 @@ const detailLoading = ref(false)
 const detailImageUrl = ref<string>('')
 const productImageMap = ref<Record<string, string>>({})
 const detailData = ref<OrderChainDetailVO | null>(null)
+const excelViewMode = ref<'table' | 'copy'>('table')
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'demandProductCode', label: t('orderOverview.column.productCode') },
+  { prop: 'demandSubProductCode', label: t('orderOverview.column.subProductCode') },
+  { prop: 'snapshot.factoryName', label: t('orderOverview.column.factoryName') },
+  { prop: 'demandQuantity', label: t('orderOverview.column.quantity') },
+  { prop: 'demandDestination', label: t('orderOverview.column.destination') },
+  { prop: 'status', label: t('orderOverview.column.status'), formatter: (row: OrderChainVO) => chainStatusLabel(row) },
+  { prop: 'action', label: t('orderOverview.column.action'), excluded: true },
+]
 
 function formatDate(val: string | undefined | null): string {
   if (!val) return '-'

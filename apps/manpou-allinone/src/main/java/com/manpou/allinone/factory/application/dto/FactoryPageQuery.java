@@ -40,6 +40,8 @@ public class FactoryPageQuery {
 
     // 合作信息
     private CooperationStatus cooperationStatus;
+    private Boolean needsQc;                   // 是否需要验货（SPEC-B13）
+
     private PaymentTerms paymentTerms;
 
     // 审计字段

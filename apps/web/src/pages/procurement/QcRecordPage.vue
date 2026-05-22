@@ -72,7 +72,15 @@
     </el-card>
 
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="qcCode" :label="$t('inspection.column.qcCode')" min-width="160" />
         <el-table-column :label="$t('inspection.column.shipmentBatchId')" min-width="150" align="center">
           <template #default="{ row }">
@@ -117,6 +125,13 @@
           </template>
         </el-table-column>
         <el-table-column prop="qcDate" :label="$t('inspection.column.qcDate')" min-width="120" />
+        <el-table-column :label="$t('inspection.dialog.qcType')" min-width="110" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.qcType === 'EXEMPT' ? 'success' : 'info'" size="small">
+              {{ qcTypeLabel(row.qcType) }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="result" :label="$t('inspection.column.result')" min-width="90" align="center">
           <template #default="{ row }">
             <el-tag :type="row.result === 'PASS' ? 'success' : 'danger'" size="small">
@@ -134,11 +149,12 @@
         <el-table-column :label="$t('inspection.column.action')" min-width="180" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('inspection.action.detail') }}</el-button>
-            <el-button link type="warning" size="small" @click.stop="onEdit(row)" v-if="hasPermission('qc:update')">{{ $t('inspection.action.edit') }}</el-button>
+            <el-button link type="warning" size="small" @click.stop="onEdit(row)" v-if="hasPermission('qc:update') && row.qcType !== 'EXEMPT'">{{ $t('inspection.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)" v-if="hasPermission('qc:delete')">{{ $t('inspection.action.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableData" />
 
       <div class="pagination-wrap">
         <el-pagination
@@ -208,6 +224,7 @@
               <el-select v-model="form.qcType" style="width:100%">
                 <el-option value="ONSITE" :label="$t('inspection.qcType.onsite')" />
                 <el-option value="REMOTE" :label="$t('inspection.qcType.remote')" />
+                <el-option value="EXEMPT" :label="$t('inspection.qcType.exempt')" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -424,11 +441,13 @@ import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
 import { shipmentBatchApi, type ShipmentBatchVO } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { hasPermission } = usePermission()
 
 const loading = ref(false)
 const submitting = ref(false)
+const excelViewMode = ref<'table' | 'copy'>('table')
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
 const shipmentBatchLoading = ref(false)
@@ -505,6 +524,24 @@ const formRules: FormRules = {
   productCode: [{ required: true, message: () => t('inspection.validation.productCodeRequired'), trigger: 'blur' }],
   inspectionCount: [{ required: true, message: () => t('inspection.validation.inspectionCountRequired'), trigger: 'blur' }],
 }
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'qcCode', label: t('inspection.column.qcCode') },
+  { prop: 'batchCode', label: t('inspection.column.shipmentBatchId'), formatter: (row) => row.batchCode || (row.shipmentBatchId ? String(row.shipmentBatchId) : '') },
+  { prop: 'productCode', label: t('inspection.column.productCode'), formatter: (row) => row.productCode },
+  { prop: 'subProductCode', label: t('inspection.column.subProductCode'), formatter: (row) => row.subProductCode || '' },
+  { prop: 'sellerName', label: t('inspection.column.sellerName'), formatter: (row) => row.sellerName || '' },
+  { prop: 'shipmentQuantity', label: t('inspection.column.quantity'), formatter: (row) => row.shipmentQuantity != null ? String(row.shipmentQuantity) : '' },
+  { prop: 'quantity', label: t('inspection.column.orderQuantity'), formatter: (row) => row.quantity != null ? String(row.quantity) : '' },
+  { prop: 'inspectionCount', label: t('inspection.column.inspectionCount'), formatter: (row) => row.inspectionCount != null ? String(row.inspectionCount) : '' },
+  { prop: 'passedCount', label: t('inspection.column.passedCount'), formatter: (row) => row.passedCount != null ? String(row.passedCount) : '' },
+  { prop: 'defectiveCount', label: t('inspection.column.defectiveCount'), formatter: (row) => row.defectiveCount != null ? String(row.defectiveCount) : '' },
+  { prop: 'qcDate', label: t('inspection.column.qcDate'), formatter: (row) => row.qcDate || '' },
+  { prop: 'qcType', label: t('inspection.dialog.qcType'), formatter: (row) => qcTypeLabel(row.qcType) },
+  { prop: 'result', label: t('inspection.column.result'), formatter: (row) => row.result === 'PASS' ? t('inspection.result.pass') : row.result === 'FAIL' ? t('inspection.result.fail') : '' },
+  { prop: 'status', label: t('inspection.column.status'), formatter: (row) => qcStatusLabel(row.status) },
+  { prop: 'action', label: t('inspection.column.action'), excluded: true },
+]
 
 const passCount = computed(() => tableData.value.filter(r => r.result === 'PASS').length)
 const failCount = computed(() => tableData.value.filter(r => r.result === 'FAIL').length)
@@ -840,7 +877,7 @@ async function onDelete(row: QcRecordVO) {
 
 
 function qcTypeLabel(qcType?: string): string {
-  return { ONSITE: t('inspection.qcType.onsite'), REMOTE: t('inspection.qcType.remote') }[qcType ?? ''] ?? '-'
+  return { ONSITE: t('inspection.qcType.onsite'), REMOTE: t('inspection.qcType.remote'), EXEMPT: t('inspection.qcType.exempt') }[qcType ?? ''] ?? '-'
 }
 
 function qcStatusLabel(status?: string): string {
@@ -858,6 +895,7 @@ onMounted(() => {
 
 <style scoped>
 .page { display: flex; flex-direction: column; gap: 16px; }
+.table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
 .stats-row { margin-bottom: 0; }
 .stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }

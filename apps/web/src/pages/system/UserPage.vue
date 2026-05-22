@@ -72,7 +72,15 @@
 
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="userCode" :label="$t('user.column.userCode')" min-width="100" />
         <el-table-column prop="username" :label="$t('user.column.username')" min-width="120" />
         <el-table-column prop="nameCn" :label="$t('user.column.nameCn')" min-width="100" />
@@ -112,6 +120,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableData" />
 
       <!-- 分页 -->
       <div class="pagination-wrap">
@@ -231,6 +240,7 @@ import * as roleApi from '@/api/role'
 import type { UserVO, UserCreateCmd, UserUpdateCmd } from '@/api/user'
 import type { RoleVO } from '@/api/role'
 import { usePermission } from '@/composables/usePermission'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { t, locale } = useI18n()
 const currentLocale = computed(() => locale.value)
@@ -239,6 +249,21 @@ const { hasPermission } = usePermission()
 // ===== 状态 =====
 const loading = ref(false)
 const tableData = ref<UserVO[]>([])
+const excelViewMode = ref<'table' | 'copy'>('table')
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'userCode', label: t('user.column.userCode') },
+  { prop: 'username', label: t('user.column.username') },
+  { prop: 'nameCn', label: t('user.column.nameCn') },
+  { prop: 'nameJp', label: t('user.column.nameJp') },
+  { prop: 'email', label: t('user.column.email') },
+  { prop: 'phone', label: t('user.column.phone') },
+  { prop: 'departmentName', label: t('user.column.department') },
+  { prop: 'roles', label: t('user.column.roles'), formatter: (row: UserVO) => row.roles?.map(r => currentLocale.value === 'ja' ? r.roleNameJp : r.roleNameCn).join(', ') ?? '' },
+  { prop: 'status', label: t('user.column.status'), formatter: (row: UserVO) => row.status === 1 ? t('user.status.normal') : t('user.status.disabled') },
+  { prop: 'action', label: t('user.column.action'), excluded: true },
+]
+
 const filterForm = reactive({ keyword: '', status: undefined as number | undefined })
 const pagination = reactive({ page: 1, size: 20, total: 0 })
 const stats = reactive({ total: 0, normal: 0, disabled: 0, todayLogin: 0 })

@@ -44,6 +44,8 @@ public class FactoryUpdateCmd {
     private String contactQq;
 
     private CooperationStatus cooperationStatus;
+    private Boolean needsQc;                       // 是否需要验货（SPEC-B13）
+
     private PaymentTerms paymentTerms;
 
     @Size(max = 500)

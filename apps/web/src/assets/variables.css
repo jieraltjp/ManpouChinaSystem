@@ -2,6 +2,12 @@
    ManpouChinaSystem 橙色商业主题 — CSS 变量系统
    ============================================================ */
 
+/* 全局文字选取颜色（醒目蓝） */
+::selection { background: #1565C0 !important; color: #fff !important; }
+::-moz-selection { background: #1565C0 !important; color: #fff !important; }
+.el-table__body tr > td.el-table__cell ::selection,
+.el-table__body tr > td.el-table__cell * ::selection { background: #1565C0 !important; color: #fff !important; }
+
 :root {
   /* ── 主色系（橙色 — 品牌核心） ── */
   --color-primary:        #E8650A;
@@ -144,7 +150,7 @@
 
 /* 表格选中行 */
 .el-table__body .current-row > td.el-table__cell {
-  background: #FDE9D4 !important;
+  background: #FCE4C4 !important;
 }
 
 /* 对话框头部 */

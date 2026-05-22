@@ -7,6 +7,7 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { shipApi, type ShipVO } from '@/api/ship'
 import { usePermission } from '@/composables/usePermission'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { hasPermission } = usePermission()
 const { t, locale: localeRef } = useI18n()
@@ -21,6 +22,19 @@ function formatTime(ts: string | undefined | null): string {
 
 const loading = ref(false)
 const tableData = ref<ShipVO[]>([])
+const excelViewMode = ref<'table' | 'copy'>('table')
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'shipName', label: t('logistics.ship.column.shipName') },
+  { prop: 'shipNumber', label: t('logistics.ship.column.shipNumber') },
+  { prop: 'carrier', label: t('logistics.ship.column.carrier') },
+  { prop: 'departurePort', label: t('logistics.ship.column.departurePort') },
+  { prop: 'arrivalPort', label: t('logistics.ship.column.arrivalPort') },
+  { prop: 'containerCount', label: t('logistics.ship.column.containerCount'), formatter: (row: ShipVO) => row.containerCount != null ? String(row.containerCount) : '' },
+  { prop: 'createTime', label: t('logistics.ship.column.createTime'), formatter: (row: ShipVO) => formatTime(row.createTime) },
+  { prop: 'action', label: t('logistics.column.actions'), excluded: true },
+]
+
 const pagination = ref({ page: 0, pageSize: 20, total: 0 })
 
 const filterForm = ref({
@@ -176,7 +190,15 @@ onMounted(loadData)
     </el-card>
 
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="shipName" :label="$t('logistics.ship.column.shipName')" min-width="140" />
         <el-table-column prop="shipNumber" :label="$t('logistics.ship.column.shipNumber')" min-width="120" />
         <el-table-column prop="carrier" :label="$t('logistics.ship.column.carrier')" min-width="130" />
@@ -198,6 +220,7 @@ onMounted(loadData)
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableData" />
 
       <el-pagination
         v-model:current-page="pagination.page"

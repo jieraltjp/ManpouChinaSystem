@@ -31,6 +31,7 @@ export interface FactoryPageVO {
   contactWechat?: string
   contactQq?: string
   cooperationStatus?: CooperationStatus
+  needsQc?: boolean     // SPEC-B13: 是否需要验货
   paymentTerms?: PaymentTerms
   notes?: string
   createBy?: string
@@ -58,6 +59,7 @@ export interface CreateFactoryRequest {
   contactWechat?: string
   contactQq?: string
   cooperationStatus?: CooperationStatus
+  needsQc?: boolean     // SPEC-B13: 是否需要验货
   paymentTerms?: PaymentTerms
   notes?: string
 }
@@ -75,6 +77,7 @@ export interface UpdateFactoryRequest {
   contactWechat?: string
   contactQq?: string
   cooperationStatus?: CooperationStatus
+  needsQc?: boolean     // SPEC-B13: 是否需要验货
   paymentTerms?: PaymentTerms
   notes?: string
 }

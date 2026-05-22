@@ -6,7 +6,7 @@ import client from './client'
 
 export type QcResult = 'PASS' | 'FAIL'
 export type QcStatus = 'PENDING' | 'COMPLETED' | 'RETURN_REQUESTED'
-export type QcType = 'ONSITE' | 'REMOTE'
+export type QcType = 'ONSITE' | 'REMOTE' | 'EXEMPT'
 
 export interface QcRecordVO {
   id: number

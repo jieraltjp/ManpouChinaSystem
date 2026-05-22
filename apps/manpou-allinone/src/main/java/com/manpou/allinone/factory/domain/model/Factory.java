@@ -82,6 +82,9 @@ public class Factory extends BaseEntity {
     @Column(name = "cooperation_status", nullable = false, length = 32)
     private CooperationStatus cooperationStatus = CooperationStatus.POTENTIAL;  // 合作状态
 
+    @Column(name = "needs_qc", nullable = false, columnDefinition = "TINYINT(1)")
+    private Boolean needsQc = true;  // 是否需要验货：true=需要，false=老厂家免验（SPEC-B13）
+
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_terms", nullable = false, length = 64)
     private PaymentTerms paymentTerms = PaymentTerms.NET_30;  // 账期

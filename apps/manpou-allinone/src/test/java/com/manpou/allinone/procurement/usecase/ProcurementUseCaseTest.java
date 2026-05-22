@@ -132,7 +132,7 @@ class ProcurementUseCaseTest {
 
         // 领域层通过 updateStatus() 方法校验 FSM，非法转换抛出异常
         Procurement p = procurementRepository.findById(savedProcurement.getId()).orElseThrow();
-        assertThatThrownBy(() -> p.updateStatus(ShipmentStatus.完了))
+        assertThatThrownBy(() -> p.updateStatus(ShipmentStatus.完了, null))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("不允许跳转");
     }
@@ -231,7 +231,7 @@ class ProcurementUseCaseTest {
         // 验证 Procurement.updateStatus 在领域层正确拦截非法跳转
         Procurement p = procurementRepository.findById(savedProcurement.getId()).orElseThrow();
 
-        assertThatThrownBy(() -> p.updateStatus(ShipmentStatus.完了))
+        assertThatThrownBy(() -> p.updateStatus(ShipmentStatus.完了, null))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("不允许跳转");
     }
@@ -242,7 +242,7 @@ class ProcurementUseCaseTest {
         p.setStatus(ShipmentStatus.完了);
         procurementRepository.save(p);
 
-        assertThatThrownBy(() -> p.updateStatus(ShipmentStatus.未定))
+        assertThatThrownBy(() -> p.updateStatus(ShipmentStatus.未定, null))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("完了状态");
     }

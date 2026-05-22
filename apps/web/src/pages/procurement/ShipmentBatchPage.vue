@@ -28,7 +28,15 @@
 
     <!-- 数据表格 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableRows" stripe style="width: 100%">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableRows" stripe style="width: 100%">
         <el-table-column prop="batchCode" :label="$t('shipmentBatch.column.batchCode')" min-width="160" show-overflow-tooltip />
         <el-table-column prop="shipmentQuantity" :label="$t('shipmentBatch.column.shipmentQuantity')" min-width="120" align="right">
           <template #default="{ row }">{{ row.shipmentQuantity?.toLocaleString() ?? '-' }}</template>
@@ -59,6 +67,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableRows" />
 
       <div class="pagination-wrap">
         <el-pagination
@@ -114,6 +123,7 @@ import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, ArrowLeft } from '@element-plus/icons-vue'
 import { shipmentBatchApi, type ShipmentBatchVO, type ShipmentBatchStatus } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -122,6 +132,7 @@ const { hasPermission } = usePermission()
 
 const loading = ref(false)
 const submitting = ref(false)
+const excelViewMode = ref<'table' | 'copy'>('table')
 const dialogVisible = ref(false)
 const dialogMode = ref<'create' | 'update'>('create')
 const currentRow = ref<ShipmentBatchVO | null>(null)
@@ -256,6 +267,18 @@ const formRules = {
   shipmentQuantity: [{ required: true, message: () => t('shipmentBatch.validation.quantityRequired'), trigger: 'blur' }],
 }
 
+const copyColumns: ExcelColDef[] = [
+  { prop: 'batchCode', label: t('shipmentBatch.column.batchCode') },
+  { prop: 'shipmentQuantity', label: t('shipmentBatch.column.shipmentQuantity'), formatter: (row) => row.shipmentQuantity != null ? row.shipmentQuantity.toLocaleString() : '' },
+  { prop: 'factoryShipDate', label: t('shipmentBatch.column.factoryShipDate'), formatter: (row) => row.factoryShipDate || '' },
+  { prop: 'actualShipDate', label: t('shipmentBatch.column.actualShipDate'), formatter: (row) => row.actualShipDate || '' },
+  { prop: 'status', label: t('shipmentBatch.column.status'), formatter: (row) => statusLabel(row.status) },
+  { prop: 'remarks', label: t('shipmentBatch.column.remarks'), formatter: (row) => row.remarks || '' },
+  { prop: 'createBy', label: t('shipmentBatch.column.createBy'), formatter: (row) => row.createBy || '' },
+  { prop: 'createTime', label: t('shipmentBatch.column.createTime'), formatter: (row) => formatTime(row.createTime) },
+  { prop: 'action', label: t('order.column.action'), excluded: true },
+]
+
 async function onSubmit() {
   if (!formRef.value) return
   await formRef.value.validate(async (valid: boolean) => {
@@ -295,6 +318,7 @@ onMounted(() => {
 
 <style scoped>
 .test-page { display: flex; flex-direction: column; gap: 16px; }
+.table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
 .page-header { display: flex; align-items: center; gap: 12px; }
 .page-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }

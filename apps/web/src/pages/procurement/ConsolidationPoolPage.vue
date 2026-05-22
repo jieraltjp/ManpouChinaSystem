@@ -8,6 +8,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { consolidationPoolApi, type ConsolidationPoolVO, type ConsolidationPoolStatus } from '@/api/logistics'
 import { containerApi } from '@/api/logistics'
 import { usePermission } from '@/composables/usePermission'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { hasPermission } = usePermission()
 
@@ -22,6 +23,7 @@ function formatTime(ts: string | undefined | null): string {
 }
 
 const loading = ref(false)
+const excelViewMode = ref<'table' | 'copy'>('table')
 const tableData = ref<ConsolidationPoolVO[]>([])
 const pagination = ref({ page: 0, pageSize: 20, total: 0 })
 
@@ -41,6 +43,18 @@ function poolStatusTag(type: ConsolidationPoolStatus) {
 function poolStatusLabel(type: ConsolidationPoolStatus) {
   return t(`logistics.poolStatus.${type}`)
 }
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'poolCode', label: t('logistics.pool.column.poolCode') },
+  { prop: 'destinationPort', label: t('logistics.pool.column.destinationPort') },
+  { prop: 'totalCbm', label: t('logistics.pool.column.totalCbm'), formatter: (row) => row.totalCbm != null ? row.totalCbm.toFixed(4) : '' },
+  { prop: 'totalWeightKg', label: t('logistics.pool.column.totalWeightKg'), formatter: (row) => row.totalWeightKg != null ? row.totalWeightKg.toFixed(2) : '' },
+  { prop: 'planCount', label: t('logistics.pool.column.planCount'), formatter: (row) => row.planCount != null ? String(row.planCount) : '' },
+  { prop: 'containerThresholdCbm', label: t('logistics.pool.column.threshold'), formatter: (row) => `${row.containerThresholdCbm ?? 70} m³` },
+  { prop: 'status', label: t('logistics.pool.column.status'), formatter: (row) => poolStatusLabel(row.status) },
+  { prop: 'createTime', label: t('logistics.column.createTime'), formatter: (row) => formatTime(row.createTime) },
+  { prop: 'action', label: t('logistics.column.actions'), excluded: true },
+]
 
 async function loadData() {
   loading.value = true
@@ -156,7 +170,15 @@ onMounted(loadData)
     </el-card>
 
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="poolCode" :label="$t('logistics.pool.column.poolCode')" min-width="160" />
         <el-table-column prop="destinationPort" :label="$t('logistics.pool.column.destinationPort')" min-width="140" />
         <el-table-column :label="$t('logistics.pool.column.totalCbm')" min-width="120" align="right">
@@ -191,6 +213,7 @@ onMounted(loadData)
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableData" />
 
       <el-pagination
         v-model:current-page="pagination.page"
@@ -221,3 +244,7 @@ onMounted(loadData)
     </el-dialog>
   </div>
 </template>
+
+<style scoped>
+.table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+</style>

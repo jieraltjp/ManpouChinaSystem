@@ -36,7 +36,15 @@
 
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="300">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="300">
         <el-table-column :label="$t('auditLog.column.createTime')" min-width="160">
           <template #default="{ row }">{{ formatTime(row.createTime) }}</template>
         </el-table-column>
@@ -65,6 +73,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableData" />
 
       <!-- 分页 -->
       <div class="pagination-wrap">
@@ -116,6 +125,7 @@ import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { pageAuditLogs } from '@/api/auditLog'
 import type { AuditLogVO } from '@/api/auditLog'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { locale: localeRef, t } = useI18n()
 const { hasPermission } = usePermission()
@@ -134,6 +144,20 @@ const ACTION_OPTIONS = ['LOGIN', 'CREATE', 'UPDATE', 'DELETE', 'APPROVE', 'REJEC
 // ===== 状态 =====
 const loading = ref(false)
 const tableData = ref<AuditLogVO[]>([])
+const excelViewMode = ref<'table' | 'copy'>('table')
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'createTime', label: t('auditLog.column.createTime'), formatter: (row: AuditLogVO) => formatTime(row.createTime) },
+  { prop: 'username', label: t('auditLog.column.username') },
+  { prop: 'module', label: t('auditLog.column.module'), formatter: (row: AuditLogVO) => t(`auditLog.module.${row.module}`, row.module) },
+  { prop: 'action', label: t('auditLog.column.action'), formatter: (row: AuditLogVO) => t(`auditLog.actionTag.${row.action}`, row.action) },
+  { prop: 'httpMethod', label: t('auditLog.column.httpMethod') },
+  { prop: 'httpUrl', label: t('auditLog.column.httpUrl') },
+  { prop: 'resourceType', label: t('auditLog.column.resourceType') },
+  { prop: 'ipAddress', label: t('auditLog.column.ipAddress') },
+  { prop: 'detail', label: t('auditLog.column.detail'), excluded: true },
+]
+
 const pagination = reactive({ page: 1, size: 20, total: 0 })
 const filterForm = reactive({
   module: '',

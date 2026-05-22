@@ -280,6 +280,7 @@ const routeTitleMap: Record<string, string> = {
   '/base/product': 'product.title',
   '/base/overview': 'orderOverview.title',
   '/base/ship': 'logistics.ship.title',
+  '/procurement/shipment-batch': 'menu.shipmentBatch',
   '/system/user': 'menu.user',
   '/system/role': 'menu.role',
   '/system/cos-test': 'menu.cosTest',

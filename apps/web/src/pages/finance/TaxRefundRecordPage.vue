@@ -61,7 +61,15 @@
 
     <!-- 数据表 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="refundCode" :label="$t('taxRefund.column.refundCode')" min-width="180">
           <template #default="{ row }">
             <span class="code-badge">{{ row.refundCode }}</span>
@@ -115,6 +123,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableData" />
 
       <div class="pagination-wrap">
         <el-pagination
@@ -295,6 +304,7 @@ import { taxRefundApi, type TaxRefundVO, type TaxRefundStatus, type TaxRefundCre
 import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const loading = ref(false)
 const drawerVisible = ref(false)
@@ -308,6 +318,8 @@ const filterForm = reactive({
 })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const tableData = ref<TaxRefundVO[]>([])
+const excelViewMode = ref<'table' | 'copy'>('table')
+
 const completeForm = reactive({
   actualRefundRmb: 0,
   refundDate: '',
@@ -472,6 +484,19 @@ function billingTypeLabel(val?: string | null): string {
 
 const { t, locale: localeRef } = useI18n()
 const { hasPermission } = usePermission()
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'refundCode', label: t('taxRefund.column.refundCode') },
+  { prop: 'procurementId', label: t('taxRefund.column.procurementId'), formatter: (row: TaxRefundVO) => row.procurementId != null ? String(row.procurementId) : '' },
+  { prop: 'billingType', label: t('taxRefund.column.billingType'), formatter: (row: TaxRefundVO) => row.billingType ? t('taxRefund.enum.billingType.' + row.billingType) : '' },
+  { prop: 'taxPoint', label: t('taxRefund.column.taxPoint'), formatter: (row: TaxRefundVO) => row.taxPoint !== null ? `${(Number(row.taxPoint) * 100).toFixed(1)}%` : '' },
+  { prop: 'estimatedRefundRmb', label: t('taxRefund.column.estimatedRefundRmb'), formatter: (row: TaxRefundVO) => row.estimatedRefundRmb !== null ? `${Number(row.estimatedRefundRmb).toLocaleString()} ${t('common.currency.cny')}` : '' },
+  { prop: 'actualRefundRmb', label: t('taxRefund.column.actualRefundRmb'), formatter: (row: TaxRefundVO) => row.actualRefundRmb !== null ? `${Number(row.actualRefundRmb).toLocaleString()} ${t('common.currency.cny')}` : '' },
+  { prop: 'refundDate', label: t('taxRefund.column.refundDate') },
+  { prop: 'refundBank', label: t('taxRefund.column.refundBank') },
+  { prop: 'status', label: t('taxRefund.column.status'), formatter: (row: TaxRefundVO) => statusLabel(row.status) },
+  { prop: 'action', label: t('taxRefund.column.action'), excluded: true },
+]
 
 function formatTime(ts: string | undefined | null): string {
   if (!ts) return '-'

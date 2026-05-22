@@ -41,6 +41,7 @@ public class FactoryAssembler {
                 .contactWechat(entity.getContactWechat())
                 .contactQq(entity.getContactQq())
                 .cooperationStatus(entity.getCooperationStatus())
+                .needsQc(entity.getNeedsQc())
                 .paymentTerms(entity.getPaymentTerms())
                 .notes(entity.getNotes())
                 .createBy(entity.getCreateBy())
@@ -73,6 +74,8 @@ public class FactoryAssembler {
         if (cmd.getContactQq() != null) entity.setContactQq(cmd.getContactQq());
         if (cmd.getCooperationStatus() != null) entity.setCooperationStatus(cmd.getCooperationStatus());
         else entity.setCooperationStatus(CooperationStatus.POTENTIAL);
+        if (cmd.getNeedsQc() != null) entity.setNeedsQc(cmd.getNeedsQc());
+        else entity.setNeedsQc(true);
         if (cmd.getPaymentTerms() != null) entity.setPaymentTerms(cmd.getPaymentTerms());
         else entity.setPaymentTerms(PaymentTerms.NET_30);
         if (cmd.getNotes() != null) entity.setNotes(cmd.getNotes());
@@ -92,6 +95,7 @@ public class FactoryAssembler {
         if (cmd.getContactWechat() != null) entity.setContactWechat(cmd.getContactWechat());
         if (cmd.getContactQq() != null) entity.setContactQq(cmd.getContactQq());
         if (cmd.getCooperationStatus() != null) entity.setCooperationStatus(cmd.getCooperationStatus());
+        if (cmd.getNeedsQc() != null) entity.setNeedsQc(cmd.getNeedsQc());
         if (cmd.getPaymentTerms() != null) entity.setPaymentTerms(cmd.getPaymentTerms());
         if (cmd.getNotes() != null) entity.setNotes(cmd.getNotes());
     }

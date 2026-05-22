@@ -55,7 +55,15 @@
     </el-card>
 
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="planCode" :label="$t('logistics.column.planCode')" min-width="160" />
         <el-table-column prop="containerNo" :label="$t('logistics.column.containerNo')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="qcCode" :label="$t('logistics.column.qcCode')" min-width="130" show-overflow-tooltip />
@@ -106,6 +114,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableData" />
 
       <div class="pagination-wrap">
         <el-pagination
@@ -249,11 +258,13 @@ import { inspectionApi, type QcRecordVO } from '@/api/inspection'
 import { factoryApi, type FactoryPageVO } from '@/api/factory'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { hasPermission } = usePermission()
 
 const loading = ref(false)
 const submitting = ref(false)
+const excelViewMode = ref<'table' | 'copy'>('table')
 const dialogVisible = ref(false)
 const qcRecordLoading = ref(false)
 const editId = ref<number | null>(null)
@@ -294,6 +305,21 @@ const formRules: FormRules = {
   productCode: [{ required: true, message: () => t('logistics.validation.productCodeRequired'), trigger: 'blur' }],
   planType: [{ required: true, message: () => t('logistics.validation.planTypeRequired'), trigger: 'change' }],
 }
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'planCode', label: t('logistics.column.planCode') },
+  { prop: 'containerNo', label: t('logistics.column.containerNo') },
+  { prop: 'qcCode', label: t('logistics.column.qcCode') },
+  { prop: 'factoryName', label: t('logistics.column.factoryName') },
+  { prop: 'productCode', label: t('logistics.column.productCode') },
+  { prop: 'subProductCode', label: t('logistics.column.subProductCode') },
+  { prop: 'planType', label: t('logistics.column.planType'), formatter: (row) => planTypeLabel(row.planType) },
+  { prop: 'cargoWeightKg', label: t('logistics.column.cargoWeightKg'), formatter: (row) => row.cargoWeightKg ? `${row.cargoWeightKg} ${t('common.units.kg')}` : '' },
+  { prop: 'cargoVolumeCbm', label: t('logistics.column.cargoVolumeCbm'), formatter: (row) => row.cargoVolumeCbm ? `${row.cargoVolumeCbm.toFixed(4)} ${t('common.units.m3')}` : '' },
+  { prop: 'requiresQc', label: t('logistics.column.requiresQc'), formatter: (row) => row.requiresQc ? t('logistics.requiresQc.yes') : t('logistics.requiresQc.no') },
+  { prop: 'status', label: t('logistics.column.status'), formatter: (row) => logisticsStatusLabel(row.status) },
+  { prop: 'action', label: t('logistics.column.action'), excluded: true },
+]
 
 const bookedCount = computed(() => tableData.value.filter(r => r.status === 'BOOKED').length)
 const transitCount = computed(() => tableData.value.filter(r => r.status === 'IN_TRANSIT').length)

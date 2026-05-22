@@ -88,6 +88,13 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column :label="$t('factory.column.needsQc')" min-width="110" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.needsQc === false ? 'success' : 'info'" size="small">
+              {{ row.needsQc === false ? t('factory.needsQc.false') : t('factory.needsQc.true') }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('factory.column.action')" min-width="150" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('factory.action.detail') }}</el-button>
@@ -133,6 +140,11 @@
         <div class="detail-section-title">{{ $t('factory.drawer.section.cooperation') }}</div>
         <div class="detail-item"><span class="detail-label">{{ $t('factory.drawer.cooperationStatus') }}</span><span class="detail-value">
           <el-tag :type="statusTagType(currentRow.cooperationStatus)" size="small">{{ statusLabel(currentRow.cooperationStatus) }}</el-tag>
+        </span></div>
+        <div class="detail-item"><span class="detail-label">{{ $t('factory.drawer.needsQc') }}</span><span class="detail-value">
+          <el-tag :type="currentRow.needsQc === false ? 'success' : 'info'" size="small">
+            {{ currentRow.needsQc === false ? t('factory.needsQc.false') : t('factory.needsQc.true') }}
+          </el-tag>
         </span></div>
         <div class="detail-section-title">{{ $t('factory.drawer.section.audit') }}</div>
         <div class="detail-item"><span class="detail-label">{{ $t('factory.drawer.createBy') }}</span><span class="detail-value">{{ currentRow.createBy ?? $t('common.format.dash') }}</span></div>
@@ -223,6 +235,12 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('factory.dialog.needsQc')">
+              <el-switch v-model="form.needsQc" active-text="" inactive-text="" />
+              <span style="margin-left:8px;font-size:12px;color:#909399">{{ $t('factory.dialog.needsQcDescription') }}</span>
+            </el-form-item>
+          </el-col>
         </el-row>
 
         <!-- 备注 -->
@@ -294,6 +312,7 @@ const defaultForm = (): CreateFactoryRequest => ({
   contactWechat: '',
   contactQq: '',
   cooperationStatus: undefined,
+  needsQc: true,
   notes: '',
 })
 
@@ -379,6 +398,7 @@ function onEdit(row: FactoryPageVO) {
     contactWechat: row.contactWechat ?? '',
     contactQq: row.contactQq ?? '',
     cooperationStatus: row.cooperationStatus,
+    needsQc: row.needsQc ?? true,
     notes: row.notes ?? '',
   })
   formVisible.value = true

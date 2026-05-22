@@ -61,7 +61,7 @@ public class ShipmentBatchAssembler {
         if (cmd.getShipmentQuantity() != null) entity.setShipmentQuantity(cmd.getShipmentQuantity());
         if (cmd.getFactoryShipDate() != null) entity.setFactoryShipDate(cmd.getFactoryShipDate());
         if (cmd.getActualShipDate() != null) entity.setActualShipDate(cmd.getActualShipDate());
-        if (cmd.getStatus() != null) entity.updateStatus(cmd.getStatus());
+        if (cmd.getStatus() != null && cmd.getStatus() != entity.getStatus()) entity.updateStatus(cmd.getStatus());
         if (cmd.getRemarks() != null) entity.setRemarks(cmd.getRemarks());
     }
 }

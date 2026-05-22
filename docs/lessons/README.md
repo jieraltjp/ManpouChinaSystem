@@ -36,6 +36,7 @@
 | client.ts 解包导致页面无数据 | [74](#74-clientts-resultt-解包一致性问题) |
 | #_return SpEL 不生效 | [85](#85-return-对-responseentityresultlist-静默失效) |
 | sanitizeImpl cyclic 误判 | [86](#86-sanitizeimpl-visited-集合误判-dag-为-cyclic) |
+| 视图列与 Entity 映射不一致导致 500 | [93](#93-视图列与-entity-映射不一致导致-500) |
 | 业务锚点导致 Demand 新建后不可见 | [33](#33-业务链起点-overview-入口锚点), [57](#57-业务关联变更须八层同步) |
 
 ---

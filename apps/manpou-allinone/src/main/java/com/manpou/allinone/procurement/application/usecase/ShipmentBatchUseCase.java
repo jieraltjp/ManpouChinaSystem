@@ -7,11 +7,15 @@ import com.manpou.allinone.procurement.application.dto.ShipmentBatchCreateCmd;
 import com.manpou.allinone.procurement.application.dto.ShipmentBatchPageQuery;
 import com.manpou.allinone.procurement.application.dto.ShipmentBatchQuery;
 import com.manpou.allinone.procurement.application.dto.ShipmentBatchUpdateCmd;
+import com.manpou.allinone.procurement.domain.event.ShipmentBatchCreatedEvent;
+import com.manpou.allinone.procurement.domain.model.Procurement;
 import com.manpou.allinone.procurement.domain.model.ShipmentBatch;
+import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
 import com.manpou.allinone.procurement.domain.repository.ShipmentBatchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -27,7 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ShipmentBatchUseCase {
 
     private final ShipmentBatchRepository shipmentBatchRepository;
+    private final ProcurementRepository procurementRepository;
     private final ShipmentBatchAssembler assembler;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 分页查询。
@@ -75,11 +81,17 @@ public class ShipmentBatchUseCase {
         ShipmentBatch entity = assembler.toEntity(cmd);
         ShipmentBatch saved = shipmentBatchRepository.save(entity);
 
-        log.info("[ShipmentBatch] created, traceId={}, id={}, procurementId={}, quantity={}",
+        // SPEC-B13: 发布出货批次创建事件，触发老厂家免验自动创建
+        Long factoryId = resolveFactoryId(saved.getProcurementId());
+        eventPublisher.publishEvent(new ShipmentBatchCreatedEvent(
+                saved.getId(), saved.getProcurementId(), factoryId));
+
+        log.info("[ShipmentBatch] created, traceId={}, id={}, procurementId={}, quantity={}, factoryId={}",
                 MDC.get(TraceFilter.TRACE_ID_KEY),
                 saved.getId(),
                 saved.getProcurementId(),
-                saved.getShipmentQuantity());
+                saved.getShipmentQuantity(),
+                factoryId);
         return saved.getId();
     }
 
@@ -128,5 +140,13 @@ public class ShipmentBatchUseCase {
 
         log.info("[ShipmentBatch] linkQc, traceId={}, batchId={}, qcRecordId={}",
                 MDC.get(TraceFilter.TRACE_ID_KEY), batchId, qcRecordId);
+    }
+
+    /** SPEC-B13: 通过 procurementId 解析 factoryId。 */
+    private Long resolveFactoryId(Long procurementId) {
+        if (procurementId == null) return null;
+        return procurementRepository.findByIdAndDeletedIsFalse(procurementId)
+                .map(Procurement::getFactoryId)
+                .orElse(null);
     }
 }

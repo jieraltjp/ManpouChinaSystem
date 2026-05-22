@@ -10,8 +10,9 @@
     "procurement-all": "発注管理",
     "demand": "01 補充需要",
     "procurement": "02 発注書",
-    "qcRecord": "03 検品記録",
-    "logisticsPlan": "04 配送計画",
+    "shipmentBatch": "03 出荷バッチ",
+    "qcRecord": "04 検品記録",
+    "logisticsPlan": "05 配送計画",
     "consolidationPool": "05 コンソリ池",
     "container": "06 コンテナ管理",
     "ship": "船舶管理",
@@ -410,6 +411,8 @@
       "qq": "QQ番号",
       "qqPlaceholder": "QQ番号",
       "cooperationStatus": "協力ステータス",
+      "needsQc": "検品要否",
+      "needsQcDescription": "OFFにすると，出荷時に「老厂家免検」記録が自動作成されます",
       "cancel": "キャンセル",
       "save": "保存"
     },
@@ -521,7 +524,8 @@
     },
     "qcType": {
       "onsite": "現地検品",
-      "remote": "リモート検品"
+      "remote": "リモート検品",
+      "exempt": "老厂家免検"
     },
     "qcStatus": {
       "pending": "確認待ち",
@@ -867,6 +871,7 @@
       "contactWechat": "WeChat",
       "contactQq": "QQ番号",
       "cooperationStatus": "協力状態",
+      "needsQc": "検品要否",
       "paymentTerms": "支払条件",
       "action": "操作"
     },
@@ -900,6 +905,7 @@
       "contactWechat": "WeChat",
       "contactQq": "QQ番号",
       "cooperationStatus": "協力状態",
+      "needsQc": "検品要否",
       "createBy": "作成者",
       "notes": "備考",
       "createTime": "作成日時",
@@ -920,6 +926,8 @@
       "factoryNamePlaceholder": "工場正式名称",
       "cooperationStatus": "協力状態",
       "cooperationStatusPlaceholder": "状態を選択",
+      "needsQc": "検品要否",
+      "needsQcDescription": "OFFにすると、出荷時に「老厂家免検」記録が自動作成されます",
       "paymentTerms": "支払条件",
       "paymentTermsPlaceholder": "支払条件を選択",
       "province": "省",
@@ -948,6 +956,10 @@
       "SUSPENDED": "一時停止",
       "ELIMINATED": "廃止",
       "POTENTIAL": "潜在協力"
+    },
+    "needsQc": {
+      "true": "検品要",
+      "false": "老厂家免検"
     },
     "paymentTerms": {
       "CASH": "現金払い",
@@ -1468,7 +1480,16 @@
     "no": "いいえ",
     "message": {
       "loadFailed": "読み込みに失敗しました。再試行してください。"
+    },
+    "viewMode": {
+      "table": "テーブル表示",
+      "excel": "Excel表示"
     }
+  },
+  "excel": {
+    "selectTip": "文字を選択後に Ctrl+C でコピー、または上のボタンで表全体をコピー",
+    "copyToExcel": "Excelにコピー",
+    "copied": "クリップボードにコピーしました"
   },
   "validation": {
     "required": "この項目は必須です"

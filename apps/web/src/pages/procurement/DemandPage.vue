@@ -61,7 +61,15 @@
 
     <!-- 表格（v2.0.0：一行 = 一个子货号） -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="demandCode" :label="$t('demand.column.demandCode')" min-width="160" />
         <el-table-column prop="productCode" :label="$t('demand.column.productCode')" min-width="110">
           <template #default="{ row }">
@@ -132,6 +140,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableData" />
 
       <div class="pagination-wrap">
         <el-pagination
@@ -386,11 +395,13 @@ import { demandApi, type DemandPageVO, type DemandType } from '@/api/demand'
 import { productApi, type MasterCodeSuggestVO, type SubCodeSuggestVO } from '@/api/product'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { hasPermission } = usePermission()
 
 const loading = ref(false)
 const submitting = ref(false)
+const excelViewMode = ref<'table' | 'copy'>('table')
 const masterCodeLoading = ref(false)
 const subCodeLoading = ref(false)
 const linkedLoading = ref(false)
@@ -468,6 +479,19 @@ const formRules = {
   subProductCode: [{ required: true, message: () => t('demand.validation.subProductCodeRequired'), trigger: 'blur' }],
   quantity: [{ required: true, message: () => t('demand.validation.quantityRequired'), trigger: 'blur' }],
 }
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'demandCode', label: t('demand.column.demandCode') },
+  { prop: 'productCode', label: t('demand.column.productCode'), formatter: (row) => row.productCode },
+  { prop: 'subProductCode', label: t('demand.column.subProductCode'), formatter: (row) => row.subProductCode },
+  { prop: 'demandType', label: t('demand.column.demandType'), formatter: (row) => row.demandType === 'NEW_PURCHASE' ? t('demand.type.newPurchase') : t('demand.type.replenishment') },
+  { prop: 'quantity', label: t('demand.column.quantity'), formatter: (row) => row.quantity != null ? String(row.quantity) : '' },
+  { prop: 'destination', label: t('demand.column.destination'), formatter: (row) => row.destination || '—' },
+  { prop: 'japanLead', label: t('demand.column.japanLead'), formatter: (row) => row.japanLead || '' },
+  { prop: 'remarks', label: t('demand.column.remarks') },
+  { prop: 'status', label: t('demand.column.status'), formatter: (row) => demandStatusLabel(row) },
+  { prop: 'action', label: t('demand.column.action'), excluded: true },
+]
 
 async function loadData() {
   loading.value = true
@@ -679,6 +703,7 @@ onMounted(() => loadData())
 <style scoped>
 .page { display: flex; flex-direction: column; gap: 16px; }
 .page-header { display: flex; align-items: center; justify-content: space-between; }
+.table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
 .table-card :deep(.el-card__body) { padding: 16px; }
 .stats-row { margin-bottom: 4px; }

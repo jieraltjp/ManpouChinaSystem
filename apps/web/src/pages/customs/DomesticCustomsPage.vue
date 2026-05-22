@@ -70,7 +70,11 @@
     <el-card class="table-card" shadow="never">
       <template #header>
         <div class="table-header">
-          <el-radio-group v-model="viewMode" size="small">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+          <el-radio-group v-model="viewMode" size="small" style="margin-left:8px">
             <el-radio-button value="list">{{ $t('customs.viewMode.list') }}</el-radio-button>
             <el-radio-button value="group">{{ $t('customs.viewMode.byContainer') }}</el-radio-button>
           </el-radio-group>
@@ -78,7 +82,7 @@
       </template>
 
       <!-- 列表视图 -->
-      <el-table v-loading="loading" v-if="viewMode === 'list'" :data="tableData" stripe style="width:100%" min-height="200">
+      <el-table v-loading="loading" v-if="viewMode === 'list' && excelViewMode === 'table'" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="customsCode" :label="$t('customs.column.customsCode')" min-width="180">
           <template #default="{ row }">
             <span class="code-badge">{{ row.customsCode }}</span>
@@ -131,6 +135,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-if="viewMode === 'list' && excelViewMode === 'copy'" :columns="copyColumns" :data="tableData" />
 
       <!-- 分组视图 -->
       <el-collapse v-loading="loading" v-if="viewMode === 'group'" class="container-group-collapse">
@@ -197,7 +202,7 @@
         </el-collapse-item>
       </el-collapse>
 
-      <div v-if="viewMode === 'list'" class="pagination-wrap">
+      <div v-if="viewMode === 'list' && excelViewMode === 'table'" class="pagination-wrap">
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.pageSize"
@@ -355,6 +360,7 @@ import { customsApi, type CustomsVO, type DomesticCustomsStatus, type CustomsCre
 import { logisticsApi, type LogisticsPlanVO } from '@/api/logistics'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { hasPermission } = usePermission()
 const loading = ref(false)
@@ -366,6 +372,7 @@ const actionLoading = ref('')
 const rejectReason = ref('')
 const rejectingRowId = ref<number | null>(null)
 const viewMode = ref<'list' | 'group'>('list')
+const excelViewMode = ref<'table' | 'copy'>('table')
 
 const containerOptions = ref<LogisticsPlanVO[]>([])
 const containerLoading = ref(false)
@@ -456,6 +463,19 @@ function statusTagType(status?: string): string {
   }
   return map[status ?? ''] ?? 'info'
 }
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'customsCode', label: t('customs.column.customsCode') },
+  { prop: 'containerNo', label: t('customs.column.containerNo') },
+  { prop: 'procurementId', label: t('customs.column.procurementId') },
+  { prop: 'productCode', label: t('customs.column.productCode') },
+  { prop: 'subProductCode', label: t('customs.column.subProductCode') },
+  { prop: 'quantity', label: t('customs.column.quantity') },
+  { prop: 'estimatedValueCny', label: t('customs.column.estimatedValueCny'), formatter: (row) => row.estimatedValueCny != null ? `${t('common.currency.cny')}${row.estimatedValueCny?.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '' },
+  { prop: 'status', label: t('customs.column.status'), formatter: (row) => statusLabel(row.status) },
+  { prop: 'createTime', label: t('customs.column.createTime'), formatter: (row) => formatTime(row.createTime) },
+  { prop: 'action', label: t('customs.column.action'), excluded: true },
+]
 
 async function loadData() {
   loading.value = true

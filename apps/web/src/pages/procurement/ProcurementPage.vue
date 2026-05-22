@@ -79,7 +79,16 @@
 
     <!-- 数据表格 -->
     <el-card class="table-card" shadow="never">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
       <el-table
+        v-if="excelViewMode === 'table'"
         v-loading="loading"
         :data="tableRows"
         stripe
@@ -168,6 +177,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableRows" />
 
       <div class="pagination-wrap">
         <el-pagination
@@ -280,14 +290,14 @@
         <!-- 选择工厂（必填） -->
         <el-form-item :label="$t('order.dialog.selectFactory')" prop="factoryId">
           <div class="factory-select-row">
-            <el-select v-model="formData.factoryId" :placeholder="$t('order.dialog.selectFactoryPlaceholder')" filterable style="flex:1" :disabled="dialogMode === 'update'" @change="onFactorySelected">
+            <el-select v-model="formData.factoryId" :placeholder="$t('order.dialog.selectFactoryPlaceholder')" filterable style="flex:1" @change="onFactorySelected">
               <el-option v-for="f in factoryOptions" :key="f.id" :label="`${f.factoryName}（${f.factoryCode}）`" :value="f.id" />
             </el-select>
-            <el-button size="small" :disabled="dialogMode === 'update'" @click="onFactoryNew">
+            <el-button size="small" @click="onFactoryNew">
               <el-icon><Plus /></el-icon> {{ $t('order.dialog.factoryNew') }}
             </el-button>
             <el-tooltip :content="$t('order.dialog.factoryEdit')" placement="top">
-              <el-button size="small" :disabled="!formData.factoryId || dialogMode === 'update'" @click="onFactoryEditCurrent">
+              <el-button size="small" :disabled="!formData.factoryId" @click="onFactoryEditCurrent">
                 <el-icon><Edit /></el-icon>
               </el-button>
             </el-tooltip>
@@ -582,6 +592,10 @@
             <el-option value="POTENTIAL" :label="$t('order.cooperationStatus.POTENTIAL')" />
           </el-select>
         </el-form-item>
+        <el-form-item :label="$t('order.factoryDialog.needsQc')">
+          <el-switch v-model="factoryFormData.needsQc" />
+          <span style="margin-left:8px;font-size:12px;color:#909399">{{ $t('order.factoryDialog.needsQcDescription') }}</span>
+        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="factoryDialogVisible = false">{{ $t('order.factoryDialog.cancel') }}</el-button>
@@ -614,9 +628,11 @@ import { demandApi, type DemandPageVO } from '@/api/demand'
 import { productApi, type MasterCodeSuggestVO } from '@/api/product'
 import { useI18n } from 'vue-i18n'
 import ProductFormDialog from '@/components/product/ProductFormDialog.vue'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const loading = ref(false)
 const submitting = ref(false)
+const excelViewMode = ref<'table' | 'copy'>('table')
 const drawerVisible = ref(false)
 const dialogVisible = ref(false)
 const dialogMode = ref<'create' | 'update'>('create')
@@ -984,6 +1000,7 @@ const defaultFactoryForm = (): CreateFactoryRequest => ({
   contactWechat: '',
   contactQq: '',
   cooperationStatus: undefined,
+  needsQc: true,
   paymentTerms: undefined,
   notes: '',
 })
@@ -1026,6 +1043,7 @@ function onFactoryEdit(row: FactoryPageVO) {
     contactWechat: row.contactWechat || '',
     contactQq: row.contactQq || '',
     cooperationStatus: row.cooperationStatus,
+    needsQc: row.needsQc ?? true,
     paymentTerms: row.paymentTerms,
     notes: row.notes || '',
   })
@@ -1127,6 +1145,21 @@ const formRules = {
   destination: [{ max: 128, message: () => t('order.validation.destinationMaxLength'), trigger: 'blur' }],
 }
 
+const copyColumns: ExcelColDef[] = [
+  { prop: 'productCode', label: t('order.column.productCode'), formatter: (row) => row.productCode },
+  { prop: 'subProductCode', label: t('order.column.subProductCode'), formatter: (row) => row.subProductCode || '—' },
+  { prop: 'factoryName', label: t('order.column.factoryName') },
+  { prop: 'priceRmb', label: t('order.column.priceRmb'), formatter: (row) => row.priceRmb != null ? row.priceRmb.toLocaleString() : '' },
+  { prop: 'exchangeRate', label: t('order.column.exchangeRate'), formatter: (row) => row.exchangeRate != null ? String(row.exchangeRate) : '' },
+  { prop: 'taxPoint', label: t('order.column.taxPoint'), formatter: (row) => row.taxPoint != null ? String(row.taxPoint) : '' },
+  { prop: 'quantity', label: t('order.column.quantity'), formatter: (row) => row.quantity != null ? String(row.quantity) : '' },
+  { prop: 'shipmentQuantity', label: t('order.column.shipmentQuantity'), formatter: (row) => row.shipmentQuantity != null && row.shipmentQuantity > 0 ? String(row.shipmentQuantity) : '' },
+  { prop: 'estimatedPriceJpy', label: t('order.column.estimatedPriceJpy'), formatter: (row) => row.estimatedPriceJpy ? row.estimatedPriceJpy.toLocaleString() : '' },
+  { prop: 'leadTimeDays', label: t('order.column.leadTimeDays'), formatter: (row) => formatLeadTime(row.leadTimeDays) },
+  { prop: 'status', label: t('order.column.status'), formatter: (row) => statusLabel(row) },
+  { prop: 'action', label: t('order.column.action'), excluded: true },
+]
+
 async function loadData() {
   loading.value = true
   try {
@@ -1212,6 +1245,7 @@ function onEdit(row: ProcurementPageVO | null) {
     destination: row?.destination ?? '',
     status: row?.status ?? ORDER_STATUS_ORDERED,
   })
+  fetchCategory(row?.productCode ?? '')
   loadSuggestOptions()
   dialogVisible.value = true
 }
@@ -1526,8 +1560,15 @@ defineExpose({ prefillFromDemand })
   font-weight: 500;
 }
 
+.table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .table-card :deep(.el-table__row) {
   cursor: pointer;
+}
+
+.pagination-wrap {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* ── 商品代码：橙色 monospace 标签 ── */

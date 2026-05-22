@@ -67,7 +67,11 @@
     <el-card class="table-card" shadow="never">
       <template #header>
         <div class="table-header">
-          <el-radio-group v-model="viewMode" size="small">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+          <el-radio-group v-model="viewMode" size="small" style="margin-left:8px">
             <el-radio-button value="list">{{ $t('japanCustoms.viewMode.list') }}</el-radio-button>
             <el-radio-button value="group">{{ $t('japanCustoms.viewMode.byContainer') }}</el-radio-button>
           </el-radio-group>
@@ -75,7 +79,7 @@
       </template>
 
       <!-- 列表视图 -->
-      <el-table v-loading="loading" v-if="viewMode === 'list'" :data="tableData" stripe style="width:100%" min-height="200">
+      <el-table v-loading="loading" v-if="viewMode === 'list' && excelViewMode === 'table'" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="containerNo" :label="$t('japanCustoms.column.containerNo')" min-width="160">
           <template #default="{ row }">
             <el-link v-if="row.containerNo" type="primary" @click.stop="onJumpToDomestic(row)">{{ row.containerNo }}</el-link>
@@ -140,6 +144,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-if="viewMode === 'list' && excelViewMode === 'copy'" :columns="copyColumns" :data="tableData" />
 
       <!-- 分组视图 -->
       <el-collapse v-loading="loading" v-if="viewMode === 'group'" class="container-group-collapse">
@@ -217,7 +222,7 @@
         </el-collapse-item>
       </el-collapse>
 
-      <div v-if="viewMode === 'list'" class="pagination-wrap">
+      <div v-if="viewMode === 'list' && excelViewMode === 'table'" class="pagination-wrap">
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.pageSize"
@@ -374,6 +379,7 @@ import { japanCustomsApi, type JapanCustomsVO, type JapanCustomsStatus } from '@
 import { customsApi, type CustomsVO } from '@/api/customs'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { hasPermission } = usePermission()
 const loading = ref(false)
@@ -386,6 +392,7 @@ const failReason = ref('')
 const completingRowId = ref<number | null>(null)
 const failingRowId = ref<number | null>(null)
 const viewMode = ref<'list' | 'group'>('list')
+const excelViewMode = ref<'table' | 'copy'>('table')
 
 const currentRow = ref<JapanCustomsVO | null>(null)
 const filterForm = reactive({
@@ -463,6 +470,22 @@ function statusTagType(status?: string): string {
   }
   return map[status ?? ''] ?? 'info'
 }
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'containerNo', label: t('japanCustoms.column.containerNo') },
+  { prop: 'customsEntryNo', label: t('japanCustoms.column.entryNo') },
+  { prop: 'domesticCustomsId', label: t('japanCustoms.column.domesticCustomsId') },
+  { prop: 'productCode', label: t('japanCustoms.column.productCode') },
+  { prop: 'subProductCode', label: t('japanCustoms.column.subProductCode') },
+  { prop: 'arrivalPort', label: t('japanCustoms.column.arrivalPort') },
+  { prop: 'arrivalDate', label: t('japanCustoms.column.arrivalDate') },
+  { prop: 'customsBroker', label: t('japanCustoms.column.broker') },
+  { prop: 'importDutyPaid', label: t('japanCustoms.column.importDuty'), formatter: (row) => row.importDutyPaid != null ? `${row.importDutyPaid?.toLocaleString('ja-JP')} ${t('common.units.jpy')}` : '' },
+  { prop: 'consumptionTaxPaid', label: t('japanCustoms.column.consumptionTax'), formatter: (row) => row.consumptionTaxPaid != null ? `${row.consumptionTaxPaid?.toLocaleString('ja-JP')} ${t('common.units.jpy')}` : '' },
+  { prop: 'clearanceDate', label: t('japanCustoms.column.clearanceDate') },
+  { prop: 'status', label: t('japanCustoms.column.status'), formatter: (row) => statusLabel(row.status) },
+  { prop: 'action', label: t('japanCustoms.column.action'), excluded: true },
+]
 
 function onNew() {
   batchForm.containerNo = ''

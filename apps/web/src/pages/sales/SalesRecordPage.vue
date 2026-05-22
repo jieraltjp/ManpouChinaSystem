@@ -78,7 +78,15 @@
 
     <!-- 数据表 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <template #header>
+        <div class="table-header">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
         <el-table-column prop="recordCode" :label="$t('sales.column.recordCode')" min-width="170">
           <template #default="{ row }">
             <span class="code-badge">{{ row.recordCode }}</span>
@@ -141,6 +149,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="tableData" />
 
       <div class="pagination-wrap">
         <el-pagination
@@ -286,6 +295,7 @@ import { Plus, CircleCheck, Warning, CloseBold, Remove, Goods } from '@element-p
 import { salesOperationsApi, type SalesRecordVO, type SalesStatus, type SalesChannel } from '@/api/salesOperations'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { t, locale: localeRef } = useI18n()
 const { hasPermission } = usePermission()
@@ -317,6 +327,22 @@ const filterForm = reactive({
 })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const tableData = ref<SalesRecordVO[]>([])
+const excelViewMode = ref<'table' | 'copy'>('table')
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'recordCode', label: t('sales.column.recordCode') },
+  { prop: 'productCode', label: t('sales.column.productCode') },
+  { prop: 'subProductCode', label: t('sales.column.subProductCode') },
+  { prop: 'salesChannel', label: t('sales.column.salesChannel'), formatter: (row) => channelLabel(row.salesChannel) },
+  { prop: 'currentStock', label: t('sales.column.currentStock'), formatter: (row) => row.currentStock !== null ? String(row.currentStock) : '' },
+  { prop: 'salesQuantity', label: t('sales.column.salesQuantity'), formatter: (row) => row.salesQuantity !== null ? String(row.salesQuantity) : '' },
+  { prop: 'returnedQuantity', label: t('sales.column.returnedQuantity'), formatter: (row) => row.returnedQuantity !== null ? String(row.returnedQuantity) : '' },
+  { prop: 'returnRate', label: t('sales.column.returnRate'), formatter: (row) => row.returnRate !== null ? `${(Number(row.returnRate) * 100).toFixed(1)}%` : '' },
+  { prop: 'sellingPriceJpy', label: t('sales.column.sellingPriceJpy'), formatter: (row) => row.sellingPriceJpy !== null ? `${Number(row.sellingPriceJpy).toLocaleString('ja-JP')} ${t('common.units.jpy')}` : '' },
+  { prop: 'listingDate', label: t('sales.column.listingDate') },
+  { prop: 'status', label: t('sales.column.status'), formatter: (row) => statusLabel(row.status) },
+  { prop: 'action', label: t('sales.column.action'), excluded: true },
+]
 
 const createForm = reactive({
   procurementId: undefined as number | undefined,

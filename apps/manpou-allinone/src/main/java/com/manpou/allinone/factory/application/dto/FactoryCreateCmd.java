@@ -49,6 +49,8 @@ public class FactoryCreateCmd {
 
     // 合作信息
     private CooperationStatus cooperationStatus;  // 合作状态
+    private Boolean needsQc;                       // 是否需要验货（SPEC-B13）
+
     private PaymentTerms paymentTerms;             // 账期
 
     @Size(max = 500)
