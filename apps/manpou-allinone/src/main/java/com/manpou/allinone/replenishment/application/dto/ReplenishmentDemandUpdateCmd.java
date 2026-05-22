@@ -1,5 +1,6 @@
 package com.manpou.allinone.replenishment.application.dto;
 
+import com.manpou.allinone.replenishment.domain.model.DemandStatus;
 import com.manpou.allinone.replenishment.domain.model.DemandType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -28,4 +29,6 @@ public class ReplenishmentDemandUpdateCmd {
 
     @Length(max = 512)
     private String remarks;
+
+    private DemandStatus status;  // 支持人工修改状态
 }

@@ -57,6 +57,7 @@ export interface UpdateDemandRequest {
   destination?: string
   japanLead?: string
   remarks?: string
+  status?: DemandStatus
 }
 
 export const demandApi = {

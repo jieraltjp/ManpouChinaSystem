@@ -237,6 +237,14 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-form-item :label="$t('logistics.column.status')">
+          <el-select v-model="form.status" style="width:200px">
+            <el-option value="PLANNED" :label="$t('logistics.status.PLANNED')" />
+            <el-option value="BOOKED" :label="$t('logistics.status.BOOKED')" />
+            <el-option value="IN_TRANSIT" :label="$t('logistics.status.IN_TRANSIT')" />
+            <el-option value="DELIVERED" :label="$t('logistics.status.DELIVERED')" />
+          </el-select>
+        </el-form-item>
         <el-form-item :label="$t('logistics.dialog.remarks')">
           <el-input v-model="form.remarks" type="textarea" :rows="2" :placeholder="$t('logistics.dialog.remarksPlaceholder')" />
         </el-form-item>
@@ -298,6 +306,7 @@ const form = reactive({
   estimatedShipDate: '',
   actualShipDate: '',
   remarks: '',
+  status: undefined as LogisticsStatus | undefined,
 })
 
 const formRules: FormRules = {
@@ -443,6 +452,7 @@ async function onSubmit() {
         estimatedShipDate: form.estimatedShipDate || undefined,
         actualShipDate: form.actualShipDate || undefined,
         remarks: form.remarks || undefined,
+        status: form.status,
       }
       await logisticsApi.update(editId.value, payload)
       ElMessage.success(t('logistics.message.updateSuccess'))
@@ -511,6 +521,7 @@ async function onEdit(row: LogisticsPlanVO) {
     estimatedShipDate: row.estimatedShipDate || '',
     actualShipDate: row.actualShipDate || '',
     remarks: row.remarks || '',
+    status: row.status,
   })
   // 直接设置 qcRecordId，列表加载后 el-select 即可正确显示（列表已包含该记录）
   form.qcRecordId = row.qcRecordId

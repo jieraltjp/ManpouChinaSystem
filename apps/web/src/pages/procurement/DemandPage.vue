@@ -350,6 +350,13 @@
               <el-input v-model="formData.remarks" :placeholder="$t('demand.dialog.remarksPlaceholder')" />
             </div>
           </div>
+          <el-form-item :label="$t('demand.column.status')" style="margin-top:12px" v-if="dialogMode === 'update'">
+            <el-select v-model="formData.status" style="width:200px">
+              <el-option value="PENDING" :label="$t('demand.status.PENDING')" />
+              <el-option value="CONFIRMED" :label="$t('demand.status.CONFIRMED')" />
+              <el-option value="RETURNED" :label="$t('demand.status.RETURNED')" />
+            </el-select>
+          </el-form-item>
         </div>
       </el-form>
 
@@ -391,7 +398,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
 import { Plus, Clock, Warning, CircleCheck } from '@element-plus/icons-vue'
-import { demandApi, type DemandPageVO, type DemandType } from '@/api/demand'
+import { demandApi, type DemandPageVO, type DemandType, type DemandStatus } from '@/api/demand'
 import { productApi, type MasterCodeSuggestVO, type SubCodeSuggestVO } from '@/api/product'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
@@ -463,6 +470,7 @@ const formData = reactive<{
   destination: string
   japanLead: string
   remarks: string
+  status: DemandStatus
 }>({
   demandType: 'REPLENISHMENT',
   productCode: '',
@@ -471,6 +479,7 @@ const formData = reactive<{
   destination: '',
   japanLead: '',
   remarks: '',
+  status: 'PENDING',
 })
 
 const formRules = {
@@ -529,6 +538,7 @@ function onNew() {
     destination: '',
     japanLead: '',
     remarks: '',
+    status: 'PENDING',
   })
   subCodeOptions.value = []
   loadedSubCodesFor.value = ''
@@ -546,6 +556,7 @@ function onEdit(row: DemandPageVO) {
     destination: row.destination || '',
     japanLead: row.japanLead || '',
     remarks: row.remarks || '',
+    status: row.status,
   })
   loadedSubCodesFor.value = row.productCode
   subCodeOptions.value = []
@@ -649,6 +660,7 @@ async function onSubmit() {
         destination: formData.destination || undefined,
         japanLead: formData.japanLead || undefined,
         remarks: formData.remarks || undefined,
+        ...(dialogMode.value === 'update' ? { status: formData.status } : {}),
       }
       if (dialogMode.value === 'create') {
         await demandApi.create(payload)

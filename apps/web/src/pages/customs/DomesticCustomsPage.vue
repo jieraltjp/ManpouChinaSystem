@@ -124,13 +124,14 @@
         <el-table-column :label="$t('customs.column.action')" min-width="200" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
+            <el-button v-if="hasPermission('customs:update')" link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('common.edit') }}</el-button>
+            <el-button v-if="hasPermission('customs:delete')" link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
             <template v-if="row.status === 'PENDING'">
               <el-button v-if="hasPermission('customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-submit'" @click.stop="onSubmit(row)">{{ $t('customs.action.submit') }}</el-button>
-              <el-button v-if="hasPermission('customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
             </template>
             <template v-else-if="row.status === 'SUBMITTED'">
               <el-button v-if="hasPermission('customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-clear'" @click.stop="onClear(row)">{{ $t('customs.action.clear') }}</el-button>
-              <el-button v-if="hasPermission('customs:update')" link type="danger" size="small" :loading="actionLoading === row.id + '-reject'" @click.stop="onReject(row)">{{ $t('customs.action.reject') }}</el-button>
+              <el-button v-if="hasPermission('customs:update')" link type="warning" size="small" :loading="actionLoading === row.id + '-reject'" @click.stop="onReject(row)">{{ $t('customs.action.reject') }}</el-button>
             </template>
           </template>
         </el-table-column>
@@ -188,13 +189,14 @@
             <el-table-column :label="$t('customs.column.action')" min-width="180" align="center">
               <template #default="{ row }">
                 <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
+                <el-button v-if="hasPermission('customs:update')" link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('common.edit') }}</el-button>
+                <el-button v-if="hasPermission('customs:delete')" link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
                 <template v-if="row.status === 'PENDING'">
                   <el-button v-if="hasPermission('customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-submit'" @click.stop="onSubmit(row)">{{ $t('customs.action.submit') }}</el-button>
-                  <el-button v-if="hasPermission('customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
                 </template>
                 <template v-else-if="row.status === 'SUBMITTED'">
                   <el-button v-if="hasPermission('customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-clear'" @click.stop="onClear(row)">{{ $t('customs.action.clear') }}</el-button>
-                  <el-button v-if="hasPermission('customs:update')" link type="danger" size="small" :loading="actionLoading === row.id + '-reject'" @click.stop="onReject(row)">{{ $t('customs.action.reject') }}</el-button>
+                  <el-button v-if="hasPermission('customs:update')" link type="warning" size="small" :loading="actionLoading === row.id + '-reject'" @click.stop="onReject(row)">{{ $t('customs.action.reject') }}</el-button>
                 </template>
               </template>
             </el-table-column>
@@ -336,6 +338,34 @@
       </el-descriptions>
     </el-drawer>
 
+    <!-- 编辑弹窗 -->
+    <el-dialog v-model="editDialogVisible" :title="editDialogTitle" width="560px" :close-on-click-modal="false" destroy-on-close>
+      <el-form label-width="140px">
+        <el-form-item :label="$t('customs.column.containerNo')">
+          <el-input v-model="form.containerNo" :placeholder="$t('customs.dialog.containerNoPlaceholder')" />
+        </el-form-item>
+        <el-form-item :label="$t('customs.column.productCode')">
+          <el-input v-model="form.productCode" :placeholder="$t('customs.dialog.productCodePlaceholder')" />
+        </el-form-item>
+        <el-form-item :label="$t('customs.column.subProductCode')">
+          <el-input v-model="form.subProductCode" :placeholder="$t('customs.dialog.subProductCodePlaceholder')" />
+        </el-form-item>
+        <el-form-item :label="$t('customs.column.quantity')">
+          <el-input-number v-model="form.quantity" :min="0" style="width:100%" />
+        </el-form-item>
+        <el-form-item :label="$t('customs.column.estimatedValueCny')">
+          <el-input-number v-model="form.estimatedValueCny" :min="0" :precision="2" style="width:100%" />
+        </el-form-item>
+        <el-form-item :label="$t('customs.dialog.remarks')">
+          <el-input v-model="form.remarks" type="textarea" :rows="2" :placeholder="$t('customs.dialog.remarksPlaceholder')" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="editDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="submitting" @click="onEditSubmit">{{ $t('common.save') }}</el-button>
+      </template>
+    </el-dialog>
+
     <!-- 驳回原因弹窗 -->
     <el-dialog v-model="rejectDialogVisible" :title="$t('customs.rejectDialogTitle')" width="420px">
       <el-form>
@@ -368,6 +398,9 @@ const submitting = ref(false)
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
 const rejectDialogVisible = ref(false)
+const editDialogVisible = ref(false)
+const editDialogTitle = ref('')
+const editingItem = ref<CustomsVO | null>(null)
 const actionLoading = ref('')
 const rejectReason = ref('')
 const rejectingRowId = ref<number | null>(null)
@@ -615,6 +648,45 @@ async function onBatchSubmit() {
 function onView(row: CustomsVO) {
   currentRow.value = row
   drawerVisible.value = true
+}
+
+function onEdit(row: CustomsVO) {
+  editingItem.value = row
+  editDialogTitle.value = t('customs.editDialogTitle')
+  Object.assign(form, {
+    containerNo: row.containerNo ?? '',
+    procurementId: row.procurementId ?? undefined,
+    factoryId: row.factoryId ?? undefined,
+    productCode: row.productCode,
+    subProductCode: row.subProductCode ?? undefined,
+    quantity: row.quantity ?? undefined,
+    estimatedValueCny: row.estimatedValueCny ?? undefined,
+    remarks: row.remarks ?? undefined,
+  })
+  editDialogVisible.value = true
+}
+
+async function onEditSubmit() {
+  if (!editingItem.value?.id) return
+  submitting.value = true
+  try {
+    await customsApi.update(editingItem.value.id, {
+      containerNo: form.containerNo || undefined,
+      factoryId: form.factoryId,
+      productCode: form.productCode,
+      subProductCode: form.subProductCode,
+      quantity: form.quantity,
+      estimatedValueCny: form.estimatedValueCny,
+      remarks: form.remarks,
+    })
+    ElMessage.success(t('common.message.saveSuccess'))
+    editDialogVisible.value = false
+    loadData()
+  } catch {
+    ElMessage.error(t('common.message.saveFailed'))
+  } finally {
+    submitting.value = false
+  }
 }
 
 async function onSubmit(row: CustomsVO) {

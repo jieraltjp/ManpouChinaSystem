@@ -3,6 +3,7 @@ package com.manpou.allinone.replenishment.application.assembler;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandCreateCmd;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandPageQuery;
 import com.manpou.allinone.replenishment.application.dto.ReplenishmentDemandUpdateCmd;
+import com.manpou.allinone.replenishment.domain.model.DemandStatus;
 import com.manpou.allinone.replenishment.domain.model.ReplenishmentDemand;
 import org.springframework.stereotype.Component;
 
@@ -70,5 +71,6 @@ public class ReplenishmentDemandAssembler {
         if (cmd.getDestination() != null) entity.setDestination(cmd.getDestination());
         if (cmd.getJapanLead() != null) entity.setJapanLead(cmd.getJapanLead());
         if (cmd.getRemarks() != null) entity.setRemarks(cmd.getRemarks());
+        if (cmd.getStatus() != null) entity.setStatus(cmd.getStatus());
     }
 }
