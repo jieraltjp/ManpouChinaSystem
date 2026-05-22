@@ -33,6 +33,10 @@
             <el-icon><ShoppingCart /></el-icon>
             <template #title>{{ $t('menu.procurement') }}</template>
           </el-menu-item>
+          <el-menu-item v-if="hasPermission('page:shipment:access')" index="/procurement/shipment-batch">
+            <el-icon><Goods /></el-icon>
+            <template #title>{{ $t('menu.shipmentBatch') }}</template>
+          </el-menu-item>
           <el-menu-item v-if="hasPermission('page:qc:access')" index="/procurement/qc-record">
             <el-icon><CircleCheck /></el-icon>
             <template #title>{{ $t('menu.qcRecord') }}</template>

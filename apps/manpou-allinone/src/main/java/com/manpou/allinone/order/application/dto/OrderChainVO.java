@@ -41,6 +41,12 @@ public class OrderChainVO {
     private String step3Status;
     private String step4Status;
 
+    // ====== Procurement 信息（列表页直接展示）======
+    private String procurementPriceRmb;
+    private String procurementTaxPoint;
+    private String procurementBillingType;
+    private String procurementCreateBy;
+
     /**
      * 快照 VO（下单时刻的工厂+商品信息）。
      * 来自 procurement_snapshot 表，不随实时数据变化。

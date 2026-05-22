@@ -91,6 +91,10 @@ public class OrderChainUseCase {
                 .step2Status(v.getStep2Status())
                 .step3Status(v.getStep3Status())
                 .step4Status(v.getStep4Status())
+                .procurementPriceRmb(v.getProcurementPriceRmb() != null ? v.getProcurementPriceRmb().toPlainString() : null)
+                .procurementTaxPoint(v.getProcurementTaxPoint() != null ? v.getProcurementTaxPoint().toPlainString() : null)
+                .procurementBillingType(v.getProcurementBillingType())
+                .procurementCreateBy(v.getProcurementCreateBy())
                 .build();
     }
 

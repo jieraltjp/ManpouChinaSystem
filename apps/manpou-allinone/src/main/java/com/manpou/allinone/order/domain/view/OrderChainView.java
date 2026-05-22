@@ -133,6 +133,9 @@ public class OrderChainView {
     @Column(name = "procurement_create_time")
     private LocalDateTime procurementCreateTime;
 
+    @Column(name = "procurement_create_by")
+    private String procurementCreateBy;
+
     // ====== 工厂快照（来自 procurement_snapshot，下单时刻不变）======
     @Column(name = "snapshot_factory_id")
     private Long snapshotFactoryId;

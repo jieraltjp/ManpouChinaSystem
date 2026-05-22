@@ -81,7 +81,6 @@
         </div>
       </template>
       <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
-        <el-table-column prop="qcCode" :label="$t('inspection.column.qcCode')" min-width="160" />
         <el-table-column :label="$t('inspection.column.shipmentBatchId')" min-width="150" align="center">
           <template #default="{ row }">
             <span v-if="row.batchCode" class="product-code">{{ row.batchCode }}</span>
@@ -526,7 +525,6 @@ const formRules: FormRules = {
 }
 
 const copyColumns: ExcelColDef[] = [
-  { prop: 'qcCode', label: t('inspection.column.qcCode') },
   { prop: 'batchCode', label: t('inspection.column.shipmentBatchId'), formatter: (row) => row.batchCode || (row.shipmentBatchId ? String(row.shipmentBatchId) : '') },
   { prop: 'productCode', label: t('inspection.column.productCode'), formatter: (row) => row.productCode },
   { prop: 'subProductCode', label: t('inspection.column.subProductCode'), formatter: (row) => row.subProductCode || '' },

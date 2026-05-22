@@ -10,7 +10,7 @@
     "procurement-all": "発注管理",
     "demand": "01 補充需要",
     "procurement": "02 発注書",
-    "shipmentBatch": "03 出荷バッチ",
+    "shipmentBatch": "03 メーカー出荷",
     "qcRecord": "04 検品記録",
     "logisticsPlan": "05 配送計画",
     "consolidationPool": "05 コンソリ池",
@@ -632,13 +632,17 @@
     "column": {
       "planCode": "配送番号",
       "containerNo": "コンテナ番号",
+      "customsClearanceNo": "通関番号",
       "qcCode": "検査番号",
       "factoryName": "関連工場",
       "productCode": "品番",
+      "quantity": "数量",
       "subProductCode": "枝番",
       "planType": "配送タイプ",
       "cargoWeightKg": "貨物重量",
+      "totalWeight": "総重量",
       "cargoVolumeCbm": "容積",
+      "totalVolume": "総容積",
       "requiresQc": "検品要",
       "status": "ステータス",
       "action": "操作",
@@ -694,11 +698,19 @@
       "remarks": "備考",
       "remarksPlaceholder": "備考情報",
       "cargoDimension": "貨物サイズ",
+      "createBy": "作成者",
       "createTime": "作成日時",
       "updateTime": "更新日時",
       "datePlaceholder": "日付を選択",
       "cancel": "キャンセル",
       "save": "保存"
+    },
+    "drawer": {
+      "cargoDimension": "貨物サイズ",
+      "estimatedShipDate": "予定出荷日",
+      "actualShipDate": "実際出荷日",
+      "totalWeight": "総重量(kg)",
+      "totalVolume": "総容積(m³)"
     },
     "drawerTitle": "配送詳細",
     "validation": {
@@ -1230,7 +1242,11 @@
       "linkedProcurementId": "関連発注書",
       "demandCreateTime": "作成日時",
       "createTime": "作成日時",
-      "imageUrl": "商品画像"
+      "imageUrl": "商品画像",
+      "priceRmb": "単価",
+      "taxPoint": "インボイス",
+      "customsType": "通関",
+      "procurementCreateBy": "仕入担当"
     },
     "step": {
       "1": "需要",
@@ -1501,6 +1517,7 @@
     "newDialogTitle": "コンテナ一括通関書類作成",
     "drawerTitle": "通関書類詳細",
     "rejectDialogTitle": "通関書類却下",
+    "editDialogTitle": "通関書類編集",
     "stat": {
       "total": "通関書類総数",
       "pending": "未提出",

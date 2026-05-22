@@ -124,7 +124,7 @@
         <el-table-column :label="$t('customs.column.action')" min-width="200" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
-            <el-button v-if="hasPermission('customs:update')" link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('common.edit') }}</el-button>
+            <el-button v-if="hasPermission('customs:update')" link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('common.edit') }}</el-button>
             <el-button v-if="hasPermission('customs:delete')" link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
             <template v-if="row.status === 'PENDING'">
               <el-button v-if="hasPermission('customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-submit'" @click.stop="onSubmit(row)">{{ $t('customs.action.submit') }}</el-button>
@@ -189,7 +189,7 @@
             <el-table-column :label="$t('customs.column.action')" min-width="180" align="center">
               <template #default="{ row }">
                 <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('customs.action.detail') }}</el-button>
-                <el-button v-if="hasPermission('customs:update')" link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('common.edit') }}</el-button>
+                <el-button v-if="hasPermission('customs:update')" link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('common.edit') }}</el-button>
                 <el-button v-if="hasPermission('customs:delete')" link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
                 <template v-if="row.status === 'PENDING'">
                   <el-button v-if="hasPermission('customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-submit'" @click.stop="onSubmit(row)">{{ $t('customs.action.submit') }}</el-button>

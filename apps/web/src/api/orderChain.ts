@@ -29,6 +29,10 @@ export interface OrderChainVO {
   step2Status: string
   step3Status: string
   step4Status: string
+  procurementPriceRmb?: string
+  procurementTaxPoint?: string
+  procurementBillingType?: string
+  procurementCreateBy?: string
 }
 
 export interface SnapshotVO {

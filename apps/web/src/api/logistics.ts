@@ -74,6 +74,9 @@ export interface LogisticsPlanVO {
   requiresQc?: boolean
   containerId?: number
   poolId?: number
+  customsClearanceNo?: string     // 通关单号（v2.0）
+  totalWeightKg?: number         // 货物总重量(kg)（v2.0）
+  totalVolumeCbm?: number        // 货物总体积(m³)（v2.0）
   estimatedShipDate?: string
   actualShipDate?: string
   remarks?: string
@@ -122,6 +125,9 @@ export interface UpdateLogisticsPlanRequest {
   requiresQc?: boolean
   containerId?: number
   poolId?: number
+  customsClearanceNo?: string   // 通关单号（v2.0）
+  totalWeightKg?: number      // 货物总重量(kg)（v2.0）
+  totalVolumeCbm?: number     // 货物总体积(m³)（v2.0）
   estimatedShipDate?: string
   actualShipDate?: string
   remarks?: string

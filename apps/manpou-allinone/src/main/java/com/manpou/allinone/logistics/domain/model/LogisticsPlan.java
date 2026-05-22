@@ -92,6 +92,15 @@ public class LogisticsPlan extends BaseEntity {
     @Column(name = "remarks", length = 512)
     private String remarks;               // 备注
 
+    @Column(name = "customs_clearance_no", length = 64)
+    private String customsClearanceNo;    // 通关单号（v2.0）
+
+    @Column(name = "total_weight_kg", precision = 12, scale = 4)
+    private BigDecimal totalWeightKg;     // 货物总重量(kg)（v2.0）
+
+    @Column(name = "total_volume_cbm", precision = 12, scale = 4)
+    private BigDecimal totalVolumeCbm;    // 货物总体积(m³)（v2.0）
+
     private static final BigDecimal CM3_TO_M3 = new BigDecimal("1000000");
 
     // ===== 领域方法 =====

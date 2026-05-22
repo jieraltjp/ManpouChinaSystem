@@ -46,12 +46,13 @@
         <!-- 商品图片 -->
         <el-table-column :label="$t('orderOverview.column.imageUrl')" width="70" align="center">
           <template #default="{ row }">
-            <img
+            <el-image
               v-if="productImageMap[row.demandProductCode]"
               :src="productImageMap[row.demandProductCode]"
-              class="product-thumb"
-              loading="lazy"
-              @error="e => (e.target as HTMLImageElement).style.display='none'"
+              fit="cover"
+              style="width:40px;height:40px;border-radius:6px;border:1px solid #e0e6ed;cursor:pointer"
+              :preview-src-list="[productImageMap[row.demandProductCode]]"
+              preview-teleported
             />
             <span v-else class="no-image">—</span>
           </template>
@@ -74,6 +75,35 @@
         <el-table-column prop="demandDestination" :label="$t('orderOverview.column.destination')" min-width="110">
           <template #default="{ row }">
             {{ row.demandDestination || '—' }}
+          </template>
+        </el-table-column>
+        <!-- 单价 -->
+        <el-table-column :label="$t('orderOverview.column.priceRmb')" min-width="90" align="right">
+          <template #default="{ row }">
+            <span v-if="row.procurementPriceRmb" class="money">¥{{ Number(row.procurementPriceRmb).toFixed(2) }}</span>
+            <span v-else>—</span>
+          </template>
+        </el-table-column>
+        <!-- 票点 -->
+        <el-table-column :label="$t('orderOverview.column.taxPoint')" min-width="70" align="center">
+          <template #default="{ row }">
+            <span v-if="row.procurementTaxPoint">{{ Number(row.procurementTaxPoint).toFixed(1) }}%</span>
+            <span v-else>—</span>
+          </template>
+        </el-table-column>
+        <!-- 报关类型 -->
+        <el-table-column :label="$t('orderOverview.column.customsType')" min-width="80" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.procurementBillingType === 'CHAO_HUI_TUI_SHUI' ? 'success' : 'warning'" size="small">
+              {{ customsTypeLabel(row.procurementBillingType) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <!-- 采购人 -->
+        <el-table-column :label="$t('orderOverview.column.procurementCreateBy')" min-width="90" align="center">
+          <template #default="{ row }">
+            <span v-if="row.procurementCreateBy" class="text-secondary">{{ row.procurementCreateBy }}</span>
+            <span v-else>—</span>
           </template>
         </el-table-column>
         <!-- 状态 -->
@@ -133,9 +163,14 @@
           <el-descriptions-item :label="$t('orderOverview.step2.productCode')">{{ detailData.procurement.productCode || '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.subProductCode')">{{ detailData.procurement.subProductCode || '-' }}</el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.imageUrl')">
-            <a v-if="detailImageUrl" :href="detailImageUrl" target="_blank">
-              <img :src="detailImageUrl" class="drawer-product-thumb" />
-            </a>
+            <el-image
+              v-if="detailImageUrl"
+              :src="detailImageUrl"
+              fit="contain"
+              style="max-width:200px;max-height:200px;border-radius:8px;border:1px solid #e0e6ed;cursor:pointer"
+              :preview-src-list="[detailImageUrl]"
+              preview-teleported
+            />
             <span v-else>—</span>
           </el-descriptions-item>
           <el-descriptions-item :label="$t('orderOverview.step2.quantity')">{{ detailData.procurement.quantity ?? '-' }}</el-descriptions-item>
@@ -262,9 +297,13 @@ const excelViewMode = ref<'table' | 'copy'>('table')
 const copyColumns: ExcelColDef[] = [
   { prop: 'demandProductCode', label: t('orderOverview.column.productCode') },
   { prop: 'demandSubProductCode', label: t('orderOverview.column.subProductCode') },
-  { prop: 'snapshot.factoryName', label: t('orderOverview.column.factoryName') },
+  { prop: 'snapshot.factoryName', label: t('orderOverview.column.factoryName'), formatter: (row: OrderChainVO) => (row as any).snapshot?.factoryName ?? '' },
   { prop: 'demandQuantity', label: t('orderOverview.column.quantity') },
   { prop: 'demandDestination', label: t('orderOverview.column.destination') },
+  { prop: 'procurementPriceRmb', label: t('orderOverview.column.priceRmb'), formatter: (row: OrderChainVO) => row.procurementPriceRmb ? `¥${Number(row.procurementPriceRmb).toFixed(2)}` : '' },
+  { prop: 'procurementTaxPoint', label: t('orderOverview.column.taxPoint'), formatter: (row: OrderChainVO) => row.procurementTaxPoint ? `${Number(row.procurementTaxPoint).toFixed(1)}%` : '' },
+  { prop: 'procurementBillingType', label: t('orderOverview.column.customsType'), formatter: (row: OrderChainVO) => customsTypeLabel(row.procurementBillingType) },
+  { prop: 'procurementCreateBy', label: t('orderOverview.column.procurementCreateBy') },
   { prop: 'status', label: t('orderOverview.column.status'), formatter: (row: OrderChainVO) => chainStatusLabel(row) },
   { prop: 'action', label: t('orderOverview.column.action'), excluded: true },
 ]
@@ -290,6 +329,11 @@ function demandTypeLabel(val: string | undefined): string {
 function billingTypeLabel(val: string | undefined): string {
   if (!val) return '-'
   return t(`order.billingType.${val}` as any, { default: val })
+}
+
+function customsTypeLabel(val: string | undefined): string {
+  if (!val) return '-'
+  return val === 'CHAO_HUI_TUI_SHUI' ? '超慧退税' : '杂货'
 }
 
 function statusLabelByValue(val: string | undefined): string {

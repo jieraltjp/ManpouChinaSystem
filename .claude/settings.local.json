@@ -274,7 +274,22 @@
       "Bash(keytool *)",
       "Bash(echo \"allinone PID: $!\")",
       "Bash(echo \"restarted PID: $!\")",
-      "Bash(export PYTHONIOENCODING=utf-8)"
+      "Bash(export PYTHONIOENCODING=utf-8)",
+      "Bash(py *)",
+      "Bash(iconv -f utf-8 -t utf-8)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(D:/Programme/java/ManpouChinaSystem/scripts/start-all.bat all *)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(where npm *)",
+      "Bash(cygpath -w /c/nvm4w/nodejs/npm)",
+      "Bash(echo \"C:\\\\\\\\nvm4w\\\\\\\\nodejs\\\\\\\\npm.cmd\")",
+      "Bash(/d/Soft/laragon/bin/mysql/mysql-5.7.44-winx64/bin/mysql.exe *)",
+      "Bash(/d/Soft/laragon/bin/mysql/mysql-8.0.30-winx64/bin/mysql.exe *)",
+      "Bash(\"/c/xampp/mysql/bin/mysql\" -h 192.168.13.202 -P 23306 -u root -pmanpou23306 manpou -e \"SHOW CREATE TABLE qc_record\\\\G\")",
+      "Bash(npm search *)",
+      "Bash(xargs -r taskkill //F //PID sleep 2)",
+      "Bash(xargs cat *)",
+      "Bash(pageSize=1 2>&1)"
     ]
   },
   "enabledPlugins": {}

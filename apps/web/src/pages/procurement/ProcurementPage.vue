@@ -106,12 +106,13 @@
         </el-table-column>
         <el-table-column :label="$t('product.drawer.imageUrl')" width="70" align="center">
           <template #default="{ row }">
-            <img
+            <el-image
               v-if="productImageMap[row.productCode]"
               :src="productImageMap[row.productCode]"
-              class="product-thumb"
-              loading="lazy"
-              @error="e => (e.target as HTMLImageElement).style.display='none'"
+              fit="cover"
+              style="width:40px;height:40px;border-radius:6px;border:1px solid #e0e6ed;cursor:pointer"
+              :preview-src-list="[productImageMap[row.productCode]]"
+              preview-teleported
             />
             <span v-else class="no-image">—</span>
           </template>
@@ -201,9 +202,14 @@
         <el-descriptions-item :label="$t('order.drawer.subProductCode')">{{ currentRow.subProductCode || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.category')">{{ getCategoryLabel(currentRow.productCode) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('product.drawer.imageUrl')" :span="2">
-          <a v-if="productImageMap[currentRow.productCode]" :href="productImageMap[currentRow.productCode]" target="_blank">
-            <img :src="productImageMap[currentRow.productCode]" class="drawer-product-thumb" />
-          </a>
+          <el-image
+            v-if="productImageMap[currentRow.productCode]"
+            :src="productImageMap[currentRow.productCode]"
+            fit="contain"
+            style="max-width:200px;max-height:200px;border-radius:8px;border:1px solid #e0e6ed;cursor:pointer"
+            :preview-src-list="[productImageMap[currentRow.productCode]]"
+            preview-teleported
+          />
           <span v-else>—</span>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.quantity')">{{ currentRow.quantity }}</el-descriptions-item>

@@ -48,4 +48,8 @@ public class LogisticsPlanCreateCmd {
 
     @Length(max = 512)
     private String remarks;               // 备注
+
+    private BigDecimal totalWeightKg;     // 货物总重量(kg)（v2.0）
+
+    private BigDecimal totalVolumeCbm;    // 货物总体积(m³)（v2.0）
 }

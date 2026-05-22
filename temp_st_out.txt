@@ -1,0 +1,37 @@
+
+=== docker pull ghcr.io/sillytavern/sillytavern:latest 2>&1 ===
+latest: Pulling from sillytavern/sillytavern
+fe59b58b7ba5: Pulling fs layer
+6a0ac1617861: Pulling fs layer
+a79331c7983b: Pulling fs layer
+b6d890cffc23: Pulling fs layer
+68ee36788587: Pulling fs layer
+d148970132be: Pulling fs layer
+61fc24e7dd0d: Pulling fs layer
+3eebacc30b80: Pulling fs layer
+8c9d18d4b852: Pulling fs layer
+d7319775d025: Pulling fs layer
+1ba15d4bb83a: Pulling fs layer
+0e4c304ad78c: Pulling fs layer
+c8e27e2e66a5: Pulling fs layer
+61fc24e7dd0d: Download complete
+fe59b58b7ba5: Download complete
+1ba15d4bb83a: Download complete
+a79331c7983b: Download complete
+b6d890cffc23: Download complete
+0e4c304ad78c: Download complete
+3eebacc30b80: Download complete
+fa2eb3a13744: Download complete
+6a0ac1617861: Download complete
+6a0ac1617861: Pull complete
+8c9d18d4b852: Download complete
+c8e27e2e66a5: Download complete
+d7319775d025: Download complete
+3eebacc30b80: Pull complete
+d7319775d025: Pull complete
+1ba15d4bb83a: Pull complete
+b6d890cffc23: Pull complete
+0e4c304ad78c: Pull complete
+c8e27e2e66a5: Pull complete
+68ee36788587: Download complete
+68ee36788587: Pull complete

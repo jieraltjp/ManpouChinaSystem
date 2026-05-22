@@ -10,7 +10,7 @@
     "procurement-all": "发注管理",
     "demand": "01 补货需求",
     "procurement": "02 发注单",
-    "shipmentBatch": "03 出货批次",
+    "shipmentBatch": "03 厂家出货",
     "qcRecord": "04 验货记录",
     "logisticsPlan": "05 调配计划",
     "consolidationPool": "05 拼柜池",
@@ -682,13 +682,17 @@
     "column": {
       "planCode": "调配编号",
       "containerNo": "货柜号",
+      "customsClearanceNo": "通关单号",
       "qcCode": "验货编号",
       "factoryName": "关联工厂",
       "productCode": "货号",
+      "quantity": "数量",
       "subProductCode": "子货号",
       "planType": "调配类型",
       "cargoWeightKg": "货物重量",
+      "totalWeight": "总重量",
       "cargoVolumeCbm": "体积",
+      "totalVolume": "总体积",
       "requiresQc": "需要检测",
       "status": "状态",
       "action": "操作",
@@ -744,11 +748,19 @@
       "remarks": "备注",
       "remarksPlaceholder": "备注信息",
       "cargoDimension": "货物尺寸",
+      "createBy": "创建人",
       "createTime": "创建时间",
       "updateTime": "更新时间",
       "datePlaceholder": "选择日期",
       "cancel": "取消",
       "save": "保存"
+    },
+    "drawer": {
+      "cargoDimension": "货物尺寸",
+      "estimatedShipDate": "预计发货日期",
+      "actualShipDate": "实际发货日期",
+      "totalWeight": "货物总重量(kg)",
+      "totalVolume": "总体积(m³)"
     },
     "drawerTitle": "调配详情",
     "validation": {
@@ -1280,7 +1292,11 @@
       "linkedProcurementId": "关联发注单",
       "demandCreateTime": "创建时间",
       "createTime": "创建时间",
-      "imageUrl": "商品图片"
+      "imageUrl": "商品图片",
+      "priceRmb": "单价",
+      "taxPoint": "票点",
+      "customsType": "报关",
+      "procurementCreateBy": "采购人"
     },
     "step": {
       "1": "需求",
@@ -1548,6 +1564,7 @@
     "newDialogTitle": "按货柜批量创建报关单",
     "drawerTitle": "报关单详情",
     "rejectDialogTitle": "驳回报关单",
+    "editDialogTitle": "编辑报关单",
     "stat": {
       "total": "报关单总数",
       "pending": "待提交",

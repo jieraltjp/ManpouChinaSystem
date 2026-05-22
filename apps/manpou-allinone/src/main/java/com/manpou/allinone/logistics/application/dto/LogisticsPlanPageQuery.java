@@ -34,9 +34,18 @@ public class LogisticsPlanPageQuery {
     private Boolean requiresQc;
     private Long containerId;
     private Long poolId;
+    // 来自 Container 的总计（装柜后有效）
+    private BigDecimal containerTotalCbm;
+    private BigDecimal containerTotalWeightKg;
+    // 来自 ConsolidationPool 的总计（拼柜中有效）
+    private BigDecimal poolTotalCbm;
+    private BigDecimal poolTotalWeightKg;
     private LocalDate estimatedShipDate;
     private LocalDate actualShipDate;
     private String remarks;
+    private String customsClearanceNo;  // 通关单号（v2.0）
+    private BigDecimal totalWeightKg;   // 货物总重量(kg)（v2.0）
+    private BigDecimal totalVolumeCbm;  // 货物总体积(m³)（v2.0）
     private String createBy;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

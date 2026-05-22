@@ -5,7 +5,11 @@ import com.manpou.allinone.common.port.QcQueryPort;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanCreateCmd;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanPageQuery;
 import com.manpou.allinone.logistics.application.dto.LogisticsPlanUpdateCmd;
+import com.manpou.allinone.logistics.domain.model.Container;
+import com.manpou.allinone.logistics.domain.model.ConsolidationPool;
 import com.manpou.allinone.logistics.domain.model.LogisticsPlan;
+import com.manpou.allinone.logistics.domain.repository.ContainerRepository;
+import com.manpou.allinone.logistics.domain.repository.ConsolidationPoolRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -17,10 +21,15 @@ public class LogisticsPlanAssembler {
 
     private final FactoryQueryPort factoryQueryPort;
     private final QcQueryPort qcQueryPort;
+    private final ContainerRepository containerRepository;
+    private final ConsolidationPoolRepository consolidationPoolRepository;
 
-    public LogisticsPlanAssembler(FactoryQueryPort factoryQueryPort, QcQueryPort qcQueryPort) {
+    public LogisticsPlanAssembler(FactoryQueryPort factoryQueryPort, QcQueryPort qcQueryPort,
+            ContainerRepository containerRepository, ConsolidationPoolRepository consolidationPoolRepository) {
         this.factoryQueryPort = factoryQueryPort;
         this.qcQueryPort = qcQueryPort;
+        this.containerRepository = containerRepository;
+        this.consolidationPoolRepository = consolidationPoolRepository;
     }
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -67,9 +76,30 @@ public class LogisticsPlanAssembler {
                 .requiresQc(entity.getRequiresQc())
                 .containerId(entity.getContainerId())
                 .poolId(entity.getPoolId())
+                // 来自 Container 的总计（装柜后有效）
+                .containerTotalCbm(entity.getContainerId() != null
+                        ? containerRepository.findByIdAndDeletedIsFalse(entity.getContainerId())
+                                .map(Container::getTotalCbm).orElse(null)
+                        : null)
+                .containerTotalWeightKg(entity.getContainerId() != null
+                        ? containerRepository.findByIdAndDeletedIsFalse(entity.getContainerId())
+                                .map(Container::getTotalWeightKg).orElse(null)
+                        : null)
+                // 来自 ConsolidationPool 的总计（拼柜中有效）
+                .poolTotalCbm(entity.getPoolId() != null
+                        ? consolidationPoolRepository.findByIdAndDeletedIsFalse(entity.getPoolId())
+                                .map(ConsolidationPool::getTotalCbm).orElse(null)
+                        : null)
+                .poolTotalWeightKg(entity.getPoolId() != null
+                        ? consolidationPoolRepository.findByIdAndDeletedIsFalse(entity.getPoolId())
+                                .map(ConsolidationPool::getTotalWeightKg).orElse(null)
+                        : null)
                 .estimatedShipDate(entity.getEstimatedShipDate())
                 .actualShipDate(entity.getActualShipDate())
                 .remarks(entity.getRemarks())
+                .customsClearanceNo(entity.getCustomsClearanceNo())
+                .totalWeightKg(entity.getTotalWeightKg())
+                .totalVolumeCbm(entity.getTotalVolumeCbm())
                 .createBy(entity.getCreateBy())
                 .createTime(entity.getCreateTime())
                 .updateTime(entity.getUpdateTime())
@@ -100,6 +130,8 @@ public class LogisticsPlanAssembler {
         if (cmd.getEstimatedShipDate() != null) entity.setEstimatedShipDate(cmd.getEstimatedShipDate());
         if (cmd.getActualShipDate() != null) entity.setActualShipDate(cmd.getActualShipDate());
         if (cmd.getRemarks() != null) entity.setRemarks(cmd.getRemarks());
+        if (cmd.getTotalWeightKg() != null) entity.setTotalWeightKg(cmd.getTotalWeightKg());
+        if (cmd.getTotalVolumeCbm() != null) entity.setTotalVolumeCbm(cmd.getTotalVolumeCbm());
     }
 
     public void copyUpdate(LogisticsPlanUpdateCmd cmd, LogisticsPlan entity) {
@@ -119,6 +151,9 @@ public class LogisticsPlanAssembler {
         if (cmd.getEstimatedShipDate() != null) entity.setEstimatedShipDate(cmd.getEstimatedShipDate());
         if (cmd.getActualShipDate() != null) entity.setActualShipDate(cmd.getActualShipDate());
         if (cmd.getRemarks() != null) entity.setRemarks(cmd.getRemarks());
+        if (cmd.getCustomsClearanceNo() != null) entity.setCustomsClearanceNo(cmd.getCustomsClearanceNo());
+        if (cmd.getTotalWeightKg() != null) entity.setTotalWeightKg(cmd.getTotalWeightKg());
+        if (cmd.getTotalVolumeCbm() != null) entity.setTotalVolumeCbm(cmd.getTotalVolumeCbm());
         if (cmd.getCargoLengthCm() != null || cmd.getCargoWidthCm() != null || cmd.getCargoHeightCm() != null) {
             entity.calculateVolume();
         }

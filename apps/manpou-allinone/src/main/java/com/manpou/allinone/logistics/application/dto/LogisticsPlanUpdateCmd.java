@@ -44,4 +44,11 @@ public class LogisticsPlanUpdateCmd {
 
     @Length(max = 512)
     private String remarks;
+
+    @Length(max = 64)
+    private String customsClearanceNo;    // 通关单号（v2.0）
+
+    private BigDecimal totalWeightKg;     // 货物总重量(kg)（v2.0）
+
+    private BigDecimal totalVolumeCbm;   // 货物总体积(m³)（v2.0）
 }

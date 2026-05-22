@@ -45,6 +45,7 @@ SELECT
   p.status                         AS procurement_status,
   p.return_reason                  AS procurement_return_reason,
   p.create_time                    AS procurement_create_time,
+  p.create_by                      AS procurement_create_by,
 
   -- ====== 工厂快照（来自 procurement_snapshot，下单时刻不变）======
   snap.factory_id                   AS snapshot_factory_id,

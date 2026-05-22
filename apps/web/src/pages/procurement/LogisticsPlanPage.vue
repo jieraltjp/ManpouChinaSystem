@@ -64,9 +64,8 @@
         </div>
       </template>
       <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
-        <el-table-column prop="planCode" :label="$t('logistics.column.planCode')" min-width="160" />
         <el-table-column prop="containerNo" :label="$t('logistics.column.containerNo')" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="qcCode" :label="$t('logistics.column.qcCode')" min-width="130" show-overflow-tooltip />
+        <el-table-column prop="customsClearanceNo" :label="$t('logistics.column.customsClearanceNo')" min-width="130" show-overflow-tooltip />
         <el-table-column prop="factoryName" :label="$t('logistics.column.factoryName')" min-width="140" show-overflow-tooltip />
         <el-table-column :label="$t('logistics.column.productCode')" min-width="130" show-overflow-tooltip>
           <template #default="{ row }">
@@ -88,9 +87,19 @@
             {{ row.cargoWeightKg ? row.cargoWeightKg + $t('common.units.kg') : '' }}
           </template>
         </el-table-column>
+        <el-table-column :label="$t('logistics.column.totalWeight')" min-width="100" align="right">
+          <template #default="{ row }">
+            {{ row.totalWeightKg ? row.totalWeightKg + $t('common.units.kg') : '' }}
+          </template>
+        </el-table-column>
         <el-table-column prop="cargoVolumeCbm" :label="$t('logistics.column.cargoVolumeCbm')" min-width="90" align="right">
           <template #default="{ row }">
             {{ row.cargoVolumeCbm ? row.cargoVolumeCbm.toFixed(4) + $t('common.units.m3') : '' }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('logistics.column.totalVolume')" min-width="90" align="right">
+          <template #default="{ row }">
+            {{ row.totalVolumeCbm ? row.totalVolumeCbm.toFixed(4) + $t('common.units.m3') : '' }}
           </template>
         </el-table-column>
         <el-table-column prop="requiresQc" :label="$t('logistics.column.requiresQc')" min-width="90" align="center">
@@ -107,8 +116,9 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('logistics.column.action')" min-width="180" align="center">
+        <el-table-column :label="$t('logistics.column.action')" min-width="200" align="center">
           <template #default="{ row }">
+            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('logistics.action.detail') }}</el-button>
             <el-button v-if="hasPermission('logistics:update')" link type="warning" size="small" @click.stop="onEdit(row)" :disabled="row.status === 'DELIVERED'">{{ $t('logistics.action.edit') }}</el-button>
             <el-button v-if="hasPermission('logistics:delete')" link type="danger" size="small" @click.stop="onDelete(row)">{{ $t('logistics.action.delete') }}</el-button>
           </template>
@@ -245,6 +255,21 @@
             <el-option value="DELIVERED" :label="$t('logistics.status.DELIVERED')" />
           </el-select>
         </el-form-item>
+        <el-form-item :label="$t('logistics.column.customsClearanceNo')">
+          <el-input v-model="form.customsClearanceNo" :placeholder="$t('logistics.column.customsClearanceNo')" style="width:100%;max-width:300px" />
+        </el-form-item>
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item :label="$t('logistics.column.totalWeight')">
+              <el-input-number v-model="form.totalWeightKg" :min="0" :precision="3" style="width:100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('logistics.column.totalVolume')">
+              <el-input-number v-model="form.totalVolumeCbm" :min="0" :precision="4" style="width:100%" />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item :label="$t('logistics.dialog.remarks')">
           <el-input v-model="form.remarks" type="textarea" :rows="2" :placeholder="$t('logistics.dialog.remarksPlaceholder')" />
         </el-form-item>
@@ -254,6 +279,49 @@
         <el-button type="primary" :loading="submitting" @click="onSubmit">{{ $t('logistics.dialog.save') }}</el-button>
       </template>
     </el-dialog>
+
+    <!-- 详情抽屉 -->
+    <el-drawer v-model="drawerVisible" :title="$t('logistics.action.detail')" size="560px" direction="rtl">
+      <el-descriptions :column="2" border v-if="currentRow">
+        <el-descriptions-item :label="$t('logistics.column.planCode')">
+          <span class="code-badge">{{ currentRow.planCode }}</span>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.containerNo')">{{ currentRow.containerNo ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.customsClearanceNo')">{{ currentRow.customsClearanceNo ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.qcCode')">{{ currentRow.qcCode ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.factoryName')">{{ currentRow.factoryName ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.productCode')">
+          <span class="product-code">{{ currentRow.productCode }}</span>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.subProductCode')">{{ currentRow.subProductCode ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.planType')">
+          <el-tag :type="planTypeTag(currentRow.planType)" size="small">{{ planTypeLabel(currentRow.planType) }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.status')">
+          <el-tag :type="logisticsStatusType(currentRow.status)" size="small">{{ logisticsStatusLabel(currentRow.status) }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.drawer.cargoDimension')" :span="2">
+          {{ currentRow.cargoLengthCm && currentRow.cargoWidthCm && currentRow.cargoHeightCm
+            ? `${currentRow.cargoLengthCm}×${currentRow.cargoWidthCm}×${currentRow.cargoHeightCm} cm`
+            : '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.cargoWeightKg')">{{ currentRow.cargoWeightKg != null ? `${currentRow.cargoWeightKg} ${$t('common.units.kg')}` : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.totalWeight')">{{ currentRow.totalWeightKg != null ? `${currentRow.totalWeightKg} ${$t('common.units.kg')}` : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.cargoVolumeCbm')">{{ currentRow.cargoVolumeCbm != null ? `${currentRow.cargoVolumeCbm.toFixed(4)} ${$t('common.units.m3')}` : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.totalVolume')">{{ currentRow.totalVolumeCbm != null ? `${currentRow.totalVolumeCbm.toFixed(4)} ${$t('common.units.m3')}` : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.quantity')">{{ currentRow.quantity ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.requiresQc')">
+          <el-tag :type="currentRow.requiresQc ? 'warning' : 'success'" size="small">
+            {{ currentRow.requiresQc ? $t('logistics.requiresQc.yes') : $t('logistics.requiresQc.no') }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.drawer.estimatedShipDate')">{{ currentRow.estimatedShipDate ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.drawer.actualShipDate')">{{ currentRow.actualShipDate ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.dialog.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.dialog.createBy')">{{ currentRow.createBy ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.createTime')">{{ currentRow.createTime ?? '-' }}</el-descriptions-item>
+      </el-descriptions>
+    </el-drawer>
   </div>
 </template>
 
@@ -274,6 +342,8 @@ const loading = ref(false)
 const submitting = ref(false)
 const excelViewMode = ref<'table' | 'copy'>('table')
 const dialogVisible = ref(false)
+const drawerVisible = ref(false)
+const currentRow = ref<LogisticsPlanVO | null>(null)
 const qcRecordLoading = ref(false)
 const editId = ref<number | null>(null)
 
@@ -306,6 +376,9 @@ const form = reactive({
   estimatedShipDate: '',
   actualShipDate: '',
   remarks: '',
+  customsClearanceNo: '',
+  totalWeightKg: undefined as number | undefined,
+  totalVolumeCbm: undefined as number | undefined,
   status: undefined as LogisticsStatus | undefined,
 })
 
@@ -316,9 +389,7 @@ const formRules: FormRules = {
 }
 
 const copyColumns: ExcelColDef[] = [
-  { prop: 'planCode', label: t('logistics.column.planCode') },
   { prop: 'containerNo', label: t('logistics.column.containerNo') },
-  { prop: 'qcCode', label: t('logistics.column.qcCode') },
   { prop: 'factoryName', label: t('logistics.column.factoryName') },
   { prop: 'productCode', label: t('logistics.column.productCode') },
   { prop: 'subProductCode', label: t('logistics.column.subProductCode') },
@@ -426,6 +497,8 @@ function onNew() {
     cargoWeightKg: 0, quantity: 0,
     requiresQc: false,
     estimatedShipDate: '', actualShipDate: '', remarks: '',
+    customsClearanceNo: '',
+    totalWeightKg: undefined, totalVolumeCbm: undefined,
   })
   qcRecordOptions.value = []
   editId.value = null
@@ -452,6 +525,9 @@ async function onSubmit() {
         estimatedShipDate: form.estimatedShipDate || undefined,
         actualShipDate: form.actualShipDate || undefined,
         remarks: form.remarks || undefined,
+        customsClearanceNo: form.customsClearanceNo || undefined,
+        totalWeightKg: form.totalWeightKg || undefined,
+        totalVolumeCbm: form.totalVolumeCbm || undefined,
         status: form.status,
       }
       await logisticsApi.update(editId.value, payload)
@@ -485,6 +561,11 @@ async function onSubmit() {
   } finally {
     submitting.value = false
   }
+}
+
+function onView(row: LogisticsPlanVO) {
+  currentRow.value = row
+  drawerVisible.value = true
 }
 
 async function onEdit(row: LogisticsPlanVO) {
@@ -521,6 +602,9 @@ async function onEdit(row: LogisticsPlanVO) {
     estimatedShipDate: row.estimatedShipDate || '',
     actualShipDate: row.actualShipDate || '',
     remarks: row.remarks || '',
+    customsClearanceNo: row.customsClearanceNo || '',
+    totalWeightKg: row.totalWeightKg ?? undefined,
+    totalVolumeCbm: row.totalVolumeCbm ?? undefined,
     status: row.status,
   })
   // 直接设置 qcRecordId，列表加载后 el-select 即可正确显示（列表已包含该记录）
