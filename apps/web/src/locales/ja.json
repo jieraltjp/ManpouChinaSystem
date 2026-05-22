@@ -1437,6 +1437,7 @@
     "reset": "リセット",
     "cancel": "キャンセル",
     "save": "保存",
+    "select": "選択",
     "confirm": "確認",
     "delete": "削除",
     "edit": "編集",
@@ -1500,7 +1501,8 @@
     "viewMode": {
       "table": "テーブル表示",
       "excel": "Excel表示"
-    }
+    },
+    "detail": "詳細"
   },
   "excel": {
     "selectTip": "文字を選択後に Ctrl+C でコピー、または上のボタンで表全体をコピー",
@@ -1622,6 +1624,7 @@
     "drawerTitle": "通関詳細",
     "completeDialogTitle": "通関完了",
     "failDialogTitle": "通関失敗をマーク",
+    "editDialogTitle": "通関記録を編集",
     "stat": {
       "total": "通関書類総数",
       "pending": "未通関",
@@ -1722,6 +1725,7 @@
       "startSuccess": "通関を開始しました",
       "completeSuccess": "通関が完了しました",
       "failSuccess": "失敗をマークしました",
+      "updateSuccess": "更新しました",
       "deleteSuccess": "削除しました",
       "actionFailed": "操作に失敗しました",
       "deleteConfirm": "この通関記録を削除しますか？",
@@ -1927,7 +1931,11 @@
       "status": "ステータス",
       "remarks": "備考",
       "createBy": "作成者",
-      "createTime": "作成日時"
+      "createTime": "作成日時",
+      "qcRecordCount": "検査記録数",
+      "totalPassedCount": "合格数",
+      "updateBy": "更新者",
+      "updateTime": "更新日時"
     },
     "status": {
       "待验货": "検査待ち",
@@ -1936,6 +1944,7 @@
       "已取消": "キャンセル済"
     },
     "dialog": {
+      "selectProcurement": "発注を選択",
       "createTitle": "新規出荷バッチ",
       "editTitle": "出荷バッチ編集",
       "procurementId": "発注番号",
@@ -1958,6 +1967,9 @@
       "deleteSuccess": "出荷バッチを削除しました",
       "deleteConfirm": "出荷バッチ「{batchCode}」を削除しますか？",
       "deleteConfirmTitle": "削除確認"
+    },
+    "drawer": {
+      "title": "出荷詳細"
     }
   },
   "user": {

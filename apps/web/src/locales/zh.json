@@ -494,7 +494,11 @@
       "status": "状态",
       "remarks": "备注",
       "createBy": "创建人",
-      "createTime": "创建时间"
+      "createTime": "创建时间",
+      "qcRecordCount": "验货记录数",
+      "totalPassedCount": "合格数",
+      "updateBy": "更新人",
+      "updateTime": "更新时间"
     },
     "status": {
       "待验货": "待验货",
@@ -503,6 +507,7 @@
       "已取消": "已取消"
     },
     "dialog": {
+      "selectProcurement": "选择采购单",
       "createTitle": "新规出货批次",
       "editTitle": "编辑出货批次",
       "procurementId": "采购单号",
@@ -525,6 +530,9 @@
       "deleteSuccess": "出货批次删除成功",
       "deleteConfirm": "确认删除出货批次「{batchCode}」？",
       "deleteConfirmTitle": "删除确认"
+    },
+    "drawer": {
+      "title": "出货详情"
     }
   },
   "inspection": {
@@ -1487,6 +1495,7 @@
     "reset": "重置",
     "cancel": "取消",
     "save": "保存",
+    "select": "选择",
     "confirm": "确认",
     "delete": "删除",
     "edit": "编辑",
@@ -1550,7 +1559,8 @@
     "viewMode": {
       "table": "表格视图",
       "excel": "Excel视图"
-    }
+    },
+    "detail": "详情"
   },
   "excel": {
     "selectTip": "选中文字后 Ctrl+C 复制，或点击上方按钮整表复制",
@@ -1669,6 +1679,7 @@
     "drawerTitle": "清关详情",
     "completeDialogTitle": "完成清关",
     "failDialogTitle": "标记清关失败",
+    "editDialogTitle": "编辑清关记录",
     "stat": {
       "total": "清关单总数",
       "pending": "待清关",
@@ -1763,6 +1774,7 @@
       "startSuccess": "开始清关成功",
       "completeSuccess": "清关完成",
       "failSuccess": "已标记失败",
+      "updateSuccess": "更新成功",
       "deleteSuccess": "删除成功",
       "actionFailed": "操作失败，请重试",
       "deleteConfirm": "确定删除该清关记录吗？"

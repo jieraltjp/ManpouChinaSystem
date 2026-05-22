@@ -130,9 +130,10 @@
             <el-tag :type="statusTagType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('japanCustoms.column.action')" min-width="200" align="center">
+        <el-table-column :label="$t('japanCustoms.column.action')" min-width="240" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('japanCustoms.action.detail') }}</el-button>
+            <el-button v-if="row.status !== 'CLEARED' && row.status !== 'FAILED' && hasPermission('japan_customs:update')" link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('common.edit') }}</el-button>
             <template v-if="row.status === 'PENDING'">
               <el-button v-if="hasPermission('japan_customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-start'" @click.stop="onStart(row)">{{ $t('japanCustoms.action.start') }}</el-button>
               <el-button v-if="hasPermission('japan_customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
@@ -140,6 +141,7 @@
             <template v-else-if="row.status === 'IN_PROGRESS'">
               <el-button v-if="hasPermission('japan_customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('japanCustoms.action.complete') }}</el-button>
               <el-button v-if="hasPermission('japan_customs:update')" link type="danger" size="small" :loading="actionLoading === row.id + '-fail'" @click.stop="onFail(row)">{{ $t('japanCustoms.action.fail') }}</el-button>
+              <el-button v-if="hasPermission('japan_customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
             </template>
           </template>
         </el-table-column>
@@ -205,9 +207,10 @@
                 <el-tag :type="statusTagType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('japanCustoms.column.action')" min-width="200" align="center">
+            <el-table-column :label="$t('japanCustoms.column.action')" min-width="240" align="center">
               <template #default="{ row }">
                 <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('japanCustoms.action.detail') }}</el-button>
+                <el-button v-if="row.status !== 'CLEARED' && row.status !== 'FAILED' && hasPermission('japan_customs:update')" link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('common.edit') }}</el-button>
                 <template v-if="row.status === 'PENDING'">
                   <el-button v-if="hasPermission('japan_customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-start'" @click.stop="onStart(row)">{{ $t('japanCustoms.action.start') }}</el-button>
                   <el-button v-if="hasPermission('japan_customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
@@ -215,6 +218,7 @@
                 <template v-else-if="row.status === 'IN_PROGRESS'">
                   <el-button v-if="hasPermission('japan_customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-complete'" @click.stop="onComplete(row)">{{ $t('japanCustoms.action.complete') }}</el-button>
                   <el-button v-if="hasPermission('japan_customs:update')" link type="danger" size="small" :loading="actionLoading === row.id + '-fail'" @click.stop="onFail(row)">{{ $t('japanCustoms.action.fail') }}</el-button>
+                  <el-button v-if="hasPermission('japan_customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
                 </template>
               </template>
             </el-table-column>
@@ -272,7 +276,7 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.clearanceDate')">{{ currentRow.clearanceDate ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('japanCustoms.column.createBy')">{{ currentRow.createBy || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('japanCustoms.column.createBy')">{{ $userNameMap?.[currentRow.createBy] || currentRow.createBy || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('japanCustoms.column.createTime')">{{ formatTime(currentRow.createTime) }}</el-descriptions-item>
       </el-descriptions>
     </el-drawer>
@@ -306,6 +310,43 @@
       <template #footer>
         <el-button @click="failDialogVisible = false">{{ $t('common.cancel') }}</el-button>
         <el-button type="danger" :loading="actionLoading.startsWith('fail-')" @click="onFailConfirm">{{ $t('common.confirm') }}</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 编辑弹窗 -->
+    <el-dialog v-model="editDialogVisible" :title="$t('japanCustoms.editDialogTitle')" width="560px" destroy-on-close>
+      <el-form :model="editForm" label-width="120px">
+        <el-form-item :label="$t('japanCustoms.column.arrivalDate')">
+          <el-date-picker v-model="editForm.arrivalDate" type="date" value-format="YYYY-MM-DD" style="width:100%" clearable />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.subProductCode')">
+          <el-input v-model="editForm.subProductCode" clearable />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.arrivalPort')">
+          <el-input v-model="editForm.arrivalPort" clearable />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.broker')">
+          <el-input v-model="editForm.customsBroker" clearable />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.brokerPhone')">
+          <el-input v-model="editForm.brokerPhone" clearable />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.brokerContact')">
+          <el-input v-model="editForm.brokerContact" clearable />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.weight')">
+          <el-input-number v-model="editForm.declaredWeightKg" :min="0" :precision="2" style="width:100%" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.volume')">
+          <el-input-number v-model="editForm.declaredVolumeCbm" :min="0" :precision="4" style="width:100%" />
+        </el-form-item>
+        <el-form-item :label="$t('japanCustoms.column.remarks')">
+          <el-input v-model="editForm.remarks" type="textarea" :rows="2" clearable />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="editDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="editSubmitting" @click="onEditConfirm">{{ $t('common.save') }}</el-button>
       </template>
     </el-dialog>
 
@@ -395,6 +436,20 @@ const viewMode = ref<'list' | 'group'>('list')
 const excelViewMode = ref<'table' | 'copy'>('table')
 
 const currentRow = ref<JapanCustomsVO | null>(null)
+const editDialogVisible = ref(false)
+const editingRowId = ref<number | null>(null)
+const editForm = reactive({
+  subProductCode: '',
+  arrivalDate: '',
+  customsBroker: '',
+  brokerPhone: '',
+  brokerContact: '',
+  arrivalPort: '',
+  declaredWeightKg: undefined as number | undefined,
+  declaredVolumeCbm: undefined as number | undefined,
+  remarks: '',
+})
+const editSubmitting = ref(false)
 const filterForm = reactive({
   containerNo: '',
   keyword: '',
@@ -590,6 +645,45 @@ function onReset() {
 function onView(row: JapanCustomsVO) {
   currentRow.value = row
   drawerVisible.value = true
+}
+
+function onEdit(row: JapanCustomsVO) {
+  editingRowId.value = row.id
+  editForm.subProductCode = row.subProductCode ?? ''
+  editForm.arrivalDate = row.arrivalDate ?? ''
+  editForm.customsBroker = row.customsBroker ?? ''
+  editForm.brokerPhone = row.brokerPhone ?? ''
+  editForm.brokerContact = row.brokerContact ?? ''
+  editForm.arrivalPort = row.arrivalPort ?? ''
+  editForm.declaredWeightKg = row.declaredWeightKg ?? undefined
+  editForm.declaredVolumeCbm = row.declaredVolumeCbm ?? undefined
+  editForm.remarks = row.remarks ?? ''
+  editDialogVisible.value = true
+}
+
+async function onEditConfirm() {
+  if (!editingRowId.value) return
+  editSubmitting.value = true
+  try {
+    await japanCustomsApi.update(editingRowId.value, {
+      subProductCode: editForm.subProductCode || undefined,
+      arrivalDate: editForm.arrivalDate || undefined,
+      customsBroker: editForm.customsBroker || undefined,
+      brokerPhone: editForm.brokerPhone || undefined,
+      brokerContact: editForm.brokerContact || undefined,
+      arrivalPort: editForm.arrivalPort || undefined,
+      declaredWeightKg: editForm.declaredWeightKg,
+      declaredVolumeCbm: editForm.declaredVolumeCbm,
+      remarks: editForm.remarks || undefined,
+    })
+    ElMessage.success(t('japanCustoms.message.updateSuccess'))
+    editDialogVisible.value = false
+    loadData()
+  } catch {
+    ElMessage.error(t('japanCustoms.message.actionFailed'))
+  } finally {
+    editSubmitting.value = false
+  }
 }
 
 async function onStart(row: JapanCustomsVO) {
