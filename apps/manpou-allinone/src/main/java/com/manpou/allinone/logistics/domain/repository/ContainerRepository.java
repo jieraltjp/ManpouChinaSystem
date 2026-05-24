@@ -26,9 +26,15 @@ public interface ContainerRepository {
 
     Page<Container> findByStatusAndDeletedIsFalse(ContainerStatus status, Pageable pageable);
 
-    Page<Container> findByPoolIdAndDeletedIsFalse(Long poolId, Pageable pageable);
-
     Page<Container> findByShipIdAndDeletedIsFalse(Long shipId, Pageable pageable);
+
+    Page<Container> findByShowFlagAndDeletedIsFalse(Boolean showFlag, Pageable pageable);
+
+    Page<Container> findByLegacyStatusAndDeletedIsFalse(String legacyStatus, Pageable pageable);
+
+    Page<Container> findByCabinetNoContainingAndDeletedIsFalse(String cabinetNo, Pageable pageable);
+
+    Page<Container> findByShipIdAndShowFlagAndDeletedIsFalse(Long shipId, Boolean showFlag, Pageable pageable);
 
     long countByShipIdAndDeletedIsFalse(Long shipId);
 
@@ -37,4 +43,18 @@ public interface ContainerRepository {
      * 返回 Object[]，由 Assembler 转换。
      */
     Page<Object[]> findAllWithShip(Pageable pageable);
+
+    Page<Object[]> findAllWithShipByShowFlag(Boolean showFlag, Pageable pageable);
+
+    Page<Object[]> findAllWithShipByLegacyStatus(String legacyStatus, Pageable pageable);
+
+    Page<Object[]> findAllWithShipByCabinetNoContaining(String cabinetNo, Pageable pageable);
+
+    Page<Object[]> findAllWithShipByShipId(Long shipId, Pageable pageable);
+
+    Page<Object[]> findAllWithShipByShipIdAndShowFlag(Long shipId, Boolean showFlag, Pageable pageable);
+
+    Page<Object[]> findAllWithShipByStatus(ContainerStatus status, Pageable pageable);
+
+    Optional<Object[]> findOneWithShip(Long id);
 }

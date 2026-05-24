@@ -29,8 +29,9 @@ export interface ProcurementPageVO {
   syntheticDemand?: boolean     // 是否为系统自动生成的需求（SPEC-B13）
   productCode: string          // 主货号
   subProductCode?: string     // 子货号/枝番（颜色）
+  shiban?: string            // 支番
   material?: string            // 材质
-  requiresQc?: boolean        // 是否需要检测
+  requiresQc?: string        // 检测类型/备注（文本，SPEC-B14）
   quantity: number
   shipmentQuantity?: number  // 出货数量（所有批次之和，SPEC-B11 §7.1）
   priceRmb: number
@@ -46,6 +47,8 @@ export interface ProcurementPageVO {
   actualShipDate?: string     // 实际出货日（v1.3.0）
   leadTimeDays?: number       // 交货期天数（v1.9.0）
   cartonNotes?: string       // 纸箱备注（v1.9.0）
+  remark?: string           // 备注
+  group?: string           // 团体
   afterSalesDeadline?: string  // 售后截止日（v1.10.0）
   productLead?: string
   japanLead?: string
@@ -75,8 +78,9 @@ export interface CreateProcurementRequest {
   productType?: ProductType
   productCode: string
   subProductCode?: string
+  shiban?: string
   material?: string
-  requiresQc?: boolean
+  requiresQc?: string
   quantity: number
   priceRmb: number
   exchangeRate: number
@@ -90,6 +94,8 @@ export interface CreateProcurementRequest {
   actualShipDate?: string
   leadTimeDays?: number
   cartonNotes?: string
+  remark?: string
+  group?: string
   afterSalesDeadline?: string  // 售后截止日（v1.10.0）
   productLead?: string
   japanLead?: string
@@ -105,8 +111,9 @@ export interface UpdateProcurementRequest {
   productType?: ProductType
   productCode?: string
   subProductCode?: string
+  shiban?: string
   material?: string
-  requiresQc?: boolean
+  requiresQc?: string
   quantity?: number
   priceRmb?: number
   exchangeRate?: number
@@ -120,6 +127,8 @@ export interface UpdateProcurementRequest {
   actualShipDate?: string
   leadTimeDays?: number
   cartonNotes?: string
+  remark?: string
+  group?: string
   afterSalesDeadline?: string  // 售后截止日（v1.10.0）
   productLead?: string
   japanLead?: string

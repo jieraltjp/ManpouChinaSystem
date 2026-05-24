@@ -106,7 +106,7 @@
         @selection-change="onSelectionChange"
       >
         <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
-        <el-table-column :label="$t('inspection.column.shipmentBatchId')" min-width="150" align="center">
+        <el-table-column v-if="false" :label="$t('inspection.column.shipmentBatchId')" min-width="150" align="center">
           <template #default="{ row }">
             <span v-if="row.batchCode" class="product-code">{{ row.batchCode }}</span>
             <span v-else-if="row.shipmentBatchId" class="product-code">{{ row.shipmentBatchId }}</span>

@@ -215,6 +215,7 @@
         <el-descriptions-item :label="$t('order.drawer.factory')">{{ currentRow.factoryName || (currentRow.factoryId ? `ID:${currentRow.factoryId}` : '-') }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.productCode')">{{ currentRow.productCode }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.subProductCode')">{{ currentRow.subProductCode || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.shiban')">{{ currentRow.shiban || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.category')">{{ getCategoryLabel(currentRow.productCode) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('product.drawer.imageUrl')" :span="2">
           <el-image
@@ -229,7 +230,7 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.quantity')">{{ currentRow.quantity }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.material')">{{ currentRow.material || '-' }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('order.drawer.requiresQc')">{{ currentRow.requiresQc ? $t('order.drawer.yes') : $t('order.drawer.no') }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.requiresQc')">{{ currentRow.requiresQc || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.priceRmb')">{{ currentRow.priceRmb }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.exchangeRate')">{{ currentRow.exchangeRate }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.taxPoint')">{{ currentRow.taxPoint }}</el-descriptions-item>
@@ -252,6 +253,8 @@
         <el-descriptions-item :label="$t('order.drawer.actualShipDate')">{{ currentRow.actualShipDate || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.leadTimeDays')">{{ formatLeadTime(currentRow.leadTimeDays) }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.cartonNotes')">{{ currentRow.cartonNotes || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.remark')">{{ currentRow.remark || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('order.drawer.group')">{{ currentRow.group || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.afterSalesDeadline')">{{ currentRow.afterSalesDeadline || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.productLead')">{{ currentRow.productLead || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('order.drawer.japanLead')">{{ currentRow.japanLead || '-' }}</el-descriptions-item>
@@ -398,7 +401,14 @@
           </el-col>
           <el-col :span="8">
             <el-form-item :label="$t('order.dialog.requiresQc')">
-              <el-switch v-model="formData.requiresQc" :active-text="$t('order.common.yes')" :inactive-text="$t('order.common.no')" />
+              <el-input v-model="formData.requiresQc" :placeholder="$t('order.dialog.requiresQcPlaceholder')" clearable maxlength="128" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item :label="$t('order.dialog.shiban')">
+              <el-input v-model="formData.shiban" :placeholder="$t('order.dialog.shibanPlaceholder')" clearable maxlength="64" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -538,6 +548,18 @@
           <el-col :span="8">
             <el-form-item :label="$t('order.dialog.afterSalesDeadline')">
               <el-date-picker v-model="formData.afterSalesDeadline" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item :label="$t('order.dialog.remark')">
+              <el-input v-model="formData.remark" :placeholder="$t('order.dialog.remarkPlaceholder')" maxlength="512" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('order.dialog.group')">
+              <el-input v-model="formData.group" :placeholder="$t('order.dialog.groupPlaceholder')" clearable maxlength="128" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -1114,8 +1136,9 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string; catego
   factoryId: undefined,
   productCode: '',
   subProductCode: '',
+  shiban: '',
   material: '',
-  requiresQc: false,
+  requiresQc: '',
   quantity: 1,
   priceRmb: 0,
   exchangeRate: 21.5,
@@ -1129,6 +1152,8 @@ const defaultFormData = (): CreateProcurementRequest & { status?: string; catego
   plannedShipDate: '',
   leadTimeDays: undefined as number | undefined,
   cartonNotes: '',
+  remark: '',
+  group: '',
   afterSalesDeadline: '',
   customerCompany: '',
   productLead: '',
@@ -1244,8 +1269,9 @@ function onEdit(row: ProcurementPageVO | null) {
     factoryId: row?.factoryId ?? undefined,
     productCode: row?.productCode ?? '',
     subProductCode: row?.subProductCode ?? '',
+    shiban: row?.shiban ?? '',
     material: row?.material ?? '',
-    requiresQc: row?.requiresQc ?? false,
+    requiresQc: row?.requiresQc ?? '',
     quantity: row?.quantity ?? 1,
     priceRmb: row?.priceRmb ?? 0,
     exchangeRate: row?.exchangeRate ?? 21.5,
@@ -1259,6 +1285,8 @@ function onEdit(row: ProcurementPageVO | null) {
     plannedShipDate: row?.plannedShipDate ?? '',
     leadTimeDays: row?.leadTimeDays ?? undefined,
     cartonNotes: row?.cartonNotes ?? '',
+    remark: row?.remark ?? '',
+    group: row?.group ?? '',
     afterSalesDeadline: row?.afterSalesDeadline ?? '',
     customerCompany: row?.customerCompany ?? '',
     productLead: row?.productLead ?? '',
@@ -1337,6 +1365,7 @@ async function onSubmit() {
           productType: 'NORMAL',
           productCode: formData.productCode,
           subProductCode: formData.subProductCode || undefined,
+          shiban: formData.shiban || undefined,
           material: formData.material || undefined,
           requiresQc: formData.requiresQc || undefined,
           quantity: formData.quantity,
@@ -1352,6 +1381,8 @@ async function onSubmit() {
           plannedShipDate: formData.plannedShipDate || undefined,
           leadTimeDays: formData.leadTimeDays ?? undefined,
           cartonNotes: formData.cartonNotes || undefined,
+          remark: formData.remark || undefined,
+          group: formData.group || undefined,
           afterSalesDeadline: formData.afterSalesDeadline || undefined,
           customerCompany: formData.customerCompany || undefined,
           productLead: formData.productLead || undefined,
@@ -1381,6 +1412,7 @@ async function onSubmit() {
           productType: isLinkedProcurement.value ? 'NORMAL' : undefined,
           productCode: formData.productCode,
           subProductCode: formData.subProductCode || undefined,
+          shiban: formData.shiban || undefined,
           material: formData.material || undefined,
           requiresQc: formData.requiresQc || undefined,
           quantity: formData.quantity,
@@ -1396,6 +1428,8 @@ async function onSubmit() {
           plannedShipDate: formData.plannedShipDate || undefined,
           leadTimeDays: formData.leadTimeDays ?? undefined,
           cartonNotes: formData.cartonNotes || undefined,
+          remark: formData.remark || undefined,
+          group: formData.group || undefined,
           afterSalesDeadline: formData.afterSalesDeadline || undefined,
           customerCompany: formData.customerCompany || undefined,
           productLead: formData.productLead || undefined,

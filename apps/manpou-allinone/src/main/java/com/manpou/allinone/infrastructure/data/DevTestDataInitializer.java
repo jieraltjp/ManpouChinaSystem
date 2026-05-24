@@ -81,7 +81,7 @@ public class DevTestDataInitializer implements CommandLineRunner {
 
         // ===== Step 3: 发注单数据（v2.0.0：1 Demand → 1 Procurement） =====
         // d1 → p1（odn012-re，120台，久留米）
-        procurementOf(f1, "odn012", "odn012-re", "PU面料", true,
+        procurementOf(f1, "odn012", "odn012-re", "PU面料", "true",
                 120, new BigDecimal("28.50"), new BigDecimal("21.5"),
                 new BigDecimal("1.1000"), BillingType.ZHE_LU_KAI_PIAO,
                 LocalDate.of(2026, 4, 10), LocalDate.of(2026, 4, 20),
@@ -89,7 +89,7 @@ public class DevTestDataInitializer implements CommandLineRunner {
                 "久留米", "久留米贸易株式会社", ShipmentStatus.完了);
 
         // d2 → p2（odn012-wh，80台，久留米）
-        procurementOf(f1, "odn012", "odn012-wh", "PU面料", true,
+        procurementOf(f1, "odn012", "odn012-wh", "PU面料", "true",
                 80, new BigDecimal("28.50"), new BigDecimal("21.5"),
                 new BigDecimal("1.1000"), BillingType.ZHE_LU_KAI_PIAO,
                 LocalDate.of(2026, 4, 12), LocalDate.of(2026, 4, 22),
@@ -97,7 +97,7 @@ public class DevTestDataInitializer implements CommandLineRunner {
                 "久留米", "久留米贸易株式会社", ShipmentStatus.完了);
 
         // d4 → p4（cpn101，300台，大阪）
-        procurementOf(f2, "cpn101", "cpn101", "尼龙布+金属扣", false,
+        procurementOf(f2, "cpn101", "cpn101", "尼龙布+金属扣", "false",
                 300, new BigDecimal("35.00"), new BigDecimal("21.5"),
                 new BigDecimal("1.1000"), BillingType.ZHE_LU_KAI_PIAO,
                 LocalDate.of(2026, 4, 8), LocalDate.of(2026, 4, 18),
@@ -105,7 +105,7 @@ public class DevTestDataInitializer implements CommandLineRunner {
                 "大阪", "大阪商会", ShipmentStatus.発注待);
 
         // d5 → p5（odn088-bk，50台，福冈）
-        procurementOf(f3, "odn088", "odn088-bk", "真皮", false,
+        procurementOf(f3, "odn088", "odn088-bk", "真皮", "false",
                 50, new BigDecimal("55.00"), new BigDecimal("21.5"),
                 new BigDecimal("1.1000"), BillingType.NO_REFUND,
                 LocalDate.of(2026, 4, 15), LocalDate.of(2026, 4, 25),
@@ -153,7 +153,7 @@ public class DevTestDataInitializer implements CommandLineRunner {
     }
 
     private void procurementOf(Factory factory, String productCode, String subProduct,
-                                String material, boolean requiresQc, int qty,
+                                String material, String requiresQc, int qty,
                                 BigDecimal priceRmb, BigDecimal exRate, BigDecimal taxPoint,
                                 BillingType billing, LocalDate orderDate,
                                 LocalDate plannedShip, LocalDate actualShip,

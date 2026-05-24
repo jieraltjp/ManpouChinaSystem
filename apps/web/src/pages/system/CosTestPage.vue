@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div v-if="hasRole('ADMIN')" class="page">
     <el-page-header @back="() => $router.back()" :content="$t('cosTest.title')" class="page-header" />
 
     <!-- 配置状态 -->

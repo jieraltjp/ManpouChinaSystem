@@ -20,7 +20,7 @@
         </el-menu-item>
 
         <!-- 发注管理 -->
-        <el-sub-menu v-if="hasPermission('page:demand:access') || hasPermission('page:procurement:access') || hasPermission('page:qc:access') || hasPermission('page:logistics:access') || hasPermission('page:customs:access') || hasPermission('page:japan_customs:access')" index="procurement" :popper-class="'sidebar-popper'">
+        <el-sub-menu v-if="hasPermission('page:demand:access') || hasPermission('page:procurement:access') || hasPermission('page:shipment:access') || hasPermission('page:qc:access') || hasPermission('page:logistics:access') || hasPermission('page:consolidation:access') || hasPermission('page:container:access') || hasPermission('page:customs:access') || hasPermission('page:japan_customs:access')" index="procurement" :popper-class="'sidebar-popper'">
           <template #title>
             <el-icon><ShoppingCart /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.procurement-all') }}</span>
@@ -45,6 +45,10 @@
             <el-icon><Van /></el-icon>
             <template #title>{{ $t('menu.logisticsPlan') }}</template>
           </el-menu-item>
+          <el-menu-item v-if="hasPermission('page:consolidation:access')" index="/procurement/consolidation-pool">
+            <el-icon><Connection /></el-icon>
+            <template #title>{{ $t('menu.consolidationPool') }}</template>
+          </el-menu-item>
           <el-menu-item v-if="hasPermission('page:customs:access')" index="/procurement/domestic-customs">
             <el-icon><DocumentCopy /></el-icon>
             <template #title>{{ $t('menu.domesticCustoms') }}</template>
@@ -61,7 +65,7 @@
             <el-icon><Money /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.finance') }}</span>
           </template>
-          <el-menu-item index="/finance/tax-refund-record">
+          <el-menu-item v-if="hasPermission('page:tax_refund:access')" index="/finance/tax-refund-record">
             <el-icon><Tickets /></el-icon>
             <template #title>{{ $t('menu.taxRefundRecord') }}</template>
           </el-menu-item>
@@ -73,14 +77,14 @@
             <el-icon><TrendCharts /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.sales') }}</span>
           </template>
-          <el-menu-item index="/sales/sales-record">
+          <el-menu-item v-if="hasPermission('page:sales:access')" index="/sales/sales-record">
             <el-icon><Goods /></el-icon>
             <template #title>{{ $t('menu.salesRecord') }}</template>
           </el-menu-item>
         </el-sub-menu>
 
         <!-- 基础数据 -->
-        <el-sub-menu v-if="hasPermission('page:factory:access') || hasPermission('page:product:access') || hasPermission('page:order:access') || hasPermission('page:ship:access')" index="base" :popper-class="'sidebar-popper'">
+        <el-sub-menu v-if="hasPermission('page:factory:access') || hasPermission('page:product:access') || hasPermission('page:order:access') || hasPermission('page:container:access') || hasPermission('cargo_size:read') || hasPermission('legacy_procurement:read') || hasPermission('dispatch:read') || hasPermission('offline_order:read')" index="base" :popper-class="'sidebar-popper'">
           <template #title>
             <el-icon><Menu /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.base') }}</span>
@@ -93,18 +97,34 @@
             <el-icon><Goods /></el-icon>
             <template #title>{{ $t('menu.product') }}</template>
           </el-menu-item>
+          <el-menu-item v-if="hasPermission('cargo_size:read')" index="/base/cargo-size">
+            <el-icon><Box /></el-icon>
+            <template #title>{{ $t('menu.cargoSize') }}</template>
+          </el-menu-item>
+          <el-menu-item v-if="hasPermission('page:container:access')" index="/base/container">
+            <el-icon><Ship /></el-icon>
+            <template #title>{{ $t('menu.container') }}</template>
+          </el-menu-item>
           <el-menu-item v-if="hasPermission('page:order:access')" index="/base/overview">
             <el-icon><Document /></el-icon>
             <template #title>{{ $t('menu.orderOverview') }}</template>
           </el-menu-item>
-          <el-menu-item v-if="hasPermission('page:ship:access')" index="/base/ship">
-            <el-icon><Ship /></el-icon>
-            <template #title>{{ $t('menu.ship') }}</template>
+          <el-menu-item v-if="hasPermission('dispatch:read')" index="/base/dispatch">
+            <el-icon><List /></el-icon>
+            <template #title>{{ $t('menu.dispatch') }}</template>
+          </el-menu-item>
+          <el-menu-item v-if="hasPermission('legacy_procurement:read')" index="/base/legacy-procurement">
+            <el-icon><Clock /></el-icon>
+            <template #title>{{ $t('menu.legacyProcurement') }}</template>
+          </el-menu-item>
+          <el-menu-item v-if="hasPermission('offline_order:read')" index="/base/offline-order">
+            <el-icon><List /></el-icon>
+            <template #title>{{ $t('menu.offlineOrder') }}</template>
           </el-menu-item>
         </el-sub-menu>
 
         <!-- 系统管理 -->
-        <el-sub-menu v-if="hasPermission('page:user:access') || hasPermission('page:role:access') || hasPermission('page:audit:access') || true" index="system" :popper-class="'sidebar-popper'">
+        <el-sub-menu v-if="hasPermission('page:user:access') || hasPermission('page:role:access') || hasPermission('page:audit:access')" index="system" :popper-class="'sidebar-popper'">
           <template #title>
             <el-icon><Setting /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.system') }}</span>
@@ -234,7 +254,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, DocumentCopy, Box, Goods, OfficeBuilding, Menu, Document, Money, Tickets, TrendCharts, Setting, User, Key, Ship } from '@element-plus/icons-vue'
+import { Fold, Expand, ArrowDown, SwitchButton, DataBoard, ShoppingCart, FolderOpened, CircleCheck, Van, DocumentCopy, Box, Goods, OfficeBuilding, Menu, Document, Money, Tickets, TrendCharts, Setting, User, Key, Ship, List, Connection } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
@@ -283,7 +303,9 @@ const routeTitleMap: Record<string, string> = {
   '/base/factory': 'factory.title',
   '/base/product': 'product.title',
   '/base/overview': 'orderOverview.title',
-  '/base/ship': 'logistics.ship.title',
+  '/base/legacy-procurement': 'legacyProcurement.title',
+  '/base/dispatch': 'dispatch.title',
+  '/base/offline-order': 'offlineOrder.title',
   '/procurement/shipment-batch': 'menu.shipmentBatch',
   '/system/user': 'menu.user',
   '/system/role': 'menu.role',

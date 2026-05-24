@@ -28,9 +28,12 @@ public class ProcurementUpdateCmd {
     private String subProductCode;   // 子货号/枝番（颜色）
 
     @Length(max = 64)
+    private String shiban;            // 支番
+
+    @Length(max = 64)
     private String material;          // 材质
 
-    private Boolean requiresQc;      // 是否需要检测
+    private String requiresQc;      // 检测类型/备注（文本）
 
     @Positive(message = "数量必须为正数")
     private Integer quantity;        // 订购数量
@@ -59,6 +62,13 @@ public class ProcurementUpdateCmd {
     private LocalDate actualShipDate;   // 实际出货日
     private Integer leadTimeDays;      // 交货期天数（30/45/60）
     private String cartonNotes;       // 纸箱备注（v1.9.0 新增）
+
+    @Length(max = 512)
+    private String remark;            // 备注
+
+    @Length(max = 128)
+    private String group;             // 团体
+
     private LocalDate afterSalesDeadline; // 售后截止日（v1.10.0 新增）
 
     // ===== 担当 =====

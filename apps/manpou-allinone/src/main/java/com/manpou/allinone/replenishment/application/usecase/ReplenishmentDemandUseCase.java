@@ -54,7 +54,7 @@ public class ReplenishmentDemandUseCase {
         );
 
         // 动态 Specification：deleted=false 为基础条件，叠加 demandType / keyword / linked
-        Specification<ReplenishmentDemand> spec = (root, _, cb) -> {
+        Specification<ReplenishmentDemand> spec = (root, cq, cb) -> {
             java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
             predicates.add(cb.isFalse(root.get("deleted")));
 

@@ -46,6 +46,12 @@
             <el-option value="NEW_PURCHASE" :label="$t('demand.type.newPurchase')" />
           </el-select>
         </el-form-item>
+        <el-form-item :label="$t('demand.filter.linked')">
+          <el-select v-model="filterForm.linked" :placeholder="$t('demand.filter.all')" clearable style="width:150px">
+            <el-option :value="true" :label="$t('demand.filter.linkedYes')" />
+            <el-option :value="false" :label="$t('demand.filter.linkedNo')" />
+          </el-select>
+        </el-form-item>
         <el-form-item :label="$t('demand.filter.productCode')">
           <el-input v-model="filterForm.keyword" :placeholder="$t('demand.dialog.productCodePlaceholder')" clearable style="width:140px" />
         </el-form-item>
@@ -82,7 +88,7 @@
       </template>
       <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200" ref="tableRef" row-key="id" @selection-change="onSelectionChange">
         <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
-        <el-table-column prop="demandCode" :label="$t('demand.column.demandCode')" min-width="160" />
+        <el-table-column v-if="false" prop="demandCode" :label="$t('demand.column.demandCode')" min-width="160" />
         <el-table-column prop="productCode" :label="$t('demand.column.productCode')" min-width="110">
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
@@ -523,6 +529,7 @@ async function loadData() {
       pageSize: pagination.pageSize,
       demandType: filterForm.demandType || undefined,
       keyword: filterForm.keyword.trim() || undefined,
+      linked: filterForm.linked,
     })
     const payload = res.data as { content: DemandPageVO[]; totalElements: number }
     tableData.value = payload.content || []
@@ -536,6 +543,7 @@ async function loadData() {
 function onReset() {
   filterForm.demandType = ''
   filterForm.keyword = ''
+  filterForm.linked = null
   pagination.page = 1
   loadData()
 }

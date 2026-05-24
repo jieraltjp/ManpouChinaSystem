@@ -27,7 +27,7 @@ public class OrderProcurementSelectorDTO {
     private String productCode;
     private String subProductCode;
     private String material;
-    private Boolean requiresQc;
+    private String requiresQc;
     private Integer quantity;
     private BigDecimal priceRmb;
     private BigDecimal exchangeRate;

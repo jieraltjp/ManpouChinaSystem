@@ -278,4 +278,47 @@ public class ProductUseCase {
                     .build();
         }).toList();
     }
+
+    // ---- SPEC-B15 货物尺寸管理：商品不完整品 ----
+
+    @Transactional(readOnly = true)
+    public Page<Product> listIncomplete(String type, String keyword, int page, int size) {
+        PageRequest pr = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        return productJpaRepository.findIncompleteProducts(type, keyword, pr);
+    }
+
+    @Transactional
+    public Product complete(Long id, com.manpou.allinone.product.application.dto.ProductCompleteCmd cmd) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> BusinessException.notFound("Product", id));
+        if (cmd.getNameZh() != null) product.setNameZh(cmd.getNameZh());
+        if (cmd.getUnitPriceRmb() != null) product.setUnitPriceRmb(cmd.getUnitPriceRmb());
+        if (cmd.getOrigin() != null) product.setOrigin(cmd.getOrigin());
+        if (cmd.getHsCode() != null) product.setHsCode(cmd.getHsCode());
+        if (cmd.getRemarks() != null) {
+            String existing = product.getRemarks();
+            product.setRemarks((existing != null ? existing + "；" : "") + "[尺寸补全] " + cmd.getRemarks());
+        }
+        // 工厂关联
+        if (cmd.getFactoryIds() != null) {
+            // 删除旧关联
+            List<ProductFactory> old = productFactoryJpaRepository.findByProductId(id);
+            productFactoryJpaRepository.deleteAll(old);
+            // 新增关联
+            if (!cmd.getFactoryIds().isEmpty()) {
+                List<ProductFactory> links = new java.util.ArrayList<>();
+                for (Long factoryId : cmd.getFactoryIds()) {
+                    ProductFactory pf = new ProductFactory();
+                    pf.setProductId(id);
+                    pf.setFactoryId(factoryId);
+                    pf.setIsPreferred(false);
+                    pf.setCreateTime(java.time.LocalDateTime.now());
+                    pf.setUpdateTime(java.time.LocalDateTime.now());
+                    links.add(pf);
+                }
+                productFactoryJpaRepository.saveAll(links);
+            }
+        }
+        return productRepository.save(product);
+    }
 }

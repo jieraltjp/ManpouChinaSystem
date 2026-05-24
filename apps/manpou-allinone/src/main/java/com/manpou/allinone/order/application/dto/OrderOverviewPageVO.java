@@ -63,7 +63,7 @@ public class OrderOverviewPageVO {
         private String productCode;
         private String subProductCode;
         private String material;
-        private Boolean requiresQc;
+        private String requiresQc;
         private Integer quantity;
         private java.math.BigDecimal priceRmb;
         private java.math.BigDecimal exchangeRate;

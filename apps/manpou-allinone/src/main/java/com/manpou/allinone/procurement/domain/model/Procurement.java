@@ -40,14 +40,20 @@ public class Procurement extends BaseEntity {
     @Column(name = "sub_product_code", length = 64)
     private String subProductCode;     // 子货号/枝番（颜色，如 re/wh/bk）
 
+    @Column(name = "shiban", length = 64)
+    private String shiban;             // 支番
+
     @Column(name = "material", length = 64)
     private String material;            // 材质
 
-    @Column(name = "requires_qc")
-    private Boolean requiresQc;        // 是否需要检测
+    @Column(name = "requires_qc", length = 128)
+    private String requiresQc;        // 检测类型/备注（文本）
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;          // 订购数量
+
+    @Column(name = "shipped_quantity")
+    private Integer shippedQuantity;   // 出货数量（v1.3.0 新增）
 
     // ===== 价格信息 =====
     @Column(name = "price_rmb", nullable = false, precision = 12, scale = 4)
@@ -91,6 +97,12 @@ public class Procurement extends BaseEntity {
 
     @Column(name = "carton_notes", length = 512)
     private String cartonNotes;     // 纸箱备注（v1.9.0 新增）
+
+    @Column(name = "remark", length = 512)
+    private String remark;          // 备注
+
+    @Column(name = "group_", length = 128)
+    private String group_;           // 团体
 
     @Column(name = "after_sales_deadline")
     private java.time.LocalDate afterSalesDeadline; // 售后截止日（v1.10.0 新增）

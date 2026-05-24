@@ -102,7 +102,7 @@ export interface ProcurementVO {
   productCode: string
   subProductCode?: string
   material?: string
-  requiresQc?: boolean
+  requiresQc?: string  // SPEC-B14: 检测类型/备注（文本）
   quantity?: number
   priceRmb?: number
   exchangeRate?: number

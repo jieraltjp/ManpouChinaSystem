@@ -3,6 +3,7 @@ package com.manpou.allinone.product.interfaces.controller;
 import com.manpou.allinone.product.application.dto.MasterCodeSuggestVO;
 import com.manpou.allinone.product.application.dto.ProductCategoryVO;
 import org.springframework.security.access.prepost.PreAuthorize;
+import com.manpou.allinone.product.application.dto.ProductCompleteCmd;
 import com.manpou.allinone.product.application.dto.ProductCreateCmd;
 import com.manpou.allinone.product.application.dto.ProductPageQuery;
 import com.manpou.allinone.product.application.dto.ProductQuery;
@@ -10,6 +11,7 @@ import com.manpou.allinone.product.application.dto.ProductUpdateCmd;
 import com.manpou.allinone.product.application.dto.ProductFactoryVO;
 import com.manpou.allinone.product.application.dto.SubCodeSuggestVO;
 import com.manpou.allinone.product.application.usecase.ProductUseCase;
+import com.manpou.allinone.product.domain.model.Product;
 import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.annotation.Idempotent;
 import com.manpou.allinone.common.result.Result;
@@ -134,5 +136,25 @@ public class ProductController {
     public Result<Void> delete(@PathVariable Long id) {
         productUseCase.delete(id);
         return Result.ok("商品删除成功", null);
+    }
+
+    // ---- SPEC-B15 货物尺寸管理：不完整品 ----
+
+    @GetMapping("/incomplete")
+    @PreAuthorize("hasAuthority('cargo_size:read')")
+    public Result<Page<Product>> listIncomplete(
+            @RequestParam(defaultValue = "no_name") String type,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return Result.ok(productUseCase.listIncomplete(type, keyword, page, size));
+    }
+
+    @PutMapping("/{id}/complete")
+    @AuditLog(module = "product", action = "UPDATE", resourceType = "product", resourceId = "#id")
+    @PreAuthorize("hasAuthority('product:update')")
+    public Result<Product> complete(@PathVariable Long id,
+                                     @Valid @RequestBody ProductCompleteCmd cmd) {
+        return Result.ok(productUseCase.complete(id, cmd));
     }
 }

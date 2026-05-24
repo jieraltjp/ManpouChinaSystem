@@ -42,6 +42,10 @@ public class ProcurementAssembler {
                 .stream()
                 .mapToInt(com.manpou.allinone.procurement.domain.model.ShipmentBatch::getShipmentQuantity)
                 .sum();
+        // legacy fallback: 无出货批次时使用 shipped_quantity（历史数据导入）
+        if (shipmentQuantity == 0 && entity.getShippedQuantity() != null) {
+            shipmentQuantity = entity.getShippedQuantity();
+        }
         return ProcurementPageQuery.builder()
                 .id(entity.getId())
                 .factoryId(entity.getFactoryId())
@@ -49,6 +53,7 @@ public class ProcurementAssembler {
                 .batchCount(Long.valueOf(batchCount))
                 .productCode(entity.getProductCode())
                 .subProductCode(entity.getSubProductCode())
+                .shiban(entity.getShiban())
                 .material(entity.getMaterial())
                 .requiresQc(entity.getRequiresQc())
                 .quantity(entity.getQuantity())
@@ -66,6 +71,8 @@ public class ProcurementAssembler {
                 .actualShipDate(entity.getActualShipDate())
                 .leadTimeDays(entity.getLeadTimeDays())
                 .cartonNotes(entity.getCartonNotes())
+                .remark(entity.getRemark())
+                .group(entity.getGroup_())
                 .afterSalesDeadline(entity.getAfterSalesDeadline())
                 .productLead(entity.getProductLead())
                 .japanLead(entity.getJapanLead())
@@ -123,6 +130,7 @@ public class ProcurementAssembler {
         if (cmd.getFactoryId() != null) entity.setFactoryId(cmd.getFactoryId());
         entity.setProductCode(cmd.getProductCode());
         if (cmd.getSubProductCode() != null) entity.setSubProductCode(cmd.getSubProductCode());
+        if (cmd.getShiban() != null) entity.setShiban(cmd.getShiban());
         if (cmd.getMaterial() != null) entity.setMaterial(cmd.getMaterial());
         if (cmd.getRequiresQc() != null) entity.setRequiresQc(cmd.getRequiresQc());
         entity.setQuantity(cmd.getQuantity());
@@ -138,6 +146,8 @@ public class ProcurementAssembler {
         if (cmd.getActualShipDate() != null) entity.setActualShipDate(cmd.getActualShipDate());
         if (cmd.getLeadTimeDays() != null) entity.setLeadTimeDays(cmd.getLeadTimeDays());
         if (cmd.getCartonNotes() != null) entity.setCartonNotes(cmd.getCartonNotes());
+        if (cmd.getRemark() != null) entity.setRemark(cmd.getRemark());
+        if (cmd.getGroup() != null) entity.setGroup_(cmd.getGroup());
         if (cmd.getAfterSalesDeadline() != null) entity.setAfterSalesDeadline(cmd.getAfterSalesDeadline());
         if (cmd.getProductLead() != null) entity.setProductLead(cmd.getProductLead());
         if (cmd.getJapanLead() != null) entity.setJapanLead(cmd.getJapanLead());
@@ -151,6 +161,7 @@ public class ProcurementAssembler {
         // factoryId 不允许在更新时修改，由 UseCase 层校验
         if (cmd.getProductCode() != null) entity.setProductCode(cmd.getProductCode());
         if (cmd.getSubProductCode() != null) entity.setSubProductCode(cmd.getSubProductCode());
+        if (cmd.getShiban() != null) entity.setShiban(cmd.getShiban());
         if (cmd.getMaterial() != null) entity.setMaterial(cmd.getMaterial());
         if (cmd.getRequiresQc() != null) entity.setRequiresQc(cmd.getRequiresQc());
         if (cmd.getQuantity() != null) entity.setQuantity(cmd.getQuantity());
@@ -166,6 +177,8 @@ public class ProcurementAssembler {
         if (cmd.getActualShipDate() != null) entity.setActualShipDate(cmd.getActualShipDate());
         if (cmd.getLeadTimeDays() != null) entity.setLeadTimeDays(cmd.getLeadTimeDays());
         if (cmd.getCartonNotes() != null) entity.setCartonNotes(cmd.getCartonNotes());
+        if (cmd.getRemark() != null) entity.setRemark(cmd.getRemark());
+        if (cmd.getGroup() != null) entity.setGroup_(cmd.getGroup());
         if (cmd.getAfterSalesDeadline() != null) entity.setAfterSalesDeadline(cmd.getAfterSalesDeadline());
         if (cmd.getProductLead() != null) entity.setProductLead(cmd.getProductLead());
         if (cmd.getJapanLead() != null) entity.setJapanLead(cmd.getJapanLead());

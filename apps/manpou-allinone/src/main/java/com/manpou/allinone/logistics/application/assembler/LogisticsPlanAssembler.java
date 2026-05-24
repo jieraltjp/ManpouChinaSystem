@@ -78,15 +78,6 @@ public class LogisticsPlanAssembler {
                 .requiresQc(entity.getRequiresQc())
                 .containerId(entity.getContainerId())
                 .poolId(entity.getPoolId())
-                // 来自 Container 的总计（装柜后有效）
-                .containerTotalCbm(entity.getContainerId() != null
-                        ? containerRepository.findByIdAndDeletedIsFalse(entity.getContainerId())
-                                .map(Container::getTotalCbm).orElse(null)
-                        : null)
-                .containerTotalWeightKg(entity.getContainerId() != null
-                        ? containerRepository.findByIdAndDeletedIsFalse(entity.getContainerId())
-                                .map(Container::getTotalWeightKg).orElse(null)
-                        : null)
                 // 来自 ConsolidationPool 的总计（拼柜中有效）
                 .poolTotalCbm(entity.getPoolId() != null
                         ? consolidationPoolRepository.findByIdAndDeletedIsFalse(entity.getPoolId())

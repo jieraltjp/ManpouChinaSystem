@@ -118,7 +118,7 @@
         <el-table-column :label="$t('orderOverview.column.action')" min-width="100" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('orderOverview.action.view') }}</el-button>
-            <el-button link class="btn-red" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
+            <el-button v-if="hasPermission('demand:delete')" link class="btn-red" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -342,10 +342,12 @@ import { Loading } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { orderChainApi, type OrderChainVO, type OrderChainDetailVO } from '@/api/orderChain'
 import { productApi } from '@/api/product'
+import { usePermission } from '@/composables/usePermission'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const router = useRouter()
 const { locale, t } = useI18n()
+const { hasPermission } = usePermission()
 
 const loading = ref(false)
 const chainData = ref<OrderChainVO[]>([])

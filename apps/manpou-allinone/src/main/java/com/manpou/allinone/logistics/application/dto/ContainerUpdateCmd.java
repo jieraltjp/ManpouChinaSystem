@@ -1,7 +1,6 @@
 package com.manpou.allinone.logistics.application.dto;
 
 import com.manpou.allinone.logistics.domain.model.ContainerStatus;
-import com.manpou.allinone.logistics.domain.model.ContainerType;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -14,8 +13,6 @@ public class ContainerUpdateCmd {
     @Length(max = 32)
     private String containerNo;
 
-    private ContainerType containerType;
-
     private ContainerStatus status;
 
     private LocalDate loadDate;
@@ -24,15 +21,25 @@ public class ContainerUpdateCmd {
 
     private LocalDate arrivalDate;
 
-    // ===== v2.0 扩展字段（SPEC-B12）=====
-    private Long shipId;                      // 关联船只（null=解除关联）
+    private Long shipId;
 
     @Size(max = 32)
-    private String timeSlot;                  // 时间段
+    private String timeSlot;
 
     @Size(max = 128)
-    private String arrivalLocation;          // 到岗地点
+    private String arrivalLocation;
 
     @Size(max = 512)
-    private String remarks;                  // 备注
+    private String remarks;
+
+    @Size(max = 16)
+    private String cabinetNo;
+
+    @Size(max = 16)
+    private String period;
+
+    @Size(max = 32)
+    private String legacyStatus;
+
+    private Boolean showFlag;
 }

@@ -68,4 +68,33 @@ public interface ProductJpaRepository extends ProductRepository, JpaRepository<P
     /** 批量查询主货号对应的类别和图片（distinct master_code） */
     @Query("SELECT DISTINCT p.masterCode, p.category, p.imageUrl FROM Product p WHERE p.masterCode IN :masterCodes AND p.deleted = false")
     List<Object[]> findCategoryByMasterCodes(@Param("masterCodes") List<String> masterCodes);
+
+    // ---- SPEC-B15 货物尺寸管理：不完整品查询 ----
+
+    /**
+     * 不完整品查询（SPEC-B15 §3.3）。
+     * type=no_name: name_zh IS NULL
+     * type=no_price: unit_price_rmb IS NULL OR unit_price_rmb = 0
+     * type=no_factory: 无 factory 关联
+     * type=all: 有尺寸的 product
+     */
+    @Query(value = """
+        SELECT p.* FROM product p
+        WHERE p.is_deleted = FALSE
+          AND p.length_cm IS NOT NULL AND p.length_cm > 0
+          AND (:type = 'all' OR :type = 'no_name' AND (p.name_zh IS NULL OR p.name_zh = '')
+              OR :type = 'no_price' AND (p.unit_price_rmb IS NULL OR p.unit_price_rmb = 0)
+              OR :type = 'no_factory' AND NOT EXISTS (
+                  SELECT 1 FROM product_factory pf WHERE pf.product_id = p.id
+              ))
+          AND (:keyword = '' OR :keyword IS NULL
+              OR p.master_code LIKE CONCAT('%', :keyword, '%')
+              OR p.sub_code LIKE CONCAT('%', :keyword, '%')
+              OR p.name_zh LIKE CONCAT('%', :keyword, '%'))
+        ORDER BY p.id DESC
+        """, nativeQuery = true)
+    Page<Product> findIncompleteProducts(
+            @Param("type") String type,
+            @Param("keyword") String keyword,
+            Pageable pageable);
 }

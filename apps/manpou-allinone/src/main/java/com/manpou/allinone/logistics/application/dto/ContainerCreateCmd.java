@@ -1,8 +1,6 @@
 package com.manpou.allinone.logistics.application.dto;
 
-import com.manpou.allinone.logistics.domain.model.ContainerType;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
@@ -15,24 +13,31 @@ public class ContainerCreateCmd {
     @Length(max = 32)
     private String containerNo;
 
-    @NotNull(message = "货柜类型不能为空")
-    private ContainerType containerType;
-
-    private Long poolId;
-
     private LocalDate loadDate;
 
     private LocalDate departureDate;
 
     private LocalDate arrivalDate;
 
-    // ===== v2.0 扩展字段（SPEC-B12）=====
+    private Long shipId;
+
     @Length(max = 32)
-    private String timeSlot;                  // 时间段
+    private String timeSlot;
 
     @Length(max = 128)
-    private String arrivalLocation;           // 到岗地点
+    private String arrivalLocation;
 
     @Length(max = 512)
-    private String remarks;                  // 备注
+    private String remarks;
+
+    @Length(max = 16)
+    private String cabinetNo;
+
+    @Length(max = 16)
+    private String period;
+
+    @Length(max = 32)
+    private String legacyStatus;
+
+    private Boolean showFlag;
 }

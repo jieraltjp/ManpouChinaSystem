@@ -1,13 +1,15 @@
 # 权限代码文档对齐审计
 
-> **版本**: 1.4.0
+> **版本**: 1.5.0
 > **创建**: 2026-05-12
-> **更新**: 2026-05-13（DB总计83条：V15基线78 + V18 ship 4 + V19 japan_customs:update ID=119）
-> **目的**: 确保 DB（83条）、ALL_PERMISSIONS Set（71条）、SPEC-B11 文档三方一致
+> **更新**: 2026-05-24（v1.5.0：追加 SPEC-B15 cargo_size 权限 120~124）
+> **目的**: 确保 DB（83条 + cargo_size 5条）、ALL_PERMISSIONS Set（71条）、SPEC-B11 文档三方一致
 
 ---
 
-## 1. DB 实际数据（83条，V15 78条 + V18 ship 4条 + V19 japan_customs:update 1条）
+## 1. DB 实际数据（83条，V15 基线78条 + V18 ship 4条 + V19 japan_customs:update 1条）
+
+> cargo_size 模块 5条（ID 120~124）在 §5 中，待 V__cargo_size.sql 插入。
 
 来源：`allinone/src/main/resources/db/migration/V15__baseline_schema.sql` 第 877-976 行。
 
@@ -141,12 +143,26 @@ customs:approve 在 CustomsController 有 @PreAuthorize，MANAGER/OPERATOR/VIEWE
 
 | permission_code | DB ID | 状态 | 修复 |
 |----------------|-------|------|------|
-| customs:approve | 45 | DB 有，Set 无（@PreAuthorize 已加在 CustomsController）| MANAGER/OPERATOR 无此权限，建议加入 Set |
+| customs:approve | 45 | DB 有，Set 无 | MANAGER/OPERATOR 无此权限，建议加入 Set |
 | warehouse:read | 101 | DB 有，Set 无 | 建议加入 Set |
 | warehouse:create | 102 | DB 有，Set 无 | 建议加入 Set |
 | warehouse:update | 103 | DB 有，Set 无 | 建议加入 Set |
 | warehouse:delete | 104 | DB 有，Set 无 | 建议加入 Set |
 | notification:read | 111 | DB 有，Set 无 | Phase 5+ |
+
+## 5. SPEC-B15 货物尺寸管理权限（待实现）
+
+> 来源：`docs/business/SPEC-B15-货物尺寸管理.md` §4
+
+| ID | permission_code | permission_name_cn | module | action | 角色（ADMIN/MANAGER/OPERATOR/VIEWER） | 状态 |
+|----|----------------|---------------------|--------|--------|------------------------------------|------|
+| 120 | cargo_size:read | 查看货物尺寸 | cargo_size | READ | ADMIN ✅ / MANAGER ✅ / OPERATOR ✅ / VIEWER ✅ | 待插入 V__cargo_size.sql |
+| 121 | cargo_size:import | 导入货物尺寸 | cargo_size | CREATE | ADMIN ✅ / MANAGER ✅ / OPERATOR ❌ / VIEWER ❌ | 待插入 |
+| 122 | cargo_size:promote | 升格货物尺寸 | cargo_size | CREATE | ADMIN ✅ / MANAGER ✅ / OPERATOR ❌ / VIEWER ❌ | 待插入 |
+| 123 | cargo_size:discard | 废弃货物尺寸 | cargo_size | DELETE | ADMIN ✅ / MANAGER ✅ / OPERATOR ❌ / VIEWER ❌ | 待插入 |
+| 124 | cargo_size:update | 编辑货物尺寸 | cargo_size | UPDATE | ADMIN ✅ / MANAGER ✅ / OPERATOR ❌ / VIEWER ❌ | 待插入 |
+
+> 注：`cargo_size:promote` 本质是创建 Product 实体，后端接口加 `@PreAuthorize("hasAuthority('cargo_size:promote') or hasAuthority('product:create')")` 双重守卫。
 | notification:create | 112 | DB 有，Set 无 | Phase 5+ |
 | notification:update | 113 | DB 有，Set 无 | Phase 5+ |
 | notification:delete | 114 | DB 有，Set 无 | Phase 5+ |

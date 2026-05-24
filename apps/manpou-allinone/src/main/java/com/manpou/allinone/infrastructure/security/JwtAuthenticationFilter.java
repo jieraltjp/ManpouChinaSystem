@@ -41,9 +41,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     /**
-     * ADMIN 角色 *:* 展开后的所有具体权限（74条）。
-     * DB 82 条（V15基线78 + V18 ship 4 + V19 japan_customs:update 1，warehouse/notification/japan_customs:delete 未入 Set）。
-     * V19 修复：japan_customs:update ID=119（原 V17 ID=70 与 factory:create 冲突，又错误写成 ID=92 与 permission:read 冲突）。
+     * ADMIN 角色 *:* 展开后的所有具体权限（105条）。
+     * CRUD 87条 + page:*:access 18条。
+     * warehouse/notification 未入 Set（模块未实现）。
+     * V56 新增：page:*:access 路由守卫权限（ID 140~157，18个模块）。
      */
     private static final Set<String> ALL_PERMISSIONS = Set.of(
         "demand:create", "demand:read", "demand:update", "demand:delete",
@@ -54,6 +55,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "consolidation:create", "consolidation:read", "consolidation:update", "consolidation:delete",
         "container:create", "container:read", "container:update", "container:delete",
         "ship:create", "ship:read", "ship:update", "ship:delete",
+        "dispatch:create", "dispatch:read", "dispatch:update", "dispatch:delete",
+        "offline_order:create", "offline_order:read", "offline_order:update", "offline_order:delete",
         "customs:create", "customs:read", "customs:update", "customs:delete", "customs:approve",
         "japan_customs:create", "japan_customs:read", "japan_customs:update", "japan_customs:delete",
         "japan_customs:start", "japan_customs:complete",
@@ -61,11 +64,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "sales:create", "sales:read", "sales:update", "sales:delete",
         "factory:create", "factory:read", "factory:update", "factory:delete",
         "product:create", "product:read", "product:update", "product:delete",
+        "cargo_size:read", "cargo_size:create", "cargo_size:import", "cargo_size:promote", "cargo_size:discard", "cargo_size:update", "cargo_size:delete",
+        "legacy_procurement:read", "legacy_procurement:create", "legacy_procurement:update", "legacy_procurement:delete",
         "order:read",
         "user:create", "user:read", "user:update", "user:delete", "user:approve", "user:reset_password",
         "role:create", "role:read", "role:update", "role:delete", "role:assign",
         "permission:read",
-        "audit:read", "audit:export"
+        "audit:read", "audit:export",
+        "page:demand:access", "page:procurement:access", "page:shipment:access", "page:qc:access",
+        "page:logistics:access", "page:consolidation:access", "page:container:access", "page:ship:access",
+        "page:customs:access", "page:japan_customs:access", "page:tax_refund:access", "page:sales:access",
+        "page:factory:access", "page:product:access", "page:order:access",
+        "page:user:access", "page:role:access", "page:audit:access"
     );
 
     private final JwtService jwtService;

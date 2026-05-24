@@ -11,6 +11,12 @@ public class ContainerQuery {
 
     private ContainerStatus status;
     private String containerNo;
-    private Long poolId;
-    private Long shipId;                   // v2.0 船只筛选
+    private Long shipId;
+
+    // ===== list7 筛选字段（SPEC-B14）=====
+
+    // ===== list7 筛选字段（SPEC-B14）=====
+    private Boolean showFlag;            // 显示标志（默认仅返回 showFlag=true）
+    private String legacyStatus;        // 原始出运状态（未出 / 出完 / 待定）
+    private String cabinetNo;           // 箱号模糊搜索
 }

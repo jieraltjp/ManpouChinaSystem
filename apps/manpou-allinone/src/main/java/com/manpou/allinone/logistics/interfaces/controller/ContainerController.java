@@ -62,15 +62,6 @@ public class ContainerController {
         return Result.ok();
     }
 
-    @PostMapping("/{id}/plans/{planId}")
-    @PreAuthorize("hasAuthority('container:update')")
-    @AuditLog(module = "container", action = "ADD_PLAN", resourceType = "container", resourceId = "#containerId")
-    public Result<Void> addPlan(@PathVariable("id") Long containerId,
-                                @PathVariable("planId") Long planId) {
-        useCase.addPlan(containerId, planId);
-        return Result.ok();
-    }
-
     @PutMapping("/{id}/assign-ship")
     @PreAuthorize("hasAuthority('container:update')")
     @AuditLog(module = "container", action = "ASSIGN_SHIP", resourceType = "container", resourceId = "#id")

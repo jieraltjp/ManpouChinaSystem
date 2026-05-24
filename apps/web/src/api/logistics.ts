@@ -31,24 +31,26 @@ export type ContainerType = 'GP20' | 'GP40' | 'HC40' | 'HC45'
 export interface ContainerVO {
   id: number
   containerNo: string
-  containerType: ContainerType
-  totalCbm?: number
-  totalWeightKg?: number
-  planCount?: number
-  poolId?: number
   status: ContainerStatus
   loadDate?: string
   departureDate?: string
   arrivalDate?: string
   createTime?: string
   updateTime?: string
-  // ===== v2.0 扩展字段（SPEC-B12）=====
   shipId?: number
   shipName?: string
   shipNumber?: string
   timeSlot?: string
   arrivalLocation?: string
   remarks?: string
+  cabinetNo?: string
+  period?: string
+  legacyStatus?: string
+  showFlag?: boolean
+  legacyId?: number
+  legacyUpdater?: string
+  legacyUpdatetime?: string
+  legacyShipName?: string
 }
 
 // ===== 调配计划 =====
@@ -213,29 +215,33 @@ export interface ContainerPageResponse {
 
 export interface CreateContainerRequest {
   containerNo: string
-  containerType: ContainerType
-  poolId?: number
   loadDate?: string
   departureDate?: string
   arrivalDate?: string
-  // ===== v2.0 扩展字段（SPEC-B12）=====
-  timeSlot?: string
-  arrivalLocation?: string
-  remarks?: string
-}
-
-export interface UpdateContainerRequest {
-  containerNo?: string
-  containerType?: ContainerType
-  status?: ContainerStatus
-  loadDate?: string
-  departureDate?: string
-  arrivalDate?: string
-  // ===== v2.0 扩展字段（SPEC-B12）=====
   shipId?: number
   timeSlot?: string
   arrivalLocation?: string
   remarks?: string
+  cabinetNo?: string
+  period?: string
+  legacyStatus?: string
+  showFlag?: boolean
+}
+
+export interface UpdateContainerRequest {
+  containerNo?: string
+  status?: ContainerStatus
+  loadDate?: string
+  departureDate?: string
+  arrivalDate?: string
+  shipId?: number
+  timeSlot?: string
+  arrivalLocation?: string
+  remarks?: string
+  cabinetNo?: string
+  period?: string
+  legacyStatus?: string
+  showFlag?: boolean
 }
 
 export interface AssignShipRequest {
@@ -244,7 +250,7 @@ export interface AssignShipRequest {
 }
 
 export const containerApi = {
-  list(params: { page?: number; pageSize?: number; status?: ContainerStatus; poolId?: number; shipId?: number }) {
+  list(params: { page?: number; pageSize?: number; status?: ContainerStatus; poolId?: number; shipId?: number; showFlag?: boolean; legacyStatus?: string; cabinetNo?: string }) {
     return client.get<ContainerPageResponse>('/containers', { params })
   },
   get(id: number) {

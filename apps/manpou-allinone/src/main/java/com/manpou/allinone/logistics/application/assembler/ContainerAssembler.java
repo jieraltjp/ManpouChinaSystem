@@ -25,53 +25,51 @@ public class ContainerAssembler {
         return ContainerPageQuery.builder()
                 .id(entity.getId())
                 .containerNo(entity.getContainerNo())
-                .containerType(entity.getContainerType())
-                .totalCbm(entity.getTotalCbm())
-                .totalWeightKg(entity.getTotalWeightKg())
-                .planCount(entity.getPlanCount())
-                .poolId(entity.getPoolId())
                 .status(entity.getStatus())
                 .loadDate(entity.getLoadDate())
                 .departureDate(entity.getDepartureDate())
                 .arrivalDate(entity.getArrivalDate())
                 .createTime(entity.getCreateTime())
                 .updateTime(entity.getUpdateTime())
-                // v2.0 扩展字段
                 .shipId(entity.getShipId())
+                .shipName(null) // requires JOIN to ship table
+                .shipNumber(null)
                 .timeSlot(entity.getTimeSlot())
                 .arrivalLocation(entity.getArrivalLocation())
                 .remarks(entity.getRemarks())
+                .cabinetNo(entity.getCabinetNo())
+                .period(entity.getPeriod())
+                .legacyStatus(entity.getLegacyStatus())
+                .showFlag(entity.getShowFlag())
+                .legacyId(entity.getLegacyId())
+                .legacyUpdater(entity.getLegacyUpdater())
+                .legacyUpdatetime(entity.getLegacyUpdatetime())
+                .legacyShipName(entity.getShipName())
                 .build();
     }
 
     public Container toEntity(ContainerCreateCmd cmd) {
         Container entity = new Container();
         entity.setContainerNo(cmd.getContainerNo());
-        if (cmd.getContainerType() != null) {
-            entity.setContainerType(cmd.getContainerType());
-        }
-        if (cmd.getPoolId() != null) entity.setPoolId(cmd.getPoolId());
-        // v2.0 扩展字段
+        entity.setLoadDate(cmd.getLoadDate());
+        entity.setDepartureDate(cmd.getDepartureDate());
+        entity.setArrivalDate(cmd.getArrivalDate());
+        if (cmd.getShipId() != null) entity.setShipId(cmd.getShipId());
         if (cmd.getTimeSlot() != null) entity.setTimeSlot(cmd.getTimeSlot());
         if (cmd.getArrivalLocation() != null) entity.setArrivalLocation(cmd.getArrivalLocation());
         if (cmd.getRemarks() != null) entity.setRemarks(cmd.getRemarks());
+        if (cmd.getCabinetNo() != null) entity.setCabinetNo(cmd.getCabinetNo());
+        if (cmd.getPeriod() != null) entity.setPeriod(cmd.getPeriod());
+        if (cmd.getLegacyStatus() != null) entity.setLegacyStatus(cmd.getLegacyStatus());
+        if (cmd.getShowFlag() != null) entity.setShowFlag(cmd.getShowFlag());
         return entity;
     }
 
-    /**
-     * 从 JOIN 查询 Object[] 转换为 DTO（含 shipName / shipNumber）。
-     * array[0]=Container, array[1]=shipName(String), array[2]=shipNumber(String)
-     */
     public ContainerPageQuery toDtoFromArray(Object[] row) {
         Container c = (Container) row[0];
         return ContainerPageQuery.builder()
                 .id(c.getId())
                 .containerNo(c.getContainerNo())
-                .containerType(c.getContainerType())
-                .totalCbm(c.getTotalCbm())
-                .totalWeightKg(c.getTotalWeightKg())
-                .planCount(c.getPlanCount())
-                .poolId(c.getPoolId())
                 .status(c.getStatus())
                 .loadDate(c.getLoadDate())
                 .departureDate(c.getDepartureDate())
@@ -84,20 +82,30 @@ public class ContainerAssembler {
                 .timeSlot(c.getTimeSlot())
                 .arrivalLocation(c.getArrivalLocation())
                 .remarks(c.getRemarks())
+                .cabinetNo(c.getCabinetNo())
+                .period(c.getPeriod())
+                .legacyStatus(c.getLegacyStatus())
+                .showFlag(c.getShowFlag())
+                .legacyId(c.getLegacyId())
+                .legacyUpdater(c.getLegacyUpdater())
+                .legacyUpdatetime(c.getLegacyUpdatetime())
+                .legacyShipName(c.getShipName())
                 .build();
     }
 
     public void copyUpdate(ContainerUpdateCmd cmd, Container entity) {
         if (cmd.getContainerNo() != null) entity.setContainerNo(cmd.getContainerNo());
-        if (cmd.getContainerType() != null) entity.setContainerType(cmd.getContainerType());
         if (cmd.getStatus() != null) entity.advanceStatus(cmd.getStatus());
         if (cmd.getLoadDate() != null) entity.setLoadDate(cmd.getLoadDate());
         if (cmd.getDepartureDate() != null) entity.setDepartureDate(cmd.getDepartureDate());
         if (cmd.getArrivalDate() != null) entity.setArrivalDate(cmd.getArrivalDate());
-        // v2.0 扩展字段
         if (cmd.getShipId() != null) entity.setShipId(cmd.getShipId());
         if (cmd.getTimeSlot() != null) entity.setTimeSlot(cmd.getTimeSlot());
         if (cmd.getArrivalLocation() != null) entity.setArrivalLocation(cmd.getArrivalLocation());
         if (cmd.getRemarks() != null) entity.setRemarks(cmd.getRemarks());
+        if (cmd.getCabinetNo() != null) entity.setCabinetNo(cmd.getCabinetNo());
+        if (cmd.getPeriod() != null) entity.setPeriod(cmd.getPeriod());
+        if (cmd.getLegacyStatus() != null) entity.setLegacyStatus(cmd.getLegacyStatus());
+        if (cmd.getShowFlag() != null) entity.setShowFlag(cmd.getShowFlag());
     }
 }

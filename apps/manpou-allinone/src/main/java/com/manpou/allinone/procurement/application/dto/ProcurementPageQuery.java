@@ -32,8 +32,9 @@ public class ProcurementPageQuery {
     // ===== 商品信息 =====
     private String productCode;         // 主货号
     private String subProductCode;     // 子货号/枝番（颜色）
+    private String shiban;             // 支番
     private String material;            // 材质
-    private Boolean requiresQc;        // 是否需要检测
+    private String requiresQc;        // 检测类型/备注（文本）
     private Integer quantity;          // 订购数量
     private Integer shipmentQuantity;  // 出货数量（所有批次之和，SPEC-B11 §7.1）
 
@@ -55,6 +56,8 @@ public class ProcurementPageQuery {
     private LocalDate actualShipDate;  // 实际出货日（v1.3.0 新增）
     private Integer leadTimeDays;      // 交货期天数（30/45/60）
     private String cartonNotes;       // 纸箱备注（v1.9.0 新增）
+    private String remark;            // 备注
+    private String group;             // 团体
     private LocalDate afterSalesDeadline; // 售后截止日（v1.10.0 新增）
 
     // ===== 担当 =====

@@ -6,7 +6,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, Plus } from '@element-plus/icons-vue'
-import { containerApi, type ContainerVO, type ContainerStatus, type ContainerType, type AssignShipRequest } from '@/api/logistics'
+import { containerApi, type ContainerVO, type AssignShipRequest } from '@/api/logistics'
 import { shipApi, type ShipVO } from '@/api/ship'
 import { usePermission } from '@/composables/usePermission'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
@@ -30,20 +30,26 @@ const pagination = ref({ page: 0, pageSize: 20, total: 0 })
 const tableRef = ref()
 const selectedRows = ref<ContainerVO[]>([])
 
-const filterForm = ref({ status: '' as ContainerStatus | '', containerNo: '', shipId: '' as number | '' })
+const filterForm = ref({ containerNo: '', shipId: '' as number | '', showFlag: null as boolean | null, legacyStatus: '', cabinetNo: '' })
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const editingItem = ref<Partial<ContainerVO>>({})
 
+// ===== 详情抽屉 =====
+const drawerVisible = ref(false)
+const currentRow = ref<ContainerVO | null>(null)
+
 const formData = ref({
   containerNo: '',
-  containerType: 'GP20' as ContainerType,
   loadDate: '',
   departureDate: '',
-  arrivalDate: '',
   timeSlot: '',
   arrivalLocation: '',
   remarks: '',
+  cabinetNo: '',
+  period: '',
+  legacyStatus: '',
+  showFlag: true as boolean,
 })
 
 // ===== 分配船只 =====
@@ -53,35 +59,20 @@ const assignEditingContainer = ref<Partial<ContainerVO>>({})
 const shipOptions = ref<ShipVO[]>([])
 const assignForm = ref<AssignShipRequest>({ shipId: 0, loadDate: '' })
 
-const statusOptions: ContainerStatus[] = ['CREATED', 'LOADED', 'DEPARTED', 'ARRIVED']
-const typeOptions: ContainerType[] = ['GP20', 'GP40', 'HC40', 'HC45']
-
-function containerStatusTag(type: ContainerStatus) {
-  return { CREATED: 'info', LOADED: 'success', DEPARTED: 'warning', ARRIVED: 'primary' }[type] ?? 'info'
-}
-
-function containerStatusLabel(type: ContainerStatus) {
-  return t(`logistics.containerStatus.${type}`)
-}
-
-function containerTypeLabel(type: ContainerType) {
-  return t(`logistics.container.type.${type}`)
-}
+const periodOptions = ['凌晨0-6', '早上6-12', '下午12-18', '晚上18-24']
+const legacyStatusOptions = ['未出', '出完', '待定']
 
 const copyColumns: ExcelColDef[] = [
   { prop: 'containerNo', label: t('logistics.container.column.containerNo') },
-  { prop: 'containerType', label: t('logistics.container.column.containerType'), formatter: (row) => containerTypeLabel(row.containerType) },
-  { prop: 'totalCbm', label: t('logistics.container.column.totalCbm'), formatter: (row) => row.totalCbm != null ? row.totalCbm.toFixed(4) : '' },
-  { prop: 'totalWeightKg', label: t('logistics.container.column.totalWeightKg'), formatter: (row) => row.totalWeightKg != null ? row.totalWeightKg.toFixed(2) : '' },
-  { prop: 'planCount', label: t('logistics.container.column.planCount'), formatter: (row) => row.planCount != null ? String(row.planCount) : '' },
-  { prop: 'status', label: t('logistics.container.column.status'), formatter: (row) => containerStatusLabel(row.status) },
+  { prop: 'shipName', label: t('logistics.container.column.shipName'), formatter: (row) => row.shipName || '' },
+  { prop: 'shipNumber', label: t('logistics.container.column.shipNumber'), formatter: (row) => row.shipNumber || '' },
+  { prop: 'cabinetNo', label: t('logistics.container.column.cabinetNo'), formatter: (row) => row.cabinetNo || '' },
   { prop: 'loadDate', label: t('logistics.container.column.loadDate'), formatter: (row) => row.loadDate || '' },
   { prop: 'departureDate', label: t('logistics.container.column.departureDate'), formatter: (row) => row.departureDate || '' },
-  { prop: 'arrivalDate', label: t('logistics.container.column.arrivalDate'), formatter: (row) => row.arrivalDate || '' },
-  { prop: 'shipName', label: t('logistics.container.column.shipName'), formatter: (row) => row.shipName || '' },
-  { prop: 'timeSlot', label: t('logistics.container.column.timeSlot'), formatter: (row) => row.timeSlot || '' },
+  { prop: 'period', label: t('logistics.container.column.period'), formatter: (row) => row.period || '' },
+  { prop: 'legacyStatus', label: t('logistics.container.column.status'), formatter: (row) => row.legacyStatus || '-' },
   { prop: 'arrivalLocation', label: t('logistics.container.column.arrivalLocation'), formatter: (row) => row.arrivalLocation || '' },
-  { prop: 'createTime', label: t('logistics.column.createTime'), formatter: (row) => formatTime(row.createTime) },
+  { prop: 'remarks', label: t('logistics.container.column.remarks'), formatter: (row) => row.remarks || '' },
   { prop: 'action', label: t('logistics.column.actions'), excluded: true },
 ]
 
@@ -91,8 +82,10 @@ async function loadData() {
     const res = await containerApi.list({
       page: pagination.value.page,
       pageSize: pagination.value.pageSize,
-      status: filterForm.value.status || undefined,
       shipId: filterForm.value.shipId || undefined,
+      showFlag: filterForm.value.showFlag ?? undefined,
+      legacyStatus: filterForm.value.legacyStatus || undefined,
+      cabinetNo: filterForm.value.cabinetNo || undefined,
     })
     const data = res.data
     tableData.value = data?.content ?? []
@@ -105,20 +98,27 @@ async function loadData() {
 }
 
 function onSearch() { pagination.value.page = 0; loadData() }
-function onReset() { filterForm.value = { status: '', containerNo: '', shipId: '' }; pagination.value.page = 0; loadData() }
+function onReset() { filterForm.value = { containerNo: '', shipId: '', showFlag: null, legacyStatus: '', cabinetNo: '' }; pagination.value.page = 0; loadData() }
+
+function onView(row: ContainerVO) {
+  currentRow.value = row
+  drawerVisible.value = true
+}
 
 function onNew() {
   editingItem.value = {}
   dialogTitle.value = t('logistics.container.newButton')
   formData.value = {
     containerNo: '',
-    containerType: 'GP20',
     loadDate: '',
     departureDate: '',
-    arrivalDate: '',
     timeSlot: '',
     arrivalLocation: '',
     remarks: '',
+    cabinetNo: '',
+    period: '',
+    legacyStatus: '',
+    showFlag: true,
   }
   dialogVisible.value = true
 }
@@ -128,13 +128,15 @@ function onEdit(row: ContainerVO) {
   dialogTitle.value = t('logistics.container.editTitle')
   formData.value = {
     containerNo: row.containerNo,
-    containerType: row.containerType,
     loadDate: row.loadDate ?? '',
     departureDate: row.departureDate ?? '',
-    arrivalDate: row.arrivalDate ?? '',
     timeSlot: row.timeSlot ?? '',
     arrivalLocation: row.arrivalLocation ?? '',
     remarks: row.remarks ?? '',
+    cabinetNo: row.cabinetNo ?? '',
+    period: row.period ?? '',
+    legacyStatus: row.legacyStatus ?? '',
+    showFlag: row.showFlag ?? true,
   }
   dialogVisible.value = true
 }
@@ -145,28 +147,22 @@ async function onSubmit() {
     return
   }
   try {
+    const commonFields = {
+      containerNo: formData.value.containerNo,
+      loadDate: formData.value.loadDate || undefined,
+      departureDate: formData.value.departureDate || undefined,
+      timeSlot: formData.value.timeSlot.trim() || undefined,
+      arrivalLocation: formData.value.arrivalLocation.trim() || undefined,
+      remarks: formData.value.remarks.trim() || undefined,
+      cabinetNo: formData.value.cabinetNo.trim() || undefined,
+      period: formData.value.period || undefined,
+      legacyStatus: formData.value.legacyStatus || undefined,
+      showFlag: formData.value.showFlag,
+    }
     if (editingItem.value.id) {
-      await containerApi.update(editingItem.value.id, {
-        containerNo: formData.value.containerNo,
-        containerType: formData.value.containerType,
-        loadDate: formData.value.loadDate || undefined,
-        departureDate: formData.value.departureDate || undefined,
-        arrivalDate: formData.value.arrivalDate || undefined,
-        timeSlot: formData.value.timeSlot.trim() || undefined,
-        arrivalLocation: formData.value.arrivalLocation.trim() || undefined,
-        remarks: formData.value.remarks.trim() || undefined,
-      })
+      await containerApi.update(editingItem.value.id, commonFields)
     } else {
-      await containerApi.create({
-        containerNo: formData.value.containerNo,
-        containerType: formData.value.containerType,
-        loadDate: formData.value.loadDate || undefined,
-        departureDate: formData.value.departureDate || undefined,
-        arrivalDate: formData.value.arrivalDate || undefined,
-        timeSlot: formData.value.timeSlot.trim() || undefined,
-        arrivalLocation: formData.value.arrivalLocation.trim() || undefined,
-        remarks: formData.value.remarks.trim() || undefined,
-      })
+      await containerApi.create(commonFields)
     }
     ElMessage.success(t('common.message.saveSuccess'))
     dialogVisible.value = false
@@ -255,7 +251,7 @@ async function onAssignShipSubmit() {
 
 async function onUnassignShip(row: ContainerVO) {
   try {
-    await ElMessageBox.confirm(t('logistics.container.unassignSuccess'), t('common.delete'), { type: 'warning' })
+    await ElMessageBox.confirm(t('logistics.container.unassignConfirm'), t('common.delete'), { type: 'warning' })
     await containerApi.unassignShip(row.id)
     ElMessage.success(t('logistics.container.unassignSuccess'))
     loadData()
@@ -274,11 +270,6 @@ onMounted(loadData)
   <div class="page">
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" :model="filterForm">
-        <el-form-item :label="$t('logistics.container.filter.status')">
-          <el-select v-model="filterForm.status" :placeholder="$t('logistics.filter.all')" clearable style="width:150px">
-            <el-option v-for="s in statusOptions" :key="s" :value="s" :label="containerStatusLabel(s)" />
-          </el-select>
-        </el-form-item>
         <el-form-item :label="$t('logistics.container.filter.containerNo')">
           <el-input v-model="filterForm.containerNo" :placeholder="$t('logistics.container.filter.containerNoHint')" clearable style="width:180px" />
         </el-form-item>
@@ -294,10 +285,24 @@ onMounted(loadData)
             <el-option v-for="s in shipOptions" :key="s.id" :value="s.id" :label="`${s.shipName} (${s.shipNumber})`" />
           </el-select>
         </el-form-item>
+        <el-form-item :label="$t('logistics.container.filter.showFlag')">
+          <el-select v-model="filterForm.showFlag" :placeholder="$t('logistics.filter.all')" clearable style="width:120px">
+            <el-option :value="true" :label="$t('logistics.container.showFlag.active')" />
+            <el-option :value="false" :label="$t('logistics.container.showFlag.archived')" />
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('logistics.container.filter.legacyStatus')">
+          <el-select v-model="filterForm.legacyStatus" :placeholder="$t('logistics.filter.all')" clearable style="width:110px">
+            <el-option v-for="s in legacyStatusOptions" :key="s" :value="s" :label="s" />
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('logistics.container.filter.cabinetNo')">
+          <el-input v-model="filterForm.cabinetNo" :placeholder="$t('logistics.container.filter.cabinetNoHint')" clearable style="width:150px" />
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSearch">{{ $t('logistics.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('logistics.filter.reset') }}</el-button>
-          <el-button v-if="hasPermission('container:create')" type="primary" @click="onNew">
+          <el-button type="primary" @click="onNew" v-if="hasPermission('container:create')">
             <el-icon><Plus /></el-icon>{{ $t('logistics.container.newButton') }}
           </el-button>
         </el-form-item>
@@ -328,59 +333,41 @@ onMounted(loadData)
       </template>
       <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200" ref="tableRef" row-key="id" @selection-change="onSelectionChange">
         <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
-        <el-table-column prop="containerNo" :label="$t('logistics.container.column.containerNo')" min-width="160" />
-        <el-table-column :label="$t('logistics.container.column.containerType')" min-width="100" align="center">
-          <template #default="{ row }">
-            <el-tag size="small">{{ containerTypeLabel(row.containerType) }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('logistics.container.column.totalCbm')" min-width="110" align="right">
-          <template #default="{ row }">
-            {{ row.totalCbm != null ? row.totalCbm.toFixed(4) : '-' }}
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('logistics.container.column.totalWeightKg')" min-width="120" align="right">
-          <template #default="{ row }">
-            {{ row.totalWeightKg != null ? row.totalWeightKg.toFixed(2) : '-' }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="planCount" :label="$t('logistics.container.column.planCount')" min-width="90" align="center" />
-        <el-table-column :label="$t('logistics.container.column.status')" min-width="100" align="center">
-          <template #default="{ row }">
-            <el-tag :type="containerStatusTag(row.status)" size="small">{{ containerStatusLabel(row.status) }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="loadDate" :label="$t('logistics.container.column.loadDate')" min-width="110" />
-        <el-table-column prop="departureDate" :label="$t('logistics.container.column.departureDate')" min-width="110" />
-        <el-table-column prop="arrivalDate" :label="$t('logistics.container.column.arrivalDate')" min-width="110" />
-        <el-table-column :label="$t('logistics.container.column.shipName')" min-width="130">
+        <el-table-column prop="containerNo" :label="$t('logistics.container.column.containerNo')" min-width="120" />
+        <el-table-column :label="$t('logistics.container.column.shipName')" min-width="110">
           <template #default="{ row }">
             {{ row.shipName ?? '-' }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('logistics.container.column.timeSlot')" min-width="110">
+        <el-table-column :label="$t('logistics.container.column.shipNumber')" min-width="100">
           <template #default="{ row }">
-            {{ row.timeSlot ?? '-' }}
+            {{ row.shipNumber ?? '-' }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('logistics.container.column.arrivalLocation')" min-width="130">
+        <el-table-column prop="cabinetNo" :label="$t('logistics.container.column.cabinetNo')" min-width="130" />
+        <el-table-column prop="loadDate" :label="$t('logistics.container.column.loadDate')" min-width="100" />
+        <el-table-column prop="departureDate" :label="$t('logistics.container.column.departureDate')" min-width="100" />
+        <el-table-column prop="period" :label="$t('logistics.container.column.period')" min-width="90" />
+        <el-table-column :label="$t('logistics.container.column.status')" min-width="70" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.legacyStatus === '出完' ? 'success' : row.legacyStatus === '未出' ? 'info' : 'warning'" size="small">{{ row.legacyStatus || '-' }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('logistics.container.column.arrivalLocation')" min-width="100">
           <template #default="{ row }">
             {{ row.arrivalLocation ?? '-' }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('logistics.column.createTime')" min-width="160">
-          <template #default="{ row }">{{ formatTime(row.createTime) }}</template>
-        </el-table-column>
-        <el-table-column :label="$t('logistics.column.actions')" min-width="200" fixed="right">
+        <el-table-column :label="$t('logistics.container.column.remarks')" min-width="110" show-overflow-tooltip>
           <template #default="{ row }">
-            <el-button v-if="hasPermission('container:update')" size="small" @click="onEdit(row)">{{ $t('common.edit') }}</el-button>
-            <el-button v-if="hasPermission('container:update')" size="small" type="success" plain @click="onAssignShip(row)">
-              {{ row.shipId ? t('logistics.container.dialog.assignShip') : t('logistics.container.dialog.assignShip') }}
-            </el-button>
-            <el-button v-if="hasPermission('container:update') && row.shipId" size="small" type="warning" plain @click="onUnassignShip(row)">
-              {{ $t('logistics.container.unassignSuccess') }}
-            </el-button>
-            <el-button v-if="hasPermission('container:delete')" size="small" type="danger" plain @click="onDelete(row)">{{ $t('common.delete') }}</el-button>
+            <span class="cell-single-line">{{ row.remarks || '-' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('logistics.column.actions')" min-width="150">
+          <template #default="{ row }">
+            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('common.view') }}</el-button>
+            <el-button v-if="hasPermission('container:update')" link type="warning" size="small" @click="onEdit(row)">{{ $t('common.edit') }}</el-button>
+            <el-button v-if="hasPermission('container:delete')" link type="danger" size="small" @click="onDelete(row)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -398,15 +385,14 @@ onMounted(loadData)
       />
     </el-card>
 
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" :close-on-click-modal="false">
-      <el-form label-width="160px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="580px" :close-on-click-modal="false">
+      <el-form label-width="140px">
         <el-form-item :label="$t('logistics.container.column.containerNo')" required>
           <el-input v-model="formData.containerNo" :placeholder="$t('logistics.container.containerNoPlaceholder')" />
         </el-form-item>
-        <el-form-item :label="$t('logistics.container.column.containerType')" required>
-          <el-select v-model="formData.containerType" style="width:100%">
-            <el-option v-for="t in typeOptions" :key="t" :value="t" :label="containerTypeLabel(t)" />
-          </el-select>
+        <!-- list7 原始字段（SPEC-B14）-->
+        <el-form-item :label="$t('logistics.container.column.cabinetNo')">
+          <el-input v-model="formData.cabinetNo" placeholder="CBHU4225619" />
         </el-form-item>
         <el-form-item :label="$t('logistics.container.column.loadDate')">
           <el-date-picker v-model="formData.loadDate" type="date" value-format="YYYY-MM-DD" style="width:100%" />
@@ -414,11 +400,15 @@ onMounted(loadData)
         <el-form-item :label="$t('logistics.container.column.departureDate')">
           <el-date-picker v-model="formData.departureDate" type="date" value-format="YYYY-MM-DD" style="width:100%" />
         </el-form-item>
-        <el-form-item :label="$t('logistics.container.column.arrivalDate')">
-          <el-date-picker v-model="formData.arrivalDate" type="date" value-format="YYYY-MM-DD" style="width:100%" />
+        <el-form-item :label="$t('logistics.container.column.period')">
+          <el-select v-model="formData.period" clearable style="width:100%">
+            <el-option v-for="p in periodOptions" :key="p" :value="p" :label="p" />
+          </el-select>
         </el-form-item>
-        <el-form-item :label="$t('logistics.container.column.timeSlot')">
-          <el-input v-model="formData.timeSlot" :placeholder="$t('logistics.container.dialog.timeSlotPlaceholder')" />
+        <el-form-item :label="$t('logistics.container.column.status')">
+          <el-select v-model="formData.legacyStatus" clearable style="width:100%">
+            <el-option v-for="s in legacyStatusOptions" :key="s" :value="s" :label="s" />
+          </el-select>
         </el-form-item>
         <el-form-item :label="$t('logistics.container.column.arrivalLocation')">
           <el-input v-model="formData.arrivalLocation" :placeholder="$t('logistics.container.dialog.arrivalLocationPlaceholder')" />
@@ -426,12 +416,45 @@ onMounted(loadData)
         <el-form-item :label="$t('logistics.container.column.remarks')">
           <el-input v-model="formData.remarks" :placeholder="$t('logistics.container.dialog.remarksPlaceholder')" type="textarea" :rows="2" />
         </el-form-item>
+        <el-form-item :label="$t('logistics.container.column.showFlag')">
+          <el-switch v-model="formData.showFlag" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">{{ $t('common.cancel') }}</el-button>
         <el-button type="primary" @click="onSubmit">{{ $t('common.save') }}</el-button>
       </template>
     </el-dialog>
+
+    <!-- 详情抽屉 -->
+    <el-drawer v-model="drawerVisible" :title="$t('logistics.container.drawerTitle')" size="560px" direction="rtl">
+      <el-descriptions :column="2" border v-if="currentRow">
+        <el-descriptions-item :label="$t('logistics.container.column.containerNo')">{{ currentRow.containerNo }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.container.column.shipName')">{{ currentRow.shipName || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.container.column.shipNumber')">{{ currentRow.shipNumber || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.container.column.cabinetNo')">{{ currentRow.cabinetNo || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.container.column.loadDate')">{{ currentRow.loadDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.container.column.departureDate')">{{ currentRow.departureDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.container.column.period')">{{ currentRow.period || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.container.column.status')">
+          <el-tag :type="currentRow.legacyStatus === '出完' ? 'success' : currentRow.legacyStatus === '未出' ? 'info' : 'warning'" size="small">{{ currentRow.legacyStatus || '-' }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.container.column.arrivalLocation')">{{ currentRow.arrivalLocation || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.container.column.showFlag')">
+          <el-tag v-if="currentRow.showFlag === false" type="info" size="small">{{ $t('logistics.container.showFlag.archived') }}</el-tag>
+          <el-tag v-else type="success" size="small">{{ $t('logistics.container.showFlag.active') }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.container.column.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.container.column.legacyUpdater')">{{ currentRow.legacyUpdater || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.container.column.legacyUpdatetime')">{{ currentRow.legacyUpdatetime ? formatTime(currentRow.legacyUpdatetime) : '-' }}</el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <el-button v-if="hasPermission('container:update')" type="warning" @click="() => { drawerVisible = false; onEdit(currentRow!) }">{{ $t('common.edit') }}</el-button>
+        <el-button v-if="hasPermission('container:update')" type="primary" @click="() => { drawerVisible = false; onAssignShip(currentRow!) }">{{ $t('logistics.container.dialog.assignShip') }}</el-button>
+        <el-button v-if="hasPermission('container:update') && currentRow?.shipId" type="danger" @click="() => { drawerVisible = false; onUnassignShip(currentRow!) }">{{ $t('logistics.container.dialog.unassignShip') }}</el-button>
+        <el-button @click="drawerVisible = false">{{ $t('common.close') }}</el-button>
+      </template>
+    </el-drawer>
 
     <!-- 分配船只弹窗 -->
     <el-dialog v-model="assignDialogVisible" :title="assignDialogTitle" width="480px" :close-on-click-modal="false">
@@ -459,7 +482,13 @@ onMounted(loadData)
 </template>
 
 <style scoped>
+.page { display: flex; flex-direction: column; gap: 16px; }
+.filter-card :deep(.el-card__body) { padding-bottom: 0; }
+.table-card :deep(.el-card__body) { padding: 16px; }
 .table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .selection-count { margin-left: 4px; }
+:deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
+:deep(.cell-single-line) { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.btn-blue { color: #409EFF !important; }
 </style>
