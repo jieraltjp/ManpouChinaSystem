@@ -3,6 +3,7 @@
 > **版本**: 1.2.0
 > **更新**: 2026-05-08（v1.2.0：Entity补shipmentBatchId字段）
 > **更新**: 2026-05-07（v1.1.2：注⚠️QcRecord.taxRefund字段Entity仍存在，与文档v1.1.1不一致）
+> **更新**: 2026-05-24（v1.1.2 终态：字段仍在使用中，不属于待定项。QcRecordAssembler/QcRecordUpdateCmd/QcRecordCreateCmd 均引用该字段，实际业务流程中仍依赖此字段记录验货层退税标记）
 > **更新**: 2026-04-27（v1.1.1：移除 QcRecord.taxRefund，退税由采购层 billingType 决定）
 > **更新**: 2026-04-27（v1.1.0：新增验货完成后自动推进采购单状态；新增选择采购后代入字段自动预填）
 > **更新**: 2026-04-23（补充元数据字段）
@@ -24,9 +25,9 @@
 
 **关键设计**：QcRecord 从内嵌值对象升级为独立聚合根，可独立查询和追踪。
 
-**v1.1.1 字段移除**：`taxRefund`（是否退税）已从 QcRecord 移除。退税决策属于采购层，由 `Procurement.billingType`（报关类型）决定。
+**v1.1.1 原计划字段移除**：`taxRefund`（是否退税）原计划从 QcRecord 移除，退税决策改由采购层 `Procurement.billingType` 决定。但该决定未落地（见 v1.1.2 终态），`taxRefund` 字段仍在 Entity/Assembler/Cmd 中活跃使用。
 
-> ⚠️ **v1.1.2 补充**：Entity `QcRecord.java` 仍含 `taxRefund` 字段（DB列未DROP），与文档v1.1.1不一致。此为代码与文档的差距，待决策是否从Entity中移除。
+> ⚠️ **v1.1.2 终态**：Entity `QcRecord.java:99` 仍含 `taxRefund` 字段，QcRecordAssembler/QcRecordUpdateCmd/QcRecordCreateCmd 均引用此字段。该字段在业务流程中仍被使用，v1.1.1 的"移除"决定未落地。SPEC-B03 正文"字段移除"描述已失效，应以本条为准。
 
 **v1.1.0 新增自动行为**：
 - 创建验货记录时，若 `sellerName` 未填，自动从关联 Procurement.factoryId → Factory.factoryName 代入（K-03 规则）

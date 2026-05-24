@@ -212,7 +212,7 @@ const routes: RouteRecordRaw[] = [
             path: 'profile',
             name: 'Profile',
             component: () => import('@/pages/system/ProfilePage.vue'),
-            meta: { titleKey: 'menu.profileLabel', requiresAuth: true },
+            meta: { titleKey: 'menu.profileLabel', requiresAuth: true, permission: 'page:profile:access' },
           },
         ],
       },

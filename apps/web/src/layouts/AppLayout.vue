@@ -84,7 +84,7 @@
         </el-sub-menu>
 
         <!-- 基础数据 -->
-        <el-sub-menu v-if="hasPermission('page:factory:access') || hasPermission('page:product:access') || hasPermission('page:order:access') || hasPermission('page:container:access') || hasPermission('cargo_size:read') || hasPermission('legacy_procurement:read') || hasPermission('dispatch:read') || hasPermission('offline_order:read')" index="base" :popper-class="'sidebar-popper'">
+        <el-sub-menu v-if="hasPermission('page:factory:access') || hasPermission('page:product:access') || hasPermission('page:order:access') || hasPermission('page:container:access') || hasPermission('page:cargo_size:access') || hasPermission('page:legacy_procurement:access') || hasPermission('page:dispatch:access') || hasPermission('page:offline_order:access')" index="base" :popper-class="'sidebar-popper'">
           <template #title>
             <el-icon><Menu /></el-icon>
             <span v-if="!isCollapsed">{{ $t('menu.base') }}</span>
@@ -97,7 +97,7 @@
             <el-icon><Goods /></el-icon>
             <template #title>{{ $t('menu.product') }}</template>
           </el-menu-item>
-          <el-menu-item v-if="hasPermission('cargo_size:read')" index="/base/cargo-size">
+          <el-menu-item v-if="hasPermission('page:cargo_size:access')" index="/base/cargo-size">
             <el-icon><Box /></el-icon>
             <template #title>{{ $t('menu.cargoSize') }}</template>
           </el-menu-item>
@@ -109,15 +109,15 @@
             <el-icon><Document /></el-icon>
             <template #title>{{ $t('menu.orderOverview') }}</template>
           </el-menu-item>
-          <el-menu-item v-if="hasPermission('dispatch:read')" index="/base/dispatch">
+          <el-menu-item v-if="hasPermission('page:dispatch:access')" index="/base/dispatch">
             <el-icon><List /></el-icon>
             <template #title>{{ $t('menu.dispatch') }}</template>
           </el-menu-item>
-          <el-menu-item v-if="hasPermission('legacy_procurement:read')" index="/base/legacy-procurement">
+          <el-menu-item v-if="hasPermission('page:legacy_procurement:access')" index="/base/legacy-procurement">
             <el-icon><Clock /></el-icon>
             <template #title>{{ $t('menu.legacyProcurement') }}</template>
           </el-menu-item>
-          <el-menu-item v-if="hasPermission('offline_order:read')" index="/base/offline-order">
+          <el-menu-item v-if="hasPermission('page:offline_order:access')" index="/base/offline-order">
             <el-icon><List /></el-icon>
             <template #title>{{ $t('menu.offlineOrder') }}</template>
           </el-menu-item>
@@ -141,7 +141,7 @@
             <el-icon><Document /></el-icon>
             <template #title>{{ $t('menu.auditLog') }}</template>
           </el-menu-item>
-          <el-menu-item index="/system/profile">
+          <el-menu-item v-if="hasPermission('page:profile:access')" index="/system/profile">
             <el-icon><User /></el-icon>
             <template #title>{{ $t('menu.profileLabel') }}</template>
           </el-menu-item>

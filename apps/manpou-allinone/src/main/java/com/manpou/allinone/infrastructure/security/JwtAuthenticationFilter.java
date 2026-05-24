@@ -41,8 +41,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     /**
-     * ADMIN 角色 *:* 展开后的所有具体权限（105条）。
-     * CRUD 87条 + page:*:access 18条。
+     * ADMIN 角色 *:* 展开后的所有具体权限（108条）。
+     * CRUD 87条 + page:*:access 23条。
      * warehouse/notification 未入 Set（模块未实现）。
      * V56 新增：page:*:access 路由守卫权限（ID 140~157，18个模块）。
      */
@@ -75,7 +75,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "page:logistics:access", "page:consolidation:access", "page:container:access", "page:ship:access",
         "page:customs:access", "page:japan_customs:access", "page:tax_refund:access", "page:sales:access",
         "page:factory:access", "page:product:access", "page:order:access",
-        "page:user:access", "page:role:access", "page:audit:access"
+        "page:user:access", "page:role:access", "page:audit:access",
+        "page:cargo_size:access", "page:dispatch:access", "page:legacy_procurement:access", "page:offline_order:access", "page:profile:access"
     );
 
     private final JwtService jwtService;

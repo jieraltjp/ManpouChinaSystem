@@ -20,14 +20,30 @@
           <el-button @click="onReset">{{ $t('legacyProcurement.filter.reset') }}</el-button>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-model="filterForm.overdueOnly" :label="$t('legacyProcurement.filter.overdueOnly')" @change="onSearch" />
+          <el-checkbox v-model="filterForm.overdueOnly" @change="onSearch">
+            <span>{{ $t('legacyProcurement.filter.overdueOnly') }}</span>
+          </el-checkbox>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onNew" v-if="hasPermission('legacy_procurement:create')">
+            {{ $t('legacyProcurement.dialog.createTitle') }}
+          </el-button>
         </el-form-item>
       </el-form>
     </el-card>
 
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="displayData" stripe style="width:100%" min-height="200" :row-class-name="getRowClassName">
+      <template #header>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <el-radio-group v-model="excelViewMode" size="small">
+            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+          </el-radio-group>
+        </div>
+      </template>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="displayData" stripe style="width:100%" min-height="200" :row-class-name="getRowClassName">
+        <el-table-column type="selection" width="40" align="center" />
         <el-table-column prop="legacyId" :label="$t('legacyProcurement.column.legacyId')" width="70" align="center" />
         <el-table-column prop="code" :label="$t('legacyProcurement.column.code')" min-width="110" show-overflow-tooltip />
         <el-table-column prop="subCode" :label="$t('legacyProcurement.column.subCode')" min-width="80" show-overflow-tooltip />
@@ -105,18 +121,15 @@
           </template>
         </el-table-column>
         <el-table-column prop="container" :label="$t('legacyProcurement.column.container')" min-width="120" show-overflow-tooltip />
-        <el-table-column :label="$t('legacyProcurement.column.action')" width="120" align="center" fixed="right">
-          <template #header>
-            <el-button type="primary" size="small" @click="onNew" style="font-size:12px;padding:4px 8px;" v-if="hasPermission('legacy_procurement:create')">
-              {{ $t('legacyProcurement.dialog.createTitle') }}
-            </el-button>
-          </template>
+        <el-table-column :label="$t('legacyProcurement.column.action')" width="160" align="center">
           <template #default="{ row }">
+            <el-button link class="btn-blue" size="small" @click.stop="onDetail(row)">{{ $t('legacyProcurement.action.detail') }}</el-button>
             <el-button link class="btn-blue" size="small" @click.stop="onEdit(row)" v-if="hasPermission('legacy_procurement:update')">{{ $t('legacyProcurement.action.edit') }}</el-button>
             <el-button link class="btn-danger" size="small" @click.stop="onDelete(row)" v-if="hasPermission('legacy_procurement:delete')">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <ExcelTable v-else :columns="copyColumns" :data="displayData" />
 
       <!-- 分页 -->
       <div class="pagination-wrap">
@@ -434,7 +447,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { legacyProcurementApi } from '@/api/legacy-procurement'
@@ -442,11 +455,43 @@ import type { LegacyProcurementPageVO } from '@/api/legacy-procurement'
 import { useProductImage } from '@/composables/useProductImage'
 import ProductImageCell from '@/components/ProductImageCell.vue'
 import { usePermission } from '@/composables/usePermission'
+import { useOverdue } from '@/composables/useOverdue'
+import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { imageMap, loadImageMap } = useProductImage()
 const { hasPermission } = usePermission()
 const { locale: localeRef } = useI18n()
 const { t } = useI18n()
+
+const excelViewMode = ref<'table' | 'copy'>('table')
+
+const copyColumns: ExcelColDef[] = [
+  { prop: 'code', label: t('legacyProcurement.column.code') },
+  { prop: 'subCode', label: t('legacyProcurement.column.subCode') },
+  { prop: 'itemName', label: t('legacyProcurement.column.itemName') },
+  { prop: 'orderGroup', label: t('legacyProcurement.column.orderGroup') },
+  { prop: 'orderCount', label: t('legacyProcurement.column.orderCount'), formatter: (row) => row.orderCount != null ? String(row.orderCount) : '' },
+  { prop: 'inspectCount', label: t('legacyProcurement.column.inspectCount'), formatter: (row) => row.inspectCount != null ? String(row.inspectCount) : '' },
+  { prop: 'yoyakuHasoubi', label: t('legacyProcurement.column.yoyakuHasoubi') },
+  { prop: 'arrivalDepo', label: t('legacyProcurement.column.arrivalDepo') },
+  { prop: 'departure', label: t('legacyProcurement.column.departure') },
+  { prop: 'arrival', label: t('legacyProcurement.column.arrival') },
+  { prop: 'arrivalJikan', label: t('legacyProcurement.column.arrivalJikan'), formatter: (row) => row.arrivalJikan != null ? String(row.arrivalJikan).padStart(2, '0') + ':00' : '' },
+  { prop: 'receive', label: t('legacyProcurement.column.receive') },
+  { prop: 'neStock', label: t('legacyProcurement.column.neStock') },
+  { prop: 'houkoku', label: t('legacyProcurement.column.houkoku') },
+  { prop: 'kaitsuke', label: t('legacyProcurement.column.kaitsuke'), formatter: (row) => formatNum(row.kaitsuke) },
+  { prop: 'kanpu', label: t('legacyProcurement.column.kanpu') },
+  { prop: 'hyoten', label: t('legacyProcurement.column.hyoten'), formatter: (row) => formatNum(row.hyoten) },
+  { prop: 'unitCh', label: t('legacyProcurement.column.unitCh'), formatter: (row) => formatNum(row.unitCh) },
+  { prop: 'totalCh', label: t('legacyProcurement.column.totalCh'), formatter: (row) => formatNum(row.totalCh) },
+  { prop: 'unitJp', label: t('legacyProcurement.column.unitJp'), formatter: (row) => formatNum(row.unitJp) },
+  { prop: 'totalJp', label: t('legacyProcurement.column.totalJp'), formatter: (row) => row.totalJp != null ? row.totalJp.toLocaleString() : '' },
+  { prop: 'rate', label: t('legacyProcurement.column.rate'), formatter: (row) => formatNum(row.rate) },
+  { prop: 'container', label: t('legacyProcurement.column.container') },
+  { prop: 'updater', label: t('legacyProcurement.column.updater') },
+  { prop: 'note', label: t('legacyProcurement.column.note') },
+]
 
 function formatTime(ts: string | undefined | null): string {
   if (!ts) return '-'
@@ -469,22 +514,12 @@ const currentRow = ref<LegacyProcurementPageVO | null>(null)
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const filterForm = reactive({ code: '', orderGroup: '', itemName: '', updater: '', overdueOnly: false })
 
-function isOverdue(row: LegacyProcurementPageVO): boolean {
-  const refDate = row.arrivalDepo || row.yoyakuHasoubi
-  if (!refDate) return false
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  return today > new Date(refDate + 'T00:00:00')
-}
+const { isOverdue, getRowClassName, filterOverdue } = useOverdue(tableData)
 
 const displayData = computed(() => {
   if (!filterForm.overdueOnly) return tableData.value
-  return tableData.value.filter(isOverdue)
+  return filterOverdue(tableData.value)
 })
-
-function getRowClassName({ row }: { row: LegacyProcurementPageVO }): string {
-  return isOverdue(row) ? 'overdue-row' : ''
-}
 
 // Edit dialog
 const editVisible = ref(false)
@@ -591,6 +626,11 @@ function onNew() {
     note: '', receive: '',
   })
   editVisible.value = true
+}
+
+function onDetail(row: LegacyProcurementPageVO) {
+  currentRow.value = row
+  detailVisible.value = true
 }
 
 function onEdit(row: LegacyProcurementPageVO) {
@@ -746,7 +786,7 @@ loadData()
   background-color: #fde2e2 !important;
 }
 :deep(.el-table .overdue-row:hover > td) {
-  background-color: #fbczczc !important;
+  background-color: #fbd5d5 !important;
 }
 :deep(.el-table .overdue-row td) {
   background-color: inherit !important;

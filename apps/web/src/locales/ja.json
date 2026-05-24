@@ -404,7 +404,9 @@
       "markReturn": "注文件失敗としてマーク",
       "returnReasonPlaceholder": "退货理由を入力してください...",
       "returnConfirmTip": "マーク後、状態は元に戻せません。需要側に通知されます",
-      "returnReasonRequired": "退货理由を入力してください"
+      "returnReasonRequired": "退货理由を入力してください",
+      "selectTargetStatus": "対象ステータスを選択",
+      "selectStatusPlaceholder": "ステータスを選択してください"
     },
     "factoryDialog": {
       "newTitle": "工場新規追加",
@@ -2138,6 +2140,7 @@
       "disable": "無効",
       "enable": "有効化",
       "resetPassword": "パスワードリセット",
+      "copyPassword": "パスワードをコピー",
       "assignRole": "役割を割り当て"
     },
     "dialog": {
@@ -2539,7 +2542,8 @@
       "updater": "更新者",
       "updaterPlaceholder": "更新者でで検索",
       "search": "検索",
-      "reset": "リセット"
+      "reset": "リセット",
+      "overdueOnly": "超過のみ表示(バン詰め)"
     },
     "column": {
       "legacyId": "ID",

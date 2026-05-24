@@ -1,7 +1,8 @@
 # SPEC-B04 — 调配计划业务规格（步骤4）
 
-> **版本**: 1.7.0
+> **版本**: 1.7.1
 > **创建**: 2026-04-22
+> **更新**: 2026-05-24（v1.7.1：Container Entity仍缺sealNo/departurePort/arrivalPort/closeLoading()，JapanCustomsRecord含arrivalPort，Ship含departurePort+arrivalPort，属正常分层设计；审计确认非遗漏）
 > **更新**: 2026-05-11（v1.7.0：修正ContainerType枚举值 GP20/GP40/HC40/HC45（代码vs doc）；DB-04同步）
 > **更新**: 2026-05-07（v1.5.0：ConsolidationPool字段名修正；Container.containerCode缺失注⚠️）
 > **状态**: ✅ 已实现（LogisticsPlan + Container + ConsolidationPool）

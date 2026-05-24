@@ -32,6 +32,7 @@
     <!-- Table Card -->
     <el-card class="table-card" :body-style="{ padding: '0' }">
       <el-table :data="tableData" v-loading="loading" stripe style="width: 100%">
+        <el-table-column type="selection" width="40" align="center" />
         <el-table-column :label="$t('offlineOrder.column.code')" prop="code" show-overflow-tooltip min-width="120" />
         <el-table-column :label="$t('offlineOrder.column.subCode')" prop="subCode" show-overflow-tooltip min-width="100" />
         <el-table-column :label="$t('offlineOrder.column.houkoku')" prop="houkoku" show-overflow-tooltip min-width="100" />

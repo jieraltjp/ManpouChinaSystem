@@ -1,7 +1,8 @@
 # 用户中心与权限体系 — SPEC-B11
 
-> **版本**: 1.14.0
+> **版本**: 1.15.0
 > **创建**: 2026-04-30
+> **更新**: 2026-05-24（v1.15.0：审计修复——补充缺失权限列表（page:*:access/cargo_size/legacy_procurement/dispatch/offline_order 共39条）；更新状态为 Phase 5 完成；Phase 6 待开发）
 > **更新**: 2026-05-14（v1.14.0：迁移体系重构（V15-V20）；Phase 3/4 前端权限/日志页状态修正；历史迁移章节加注废弃说明）
 > **状态**: ✅ Phase 2 完成；✅ Phase 3 完成；✅ Phase 4 完成（操作日志全链路）；✅ Phase 5 完成（头像上传）；Phase 6 待开发
 > **依据**: 用户需求（用户管理 + 权限 + 操作日志 + 个人信息设置）
@@ -614,6 +615,56 @@ public boolean canLogin(User user) {
 | `ship:delete` | 删除船只 | 船舶を削除 | DELETE | 118 |
 
 > 注：`container:read/create/update/delete`（ID 29-32）已存在于 V15 baseline。`ship:*`（ID 115~118）为 V18 新增，V15 baseline 尚未包含。
+
+#### ⚠️ 已使用但未入库的权限（审计 2026-05-24）
+
+以下权限在代码中被 `@PreAuthorize` 或 `hasPermission()` 使用，但 permission 表种子数据中不存在，会导致非 ADMIN 用户 403：
+
+| 权限编码 | 使用位置 | 说明 |
+|---------|---------|------|
+| `page:demand:access` | AppLayout.vue | 菜单显隐（base 子菜单） |
+| `page:procurement:access` | AppLayout.vue | 菜单显隐 |
+| `page:shipment:access` | AppLayout.vue | 菜单显隐 |
+| `page:qc:access` | AppLayout.vue | 菜单显隐 |
+| `page:logistics:access` | AppLayout.vue | 菜单显隐 |
+| `page:consolidation:access` | AppLayout.vue | 菜单显隐 |
+| `page:container:access` | AppLayout.vue | 菜单显隐 |
+| `page:customs:access` | AppLayout.vue | 菜单显隐 |
+| `page:japan_customs:access` | AppLayout.vue | 菜单显隐 |
+| `page:tax_refund:access` | AppLayout.vue | 菜单显隐 |
+| `page:sales:access` | AppLayout.vue | 菜单显隐 |
+| `page:factory:access` | AppLayout.vue | 菜单显隐 |
+| `page:product:access` | AppLayout.vue | 菜单显隐 |
+| `page:order:access` | AppLayout.vue | 菜单显隐 |
+| `page:user:access` | AppLayout.vue | 菜单显隐 |
+| `page:role:access` | AppLayout.vue | 菜单显隐 |
+| `page:audit:access` | AppLayout.vue | 菜单显隐 |
+| `page:ship:access` | AppLayout.vue | 菜单显隐 |
+| `page:cargo_size:access` | AppLayout.vue | 菜单显隐 |
+| `page:legacy_procurement:access` | AppLayout.vue | 菜单显隐 |
+| `page:dispatch:access` | AppLayout.vue | 菜单显隐 |
+| `page:offline_order:access` | AppLayout.vue | 菜单显隐 |
+| `cargo_size:read` | CargoSizeController | 货物尺寸管理 |
+| `cargo_size:create` | CargoSizeController | 货物尺寸管理 |
+| `cargo_size:update` | CargoSizeController | 货物尺寸管理 |
+| `cargo_size:delete` | CargoSizeController | 货物尺寸管理 |
+| `cargo_size:promote` | CargoSizeController | 货物尺寸管理 |
+| `cargo_size:discard` | CargoSizeController | 货物尺寸管理 |
+| `legacy_procurement:read` | LegacyProcurementController | 旧发注管理 |
+| `legacy_procurement:create` | LegacyProcurementController | 旧发注管理 |
+| `legacy_procurement:update` | LegacyProcurementController | 旧发注管理 |
+| `legacy_procurement:delete` | LegacyProcurementController | 旧发注管理 |
+| `dispatch:read` | DispatchController | 货物发送整理 |
+| `dispatch:create` | DispatchController | 货物发送整理 |
+| `dispatch:update` | DispatchController | 货物发送整理 |
+| `dispatch:delete` | DispatchController | 货物发送整理 |
+| `offline_order:read` | OfflineOrderController | 线下订单管理 |
+| `offline_order:create` | OfflineOrderController | 线下订单管理 |
+| `offline_order:update` | OfflineOrderController | 线下订单管理 |
+| `offline_order:delete` | OfflineOrderController | 线下订单管理 |
+
+> **架构说明**：`page:*:access` 为前端菜单显隐专用，与业务 API 权限（如 `demand:read`）为两套并行体系。当前 DB 无 seed，全部非 ADMIN 用户菜单空白（只有 ADMIN 因 `*:*` 通配可绕过）。
+
 
 #### 报关模块（customs）
 

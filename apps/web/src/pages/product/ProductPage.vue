@@ -1,20 +1,5 @@
 <template>
   <div class="page">
-    <!-- 统计行 -->
-    <el-row :gutter="16" class="stats-row">
-      <el-col :span="6">
-        <el-card shadow="hover" class="stat-card">
-          <div class="stat-content">
-            <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#E8650A"><Goods /></el-icon></div>
-            <div>
-              <div class="stat-value">{{ pagination.total }}</div>
-              <div class="stat-label">{{ $t('product.stat.total') }}</div>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
-
     <!-- 筛选 -->
     <el-card class="filter-card" shadow="never">
       <el-row :gutter="16">
@@ -463,7 +448,7 @@
 import { ref, reactive, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Goods, Loading } from '@element-plus/icons-vue'
+import { Plus, Loading } from '@element-plus/icons-vue'
 import { productApi } from '@/api/product'
 import { aiApi } from '@/api/ai'
 import type { ProductPageVO, CreateProductRequest, UpdateProductRequest, ProductFactoryVO } from '@/api/product'
@@ -736,7 +721,6 @@ loadData()
 .page { display: flex; flex-direction: column; gap: 16px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
 .table-card :deep(.el-card__body) { padding: 16px; }
-.stats-row { margin-bottom: 4px; }
 .drawer-content {
   padding: 0 16px;
 }

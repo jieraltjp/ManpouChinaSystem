@@ -1,8 +1,13 @@
--- V56: page_access权限 + dispatch模块 + cargo_size:delete
+-- V56: page_access权限 + dispatch模块 + cargo_size + legacy_procurement CRUD
 -- 时间: 2026-05-24
--- G1: 18个 page:*:access（路由守卫用，前端页面入口权限，已在DB，迁移仅做幂等）
--- G2: dispatch 4条CRUD（DispatchPage用，ID 135~138）
--- G3: cargo_size:delete（ID 134，V54漏了）
+-- G1: cargo_size:delete（V54漏了，ID 134）
+-- G2: dispatch 4条CRUD（IDs 135~138）
+-- G3: cargo_size:create（DB缺失，ID 119）
+-- G4: legacy_procurement CRUD（DB只有read，IDs 126~128）
+-- G5: page:*:access 18个模块（DB已有，幂等插入，IDs 140~157）
+-- G6: page:cargo_size/dispatch/legacy_procurement:access（IDs 158~160）
+-- G7: page:offline_order:access（ID 161）
+-- G8: page:profile:access（ID 162）
 
 -- ================================================================
 -- 一、cargo_size:delete（V54漏了ID 134，ID 125 是 legacy_procurement:read）
@@ -52,8 +57,41 @@ WHERE r.role_code = 'VIEWER' AND p.permission_code = 'dispatch:read'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
 -- ================================================================
--- 三、page:*:access 路由守卫权限（18个模块，DB已有，幂等插入）
--- 注意：这些权限在DB已存在（IDs 71~88），此处仅确保幂等
+-- 四、cargo_size:create（DB缺失，ALL_PERMISSIONS已有）
+-- ================================================================
+INSERT INTO permission (id, permission_code, permission_name_cn, permission_name_jp, module, action_, sort_order, status, create_time, is_deleted, create_by, update_by)
+VALUES (119, 'cargo_size:create', '创建货物尺寸', '貨物サイズ作成', 'cargo_size', 'CREATE', 119, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
+ON DUPLICATE KEY UPDATE permission_name_cn = VALUES(permission_name_cn);
+
+INSERT INTO role_permission (role_id, permission_id)
+SELECT r.id, p.id FROM role r, permission p
+WHERE r.role_code IN ('ADMIN','MANAGER') AND p.permission_code = 'cargo_size:create'
+ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
+
+-- ================================================================
+-- 五、legacy_procurement CRUD（DB只有read，缺少create/update/delete）
+-- ================================================================
+INSERT INTO permission (id, permission_code, permission_name_cn, permission_name_jp, module, action_, sort_order, status, create_time, is_deleted, create_by, update_by)
+VALUES
+    (126, 'legacy_procurement:create', '创建旧发注', '旧発注管理-作成',     'legacy_procurement', 'CREATE', 126, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (127, 'legacy_procurement:update', '编辑旧发注', '旧発注管理-編集',     'legacy_procurement', 'UPDATE', 127, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (128, 'legacy_procurement:delete', '删除旧发注', '旧発注管理-削除',     'legacy_procurement', 'DELETE', 128, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
+ON DUPLICATE KEY UPDATE permission_name_cn = VALUES(permission_name_cn);
+
+-- ADMIN/MANAGER: 全部 legacy_procurement 权限
+INSERT INTO role_permission (role_id, permission_id)
+SELECT r.id, p.id FROM role r, permission p
+WHERE r.role_code IN ('ADMIN','MANAGER') AND p.permission_code LIKE 'legacy_procurement:%'
+ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
+
+-- OPERATOR: 增删改
+INSERT INTO role_permission (role_id, permission_id)
+SELECT r.id, p.id FROM role r, permission p
+WHERE r.role_code = 'OPERATOR' AND p.permission_code LIKE 'legacy_procurement:%' AND p.action_ != 'READ'
+ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
+-- ================================================================
+-- 六、page:*:access 路由守卫权限（18个模块，DB已有，幂等插入）
+-- 注意：这些权限在DB已存在（IDs 140~157），此处仅确保幂等
 -- ================================================================
 INSERT INTO permission (id, permission_code, permission_name_cn, permission_name_jp, module, action_, sort_order, status, create_time, is_deleted, create_by, update_by)
 VALUES
@@ -107,13 +145,55 @@ ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 INSERT INTO role_permission (role_id, permission_id)
 SELECT r.id, p.id FROM role r, permission p
 WHERE r.role_code = 'VIEWER'
-  AND p.permission_code IN (
-      'page:demand:access','page:procurement:access','page:shipment:access',
-      'page:qc:access','page:logistics:access','page:consolidation:access',
-      'page:container:access','page:ship:access',
-      'page:customs:access','page:japan_customs:access',
-      'page:tax_refund:access','page:sales:access',
-      'page:factory:access','page:product:access','page:order:access',
-      'page:user:access','page:role:access','page:audit:access'
-  )
+-- G6: cargo_size/dispatch/legacy_procurement page 访问权限（基础数据菜单守卫，IDs 158~160）
+-- ================================================================
+-- 七、page:cargo_size:access / page:dispatch:access / page:legacy_procurement:access（IDs 158~160）
+-- ================================================================
+INSERT INTO permission (id, permission_code, permission_name_cn, permission_name_jp, module, action_, sort_order, status, create_time, is_deleted, create_by, update_by)
+VALUES
+    (158, 'page:cargo_size:access',        '访问货物尺寸',       '貨物サイズ頁アクセス',     'page', 'ACCESS', 158, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (159, 'page:dispatch:access',          '访问配送单',         '配送單頁アクセス',         'page', 'ACCESS', 159, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (160, 'page:legacy_procurement:access', '访问旧发注',        '旧発注管理頁アクセス',     'page', 'ACCESS', 160, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
+ON DUPLICATE KEY UPDATE permission_name_cn = VALUES(permission_name_cn);
+
+-- ADMIN/MANAGER: 全部
+INSERT INTO role_permission (role_id, permission_id)
+SELECT r.id, p.id FROM role r, permission p
+WHERE r.role_code IN ('ADMIN','MANAGER') AND p.permission_code LIKE 'page:%'
+ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
+
+-- OPERATOR: 货物尺寸 + 配送单（工作页面）
+INSERT INTO role_permission (role_id, permission_id)
+SELECT r.id, p.id FROM role r, permission p
+WHERE r.role_code = 'OPERATOR' AND p.permission_code IN ('page:cargo_size:access','page:dispatch:access')
+ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
+
+-- VIEWER: 货物尺寸（可查看）
+INSERT INTO role_permission (role_id, permission_id)
+SELECT r.id, p.id FROM role r, permission p
+WHERE r.role_code = 'VIEWER' AND p.permission_code IN ('page:cargo_size:access','page:dispatch:access')
+ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
+
+-- ================================================================
+-- 八、page:offline_order:access（ID 161，/system/role 可控制入口）
+-- ================================================================
+INSERT INTO permission (id, permission_code, permission_name_cn, permission_name_jp, module, action_, sort_order, status, create_time, is_deleted, create_by, update_by)
+VALUES (161, 'page:offline_order:access', '访问线下订单', 'オフライン注文頁アクセス', 'page', 'ACCESS', 161, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
+ON DUPLICATE KEY UPDATE permission_name_cn = VALUES(permission_name_cn);
+
+INSERT INTO role_permission (role_id, permission_id)
+SELECT r.id, p.id FROM role r, permission p
+WHERE r.role_code IN ('ADMIN','MANAGER','OPERATOR','VIEWER') AND p.permission_code = 'page:offline_order:access'
+ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
+
+-- ================================================================
+-- 九、page:profile:access（ID 162，个人中心入口控制）
+-- ================================================================
+INSERT INTO permission (id, permission_code, permission_name_cn, permission_name_jp, module, action_, sort_order, status, create_time, is_deleted, create_by, update_by)
+VALUES (162, 'page:profile:access', '访问个人中心', 'プロフィール頁アクセス', 'page', 'ACCESS', 162, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
+ON DUPLICATE KEY UPDATE permission_name_cn = VALUES(permission_name_cn);
+
+INSERT INTO role_permission (role_id, permission_id)
+SELECT r.id, p.id FROM role r, permission p
+WHERE r.role_code IN ('ADMIN','MANAGER','OPERATOR','VIEWER') AND p.permission_code = 'page:profile:access'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);

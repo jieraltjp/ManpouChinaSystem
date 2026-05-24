@@ -175,3 +175,6 @@ tmp_excel/
 *.tar
 *.xz
 *.zip
+
+# Local sensitive files
+token.txt
