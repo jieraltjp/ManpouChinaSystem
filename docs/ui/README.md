@@ -10,6 +10,8 @@
 |------|------|
 | UI-01 ~ UI-03 | 系统页面（登录/仪表盘/示例），无业务步号 |
 | UI-04 ~ UI-12 | 业务步号 01 ~ 09（与业务步号一一对应） |
+| UI-13 ~ UI-16 | 基础数据 + 详情页 |
+| UI-17 ~ UI-26 | SPEC-B11/B-12 扩展页面（用户/角色/日志/Profile/Ship 等） |
 
 ---
 
@@ -31,16 +33,17 @@
 | UI-12 | [pages/09-order-overview.md](pages/09-order-overview.md) | `/base/overview` | 09 | ✅ |
 | UI-13 | [pages/10-product.md](pages/10-product.md) | `/base/product` | — | ✅ |
 | UI-14 | [pages/11-factory.md](pages/11-factory.md) | `/base/factory` | — | ✅ |
-| UI-15 | [pages/12-demand-overview.md](pages/12-demand-overview.md) | `/base/overview/demand/:demandId` | — | ✅ |
-| UI-16 | [pages/13-procurement-overview.md](pages/13-procurement-overview.md) | `/base/overview/procurement/:procurementId` | — | ✅ |
-| — | [pages/17-shipment-batch.md](pages/17-shipment-batch.md) | `/procurement/shipment-batch` | — | ✅ |
-| — | [pages/18-consolidation-pool.md](pages/18-consolidation-pool.md) | `/procurement/consolidation-pool` | — | ✅ |
-| — | [pages/19-container.md](pages/19-container.md) | `/procurement/container` | — | ✅ |
-| UI-17 | [pages/14-user-management.md](pages/14-user-management.md) | `/system/user` | B-11 | ✅ 前端完成（Phase 3 后端权限控制已完成） |
-| UI-18 | [pages/15-role-management.md](pages/15-role-management.md) | `/system/role` | B-11 | ✅ 前端完成（Phase 3 后端权限控制已完成） |
-| UI-19 | [pages/16-audit-log.md](pages/16-audit-log.md) | `/system/audit-log` | B-11 | ✅ |
-| UI-20 | [pages/17-profile.md](pages/17-profile.md) | `/profile` | B-11 | ✅ |
-| UI-21 | [pages/20-ship.md](pages/20-ship.md) | `/base/ship` | B-12 | ✅ |
+| UI-16 | [pages/12-demand-overview.md](pages/12-demand-overview.md) | `/base/overview/demand/:demandId` | — | ✅ |
+| UI-17 | [pages/13-procurement-overview.md](pages/13-procurement-overview.md) | `/base/overview/procurement/:procurementId` | — | ✅ |
+| UI-18 | [pages/17-shipment-batch.md](pages/17-shipment-batch.md) | `/procurement/shipment-batch` | — | ✅ |
+| UI-19 | [pages/18-consolidation-pool.md](pages/18-consolidation-pool.md) | `/procurement/consolidation-pool` | — | ✅ |
+| UI-20 | [pages/19-container.md](pages/19-container.md) | `/procurement/container` | — | ✅ |
+| UI-21 | [pages/18-legacy-procurement-overdue.md](pages/18-legacy-procurement-overdue.md) | `/base/legacy-procurement` | — | ✅ 超期筛选补充 |
+| UI-22 | [pages/14-user-management.md](pages/14-user-management.md) | `/system/user` | B-11 | ✅ 前端完成（Phase 3 后端权限控制已完成） |
+| UI-23 | [pages/15-role-management.md](pages/15-role-management.md) | `/system/role` | B-11 | ✅ 前端完成（Phase 3 后端权限控制已完成） |
+| UI-24 | [pages/16-audit-log.md](pages/16-audit-log.md) | `/system/audit-log` | B-11 | ✅ |
+| UI-25 | [pages/17-profile.md](pages/17-profile.md) | `/profile` | B-11 | ✅ |
+| UI-26 | [pages/20-ship.md](pages/20-ship.md) | `/base/ship` | B-12 | ✅ |
 | — | [05-UI改版方案-橙色商业主题.md](05-UI改版方案-橙色商业主题.md) | — | — | ✅ |
 | — | [ARCHITECTURE.md](ARCHITECTURE.md) | — | — | ✅ |
 
@@ -66,6 +69,9 @@
 | — | `/sales/sales-record` | SalesRecordPage.vue | UI-11 |
 | — | `/base/factory` | FactoryPage.vue | UI-14 |
 | — | `/base/product` | ProductPage.vue | UI-13 |
+| — | `/base/legacy-procurement` | LegacyProcurementPage.vue | 18-legacy-procurement-overdue.md |
+| — | `/base/dispatch` | DispatchPage.vue | — |
+| — | `/base/offline-order` | OfflineOrderPage.vue | — |
 | 09 | `/base/overview` | OrderOverviewPage.vue | UI-12 |
 | — | `/base/overview/demand/:demandId` | DemandOverviewPage.vue | UI-15 |
 | — | `/base/overview/procurement/:procurementId` | ProcurementOverviewPage.vue | UI-16 |

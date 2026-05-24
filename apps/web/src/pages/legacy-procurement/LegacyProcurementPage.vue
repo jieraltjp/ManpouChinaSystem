@@ -20,7 +20,7 @@
           <el-button @click="onReset">{{ $t('legacyProcurement.filter.reset') }}</el-button>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-model="filterForm.overdueOnly" @change="onSearch">
+          <el-checkbox v-model="filterForm.overdueOnly">
             <span>{{ $t('legacyProcurement.filter.overdueOnly') }}</span>
           </el-checkbox>
         </el-form-item>
@@ -447,7 +447,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { legacyProcurementApi } from '@/api/legacy-procurement'
@@ -455,7 +455,7 @@ import type { LegacyProcurementPageVO } from '@/api/legacy-procurement'
 import { useProductImage } from '@/composables/useProductImage'
 import ProductImageCell from '@/components/ProductImageCell.vue'
 import { usePermission } from '@/composables/usePermission'
-import { useOverdue } from '@/composables/useOverdue'
+import { useOverdue, useOverdueUrlSync } from '@/composables/useOverdue'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { imageMap, loadImageMap } = useProductImage()
@@ -514,12 +514,19 @@ const currentRow = ref<LegacyProcurementPageVO | null>(null)
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const filterForm = reactive({ code: '', orderGroup: '', itemName: '', updater: '', overdueOnly: false })
 
-const { isOverdue, getRowClassName, filterOverdue } = useOverdue(tableData)
+const { getRowClassName, filterOverdue } = useOverdue(tableData)
 
 const displayData = computed(() => {
   if (!filterForm.overdueOnly) return tableData.value
   return filterOverdue(tableData.value)
 })
+
+// URL 持久化：overdueOnly ↔ ?overdue=true
+const syncToQuery = useOverdueUrlSync(
+  toRef(filterForm, 'overdueOnly'),
+  () => { pagination.page = 1 },
+)
+watch(() => filterForm.overdueOnly, (v: boolean) => { syncToQuery(v) })
 
 // Edit dialog
 const editVisible = ref(false)
@@ -575,7 +582,6 @@ async function loadData() {
     if (filterForm.updater) params.updater = filterForm.updater
 
     const res = await legacyProcurementApi.list(params as Record<string, string | number>)
-    console.log('[LegacyProcurement] API response:', res)
     const data = res.data as { content?: LegacyProcurementPageVO[]; totalElements?: number } | undefined
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0

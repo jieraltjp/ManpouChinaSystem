@@ -244,6 +244,10 @@ public class RoleService {
             case "role" -> "角色管理";
             case "audit" -> "操作日志";
             case "auth" -> "认证";
+            case "page:procurement" -> "发注管理";
+            case "page:base" -> "基础数据";
+            case "page:sales" -> "运营";
+            case "page:system" -> "系统管理";
             default -> module;
         };
     }
@@ -267,6 +271,10 @@ public class RoleService {
             case "role" -> "役割管理";
             case "audit" -> "操作ログ";
             case "auth" -> "認証";
+            case "page:procurement" -> "発注管理";
+            case "page:base" -> "基本データ";
+            case "page:sales" -> "運営";
+            case "page:system" -> "システム管理";
             default -> module;
         };
     }

@@ -18,7 +18,7 @@ export interface OverdueableVO {
  * 超期检测核心逻辑（纯函数，无副作用）。
  * @param data - 页面数据源，类型约束
  */
-export function useOverdue<T extends OverdueableVO>(data: Ref<T[]>) {
+export function useOverdue<T extends OverdueableVO>(_data: Ref<T[]>) {
   function isOverdue(row: T): boolean {
     const refDate = row.arrivalDepo || row.yoyakuHasoubi
     if (!refDate) return false
@@ -41,7 +41,7 @@ export function useOverdue<T extends OverdueableVO>(data: Ref<T[]>) {
 /**
  * 将 overdueOnly 状态与 URL query param 同步。
  * 调用方在 setup 中调用一次即可。
- * @param overdueOnly - overdueOnly reactive ref
+ * @param overdueOnly - overdueOnly reactive/computed ref
  * @param onOverdueChange - 超期状态变更回调（用于重置分页等）
  */
 export function useOverdueUrlSync(

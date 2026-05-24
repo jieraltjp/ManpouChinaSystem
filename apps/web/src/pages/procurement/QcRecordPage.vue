@@ -840,18 +840,12 @@ function onReset() {
 }
 
 function onShipmentBatchSelected(id: number) {
-  console.log('[QC] onShipmentBatchSelected called, id:', id)
   const batch = shipmentBatchList.value.find(b => b.id === id)
-  console.log('[QC] batch found:', batch, 'shipmentQuantity:', batch?.shipmentQuantity)
   if (!batch) return
   form.shipmentBatchId = batch.id
   form.procurementId = batch.procurementId
-  // 预填出货数量（el-input-number 响应式专用）
   inspectionCountRef.value = batch.shipmentQuantity ?? 0
-  console.log('[QC] inspectionCountRef set to:', inspectionCountRef.value)
-  // 显示选中批次码（新建弹窗内）
   form.batchCode = batch.batchCode || ''
-  console.log('[QC] form.batchCode set to:', form.batchCode)
   // 通过 procurementId 补充商品信息（productCode, sellerName, material, destination）
   if (batch.procurementId) {
     procurementApi.list({ page: 0, pageSize: 200 }).then(res => {

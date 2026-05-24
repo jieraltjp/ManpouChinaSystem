@@ -95,24 +95,24 @@ ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 -- ================================================================
 INSERT INTO permission (id, permission_code, permission_name_cn, permission_name_jp, module, action_, sort_order, status, create_time, is_deleted, create_by, update_by)
 VALUES
-    (140, 'page:demand:access',       '进入补货需求页',   '補充需要ページアクセス',   'page', 'ACCESS', 140, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (141, 'page:procurement:access',   '进入发注单页',     '発注書ページアクセス',     'page', 'ACCESS', 141, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (142, 'page:shipment:access',      '进入厂家出货页',   'メーカー出荷ページアクセス','page', 'ACCESS', 142, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (143, 'page:qc:access',            '进入验货记录页',   '検品記録ページアクセス',   'page', 'ACCESS', 143, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (144, 'page:logistics:access',      '进入调配计划页',   '配送計画ページアクセス',   'page', 'ACCESS', 144, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (145, 'page:consolidation:access',  '进入拼柜池页',     'コンソリ頁アクセス',       'page', 'ACCESS', 145, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (146, 'page:container:access',      '进入货柜管理页',   'コンテナ頁アクセス',       'page', 'ACCESS', 146, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (147, 'page:ship:access',           '进入船只管理页',   '船舶管理頁アクセス',       'page', 'ACCESS', 147, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (148, 'page:customs:access',        '进入国内报关页',   '国内通関頁アクセス',       'page', 'ACCESS', 148, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (149, 'page:japan_customs:access', '进入日本清关页',   '日本通関頁アクセス',       'page', 'ACCESS', 149, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (150, 'page:tax_refund:access',     '进入出口退税页',   '輸出退税頁アクセス',       'page', 'ACCESS', 150, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (151, 'page:sales:access',          '进入运营销售页',   '運営販売頁アクセス',       'page', 'ACCESS', 151, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (152, 'page:factory:access',         '进入工厂管理页',   '工場管理頁アクセス',       'page', 'ACCESS', 152, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (153, 'page:product:access',         '进入商品目录页',   '商品ディレクトリ頁アクセス','page', 'ACCESS', 153, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (154, 'page:order:access',          '进入订单总览页',   '注文一覧頁アクセス',       'page', 'ACCESS', 154, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (155, 'page:user:access',           '进入用户管理页',   'ユーザー管理頁アクセス',   'page', 'ACCESS', 155, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (156, 'page:role:access',           '进入角色管理页',   '役割管理頁アクセス',       'page', 'ACCESS', 156, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (157, 'page:audit:access',          '进入操作日志页',   '操作ログ頁アクセス',       'page', 'ACCESS', 157, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
+    (140, 'page:demand:access',       '进入补货需求页',   '補充需要ページアクセス',   'page:procurement', 'ACCESS', 140, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (141, 'page:procurement:access',   '进入发注单页',     '発注書ページアクセス',     'page:procurement', 'ACCESS', 141, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (142, 'page:shipment:access',      '进入厂家出货页',   'メーカー出荷ページアクセス','page:procurement', 'ACCESS', 142, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (143, 'page:qc:access',            '进入验货记录页',   '検品記録ページアクセス',   'page:procurement', 'ACCESS', 143, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (144, 'page:logistics:access',      '进入调配计划页',   '配送計画ページアクセス',   'page:procurement', 'ACCESS', 144, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (145, 'page:consolidation:access',  '进入拼柜池页',     'コンソリ頁アクセス',       'page:procurement', 'ACCESS', 145, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (146, 'page:container:access',      '进入货柜管理页',   'コンテナ頁アクセス',       'page:base', 'ACCESS', 146, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (147, 'page:ship:access',           '进入船只管理页',   '船舶管理頁アクセス',       'page:base', 'ACCESS', 147, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (148, 'page:customs:access',        '进入国内报关页',   '国内通関頁アクセス',       'page:procurement', 'ACCESS', 148, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (149, 'page:japan_customs:access', '进入日本清关页',   '日本通関頁アクセス',       'page:procurement', 'ACCESS', 149, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (150, 'page:tax_refund:access',     '进入出口退税页',   '輸出退税頁アクセス',       'page:sales', 'ACCESS', 150, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (151, 'page:sales:access',          '进入运营销售页',   '運営販売頁アクセス',       'page:sales', 'ACCESS', 151, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (152, 'page:factory:access',         '进入工厂管理页',   '工場管理頁アクセス',       'page:base', 'ACCESS', 152, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (153, 'page:product:access',         '进入商品目录页',   '商品ディレクトリ頁アクセス','page:base', 'ACCESS', 153, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (154, 'page:order:access',          '进入订单总览页',   '注文一覧頁アクセス',       'page:base', 'ACCESS', 154, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (155, 'page:user:access',           '进入用户管理页',   'ユーザー管理頁アクセス',   'page:system', 'ACCESS', 155, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (156, 'page:role:access',           '进入角色管理页',   '役割管理頁アクセス',       'page:system', 'ACCESS', 156, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (157, 'page:audit:access',          '进入操作日志页',   '操作ログ頁アクセス',       'page:system', 'ACCESS', 157, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
 ON DUPLICATE KEY UPDATE permission_name_cn = VALUES(permission_name_cn);
 
 -- page:*:access 角色分配
@@ -151,9 +151,9 @@ WHERE r.role_code = 'VIEWER'
 -- ================================================================
 INSERT INTO permission (id, permission_code, permission_name_cn, permission_name_jp, module, action_, sort_order, status, create_time, is_deleted, create_by, update_by)
 VALUES
-    (158, 'page:cargo_size:access',        '访问货物尺寸',       '貨物サイズ頁アクセス',     'page', 'ACCESS', 158, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (159, 'page:dispatch:access',          '访问配送单',         '配送單頁アクセス',         'page', 'ACCESS', 159, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
-    (160, 'page:legacy_procurement:access', '访问旧发注',        '旧発注管理頁アクセス',     'page', 'ACCESS', 160, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
+    (158, 'page:cargo_size:access',        '访问货物尺寸',       '貨物サイズ頁アクセス',     'page:base', 'ACCESS', 158, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (159, 'page:dispatch:access',          '访问配送单',         '配送單頁アクセス',         'page:base', 'ACCESS', 159, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM'),
+    (160, 'page:legacy_procurement:access', '访问旧发注',        '旧発注管理頁アクセス',     'page:base', 'ACCESS', 160, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
 ON DUPLICATE KEY UPDATE permission_name_cn = VALUES(permission_name_cn);
 
 -- ADMIN/MANAGER: 全部
@@ -178,7 +178,7 @@ ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 -- 八、page:offline_order:access（ID 161，/system/role 可控制入口）
 -- ================================================================
 INSERT INTO permission (id, permission_code, permission_name_cn, permission_name_jp, module, action_, sort_order, status, create_time, is_deleted, create_by, update_by)
-VALUES (161, 'page:offline_order:access', '访问线下订单', 'オフライン注文頁アクセス', 'page', 'ACCESS', 161, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
+VALUES (161, 'page:offline_order:access', '访问线下订单', 'オフライン注文頁アクセス', 'page:base', 'ACCESS', 161, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
 ON DUPLICATE KEY UPDATE permission_name_cn = VALUES(permission_name_cn);
 
 INSERT INTO role_permission (role_id, permission_id)
@@ -190,7 +190,7 @@ ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 -- 九、page:profile:access（ID 162，个人中心入口控制）
 -- ================================================================
 INSERT INTO permission (id, permission_code, permission_name_cn, permission_name_jp, module, action_, sort_order, status, create_time, is_deleted, create_by, update_by)
-VALUES (162, 'page:profile:access', '访问个人中心', 'プロフィール頁アクセス', 'page', 'ACCESS', 162, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
+VALUES (162, 'page:profile:access', '访问个人中心', 'プロフィール頁アクセス', 'page:system', 'ACCESS', 162, 1, NOW(3), 0, 'SYSTEM', 'SYSTEM')
 ON DUPLICATE KEY UPDATE permission_name_cn = VALUES(permission_name_cn);
 
 INSERT INTO role_permission (role_id, permission_id)

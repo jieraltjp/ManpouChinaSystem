@@ -427,8 +427,8 @@ const arrivalTagType = (arrival?: string): '' | 'success' | 'warning' | 'info' =
 }
 
 const arrivalLabel = (arrival?: string): string => {
-  if (arrival === 'OUT') return '已到货'
-  if (arrival === 'NOT_OUT') return '未到货'
+  if (arrival === 'OUT') return t('offlineOrder.arrivalStatus.out')
+  if (arrival === 'NOT_OUT') return t('offlineOrder.arrivalStatus.notOut')
   return '-'
 }
 
@@ -525,7 +525,7 @@ const onSubmit = async () => {
     editVisible.value = false
     loadData()
   } catch {
-    ElMessage.error('保存失败')
+    ElMessage.error(t('offlineOrder.message.saveFailed'))
   } finally {
     submitting.value = false
   }
@@ -543,7 +543,7 @@ const onDelete = (row: OfflineOrderPageVO) => {
         ElMessage.success(t('offlineOrder.message.deleteSuccess'))
         loadData()
       } catch {
-        ElMessage.error('删除失败')
+        ElMessage.error(t('offlineOrder.message.deleteFailed'))
       }
     })
     .catch(() => {})

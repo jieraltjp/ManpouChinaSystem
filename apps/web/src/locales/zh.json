@@ -2837,7 +2837,9 @@
       "loadFailed": "加载线下订单失败",
       "createSuccess": "新增成功",
       "updateSuccess": "更新成功",
-      "deleteSuccess": "删除成功"
+      "deleteSuccess": "删除成功",
+      "saveFailed": "保存失败",
+      "deleteFailed": "删除失败"
     }
   }
 }

@@ -2838,7 +2838,9 @@
       "loadFailed": "オフライン注文の読み込みに失敗しました",
       "createSuccess": "追加成功",
       "updateSuccess": "更新成功",
-      "deleteSuccess": "削除成功"
+      "deleteSuccess": "削除成功",
+      "saveFailed": "保存に失敗しました",
+      "deleteFailed": "削除に失敗しました"
     }
   }
 }
