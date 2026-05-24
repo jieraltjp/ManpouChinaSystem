@@ -34,4 +34,9 @@ public class ShipmentBatchPageQuery {
     private LocalDateTime createTime;
     private String updateBy;
     private LocalDateTime updateTime;
+
+    // 商品信息（通过 procurement.productCode = nameZh 关联 product 表获取）
+    private String productMasterCode;
+    private String productSubCode;
+    private String productImageUrl;
 }

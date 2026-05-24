@@ -229,7 +229,6 @@
         </div>
         <div class="drawer-footer">
           <el-button @click="detailVisible = false">{{ $t('product.drawer.close') }}</el-button>
-          <el-button type="primary" @click="onEditFromDrawer" v-if="hasPermission('product:update')">{{ $t('product.drawer.edit') }}</el-button>
         </div>
       </div>
     </el-drawer>
@@ -258,22 +257,36 @@
         </el-row>
 
         <el-row :gutter="16">
-          <el-col :span="12">
+          <el-col :span="9">
             <el-form-item :label="$t('product.dialog.nameZh')" prop="nameZh">
               <el-input v-model="form.nameZh" :placeholder="$t('product.dialog.nameZhPlaceholder')" maxlength="255" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('product.dialog.nameEn')">
-              <el-input v-model="form.nameEn" :placeholder="$t('product.dialog.nameEnPlaceholder')" maxlength="255" />
+          <el-col :span="6">
+            <el-form-item :label="$t('product.dialog.oneClickTranslate')" label-width="110px">
+              <el-button
+                type="primary"
+                size="small"
+                :loading="translatingAll"
+                :disabled="!form.nameZh"
+                @click="onTranslateAll"
+              >
+                <span v-if="!translatingAll">🔄</span>
+                {{ translatingAll ? $t('product.dialog.translating') : $t('product.dialog.oneClickTranslate') }}
+              </el-button>
+            </el-form-item>
+          </el-col>
+          <el-col :span="9">
+            <el-form-item :label="$t('product.dialog.nameJa')">
+              <el-input v-model="form.nameJa" :placeholder="$t('product.dialog.nameJaPlaceholder')" maxlength="128" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item :label="$t('product.dialog.nameJa')">
-              <el-input v-model="form.nameJa" :placeholder="$t('product.dialog.nameJaPlaceholder')" maxlength="128" />
+            <el-form-item :label="$t('product.dialog.nameEn')">
+              <el-input v-model="form.nameEn" :placeholder="$t('product.dialog.nameEnPlaceholder')" maxlength="255" />
             </el-form-item>
           </el-col>
           <el-col :span="6">
@@ -298,11 +311,25 @@
               <el-input v-model="form.material" :placeholder="$t('product.dialog.materialPlaceholder')" maxlength="64" />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="4">
+            <el-form-item :label="$t('product.dialog.translate')" label-width="60px">
+              <el-button
+                type="info"
+                size="small"
+                :loading="translatingMaterial"
+                :disabled="!form.material"
+                @click="onTranslateMaterial"
+              >{{ $t('product.dialog.translate') }}</el-button>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
             <el-form-item :label="$t('product.dialog.materialJa')">
               <el-input v-model="form.materialJa" :placeholder="$t('product.dialog.materialJaPlaceholder')" maxlength="255" />
             </el-form-item>
           </el-col>
+        </el-row>
+
+        <el-row :gutter="16">
           <el-col :span="8">
             <el-form-item :label="$t('product.dialog.origin')">
               <el-input v-model="form.origin" :placeholder="$t('product.dialog.originPlaceholder')" maxlength="100" />
@@ -438,6 +465,7 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Goods, Loading } from '@element-plus/icons-vue'
 import { productApi } from '@/api/product'
+import { aiApi } from '@/api/ai'
 import type { ProductPageVO, CreateProductRequest, UpdateProductRequest, ProductFactoryVO } from '@/api/product'
 import { usePermission } from '@/composables/usePermission'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
@@ -455,6 +483,8 @@ function formatTime(ts: string | undefined | null): string {
 
 const loading = ref(false)
 const submitting = ref(false)
+const translatingAll = ref(false)
+const translatingMaterial = ref(false)
 const factoriesLoading = ref(false)
 const tableData = ref<ProductPageVO[]>([])
 const excelViewMode = ref<'table' | 'copy'>('table')
@@ -618,9 +648,6 @@ function onEdit(row: ProductPageVO) {
   formVisible.value = true
 }
 
-function onEditFromDrawer() {
-  if (currentRow.value) onEdit(currentRow.value)
-}
 
 async function onDelete(row: ProductPageVO) {
   await ElMessageBox.confirm(
@@ -666,6 +693,40 @@ function pkgDims(row: ProductPageVO) {
   const l = row.packageLengthCm, w = row.packageWidthCm, h = row.packageHeightCm
   if (l || w || h) return `${l ?? '-'} × ${w ?? '-'} × ${h ?? '-'} cm`
   return '-'
+}
+
+async function onTranslateAll() {
+  if (!form.nameZh) return
+  translatingAll.value = true
+  try {
+    const [jaRes, enRes] = await Promise.all([
+      aiApi.translateZhToJa({ sourceText: form.nameZh, targetLang: 'ja' }),
+      aiApi.translateZhToJa({ sourceText: form.nameZh, targetLang: 'en' }),
+    ])
+    if (jaRes.data?.nameJa) form.nameJa = jaRes.data.nameJa
+    if (enRes.data?.nameEn) form.nameEn = enRes.data.nameEn
+    ElMessage.success(t('product.dialog.translateSuccess'))
+  } catch {
+    ElMessage.error(t('product.dialog.translateError'))
+  } finally {
+    translatingAll.value = false
+  }
+}
+
+async function onTranslateMaterial() {
+  if (!form.material) return
+  translatingMaterial.value = true
+  try {
+    const res = await aiApi.translateZhToJa({ sourceText: form.material, targetLang: 'ja' })
+    if (res.data?.nameJa) {
+      form.materialJa = res.data.nameJa
+      ElMessage.success(t('product.dialog.translateSuccess'))
+    }
+  } catch {
+    ElMessage.error(t('product.dialog.translateError'))
+  } finally {
+    translatingMaterial.value = false
+  }
 }
 
 loadData()

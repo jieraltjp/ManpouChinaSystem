@@ -13,7 +13,8 @@ export type DomesticCustomsStatus = 'PENDING' | 'SUBMITTED' | 'CLEARED' | 'REJEC
 
 export interface CustomsVO {
   id: number
-  customsCode: string
+  customsCode: string        // 系统流水号，不可编辑
+  customsDeclarationNo?: string // 报关申报号（用户自填，v2.0）
   containerNo?: string   // 货柜号（v1.3.0）
   procurementId: number | null
   logisticsPlanId: number | null
@@ -68,6 +69,7 @@ export interface CustomsBatchCreateRequest {
 }
 
 export interface CustomsUpdateRequest {
+  customsDeclarationNo?: string // 报关申报号（v2.0）
   containerNo?: string   // 货柜号（v1.3.0）
   factoryId?: number
   productCode?: string
@@ -108,5 +110,9 @@ export const customsApi = {
   },
   delete(id: number) {
     return client.delete<{ code: string }>(`/customs/${id}`)
+  },
+  /** 批量修改报关申报号（v2.0） */
+  batchUpdateDeclarationNo(ids: number[], customsDeclarationNo: string) {
+    return client.patch<{ code: string }>('/customs/batch-declaration-no', { ids, customsDeclarationNo })
   },
 }

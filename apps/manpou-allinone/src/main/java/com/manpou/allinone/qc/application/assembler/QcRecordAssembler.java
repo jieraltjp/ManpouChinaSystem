@@ -2,6 +2,7 @@ package com.manpou.allinone.qc.application.assembler;
 
 import com.manpou.allinone.common.port.FactoryQueryPort;
 import com.manpou.allinone.common.port.ProcurementPort;
+import com.manpou.allinone.common.port.ProductQueryPort;
 import com.manpou.allinone.procurement.domain.model.ShipmentBatch;
 import com.manpou.allinone.procurement.domain.repository.ShipmentBatchRepository;
 import com.manpou.allinone.qc.application.dto.QcRecordCreateCmd;
@@ -23,13 +24,16 @@ public class QcRecordAssembler {
 
     private final ProcurementPort procurementPort;
     private final FactoryQueryPort factoryQueryPort;
+    private final ProductQueryPort productQueryPort;
     private final ShipmentBatchRepository shipmentBatchRepository;
 
     public QcRecordAssembler(ProcurementPort procurementPort,
                              FactoryQueryPort factoryQueryPort,
+                             ProductQueryPort productQueryPort,
                              ShipmentBatchRepository shipmentBatchRepository) {
         this.procurementPort = procurementPort;
         this.factoryQueryPort = factoryQueryPort;
+        this.productQueryPort = productQueryPort;
         this.shipmentBatchRepository = shipmentBatchRepository;
     }
 
@@ -73,6 +77,14 @@ public class QcRecordAssembler {
             }
         }
 
+        // 商品图片（通过 productCode=masterCode 查询 Product 表）
+        String productImageUrl = null;
+        if (entity.getProductCode() != null) {
+            productImageUrl = productQueryPort.findByMasterCode(entity.getProductCode())
+                    .map(p -> p.getImageUrl())
+                    .orElse(null);
+        }
+
         return QcRecordPageQuery.builder()
                 .id(entity.getId())
                 .qcCode(entity.getQcCode())
@@ -112,6 +124,7 @@ public class QcRecordAssembler {
                 .createBy(entity.getCreateBy())
                 .createTime(entity.getCreateTime())
                 .updateTime(entity.getUpdateTime())
+                .productImageUrl(productImageUrl)
                 .build();
     }
 
@@ -119,7 +132,15 @@ public class QcRecordAssembler {
         QcRecord entity = new QcRecord();
         entity.setQcCode(generateQcCode());
         entity.setShipmentBatchId(cmd.getShipmentBatchId());
-        entity.setProcurementId(cmd.getProcurementId());
+        // procurementId 前端可选（V43后不再强制），但 DB NOT NULL；从前端传入或从 ShipmentBatch 反查
+        Long procurementId = cmd.getProcurementId();
+        if (procurementId == null && cmd.getShipmentBatchId() != null) {
+            procurementId = shipmentBatchRepository
+                    .findByIdAndDeletedIsFalse(cmd.getShipmentBatchId())
+                    .map(ShipmentBatch::getProcurementId)
+                    .orElse(null);
+        }
+        entity.setProcurementId(procurementId);
         entity.setProductCode(cmd.getProductCode());
         copyCreate(cmd, entity);
         return entity;

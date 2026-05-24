@@ -56,53 +56,98 @@
 
     <el-card class="table-card" shadow="never">
       <template #header>
-        <div class="table-header">
+        <div class="batch-actions">
           <el-radio-group v-model="excelViewMode" size="small">
             <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
             <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
           </el-radio-group>
+          <span v-if="selectedRows.length" class="selection-count">
+            <el-tag type="info" size="small">{{ $t('common.batch.selectedCount', { n: selectedRows.length }) }}</el-tag>
+          </span>
+          <el-button
+            v-if="selectedRows.length"
+            type="danger"
+            size="small"
+            @click="onBatchDelete"
+          >
+            <el-icon><Delete /></el-icon>{{ $t('common.batch.delete', { n: selectedRows.length }) }}
+          </el-button>
+          <el-button
+            v-if="selectedRows.length && hasPermission('logistics:update')"
+            type="primary"
+            size="small"
+            @click="onBatchUpdateCustoms"
+          >
+            <el-icon><Edit /></el-icon>{{ $t('logistics.batch.updateCustoms', { n: selectedRows.length }) }}
+          </el-button>
         </div>
       </template>
-      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
-        <el-table-column prop="containerNo" :label="$t('logistics.column.containerNo')" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="customsClearanceNo" :label="$t('logistics.column.customsClearanceNo')" min-width="130" show-overflow-tooltip />
-        <el-table-column prop="factoryName" :label="$t('logistics.column.factoryName')" min-width="140" show-overflow-tooltip />
-        <el-table-column :label="$t('logistics.column.productCode')" min-width="130" show-overflow-tooltip>
+      <el-table
+        v-if="excelViewMode === 'table'"
+        ref="tableRef"
+        v-loading="loading"
+        :data="tableData"
+        stripe
+        style="width:100%"
+        min-height="200"
+        row-key="id"
+        @selection-change="onSelectionChange"
+      >
+        <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
+        <el-table-column :label="$t('logistics.column.productCode')" min-width="110" show-overflow-tooltip>
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('logistics.column.subProductCode')" min-width="130" show-overflow-tooltip>
+        <el-table-column :label="$t('logistics.column.subProductCode')" min-width="110" show-overflow-tooltip>
           <template #default="{ row }">
             <span class="product-code">{{ row.subProductCode || '-' }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="planType" :label="$t('logistics.column.planType')" min-width="100" align="center">
+        <el-table-column :label="$t('product.drawer.imageUrl')" width="70" align="center">
+          <template #default="{ row }">
+            <ProductImageCell :product-code="row.productCode" :image-map="imageMap" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="containerNo" :label="$t('logistics.column.containerNo')" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="customsClearanceNo" :label="$t('logistics.column.customsClearanceNo')" min-width="110" show-overflow-tooltip />
+        <el-table-column prop="factoryName" :label="$t('logistics.column.factoryName')" min-width="110" show-overflow-tooltip />
+        <el-table-column prop="planType" :label="$t('logistics.column.planType')" min-width="90" align="center">
           <template #default="{ row }">
             <el-tag :type="planTypeTag(row.planType)" size="small">{{ planTypeLabel(row.planType) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="cargoWeightKg" :label="$t('logistics.column.cargoWeightKg')" min-width="100" align="right">
+        <el-table-column prop="cargoWeightKg" :label="$t('logistics.column.cargoWeightKg')" min-width="80" align="right">
           <template #default="{ row }">
             {{ row.cargoWeightKg ? row.cargoWeightKg + $t('common.units.kg') : '' }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('logistics.column.totalWeight')" min-width="100" align="right">
+        <el-table-column :label="$t('logistics.column.netWeightKg')" min-width="75" align="right">
+          <template #default="{ row }">
+            {{ row.netWeightKg != null ? row.netWeightKg + $t('common.units.kg') : '' }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('logistics.column.grossWeightKg')" min-width="75" align="right">
+          <template #default="{ row }">
+            {{ row.grossWeightKg != null ? row.grossWeightKg + $t('common.units.kg') : '' }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('logistics.column.totalWeight')" min-width="80" align="right">
           <template #default="{ row }">
             {{ row.totalWeightKg ? row.totalWeightKg + $t('common.units.kg') : '' }}
           </template>
         </el-table-column>
-        <el-table-column prop="cargoVolumeCbm" :label="$t('logistics.column.cargoVolumeCbm')" min-width="90" align="right">
+        <el-table-column prop="cargoVolumeCbm" :label="$t('logistics.column.cargoVolumeCbm')" min-width="75" align="right">
           <template #default="{ row }">
             {{ row.cargoVolumeCbm ? row.cargoVolumeCbm.toFixed(4) + $t('common.units.m3') : '' }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('logistics.column.totalVolume')" min-width="90" align="right">
+        <el-table-column :label="$t('logistics.column.totalVolume')" min-width="75" align="right">
           <template #default="{ row }">
             {{ row.totalVolumeCbm ? row.totalVolumeCbm.toFixed(4) + $t('common.units.m3') : '' }}
           </template>
         </el-table-column>
-        <el-table-column prop="requiresQc" :label="$t('logistics.column.requiresQc')" min-width="90" align="center">
+        <el-table-column prop="requiresQc" :label="$t('logistics.column.requiresQc')" min-width="75" align="center">
           <template #default="{ row }">
             <el-tag :type="row.requiresQc ? 'warning' : 'success'" size="small">
               {{ row.requiresQc ? $t('logistics.requiresQc.yes') : $t('logistics.requiresQc.no') }}
@@ -224,11 +269,23 @@
           </div>
         </div>
         <el-row :gutter="16">
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item :label="$t('logistics.dialog.cargoWeightKg')">
               <el-input-number v-model="form.cargoWeightKg" :min="0" :precision="3" style="width:100%" />
             </el-form-item>
           </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('logistics.dialog.netWeightKg')">
+              <el-input-number v-model="form.netWeightKg" :min="0" :precision="3" style="width:100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('logistics.dialog.grossWeightKg')">
+              <el-input-number v-model="form.grossWeightKg" :min="0" :precision="3" style="width:100%" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item :label="$t('logistics.dialog.quantity')">
               <el-input-number v-model="form.quantity" :min="0" style="width:100%" />
@@ -306,6 +363,8 @@
             : '-' }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.column.cargoWeightKg')">{{ currentRow.cargoWeightKg != null ? `${currentRow.cargoWeightKg} ${$t('common.units.kg')}` : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.netWeightKg')">{{ currentRow.netWeightKg != null ? `${currentRow.netWeightKg} ${$t('common.units.kg')}` : '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('logistics.column.grossWeightKg')">{{ currentRow.grossWeightKg != null ? `${currentRow.grossWeightKg} ${$t('common.units.kg')}` : '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.column.totalWeight')">{{ currentRow.totalWeightKg != null ? `${currentRow.totalWeightKg} ${$t('common.units.kg')}` : '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.column.cargoVolumeCbm')">{{ currentRow.cargoVolumeCbm != null ? `${currentRow.cargoVolumeCbm.toFixed(4)} ${$t('common.units.m3')}` : '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.column.totalVolume')">{{ currentRow.totalVolumeCbm != null ? `${currentRow.totalVolumeCbm.toFixed(4)} ${$t('common.units.m3')}` : '-' }}</el-descriptions-item>
@@ -322,21 +381,49 @@
         <el-descriptions-item :label="$t('logistics.column.createTime')">{{ currentRow.createTime ?? '-' }}</el-descriptions-item>
       </el-descriptions>
     </el-drawer>
+
+    <!-- 批量修改报关单号弹窗 -->
+    <el-dialog
+      v-model="batchCustomsVisible"
+      :title="$t('logistics.batch.updateCustomsTitle')"
+      width="420px"
+      destroy-on-close
+    >
+      <el-form label-position="top">
+        <el-form-item :label="$t('logistics.column.customsClearanceNo')">
+          <el-input
+            v-model="batchCustomsNo"
+            :placeholder="$t('logistics.batch.customsPlaceholder')"
+            maxlength="64"
+            clearable
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="batchCustomsVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="batchCustomsLoading" @click="onBatchCustomsSubmit">
+          {{ $t('common.confirm') }}
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { Plus, Van, Top, Loading } from '@element-plus/icons-vue'
+import { Plus, Van, Top, Loading, Delete, Edit } from '@element-plus/icons-vue'
 import { logisticsApi, type LogisticsPlanVO, type LogisticsStatus, type PlanType } from '@/api/logistics'
 import { inspectionApi, type QcRecordVO } from '@/api/inspection'
 import { factoryApi, type FactoryPageVO } from '@/api/factory'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import { useProductImage } from '@/composables/useProductImage'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
+import ProductImageCell from '@/components/ProductImageCell.vue'
 
 const { hasPermission } = usePermission()
+const { imageMap, loadImageMap } = useProductImage()
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -355,6 +442,11 @@ const filterForm = reactive({
 })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const tableData = ref<LogisticsPlanVO[]>([])
+const tableRef = ref()
+const selectedRows = ref<LogisticsPlanVO[]>([])
+const batchCustomsVisible = ref(false)
+const batchCustomsNo = ref('')
+const batchCustomsLoading = ref(false)
 
 const formRef = ref<FormInstance>()
 const { t } = useI18n()
@@ -371,6 +463,8 @@ const form = reactive({
   cargoWidthCm: undefined as number | undefined,
   cargoHeightCm: undefined as number | undefined,
   cargoWeightKg: undefined as number | undefined,
+  netWeightKg: undefined as number | undefined,    // V49 净重
+  grossWeightKg: undefined as number | undefined,  // V49 毛重
   quantity: undefined as number | undefined,
   requiresQc: false,
   estimatedShipDate: '',
@@ -395,6 +489,8 @@ const copyColumns: ExcelColDef[] = [
   { prop: 'subProductCode', label: t('logistics.column.subProductCode') },
   { prop: 'planType', label: t('logistics.column.planType'), formatter: (row) => planTypeLabel(row.planType) },
   { prop: 'cargoWeightKg', label: t('logistics.column.cargoWeightKg'), formatter: (row) => row.cargoWeightKg ? `${row.cargoWeightKg} ${t('common.units.kg')}` : '' },
+  { prop: 'netWeightKg', label: t('logistics.column.netWeightKg'), formatter: (row) => row.netWeightKg != null ? `${row.netWeightKg} ${t('common.units.kg')}` : '' },
+  { prop: 'grossWeightKg', label: t('logistics.column.grossWeightKg'), formatter: (row) => row.grossWeightKg != null ? `${row.grossWeightKg} ${t('common.units.kg')}` : '' },
   { prop: 'cargoVolumeCbm', label: t('logistics.column.cargoVolumeCbm'), formatter: (row) => row.cargoVolumeCbm ? `${row.cargoVolumeCbm.toFixed(4)} ${t('common.units.m3')}` : '' },
   { prop: 'requiresQc', label: t('logistics.column.requiresQc'), formatter: (row) => row.requiresQc ? t('logistics.requiresQc.yes') : t('logistics.requiresQc.no') },
   { prop: 'status', label: t('logistics.column.status'), formatter: (row) => logisticsStatusLabel(row.status) },
@@ -417,6 +513,7 @@ async function loadData() {
     const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
+    await loadImageMap(tableData.value)
   } catch {
     ElMessage.error(t('logistics.message.loadFailed'))
   } finally {
@@ -438,6 +535,10 @@ function onReset() {
   filterForm.status = ''
   pagination.page = 1
   loadData()
+}
+
+function onSelectionChange(selection: LogisticsPlanVO[]) {
+  selectedRows.value = selection
 }
 
 async function loadQcRecordOptions() {
@@ -485,6 +586,9 @@ function onQcRecordSelected(id: number) {
   if (!form.cargoWidthCm && r.boxWidthCm) form.cargoWidthCm = r.boxWidthCm
   if (!form.cargoHeightCm && r.boxHeightCm) form.cargoHeightCm = r.boxHeightCm
   if (!form.cargoWeightKg && r.grossWeight) form.cargoWeightKg = r.grossWeight
+  // V49: 从 QC record 自动带入净重/毛重
+  if (!form.netWeightKg && r.netWeightPerUnit) form.netWeightKg = r.netWeightPerUnit
+  if (!form.grossWeightKg && r.grossWeight) form.grossWeightKg = r.grossWeight
 }
 
 function onNew() {
@@ -494,7 +598,7 @@ function onNew() {
     containerNo: '', productCode: '', subProductCode: '', planType: undefined,
     // 数字字段默认 0（显示占位，用户可选中修改；auto-fill 时会被代入真实值）
     cargoLengthCm: undefined, cargoWidthCm: undefined, cargoHeightCm: undefined,
-    cargoWeightKg: 0, quantity: 0,
+    cargoWeightKg: 0, netWeightKg: undefined, grossWeightKg: undefined, quantity: 0,
     requiresQc: false,
     estimatedShipDate: '', actualShipDate: '', remarks: '',
     customsClearanceNo: '',
@@ -520,6 +624,8 @@ async function onSubmit() {
         cargoWidthCm: form.cargoWidthCm,
         cargoHeightCm: form.cargoHeightCm,
         cargoWeightKg: form.cargoWeightKg || undefined,
+        netWeightKg: form.netWeightKg || undefined,
+        grossWeightKg: form.grossWeightKg || undefined,
         quantity: form.quantity || undefined,
         requiresQc: form.requiresQc,
         estimatedShipDate: form.estimatedShipDate || undefined,
@@ -597,6 +703,8 @@ async function onEdit(row: LogisticsPlanVO) {
     cargoWidthCm: row.cargoWidthCm,
     cargoHeightCm: row.cargoHeightCm,
     cargoWeightKg: row.cargoWeightKg ?? 0,
+    netWeightKg: row.netWeightKg ?? undefined,
+    grossWeightKg: row.grossWeightKg ?? undefined,
     quantity: row.quantity ?? 0,
     requiresQc: row.requiresQc ?? false,
     estimatedShipDate: row.estimatedShipDate || '',
@@ -628,6 +736,54 @@ async function onDelete(row: LogisticsPlanVO) {
     loadData()
   } catch {
     ElMessage.error(t('logistics.message.deleteFailed') || t('common.error.actionFailed'))
+  }
+}
+
+async function onBatchDelete() {
+  if (!selectedRows.value.length) return
+  try {
+    await ElMessageBox.confirm(
+      t('common.batch.deleteConfirm', { n: selectedRows.value.length }),
+      t('common.batch.deleteConfirmTitle'),
+      { confirmButtonText: t('common.delete'), cancelButtonText: t('common.cancel'), type: 'warning' },
+    )
+  } catch { return }
+  loading.value = true
+  try {
+    await Promise.all(selectedRows.value.map(r => logisticsApi.delete(r.id)))
+    ElMessage.success(t('common.batch.deleteSuccess', { n: selectedRows.value.length }))
+    selectedRows.value = []
+    loadData()
+  } catch {
+    ElMessage.error(t('common.batch.deleteFailed'))
+  } finally {
+    loading.value = false
+  }
+}
+
+function onBatchUpdateCustoms() {
+  batchCustomsNo.value = ''
+  batchCustomsVisible.value = true
+}
+
+async function onBatchCustomsSubmit() {
+  if (!batchCustomsNo.value.trim()) {
+    ElMessage.warning(t('logistics.batch.customsRequired'))
+    return
+  }
+  batchCustomsLoading.value = true
+  try {
+    const ids = selectedRows.value.map(r => r.id)
+    await logisticsApi.batchUpdateCustomsClearanceNo(ids, batchCustomsNo.value.trim())
+    ElMessage.success(t('logistics.batch.updateSuccess', { n: ids.length }))
+    batchCustomsVisible.value = false
+    selectedRows.value = []
+    tableRef.value?.clearSelection()
+    loadData()
+  } catch {
+    ElMessage.error(t('logistics.batch.updateFailed'))
+  } finally {
+    batchCustomsLoading.value = false
   }
 }
 
@@ -675,4 +831,6 @@ onMounted(() => loadData())
 .dim-sep { color: var(--text-secondary); font-size: 14px; flex-shrink: 0; }
 .dim-unit { color: var(--text-secondary); font-size: 13px; flex-shrink: 0; }
 .drawer-footer { padding: 16px 0 0; border-top: 1px solid var(--border-color); margin-top: 16px; display: flex; gap: 8px; }
+.batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.selection-count { margin-left: 4px; }
 </style>

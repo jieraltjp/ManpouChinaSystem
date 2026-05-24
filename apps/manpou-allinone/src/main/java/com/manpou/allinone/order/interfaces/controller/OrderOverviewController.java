@@ -106,11 +106,21 @@ public class OrderOverviewController {
     }
 
     /**
-     * 订单总览详情（指定 Demand 的全链路步骤1~4数据）。
+     * 订单总览详情（指定 Demand 的全链路步骤1~9数据）。
      */
     @GetMapping("/chain/{demandId}")
     @PreAuthorize("hasAuthority('procurement:read')")
     public Result<OrderChainDetailVO> getChainDetail(@PathVariable Long demandId) {
         return Result.ok(orderChainUseCase.getChainDetail(demandId));
+    }
+
+    /**
+     * 删除 Demand 及其关联的全链路数据（级联软删除）。
+     */
+    @DeleteMapping("/chain/{demandId}")
+    @PreAuthorize("hasAuthority('procurement:delete')")
+    public Result<Void> deleteChain(@PathVariable Long demandId) {
+        orderChainUseCase.deleteChain(demandId);
+        return Result.ok();
     }
 }

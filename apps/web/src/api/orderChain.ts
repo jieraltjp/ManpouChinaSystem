@@ -1,8 +1,8 @@
 /**
  * 订单总览（订单链）API 客户端。
  * 路由: /api/v1/orders/chain
- * 后端: OrderChainController → OrderChainUseCase → v_order_chain_v1 VIEW
- * Phase 1: 步骤 1~4（Demand → Procurement → QcRecord → LogisticsPlan）
+ * 后端: OrderChainController → OrderChainUseCase → v_order_chain_v2 VIEW + 实际表
+ * 全链路9步（步骤3：厂家出货多批次，步骤4：验货记录多记录）
  */
 import client from './client'
 
@@ -29,6 +29,11 @@ export interface OrderChainVO {
   step2Status: string
   step3Status: string
   step4Status: string
+  step5Status?: string
+  step6Status?: string
+  step7Status?: string
+  step8Status?: string
+  step9Status?: string
   procurementPriceRmb?: string
   procurementTaxPoint?: string
   procurementBillingType?: string
@@ -55,12 +60,26 @@ export interface OrderChainDetailVO {
   demand: DemandVO | null
   procurement: ProcurementVO | null
   factory: FactoryVO | null
-  qcRecord: QcRecordVO | null
+  shipmentBatches: ShipmentBatchVO[] | null
+  qcRecords: QcRecordVO[] | null
   logisticsPlan: LogisticsPlanVO | null
   domesticCustoms: DomesticCustomsVO | null
   japanCustoms: JapanCustomsVO | null
   taxRefund: TaxRefundVO | null
   salesRecord: SalesRecordVO | null
+}
+
+export interface ShipmentBatchVO {
+  id: number
+  batchCode: string
+  procurementId?: number
+  shipmentQuantity?: number
+  factoryShipDate?: string
+  actualShipDate?: string
+  status?: string
+  remarks?: string
+  qcRecordCount?: number
+  totalPassedCount?: number
 }
 
 export interface DemandVO {
@@ -138,6 +157,7 @@ export interface QcRecordVO {
   qcDate?: string
   qcUserId?: number
   status?: string
+  productImageUrl?: string
 }
 
 export interface LogisticsPlanVO {
@@ -156,6 +176,8 @@ export interface LogisticsPlanVO {
   cargoHeightCm?: number
   cargoVolumeCbm?: number
   cargoWeightKg?: number
+  netWeightKg?: number
+  grossWeightKg?: number
   qcPassedCount?: number
   quantity?: number
   requiresQc?: boolean
@@ -258,5 +280,8 @@ export const orderChainApi = {
   },
   getChainDetail(demandId: number) {
     return client.get<OrderChainDetailVO>(`/orders/chain/${demandId}`)
+  },
+  deleteChain(demandId: number) {
+    return client.delete(`/orders/chain/${demandId}`)
   },
 }

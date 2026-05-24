@@ -66,7 +66,13 @@ public class LogisticsPlan extends BaseEntity {
     private BigDecimal cargoHeightCm;     // 高(cm)
 
     @Column(name = "cargo_weight_kg", precision = 10, scale = 4)
-    private BigDecimal cargoWeightKg;     // 重量(kg)
+    private BigDecimal cargoWeightKg;     // 重量(kg)（v2.0 重构为毛重，净重/毛重分离）
+
+    @Column(name = "net_weight_kg", precision = 10, scale = 4)
+    private BigDecimal netWeightKg;      // 净重(kg)（V49 新增）
+
+    @Column(name = "gross_weight_kg", precision = 10, scale = 4)
+    private BigDecimal grossWeightKg;     // 毛重(kg)（V49 新增）
 
     @Column(name = "cargo_volume_cbm", precision = 10, scale = 6)
     private BigDecimal cargoVolumeCbm;     // 体积(m³)

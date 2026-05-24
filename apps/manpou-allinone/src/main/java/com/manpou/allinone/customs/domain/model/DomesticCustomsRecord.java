@@ -63,6 +63,9 @@ public class DomesticCustomsRecord extends BaseEntity {
     @Column(name = "status", nullable = false, length = 24)
     private DomesticCustomsStatus status = DomesticCustomsStatus.PENDING;
 
+    @Column(name = "customs_declaration_no", length = 64)
+    private String customsDeclarationNo;  // 报关申报号（用户自填，v2.0）
+
     @Column(name = "remarks", length = 512)
     private String remarks;               // 备注
 

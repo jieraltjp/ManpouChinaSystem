@@ -29,6 +29,8 @@ public class LogisticsPlanPageQuery {
     private BigDecimal cargoWidthCm;
     private BigDecimal cargoHeightCm;
     private BigDecimal cargoWeightKg;
+    private BigDecimal netWeightKg;       // 净重(kg)（V49）
+    private BigDecimal grossWeightKg;    // 毛重(kg)（V49）
     private BigDecimal cargoVolumeCbm;
     private Integer quantity;
     private Boolean requiresQc;

@@ -173,6 +173,10 @@ export interface ShipmentBatchVO {
   createTime?: string
   updateBy?: string
   updateTime?: string
+  // 商品信息
+  productMasterCode?: string
+  productSubCode?: string
+  productImageUrl?: string
 }
 
 export interface ShipmentBatchPageResponse {

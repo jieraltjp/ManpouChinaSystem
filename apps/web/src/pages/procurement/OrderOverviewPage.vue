@@ -87,7 +87,7 @@
         <!-- 票点 -->
         <el-table-column :label="$t('orderOverview.column.taxPoint')" min-width="70" align="center">
           <template #default="{ row }">
-            <span v-if="row.procurementTaxPoint">{{ Number(row.procurementTaxPoint).toFixed(1) }}%</span>
+            <span v-if="row.procurementTaxPoint">{{ Number(row.procurementTaxPoint).toFixed(1) }}</span>
             <span v-else>—</span>
           </template>
         </el-table-column>
@@ -115,9 +115,10 @@
           </template>
         </el-table-column>
         <!-- 操作 -->
-        <el-table-column :label="$t('orderOverview.column.action')" min-width="80" align="center">
+        <el-table-column :label="$t('orderOverview.column.action')" min-width="100" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('orderOverview.action.view') }}</el-button>
+            <el-button link class="btn-red" size="small" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -187,76 +188,141 @@
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
 
-        <!-- 步骤3：验货记录 -->
+        <!-- 步骤3：厂家出货 -->
         <div class="drawer-section-title">{{ $t('orderOverview.step3.title') }}</div>
-        <el-descriptions v-if="detailData.qcRecord" :column="2" border size="small">
-          <el-descriptions-item :label="$t('orderOverview.step3.qcCode')">{{ detailData.qcRecord.qcCode || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step3.result')">{{ qcResultLabel(detailData.qcRecord.result) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step3.inspectionCount')">{{ detailData.qcRecord.inspectionCount ?? '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step3.passedCount')">{{ detailData.qcRecord.passedCount ?? '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step3.defectiveCount')">{{ detailData.qcRecord.defectiveCount ?? '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step3.qcDate')">{{ formatDate(detailData.qcRecord.qcDate) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step3.status')">{{ qcStatusLabel(detailData.qcRecord.status) }}</el-descriptions-item>
-        </el-descriptions>
+        <el-table v-if="detailData.shipmentBatches?.length" :data="detailData.shipmentBatches" stripe size="small" style="width:100%">
+          <el-table-column :label="$t('orderOverview.step3.batchCode')" prop="batchCode" min-width="130" show-overflow-tooltip />
+          <el-table-column :label="$t('orderOverview.step3.shipmentQuantity')" prop="shipmentQuantity" width="100" align="right">
+            <template #default="{ row }">{{ row.shipmentQuantity ?? '-' }}</template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step3.factoryShipDate')" prop="factoryShipDate" width="120">
+            <template #default="{ row }">{{ row.factoryShipDate || '-' }}</template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step3.actualShipDate')" prop="actualShipDate" width="120">
+            <template #default="{ row }">{{ row.actualShipDate || '-' }}</template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step3.qcRecordCount')" prop="qcRecordCount" width="90" align="center">
+            <template #default="{ row }">{{ row.qcRecordCount ?? '-' }}</template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step3.totalPassedCount')" prop="totalPassedCount" width="90" align="right">
+            <template #default="{ row }">{{ row.totalPassedCount ?? '-' }}</template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step3.status')" prop="status" width="100">
+            <template #default="{ row }">
+              <el-tag size="small">{{ row.status || '-' }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step3.remarks')" prop="remarks" min-width="100" show-overflow-tooltip>
+            <template #default="{ row }">{{ row.remarks || '-' }}</template>
+          </el-table-column>
+        </el-table>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
 
-        <!-- 步骤4：调配计划 -->
+        <!-- 步骤4：验货记录 -->
         <div class="drawer-section-title">{{ $t('orderOverview.step4.title') }}</div>
-        <el-descriptions v-if="detailData.logisticsPlan" :column="2" border size="small">
-          <el-descriptions-item :label="$t('orderOverview.step4.planCode')">{{ detailData.logisticsPlan.planCode || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step4.planType')">{{ planTypeLabel(detailData.logisticsPlan.planType) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step4.cargoVolume')">{{ detailData.logisticsPlan.cargoVolumeCbm ? detailData.logisticsPlan.cargoVolumeCbm + ' CBM' : '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step4.cargoWeight')">{{ detailData.logisticsPlan.cargoWeightKg ? detailData.logisticsPlan.cargoWeightKg + ' kg' : '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step4.estimatedShipDate')">{{ formatDate(detailData.logisticsPlan.estimatedShipDate) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step4.actualShipDate')">{{ formatDate(detailData.logisticsPlan.actualShipDate) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step4.status')">{{ logisticsStatusLabel(detailData.logisticsPlan.status) }}</el-descriptions-item>
-        </el-descriptions>
+        <el-table v-if="detailData.qcRecords?.length" :data="detailData.qcRecords" stripe size="small" style="width:100%">
+          <el-table-column :label="$t('orderOverview.step4.qcCode')" prop="qcCode" min-width="130" show-overflow-tooltip />
+          <el-table-column :label="$t('orderOverview.step4.productCode')" prop="productCode" width="100">
+            <template #default="{ row }">
+              <span class="product-code">{{ row.productCode || '-' }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step4.subProductCode')" prop="subProductCode" width="100">
+            <template #default="{ row }">{{ row.subProductCode || '-' }}</template>
+          </el-table-column>
+          <el-table-column label="商品图片" width="70" align="center">
+            <template #default="{ row }">
+              <el-image
+                v-if="row.productImageUrl"
+                :src="row.productImageUrl"
+                fit="cover"
+                style="width:40px;height:40px;border-radius:6px;border:1px solid #e0e6ed;cursor:pointer"
+                :preview-src-list="[row.productImageUrl]"
+                preview-teleported
+              />
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step4.result')" prop="result" width="90" align="center">
+            <template #default="{ row }">{{ qcResultLabel(row.result) }}</template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step4.inspectionCount')" prop="inspectionCount" width="80" align="right">
+            <template #default="{ row }">{{ row.inspectionCount ?? '-' }}</template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step4.passedCount')" prop="passedCount" width="80" align="right">
+            <template #default="{ row }">{{ row.passedCount ?? '-' }}</template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step4.defectiveCount')" prop="defectiveCount" width="80" align="right">
+            <template #default="{ row }">{{ row.defectiveCount ?? '-' }}</template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step4.qcDate')" prop="qcDate" width="120">
+            <template #default="{ row }">{{ row.qcDate || '-' }}</template>
+          </el-table-column>
+          <el-table-column :label="$t('orderOverview.step4.status')" prop="status" width="100">
+            <template #default="{ row }">
+              <el-tag size="small">{{ qcStatusLabel(row.status) }}</el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
 
-        <!-- 步骤5：国内报关 -->
+        <!-- 步骤5：调配计划 -->
         <div class="drawer-section-title">{{ $t('orderOverview.step5.title') }}</div>
-        <el-descriptions v-if="detailData.domesticCustoms" :column="2" border size="small">
-          <el-descriptions-item :label="$t('orderOverview.step5.customsCode')">{{ detailData.domesticCustoms.customsCode || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step5.containerNo')">{{ detailData.domesticCustoms.containerNo || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step5.productCode')">{{ detailData.domesticCustoms.productCode || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step5.estimatedValueCny')">{{ detailData.domesticCustoms.estimatedValueCny ? $t('common.currency.cny') + Number(detailData.domesticCustoms.estimatedValueCny).toFixed(2) : '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step5.status')">{{ domesticCustomsStatusLabel(detailData.domesticCustoms.status) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step5.createTime')">{{ formatDate(detailData.domesticCustoms.createTime) }}</el-descriptions-item>
+        <el-descriptions v-if="detailData.logisticsPlan" :column="2" border size="small">
+          <el-descriptions-item :label="$t('orderOverview.step5.planCode')">{{ detailData.logisticsPlan.planCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step5.planType')">{{ planTypeLabel(detailData.logisticsPlan.planType) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step5.cargoVolume')">{{ detailData.logisticsPlan.cargoVolumeCbm ? detailData.logisticsPlan.cargoVolumeCbm + ' CBM' : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step5.cargoWeight')">{{ detailData.logisticsPlan.cargoWeightKg ? detailData.logisticsPlan.cargoWeightKg + ' kg' : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step5.estimatedShipDate')">{{ formatDate(detailData.logisticsPlan.estimatedShipDate) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step5.actualShipDate')">{{ formatDate(detailData.logisticsPlan.actualShipDate) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step5.status')">{{ logisticsStatusLabel(detailData.logisticsPlan.status) }}</el-descriptions-item>
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
 
-        <!-- 步骤6：日本清关 -->
+        <!-- 步骤6：国内报关 -->
         <div class="drawer-section-title">{{ $t('orderOverview.step6.title') }}</div>
-        <el-descriptions v-if="detailData.japanCustoms" :column="2" border size="small">
-          <el-descriptions-item :label="$t('orderOverview.step6.containerNo')">{{ detailData.japanCustoms.containerNo || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step6.importDutyPaid')">{{ detailData.japanCustoms.importDutyPaid ? $t('common.currency.jpy') + Number(detailData.japanCustoms.importDutyPaid).toLocaleString() : '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step6.consumptionTaxPaid')">{{ detailData.japanCustoms.consumptionTaxPaid ? $t('common.currency.jpy') + Number(detailData.japanCustoms.consumptionTaxPaid).toLocaleString() : '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step6.arrivalDate')">{{ formatDate(detailData.japanCustoms.arrivalDate) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step6.clearanceDate')">{{ formatDate(detailData.japanCustoms.clearanceDate) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step6.status')">{{ japanCustomsStatusLabel(detailData.japanCustoms.status) }}</el-descriptions-item>
+        <el-descriptions v-if="detailData.domesticCustoms" :column="2" border size="small">
+          <el-descriptions-item :label="$t('orderOverview.step6.customsCode')">{{ detailData.domesticCustoms.customsCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step6.containerNo')">{{ detailData.domesticCustoms.containerNo || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step6.productCode')">{{ detailData.domesticCustoms.productCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step6.estimatedValueCny')">{{ detailData.domesticCustoms.estimatedValueCny ? $t('common.currency.cny') + Number(detailData.domesticCustoms.estimatedValueCny).toFixed(2) : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step6.status')">{{ domesticCustomsStatusLabel(detailData.domesticCustoms.status) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step6.createTime')">{{ formatDate(detailData.domesticCustoms.createTime) }}</el-descriptions-item>
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
 
-        <!-- 步骤7：退税 -->
+        <!-- 步骤7：日本清关 -->
         <div class="drawer-section-title">{{ $t('orderOverview.step7.title') }}</div>
-        <el-descriptions v-if="detailData.taxRefund" :column="2" border size="small">
-          <el-descriptions-item :label="$t('orderOverview.step7.refundCode')">{{ detailData.taxRefund.refundCode || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step7.billingType')">{{ billingTypeLabel(detailData.taxRefund.billingType) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step7.estimatedRefundRmb')">{{ detailData.taxRefund.estimatedRefundRmb ? $t('common.currency.cny') + Number(detailData.taxRefund.estimatedRefundRmb).toFixed(2) : '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step7.refundDate')">{{ formatDate(detailData.taxRefund.refundDate) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step7.status')">{{ taxRefundStatusLabel(detailData.taxRefund.status) }}</el-descriptions-item>
+        <el-descriptions v-if="detailData.japanCustoms" :column="2" border size="small">
+          <el-descriptions-item :label="$t('orderOverview.step7.containerNo')">{{ detailData.japanCustoms.containerNo || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step7.importDutyPaid')">{{ detailData.japanCustoms.importDutyPaid ? $t('common.currency.jpy') + Number(detailData.japanCustoms.importDutyPaid).toLocaleString() : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step7.consumptionTaxPaid')">{{ detailData.japanCustoms.consumptionTaxPaid ? $t('common.currency.jpy') + Number(detailData.japanCustoms.consumptionTaxPaid).toLocaleString() : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step7.arrivalDate')">{{ formatDate(detailData.japanCustoms.arrivalDate) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step7.clearanceDate')">{{ formatDate(detailData.japanCustoms.clearanceDate) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step7.status')">{{ japanCustomsStatusLabel(detailData.japanCustoms.status) }}</el-descriptions-item>
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
 
-        <!-- 步骤8：运营销售 -->
+        <!-- 步骤8：退税 -->
         <div class="drawer-section-title">{{ $t('orderOverview.step8.title') }}</div>
+        <el-descriptions v-if="detailData.taxRefund" :column="2" border size="small">
+          <el-descriptions-item :label="$t('orderOverview.step8.refundCode')">{{ detailData.taxRefund.refundCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step8.billingType')">{{ billingTypeLabel(detailData.taxRefund.billingType) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step8.estimatedRefundRmb')">{{ detailData.taxRefund.estimatedRefundRmb ? $t('common.currency.cny') + Number(detailData.taxRefund.estimatedRefundRmb).toFixed(2) : '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step8.refundDate')">{{ formatDate(detailData.taxRefund.refundDate) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step8.status')">{{ taxRefundStatusLabel(detailData.taxRefund.status) }}</el-descriptions-item>
+        </el-descriptions>
+        <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
+
+        <!-- 步骤9：运营销售 -->
+        <div class="drawer-section-title">{{ $t('orderOverview.step9.title') }}</div>
         <el-descriptions v-if="detailData.salesRecord" :column="2" border size="small">
-          <el-descriptions-item :label="$t('orderOverview.step8.recordCode')">{{ detailData.salesRecord.recordCode || '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step8.salesChannel')">{{ salesChannelLabel(detailData.salesRecord.salesChannel) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step8.initialStock')">{{ detailData.salesRecord.initialStock ?? '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step8.currentStock')">{{ detailData.salesRecord.currentStock ?? '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step8.salesQuantity')">{{ detailData.salesRecord.salesQuantity ?? '-' }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('orderOverview.step8.status')">{{ salesStatusLabel(detailData.salesRecord.status) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step9.recordCode')">{{ detailData.salesRecord.recordCode || '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step9.salesChannel')">{{ salesChannelLabel(detailData.salesRecord.salesChannel) }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step9.initialStock')">{{ detailData.salesRecord.initialStock ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step9.currentStock')">{{ detailData.salesRecord.currentStock ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step9.salesQuantity')">{{ detailData.salesRecord.salesQuantity ?? '-' }}</el-descriptions-item>
+          <el-descriptions-item :label="$t('orderOverview.step9.status')">{{ salesStatusLabel(detailData.salesRecord.status) }}</el-descriptions-item>
         </el-descriptions>
         <div v-else class="step-empty">{{ $t('orderOverview.stepStatusUI.notStarted') }}</div>
 
@@ -273,6 +339,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Loading } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { orderChainApi, type OrderChainVO, type OrderChainDetailVO } from '@/api/orderChain'
 import { productApi } from '@/api/product'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
@@ -343,7 +410,7 @@ function statusLabelByValue(val: string | undefined): string {
 
 function qcResultLabel(val: string | undefined): string {
   if (!val) return '-'
-  return t(`orderOverview.step3.qcResult.${val}` as any, { default: val })
+  return t(`orderOverview.step4.qcResult.${val}` as any, { default: val })
 }
 
 function qcStatusLabel(val: string | undefined): string {
@@ -389,6 +456,16 @@ function salesStatusLabel(val: string | undefined): string {
 }
 
 function chainStatusType(row: OrderChainVO): string {
+  if (row.step9Status === 'COMPLETED') return 'success'
+  if (row.step9Status === 'IN_PROGRESS') return 'warning'
+  if (row.step8Status === 'COMPLETED') return 'success'
+  if (row.step8Status === 'IN_PROGRESS') return 'warning'
+  if (row.step7Status === 'COMPLETED') return 'success'
+  if (row.step7Status === 'IN_PROGRESS') return 'warning'
+  if (row.step6Status === 'COMPLETED') return 'success'
+  if (row.step6Status === 'IN_PROGRESS') return 'warning'
+  if (row.step5Status === 'COMPLETED') return 'success'
+  if (row.step5Status === 'IN_PROGRESS') return 'warning'
   if (row.step4Status === 'COMPLETED') return 'success'
   if (row.step4Status === 'IN_PROGRESS') return 'warning'
   if (row.step3Status === 'COMPLETED') return 'success'
@@ -401,6 +478,11 @@ function chainStatusType(row: OrderChainVO): string {
 
 function chainStatusLabel(row: OrderChainVO): string {
   const steps = [
+    { status: row.step9Status, label: t('orderOverview.step.9') },
+    { status: row.step8Status, label: t('orderOverview.step.8') },
+    { status: row.step7Status, label: t('orderOverview.step.7') },
+    { status: row.step6Status, label: t('orderOverview.step.6') },
+    { status: row.step5Status, label: t('orderOverview.step.5') },
     { status: row.step4Status, label: t('orderOverview.step.4') },
     { status: row.step3Status, label: t('orderOverview.step.3') },
     { status: row.step2Status, label: t('orderOverview.step.2') },
@@ -477,6 +559,21 @@ async function onView(row: OrderChainVO) {
   }
 }
 
+async function onDelete(row: OrderChainVO) {
+  try {
+    await ElMessageBox.confirm(
+      t('common.deleteConfirm'),
+      t('common.warning'),
+      { type: 'warning', confirmButtonText: t('common.confirm'), cancelButtonText: t('common.cancel') }
+    )
+    await orderChainApi.deleteChain(row.demandId)
+    ElMessage.success(t('common.deleteSuccess'))
+    loadChainList()
+  } catch (err: any) {
+    if (err !== 'cancel') ElMessage.error(t('common.deleteFailed'))
+  }
+}
+
 onMounted(() => {
   loadChainList()
 })
@@ -508,6 +605,7 @@ onMounted(() => {
 /* 商品图片缩略图 */
 .return-reason-text { color: #F56C6C; font-size: 13px; }
 .btn-blue { color: #409EFF !important; }
+.btn-red { color: #F56C6C !important; }
 .product-thumb {
   width: 40px;
   height: 40px;

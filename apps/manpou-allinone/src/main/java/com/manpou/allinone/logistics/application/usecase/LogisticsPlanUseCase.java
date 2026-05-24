@@ -75,6 +75,9 @@ public class LogisticsPlanUseCase {
             if (cmd.getCargoWidthCm() == null && qcRecord.getBoxWidthCm() != null) cmd.setCargoWidthCm(qcRecord.getBoxWidthCm());
             if (cmd.getCargoHeightCm() == null && qcRecord.getBoxHeightCm() != null) cmd.setCargoHeightCm(qcRecord.getBoxHeightCm());
             if (cmd.getCargoWeightKg() == null && qcRecord.getGrossWeight() != null) cmd.setCargoWeightKg(qcRecord.getGrossWeight());
+            // V49: 从 QC record 自动带入净重/毛重
+            if (cmd.getNetWeightKg() == null && qcRecord.getNetWeightPerUnit() != null) cmd.setNetWeightKg(qcRecord.getNetWeightPerUnit());
+            if (cmd.getGrossWeightKg() == null && qcRecord.getGrossWeight() != null) cmd.setGrossWeightKg(qcRecord.getGrossWeight());
             // SPEC-B00 数量等式：quantity = passedCount（验货合格量），非采购量
             if (cmd.getQuantity() == null && qcRecord.getPassedCount() != null) cmd.setQuantity(qcRecord.getPassedCount());
         }
@@ -122,5 +125,23 @@ public class LogisticsPlanUseCase {
         entity.markDeleted();
         logisticsPlanRepository.save(entity);
         log.info("[LogisticsPlan] deleted, traceId={}, id={}", null, id);
+    }
+
+    @Transactional
+    public int batchUpdateCustomsClearanceNo(java.util.List<Long> ids, String customsClearanceNo) {
+        if (ids == null || ids.isEmpty()) {
+            throw new BusinessException("logistics.batch_empty", "请选择要修改的调配计划");
+        }
+        int count = 0;
+        for (Long id : ids) {
+            int updated = logisticsPlanRepository.findByIdAndDeletedIsFalse(id).map(entity -> {
+                entity.setCustomsClearanceNo(customsClearanceNo);
+                logisticsPlanRepository.save(entity);
+                log.info("[LogisticsPlan] batch update customsClearanceNo, id={}, value={}", id, customsClearanceNo);
+                return 1;
+            }).orElse(0);
+            count += updated;
+        }
+        return count;
     }
 }

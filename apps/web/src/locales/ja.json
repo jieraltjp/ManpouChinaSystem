@@ -16,12 +16,12 @@
     "consolidationPool": "05 コンソリ池",
     "container": "06 コンテナ管理",
     "ship": "船舶管理",
-    "domesticCustoms": "05 国内通関",
-    "japanCustomsRecord": "06 日本通関",
+    "domesticCustoms": "06 国内通関",
+    "japanCustomsRecord": "07 日本通関",
     "finance": "財務管理",
-    "taxRefundRecord": "07 輸出退税",
+    "taxRefundRecord": "08 輸出退税",
     "sales": "運営販売",
-    "salesRecord": "08 運営販売",
+    "salesRecord": "09 運営販売",
     "factory": "工場管理",
     "product": "商品ディレクトリ",
     "base": "基礎データ",
@@ -132,6 +132,7 @@
       "RETURNED": "注文件失敗"
     },
     "action": {
+      "detail": "詳細",
       "edit": "編集",
       "delete": "削除"
     },
@@ -601,6 +602,58 @@
       "deleteSuccess": "検品記録の削除が完了しました",
       "deleteConfirm": "この検品記録を削除してもよろしいですか？",
       "deleteConfirmTitle": "削除確認"
+    },
+    "print": {
+      "button": "検収書を印刷",
+      "batchButton": "一括印刷",
+      "selectedCount": "{n}件選択中",
+      "selectFirst": "印刷する検品記録を選択してください",
+      "noData": "データなし",
+      "title": "検収書プレビュー",
+      "printBtn": "印刷",
+      "cancelBtn": "キャンセル",
+      "companyName": "マンプ（中国）管理システム",
+      "reportTitle": "貨物検収書",
+      "qcInfo": "検品情報",
+      "productInfo": "製品情報",
+      "packageInfo": "包装情報",
+      "qcResult": "検品結果",
+      "qcStandard": "検品基準",
+      "remarks": "備考",
+      "signatures": "署名欄",
+      "qcInspector": "検品員署名",
+      "factoryRep": "メーカー代表署名",
+      "warehouseRep": "倉庫署名",
+      "qcCode": "検品番号",
+      "qcDate": "検品日",
+      "qcType": "検品タイプ",
+      "result": "検品結果",
+      "factoryName": "メーカー名",
+      "batchCode": "出荷ロット",
+      "productCode": "品番",
+      "subProductCode": "子品番",
+      "material": "材質",
+      "destination": "出荷先",
+      "shipmentQty": "出荷数量",
+      "orderQty": "注文数量",
+      "boxCount": "カートン数",
+      "boxDim": "カートンサイズ",
+      "netWeight": "正味重量",
+      "grossWeight": "総重量",
+      "unitPrice": "税込単価",
+      "inspectionCount": "検査数",
+      "passedCount": "合格数",
+      "defectiveCount": "不良数",
+      "passRate": "合格率",
+      "printDate": "印刷日"
+    },
+    "batch": {
+      "selectedCount": "{n}件選択中",
+      "delete": "一括削除 ({n}件)",
+      "deleteConfirm": "選択した{n}件を削除しますか？",
+      "deleteConfirmTitle": "一括削除",
+      "deleteSuccess": "一括削除完了、{n}件を削除しました",
+      "deleteFailed": "一括削除に失敗しました"
     }
   },
   "logistics": {
@@ -647,7 +700,9 @@
       "status": "ステータス",
       "action": "操作",
       "createTime": "作成日時",
-      "actions": "操作"
+      "actions": "操作",
+      "netWeightKg": "正味重量",
+      "grossWeightKg": "総重量"
     },
     "action": {
       "detail": "詳細",
@@ -667,6 +722,14 @@
     "requiresQc": {
       "yes": "検品要",
       "no": "不要"
+    },
+    "batch": {
+      "updateCustoms": "通関番号を一括変更（{n}）",
+      "updateCustomsTitle": "通関番号一括変更",
+      "customsPlaceholder": "通関番号を入力してください",
+      "customsRequired": "通関番号を入力してください",
+      "updateSuccess": "{n}件の通関番号を変更しました",
+      "updateFailed": "通関番号の一括変更に失敗しました"
     },
     "dialog": {
       "newTitle": "新規追加",
@@ -703,7 +766,9 @@
       "updateTime": "更新日時",
       "datePlaceholder": "日付を選択",
       "cancel": "キャンセル",
-      "save": "保存"
+      "save": "保存",
+      "netWeightKg": "正味重量(kg)",
+      "grossWeightKg": "総重量(kg)"
     },
     "drawer": {
       "cargoDimension": "貨物サイズ",
@@ -1125,6 +1190,13 @@
       "nameZhPlaceholder": "中文名称",
       "nameEn": "英文名称",
       "nameEnPlaceholder": "English name",
+      "nameJa": "日本語名称",
+      "nameJaPlaceholder": "日本語名称",
+      "translate": "翻訳",
+      "translateSuccess": "翻訳完了",
+      "translateError": "翻訳に失敗しました。再試行してください。",
+      "oneClickTranslate": "一括翻訳",
+      "translating": "翻訳中...",
       "hsCode": "HSコード",
       "hsCodePlaceholder": "HSコード",
       "unitPriceRmb": "税込単価(CNY)",
@@ -1139,8 +1211,6 @@
       "materialPlaceholder": "例：plastic/metal",
       "unit": "単位",
       "unitPlaceholder": "例：個/套/箱",
-      "nameJa": "日本語名称",
-      "nameJaPlaceholder": "日本語名称",
       "taxPoint": "インボイス係数",
       "taxPointPlaceholder": "デフォルト 1.1",
       "taxRate": "消費税率",
@@ -1251,8 +1321,13 @@
     "step": {
       "1": "需要",
       "2": "発注",
-      "3": "検品",
-      "4": "配車"
+      "3": "工場出荷",
+      "4": "検品",
+      "5": "配車",
+      "6": "国内通関",
+      "7": "日本通関",
+      "8": "退税",
+      "9": "上架運営"
     },
     "action": {
       "overview": "総览",
@@ -1288,7 +1363,18 @@
       "returnReason": "退货理由"
     },
     "step3": {
-      "title": "ステップ3：検品記録",
+      "title": "ステップ3：工場出荷",
+      "batchCode": "バッチ番号",
+      "shipmentQuantity": "出荷数量",
+      "factoryShipDate": "工場出荷日",
+      "actualShipDate": "実際出荷日",
+      "status": "ステータス",
+      "qcRecordCount": "検品回数",
+      "totalPassedCount": "合格総数",
+      "remarks": "備考"
+    },
+    "step4": {
+      "title": "ステップ4：検品記録",
       "qcCode": "検品番号",
       "result": "結果",
       "qcResult": {
@@ -1299,10 +1385,12 @@
       "passedCount": "合格数",
       "defectiveCount": "不良数",
       "qcDate": "検品日",
-      "status": "ステータス"
+      "status": "ステータス",
+      "productCode": "主品番",
+      "subProductCode": "子品番"
     },
-    "step4": {
-      "title": "ステップ4：配送計画",
+    "step5": {
+      "title": "ステップ5：配送計画",
       "planCode": "配送番号",
       "planType": "輸送方法",
       "cargoVolume": "容積(CBM)",
@@ -1311,8 +1399,8 @@
       "actualShipDate": "実際出荷日",
       "status": "ステータス"
     },
-    "step5": {
-      "title": "ステップ5：国内通関",
+    "step6": {
+      "title": "ステップ6：国内通関",
       "customsCode": "通関番号",
       "containerNo": "コンテナ番号",
       "productCode": "品番",
@@ -1320,8 +1408,8 @@
       "createTime": "作成日時",
       "status": "ステータス"
     },
-    "step6": {
-      "title": "ステップ6：日本通関",
+    "step7": {
+      "title": "ステップ7：日本通関",
       "containerNo": "コンテナ番号",
       "customsEntryNo": "入境通関番号",
       "arrivalDate": "到着日",
@@ -1332,17 +1420,20 @@
       "arrivalPort": "仕向港",
       "status": "ステータス"
     },
-    "step7": {
-      "title": "ステップ7：退税",
+    "step8": {
+      "title": "ステップ8：退税",
       "refundCode": "退税番号",
       "billingType": "通関タイプ",
+      "priceRmb": "人民元単価",
+      "quantity": "数量",
+      "taxPoint": "税率",
       "estimatedRefundRmb": "理論退税額",
       "actualRefundRmb": "実際退税額",
       "refundDate": "退税日",
       "status": "ステータス"
     },
-    "step8": {
-      "title": "ステップ8：運営販売",
+    "step9": {
+      "title": "ステップ9：運営販売",
       "recordCode": "販売番号",
       "salesChannel": "販売チャネル",
       "listingDate": "上架日",
@@ -1351,6 +1442,7 @@
       "salesQuantity": "累計販売数",
       "returnRate": "退货率",
       "sellingPriceJpy": "販売価格(JPY)",
+      "returnedQuantity": "退货数量",
       "status": "ステータス"
     },
     "stepStatusUI": {
@@ -1440,6 +1532,16 @@
     "select": "選択",
     "confirm": "確認",
     "delete": "削除",
+    "batchDeleteConfirm": "{n}件を一括削除しますか？",
+    "batchDeleteSuccess": "一括削除成功、{n}件を削除しました",
+    "batch": {
+      "selectedCount": "{n}件選択中",
+      "delete": "一括削除 ({n}件)",
+      "deleteConfirm": "選択した{n}件を削除しますか？",
+      "deleteConfirmTitle": "一括削除",
+      "deleteSuccess": "一括削除完了、{n}件を削除しました",
+      "deleteFailed": "一括削除に失敗しました"
+    },
     "edit": "編集",
     "view": "詳細",
     "warning": "警告",
@@ -1502,7 +1604,10 @@
       "table": "テーブル表示",
       "excel": "Excel表示"
     },
-    "detail": "詳細"
+    "detail": "詳細",
+    "deleteConfirm": "この記録を削除してもよろしいですか？",
+    "deleteSuccess": "削除しました",
+    "deleteFailed": "削除に失敗しました"
   },
   "excel": {
     "selectTip": "文字を選択後に Ctrl+C でコピー、または上のボタンで表全体をコピー",
@@ -1536,7 +1641,8 @@
       "status": "ステータス"
     },
     "column": {
-      "customsCode": "通関書類番号",
+      "customsCode": "システム連番",
+      "customsDeclarationNo": "通関申告番号",
       "containerNo": "コンテナ番号",
       "procurementId": "仕入書類番号",
       "productCode": "商品コード",
@@ -1594,6 +1700,13 @@
       "reasonLabel": "却下理由",
       "reasonPlaceholder": "却下理由を入力"
     },
+    "batchDeclarationNo": {
+      "button": "一括申告番号変更",
+      "dialogTitle": "通関申告番号一括変更",
+      "declarationNoLabel": "通関申告番号",
+      "declarationNoPlaceholder": "通関申告番号を入力",
+      "selectedCount": "{n}件選択済み"
+    },
     "validation": {
       "productCodeRequired": "商品コードは必須です",
       "containerNoRequired": "コンテナ番号は必須です",
@@ -1604,7 +1717,12 @@
       "selectedPlans": "選択した計画",
       "totalValue": "合計金額",
       "items": "件",
-      "createButton": "一括作成 ({n})"
+      "createButton": "一括作成 ({n})",
+      "delete": "選択を削除 ({n}件)",
+      "deleteConfirm": "選択した{n}件の発注書を削除しますか？",
+      "deleteConfirmTitle": "一括削除",
+      "deleteSuccess": "一括削除成功",
+      "deleteFailed": "一括削除失敗"
     },
     "message": {
       "loadFailed": "通関書類一覧の読み込みに失敗しました",
@@ -1616,7 +1734,10 @@
       "rejectSuccess": "通関書類を却下しました",
       "deleteSuccess": "通関書類を削除しました",
       "actionFailed": "操作に失敗しました",
-      "deleteConfirm": "この通関書類を削除しますか？"
+      "deleteConfirm": "この通関書類を削除しますか？",
+      "batchDeleteConfirm": "選択した{n}件の通関書類を削除しますか？",
+      "batchDeleteSuccess": "一括削除成功、{n}件の通関書類を削除しました",
+      "batchUpdateDeclarationNoSuccess": "通関申告番号の一括変更に成功しました、{n}件"
     }
   },
   "japanCustoms": {
@@ -1730,7 +1851,9 @@
       "actionFailed": "操作に失敗しました",
       "deleteConfirm": "この通関記録を削除しますか？",
       "createSuccess": "作成しました",
-      "createFailed": "作成に失敗しました"
+      "createFailed": "作成に失敗しました",
+      "batchDeleteConfirm": "選択した{n}件の通関記録を削除しますか？",
+      "batchDeleteSuccess": "一括削除成功、{n}件の通関記録を削除しました"
     }
   },
   "taxRefund": {
@@ -1909,7 +2032,9 @@
       "relistSuccess": "再上架しました",
       "deleteSuccess": "削除しました",
       "actionFailed": "操作に失敗しました",
-      "deleteConfirm": "この販売記録を削除しますか？"
+      "deleteConfirm": "この販売記録を削除しますか？",
+      "batchDeleteConfirm": "選択した{n}件の販売記録を削除しますか？",
+      "batchDeleteSuccess": "一括削除成功、{n}件の販売記録を削除しました"
     },
     "validation": {
       "salesChannelRequired": "販売チャネルを選択してください"

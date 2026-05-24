@@ -26,6 +26,9 @@ public class CustomsUpdateCmd {
 
     private BigDecimal estimatedValueCny;
 
+    @Size(max = 64, message = "报关申报号最多 64 字符")
+    private String customsDeclarationNo; // 报关申报号（v2.0，支持批量修改）
+
     @Size(max = 512, message = "备注最多 512 字符")
     private String remarks;
 }

@@ -67,9 +67,21 @@
             <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
             <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
           </el-radio-group>
+          <span v-if="selectedRows.length" class="selection-count">
+            <el-tag type="info" size="small">{{ $t('common.batch.selectedCount', { n: selectedRows.length }) }}</el-tag>
+          </span>
+          <el-button
+            v-if="selectedRows.length"
+            type="danger"
+            size="small"
+            @click="onBatchDelete"
+          >
+            <el-icon><Delete /></el-icon>{{ $t('common.batch.delete', { n: selectedRows.length }) }}
+          </el-button>
         </div>
       </template>
-      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200" ref="tableRef" row-key="id" @selection-change="onSelectionChange">
+        <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
         <el-table-column prop="demandCode" :label="$t('demand.column.demandCode')" min-width="160" />
         <el-table-column prop="productCode" :label="$t('demand.column.productCode')" min-width="110">
           <template #default="{ row }">
@@ -185,7 +197,6 @@
       </el-descriptions>
       <div class="drawer-footer">
         <el-button @click="drawerVisible = false">{{ $t('common.close') }}</el-button>
-        <el-button v-if="hasPermission('demand:update')" type="primary" @click="drawerVisible = false; currentRow && onEdit(currentRow)">{{ $t('demand.action.edit') }}</el-button>
       </div>
     </el-drawer>
 
@@ -397,7 +408,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
-import { Plus, Clock, Warning, CircleCheck } from '@element-plus/icons-vue'
+import { Plus, Clock, Warning, CircleCheck, Delete } from '@element-plus/icons-vue'
 import { demandApi, type DemandPageVO, type DemandType, type DemandStatus } from '@/api/demand'
 import { productApi, type MasterCodeSuggestVO, type SubCodeSuggestVO } from '@/api/product'
 import { useI18n } from 'vue-i18n'
@@ -406,6 +417,8 @@ import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
 const { hasPermission } = usePermission()
 
+const tableRef = ref()
+const selectedRows = ref<DemandPageVO[]>([])
 const loading = ref(false)
 const submitting = ref(false)
 const excelViewMode = ref<'table' | 'copy'>('table')
@@ -433,7 +446,7 @@ const formRef = ref<FormInstance>()
 
 const { t, locale: localeRef } = useI18n()
 
-const filterForm = reactive({ demandType: '', keyword: '' })
+const filterForm = reactive({ demandType: '', keyword: '', linked: null as boolean | null })
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
 const tableData = ref<DemandPageVO[]>([])
 const productCategoryMap = ref<Record<string, string>>({}) // productCode -> category
@@ -631,6 +644,10 @@ async function searchJapanLead(query: string) {
   finally { leadLoading.value = false }
 }
 
+function onSelectionChange(selection: DemandPageVO[]) {
+  selectedRows.value = selection
+}
+
 async function onDelete(row: DemandPageVO) {
   try {
     await ElMessageBox.confirm(
@@ -644,6 +661,28 @@ async function onDelete(row: DemandPageVO) {
     ElMessage.success(t('demand.message.deleteSuccess'))
     loadData()
   } catch { /* interceptor */ }
+}
+
+async function onBatchDelete() {
+  if (!selectedRows.value.length) return
+  try {
+    await ElMessageBox.confirm(
+      t('common.batch.deleteConfirm', { n: selectedRows.value.length }),
+      t('common.batch.deleteConfirmTitle'),
+      { confirmButtonText: t('common.delete'), cancelButtonText: t('common.cancel'), type: 'warning' }
+    )
+  } catch { return }
+  loading.value = true
+  try {
+    await Promise.all(selectedRows.value.map(r => demandApi.delete(r.id)))
+    ElMessage.success(t('common.batch.deleteSuccess', { n: selectedRows.value.length }))
+    selectedRows.value = []
+    await loadData()
+  } catch {
+    ElMessage.error(t('common.batch.deleteFailed'))
+  } finally {
+    loading.value = false
+  }
 }
 
 async function onSubmit() {
@@ -716,6 +755,8 @@ onMounted(() => loadData())
 .page { display: flex; flex-direction: column; gap: 16px; }
 .page-header { display: flex; align-items: center; justify-content: space-between; }
 .table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.selection-count { margin-left: 4px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
 .table-card :deep(.el-card__body) { padding: 16px; }
 .stats-row { margin-bottom: 4px; }

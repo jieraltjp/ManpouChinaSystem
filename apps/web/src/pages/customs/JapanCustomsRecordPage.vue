@@ -66,7 +66,18 @@
     <!-- 数据表 -->
     <el-card class="table-card" shadow="never">
       <template #header>
-        <div class="table-header">
+        <div class="batch-actions">
+          <span v-if="selectedRows.length" class="selection-count">
+            <el-tag type="info" size="small">{{ $t('common.batch.selectedCount', { n: selectedRows.length }) }}</el-tag>
+          </span>
+          <el-button
+            v-if="selectedRows.length"
+            type="danger"
+            size="small"
+            @click="onBatchDelete"
+          >
+            <el-icon><Delete /></el-icon>{{ $t('common.batch.delete', { n: selectedRows.length }) }}
+          </el-button>
           <el-radio-group v-model="excelViewMode" size="small">
             <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
             <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
@@ -79,7 +90,25 @@
       </template>
 
       <!-- 列表视图 -->
-      <el-table v-loading="loading" v-if="viewMode === 'list' && excelViewMode === 'table'" :data="tableData" stripe style="width:100%" min-height="200">
+      <el-table v-loading="loading" v-if="viewMode === 'list' && excelViewMode === 'table'" :data="tableData" stripe style="width:100%" min-height="200" ref="tableRef" row-key="id" @selection-change="onSelectionChange">
+        <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
+        <el-table-column prop="productCode" :label="$t('japanCustoms.column.productCode')" min-width="80" align="center">
+          <template #default="{ row }">
+            <span v-if="row.productCode">{{ row.productCode }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="subProductCode" :label="$t('japanCustoms.column.subProductCode')" min-width="80" align="center">
+          <template #default="{ row }">
+            <span v-if="row.subProductCode">{{ row.subProductCode }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('product.drawer.imageUrl')" width="70" align="center">
+          <template #default="{ row }">
+            <ProductImageCell :product-code="row.productCode" :image-map="imageMap" />
+          </template>
+        </el-table-column>
         <el-table-column prop="containerNo" :label="$t('japanCustoms.column.containerNo')" min-width="160">
           <template #default="{ row }">
             <el-link v-if="row.containerNo" type="primary" @click.stop="onJumpToDomestic(row)">{{ row.containerNo }}</el-link>
@@ -94,18 +123,6 @@
         <el-table-column prop="domesticCustomsId" :label="$t('japanCustoms.column.domesticCustomsId')" min-width="100" align="center">
           <template #default="{ row }">
             <span v-if="row.domesticCustomsId">{{ row.domesticCustomsId }}</span>
-            <span v-else>-</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="productCode" :label="$t('japanCustoms.column.productCode')" min-width="80" align="center">
-          <template #default="{ row }">
-            <span v-if="row.productCode">{{ row.productCode }}</span>
-            <span v-else>-</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="subProductCode" :label="$t('japanCustoms.column.subProductCode')" min-width="80" align="center">
-          <template #default="{ row }">
-            <span v-if="row.subProductCode">{{ row.subProductCode }}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -133,7 +150,7 @@
         <el-table-column :label="$t('japanCustoms.column.action')" min-width="240" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('japanCustoms.action.detail') }}</el-button>
-            <el-button v-if="row.status !== 'CLEARED' && row.status !== 'FAILED' && hasPermission('japan_customs:update')" link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('common.edit') }}</el-button>
+            <el-button v-if="row.status !== 'CLEARED' && row.status !== 'FAILED' && hasPermission('japan_customs:update')" link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('common.edit') }}</el-button>
             <template v-if="row.status === 'PENDING'">
               <el-button v-if="hasPermission('japan_customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-start'" @click.stop="onStart(row)">{{ $t('japanCustoms.action.start') }}</el-button>
               <el-button v-if="hasPermission('japan_customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
@@ -165,6 +182,23 @@
             </div>
           </template>
           <el-table :data="group.records" stripe>
+            <el-table-column prop="productCode" :label="$t('japanCustoms.column.productCode')" min-width="80" align="center">
+              <template #default="{ row }">
+                <span v-if="row.productCode">{{ row.productCode }}</span>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="subProductCode" :label="$t('japanCustoms.column.subProductCode')" min-width="80" align="center">
+              <template #default="{ row }">
+                <span v-if="row.subProductCode">{{ row.subProductCode }}</span>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column :label="$t('product.drawer.imageUrl')" width="70" align="center">
+              <template #default="{ row }">
+                <ProductImageCell :product-code="row.productCode" :image-map="imageMap" />
+              </template>
+            </el-table-column>
             <el-table-column prop="containerNo" :label="$t('japanCustoms.column.containerNo')" min-width="160">
               <template #default="{ row }">
                 <el-link v-if="row.containerNo" type="primary" @click.stop="onJumpToDomestic(row)">{{ row.containerNo }}</el-link>
@@ -179,18 +213,6 @@
             <el-table-column prop="domesticCustomsId" :label="$t('japanCustoms.column.domesticCustomsId')" min-width="100" align="center">
               <template #default="{ row }">
                 <span v-if="row.domesticCustomsId">{{ row.domesticCustomsId }}</span>
-                <span v-else>-</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="productCode" :label="$t('japanCustoms.column.productCode')" min-width="80" align="center">
-              <template #default="{ row }">
-                <span v-if="row.productCode">{{ row.productCode }}</span>
-                <span v-else>-</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="subProductCode" :label="$t('japanCustoms.column.subProductCode')" min-width="80" align="center">
-              <template #default="{ row }">
-                <span v-if="row.subProductCode">{{ row.subProductCode }}</span>
                 <span v-else>-</span>
               </template>
             </el-table-column>
@@ -210,7 +232,7 @@
             <el-table-column :label="$t('japanCustoms.column.action')" min-width="240" align="center">
               <template #default="{ row }">
                 <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('japanCustoms.action.detail') }}</el-button>
-                <el-button v-if="row.status !== 'CLEARED' && row.status !== 'FAILED' && hasPermission('japan_customs:update')" link type="primary" size="small" @click.stop="onEdit(row)">{{ $t('common.edit') }}</el-button>
+                <el-button v-if="row.status !== 'CLEARED' && row.status !== 'FAILED' && hasPermission('japan_customs:update')" link type="warning" size="small" @click.stop="onEdit(row)">{{ $t('common.edit') }}</el-button>
                 <template v-if="row.status === 'PENDING'">
                   <el-button v-if="hasPermission('japan_customs:update')" link type="success" size="small" :loading="actionLoading === row.id + '-start'" @click.stop="onStart(row)">{{ $t('japanCustoms.action.start') }}</el-button>
                   <el-button v-if="hasPermission('japan_customs:delete')" link type="danger" size="small" :loading="actionLoading === row.id + '-delete'" @click.stop="onDelete(row)">{{ $t('common.delete') }}</el-button>
@@ -415,14 +437,19 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Document, Clock, Loading, CircleCheck, Plus, Box } from '@element-plus/icons-vue'
+import { Document, Clock, Loading, CircleCheck, Plus, Box, Delete } from '@element-plus/icons-vue'
 import { japanCustomsApi, type JapanCustomsVO, type JapanCustomsStatus } from '@/api/japanCustoms'
 import { customsApi, type CustomsVO } from '@/api/customs'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import { useProductImage } from '@/composables/useProductImage'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
+import ProductImageCell from '@/components/ProductImageCell.vue'
 
 const { hasPermission } = usePermission()
+const { imageMap, loadImageMap } = useProductImage()
+const tableRef = ref<any>(null)
+const selectedRows = ref<JapanCustomsVO[]>([])
 const loading = ref(false)
 const drawerVisible = ref(false)
 const completeDialogVisible = ref(false)
@@ -624,6 +651,7 @@ async function loadData() {
     const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
+    await loadImageMap(tableData.value)
   } catch {
     ElMessage.error(t('japanCustoms.message.loadFailed'))
   } finally {
@@ -769,6 +797,32 @@ async function onDelete(row: JapanCustomsVO) {
   }
 }
 
+function onSelectionChange(selection: JapanCustomsVO[]) {
+  selectedRows.value = selection
+}
+
+async function onBatchDelete() {
+  if (!selectedRows.value.length) return
+  try {
+    await ElMessageBox.confirm(
+      t('common.batch.deleteConfirm', { n: selectedRows.value.length }),
+      t('common.batch.deleteConfirmTitle'),
+      { confirmButtonText: t('common.delete'), cancelButtonText: t('common.cancel'), type: 'warning' }
+    )
+  } catch { return }
+  loading.value = true
+  try {
+    await Promise.all(selectedRows.value.map(r => japanCustomsApi.delete(r.id)))
+    ElMessage.success(t('common.batch.deleteSuccess', { n: selectedRows.value.length }))
+    selectedRows.value = []
+    loadData()
+  } catch {
+    ElMessage.error(t('common.batch.deleteFailed'))
+  } finally {
+    loading.value = false
+  }
+}
+
 onMounted(() => loadData())
 
 // 修正 el-table 空状态时 empty-block 宽度超出列宽
@@ -823,4 +877,6 @@ watch(tableData, () => {
 .batch-hint { font-size: 12px; color: #67c23a; font-weight: 600; white-space: nowrap; }
 .batch-plan-table { margin-top: 8px; }
 :deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
+.batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.selection-count { margin-left: 4px; }
 </style>

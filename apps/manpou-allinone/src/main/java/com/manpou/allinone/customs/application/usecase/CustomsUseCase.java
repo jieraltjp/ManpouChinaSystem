@@ -145,4 +145,23 @@ public class CustomsUseCase {
         customsRepository.save(entity);
         log.info("[DomesticCustomsRecord] deleted, traceId={}, id={}", MDC.get(TraceFilter.TRACE_ID_KEY), id);
     }
+
+    /**
+     * 批量修改报关申报号（v2.0）。
+     * 将选中记录的 customsDeclarationNo 统一更新为指定值。
+     */
+    @Transactional
+    public int batchUpdateDeclarationNo(List<Long> ids, String declarationNo) {
+        int count = 0;
+        for (Long id : ids) {
+            DomesticCustomsRecord entity = customsRepository.findByIdAndDeletedIsFalse(id)
+                    .orElseThrow(() -> BusinessException.notFound("DomesticCustomsRecord", id));
+            entity.setCustomsDeclarationNo(declarationNo);
+            customsRepository.save(entity);
+            count++;
+        }
+        log.info("[DomesticCustomsRecord] batch-update-declaration-no, traceId={}, count={}, declarationNo={}",
+                MDC.get(TraceFilter.TRACE_ID_KEY), count, declarationNo);
+        return count;
+    }
 }

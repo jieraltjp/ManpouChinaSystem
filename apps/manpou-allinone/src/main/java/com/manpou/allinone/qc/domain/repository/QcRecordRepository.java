@@ -5,6 +5,7 @@ import com.manpou.allinone.qc.domain.model.QcResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -30,9 +31,13 @@ public interface QcRecordRepository {
 
     Page<QcRecord> findByProcurementIdAndDeletedIsFalse(Long procurementId, Pageable pageable);
 
+    List<QcRecord> findByProcurementIdAndDeletedIsFalse(Long procurementId);
+
     Page<QcRecord> findByProductCodeAndDeletedIsFalse(String productCode, Pageable pageable);
 
     Page<QcRecord> findByShipmentBatchIdAndDeletedIsFalse(Long shipmentBatchId, Pageable pageable);
+
+    List<QcRecord> findByShipmentBatchIdAndDeletedIsFalse(Long shipmentBatchId);
 
     /** 按采购单聚合合格数量。 */
     Integer sumPassedCountByProcurementId(Long procurementId);

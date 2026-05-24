@@ -16,6 +16,7 @@ public class CustomsAssembler {
         return CustomsPageQuery.builder()
                 .id(entity.getId())
                 .customsCode(entity.getCustomsCode())
+                .customsDeclarationNo(entity.getCustomsDeclarationNo())
                 .containerNo(entity.getContainerNo())
                 .procurementId(entity.getProcurementId())
                 .logisticsPlanId(entity.getLogisticsPlanId())
@@ -55,6 +56,7 @@ public class CustomsAssembler {
         if (cmd.getQuantity() != null) entity.setQuantity(cmd.getQuantity());
         if (cmd.getEstimatedValueCny() != null) entity.setEstimatedValueCny(cmd.getEstimatedValueCny());
         if (cmd.getRemarks() != null) entity.setRemarks(cmd.getRemarks());
+        if (cmd.getCustomsDeclarationNo() != null) entity.setCustomsDeclarationNo(cmd.getCustomsDeclarationNo());
     }
 
     private static String generateCustomsCode() {

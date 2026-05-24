@@ -34,6 +34,16 @@ public class JwtContextHolder {
         return ctx != null ? ctx.getTenantId() : null;
     }
 
+    public static String getUsername() {
+        UserContext ctx = get();
+        return ctx != null ? ctx.getUsername() : null;
+    }
+
+    public static String getOperatorName() {
+        UserContext ctx = get();
+        return ctx != null ? ctx.getOperatorName() : null;
+    }
+
     public static void clear() {
         CONTEXT.remove();
     }

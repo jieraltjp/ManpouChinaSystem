@@ -2,14 +2,21 @@ package com.manpou.allinone.finance.application.assembler;
 
 import com.manpou.allinone.finance.application.dto.*;
 import com.manpou.allinone.finance.domain.model.TaxRefundRecord;
+import com.manpou.allinone.product.domain.repository.ProductRepository;
+import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
 
 @Component
+@RequiredArgsConstructor
 public class TaxRefundAssembler {
 
     private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    private final ProcurementRepository procurementRepository;
+    private final ProductRepository productRepository;
 
     public TaxRefundRecord toEntity(TaxRefundCreateCmd cmd) {
         TaxRefundRecord entity = new TaxRefundRecord();
@@ -31,7 +38,7 @@ public class TaxRefundAssembler {
     }
 
     public TaxRefundPageQuery toDto(TaxRefundRecord entity) {
-        return TaxRefundPageQuery.builder()
+        TaxRefundPageQuery.TaxRefundPageQueryBuilder builder = TaxRefundPageQuery.builder()
                 .id(entity.getId())
                 .refundCode(entity.getRefundCode())
                 .procurementId(entity.getProcurementId())
@@ -49,7 +56,22 @@ public class TaxRefundAssembler {
                 .remarks(entity.getRemarks())
                 .createBy(entity.getCreateBy())
                 .createTime(entity.getCreateTime() != null ? entity.getCreateTime().format(DT_FMT) : null)
-                .updateTime(entity.getUpdateTime() != null ? entity.getUpdateTime().format(DT_FMT) : null)
-                .build();
+                .updateTime(entity.getUpdateTime() != null ? entity.getUpdateTime().format(DT_FMT) : null);
+
+        // 通过 procurementId JOIN 获取产品信息
+        if (entity.getProcurementId() != null) {
+            procurementRepository.findByIdAndDeletedIsFalse(entity.getProcurementId())
+                    .ifPresent(procurement -> {
+                        builder.productCode(procurement.getProductCode());
+                        builder.subProductCode(procurement.getSubProductCode());
+                        // 通过 productCode 查图片
+                        if (procurement.getProductCode() != null) {
+                            productRepository.findByMasterCodeAndDeletedIsFalse(procurement.getProductCode())
+                                    .ifPresent(product -> builder.productImageUrl(product.getImageUrl()));
+                        }
+                    });
+        }
+
+        return builder.build();
     }
 }

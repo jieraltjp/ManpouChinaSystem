@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -38,6 +39,7 @@ public class SecurityConfig {
             // 路由权限配置
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/**").permitAll()       // 登录接口
+                .requestMatchers("/api/v1/ai/**").permitAll()          // AI 翻译接口（业务层仍有 @PreAuthorize）
                 .requestMatchers("/api/v1/test/**").hasRole("ADMIN") // 开发测试接口（生产环境建议删除此路径）
                 .requestMatchers("/actuator/health").permitAll()     // 健康检查
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()  // API 文档

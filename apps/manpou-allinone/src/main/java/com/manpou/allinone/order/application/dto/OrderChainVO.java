@@ -35,11 +35,16 @@ public class OrderChainVO {
     // ====== 快照信息（来自 procurement_snapshot，下单时刻固定不变）======
     private SnapshotVO snapshot;
 
-    // ====== 4步状态（Phase1）======
+    // ====== 9步状态（与 SPEC-B00 对齐：Step1 Demand → Step9 SalesRecord）======
     private String step1Status;
     private String step2Status;
     private String step3Status;
     private String step4Status;
+    private String step5Status;
+    private String step6Status;
+    private String step7Status;
+    private String step8Status;
+    private String step9Status;
 
     // ====== Procurement 信息（列表页直接展示）======
     private String procurementPriceRmb;

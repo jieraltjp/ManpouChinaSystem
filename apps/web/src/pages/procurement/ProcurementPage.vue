@@ -80,20 +80,35 @@
     <!-- 数据表格 -->
     <el-card class="table-card" shadow="never">
       <template #header>
-        <div class="table-header">
+        <div class="batch-actions">
           <el-radio-group v-model="excelViewMode" size="small">
             <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
             <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
           </el-radio-group>
+          <span v-if="selectedRows.length" class="selection-count">
+            <el-tag type="info" size="small">{{ $t('common.batch.selectedCount', { n: selectedRows.length }) }}</el-tag>
+          </span>
+          <el-button
+            v-if="selectedRows.length && hasPermission('procurement:delete')"
+            type="danger"
+            size="small"
+            @click="onBatchDelete"
+          >
+            <el-icon><Delete /></el-icon>{{ $t('common.batch.delete', { n: selectedRows.length }) }}
+          </el-button>
         </div>
       </template>
       <el-table
         v-if="excelViewMode === 'table'"
+        ref="tableRef"
         v-loading="loading"
         :data="tableRows"
         stripe
         style="width: 100%"
+        row-key="id"
+        @selection-change="onSelectionChange"
       >
+        <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
         <el-table-column :label="$t('order.column.productCode')" min-width="150" show-overflow-tooltip>
           <template #default="{ row }">
             <span class="product-code">{{ row.productCode }}</span>
@@ -250,7 +265,6 @@
 
       <div class="drawer-actions">
         <el-button @click="drawerVisible = false">{{ $t('order.drawer.close') }}</el-button>
-        <el-button v-if="hasPermission('procurement:update')" type="primary" @click="onEdit(currentRow)">{{ $t('order.drawer.edit') }}</el-button>
       </div>
     </el-drawer>
 
@@ -626,7 +640,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { usePermission } from '@/composables/usePermission'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
-import { Plus, Clock, CircleCheck, Warning, Document, Edit } from '@element-plus/icons-vue'
+import { Plus, Clock, CircleCheck, Warning, Document, Edit, Delete } from '@element-plus/icons-vue'
 import { h } from 'vue'
 import { procurementApi, type ProcurementPageVO, type CreateProcurementRequest, type UpdateProcurementRequest, BILLING_TYPE_OPTIONS } from '@/api/procurement'
 import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateFactoryRequest } from '@/api/factory'
@@ -644,6 +658,8 @@ const dialogVisible = ref(false)
 const dialogMode = ref<'create' | 'update'>('create')
 const currentRow = ref<ProcurementPageVO | null>(null)
 const formRef = ref<FormInstance>()
+const tableRef = ref()
+const selectedRows = ref<ProcurementPageVO[]>([])
 
 // 转采购模式：记录当前需求ID，提交后调用 convert API
 const convertingDemandId = ref<number | null>(null)
@@ -1277,6 +1293,32 @@ async function onDelete(row: ProcurementPageVO) {
   }
 }
 
+function onSelectionChange(selection: ProcurementPageVO[]) {
+  selectedRows.value = selection
+}
+
+async function onBatchDelete() {
+  if (!selectedRows.value.length) return
+  try {
+    await ElMessageBox.confirm(
+      t('common.batch.deleteConfirm', { n: selectedRows.value.length }),
+      t('common.batch.deleteConfirmTitle'),
+      { confirmButtonText: t('common.delete'), cancelButtonText: t('common.cancel'), type: 'warning' },
+    )
+  } catch { return }
+  loading.value = true
+  try {
+    await Promise.all(selectedRows.value.map(r => procurementApi.delete(r.id)))
+    ElMessage.success(t('common.batch.deleteSuccess', { n: selectedRows.value.length }))
+    selectedRows.value = []
+    await loadData()
+  } catch {
+    ElMessage.error(t('common.batch.deleteFailed'))
+  } finally {
+    loading.value = false
+  }
+}
+
 async function onSubmit() {
   if (!formRef.value) return
   await formRef.value.validate(async (valid: boolean) => {
@@ -1567,6 +1609,8 @@ defineExpose({ prefillFromDemand })
 }
 
 .table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.selection-count { margin-left: 4px; }
 .table-card :deep(.el-table__row) {
   cursor: pointer;
 }

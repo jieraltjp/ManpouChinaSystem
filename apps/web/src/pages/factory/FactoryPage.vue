@@ -157,7 +157,6 @@
         </div>
         <div class="drawer-footer">
           <el-button @click="detailVisible = false">{{ $t('factory.drawer.close') }}</el-button>
-          <el-button type="primary" @click="onEditFromDrawer" v-if="hasPermission('factory:update')">{{ $t('factory.drawer.edit') }}</el-button>
         </div>
       </div>
     </el-drawer>
@@ -404,9 +403,6 @@ function onEdit(row: FactoryPageVO) {
   formVisible.value = true
 }
 
-function onEditFromDrawer() {
-  if (currentRow.value) onEdit(currentRow.value)
-}
 
 async function onDelete(row: FactoryPageVO) {
   await ElMessageBox.confirm(

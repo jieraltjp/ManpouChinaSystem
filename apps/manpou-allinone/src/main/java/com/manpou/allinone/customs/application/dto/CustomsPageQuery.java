@@ -21,7 +21,8 @@ import java.time.LocalDateTime;
 public class CustomsPageQuery {
 
     private Long id;
-    private String customsCode;
+    private String customsCode;     // 系统流水号，不可编辑
+    private String customsDeclarationNo; // 报关申报号（用户自填，v2.0）
     private String containerNo;    // 货柜号（v1.3.0）
     private Long procurementId;
     private Long logisticsPlanId;

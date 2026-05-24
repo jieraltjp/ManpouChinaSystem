@@ -41,6 +41,7 @@
 | B-PLAN | [SPEC-B04-调配计划-步骤4.md](./SPEC-B04-调配计划-步骤4.md) | LogisticsPlan 状态机（PLANNED→BOOKED→IN_TRANSIT→DELIVERED） |
 | B-INSPECT | [SPEC-B03-验货记录-步骤3.md](./SPEC-B03-验货记录-步骤3.md) | QcRecord 状态机（COMPLETED/RETURN_REQUESTED） |
 | 审计报告 | [../audit/BUSINESS-LOGIC-AUDIT-2026-05-07.md](../audit/BUSINESS-LOGIC-AUDIT-2026-05-07.md) | FSM/DB-Entity/计算字段/字段必填五层对齐审计 |
+| **AI-01** | [SPEC-AI-01-AI翻译服务设计.md](./SPEC-AI-01-AI翻译服务设计.md) | DeepSeek 商品名中日互译（nameZh→nameJa，material→materialJa） ⏳ |
 
 ---
 

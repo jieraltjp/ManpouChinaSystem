@@ -102,6 +102,13 @@ cos:
   prefix: ${COS_PREFIX:qc-images/}
   max-file-size: ${COS_MAX_FILE_SIZE:5242880}
 
+# DeepSeek AI 翻译配置（SPEC-AI-01）
+deepseek:
+  api-key: ${DEEPSEEK_API_KEY:}
+  model: ${DEEPSEEK_MODEL:deepseek-chat}
+  base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
+  timeout-seconds: ${DEEPSEEK_TIMEOUT:30}
+
 management:
   endpoints:
     web.exposure.include: health,info,metrics,prometheus

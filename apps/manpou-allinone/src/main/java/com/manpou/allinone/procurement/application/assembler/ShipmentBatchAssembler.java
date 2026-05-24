@@ -1,9 +1,13 @@
 package com.manpou.allinone.procurement.application.assembler;
 
+import com.manpou.allinone.product.domain.model.Product;
+import com.manpou.allinone.product.domain.repository.ProductRepository;
 import com.manpou.allinone.procurement.application.dto.ShipmentBatchCreateCmd;
 import com.manpou.allinone.procurement.application.dto.ShipmentBatchPageQuery;
 import com.manpou.allinone.procurement.application.dto.ShipmentBatchUpdateCmd;
 import com.manpou.allinone.procurement.domain.model.ShipmentBatch;
+import com.manpou.allinone.procurement.domain.repository.ProcurementRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -14,7 +18,11 @@ import java.util.concurrent.atomic.AtomicLong;
  * 出货批次 DTO ↔ Entity 转换器（SPEC-B11）。
  */
 @Component
+@RequiredArgsConstructor
 public class ShipmentBatchAssembler {
+
+    private final ProductRepository productRepository;
+    private final ProcurementRepository procurementRepository;
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final AtomicLong SEQ = new AtomicLong(System.currentTimeMillis() % 1000);
@@ -25,6 +33,26 @@ public class ShipmentBatchAssembler {
     }
 
     public ShipmentBatchPageQuery toDto(ShipmentBatch entity) {
+        // 通过 procurement.productCode = nameZh 查询商品，获取主货号/子货号/图片
+        String productMasterCode = null;
+        String productSubCode = null;
+        String productImageUrl = null;
+        if (entity.getProcurementId() != null) {
+            var procOpt = procurementRepository.findByIdAndDeletedIsFalse(entity.getProcurementId());
+            if (procOpt.isPresent()) {
+                var proc = procOpt.get();
+                Product product = productRepository.findByNameZhAndDeletedIsFalse(proc.getProductCode()).orElse(null);
+                if (product == null && proc.getSubProductCode() != null && !proc.getSubProductCode().isBlank()) {
+                    product = productRepository.findByMasterCodeAndSubCodeAndDeletedIsFalse(
+                            proc.getProductCode(), proc.getSubProductCode()).orElse(null);
+                }
+                if (product != null) {
+                    productMasterCode = product.getMasterCode();
+                    productSubCode = product.getSubCode();
+                    productImageUrl = product.getImageUrl();
+                }
+            }
+        }
         return ShipmentBatchPageQuery.builder()
                 .id(entity.getId())
                 .procurementId(entity.getProcurementId())
@@ -38,6 +66,9 @@ public class ShipmentBatchAssembler {
                 .createTime(entity.getCreateTime())
                 .updateBy(entity.getUpdateBy())
                 .updateTime(entity.getUpdateTime())
+                .productMasterCode(productMasterCode)
+                .productSubCode(productSubCode)
+                .productImageUrl(productImageUrl)
                 .build();
     }
 

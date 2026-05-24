@@ -5,6 +5,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Delete } from '@element-plus/icons-vue'
 import { consolidationPoolApi, type ConsolidationPoolVO, type ConsolidationPoolStatus } from '@/api/logistics'
 import { containerApi } from '@/api/logistics'
 import { usePermission } from '@/composables/usePermission'
@@ -26,6 +27,9 @@ const loading = ref(false)
 const excelViewMode = ref<'table' | 'copy'>('table')
 const tableData = ref<ConsolidationPoolVO[]>([])
 const pagination = ref({ page: 0, pageSize: 20, total: 0 })
+
+const tableRef = ref()
+const selectedRows = ref<ConsolidationPoolVO[]>([])
 
 const filterForm = ref({ status: '' as ConsolidationPoolStatus | '', destinationPort: '' })
 const dialogVisible = ref(false)
@@ -128,6 +132,32 @@ async function onDelete(row: ConsolidationPoolVO) {
   }
 }
 
+function onSelectionChange(selection: ConsolidationPoolVO[]) {
+  selectedRows.value = selection
+}
+
+async function onBatchDelete() {
+  if (!selectedRows.value.length) return
+  try {
+    await ElMessageBox.confirm(
+      t('common.batch.deleteConfirm', { n: selectedRows.value.length }),
+      t('common.batch.deleteConfirmTitle'),
+      { confirmButtonText: t('common.delete'), cancelButtonText: t('common.cancel'), type: 'warning' }
+    )
+  } catch { return }
+  loading.value = true
+  try {
+    await Promise.all(selectedRows.value.map(r => consolidationPoolApi.delete(r.id)))
+    ElMessage.success(t('common.batch.deleteSuccess', { n: selectedRows.value.length }))
+    selectedRows.value = []
+    loadData()
+  } catch {
+    ElMessage.error(t('common.batch.deleteFailed'))
+  } finally {
+    loading.value = false
+  }
+}
+
 async function onCreateContainer(row: ConsolidationPoolVO) {
   try {
     await ElMessageBox.confirm(
@@ -176,9 +206,23 @@ onMounted(loadData)
             <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
             <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
           </el-radio-group>
+          <div class="batch-actions">
+            <span v-if="selectedRows.length" class="selection-count">
+              <el-tag type="info" size="small">{{ $t('common.batch.selectedCount', { n: selectedRows.length }) }}</el-tag>
+            </span>
+            <el-button
+              v-if="selectedRows.length && hasPermission('consolidation:delete')"
+              type="danger"
+              size="small"
+              @click="onBatchDelete"
+            >
+              <el-icon><Delete /></el-icon>{{ $t('common.batch.delete', { n: selectedRows.length }) }}
+            </el-button>
+          </div>
         </div>
       </template>
-      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200" ref="tableRef" row-key="id" @selection-change="onSelectionChange">
+        <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
         <el-table-column prop="poolCode" :label="$t('logistics.pool.column.poolCode')" min-width="160" />
         <el-table-column prop="destinationPort" :label="$t('logistics.pool.column.destinationPort')" min-width="140" />
         <el-table-column :label="$t('logistics.pool.column.totalCbm')" min-width="120" align="right">
@@ -246,5 +290,7 @@ onMounted(loadData)
 </template>
 
 <style scoped>
-.table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.selection-count { margin-left: 4px; }
 </style>

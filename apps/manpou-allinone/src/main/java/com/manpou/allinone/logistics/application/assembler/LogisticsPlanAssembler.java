@@ -71,6 +71,8 @@ public class LogisticsPlanAssembler {
                 .cargoWidthCm(entity.getCargoWidthCm())
                 .cargoHeightCm(entity.getCargoHeightCm())
                 .cargoWeightKg(entity.getCargoWeightKg())
+                .netWeightKg(entity.getNetWeightKg())
+                .grossWeightKg(entity.getGrossWeightKg())
                 .cargoVolumeCbm(entity.getCargoVolumeCbm())
                 .quantity(entity.getQuantity())
                 .requiresQc(entity.getRequiresQc())
@@ -125,6 +127,8 @@ public class LogisticsPlanAssembler {
         if (cmd.getCargoWidthCm() != null) entity.setCargoWidthCm(cmd.getCargoWidthCm());
         if (cmd.getCargoHeightCm() != null) entity.setCargoHeightCm(cmd.getCargoHeightCm());
         if (cmd.getCargoWeightKg() != null) entity.setCargoWeightKg(cmd.getCargoWeightKg());
+        if (cmd.getNetWeightKg() != null) entity.setNetWeightKg(cmd.getNetWeightKg());
+        if (cmd.getGrossWeightKg() != null) entity.setGrossWeightKg(cmd.getGrossWeightKg());
         if (cmd.getQuantity() != null) entity.setQuantity(cmd.getQuantity());
         if (cmd.getRequiresQc() != null) entity.setRequiresQc(cmd.getRequiresQc());
         if (cmd.getEstimatedShipDate() != null) entity.setEstimatedShipDate(cmd.getEstimatedShipDate());
@@ -143,6 +147,8 @@ public class LogisticsPlanAssembler {
         if (cmd.getCargoWidthCm() != null) entity.setCargoWidthCm(cmd.getCargoWidthCm());
         if (cmd.getCargoHeightCm() != null) entity.setCargoHeightCm(cmd.getCargoHeightCm());
         if (cmd.getCargoWeightKg() != null) entity.setCargoWeightKg(cmd.getCargoWeightKg());
+        if (cmd.getNetWeightKg() != null) entity.setNetWeightKg(cmd.getNetWeightKg());
+        if (cmd.getGrossWeightKg() != null) entity.setGrossWeightKg(cmd.getGrossWeightKg());
         if (cmd.getQuantity() != null) entity.setQuantity(cmd.getQuantity());
         if (cmd.getRequiresQc() != null) entity.setRequiresQc(cmd.getRequiresQc());
         if (cmd.getContainerId() != null) entity.setContainerId(cmd.getContainerId());

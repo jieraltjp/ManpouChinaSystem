@@ -123,5 +123,10 @@ public class JwtService {
         public String getTenantId() {
             return tenantId;
         }
+
+        @Override
+        public String getUsername() {
+            return username;
+        }
     }
 }

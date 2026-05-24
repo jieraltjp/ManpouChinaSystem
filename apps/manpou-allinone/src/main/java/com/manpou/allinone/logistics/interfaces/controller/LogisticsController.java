@@ -60,4 +60,17 @@ public class LogisticsController {
         logisticsPlanUseCase.delete(id);
         return Result.ok();
     }
+
+    @PatchMapping("/batch/customs-clearance-no")
+    @PreAuthorize("hasAuthority('logistics:update')")
+    @AuditLog(module = "logistics", action = "BATCH_UPDATE_CUSTOMS_NO", resourceType = "logistics_plan", resourceId = "#ids")
+    public Result<Integer> batchUpdateCustomsClearanceNo(
+            @RequestBody java.util.Map<String, Object> body) {
+        @SuppressWarnings("unchecked")
+        java.util.List<Long> ids = ((java.util.List<Number>) body.get("ids")).stream()
+                .map(Number::longValue).toList();
+        String customsClearanceNo = (String) body.get("customsClearanceNo");
+        int count = logisticsPlanUseCase.batchUpdateCustomsClearanceNo(ids, customsClearanceNo);
+        return Result.ok(count);
+    }
 }

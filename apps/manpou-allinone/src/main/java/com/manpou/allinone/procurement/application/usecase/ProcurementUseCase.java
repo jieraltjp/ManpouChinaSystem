@@ -242,9 +242,13 @@ public class ProcurementUseCase {
 
         Product product = null;
         if (procurement.getProductCode() != null && !procurement.getProductCode().isBlank()) {
-            product = productRepository
-                    .findByMasterCodeAndSubCodeIsNullAndDeletedIsFalse(procurement.getProductCode())
-                    .orElse(null);
+            // procurement.productCode 存的是商品中文名，先用 nameZh 精确匹配
+            product = productRepository.findByNameZhAndDeletedIsFalse(procurement.getProductCode()).orElse(null);
+            // 子货号阶段：按 subCode 匹配（Procurement.subProductCode = Product.subCode）
+            if (product == null && procurement.getSubProductCode() != null && !procurement.getSubProductCode().isBlank()) {
+                product = productRepository.findByMasterCodeAndSubCodeAndDeletedIsFalse(
+                        procurement.getProductCode(), procurement.getSubProductCode()).orElse(null);
+            }
         }
 
         ProcurementSnapshot snapshot = snapshotRepository.findByProcurementId(procurement.getId())

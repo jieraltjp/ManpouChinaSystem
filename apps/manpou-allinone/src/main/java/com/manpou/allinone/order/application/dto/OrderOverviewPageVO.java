@@ -146,6 +146,7 @@ public class OrderOverviewPageVO {
         private java.time.LocalDate qcDate;
         private Long qcUserId;
         private String status;
+        private String productImageUrl;
     }
 
     @Data
@@ -166,6 +167,8 @@ public class OrderOverviewPageVO {
         private java.math.BigDecimal cargoHeightCm;
         private java.math.BigDecimal cargoVolumeCbm;
         private java.math.BigDecimal cargoWeightKg;
+        private java.math.BigDecimal netWeightKg;   // V49
+        private java.math.BigDecimal grossWeightKg;  // V49
         private Integer quantity;
         private Boolean requiresQc;
         private java.time.LocalDate estimatedShipDate;

@@ -28,6 +28,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findByNameZhContainingAndDeletedIsFalse(String keyword, Pageable pageable);
 
+    Optional<Product> findByNameZhAndDeletedIsFalse(String nameZh);
+
     Page<Product> findByHsCodeAndDeletedIsFalse(String hsCode, Pageable pageable);
 
     Page<Product> findByHsCodeJpAndDeletedIsFalse(String hsCodeJp, Pageable pageable);

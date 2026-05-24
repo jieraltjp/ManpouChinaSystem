@@ -29,6 +29,7 @@ public class QcRecordPageQuery {
     private String factoryName;         // 关联工厂名称（来自 factory 表，v1.3.0）
     private String productCode;
     private String subProductCode;
+    private String productImageUrl;
     private Long qcUserId;
     private QcType qcType;
     private LocalDate qcDate;

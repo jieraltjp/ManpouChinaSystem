@@ -22,10 +22,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class QcRecordUseCase {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final QcRecordRepository qcRecordRepository;
     private final QcRecordAssembler qcRecordAssembler;
@@ -90,6 +96,15 @@ public class QcRecordUseCase {
         QcRecord saved = qcRecordRepository.save(entity);
         log.info("[QcRecord] after save, id={}, qcCode={}", saved.getId(), saved.getQcCode());
         qcRecordRepository.flush();
+        // JPA shipment_batch_id 列配置了 insertable=false，需用原生 SQL 补写
+        if (cmd.getShipmentBatchId() != null) {
+            entityManager.createNativeQuery("UPDATE qc_record SET shipment_batch_id = :sid WHERE id = :id")
+                    .setParameter("sid", cmd.getShipmentBatchId())
+                    .setParameter("id", saved.getId())
+                    .executeUpdate();
+            entityManager.flush();
+            log.info("[QcRecord] shipment_batch_id={} backfilled for id={}", cmd.getShipmentBatchId(), saved.getId());
+        }
         log.info("[QcRecord] after flush, id={}", saved.getId());
         log.info("[QcRecord] created, traceId={}, id={}, qcCode={}, result={}",
                 null, saved.getId(), saved.getQcCode(), saved.getResult());

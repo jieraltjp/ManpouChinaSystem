@@ -21,10 +21,13 @@ import org.slf4j.MDC;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * 补货需求用例服务（v2.2.0）。
@@ -49,14 +52,34 @@ public class ReplenishmentDemandUseCase {
                 Math.min(query.getPageSize(), 100),
                 Sort.by(Sort.Direction.DESC, "createTime")
         );
-        Page<ReplenishmentDemand> page;
-        if (query.getDemandType() != null) {
-            page = demandRepository.findByDemandTypeAndDeletedIsFalse(query.getDemandType(), pageRequest);
-        } else if (query.getKeyword() != null && !query.getKeyword().isBlank()) {
-            page = demandRepository.findByProductCodeOrSubProductCodeFuzzy(query.getKeyword().trim(), pageRequest);
-        } else {
-            page = demandRepository.findAllByDeletedIsFalse(pageRequest);
-        }
+
+        // 动态 Specification：deleted=false 为基础条件，叠加 demandType / keyword / linked
+        Specification<ReplenishmentDemand> spec = (root, _, cb) -> {
+            java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
+            predicates.add(cb.isFalse(root.get("deleted")));
+
+            if (query.getDemandType() != null) {
+                predicates.add(cb.equal(root.get("demandType"), query.getDemandType()));
+            }
+            if (query.getKeyword() != null && !query.getKeyword().isBlank()) {
+                String kw = query.getKeyword().trim().toLowerCase();
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("productCode")), "%" + kw + "%"),
+                        cb.like(cb.lower(root.get("subProductCode")), "%" + kw + "%")
+                ));
+            }
+            if (query.getLinked() != null) {
+                if (query.getLinked()) {
+                    predicates.add(root.get("linkedProcurementId").isNotNull());
+                } else {
+                    predicates.add(root.get("linkedProcurementId").isNull());
+                }
+            }
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        };
+
+        Page<ReplenishmentDemand> page = demandRepository.findAll(spec, pageRequest);
+
         // 批量补充 imageUrl（v2.1.0）
         var productCodes = page.getContent().stream()
                 .map(ReplenishmentDemand::getProductCode)

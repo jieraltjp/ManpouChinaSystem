@@ -132,6 +132,8 @@ public class OrderOverviewAssembler {
                 .cargoHeightCm(entity.getCargoHeightCm())
                 .cargoVolumeCbm(entity.getCargoVolumeCbm())
                 .cargoWeightKg(entity.getCargoWeightKg())
+                .netWeightKg(entity.getNetWeightKg())    // V49
+                .grossWeightKg(entity.getGrossWeightKg())  // V49
                 .quantity(entity.getQuantity())
                 .requiresQc(entity.getRequiresQc())
                 .estimatedShipDate(entity.getEstimatedShipDate())

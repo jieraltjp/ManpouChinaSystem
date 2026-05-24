@@ -289,7 +289,8 @@
       "Bash(npm search *)",
       "Bash(xargs -r taskkill //F //PID sleep 2)",
       "Bash(xargs cat *)",
-      "Bash(pageSize=1 2>&1)"
+      "Bash(pageSize=1 2>&1)",
+      "Bash(awk '{print $1}')"
     ]
   },
   "enabledPlugins": {}

@@ -16,12 +16,12 @@
     "consolidationPool": "05 拼柜池",
     "container": "06 货柜管理",
     "ship": "船只管理",
-    "domesticCustoms": "05 国内报关",
-    "japanCustomsRecord": "06 日本清关",
+    "domesticCustoms": "06 国内报关",
+    "japanCustomsRecord": "07 日本清关",
     "finance": "财务管理",
-    "taxRefundRecord": "07 出口退税",
+    "taxRefundRecord": "08 出口退税",
     "sales": "运营销售",
-    "salesRecord": "08 运营销售",
+    "salesRecord": "09 运营销售",
     "factory": "工厂管理",
     "product": "商品目录",
     "base": "基础数据",
@@ -132,6 +132,7 @@
       "RETURNED": "订货失败"
     },
     "action": {
+      "detail": "详情",
       "edit": "编辑",
       "delete": "删除"
     },
@@ -659,6 +660,58 @@
       "deleteSuccess": "删除验货记录成功",
       "deleteConfirm": "确定删除该验货记录吗？",
       "deleteConfirmTitle": "确认删除"
+    },
+    "print": {
+      "button": "打印验收单",
+      "batchButton": "批量打印验收单",
+      "selectedCount": "已选 {n} 条",
+      "selectFirst": "请先勾选要打印的验货记录",
+      "noData": "无数据",
+      "title": "验货验收单打印预览",
+      "printBtn": "打印",
+      "cancelBtn": "取消",
+      "companyName": "漫普中国管理系统",
+      "reportTitle": "货品验收单",
+      "qcInfo": "验货信息",
+      "productInfo": "货品信息",
+      "packageInfo": "包装信息",
+      "qcResult": "验货结果",
+      "qcStandard": "验货标准",
+      "remarks": "备注",
+      "signatures": "签字栏",
+      "qcInspector": "质检员签字",
+      "factoryRep": "厂家代表签字",
+      "warehouseRep": "仓库签字",
+      "qcCode": "验货单号",
+      "qcDate": "验货日期",
+      "qcType": "验货类型",
+      "result": "验货结果",
+      "factoryName": "厂家名称",
+      "batchCode": "出货批次",
+      "productCode": "货号",
+      "subProductCode": "子货号",
+      "material": "材质",
+      "destination": "目的地",
+      "shipmentQty": "出货数量",
+      "orderQty": "订单数量",
+      "boxCount": "箱数",
+      "boxDim": "箱子尺寸",
+      "netWeight": "单件净重",
+      "grossWeight": "毛重",
+      "unitPrice": "含税单价",
+      "inspectionCount": "检品数",
+      "passedCount": "合格数",
+      "defectiveCount": "不良数",
+      "passRate": "合格率",
+      "printDate": "打印日期"
+    },
+    "batch": {
+      "selectedCount": "已选 {n} 条",
+      "delete": "批量删除 ({n} 条)",
+      "deleteConfirm": "确定删除已选 {n} 条？",
+      "deleteConfirmTitle": "批量删除",
+      "deleteSuccess": "批量删除成功，共 {n} 条",
+      "deleteFailed": "批量删除失败"
     }
   },
   "logistics": {
@@ -705,7 +758,9 @@
       "status": "状态",
       "action": "操作",
       "createTime": "创建时间",
-      "actions": "操作"
+      "actions": "操作",
+      "netWeightKg": "净重",
+      "grossWeightKg": "毛重"
     },
     "action": {
       "detail": "详情",
@@ -725,6 +780,14 @@
     "requiresQc": {
       "yes": "需检测",
       "no": "无需"
+    },
+    "batch": {
+      "updateCustoms": "批量修改报关单号（{n}）",
+      "updateCustomsTitle": "批量修改报关单号",
+      "customsPlaceholder": "请输入通关单号",
+      "customsRequired": "请输入通关单号",
+      "updateSuccess": "已成功修改 {n} 条记录的报关单号",
+      "updateFailed": "批量修改报关单号失败"
     },
     "dialog": {
       "newTitle": "新增调配",
@@ -761,7 +824,9 @@
       "updateTime": "更新时间",
       "datePlaceholder": "选择日期",
       "cancel": "取消",
-      "save": "保存"
+      "save": "保存",
+      "netWeightKg": "净重(kg)",
+      "grossWeightKg": "毛重(kg)"
     },
     "drawer": {
       "cargoDimension": "货物尺寸",
@@ -1176,6 +1241,11 @@
       "nameEnPlaceholder": "English name",
       "nameJa": "日文名称",
       "nameJaPlaceholder": "日本語名称",
+      "translate": "翻译日文",
+      "translateSuccess": "已翻译日文",
+      "translateError": "翻译失败，请重试",
+      "oneClickTranslate": "一键翻译",
+      "translating": "翻译中...",
       "material": "材质",
       "materialPlaceholder": "如 plastic/metal",
       "materialJa": "日文材质",
@@ -1309,8 +1379,13 @@
     "step": {
       "1": "需求",
       "2": "发注",
-      "3": "验货",
-      "4": "调配"
+      "3": "厂家出货",
+      "4": "验货",
+      "5": "调配",
+      "6": "国内报关",
+      "7": "日本清关",
+      "8": "退税",
+      "9": "运营销售"
     },
     "action": {
       "overview": "总览",
@@ -1346,7 +1421,18 @@
       "returnReason": "退货原因"
     },
     "step3": {
-      "title": "步骤3：验货记录",
+      "title": "步骤3：厂家出货",
+      "batchCode": "批次编号",
+      "shipmentQuantity": "出货数量",
+      "factoryShipDate": "厂家出货日",
+      "actualShipDate": "实际出货日",
+      "status": "状态",
+      "qcRecordCount": "验货次数",
+      "totalPassedCount": "合格总数",
+      "remarks": "备注"
+    },
+    "step4": {
+      "title": "步骤4：验货记录",
       "qcCode": "验货编号",
       "result": "结果",
       "qcResult": {
@@ -1357,10 +1443,12 @@
       "passedCount": "合格数",
       "defectiveCount": "不良数",
       "qcDate": "验货日期",
-      "status": "状态"
+      "status": "状态",
+      "productCode": "主货号",
+      "subProductCode": "子货号"
     },
-    "step4": {
-      "title": "步骤4：调配计划",
+    "step5": {
+      "title": "步骤5：调配计划",
       "planCode": "调配编号",
       "planType": "运输方式",
       "cargoVolume": "体积(CBM)",
@@ -1369,8 +1457,8 @@
       "actualShipDate": "实际发货日",
       "status": "状态"
     },
-    "step5": {
-      "title": "步骤5：国内报关",
+    "step6": {
+      "title": "步骤6：国内报关",
       "customsCode": "报关单号",
       "containerNo": "货柜号",
       "productCode": "货号",
@@ -1378,8 +1466,8 @@
       "createTime": "创建时间",
       "status": "状态"
     },
-    "step6": {
-      "title": "步骤6：日本清关",
+    "step7": {
+      "title": "步骤7：日本清关",
       "containerNo": "货柜号",
       "customsEntryNo": "入境报关号",
       "arrivalDate": "到达日期",
@@ -1390,17 +1478,20 @@
       "arrivalPort": "目的港",
       "status": "状态"
     },
-    "step7": {
-      "title": "步骤7：退税",
+    "step8": {
+      "title": "步骤8：退税",
       "refundCode": "退税编号",
       "billingType": "报关类型",
+      "priceRmb": "人民币单价",
+      "quantity": "数量",
+      "taxPoint": "票点",
       "estimatedRefundRmb": "理论退税额",
       "actualRefundRmb": "实际退税额",
       "refundDate": "退税日期",
       "status": "状态"
     },
-    "step8": {
-      "title": "步骤8：运营销售",
+    "step9": {
+      "title": "步骤9：运营销售",
       "recordCode": "销售编号",
       "salesChannel": "销售渠道",
       "listingDate": "上架日期",
@@ -1409,6 +1500,7 @@
       "salesQuantity": "累计销量",
       "returnRate": "退货率",
       "sellingPriceJpy": "销售价(JPY)",
+      "returnedQuantity": "退货数量",
       "status": "状态"
     },
     "stepStatusUI": {
@@ -1498,6 +1590,16 @@
     "select": "选择",
     "confirm": "确认",
     "delete": "删除",
+    "batchDeleteConfirm": "确认批量删除 {n} 件？",
+    "batchDeleteSuccess": "批量删除成功，共 {n} 件",
+    "batch": {
+      "selectedCount": "已选 {n} 条",
+      "delete": "批量删除 ({n} 条)",
+      "deleteConfirm": "确认删除已选 {n} 条？",
+      "deleteConfirmTitle": "批量删除",
+      "deleteSuccess": "批量删除成功，共 {n} 条",
+      "deleteFailed": "批量删除失败，请重试"
+    },
     "edit": "编辑",
     "view": "详情",
     "warning": "警告",
@@ -1560,7 +1662,10 @@
       "table": "表格视图",
       "excel": "Excel视图"
     },
-    "detail": "详情"
+    "detail": "详情",
+    "deleteConfirm": "确认删除该记录？",
+    "deleteSuccess": "删除成功",
+    "deleteFailed": "删除失败"
   },
   "excel": {
     "selectTip": "选中文字后 Ctrl+C 复制，或点击上方按钮整表复制",
@@ -1591,7 +1696,8 @@
       "status": "状态"
     },
     "column": {
-      "customsCode": "报关单号",
+      "customsCode": "系统流水号",
+      "customsDeclarationNo": "报关申报号",
       "containerNo": "货柜号",
       "procurementId": "采购单号",
       "productCode": "货号",
@@ -1649,6 +1755,13 @@
       "reasonLabel": "驳回原因",
       "reasonPlaceholder": "请输入驳回原因"
     },
+    "batchDeclarationNo": {
+      "button": "批量修改申报号",
+      "dialogTitle": "批量修改报关申报号",
+      "declarationNoLabel": "报关申报号",
+      "declarationNoPlaceholder": "请输入报关申报号",
+      "selectedCount": "已选 {n} 条记录"
+    },
     "validation": {
       "containerNoRequired": "货柜号不能为空",
       "productCodeRequired": "请输入货号",
@@ -1659,7 +1772,12 @@
       "selectedPlans": "已选计划",
       "totalValue": "合计货值",
       "items": "条记录",
-      "createButton": "批量创建 ({n})"
+      "createButton": "批量创建 ({n})",
+      "delete": "删除已选 ({n}条)",
+      "deleteConfirm": "确定删除已选 {n} 条发注单吗？",
+      "deleteConfirmTitle": "批量删除",
+      "deleteSuccess": "批量删除成功",
+      "deleteFailed": "批量删除失败"
     },
     "message": {
       "loadFailed": "加载报关单列表失败",
@@ -1671,7 +1789,10 @@
       "rejectSuccess": "报关单已驳回",
       "deleteSuccess": "报关单删除成功",
       "actionFailed": "操作失败，请重试",
-      "deleteConfirm": "确定删除该报关单吗？"
+      "deleteConfirm": "确定删除该报关单吗？",
+      "batchDeleteConfirm": "确定批量删除 {n} 条报关单吗？",
+      "batchDeleteSuccess": "批量删除成功，共 {n} 条报关单",
+      "batchUpdateDeclarationNoSuccess": "批量更新报关申报号成功，共 {n} 条"
     }
   },
   "japanCustoms": {
@@ -1777,7 +1898,9 @@
       "updateSuccess": "更新成功",
       "deleteSuccess": "删除成功",
       "actionFailed": "操作失败，请重试",
-      "deleteConfirm": "确定删除该清关记录吗？"
+      "deleteConfirm": "确定删除该清关记录吗？",
+      "batchDeleteConfirm": "确定批量删除 {n} 条清关记录吗？",
+      "batchDeleteSuccess": "批量删除成功，共 {n} 条清关单"
     },
     "viewMode": {
       "list": "列表视图",
@@ -1964,7 +2087,9 @@
       "relistSuccess": "已重新上架",
       "deleteSuccess": "删除成功",
       "actionFailed": "操作失败，请重试",
-      "deleteConfirm": "确定删除该销售记录吗？"
+      "deleteConfirm": "确定删除该销售记录吗？",
+      "batchDeleteConfirm": "确定批量删除 {n} 条销售记录吗？",
+      "batchDeleteSuccess": "批量删除成功，共 {n} 条销售记录"
     },
     "validation": {
       "salesChannelRequired": "请选择销售渠道"

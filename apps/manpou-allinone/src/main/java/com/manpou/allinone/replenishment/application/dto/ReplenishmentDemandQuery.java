@@ -10,4 +10,6 @@ public class ReplenishmentDemandQuery {
     private Integer pageSize = 20;
     private DemandType demandType;
     private String keyword;
+    /** 关联发注单过滤：true=仅已关联，false=仅未关联，null=全部 */
+    private Boolean linked;
 }

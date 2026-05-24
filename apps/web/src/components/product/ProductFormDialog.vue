@@ -29,22 +29,36 @@
       </el-row>
 
       <el-row :gutter="16">
-        <el-col :span="12">
+        <el-col :span="9">
           <el-form-item :label="$t('product.dialog.nameZh')" prop="nameZh">
             <el-input v-model="form.nameZh" :placeholder="$t('product.dialog.nameZhPlaceholder')" maxlength="255" />
           </el-form-item>
         </el-col>
-        <el-col :span="12">
-          <el-form-item :label="$t('product.dialog.nameEn')">
-            <el-input v-model="form.nameEn" :placeholder="$t('product.dialog.nameEnPlaceholder')" maxlength="255" />
+        <el-col :span="6">
+          <el-form-item :label="$t('product.dialog.oneClickTranslate')" label-width="110px">
+            <el-button
+              type="primary"
+              size="small"
+              :loading="translatingAll"
+              :disabled="!form.nameZh"
+              @click="onTranslateAll"
+            >
+              <span v-if="!translatingAll">🔄</span>
+              {{ translatingAll ? $t('product.dialog.translating') : $t('product.dialog.oneClickTranslate') }}
+            </el-button>
+          </el-form-item>
+        </el-col>
+        <el-col :span="9">
+          <el-form-item :label="$t('product.dialog.nameJa')">
+            <el-input v-model="form.nameJa" :placeholder="$t('product.dialog.nameJaPlaceholder')" maxlength="128" />
           </el-form-item>
         </el-col>
       </el-row>
 
       <el-row :gutter="16">
         <el-col :span="12">
-          <el-form-item :label="$t('product.dialog.nameJa')">
-            <el-input v-model="form.nameJa" :placeholder="$t('product.dialog.nameJaPlaceholder')" maxlength="128" />
+          <el-form-item :label="$t('product.dialog.nameEn')">
+            <el-input v-model="form.nameEn" :placeholder="$t('product.dialog.nameEnPlaceholder')" maxlength="255" />
           </el-form-item>
         </el-col>
         <el-col :span="6">
@@ -69,7 +83,18 @@
             <el-input v-model="form.material" :placeholder="$t('product.dialog.materialPlaceholder')" maxlength="64" />
           </el-form-item>
         </el-col>
-        <el-col :span="8">
+        <el-col :span="4">
+          <el-form-item :label="$t('product.dialog.translate')" label-width="60px">
+            <el-button
+              type="info"
+              size="small"
+              :loading="translatingMaterial"
+              :disabled="!form.material"
+              @click="onTranslateMaterial"
+            >{{ $t('product.dialog.translate') }}</el-button>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
           <el-form-item :label="$t('product.dialog.materialJa')">
             <el-input v-model="form.materialJa" :placeholder="$t('product.dialog.materialJaPlaceholder')" maxlength="255" />
           </el-form-item>
@@ -210,6 +235,7 @@ import { ref, reactive, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { productApi } from '@/api/product'
+import { aiApi } from '@/api/ai'
 import type { CreateProductRequest, UpdateProductRequest } from '@/api/product'
 
 const props = defineProps<{
@@ -233,6 +259,8 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const submitting = ref(false)
+const translatingAll = ref(false)
+const translatingMaterial = ref(false)
 const formRef = ref()
 
 const visible = computed({
@@ -342,6 +370,41 @@ watch(() => props.modelValue, async (v) => {
     resetForm()
   }
 })
+
+async function onTranslateAll() {
+  if (!form.nameZh) return
+  translatingAll.value = true
+  try {
+    const promises = [aiApi.translateZhToJa({ sourceText: form.nameZh, targetLang: 'ja' })]
+    promises.push(aiApi.translateZhToJa({ sourceText: form.nameZh, targetLang: 'en' }))
+    const results = await Promise.all(promises)
+    const jaRes = results[0]
+    const enRes = results[1]
+    if (jaRes.data?.nameJa) form.nameJa = jaRes.data.nameJa
+    if (enRes.data?.nameEn) form.nameEn = enRes.data.nameEn
+    ElMessage.success(t('product.dialog.translateSuccess'))
+  } catch {
+    ElMessage.error(t('product.dialog.translateError'))
+  } finally {
+    translatingAll.value = false
+  }
+}
+
+async function onTranslateMaterial() {
+  if (!form.material) return
+  translatingMaterial.value = true
+  try {
+    const res = await aiApi.translateZhToJa({ sourceText: form.material, targetLang: 'ja' })
+    if (res.data?.nameJa) {
+      form.materialJa = res.data.nameJa
+      ElMessage.success(t('product.dialog.translateSuccess'))
+    }
+  } catch {
+    ElMessage.error(t('product.dialog.translateError'))
+  } finally {
+    translatingMaterial.value = false
+  }
+}
 
 function onClosed() {
   formRef.value?.resetFields()

@@ -248,3 +248,9 @@ a:hover {
 .btn-blue {
   color: #409EFF !important;
 }
+
+/* ── 抽屉底部操作区：全部隐藏 ── */
+.drawer-actions,
+.drawer-footer {
+  display: none !important;
+}

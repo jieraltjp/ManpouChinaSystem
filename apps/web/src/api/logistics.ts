@@ -69,6 +69,8 @@ export interface LogisticsPlanVO {
   cargoWidthCm?: number
   cargoHeightCm?: number
   cargoWeightKg?: number
+  netWeightKg?: number    // 净重(kg)（V49）
+  grossWeightKg?: number  // 毛重(kg)（V49）
   cargoVolumeCbm?: number
   quantity?: number
   requiresQc?: boolean
@@ -104,6 +106,8 @@ export interface CreateLogisticsPlanRequest {
   cargoWidthCm?: number
   cargoHeightCm?: number
   cargoWeightKg?: number
+  netWeightKg?: number    // 净重(kg)（V49）
+  grossWeightKg?: number  // 毛重(kg)（V49）
   quantity?: number
   requiresQc?: boolean
   estimatedShipDate?: string
@@ -121,6 +125,8 @@ export interface UpdateLogisticsPlanRequest {
   cargoWidthCm?: number
   cargoHeightCm?: number
   cargoWeightKg?: number
+  netWeightKg?: number    // 净重(kg)（V49）
+  grossWeightKg?: number  // 毛重(kg)（V49）
   quantity?: number
   requiresQc?: boolean
   containerId?: number
@@ -148,6 +154,9 @@ export const logisticsApi = {
   },
   delete(id: number) {
     return client.delete<{ code: string }>(`/logistics-plans/${id}`)
+  },
+  batchUpdateCustomsClearanceNo(ids: number[], customsClearanceNo: string) {
+    return client.patch<number>('/logistics-plans/batch/customs-clearance-no', { ids, customsClearanceNo })
   },
 }
 

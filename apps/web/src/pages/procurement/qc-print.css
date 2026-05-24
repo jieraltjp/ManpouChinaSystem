@@ -1,0 +1,177 @@
+/* 验货验收单打印样式（预览弹窗内显示 + 打印输出） */
+#qc-print-area {
+  font-family: 'Microsoft YaHei', 'PingFang SC', 'SimHei', sans-serif;
+  color: #1a1a1a;
+  font-size: 13px;
+}
+
+#qc-print-area .report-header {
+  text-align: center;
+  border-bottom: 2px solid #1E3A5F;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+#qc-print-area .company-name {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+#qc-print-area .report-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1E3A5F;
+  letter-spacing: 4px;
+  margin: 4px 0;
+}
+
+#qc-print-area .report-subtitle {
+  font-size: 11px;
+  color: #999;
+}
+
+#qc-print-area .section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1E3A5F;
+  background: #EEF3F8;
+  padding: 4px 10px;
+  border-left: 3px solid #1E3A5F;
+  margin: 12px 0 6px;
+}
+
+#qc-print-area table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0;
+}
+
+#qc-print-area td {
+  border: 1px solid #C8D4E0;
+  padding: 5px 8px;
+  vertical-align: top;
+}
+
+#qc-print-area td.label {
+  background: #F4F7FB;
+  font-weight: 600;
+  color: #3B5A7E;
+  width: 100px;
+  font-size: 12px;
+}
+
+#qc-print-area td.section-header {
+  background: #EEF3F8;
+  font-weight: 700;
+  color: #1E3A5F;
+  text-align: center;
+  font-size: 12px;
+  padding: 4px;
+}
+
+#qc-print-area .result-pass {
+  color: #16A34A;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+#qc-print-area .result-fail {
+  color: #DC2626;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+#qc-print-area .qc-standard-box {
+  background: #FFFBEB;
+  border: 1px solid #FCD34D;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.8;
+  min-height: 40px;
+}
+
+#qc-print-area .remarks-box {
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+  min-height: 40px;
+}
+
+#qc-print-area .signatures {
+  margin-top: 20px;
+  display: flex;
+  gap: 24px;
+}
+
+#qc-print-area .sig-block {
+  flex: 1;
+  text-align: center;
+}
+
+#qc-print-area .sig-line {
+  border-top: 1px solid #1a1a1a;
+  margin-top: 36px;
+  margin-bottom: 4px;
+}
+
+#qc-print-area .sig-label {
+  font-size: 12px;
+  color: #555;
+}
+
+#qc-print-area .sig-date {
+  font-size: 11px;
+  color: #999;
+  margin-top: 2px;
+}
+
+#qc-print-area .report-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #999;
+  margin-top: 12px;
+  padding-top: 6px;
+  border-top: 1px solid #E5E7EB;
+}
+
+/* 批量打印分页 */
+#qc-print-area .report-block {
+  padding-bottom: 8px;
+}
+#qc-print-area .report-block.page-break {
+  page-break-before: always;
+  padding-top: 16px;
+}
+
+.print-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: #909399;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #qc-print-area,
+  #qc-print-area * {
+    visibility: visible;
+  }
+  #qc-print-area {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  .el-dialog {
+    display: none !important;
+  }
+  #qc-print-area .report-block.page-break {
+    page-break-before: always;
+  }
+}

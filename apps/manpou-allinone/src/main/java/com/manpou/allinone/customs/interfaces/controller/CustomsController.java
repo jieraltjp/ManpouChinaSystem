@@ -1,6 +1,7 @@
 package com.manpou.allinone.customs.interfaces.controller;
 
 import com.manpou.allinone.customs.application.dto.CustomsBatchCreateCmd;
+import com.manpou.allinone.customs.application.dto.CustomsBatchDeclarationNoCmd;
 import com.manpou.allinone.customs.application.dto.CustomsCreateCmd;
 import com.manpou.allinone.customs.application.dto.CustomsPageQuery;
 import com.manpou.allinone.customs.application.dto.CustomsQuery;
@@ -100,5 +101,16 @@ public class CustomsController {
     public Result<Void> delete(@PathVariable Long id) {
         customsUseCase.delete(id);
         return Result.ok("删除成功", null);
+    }
+
+    /**
+     * 批量修改报关申报号（v2.0）。
+     */
+    @PatchMapping("/batch-declaration-no")
+    @AuditLog(module = "customs", action = "UPDATE", resourceType = "customs", resourceId = "batch-declaration-no")
+    @PreAuthorize("hasAuthority('customs:update')")
+    public Result<Integer> batchUpdateDeclarationNo(@Valid @RequestBody CustomsBatchDeclarationNoCmd cmd) {
+        int count = customsUseCase.batchUpdateDeclarationNo(cmd.getIds(), cmd.getCustomsDeclarationNo());
+        return Result.ok("批量更新成功，共 " + count + " 条", count);
     }
 }

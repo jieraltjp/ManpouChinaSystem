@@ -34,9 +34,38 @@
             <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
             <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
           </el-radio-group>
+          <div class="batch-actions">
+            <span v-if="selectedRows.length" class="selection-count">
+              <el-tag type="info" size="small">{{ $t('common.batch.selectedCount', { n: selectedRows.length }) }}</el-tag>
+            </span>
+            <el-button
+              v-if="selectedRows.length"
+              type="danger"
+              size="small"
+              @click="onBatchDelete"
+            >
+              <el-icon><Delete /></el-icon>{{ $t('common.batch.delete', { n: selectedRows.length }) }}
+            </el-button>
+          </div>
         </div>
       </template>
-      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableRows" stripe style="width: 100%">
+      <el-table v-if="excelViewMode === 'table'" ref="tableRef" v-loading="loading" :data="tableRows" stripe style="width: 100%" row-key="id" @selection-change="onSelectionChange">
+        <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
+        <el-table-column prop="productMasterCode" :label="$t('product.column.masterCode')" min-width="100" align="center" show-overflow-tooltip />
+        <el-table-column prop="productSubCode" :label="$t('product.column.subCode')" min-width="100" align="center" show-overflow-tooltip />
+        <el-table-column prop="productImageUrl" :label="$t('product.column.image')" width="80" align="center">
+          <template #default="{ row }">
+            <el-image
+              v-if="row.productImageUrl"
+              :src="row.productImageUrl"
+              fit="contain"
+              style="width: 48px; height: 48px;"
+              :preview-src-list="[row.productImageUrl]"
+              preview-teleported
+            />
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="batchCode" :label="$t('shipmentBatch.column.batchCode')" min-width="160" show-overflow-tooltip />
         <el-table-column prop="shipmentQuantity" :label="$t('shipmentBatch.column.shipmentQuantity')" min-width="120" align="right">
           <template #default="{ row }">{{ row.shipmentQuantity?.toLocaleString() ?? '-' }}</template>
@@ -59,8 +88,9 @@
         <el-table-column prop="createTime" :label="$t('shipmentBatch.column.createTime')" min-width="160" align="center">
           <template #default="{ row }">{{ formatTime(row.createTime) }}</template>
         </el-table-column>
-        <el-table-column :label="$t('order.column.action')" min-width="180" align="center">
+        <el-table-column :label="$t('order.column.action')" min-width="200" align="center">
           <template #default="{ row }">
+            <el-button link class="btn-blue" size="small" @click="onDetail(row)">{{ $t('demand.action.detail') }}</el-button>
             <el-button link class="btn-blue" size="small" @click="onEdit(row)" v-if="hasPermission('shipment:update')">{{ $t('demand.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click="onDelete(row)"
               :disabled="!deletableStatuses.includes(row.status)" v-if="hasPermission('shipment:delete')">{{ $t('common.delete') }}</el-button>
@@ -82,6 +112,41 @@
         />
       </div>
     </el-card>
+
+    <!-- 详情抽屉 -->
+    <el-drawer v-model="detailVisible" :title="$t('shipmentBatch.drawer.title')" size="560px" direction="rtl" bodyStyle="overflow-y: auto">
+      <el-descriptions :column="2" border v-if="currentRow">
+        <el-descriptions-item :label="$t('shipmentBatch.column.batchCode')">
+          <span class="code-badge">{{ currentRow.batchCode }}</span>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('shipmentBatch.column.status')">
+          <el-tag :type="statusType(currentRow.status)" size="small">{{ statusLabel(currentRow.status) }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('product.column.masterCode')">{{ currentRow.productMasterCode || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('product.column.subCode')">{{ currentRow.productSubCode || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('shipmentBatch.column.shipmentQuantity')">{{ currentRow.shipmentQuantity?.toLocaleString() ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('shipmentBatch.column.factoryShipDate')">{{ currentRow.factoryShipDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('shipmentBatch.column.actualShipDate')">{{ currentRow.actualShipDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('shipmentBatch.column.qcRecordCount')">{{ currentRow.qcRecordCount ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('shipmentBatch.column.totalPassedCount')">{{ currentRow.totalPassedCount ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('shipmentBatch.column.remarks')" :span="2">{{ currentRow.remarks || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('shipmentBatch.column.createBy')">{{ currentRow.createBy || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('shipmentBatch.column.createTime')">{{ formatTime(currentRow.createTime) }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('shipmentBatch.column.updateBy')">{{ currentRow.updateBy || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('shipmentBatch.column.updateTime')">{{ formatTime(currentRow.updateTime) }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('product.column.image')" :span="2">
+          <el-image
+            v-if="currentRow.productImageUrl"
+            :src="currentRow.productImageUrl"
+            fit="contain"
+            style="width: 80px; height: 80px;"
+            :preview-src-list="[currentRow.productImageUrl]"
+            preview-teleported
+          />
+          <span v-else>-</span>
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-drawer>
 
     <!-- 新建/编辑弹窗 -->
     <el-dialog v-model="dialogVisible" :title="dialogMode === 'create' ? $t('shipmentBatch.dialog.createTitle') : $t('shipmentBatch.dialog.editTitle')" width="560px">
@@ -120,7 +185,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { usePermission } from '@/composables/usePermission'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, ElMessageBox } from 'element-plus'
-import { Plus, ArrowLeft } from '@element-plus/icons-vue'
+import { Plus, ArrowLeft, Delete } from '@element-plus/icons-vue'
 import { shipmentBatchApi, type ShipmentBatchVO, type ShipmentBatchStatus } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
@@ -131,9 +196,12 @@ const { t, locale: localeRef } = useI18n()
 const { hasPermission } = usePermission()
 
 const loading = ref(false)
+const tableRef = ref()
+const selectedRows = ref<ShipmentBatchVO[]>([])
 const submitting = ref(false)
 const excelViewMode = ref<'table' | 'copy'>('table')
 const dialogVisible = ref(false)
+const detailVisible = ref(false)
 const dialogMode = ref<'create' | 'update'>('create')
 const currentRow = ref<ShipmentBatchVO | null>(null)
 const formRef = ref<FormInstance>()
@@ -223,6 +291,11 @@ function onNew() {
   dialogVisible.value = true
 }
 
+function onDetail(row: ShipmentBatchVO) {
+  currentRow.value = row
+  detailVisible.value = true
+}
+
 function onEdit(row: ShipmentBatchVO) {
   dialogMode.value = 'update'
   currentRow.value = row
@@ -252,6 +325,32 @@ async function onDelete(row: ShipmentBatchVO) {
   } catch { /* handled by interceptor */ }
 }
 
+function onSelectionChange(selection: ShipmentBatchVO[]) {
+  selectedRows.value = selection
+}
+
+async function onBatchDelete() {
+  if (!selectedRows.value.length) return
+  try {
+    await ElMessageBox.confirm(
+      t('common.batch.deleteConfirm', { n: selectedRows.value.length }),
+      t('common.batch.deleteConfirmTitle'),
+      { confirmButtonText: t('common.delete'), cancelButtonText: t('common.cancel'), type: 'warning' },
+    )
+  } catch { return }
+  loading.value = true
+  try {
+    await Promise.all(selectedRows.value.map(r => shipmentBatchApi.delete(r.id)))
+    ElMessage.success(t('common.batch.deleteSuccess', { n: selectedRows.value.length }))
+    selectedRows.value = []
+    loadData()
+  } catch {
+    ElMessage.error(t('common.batch.deleteFailed'))
+  } finally {
+    loading.value = false
+  }
+}
+
 const defaultFormData = () => ({
   procurementId: procurementId.value ?? 0,
   shipmentQuantity: 1,
@@ -268,6 +367,9 @@ const formRules = {
 }
 
 const copyColumns: ExcelColDef[] = [
+  { prop: 'productMasterCode', label: t('product.column.masterCode'), formatter: (row) => row.productMasterCode || '' },
+  { prop: 'productSubCode', label: t('product.column.subCode'), formatter: (row) => row.productSubCode || '' },
+  { prop: 'productImageUrl', label: t('product.column.image'), formatter: (row) => row.productImageUrl || '' },
   { prop: 'batchCode', label: t('shipmentBatch.column.batchCode') },
   { prop: 'shipmentQuantity', label: t('shipmentBatch.column.shipmentQuantity'), formatter: (row) => row.shipmentQuantity != null ? row.shipmentQuantity.toLocaleString() : '' },
   { prop: 'factoryShipDate', label: t('shipmentBatch.column.factoryShipDate'), formatter: (row) => row.factoryShipDate || '' },
@@ -323,4 +425,6 @@ onMounted(() => {
 .page-header { display: flex; align-items: center; gap: 12px; }
 .page-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
+.batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.selection-count { margin-left: 4px; }
 </style>

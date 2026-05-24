@@ -17,4 +17,12 @@ public interface UserContext {
 
     /** 当前租户 ID。 */
     String getTenantId();
+
+    /** 当前用户名。 */
+    String getUsername();
+
+    /** 操作人名称。 */
+    default String getOperatorName() {
+        return getUsername();
+    }
 }

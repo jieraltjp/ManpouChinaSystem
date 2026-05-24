@@ -74,13 +74,38 @@
     <el-card class="table-card" shadow="never">
       <template #header>
         <div class="table-header">
-          <el-radio-group v-model="excelViewMode" size="small">
-            <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
-            <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
-          </el-radio-group>
+          <!-- 批量操作区 -->
+          <div class="batch-actions">
+            <el-radio-group v-model="excelViewMode" size="small">
+              <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
+              <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
+            </el-radio-group>
+            <span v-if="selectedRows.length" class="selection-count">
+              <el-tag type="info" size="small">{{ $t('common.batch.selectedCount', { n: selectedRows.length }) }}</el-tag>
+            </span>
+            <el-button
+              v-if="selectedRows.length"
+              type="primary"
+              size="small"
+              @click="onBatchPrint"
+            >
+              <el-icon><Printer /></el-icon>{{ $t('inspection.print.batchButton') }}
+            </el-button>
+          </div>
         </div>
       </template>
-      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <el-table
+        v-if="excelViewMode === 'table'"
+        v-loading="loading"
+        :data="tableData"
+        stripe
+        style="width:100%"
+        min-height="200"
+        ref="tableRef"
+        row-key="id"
+        @selection-change="onSelectionChange"
+      >
+        <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
         <el-table-column :label="$t('inspection.column.shipmentBatchId')" min-width="150" align="center">
           <template #default="{ row }">
             <span v-if="row.batchCode" class="product-code">{{ row.batchCode }}</span>
@@ -96,6 +121,11 @@
         <el-table-column prop="subProductCode" :label="$t('inspection.column.subProductCode')" min-width="110">
           <template #default="{ row }">
             {{ row.subProductCode || '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('product.drawer.imageUrl')" width="70" align="center">
+          <template #default="{ row }">
+            <ProductImageCell :product-code="row.productCode" :image-map="imageMap" />
           </template>
         </el-table-column>
         <el-table-column prop="sellerName" :label="$t('inspection.column.sellerName')" min-width="120" show-overflow-tooltip />
@@ -191,7 +221,11 @@
                   :value="b.id"
                 />
               </el-select>
-              <div v-if="currentRow?.batchCode" class="batch-info-tag">
+              <div v-if="form.batchCode" class="batch-info-tag">
+                <el-tag size="small" type="info">{{ form.batchCode }}</el-tag>
+                <el-tag v-if="shipmentBatchList.find(b => b.id === form.shipmentBatchId)?.status" size="small" type="warning" style="margin-left:4px">{{ shipmentBatchList.find(b => b.id === form.shipmentBatchId)?.status }}</el-tag>
+              </div>
+              <div v-else-if="currentRow?.batchCode" class="batch-info-tag">
                 <el-tag size="small" type="info">{{ currentRow.batchCode }}</el-tag>
                 <el-tag v-if="currentRow.batchStatus" size="small" type="warning" style="margin-left:4px">{{ currentRow.batchStatus }}</el-tag>
               </div>
@@ -251,7 +285,7 @@
         <el-row :gutter="10">
           <el-col :span="6">
             <el-form-item :label="$t('inspection.dialog.inspectionCount')" prop="inspectionCount">
-              <el-input-number v-model="form.inspectionCount" :min="0" style="width:100%" />
+              <el-input-number v-model="inspectionCountRef" :min="0" style="width:100%" />
             </el-form-item>
           </el-col>
           <el-col :span="6">
@@ -428,27 +462,179 @@
         </el-descriptions-item>
       </el-descriptions>
     </el-drawer>
+
+    <!-- 打印验收单弹窗（批量） -->
+    <el-dialog v-model="printVisible" :title="$t('inspection.print.title')" width="880px" destroy-on-close>
+      <div v-if="printRows.length" id="qc-print-area">
+        <!-- 批量打印：遍历每条验货记录 -->
+        <template v-for="(row, index) in printRows" :key="row.id">
+          <!-- 每条记录一个报告块 -->
+          <div class="report-block" :class="{ 'page-break': index > 0 }">
+            <!-- 表头 -->
+            <div class="report-header">
+              <div class="company-name">{{ $t('inspection.print.companyName') }}</div>
+              <div class="report-title">{{ $t('inspection.print.reportTitle') }}</div>
+              <div class="report-subtitle">{{ row.qcCode }} &nbsp;|&nbsp; {{ $t('inspection.print.printDate') }}: {{ printDate }}</div>
+            </div>
+
+            <!-- 基本信息 -->
+            <div class="section-title">{{ $t('inspection.print.qcInfo') }}</div>
+            <table>
+              <tr>
+                <td class="label">{{ $t('inspection.print.qcCode') }}</td>
+                <td><strong>{{ row.qcCode }}</strong></td>
+                <td class="label">{{ $t('inspection.print.qcDate') }}</td>
+                <td>{{ row.qcDate || '-' }}</td>
+              </tr>
+              <tr>
+                <td class="label">{{ $t('inspection.print.qcType') }}</td>
+                <td>{{ qcTypeLabel(row.qcType) }}</td>
+                <td class="label">{{ $t('inspection.print.result') }}</td>
+                <td>
+                  <span v-if="row.result === 'PASS'" class="result-pass">✓ {{ $t('inspection.result.pass') }}</span>
+                  <span v-else class="result-fail">✗ {{ $t('inspection.result.fail') }}</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="label">{{ $t('inspection.print.factoryName') }}</td>
+                <td>{{ row.factoryName || row.sellerName || '-' }}</td>
+                <td class="label">{{ $t('inspection.print.batchCode') }}</td>
+                <td>{{ row.batchCode || '-' }}</td>
+              </tr>
+            </table>
+
+            <!-- 货品信息 -->
+            <div class="section-title">{{ $t('inspection.print.productInfo') }}</div>
+            <table>
+              <tr>
+                <td class="label">{{ $t('inspection.print.productCode') }}</td>
+                <td><strong>{{ row.productCode }}</strong></td>
+                <td class="label">{{ $t('inspection.print.subProductCode') }}</td>
+                <td>{{ row.subProductCode || '-' }}</td>
+              </tr>
+              <tr>
+                <td class="label">{{ $t('inspection.print.material') }}</td>
+                <td>{{ row.material || '-' }}</td>
+                <td class="label">{{ $t('inspection.print.destination') }}</td>
+                <td>{{ row.destination || '-' }}</td>
+              </tr>
+            </table>
+
+            <!-- 包装信息 -->
+            <div class="section-title">{{ $t('inspection.print.packageInfo') }}</div>
+            <table>
+              <tr>
+                <td class="label">{{ $t('inspection.print.shipmentQty') }}</td>
+                <td>{{ row.shipmentQuantity ?? '-' }}</td>
+                <td class="label">{{ $t('inspection.print.orderQty') }}</td>
+                <td>{{ row.quantity ?? '-' }}</td>
+                <td class="label">{{ $t('inspection.print.boxCount') }}</td>
+                <td>{{ row.boxCount ?? '-' }}</td>
+              </tr>
+              <tr>
+                <td class="label">{{ $t('inspection.print.boxDim') }}</td>
+                <td colspan="3">{{ getBoxDimension(row) || '-' }}</td>
+                <td class="label">{{ $t('inspection.print.netWeight') }}</td>
+                <td>{{ row.netWeightPerUnit ? row.netWeightPerUnit + ' kg' : '-' }}</td>
+              </tr>
+              <tr>
+                <td class="label">{{ $t('inspection.print.grossWeight') }}</td>
+                <td>{{ row.grossWeight ? row.grossWeight + ' kg' : '-' }}</td>
+                <td class="label">{{ $t('inspection.print.unitPrice') }}</td>
+                <td colspan="3">{{ row.taxInclusivePrice ? '¥' + row.taxInclusivePrice : '-' }}</td>
+              </tr>
+            </table>
+
+            <!-- 验货结果 -->
+            <div class="section-title">{{ $t('inspection.print.qcResult') }}</div>
+            <table>
+              <tr>
+                <td class="label">{{ $t('inspection.print.inspectionCount') }}</td>
+                <td style="text-align:center"><strong>{{ row.inspectionCount ?? '-' }}</strong></td>
+                <td class="label">{{ $t('inspection.print.passedCount') }}</td>
+                <td style="text-align:center"><strong style="color:#16A34A">{{ row.passedCount ?? '-' }}</strong></td>
+                <td class="label">{{ $t('inspection.print.defectiveCount') }}</td>
+                <td style="text-align:center"><strong style="color:#DC2626">{{ row.defectiveCount ?? '-' }}</strong></td>
+                <td class="label">{{ $t('inspection.print.passRate') }}</td>
+                <td style="text-align:center"><strong>{{ getPassRate(row) }}</strong></td>
+              </tr>
+            </table>
+
+            <!-- 验货标准 -->
+            <div class="section-title">{{ $t('inspection.print.qcStandard') }}</div>
+            <div class="qc-standard-box">{{ row.qcStandard || '-' }}</div>
+
+            <!-- 备注 -->
+            <div class="section-title">{{ $t('inspection.print.remarks') }}</div>
+            <div class="remarks-box">{{ row.remarks || '-' }}</div>
+
+            <!-- 签字栏 -->
+            <div class="section-title">{{ $t('inspection.print.signatures') }}</div>
+            <div class="signatures">
+              <div class="sig-block">
+                <div class="sig-line"></div>
+                <div class="sig-label">{{ $t('inspection.print.qcInspector') }}</div>
+                <div class="sig-date">{{ row.createTime ? new Date(row.createTime).toLocaleDateString(localeRef === 'ja' ? 'ja-JP' : 'zh-CN') : '-' }}</div>
+              </div>
+              <div class="sig-block">
+                <div class="sig-line"></div>
+                <div class="sig-label">{{ $t('inspection.print.factoryRep') }}</div>
+                <div class="sig-date">&nbsp;</div>
+              </div>
+              <div class="sig-block">
+                <div class="sig-line"></div>
+                <div class="sig-label">{{ $t('inspection.print.warehouseRep') }}</div>
+                <div class="sig-date">&nbsp;</div>
+              </div>
+            </div>
+
+            <div class="report-footer">
+              <span>{{ $t('inspection.print.companyName') }}</span>
+              <span>{{ $t('inspection.print.printDate') }}: {{ printDate }}</span>
+            </div>
+          </div>
+        </template>
+      </div>
+      <div v-else class="print-empty">
+        <el-empty :description="$t('inspection.print.noData')" />
+      </div>
+
+      <template #footer>
+        <el-button @click="printVisible = false">{{ $t('inspection.print.cancelBtn') }}</el-button>
+        <el-button type="primary" @click="doPrint" :disabled="!printRows.length">
+          <el-icon><Printer /></el-icon>{{ $t('inspection.print.printBtn') }}
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted, shallowRef } from 'vue'
 import { ElMessage, type FormInstance, type FormRules, ElMessageBox } from 'element-plus'
-import { Plus, Document, CircleCheck, Warning } from '@element-plus/icons-vue'
+import { Plus, Document, CircleCheck, Warning, Printer } from '@element-plus/icons-vue'
 import { inspectionApi, type QcRecordVO, type QcResult, type QcStatus, type QcType, type QcImageVO } from '@/api/inspection'
 import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
 import { shipmentBatchApi, type ShipmentBatchVO } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import { useProductImage } from '@/composables/useProductImage'
+import ProductImageCell from '@/components/ProductImageCell.vue'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
+import '@/pages/procurement/qc-print.css'
 
 const { hasPermission } = usePermission()
+const { imageMap, loadImageMap } = useProductImage()
 
 const loading = ref(false)
 const submitting = ref(false)
 const excelViewMode = ref<'table' | 'copy'>('table')
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
+const printVisible = ref(false)
+const printRows = ref<QcRecordVO[]>([])
+const tableRef = ref()
+const selectedRows = ref<QcRecordVO[]>([])
 const shipmentBatchLoading = ref(false)
 
 const currentRow = ref<QcRecordVO | null>(null)
@@ -476,7 +662,8 @@ const { t, locale: localeRef } = useI18n()
 
 const form = reactive({
   shipmentBatchId: undefined as number | undefined,  // V43新增：关联出货批次（必填）
-  procurementId: undefined as number | undefined,    // 保留用于审计追溯
+  batchCode: '',                                      // 选中批次码（用于新建弹窗内展示）
+  procurementId: undefined as number | undefined,      // 保留用于审计追溯
   productCode: '',
   subProductCode: '',
   qcUserId: undefined as number | undefined,
@@ -502,6 +689,9 @@ const form = reactive({
   orderDate: '',
   sellerName: '',
 })
+
+// 检品数独立 ref（el-input-number 对 reactive 对象直接赋值响应不佳）
+const inspectionCountRef = shallowRef(0)
 
 // 弹窗打开时预加载出货批次（下拉默认有选项）
 watch(dialogVisible, async (val) => {
@@ -544,6 +734,11 @@ const copyColumns: ExcelColDef[] = [
 const passCount = computed(() => tableData.value.filter(r => r.result === 'PASS').length)
 const failCount = computed(() => tableData.value.filter(r => r.result === 'FAIL').length)
 
+const printDate = computed(() => {
+  const now = new Date()
+  return now.toLocaleDateString(localeRef.value === 'ja' ? 'ja-JP' : 'zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+})
+
 const boxDimension = computed(() => {
   const r = currentRow.value
   if (!r) return '-'
@@ -553,6 +748,19 @@ const boxDimension = computed(() => {
   if (r.boxHeightCm) parts.push(r.boxHeightCm)
   return parts.length ? parts.join(t('common.format.times')) + t('common.units.cm') : '-'
 })
+
+function getPassRate(row: QcRecordVO): string {
+  if (!row || !row.inspectionCount) return '-'
+  return (((row.passedCount ?? 0) / row.inspectionCount) * 100).toFixed(1) + '%'
+}
+
+function getBoxDimension(row: QcRecordVO): string {
+  const parts: (string | number)[] = []
+  if (row.boxLengthCm) parts.push(row.boxLengthCm)
+  if (row.boxWidthCm) parts.push(row.boxWidthCm)
+  if (row.boxHeightCm) parts.push(row.boxHeightCm)
+  return parts.length ? parts.join(t('common.format.times')) + t('common.units.cm') : '-'
+}
 
 // --- 图片上传处理（SPEC-C12） ---
 function onImageChange(file: { name: string; raw: File; uid: number }, fileList: { name: string; raw: File; uid: number }[]) {
@@ -603,6 +811,7 @@ async function loadData() {
     })
     const data = res.data
     tableData.value = data?.content ?? []
+    await loadImageMap(tableData.value)
     pagination.total = data?.totalElements ?? 0
   } catch {
     ElMessage.error(t('inspection.message.loadFailed'))
@@ -631,10 +840,18 @@ function onReset() {
 }
 
 function onShipmentBatchSelected(id: number) {
+  console.log('[QC] onShipmentBatchSelected called, id:', id)
   const batch = shipmentBatchList.value.find(b => b.id === id)
+  console.log('[QC] batch found:', batch, 'shipmentQuantity:', batch?.shipmentQuantity)
   if (!batch) return
   form.shipmentBatchId = batch.id
   form.procurementId = batch.procurementId
+  // 预填出货数量（el-input-number 响应式专用）
+  inspectionCountRef.value = batch.shipmentQuantity ?? 0
+  console.log('[QC] inspectionCountRef set to:', inspectionCountRef.value)
+  // 显示选中批次码（新建弹窗内）
+  form.batchCode = batch.batchCode || ''
+  console.log('[QC] form.batchCode set to:', form.batchCode)
   // 通过 procurementId 补充商品信息（productCode, sellerName, material, destination）
   if (batch.procurementId) {
     procurementApi.list({ page: 0, pageSize: 200 }).then(res => {
@@ -656,11 +873,11 @@ function onShipmentBatchSelected(id: number) {
 }
 
 function onNew() {
-  formRef.value?.resetFields()
-  currentRow.value = null  // 必须重置，否则 onSubmit 会误入编辑分支
+  formRef.value?.clearValidate()
+  currentRow.value = null
   const today = new Date().toISOString().slice(0, 10)
   Object.assign(form, {
-    shipmentBatchId: undefined, procurementId: undefined,
+    shipmentBatchId: undefined, batchCode: '', procurementId: undefined,
     productCode: '', subProductCode: '', qcUserId: undefined,
     qcType: 'ONSITE', qcDate: today, result: 'PASS', status: 'PENDING',
     inspectionCount: 0, passedCount: 0,
@@ -669,6 +886,7 @@ function onNew() {
     taxInclusivePrice: 0, material: '',
     qcStandard: '', remarks: '', images: '', destination: '', quantity: 0, orderDate: '', sellerName: '',
   })
+  inspectionCountRef.value = 0
   uploadFileList.value = []
   dialogVisible.value = true
 }
@@ -678,7 +896,7 @@ async function onSubmit() {
   if (!valid) return
   submitting.value = true
   try {
-    if (form.inspectionCount !== undefined && form.passedCount !== undefined && form.passedCount > form.inspectionCount) {
+    if (inspectionCountRef.value !== undefined && form.passedCount !== undefined && form.passedCount > inspectionCountRef.value) {
       ElMessage.warning(t('inspection.validation.passedCountExceeds'))
       submitting.value = false
       return
@@ -705,7 +923,7 @@ async function onSubmit() {
         qcDate: form.qcDate || undefined,
         result: form.result,
         status: form.status,
-        inspectionCount: form.inspectionCount,
+        inspectionCount: inspectionCountRef.value,
         passedCount: form.passedCount,
         boxCount: form.boxCount,
         boxLengthCm: form.boxLengthCm,
@@ -745,7 +963,7 @@ async function onSubmit() {
         qcType: form.qcType,
         qcDate: form.qcDate || undefined,
         result: form.result,
-        inspectionCount: form.inspectionCount,
+        inspectionCount: inspectionCountRef.value,
         passedCount: form.passedCount,
         boxCount: form.boxCount,
         boxLengthCm: form.boxLengthCm,
@@ -878,6 +1096,68 @@ function qcTypeLabel(qcType?: string): string {
   return { ONSITE: t('inspection.qcType.onsite'), REMOTE: t('inspection.qcType.remote'), EXEMPT: t('inspection.qcType.exempt') }[qcType ?? ''] ?? '-'
 }
 
+function onSelectionChange(selection: QcRecordVO[]) {
+  selectedRows.value = selection
+}
+
+function onBatchPrint() {
+  if (!selectedRows.value.length) {
+    ElMessage.warning(t('inspection.print.selectFirst'))
+    return
+  }
+  printRows.value = [...selectedRows.value]
+  printVisible.value = true
+}
+
+function doPrint() {
+  const printArea = document.getElementById('qc-print-area')
+  if (!printArea) return
+  const printWindow = window.open('', '_blank')
+  if (!printWindow) {
+    ElMessage.warning('请允许弹出窗口以进行打印')
+    return
+  }
+  const reportTitle = t('inspection.print.reportTitle')
+  printWindow.document.write('<!DOCTYPE html>')
+  printWindow.document.write('<html><head>')
+  printWindow.document.write('<meta charset="utf-8">')
+  printWindow.document.write('<title>' + reportTitle + '</title>')
+  printWindow.document.write('<style>')
+  printWindow.document.write('*{box-sizing:border-box;margin:0;padding:0}')
+  printWindow.document.write('body{font-family:"Microsoft YaHei","PingFang SC","SimHei",sans-serif;color:#1a1a1a;font-size:13px;padding:20px}')
+  printWindow.document.write('.report-block{padding-bottom:8px}')
+  printWindow.document.write('.report-block.page-break{page-break-before:always;padding-top:16px}')
+  printWindow.document.write('.report-header{text-align:center;border-bottom:2px solid #1E3A5F;padding-bottom:10px;margin-bottom:12px}')
+  printWindow.document.write('.company-name{font-size:12px;color:#666;margin-bottom:4px}')
+  printWindow.document.write('.report-title{font-size:22px;font-weight:800;color:#1E3A5F;letter-spacing:4px;margin:4px 0}')
+  printWindow.document.write('.report-subtitle{font-size:11px;color:#999}')
+  printWindow.document.write('.section-title{font-size:13px;font-weight:700;color:#1E3A5F;background:#EEF3F8;padding:4px 10px;border-left:3px solid #1E3A5F;margin:12px 0 6px}')
+  printWindow.document.write('table{width:100%;border-collapse:collapse;margin-bottom:0}')
+  printWindow.document.write('td{border:1px solid #C8D4E0;padding:5px 8px;vertical-align:top}')
+  printWindow.document.write('td.label{background:#F4F7FB;font-weight:600;color:#3B5A7E;width:100px;font-size:12px}')
+  printWindow.document.write('.result-pass{color:#16A34A;font-weight:800;font-size:16px}')
+  printWindow.document.write('.result-fail{color:#DC2626;font-weight:800;font-size:16px}')
+  printWindow.document.write('.qc-standard-box{background:#FFFBEB;border:1px solid #FCD34D;border-radius:4px;padding:8px 12px;font-size:12px;line-height:1.8;min-height:40px}')
+  printWindow.document.write('.remarks-box{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:4px;padding:8px 12px;font-size:12px;min-height:40px}')
+  printWindow.document.write('.signatures{margin-top:20px;display:flex;gap:24px}')
+  printWindow.document.write('.sig-block{flex:1;text-align:center}')
+  printWindow.document.write('.sig-line{border-top:1px solid #1a1a1a;margin-top:36px;margin-bottom:4px}')
+  printWindow.document.write('.sig-label{font-size:12px;color:#555}')
+  printWindow.document.write('.sig-date{font-size:11px;color:#999;margin-top:2px}')
+  printWindow.document.write('.report-footer{display:flex;justify-content:space-between;font-size:11px;color:#999;margin-top:12px;padding-top:6px;border-top:1px solid #E5E7EB}')
+  printWindow.document.write('@media print{body{padding:0}.el-dialog{display:none!important}.report-block.page-break{page-break-before:always}}')
+  printWindow.document.write('</style>')
+  printWindow.document.write('</head><body>')
+  printWindow.document.write(printArea.innerHTML)
+  printWindow.document.write('</body></html>')
+  printWindow.document.close()
+  printWindow.focus()
+  setTimeout(() => {
+    printWindow.print()
+    printWindow.close()
+  }, 300)
+}
+
 function qcStatusLabel(status?: string): string {
   return { PENDING: t('inspection.qcStatus.pending'), COMPLETED: t('inspection.qcStatus.completed'), RETURN_REQUESTED: t('inspection.qcStatus.returnRequested') }[status ?? ''] ?? status ?? '-'
 }
@@ -894,6 +1174,8 @@ onMounted(() => {
 <style scoped>
 .page { display: flex; flex-direction: column; gap: 16px; }
 .table-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.selection-count { margin-left: 4px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
 .stats-row { margin-bottom: 0; }
 .stat-card { border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: all var(--transition-fast); }

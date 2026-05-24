@@ -70,6 +70,23 @@
         </div>
       </template>
       <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+        <el-table-column prop="productCode" :label="$t('customs.column.productCode')" min-width="130">
+          <template #default="{ row }">
+            <span v-if="row.productCode" class="product-code">{{ row.productCode }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="subProductCode" :label="$t('customs.column.subProductCode')" min-width="100">
+          <template #default="{ row }">
+            <span v-if="row.subProductCode" class="product-code">{{ row.subProductCode }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('product.drawer.imageUrl')" width="70" align="center">
+          <template #default="{ row }">
+            <ProductImageCell :product-code="row.productCode" :image-map="imageMap" />
+          </template>
+        </el-table-column>
         <el-table-column prop="refundCode" :label="$t('taxRefund.column.refundCode')" min-width="180">
           <template #default="{ row }">
             <span class="code-badge">{{ row.refundCode }}</span>
@@ -150,6 +167,14 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.procurementId')">{{ currentRow.procurementId ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.japanCustomsId')">{{ currentRow.japanCustomsId ?? '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('customs.column.productCode')">
+          <span v-if="currentRow.productCode" class="product-code">{{ currentRow.productCode }}</span>
+          <span v-else>-</span>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('customs.column.subProductCode')">
+          <span v-if="currentRow.subProductCode" class="product-code">{{ currentRow.subProductCode }}</span>
+          <span v-else>-</span>
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.billingType')">{{ currentRow.billingType ? $t('taxRefund.enum.billingType.' + currentRow.billingType) : '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('taxRefund.column.taxPoint')">
           <span v-if="currentRow.taxPoint !== null">{{ (Number(currentRow.taxPoint) * 100).toFixed(1) }}%</span>
@@ -304,8 +329,11 @@ import { taxRefundApi, type TaxRefundVO, type TaxRefundStatus, type TaxRefundCre
 import { procurementApi, type ProcurementPageVO } from '@/api/procurement'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import { useProductImage } from '@/composables/useProductImage'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
+import ProductImageCell from '@/components/ProductImageCell.vue'
 
+const { imageMap, loadImageMap } = useProductImage()
 const loading = ref(false)
 const drawerVisible = ref(false)
 const completeDialogVisible = ref(false)
@@ -542,6 +570,7 @@ async function loadData() {
     const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
+    await loadImageMap(tableData.value, 'productCode')
   } catch {
     ElMessage.error(t('taxRefund.message.loadFailed'))
   } finally {
@@ -639,6 +668,7 @@ watch(tableData, () => {
 .stat-value { font-size: 26px; font-weight: 800; color: var(--text-primary); line-height: 1; font-variant-numeric: tabular-nums; }
 .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
 .code-badge { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
+.product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; background: var(--color-primary-pale); padding: 3px 9px; border-radius: 5px; }
 .money { color: #F59E0B; font-weight: 600; }
 .money-success { color: #16A34A; font-weight: 600; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }

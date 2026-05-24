@@ -30,6 +30,10 @@ export interface TaxRefundVO {
   createBy: string
   createTime: string
   updateTime: string
+  // 产品信息（JOIN procurement + product）
+  productCode?: string
+  subProductCode?: string
+  productImageUrl?: string
 }
 
 export interface TaxRefundPageResponse {

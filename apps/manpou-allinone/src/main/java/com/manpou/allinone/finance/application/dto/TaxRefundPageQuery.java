@@ -28,4 +28,8 @@ public class TaxRefundPageQuery {
     private String createBy;
     private String createTime;
     private String updateTime;
+    // 产品信息（通过 procurementId JOIN procurement + product 获取）
+    private String productCode;
+    private String subProductCode;
+    private String productImageUrl;
 }

@@ -79,19 +79,26 @@
     <!-- 数据表 -->
     <el-card class="table-card" shadow="never">
       <template #header>
-        <div class="table-header">
+        <div class="batch-actions">
+          <span v-if="selectedRows.length" class="selection-count">
+            <el-tag type="info" size="small">{{ $t('common.batch.selectedCount', { n: selectedRows.length }) }}</el-tag>
+          </span>
+          <el-button
+            v-if="selectedRows.length"
+            type="danger"
+            size="small"
+            @click="onBatchDelete"
+          >
+            <el-icon><Delete /></el-icon>{{ $t('common.batch.delete', { n: selectedRows.length }) }}
+          </el-button>
           <el-radio-group v-model="excelViewMode" size="small">
             <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
             <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
           </el-radio-group>
         </div>
       </template>
-      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
-        <el-table-column prop="recordCode" :label="$t('sales.column.recordCode')" min-width="170">
-          <template #default="{ row }">
-            <span class="code-badge">{{ row.recordCode }}</span>
-          </template>
-        </el-table-column>
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200" ref="tableRef" row-key="id" @selection-change="onSelectionChange">
+        <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
         <el-table-column prop="productCode" :label="$t('sales.column.productCode')" min-width="110">
           <template #default="{ row }">
             <span v-if="row.productCode">{{ row.productCode }}</span>
@@ -99,6 +106,16 @@
           </template>
         </el-table-column>
         <el-table-column prop="subProductCode" :label="$t('sales.column.subProductCode')" min-width="100" />
+        <el-table-column :label="$t('product.drawer.imageUrl')" width="70" align="center">
+          <template #default="{ row }">
+            <ProductImageCell :product-code="row.productCode" :image-map="imageMap" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="recordCode" :label="$t('sales.column.recordCode')" min-width="170">
+          <template #default="{ row }">
+            <span class="code-badge">{{ row.recordCode }}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="salesChannel" :label="$t('sales.column.salesChannel')" min-width="110" align="center">
           <template #default="{ row }">
             <span>{{ channelLabel(row.salesChannel) }}</span>
@@ -291,14 +308,19 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, CircleCheck, Warning, CloseBold, Remove, Goods } from '@element-plus/icons-vue'
+import { Plus, CircleCheck, Warning, CloseBold, Remove, Goods, Delete } from '@element-plus/icons-vue'
 import { salesOperationsApi, type SalesRecordVO, type SalesStatus, type SalesChannel } from '@/api/salesOperations'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import { useProductImage } from '@/composables/useProductImage'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
+import ProductImageCell from '@/components/ProductImageCell.vue'
 
 const { t, locale: localeRef } = useI18n()
 const { hasPermission } = usePermission()
+const { imageMap, loadImageMap } = useProductImage()
+const tableRef = ref<any>(null)
+const selectedRows = ref<SalesRecordVO[]>([])
 
 function formatTime(ts: string | undefined | null): string {
   if (!ts) return '-'
@@ -413,6 +435,7 @@ async function loadData() {
     const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
+    await loadImageMap(tableData.value)
   } catch {
     ElMessage.error(t('sales.message.loadFailed'))
   } finally {
@@ -551,6 +574,32 @@ async function onDelete(row: SalesRecordVO) {
   }
 }
 
+function onSelectionChange(selection: SalesRecordVO[]) {
+  selectedRows.value = selection
+}
+
+async function onBatchDelete() {
+  if (!selectedRows.value.length) return
+  try {
+    await ElMessageBox.confirm(
+      t('common.batch.deleteConfirm', { n: selectedRows.value.length }),
+      t('common.batch.deleteConfirmTitle'),
+      { confirmButtonText: t('common.delete'), cancelButtonText: t('common.cancel'), type: 'warning' }
+    )
+  } catch { return }
+  loading.value = true
+  try {
+    await Promise.all(selectedRows.value.map(r => salesOperationsApi.delete(r.id)))
+    ElMessage.success(t('common.batch.deleteSuccess', { n: selectedRows.value.length }))
+    selectedRows.value = []
+    loadData()
+  } catch {
+    ElMessage.error(t('common.batch.deleteFailed'))
+  } finally {
+    loading.value = false
+  }
+}
+
 onMounted(() => { loadData() })
 
 // 修正 el-table 空状态时 empty-block 宽度超出列宽
@@ -587,4 +636,6 @@ watch(tableData, () => {
 .text-danger { color: #DC2626; }
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
 :deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
+.batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.selection-count { margin-left: 4px; }
 </style>

@@ -69,7 +69,26 @@
     <!-- 数据表 -->
     <el-card class="table-card" shadow="never">
       <template #header>
-        <div class="table-header">
+        <div class="batch-actions">
+          <span v-if="selectedRows.length" class="selection-count">
+            <el-tag type="info" size="small">{{ $t('common.batch.selectedCount', { n: selectedRows.length }) }}</el-tag>
+          </span>
+          <el-button
+            v-if="selectedRows.length"
+            type="danger"
+            size="small"
+            @click="onBatchDelete"
+          >
+            <el-icon><Delete /></el-icon>{{ $t('common.batch.delete', { n: selectedRows.length }) }}
+          </el-button>
+          <el-button
+            v-if="selectedRows.length && hasPermission('customs:update')"
+            type="primary"
+            size="small"
+            @click="onBatchDeclarationNo"
+          >
+            {{ $t('customs.batchDeclarationNo.button') }} ({{ selectedRows.length }})
+          </el-button>
           <el-radio-group v-model="excelViewMode" size="small">
             <el-radio-button value="table">{{ $t('common.viewMode.table') }}</el-radio-button>
             <el-radio-button value="copy">{{ $t('common.viewMode.excel') }}</el-radio-button>
@@ -82,10 +101,36 @@
       </template>
 
       <!-- 列表视图 -->
-      <el-table v-loading="loading" v-if="viewMode === 'list' && excelViewMode === 'table'" :data="tableData" stripe style="width:100%" min-height="200">
+      <el-table v-loading="loading" v-if="viewMode === 'list' && excelViewMode === 'table'" :data="tableData" stripe style="width:100%" min-height="200" ref="tableRef" row-key="id" @selection-change="onSelectionChange">
+        <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
+        <el-table-column prop="productCode" :label="$t('customs.column.productCode')" min-width="140">
+          <template #default="{ row }">
+            <span class="product-code">{{ row.productCode }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="subProductCode" :label="$t('customs.column.subProductCode')" min-width="100" />
+        <el-table-column :label="$t('product.drawer.imageUrl')" width="70" align="center">
+          <template #default="{ row }">
+            <ProductImageCell :product-code="row.productCode" :image-map="imageMap" />
+          </template>
+        </el-table-column>
         <el-table-column prop="customsCode" :label="$t('customs.column.customsCode')" min-width="180">
           <template #default="{ row }">
             <span class="code-badge">{{ row.customsCode }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="customsDeclarationNo" :label="$t('customs.column.customsDeclarationNo')" min-width="180">
+          <template #default="{ row }">
+            <el-input
+              v-if="editingDeclarationNoId === row.id"
+              v-model="editingDeclarationNo"
+              size="small"
+              style="width:150px"
+              @keyup.enter="onDeclarationNoConfirm(row)"
+              @blur="onDeclarationNoConfirm(row)"
+              @keyup.escape="cancelDeclarationNoEdit"
+            />
+            <span v-else class="editable-cell" @click.stop="onDeclarationNoClick(row)">{{ row.customsDeclarationNo || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="containerNo" :label="$t('customs.column.containerNo')" min-width="140" show-overflow-tooltip />
@@ -95,12 +140,6 @@
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="productCode" :label="$t('customs.column.productCode')" min-width="140">
-          <template #default="{ row }">
-            <span class="product-code">{{ row.productCode }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="subProductCode" :label="$t('customs.column.subProductCode')" min-width="100" />
         <el-table-column prop="quantity" :label="$t('customs.column.quantity')" min-width="80" align="right">
           <template #default="{ row }">
             <span v-if="row.quantity !== null">{{ row.quantity }}</span>
@@ -155,17 +194,23 @@
             </div>
           </template>
           <el-table :data="group.records" stripe>
-            <el-table-column prop="customsCode" :label="$t('customs.column.customsCode')" min-width="180">
-              <template #default="{ row }">
-                <span class="code-badge">{{ row.customsCode }}</span>
-              </template>
-            </el-table-column>
             <el-table-column prop="productCode" :label="$t('customs.column.productCode')" min-width="120">
               <template #default="{ row }">
                 <span class="product-code">{{ row.productCode }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="subProductCode" :label="$t('customs.column.subProductCode')" min-width="100" />
+            <el-table-column :label="$t('product.drawer.imageUrl')" width="70" align="center">
+              <template #default="{ row }">
+                <ProductImageCell :product-code="row.productCode" :image-map="imageMap" />
+              </template>
+            </el-table-column>
+            <el-table-column prop="customsCode" :label="$t('customs.column.customsCode')" min-width="180">
+              <template #default="{ row }">
+                <span class="code-badge">{{ row.customsCode }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="customsDeclarationNo" :label="$t('customs.column.customsDeclarationNo')" min-width="180" />
             <el-table-column prop="quantity" :label="$t('customs.column.quantity')" min-width="80" align="right">
               <template #default="{ row }">
                 <span v-if="row.quantity !== null">{{ row.quantity }}</span>
@@ -316,6 +361,7 @@
         <el-descriptions-item :label="$t('customs.column.customsCode')">
           <span class="code-badge">{{ currentRow.customsCode }}</span>
         </el-descriptions-item>
+        <el-descriptions-item :label="$t('customs.column.customsDeclarationNo')">{{ currentRow.customsDeclarationNo || '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('customs.column.containerNo')">{{ currentRow.containerNo ?? '-' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('customs.column.status')">
           <el-tag :type="statusTagType(currentRow.status)" size="small">{{ statusLabel(currentRow.status) }}</el-tag>
@@ -341,6 +387,9 @@
     <!-- 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" :title="editDialogTitle" width="560px" :close-on-click-modal="false" destroy-on-close>
       <el-form label-width="140px">
+        <el-form-item :label="$t('customs.column.customsDeclarationNo')">
+          <el-input v-model="form.customsDeclarationNo" :placeholder="$t('customs.batchDeclarationNo.declarationNoPlaceholder')" maxlength="64" />
+        </el-form-item>
         <el-form-item :label="$t('customs.column.containerNo')">
           <el-input v-model="form.containerNo" :placeholder="$t('customs.dialog.containerNoPlaceholder')" />
         </el-form-item>
@@ -378,6 +427,23 @@
         <el-button type="danger" :loading="actionLoading.startsWith('reject-')" @click="onRejectConfirm">{{ $t('common.confirm') }}</el-button>
       </template>
     </el-dialog>
+    <!-- 批量修改报关申报号弹窗（v2.0） -->
+    <el-dialog v-model="batchDeclarationNoDialogVisible" :title="$t('customs.batchDeclarationNo.dialogTitle')" width="460px">
+      <el-form label-width="140px">
+        <el-form-item :label="$t('customs.batchDeclarationNo.selectedCount', { n: selectedRows.length })">
+          <el-tag type="info" size="small">{{ selectedRows.length }} {{ $t('customs.group.records', { n: '' }) }}</el-tag>
+        </el-form-item>
+        <el-form-item :label="$t('customs.batchDeclarationNo.declarationNoLabel')" required>
+          <el-input v-model="batchDeclarationNoValue" :placeholder="$t('customs.batchDeclarationNo.declarationNoPlaceholder')" maxlength="64" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="batchDeclarationNoDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" :loading="batchDeclarationNoLoading" :disabled="!batchDeclarationNoValue.trim()" @click="onBatchDeclarationNoConfirm">
+          {{ $t('common.confirm') }}
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -385,14 +451,19 @@
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Document, Clock, Top, CircleCheck, Box } from '@element-plus/icons-vue'
+import { Plus, Document, Clock, Top, CircleCheck, Box, Delete } from '@element-plus/icons-vue'
 import { customsApi, type CustomsVO, type DomesticCustomsStatus, type CustomsCreateRequest, type CustomsBatchCreateRequest } from '@/api/customs'
 import { logisticsApi, type LogisticsPlanVO } from '@/api/logistics'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@/composables/usePermission'
+import { useProductImage } from '@/composables/useProductImage'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
+import ProductImageCell from '@/components/ProductImageCell.vue'
 
 const { hasPermission } = usePermission()
+const { imageMap, loadImageMap } = useProductImage()
+const tableRef = ref<any>(null)
+const selectedRows = ref<CustomsVO[]>([])
 const loading = ref(false)
 const submitting = ref(false)
 const dialogVisible = ref(false)
@@ -405,6 +476,13 @@ const actionLoading = ref('')
 const rejectReason = ref('')
 const rejectingRowId = ref<number | null>(null)
 const viewMode = ref<'list' | 'group'>('list')
+
+// 报关申报号相关（v2.0）
+const batchDeclarationNoDialogVisible = ref(false)
+const batchDeclarationNoValue = ref('')
+const batchDeclarationNoLoading = ref(false)
+const editingDeclarationNoId = ref<number | null>(null)
+const editingDeclarationNo = ref('')
 const excelViewMode = ref<'table' | 'copy'>('table')
 
 const containerOptions = ref<LogisticsPlanVO[]>([])
@@ -432,7 +510,7 @@ function formatTime(ts: string | undefined | null): string {
 }
 
 // 单记录表单（保留备用；当前主模式为批量）
-const form = reactive<CustomsCreateRequest>({
+const form = reactive<CustomsCreateRequest & { customsDeclarationNo?: string }>({
   containerNo: '',
   procurementId: undefined,
   factoryId: undefined,
@@ -441,6 +519,7 @@ const form = reactive<CustomsCreateRequest>({
   quantity: undefined,
   estimatedValueCny: undefined,
   remarks: undefined,
+  customsDeclarationNo: undefined,
 })
 
 // 批量创建表单（v1.4.0）
@@ -499,6 +578,7 @@ function statusTagType(status?: string): string {
 
 const copyColumns: ExcelColDef[] = [
   { prop: 'customsCode', label: t('customs.column.customsCode') },
+  { prop: 'customsDeclarationNo', label: t('customs.column.customsDeclarationNo') },
   { prop: 'containerNo', label: t('customs.column.containerNo') },
   { prop: 'procurementId', label: t('customs.column.procurementId') },
   { prop: 'productCode', label: t('customs.column.productCode') },
@@ -524,6 +604,7 @@ async function loadData() {
     const data = res.data
     tableData.value = data?.content ?? []
     pagination.total = data?.totalElements ?? 0
+    await loadImageMap(tableData.value)
   } catch {
     ElMessage.error(t('customs.message.loadFailed'))
   } finally {
@@ -662,6 +743,7 @@ function onEdit(row: CustomsVO) {
     quantity: row.quantity ?? undefined,
     estimatedValueCny: row.estimatedValueCny ?? undefined,
     remarks: row.remarks ?? undefined,
+    customsDeclarationNo: row.customsDeclarationNo ?? undefined,
   })
   editDialogVisible.value = true
 }
@@ -671,6 +753,7 @@ async function onEditSubmit() {
   submitting.value = true
   try {
     await customsApi.update(editingItem.value.id, {
+      customsDeclarationNo: form.customsDeclarationNo || undefined,
       containerNo: form.containerNo || undefined,
       factoryId: form.factoryId,
       productCode: form.productCode,
@@ -737,6 +820,56 @@ async function onRejectConfirm() {
   }
 }
 
+// 报关申报号编辑（v2.0）
+function onDeclarationNoClick(row: CustomsVO) {
+  if (!hasPermission('customs:update')) return
+  editingDeclarationNoId.value = row.id
+  editingDeclarationNo.value = row.customsDeclarationNo ?? ''
+}
+
+async function onDeclarationNoConfirm(row: CustomsVO) {
+  if (editingDeclarationNoId.value !== row.id) return
+  const newVal = editingDeclarationNo.value.trim()
+  editingDeclarationNoId.value = null
+  if (newVal === (row.customsDeclarationNo ?? '')) return
+  submitting.value = true
+  try {
+    await customsApi.update(row.id, { customsDeclarationNo: newVal || undefined })
+    ElMessage.success(t('common.message.saveSuccess'))
+    loadData()
+  } catch {
+    ElMessage.error(t('common.message.saveFailed'))
+  } finally {
+    submitting.value = false
+  }
+}
+
+function cancelDeclarationNoEdit() {
+  editingDeclarationNoId.value = null
+}
+
+function onBatchDeclarationNo() {
+  batchDeclarationNoValue.value = ''
+  batchDeclarationNoDialogVisible.value = true
+}
+
+async function onBatchDeclarationNoConfirm() {
+  if (!batchDeclarationNoValue.value.trim()) return
+  if (!selectedRows.value.length) return
+  batchDeclarationNoLoading.value = true
+  try {
+    const ids = selectedRows.value.map(r => r.id)
+    await customsApi.batchUpdateDeclarationNo(ids, batchDeclarationNoValue.value.trim())
+    ElMessage.success(t('customs.message.batchUpdateDeclarationNoSuccess', { n: ids.length }))
+    batchDeclarationNoDialogVisible.value = false
+    loadData()
+  } catch {
+    ElMessage.error(t('common.message.saveFailed'))
+  } finally {
+    batchDeclarationNoLoading.value = false
+  }
+}
+
 async function onDelete(row: CustomsVO) {
   try {
     await ElMessageBox.confirm(t('customs.message.deleteConfirm'), t('common.warning'), {
@@ -754,6 +887,32 @@ async function onDelete(row: CustomsVO) {
     ElMessage.error(t('customs.message.actionFailed'))
   } finally {
     actionLoading.value = ''
+  }
+}
+
+function onSelectionChange(selection: CustomsVO[]) {
+  selectedRows.value = selection
+}
+
+async function onBatchDelete() {
+  if (!selectedRows.value.length) return
+  try {
+    await ElMessageBox.confirm(
+      t('common.batch.deleteConfirm', { n: selectedRows.value.length }),
+      t('common.batch.deleteConfirmTitle'),
+      { confirmButtonText: t('common.delete'), cancelButtonText: t('common.cancel'), type: 'warning' }
+    )
+  } catch { return }
+  loading.value = true
+  try {
+    await Promise.all(selectedRows.value.map(r => customsApi.delete(r.id)))
+    ElMessage.success(t('common.batch.deleteSuccess', { n: selectedRows.value.length }))
+    selectedRows.value = []
+    loadData()
+  } catch {
+    ElMessage.error(t('common.batch.deleteFailed'))
+  } finally {
+    loading.value = false
   }
 }
 
@@ -811,4 +970,8 @@ watch(tableData, () => {
 .batch-footer { background: var(--bg-page); border-radius: var(--radius-sm); padding: 12px 4px; }
 .batch-count-display { font-size: 22px; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; line-height: 32px; }
 .filter-card :deep(.el-card__body) { padding-bottom: 0; }
+.batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.selection-count { margin-left: 4px; }
+.editable-cell { cursor: pointer; color: var(--color-primary); padding: 2px 4px; border-radius: 4px; }
+.editable-cell:hover { background: var(--color-primary-pale); }
 </style>

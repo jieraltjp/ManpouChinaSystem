@@ -61,7 +61,7 @@ export interface UpdateDemandRequest {
 }
 
 export const demandApi = {
-  list(params: { page?: number; pageSize?: number; demandType?: string; keyword?: string }) {
+  list(params: { page?: number; pageSize?: number; demandType?: string; keyword?: string; linked?: boolean | null }) {
     return client.get<DemandPageResponse>('/demands', { params })
   },
   get(id: number) {

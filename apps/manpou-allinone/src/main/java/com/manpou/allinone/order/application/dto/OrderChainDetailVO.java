@@ -11,9 +11,11 @@ import com.manpou.allinone.order.application.dto.OrderOverviewPageVO.TaxRefundVO
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 /**
- * 订单总览详情 VO（Phase1 步骤1~4）。
- * 全链路8步数据，Phase1 步骤5~8 返回 null。
+ * 订单总览详情 VO（全链路8步）。
+ * 步骤3 厂家出货（多批次）、步骤4 验货记录（多记录）支持 List。
  */
 @Data
 @Builder
@@ -30,13 +32,16 @@ public class OrderChainDetailVO {
     // 步骤2 工厂快照（来自 procurement_snapshot，下单时刻数据）
     private FactoryVO factory;
 
-    // 步骤3
-    private QcRecordVO qcRecord;
+    // 步骤3：厂家出货（多批次）
+    private List<ShipmentBatchVO> shipmentBatches;
 
-    // 步骤4
+    // 步骤4：验货记录（多记录）
+    private List<QcRecordVO> qcRecords;
+
+    // 步骤5
     private LogisticsPlanVO logisticsPlan;
 
-    // 步骤5~8 Phase1 占位
+    // 步骤6~9 Phase1 占位
     private DomesticCustomsVO domesticCustoms;
     private JapanCustomsVO japanCustoms;
     private TaxRefundVO taxRefund;
