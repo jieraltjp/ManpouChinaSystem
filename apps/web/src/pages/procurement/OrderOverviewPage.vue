@@ -230,7 +230,7 @@
           <el-table-column :label="$t('orderOverview.step4.subProductCode')" prop="subProductCode" width="100">
             <template #default="{ row }">{{ row.subProductCode || '-' }}</template>
           </el-table-column>
-          <el-table-column label="商品图片" width="70" align="center">
+          <el-table-column :label="$t('orderOverview.step4.productImage')" width="70" align="center">
             <template #default="{ row }">
               <el-image
                 v-if="row.productImageUrl"
@@ -402,7 +402,9 @@ function billingTypeLabel(val: string | undefined): string {
 
 function customsTypeLabel(val: string | undefined): string {
   if (!val) return '-'
-  return val === 'CHAO_HUI_TUI_SHUI' ? '超慧退税' : '杂货'
+  if (val === 'CHAO_HUI_TUI_SHUI') return t('orderOverview.column.customsTypeOptions.CHAO_HUI_TUI_SHUI')
+  if (val === 'GENERAL') return t('orderOverview.column.customsTypeOptions.GENERAL')
+  return val
 }
 
 function statusLabelByValue(val: string | undefined): string {
@@ -606,7 +608,7 @@ onMounted(() => {
 
 /* 商品图片缩略图 */
 .return-reason-text { color: #F56C6C; font-size: 13px; }
-.btn-blue { color: #409EFF !important; }
+.btn-blue { color: #E8650A !important; }
 .btn-red { color: #F56C6C !important; }
 .product-thumb {
   width: 40px;
@@ -629,4 +631,11 @@ onMounted(() => {
   cursor: pointer;
 }
 :deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
+:deep(.el-table__header-wrapper),
+:deep(.el-table__header th.el-table__cell) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: inherit;
+}
 </style>

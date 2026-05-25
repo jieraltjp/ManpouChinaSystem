@@ -66,7 +66,7 @@ const cardClass = {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #409EFF;
+  background: #E8650A;
   color: #fff;
   font-size: 12px;
   font-weight: 700;

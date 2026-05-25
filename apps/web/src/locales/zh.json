@@ -56,7 +56,9 @@
     "passwordPlaceholder": "请输入密码",
     "usernameRequired": "用户名不能为空",
     "passwordRequired": "密码不能为空",
-    "loginFailed": "登录失败，请检查用户名和密码"
+    "loginFailed": "登录失败，请检查用户名和密码",
+    "enterpriseFooter": "MANPOU China System · Enterprise Edition",
+    "copyright": "© 2024–{year} MANPOU China. All rights reserved."
   },
   "dashboard": {
     "timezone": {
@@ -347,6 +349,16 @@
       "unlinkedProcurement": "不关联补货",
       "productCategory": "商品分类",
       "productCategoryPlaceholder": "请选择商品分类",
+      "productCategoryOptions": {
+        "OEM": "批发",
+        "ORDINARY": "普货",
+        "FACTORY_DIRECT": "厂家出口",
+        "NORMAL": "普通采购",
+        "SAMPLE": "样品",
+        "SELF_USE": "自用",
+        "PARTS": "配件",
+        "INDEPENDENT": "无关联"
+      },
       "productCode": "商品代码",
       "productCodePlaceholder": "如 de077",
       "productCodeSearchPlaceholder": "搜索货号...",
@@ -719,7 +731,8 @@
       "passedCount": "合格数",
       "defectiveCount": "不良数",
       "passRate": "合格率",
-      "printDate": "打印日期"
+      "printDate": "打印日期",
+      "allowPopup": "请允许弹出窗口以进行打印"
     },
     "batch": {
       "selectedCount": "已选 {n} 条",
@@ -918,7 +931,8 @@
         "showFlag": "显示",
         "legacyStatus": "状态",
         "cabinetNo": "箱号",
-        "cabinetNoHint": "箱号/ISO号"
+        "cabinetNoHint": "箱号/ISO号",
+        "cabinetNoPlaceholder": "如 CBHU4225619"
       },
       "column": {
         "containerNo": "货柜号",
@@ -961,7 +975,18 @@
       "unassignSuccess": "船只已解除",
       "tabLabel": "货柜",
       "drawerTitle": "货柜详情",
-      "viewButton": "查看"
+      "viewButton": "查看",
+      "periodOptions": {
+        "earlyMorning": "凌晨0-6",
+        "morning": "早上6-12",
+        "afternoon": "下午12-18",
+        "evening": "晚上18-24"
+      },
+      "legacyStatusOptions": {
+        "notOut": "未出",
+        "out": "出完",
+        "pending": "待定"
+      }
     }
   },
   "factory": {
@@ -1367,6 +1392,10 @@
       "priceRmb": "单价",
       "taxPoint": "票点",
       "customsType": "报关",
+      "customsTypeOptions": {
+        "CHAO_HUI_TUI_SHUI": "超慧退税",
+        "GENERAL": "杂货"
+      },
       "procurementCreateBy": "采购人"
     },
     "step": {
@@ -1438,7 +1467,8 @@
       "qcDate": "验货日期",
       "status": "状态",
       "productCode": "主货号",
-      "subProductCode": "子货号"
+      "subProductCode": "子货号",
+      "productImage": "商品图片"
     },
     "step5": {
       "title": "步骤5：调配计划",
@@ -1617,7 +1647,8 @@
       "jpy": "JPY",
       "rmb": "RMB",
       "day": "天",
-      "dayPlural": "天"
+      "dayPlural": "天",
+      "piece": "个"
     },
     "format": {
       "times": "×",
@@ -1645,6 +1676,9 @@
       "server": "服务器错误：",
       "loadFailed": "加载失败，请重试"
     },
+    "clipboard": {
+      "copied": "已复制"
+    },
     "action": {
       "back": "返回",
       "retry": "重试"
@@ -1652,7 +1686,10 @@
     "yes": "是",
     "no": "否",
     "message": {
-      "loadFailed": "加载失败，请重试"
+      "loadFailed": "加载失败，请重试",
+      "saveSuccess": "保存成功",
+      "saveFailed": "保存失败，请重试",
+      "deleteSuccess": "删除成功"
     },
     "viewMode": {
       "table": "表格视图",
@@ -2063,6 +2100,7 @@
       "productCode": "主货号",
       "productCodePlaceholder": "如 de077",
       "subProductCode": "子货号",
+      "subProductCodePlaceholder": "如 re / wh / bk（颜色）",
       "salesChannel": "销售渠道",
       "listingDate": "上架日期",
       "initialStock": "初始库存",
@@ -2202,6 +2240,10 @@
       "SYSTEM": "系统内置",
       "BUSINESS": "业务角色"
     },
+    "tag": {
+      "system": "系统内置",
+      "readonly": "只读"
+    },
     "action": {
       "edit": "编辑",
       "delete": "删除",
@@ -2216,7 +2258,12 @@
       "roleType": "角色类型",
       "description": "描述",
       "cancel": "取消",
-      "save": "保存配置"
+      "save": "保存配置",
+      "roleCodeHint": "请输入角色编码",
+      "roleNameCnHint": "请输入角色名称",
+      "roleNameJpHint": "请输入日文名称",
+      "descriptionHint": "请输入描述（可选）",
+      "confirmDelete": "确定删除"
     },
     "module": {
       "procurement": "发注管理",
@@ -2228,7 +2275,12 @@
       "system": "系统管理"
     },
     "permission": {
-      "selectTip": "请选择左侧角色以配置权限"
+      "selectTip": "请选择左侧角色以配置权限",
+      "selectedCount": "已选权限",
+      "column": {
+        "name": "权限名称",
+        "code": "权限编码"
+      }
     },
     "message": {
       "createSuccess": "角色创建成功",
@@ -2262,9 +2314,10 @@
     },
     "filter": {
       "userId": "操作人账号",
+      "mainProductCode": "主货号",
+      "subProductCode": "子货号",
       "module": "模块",
       "action": "动作",
-      "resourceType": "资源类型",
       "startTime": "开始时间",
       "endTime": "结束时间",
       "reset": "重置",
@@ -2385,6 +2438,14 @@
       "passwordWrong": "旧密码错误",
       "passwordWeak": "密码强度不足"
     },
+    "validation": {
+      "phoneInvalid": "手机号格式不正确",
+      "oldPasswordRequired": "当前密码不能为空",
+      "newPasswordRequired": "新密码不能为空",
+      "passwordLength": "密码长度为 8-20 位",
+      "passwordComplexity": "密码必须包含大写字母、小写字母和数字",
+      "confirmPasswordRequired": "确认密码不能为空"
+    },
     "menuLabels": {
       "profile": "个人中心"
     }
@@ -2489,6 +2550,7 @@
       "origin": "原产国",
       "hsCode": "HS编码",
       "factoryIds": "关联工厂",
+      "factorySearchPlaceholder": "搜索工厂",
       "remarks": "备注",
       "remarksPlaceholder": "来源：item_size 升格"
     },
@@ -2532,14 +2594,12 @@
       "withImg": "有图片"
     },
     "filter": {
-      "code": "品番",
-      "codePlaceholder": "输入品番搜索",
-      "orderGroup": "批次号",
-      "orderGroupPlaceholder": "输入批次号搜索",
+      "code": "型号(货号)",
+      "codePlaceholder": "输入型号搜索",
+      "container": "货柜号",
+      "containerPlaceholder": "输入货柜号搜索",
       "itemName": "品名",
       "itemNamePlaceholder": "输入品名搜索",
-      "updater": "更新人",
-      "updaterPlaceholder": "输入更新人搜索",
       "search": "查询",
       "reset": "重置",
       "overdueOnly": "只显示超期(バン詰め)"
@@ -2551,6 +2611,7 @@
       "infoFile1": "说明书(自)",
       "infoFile2": "说明书(工)",
       "updater": "担当者",
+      "material": "担当者",
       "note": "备注(评论)",
       "image": "商品图片",
       "itemName": "新品中文名",
@@ -2574,7 +2635,8 @@
       "totalJp": "合計(円)",
       "rate": "為替レート",
       "container": "货柜号",
-      "action": "操作"
+      "action": "操作",
+      "boxNum": "箱号"
     },
     "action": {
       "detail": "详情",
@@ -2691,6 +2753,9 @@
       "note": "备注",
       "updater": "更新人",
       "updatetime": "更新时间"
+    },
+    "receive": {
+      "transiting": "运输中"
     }
   },
   "dispatch": {
@@ -2775,8 +2840,12 @@
     "filter": {
       "code": "货号",
       "codeHint": "输入货号搜索",
-      "itemName": "品名",
-      "itemNameHint": "输入品名搜索",
+      "location": "所在地",
+      "locationHint": "输入所在地搜索",
+      "souko": "仓库",
+      "soukoHint": "输入仓库搜索",
+      "destination": "目的地",
+      "destinationHint": "输入目的地搜索",
       "factory": "工厂",
       "factoryHint": "输入工厂搜索",
       "arrival": "到着状态",
@@ -2790,6 +2859,11 @@
     "column": {
       "id": "ID",
       "code": "货号",
+      "manager": "担当者",
+      "destination": "目的地",
+      "tax": "税",
+      "material": "材质",
+      "kensa": "检查",
       "subCode": "支番",
       "houkoku": "退税",
       "infoFile": "信息来源",
@@ -2810,9 +2884,21 @@
       "link": "链接",
       "updater": "更新者",
       "updatetime": "更新时间",
+      "updatetimelegacy": "更新时间",
+      "updateuser": "更新者",
       "inventoryNote": "库存备注",
       "rireki": "履历",
-      "actions": "操作"
+      "actions": "操作",
+      "pieces": "件数",
+      "num": "数量",
+      "weight": "重量",
+      "weight2": "毛重",
+      "length": "长度",
+      "location": "所在地",
+      "date1": "日期",
+      "status": "状态",
+      "other": "备注",
+      "showFlag": "显示标记"
     },
     "arrivalStatus": {
       "out": "出完",
@@ -2828,6 +2914,8 @@
     "drawerSection": {
       "basic": "基本信息",
       "date": "日期信息",
+      "dateStatus": "日期与状态",
+      "weightSize": "重量与尺寸",
       "factory": "工厂信息",
       "memo": "备注信息",
       "audit": "审计信息",

@@ -54,7 +54,7 @@ const copyColumns: ExcelColDef[] = [
   { prop: 'totalCbm', label: t('logistics.pool.column.totalCbm'), formatter: (row) => row.totalCbm != null ? row.totalCbm.toFixed(4) : '' },
   { prop: 'totalWeightKg', label: t('logistics.pool.column.totalWeightKg'), formatter: (row) => row.totalWeightKg != null ? row.totalWeightKg.toFixed(2) : '' },
   { prop: 'planCount', label: t('logistics.pool.column.planCount'), formatter: (row) => row.planCount != null ? String(row.planCount) : '' },
-  { prop: 'containerThresholdCbm', label: t('logistics.pool.column.threshold'), formatter: (row) => `${row.containerThresholdCbm ?? 70} m³` },
+  { prop: 'containerThresholdCbm', label: t('logistics.pool.column.threshold'), formatter: (row) => `${row.containerThresholdCbm ?? 70} ${t('common.units.m3')}` },
   { prop: 'status', label: t('logistics.pool.column.status'), formatter: (row) => poolStatusLabel(row.status) },
   { prop: 'createTime', label: t('logistics.column.createTime'), formatter: (row) => formatTime(row.createTime) },
   { prop: 'action', label: t('logistics.column.actions'), excluded: true },

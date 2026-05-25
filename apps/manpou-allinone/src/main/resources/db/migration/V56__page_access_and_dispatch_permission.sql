@@ -141,10 +141,12 @@ WHERE r.role_code = 'OPERATOR'
   )
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- VIEWER: 全部只读页面（查看权限）
+-- VIEWER: 全部 page 权限（可查看所有页面）
 INSERT INTO role_permission (role_id, permission_id)
 SELECT r.id, p.id FROM role r, permission p
-WHERE r.role_code = 'VIEWER'
+WHERE r.role_code = 'VIEWER' AND p.permission_code LIKE 'page:%'
+ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
+
 -- G6: cargo_size/dispatch/legacy_procurement page 访问权限（基础数据菜单守卫，IDs 158~160）
 -- ================================================================
 -- 七、page:cargo_size:access / page:dispatch:access / page:legacy_procurement:access（IDs 158~160）

@@ -125,6 +125,14 @@ public class AuditLogService {
             if (query.getResourceId() != null && !query.getResourceId().isBlank()) {
                 predicates.add(cb.equal(root.get("resourceId"), query.getResourceId()));
             }
+            if (query.getMainProductCode() != null && !query.getMainProductCode().isBlank()) {
+                predicates.add(cb.like(root.get("detail"),
+                    "%\"mainProductCode\":\"" + query.getMainProductCode() + "\"%"));
+            }
+            if (query.getSubProductCode() != null && !query.getSubProductCode().isBlank()) {
+                predicates.add(cb.like(root.get("detail"),
+                    "%\"subProductCode\":\"" + query.getSubProductCode() + "\"%"));
+            }
             if (query.getStartTime() != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("createTime"), query.getStartTime()));
             }

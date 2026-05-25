@@ -84,7 +84,7 @@
             <el-tag type="info" size="small">{{ $t('common.batch.selectedCount', { n: selectedRows.length }) }}</el-tag>
           </span>
           <el-button
-            v-if="selectedRows.length"
+            v-if="selectedRows.length && hasPermission('sales:delete')"
             type="danger"
             size="small"
             @click="onBatchDelete"
@@ -227,7 +227,7 @@
           <el-input v-model="createForm.productCode" :placeholder="$t('sales.form.productCodePlaceholder')" />
         </el-form-item>
         <el-form-item :label="$t('sales.form.subProductCode')">
-          <el-input v-model="createForm.subProductCode" placeholder="re / wh / bk" />
+          <el-input v-model="createForm.subProductCode" :placeholder="$t('sales.form.subProductCodePlaceholder')" />
         </el-form-item>
         <el-form-item :label="$t('sales.form.salesChannel')" required>
           <el-select v-model="createForm.salesChannel" style="width:100%">

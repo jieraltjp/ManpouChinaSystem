@@ -9,6 +9,8 @@ import com.manpou.allinone.legacyprocurement.application.dto.LegacyProcurementUp
 import com.manpou.allinone.legacyprocurement.application.usecase.LegacyProcurementUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +31,12 @@ public class LegacyProcurementController {
     @PreAuthorize("hasAuthority('legacy_procurement:read')")
     public Result<LegacyProcurementStatsDTO> stats() {
         return Result.ok(useCase.stats());
+    }
+
+    @GetMapping("/overdue")
+    @PreAuthorize("hasAuthority('legacy_procurement:read')")
+    public Result<List<LegacyProcurementPageVO>> overdueAll() {
+        return Result.ok(useCase.overdueAll());
     }
 
     @GetMapping("/{id}")

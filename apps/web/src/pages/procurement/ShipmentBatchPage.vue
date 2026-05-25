@@ -427,4 +427,11 @@ onMounted(() => {
 .pagination-wrap { margin-top: 16px; display: flex; justify-content: flex-end; }
 .batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .selection-count { margin-left: 4px; }
+:deep(.el-table__header-wrapper),
+:deep(.el-table__header th.el-table__cell) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: inherit;
+}
 </style>

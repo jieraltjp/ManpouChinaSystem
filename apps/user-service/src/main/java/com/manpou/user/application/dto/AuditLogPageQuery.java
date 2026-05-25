@@ -21,6 +21,10 @@ public class AuditLogPageQuery {
 
     private String resourceId;
 
+    private String mainProductCode;
+
+    private String subProductCode;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime startTime;
 

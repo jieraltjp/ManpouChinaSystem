@@ -1,5 +1,6 @@
 package com.manpou.allinone.product.interfaces.controller;
 
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.result.Result;
 import com.manpou.allinone.product.application.usecase.ItemSizeImportService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class ItemSizeImportController {
      */
     @PostMapping("/item-size/import")
     @PreAuthorize("hasAuthority('product:create')")
+    @AuditLog(module = "item_size", action = "IMPORT", resourceType = "item_size")
     public Result<Map<String, Object>> triggerImport() {
         log.info("手动触发 item_size 导入...");
         ItemSizeImportService.ImportReport report = itemSizeImportService.runImport();

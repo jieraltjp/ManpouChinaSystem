@@ -12,6 +12,7 @@ import com.manpou.user.domain.model.User;
 import com.manpou.user.domain.repository.PermissionRepository;
 import com.manpou.user.domain.repository.RoleRepository;
 import com.manpou.user.domain.repository.UserRepository;
+import com.manpou.user.infrastructure.security.JwtContextHolder;
 import com.manpou.user.infrastructure.security.JwtKeyManager;
 import com.manpou.user.infrastructure.security.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -153,6 +154,16 @@ public class AuthController {
         return Result.ok();
     }
 
+    /**
+     * 用户登出（记录审计日志）。
+     */
+    @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
+    public Result<Void> logout(HttpServletRequest request) {
+        auditLogout(request);
+        return Result.ok();
+    }
+
     // ==================== 审计日志 ====================
 
     private void auditLogin(String userId, String username, String userName, HttpServletRequest request) {
@@ -171,6 +182,26 @@ public class AuthController {
             auditLogService.save(al);
         } catch (Exception ex) {
             log.warn("[AuditLog] LOGIN audit failed: userId={}, error={}", userId, ex.getMessage());
+        }
+    }
+
+    private void auditLogout(HttpServletRequest request) {
+        try {
+            AuditLog al = new AuditLog();
+            al.setTraceId(getCurrentTraceId());
+            al.setUserId(JwtContextHolder.getUserId());
+            al.setUsername(JwtContextHolder.getUsername());
+            al.setOperatorName(JwtContextHolder.getOperatorName());
+            al.setModule("auth");
+            al.setAction("LOGOUT");
+            al.setHttpMethod("POST");
+            al.setHttpUrl("/api/v1/auth/logout");
+            al.setIpAddress(getClientIp(request));
+            al.setUserAgent(truncate(request.getHeader("User-Agent"), 512));
+            al.setCreateTime(java.time.LocalDateTime.now());
+            auditLogService.save(al);
+        } catch (Exception ex) {
+            log.warn("[AuditLog] LOGOUT audit failed: error={}", ex.getMessage());
         }
     }
 

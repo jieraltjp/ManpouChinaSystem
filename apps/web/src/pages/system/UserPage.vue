@@ -5,7 +5,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#409EFF"><User /></el-icon></div>
+            <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#E8650A"><User /></el-icon></div>
             <div>
               <div class="stat-value">{{ stats.total }}</div>
               <div class="stat-label">{{ $t('user.stat.total') }}</div>
@@ -475,5 +475,5 @@ loadUsers()
 .filter-card { margin-bottom: 16px; }
 .table-card { }
 .pagination-wrap { display:flex; justify-content:flex-end; margin-top:16px; }
-.btn-blue { color:#409EFF; }
+.btn-blue { color:#E8650A; }
 </style>

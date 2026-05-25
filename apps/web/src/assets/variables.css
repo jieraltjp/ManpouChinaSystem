@@ -244,9 +244,9 @@ a:hover {
   letter-spacing: 0.3px;
 }
 
-/* ── 操作列「详情」按钮：Element Plus link 型按钮用蓝色文字 ── */
+/* ── 操作列「详情」按钮：Element Plus link 型按钮用橙色 ── */
 .btn-blue {
-  color: #409EFF !important;
+  color: var(--color-primary) !important;
 }
 
 /* ── 抽屉底部操作区：全部隐藏 ── */

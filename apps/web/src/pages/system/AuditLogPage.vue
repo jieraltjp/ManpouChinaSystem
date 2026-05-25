@@ -13,11 +13,14 @@
             <el-option v-for="a in ACTION_OPTIONS" :key="a" :label="$t(`auditLog.actionTag.${a}`)" :value="a" />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('auditLog.filter.resourceType')">
-          <el-input v-model="filterForm.resourceType" :placeholder="$t('auditLog.filter.resourceType')" clearable style="width:140px" />
-        </el-form-item>
         <el-form-item :label="$t('auditLog.filter.userId')">
           <el-input v-model="filterForm.userId" :placeholder="$t('auditLog.filter.userId')" clearable style="width:140px" />
+        </el-form-item>
+        <el-form-item :label="$t('auditLog.filter.mainProductCode')">
+          <el-input v-model="filterForm.mainProductCode" :placeholder="$t('auditLog.filter.mainProductCode')" clearable style="width:140px" />
+        </el-form-item>
+        <el-form-item :label="$t('auditLog.filter.subProductCode')">
+          <el-input v-model="filterForm.subProductCode" :placeholder="$t('auditLog.filter.subProductCode')" clearable style="width:140px" />
         </el-form-item>
         <el-form-item :label="$t('auditLog.filter.startTime')">
           <el-date-picker v-model="filterForm.startTime" type="datetime" :placeholder="$t('auditLog.filter.startTime')"
@@ -65,7 +68,6 @@
           </template>
         </el-table-column>
         <el-table-column prop="httpUrl" :label="$t('auditLog.column.httpUrl')" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="resourceType" :label="$t('auditLog.column.resourceType')" min-width="100" />
         <el-table-column prop="ipAddress" :label="$t('auditLog.column.ipAddress')" min-width="130" />
         <el-table-column :label="$t('auditLog.column.detail')" width="90" align="center">
           <template #default="{ row }">
@@ -101,7 +103,6 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('auditLog.column.httpMethod')">{{ currentLog?.httpMethod }}</el-descriptions-item>
         <el-descriptions-item :label="$t('auditLog.column.httpUrl')">{{ currentLog?.httpUrl }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('auditLog.column.resourceType')">{{ currentLog?.resourceType || '—' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('auditLog.column.resourceId')">{{ currentLog?.resourceId || '—' }}</el-descriptions-item>
         <el-descriptions-item :label="$t('auditLog.column.ipAddress')">{{ currentLog?.ipAddress }}</el-descriptions-item>
         <el-descriptions-item :label="$t('auditLog.column.traceId')">{{ currentLog?.traceId || '—' }}</el-descriptions-item>
@@ -153,7 +154,6 @@ const copyColumns: ExcelColDef[] = [
   { prop: 'action', label: t('auditLog.column.action'), formatter: (row: AuditLogVO) => t(`auditLog.actionTag.${row.action}`, row.action) },
   { prop: 'httpMethod', label: t('auditLog.column.httpMethod') },
   { prop: 'httpUrl', label: t('auditLog.column.httpUrl') },
-  { prop: 'resourceType', label: t('auditLog.column.resourceType') },
   { prop: 'ipAddress', label: t('auditLog.column.ipAddress') },
   { prop: 'detail', label: t('auditLog.column.detail'), excluded: true },
 ]
@@ -162,8 +162,9 @@ const pagination = reactive({ page: 1, size: 20, total: 0 })
 const filterForm = reactive({
   module: '',
   action: '',
-  resourceType: '',
   userId: '',
+  mainProductCode: '',
+  subProductCode: '',
   startTime: '',
   endTime: '',
 })
@@ -188,8 +189,9 @@ async function loadData() {
     const res = await pageAuditLogs({
       module: filterForm.module || undefined,
       action: filterForm.action || undefined,
-      resourceType: filterForm.resourceType || undefined,
       userId: filterForm.userId || undefined,
+      mainProductCode: filterForm.mainProductCode || undefined,
+      subProductCode: filterForm.subProductCode || undefined,
       startTime: filterForm.startTime || undefined,
       endTime: filterForm.endTime || undefined,
       page: pagination.page - 1,
@@ -217,8 +219,9 @@ function onSearch() {
 function onReset() {
   filterForm.module = ''
   filterForm.action = ''
-  filterForm.resourceType = ''
   filterForm.userId = ''
+  filterForm.mainProductCode = ''
+  filterForm.subProductCode = ''
   filterForm.startTime = ''
   filterForm.endTime = ''
   pagination.page = 1
@@ -261,7 +264,7 @@ loadData()
   border-radius: 4px;
 }
 .http-get { color: #67C23A; background: #f0f9eb; }
-.http-post { color: #409EFF; background: #ecf5ff; }
+.http-post { color: #E8650A; background: #FFF3EB; }
 .http-put, .http-patch { color: #E6A23C; background: #fdf6ec; }
 .http-delete { color: #F56C6C; background: #fef0f0; }
 .detail-json {

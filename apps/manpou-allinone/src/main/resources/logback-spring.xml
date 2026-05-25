@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  logback-spring.xml — 结构化 JSON 日志配置（manpou-allinone）
+
+  生产环境：输出 JSON 格式，供 Prometheus/Graylog/ES 解析
+  本地开发：彩色控制台输出，便于阅读
+
+  使用方式：application.yml 中指定 spring.profiles.active
+-->
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <!-- 引入 Spring Boot 默认配置（便于覆盖） -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <!-- 定义 traceId 的 MDC key（由 TraceFilter 注入） -->
+    <property name="TRACE_ID_KEY" value="traceId"/>
+
+    <!-- ================================================
+         1. JSON 结构化日志 appender（生产环境）
+         ================================================ -->
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/${APP_NAME:-manpou-allinone}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/${APP_NAME:-manpou-allinone}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service":"${APP_NAME:-manpou-allinone}","env":"${SPRING_PROFILES_ACTIVE:-unknown}"}</customFields>
+        </encoder>
+    </appender>
+
+    <!-- JSON Console Appender（用于容器 stdout） -->
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service":"${APP_NAME:-manpou-allinone}","env":"${SPRING_PROFILES_ACTIVE:-unknown}"}</customFields>
+        </encoder>
+    </appender>
+
+    <!-- ================================================
+         2. 标准控制台 appender（本地开发）
+         ================================================ -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%cyan(${TRACE_ID_KEY:-N/A})] %yellow([%thread]) %green(%logger{36}) - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ================================================
+         3. 异步 appender（生产环境，提升性能）
+         ================================================ -->
+    <appender name="ASYNC_JSON" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>true</includeCallerData>
+        <appender-ref ref="JSON_CONSOLE"/>
+    </appender>
+
+    <!-- ================================================
+         4. 审计日志 appender（单独记录业务操作）
+         ================================================ -->
+    <appender name="AUDIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/audit.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/audit.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>200MB</maxFileSize>
+            <maxHistory>90</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service":"${APP_NAME:-manpou-allinone}","logType":"audit"}</customFields>
+        </encoder>
+    </appender>
+
+    <!-- ================================================
+         4b. 错误日志 appender（仅 ERROR/FATAL，写入独立文件）
+         ================================================ -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service":"${APP_NAME:-manpou-allinone}","logType":"error"}</customFields>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- ================================================
+         5. Profile 分组
+         ================================================ -->
+    <!-- 生产环境：JSON 日志 + 审计日志 + 错误日志 -->
+    <springProfile name="prod,production">
+        <root level="INFO">
+            <appender-ref ref="ASYNC_JSON"/>
+            <appender-ref ref="JSON_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+        <logger name="com.manpou" level="INFO"/>
+        <logger name="com.manpou.audit" level="INFO" additivity="false">
+            <appender-ref ref="AUDIT_FILE"/>
+        </logger>
+    </springProfile>
+
+    <!-- 测试环境：JSON 控制台 -->
+    <springProfile name="test,staging">
+        <root level="INFO">
+            <appender-ref ref="JSON_CONSOLE"/>
+        </root>
+        <logger name="com.manpou" level="DEBUG"/>
+    </springProfile>
+
+    <!-- 本地开发：标准彩色控制台 -->
+    <springProfile name="local,dev">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+        <logger name="com.manpou" level="DEBUG"/>
+        <logger name="org.springframework.web" level="DEBUG"/>
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
+    </springProfile>
+
+    <!-- 默认（无 profile）：JSON 控制台 -->
+    <springProfile name="default">
+        <root level="INFO">
+            <appender-ref ref="JSON_CONSOLE"/>
+        </root>
+        <logger name="com.manpou" level="INFO"/>
+    </springProfile>
+
+    <!-- ================================================
+         6. 第三方库日志级别控制
+         ================================================ -->
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.springframework.cloud" level="INFO"/>
+    <logger name="com.alibaba.cloud" level="INFO"/>
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.hibernate.SQL" level="WARN"/>
+    <logger name="org.apache.kafka" level="WARN"/>
+    <logger name="io.lettuce" level="WARN"/>
+    <logger name="io.shardingsphere" level="WARN"/>
+
+    <!-- 敏感信息脱敏（禁止打印密码等） -->
+    <logger name="com.manpou" level="DEBUG">
+        <evaluator class="ch.qos.logback.classic.boolex.JaninoEventEvaluator">
+            <expression>return message.contains("password") || message.contains("secret") || message.contains("token");</expression>
+        </evaluator>
+    </logger>
+
+</configuration>

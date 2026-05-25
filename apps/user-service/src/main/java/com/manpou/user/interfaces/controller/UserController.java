@@ -1,5 +1,6 @@
 package com.manpou.user.interfaces.controller;
 
+import com.manpou.common.annotation.AuditLog;
 import com.manpou.common.result.Result;
 import com.manpou.user.application.dto.*;
 import com.manpou.user.application.service.UserService;
@@ -43,6 +44,7 @@ public class UserController {
      */
     @PostMapping
     @PreAuthorize("hasAuthority('user:create')")
+    @AuditLog(module = "user", action = "CREATE", resourceType = "user")
     public Result<UserVO> create(@Valid @RequestBody UserCreateCmd cmd) {
         return Result.ok(userService.create(cmd));
     }
@@ -52,6 +54,7 @@ public class UserController {
      */
     @PutMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('user:update')")
+    @AuditLog(module = "user", action = "UPDATE", resourceType = "user", resourceId = "#id")
     public Result<UserVO> update(@PathVariable Long id,
                                   @RequestBody UserUpdateCmd cmd) {
         return Result.ok(userService.update(id, cmd));
@@ -62,6 +65,7 @@ public class UserController {
      */
     @DeleteMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('user:delete')")
+    @AuditLog(module = "user", action = "DELETE", resourceType = "user", resourceId = "#id")
     public Result<Void> delete(@PathVariable Long id) {
         userService.delete(id);
         return Result.ok();
@@ -72,6 +76,7 @@ public class UserController {
      */
     @PutMapping("/{id:\\d+}/status")
     @PreAuthorize("hasAuthority('user:update')")
+    @AuditLog(module = "user", action = "UPDATE_STATUS", resourceType = "user", resourceId = "#id")
     public Result<Void> updateStatus(@PathVariable Long id,
                                      @RequestBody UserStatusCmd cmd) {
         userService.updateStatus(id, cmd.getStatus());
@@ -83,6 +88,7 @@ public class UserController {
      */
     @PutMapping("/{id:\\d+}/password/reset")
     @PreAuthorize("hasAuthority('user:reset_password')")
+    @AuditLog(module = "user", action = "RESET_PASSWORD", resourceType = "user", resourceId = "#id")
     public Result<PasswordResetVO> resetPassword(@PathVariable Long id) {
         return Result.ok(userService.resetPassword(id));
     }
@@ -92,6 +98,7 @@ public class UserController {
      */
     @PutMapping("/{id:\\d+}/roles")
     @PreAuthorize("hasAuthority('user:update')")
+    @AuditLog(module = "user", action = "ASSIGN_ROLES", resourceType = "user_role", resourceId = "#id")
     public Result<Void> assignRoles(@PathVariable Long id,
                                     @RequestBody UserRolesCmd cmd) {
         userService.assignRoles(id, cmd.getRoleIds());

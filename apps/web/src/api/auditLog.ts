@@ -32,6 +32,8 @@ export interface AuditLogPageQuery {
   action?: string
   resourceType?: string
   resourceId?: string
+  mainProductCode?: string
+  subProductCode?: string
   startTime?: string
   endTime?: string
   page?: number

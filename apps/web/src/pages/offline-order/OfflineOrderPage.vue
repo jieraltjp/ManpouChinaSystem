@@ -6,18 +6,14 @@
         <el-form-item :label="$t('offlineOrder.filter.code')">
           <el-input v-model="filter.code" :placeholder="$t('offlineOrder.filter.codeHint')" clearable style="width: 140px" />
         </el-form-item>
-        <el-form-item :label="$t('offlineOrder.filter.itemName')">
-          <el-input v-model="filter.itemName" :placeholder="$t('offlineOrder.filter.itemNameHint')" clearable style="width: 160px" />
+        <el-form-item :label="$t('offlineOrder.filter.location')">
+          <el-input v-model="filter.location" :placeholder="$t('offlineOrder.filter.locationHint')" clearable style="width: 140px" />
         </el-form-item>
-        <el-form-item :label="$t('offlineOrder.filter.factory')">
-          <el-input v-model="filter.factory" :placeholder="$t('offlineOrder.filter.factoryHint')" clearable style="width: 140px" />
+        <el-form-item :label="$t('offlineOrder.filter.souko')">
+          <el-input v-model="filter.souko" :placeholder="$t('offlineOrder.filter.soukoHint')" clearable style="width: 140px" />
         </el-form-item>
-        <el-form-item :label="$t('offlineOrder.filter.arrival')">
-          <el-select v-model="filter.arrival" :placeholder="$t('offlineOrder.filter.arrivalHint')" clearable style="width: 120px">
-            <el-option :label="$t('offlineOrder.filter.all')" value="" />
-            <el-option :label="$t('offlineOrder.arrivalStatus.out')" value="OUT" />
-            <el-option :label="$t('offlineOrder.arrivalStatus.notOut')" value="NOT_OUT" />
-          </el-select>
+        <el-form-item :label="$t('offlineOrder.filter.destination')">
+          <el-input v-model="filter.destination" :placeholder="$t('offlineOrder.filter.destinationHint')" clearable style="width: 140px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="loadData">{{ $t('offlineOrder.filter.search') }}</el-button>
@@ -34,26 +30,22 @@
       <el-table :data="tableData" v-loading="loading" stripe style="width: 100%">
         <el-table-column type="selection" width="40" align="center" />
         <el-table-column :label="$t('offlineOrder.column.code')" prop="code" show-overflow-tooltip min-width="120" />
-        <el-table-column :label="$t('offlineOrder.column.subCode')" prop="subCode" show-overflow-tooltip min-width="100" />
-        <el-table-column :label="$t('offlineOrder.column.houkoku')" prop="houkoku" show-overflow-tooltip min-width="100" />
-        <el-table-column :label="$t('offlineOrder.column.itemName')" prop="itemName" show-overflow-tooltip min-width="140" />
-        <el-table-column :label="$t('offlineOrder.column.volumeCount')" prop="volumeCount" show-overflow-tooltip min-width="100" />
-        <el-table-column :label="$t('offlineOrder.column.orderCount')" prop="orderCount" show-overflow-tooltip min-width="100" />
-        <el-table-column :label="$t('offlineOrder.column.expectedDate')" prop="expectedDate" show-overflow-tooltip min-width="110" />
-        <el-table-column :label="$t('offlineOrder.column.orderDate')" prop="orderDate" show-overflow-tooltip min-width="110" />
-        <el-table-column :label="$t('offlineOrder.column.arrival')" prop="arrival" width="110">
-          <template #default="{ row }">
-            <el-tag :type="arrivalTagType(row.arrival)" size="small">{{ arrivalLabel(row.arrival) }}</el-tag>
-          </template>
-        </el-table-column>
+        <el-table-column :label="$t('offlineOrder.column.manager')" prop="manager" show-overflow-tooltip min-width="100" />
+        <el-table-column :label="$t('offlineOrder.column.destination')" prop="destination" show-overflow-tooltip min-width="100" />
+        <el-table-column :label="$t('offlineOrder.column.tax')" prop="tax" show-overflow-tooltip min-width="80" />
+        <el-table-column :label="$t('offlineOrder.column.material')" prop="material" show-overflow-tooltip min-width="100" />
+        <el-table-column :label="$t('offlineOrder.column.kensa')" prop="kensa" show-overflow-tooltip min-width="80" />
+        <el-table-column :label="$t('offlineOrder.column.pieces')" prop="pieces" show-overflow-tooltip min-width="80" />
+        <el-table-column :label="$t('offlineOrder.column.num')" prop="num" show-overflow-tooltip min-width="80" />
+        <el-table-column :label="$t('offlineOrder.column.date1')" prop="date1" show-overflow-tooltip min-width="110" />
+        <el-table-column :label="$t('offlineOrder.column.status')" prop="status" show-overflow-tooltip min-width="100" />
+        <el-table-column :label="$t('offlineOrder.column.location')" prop="location" show-overflow-tooltip min-width="120" />
         <el-table-column :label="$t('offlineOrder.column.unitCh')" prop="unitCh" show-overflow-tooltip min-width="80" />
         <el-table-column :label="$t('offlineOrder.column.rate')" prop="rate" show-overflow-tooltip min-width="80" />
-        <el-table-column :label="$t('offlineOrder.column.souko')" prop="souko" show-overflow-tooltip min-width="100" />
-        <el-table-column :label="$t('offlineOrder.column.factory')" prop="factory" show-overflow-tooltip min-width="120" />
-        <el-table-column :label="$t('offlineOrder.column.contactor')" prop="contactor" show-overflow-tooltip min-width="100" />
-        <el-table-column :label="$t('offlineOrder.column.contactorTel')" prop="contactorTel" show-overflow-tooltip min-width="120" />
-        <el-table-column :label="$t('offlineOrder.column.principal')" prop="principal" show-overflow-tooltip min-width="100" />
-        <el-table-column :label="$t('offlineOrder.column.updater')" prop="updater" show-overflow-tooltip min-width="100" />
+        <el-table-column :label="$t('offlineOrder.column.souko')" prop="souko" show-overflow-tooltip min-width="120" />
+        <el-table-column :label="$t('offlineOrder.column.factory')" prop="factoryAddr" show-overflow-tooltip min-width="120" />
+        <el-table-column :label="$t('offlineOrder.column.updateuser')" prop="updateuser" show-overflow-tooltip min-width="100" />
+        <el-table-column :label="$t('offlineOrder.column.updatetimelegacy')" prop="updatetime" show-overflow-tooltip min-width="150" />
         <el-table-column :label="$t('offlineOrder.column.actions')" width="160">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click="onDetail(row)">{{ $t('offlineOrder.dialog.detail') }}</el-button>
@@ -82,7 +74,7 @@
       v-model="detailVisible"
       :title="$t('offlineOrder.drawerTitle')"
       direction="rtl"
-      size="680px"
+      size="720px"
     >
       <div class="drawer-content">
         <!-- Basic Info -->
@@ -93,32 +85,62 @@
             <span class="detail-value">{{ currentRow?.code || '-' }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.subCode') }}:</span>
-            <span class="detail-value">{{ currentRow?.subCode || '-' }}</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.manager') }}:</span>
+            <span class="detail-value">{{ currentRow?.manager || '-' }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.houkoku') }}:</span>
-            <span class="detail-value">{{ currentRow?.houkoku || '-' }}</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.destination') }}:</span>
+            <span class="detail-value">{{ currentRow?.destination || '-' }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.infoFile') }}:</span>
-            <span class="detail-value">{{ currentRow?.infoFile || '-' }}</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.tax') }}:</span>
+            <span class="detail-value">{{ currentRow?.tax || '-' }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.itemName') }}:</span>
-            <span class="detail-value">{{ currentRow?.itemName || '-' }}</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.material') }}:</span>
+            <span class="detail-value">{{ currentRow?.material || '-' }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.volumeCount') }}:</span>
-            <span class="detail-value">{{ currentRow?.volumeCount ?? '-' }}</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.kensa') }}:</span>
+            <span class="detail-value">{{ currentRow?.kensa || '-' }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.orderCount') }}:</span>
-            <span class="detail-value">{{ currentRow?.orderCount ?? '-' }}</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.pieces') }}:</span>
+            <span class="detail-value">{{ currentRow?.pieces ?? '-' }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.arrival') }}:</span>
-            <span class="detail-value">{{ arrivalLabel(currentRow?.arrival) }}</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.num') }}:</span>
+            <span class="detail-value">{{ currentRow?.num ?? '-' }}</span>
+          </div>
+        </div>
+
+        <!-- Weight & Size -->
+        <div class="drawer-section-title">{{ $t('offlineOrder.drawerSection.weightSize') }}</div>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">{{ $t('offlineOrder.column.weight') }}:</span>
+            <span class="detail-value">{{ currentRow?.weight ?? '-' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ $t('offlineOrder.column.weight2') }}:</span>
+            <span class="detail-value">{{ currentRow?.weight2 ?? '-' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ $t('offlineOrder.column.length') }}:</span>
+            <span class="detail-value">{{ currentRow?.length ?? '-' }}</span>
+          </div>
+        </div>
+
+        <!-- Date & Status -->
+        <div class="drawer-section-title">{{ $t('offlineOrder.drawerSection.dateStatus') }}</div>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">{{ $t('offlineOrder.column.date1') }}:</span>
+            <span class="detail-value">{{ currentRow?.date1 || '-' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ $t('offlineOrder.column.status') }}:</span>
+            <span class="detail-value">{{ currentRow?.status || '-' }}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">{{ $t('offlineOrder.column.unitCh') }}:</span>
@@ -130,41 +152,20 @@
           </div>
         </div>
 
-        <!-- Date Info -->
-        <div class="drawer-section-title">{{ $t('offlineOrder.drawerSection.date') }}</div>
-        <div class="detail-grid">
-          <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.expectedDate') }}:</span>
-            <span class="detail-value">{{ currentRow?.expectedDate || '-' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.orderDate') }}:</span>
-            <span class="detail-value">{{ currentRow?.orderDate || '-' }}</span>
-          </div>
-        </div>
-
         <!-- Factory Info -->
         <div class="drawer-section-title">{{ $t('offlineOrder.drawerSection.factory') }}</div>
         <div class="detail-grid">
           <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.factory') }}:</span>
-            <span class="detail-value">{{ currentRow?.factory || '-' }}</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.location') }}:</span>
+            <span class="detail-value">{{ currentRow?.location || '-' }}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">{{ $t('offlineOrder.column.souko') }}:</span>
             <span class="detail-value">{{ currentRow?.souko || '-' }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.contactor') }}:</span>
-            <span class="detail-value">{{ currentRow?.contactor || '-' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.contactorTel') }}:</span>
-            <span class="detail-value">{{ currentRow?.contactorTel || '-' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.principal') }}:</span>
-            <span class="detail-value">{{ currentRow?.principal || '-' }}</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.factory') }}:</span>
+            <span class="detail-value">{{ currentRow?.factoryAddr || '-' }}</span>
           </div>
         </div>
 
@@ -172,16 +173,12 @@
         <div class="drawer-section-title">{{ $t('offlineOrder.drawerSection.memo') }}</div>
         <div class="detail-grid">
           <div class="detail-item full-width">
-            <span class="detail-label">{{ $t('offlineOrder.column.inventoryNote') }}:</span>
-            <span class="detail-value">{{ currentRow?.inventoryNote || '-' }}</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.other') }}:</span>
+            <span class="detail-value">{{ currentRow?.other || '-' }}</span>
           </div>
           <div class="detail-item full-width">
-            <span class="detail-label">{{ $t('offlineOrder.column.memo') }}:</span>
-            <span class="detail-value">{{ currentRow?.memo || '-' }}</span>
-          </div>
-          <div class="detail-item full-width">
-            <span class="detail-label">{{ $t('offlineOrder.column.link') }}:</span>
-            <span class="detail-value">{{ currentRow?.link || '-' }}</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.rireki') }}:</span>
+            <span class="detail-value">{{ currentRow?.rireki || '-' }}</span>
           </div>
         </div>
 
@@ -189,11 +186,11 @@
         <div class="drawer-section-title">{{ $t('offlineOrder.drawerSection.audit') }}</div>
         <div class="detail-grid">
           <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.updater') }}:</span>
-            <span class="detail-value">{{ currentRow?.updater || '-' }}</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.updateuser') }}:</span>
+            <span class="detail-value">{{ currentRow?.updateuser || '-' }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">{{ $t('offlineOrder.column.updatetime') }}:</span>
+            <span class="detail-label">{{ $t('offlineOrder.column.updatetimelegacy') }}:</span>
             <span class="detail-value">{{ formatDate(currentRow?.updatetime) }}</span>
           </div>
         </div>
@@ -205,8 +202,8 @@
     </el-drawer>
 
     <!-- Edit Dialog -->
-    <el-dialog v-model="editVisible" :title="editTitle" width="680px" destroy-on-close>
-      <el-form ref="formRef" :model="form" label-width="120px" style="padding: 0 8px">
+    <el-dialog v-model="editVisible" :title="editTitle" width="760px" destroy-on-close>
+      <el-form ref="formRef" :model="form" label-width="130px" style="padding: 0 8px">
         <!-- Basic Fields -->
         <div class="drawer-section-title">{{ $t('offlineOrder.drawerSection.basic') }}</div>
         <el-row :gutter="16">
@@ -216,79 +213,94 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.subCode')" prop="subCode">
-              <el-input v-model="form.subCode" :placeholder="$t('offlineOrder.column.subCode')" />
+            <el-form-item :label="$t('offlineOrder.column.manager')" prop="manager">
+              <el-input v-model="form.manager" :placeholder="$t('offlineOrder.column.manager')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.houkoku')" prop="houkoku">
-              <el-input v-model="form.houkoku" :placeholder="$t('offlineOrder.column.houkoku')" />
+            <el-form-item :label="$t('offlineOrder.column.destination')" prop="destination">
+              <el-input v-model="form.destination" :placeholder="$t('offlineOrder.column.destination')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.infoFile')" prop="infoFile">
-              <el-input v-model="form.infoFile" :placeholder="$t('offlineOrder.column.infoFile')" />
+            <el-form-item :label="$t('offlineOrder.column.tax')" prop="tax">
+              <el-input v-model="form.tax" :placeholder="$t('offlineOrder.column.tax')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.itemName')" prop="itemName">
-              <el-input v-model="form.itemName" :placeholder="$t('offlineOrder.column.itemName')" />
+            <el-form-item :label="$t('offlineOrder.column.material')" prop="material">
+              <el-input v-model="form.material" :placeholder="$t('offlineOrder.column.material')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.volumeCount')" prop="volumeCount">
-              <el-input-number v-model="form.volumeCount" :min="0" style="width: 100%" />
+            <el-form-item :label="$t('offlineOrder.column.kensa')" prop="kensa">
+              <el-input v-model="form.kensa" :placeholder="$t('offlineOrder.column.kensa')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.orderCount')" prop="orderCount">
-              <el-input-number v-model="form.orderCount" :min="0" style="width: 100%" />
+            <el-form-item :label="$t('offlineOrder.column.pieces')" prop="pieces">
+              <el-input-number v-model="form.pieces" :min="0" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.arrival')" prop="arrival">
-              <el-select v-model="form.arrival" :placeholder="$t('offlineOrder.filter.arrival')" style="width: 100%">
-                <el-option :label="$t('offlineOrder.filter.all')" value="" />
-                <el-option :label="$t('offlineOrder.arrivalStatus.out')" value="OUT" />
-                <el-option :label="$t('offlineOrder.arrivalStatus.notOut')" value="NOT_OUT" />
-              </el-select>
+            <el-form-item :label="$t('offlineOrder.column.num')" prop="num">
+              <el-input-number v-model="form.num" :min="0" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.unitCh')" prop="unitCh">
-              <el-input v-model="form.unitCh" :placeholder="$t('offlineOrder.column.unitCh')" />
+            <el-form-item :label="$t('offlineOrder.column.status')" prop="status">
+              <el-input v-model="form.status" :placeholder="$t('offlineOrder.column.status')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.rate')" prop="rate">
-              <el-input v-model="form.rate" :placeholder="$t('offlineOrder.column.rate')" />
+            <el-form-item :label="$t('offlineOrder.column.showFlag')" prop="showFlag">
+              <el-input-number v-model="form.showFlag" :min="0" style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <!-- Date Fields -->
-        <div class="drawer-section-title">{{ $t('offlineOrder.drawerSection.date') }}</div>
+        <!-- Weight & Size Fields -->
+        <div class="drawer-section-title">{{ $t('offlineOrder.drawerSection.weightSize') }}</div>
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.expectedDate')" prop="expectedDate">
+            <el-form-item :label="$t('offlineOrder.column.weight')" prop="weight">
+              <el-input-number v-model="form.weight" :min="0" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('offlineOrder.column.weight2')" prop="weight2">
+              <el-input-number v-model="form.weight2" :min="0" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('offlineOrder.column.length')" prop="length">
+              <el-input-number v-model="form.length" :min="0" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <!-- Date & Unit Fields -->
+        <div class="drawer-section-title">{{ $t('offlineOrder.drawerSection.dateStatus') }}</div>
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item :label="$t('offlineOrder.column.date1')" prop="date1">
               <el-date-picker
-                v-model="form.expectedDate"
+                v-model="form.date1"
                 type="date"
                 value-format="YYYY-MM-DD"
-                :placeholder="$t('offlineOrder.column.expectedDate')"
+                :placeholder="$t('offlineOrder.column.date1')"
                 style="width: 100%"
               />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.orderDate')" prop="orderDate">
-              <el-date-picker
-                v-model="form.orderDate"
-                type="date"
-                value-format="YYYY-MM-DD"
-                :placeholder="$t('offlineOrder.column.orderDate')"
-                style="width: 100%"
-              />
+            <el-form-item :label="$t('offlineOrder.column.unitCh')" prop="unitCh">
+              <el-input-number v-model="form.unitCh" :min="0" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('offlineOrder.column.rate')" prop="rate">
+              <el-input-number v-model="form.rate" :min="0" style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -297,8 +309,8 @@
         <div class="drawer-section-title">{{ $t('offlineOrder.drawerSection.factory') }}</div>
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.factory')" prop="factory">
-              <el-input v-model="form.factory" :placeholder="$t('offlineOrder.column.factory')" />
+            <el-form-item :label="$t('offlineOrder.column.location')" prop="location">
+              <el-input v-model="form.location" :placeholder="$t('offlineOrder.column.location')" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -307,18 +319,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.contactor')" prop="contactor">
-              <el-input v-model="form.contactor" :placeholder="$t('offlineOrder.column.contactor')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.contactorTel')" prop="contactorTel">
-              <el-input v-model="form.contactorTel" :placeholder="$t('offlineOrder.column.contactorTel')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('offlineOrder.column.principal')" prop="principal">
-              <el-input v-model="form.principal" :placeholder="$t('offlineOrder.column.principal')" />
+            <el-form-item :label="$t('offlineOrder.column.factory')" prop="factoryAddr">
+              <el-input v-model="form.factoryAddr" :placeholder="$t('offlineOrder.column.factory')" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -327,18 +329,13 @@
         <div class="drawer-section-title">{{ $t('offlineOrder.drawerSection.memo') }}</div>
         <el-row :gutter="16">
           <el-col :span="24">
-            <el-form-item :label="$t('offlineOrder.column.inventoryNote')" prop="inventoryNote">
-              <el-input v-model="form.inventoryNote" type="textarea" :rows="2" :placeholder="$t('offlineOrder.column.inventoryNote')" />
+            <el-form-item :label="$t('offlineOrder.column.other')" prop="other">
+              <el-input v-model="form.other" type="textarea" :rows="2" :placeholder="$t('offlineOrder.column.other')" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item :label="$t('offlineOrder.column.memo')" prop="memo">
-              <el-input v-model="form.memo" type="textarea" :rows="2" :placeholder="$t('offlineOrder.column.memo')" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item :label="$t('offlineOrder.column.link')" prop="link">
-              <el-input v-model="form.link" type="textarea" :rows="2" :placeholder="$t('offlineOrder.column.link')" />
+            <el-form-item :label="$t('offlineOrder.column.rireki')" prop="rireki">
+              <el-input v-model="form.rireki" type="textarea" :rows="2" :placeholder="$t('offlineOrder.column.rireki')" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -358,8 +355,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
 import { useI18n } from 'vue-i18n'
-import { offlineOrderApi } from '@/api/offline-order'
-import type { OfflineOrderPageVO, CreateOfflineOrderRequest, UpdateOfflineOrderRequest } from '@/api/offline-order'
+import { legacyImportList8Api } from '@/api/legacy-import-list8'
+import type { LegacyImportList8VO, LegacyImportList8UpdateCmd } from '@/api/legacy-import-list8'
 import { usePermission } from '@/composables/usePermission'
 
 const { hasPermission } = usePermission()
@@ -368,21 +365,21 @@ const { t } = useI18n()
 // Filter
 const filter = reactive({
   code: '',
-  itemName: '',
-  factory: '',
-  arrival: '' as '' | 'OUT' | 'NOT_OUT',
+  location: '',
+  souko: '',
+  destination: '',
   page: 0,
   pageSize: 20,
 })
 
 // Table state
 const loading = ref(false)
-const tableData = ref<OfflineOrderPageVO[]>([])
+const tableData = ref<LegacyImportList8VO[]>([])
 const total = ref(0)
 
 // Detail state
 const detailVisible = ref(false)
-const currentRow = ref<OfflineOrderPageVO | null>(null)
+const currentRow = ref<LegacyImportList8VO | null>(null)
 
 // Edit state
 const editVisible = ref(false)
@@ -391,46 +388,35 @@ const formRef = ref<FormInstance>()
 const isCreate = ref(true)
 const editingId = ref<number | null>(null)
 
-const blankForm = (): CreateOfflineOrderRequest => ({
+const blankForm = (): LegacyImportList8UpdateCmd => ({
   code: '',
-  subCode: '',
-  houkoku: '',
-  infoFile: '',
-  itemName: '',
-  volumeCount: undefined,
-  orderCount: undefined,
-  arrival: undefined,
-  expectedDate: '',
-  orderDate: '',
+  manager: '',
+  destination: '',
+  tax: '',
+  material: '',
+  kensa: '',
+  pieces: undefined,
+  num: undefined,
+  weight: undefined,
+  weight2: undefined,
+  length: undefined,
+  date1: '',
+  status: '',
+  other: '',
   unitCh: undefined,
   rate: undefined,
   souko: '',
-  factory: '',
-  contactor: '',
-  contactorTel: '',
-  principal: '',
-  memo: '',
-  link: '',
-  inventoryNote: undefined,
+  location: '',
+  factoryAddr: '',
+  showFlag: undefined,
+  rireki: '',
 })
 
-const form = reactive<CreateOfflineOrderRequest>(blankForm())
+const form = reactive<LegacyImportList8UpdateCmd>(blankForm())
 
 const editTitle = computed(() =>
   isCreate.value ? t('offlineOrder.newButton') : t('offlineOrder.editTitle')
 )
-
-const arrivalTagType = (arrival?: string): '' | 'success' | 'warning' | 'info' => {
-  if (arrival === 'OUT') return 'success'
-  if (arrival === 'NOT_OUT') return 'warning'
-  return 'info'
-}
-
-const arrivalLabel = (arrival?: string): string => {
-  if (arrival === 'OUT') return t('offlineOrder.arrivalStatus.out')
-  if (arrival === 'NOT_OUT') return t('offlineOrder.arrivalStatus.notOut')
-  return '-'
-}
 
 const formatDate = (d?: string): string => {
   if (!d) return '-'
@@ -442,13 +428,13 @@ const loadData = async () => {
   try {
     const params = {
       code: filter.code || undefined,
-      itemName: filter.itemName || undefined,
-      factory: filter.factory || undefined,
-      arrival: filter.arrival || undefined,
+      location: filter.location || undefined,
+      souko: filter.souko || undefined,
+      destination: filter.destination || undefined,
       page: filter.page,
       pageSize: filter.pageSize,
     }
-    const res = await offlineOrderApi.list(params)
+    const res = await legacyImportList8Api.list(params)
     tableData.value = res.data?.content ?? []
     total.value = res.data?.totalElements ?? 0
   } catch {
@@ -460,9 +446,9 @@ const loadData = async () => {
 
 const onReset = () => {
   filter.code = ''
-  filter.itemName = ''
-  filter.factory = ''
-  filter.arrival = ''
+  filter.location = ''
+  filter.souko = ''
+  filter.destination = ''
   filter.page = 0
   loadData()
 }
@@ -472,7 +458,7 @@ const onPageChange = (page: number) => {
   loadData()
 }
 
-const onDetail = (row: OfflineOrderPageVO) => {
+const onDetail = (row: LegacyImportList8VO) => {
   currentRow.value = row
   detailVisible.value = true
 }
@@ -484,30 +470,31 @@ const onCreate = () => {
   editVisible.value = true
 }
 
-const onEdit = (row: OfflineOrderPageVO) => {
+const onEdit = (row: LegacyImportList8VO) => {
   isCreate.value = false
   editingId.value = row.id
   Object.assign(form, {
     code: row.code ?? '',
-    subCode: row.subCode ?? '',
-    houkoku: row.houkoku ?? '',
-    infoFile: row.infoFile ?? '',
-    itemName: row.itemName ?? '',
-    volumeCount: row.volumeCount,
-    orderCount: row.orderCount,
-    arrival: row.arrival as 'OUT' | 'NOT_OUT' | undefined,
-    expectedDate: row.expectedDate ?? '',
-    orderDate: row.orderDate ?? '',
-    unitCh: row.unitCh ?? '',
-    rate: row.rate ?? '',
+    manager: row.manager ?? '',
+    destination: row.destination ?? '',
+    tax: row.tax ?? '',
+    material: row.material ?? '',
+    kensa: row.kensa ?? '',
+    pieces: row.pieces,
+    num: row.num,
+    weight: row.weight,
+    weight2: row.weight2,
+    length: row.length,
+    date1: row.date1 ?? '',
+    status: row.status ?? '',
+    other: row.other ?? '',
+    unitCh: row.unitCh,
+    rate: row.rate,
     souko: row.souko ?? '',
-    factory: row.factory ?? '',
-    contactor: row.contactor ?? '',
-    contactorTel: row.contactorTel ?? '',
-    principal: row.principal ?? '',
-    inventoryNote: row.inventoryNote ?? '',
-    memo: row.memo ?? '',
-    link: row.link ?? '',
+    location: row.location ?? '',
+    factoryAddr: row.factoryAddr ?? '',
+    showFlag: row.showFlag,
+    rireki: row.rireki ?? '',
   })
   editVisible.value = true
 }
@@ -516,10 +503,10 @@ const onSubmit = async () => {
   submitting.value = true
   try {
     if (!editingId.value) {
-      await offlineOrderApi.create(form as CreateOfflineOrderRequest)
+      await legacyImportList8Api.create(form)
       ElMessage.success(t('offlineOrder.message.createSuccess'))
     } else {
-      await offlineOrderApi.update(editingId.value, form as UpdateOfflineOrderRequest)
+      await legacyImportList8Api.update(editingId.value, form)
       ElMessage.success(t('offlineOrder.message.updateSuccess'))
     }
     editVisible.value = false
@@ -531,7 +518,7 @@ const onSubmit = async () => {
   }
 }
 
-const onDelete = (row: OfflineOrderPageVO) => {
+const onDelete = (row: LegacyImportList8VO) => {
   ElMessageBox.confirm(
     t('offlineOrder.deleteConfirm', { code: row.code, id: row.id }),
     t('common.delete'),
@@ -539,7 +526,7 @@ const onDelete = (row: OfflineOrderPageVO) => {
   )
     .then(async () => {
       try {
-        await offlineOrderApi.delete(row.id)
+        await legacyImportList8Api.delete(row.id)
         ElMessage.success(t('offlineOrder.message.deleteSuccess'))
         loadData()
       } catch {
@@ -617,5 +604,12 @@ onMounted(() => {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+}
+:deep(.el-table__header-wrapper),
+:deep(.el-table__header th.el-table__cell) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: inherit;
 }
 </style>

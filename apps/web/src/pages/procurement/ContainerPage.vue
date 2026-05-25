@@ -2,7 +2,7 @@
 /**
  * 货柜管理页面（v1.5.0，SPEC-B00 Issue #8）
  */
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, Plus } from '@element-plus/icons-vue'
@@ -59,8 +59,17 @@ const assignEditingContainer = ref<Partial<ContainerVO>>({})
 const shipOptions = ref<ShipVO[]>([])
 const assignForm = ref<AssignShipRequest>({ shipId: 0, loadDate: '' })
 
-const periodOptions = ['凌晨0-6', '早上6-12', '下午12-18', '晚上18-24']
-const legacyStatusOptions = ['未出', '出完', '待定']
+const periodOptions = computed(() => [
+  t('logistics.container.periodOptions.earlyMorning'),
+  t('logistics.container.periodOptions.morning'),
+  t('logistics.container.periodOptions.afternoon'),
+  t('logistics.container.periodOptions.evening'),
+])
+const legacyStatusOptions = computed(() => [
+  t('logistics.container.legacyStatusOptions.notOut'),
+  t('logistics.container.legacyStatusOptions.out'),
+  t('logistics.container.legacyStatusOptions.pending'),
+])
 
 const copyColumns: ExcelColDef[] = [
   { prop: 'containerNo', label: t('logistics.container.column.containerNo') },
@@ -331,7 +340,7 @@ onMounted(loadData)
           </div>
         </div>
       </template>
-      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200" ref="tableRef" row-key="id" @selection-change="onSelectionChange">
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" ref="tableRef" row-key="id" @selection-change="onSelectionChange">
         <el-table-column type="selection" width="50" align="center" :reserve-selection="true" />
         <el-table-column prop="containerNo" :label="$t('logistics.container.column.containerNo')" min-width="120" />
         <el-table-column :label="$t('logistics.container.column.shipName')" min-width="110">
@@ -392,7 +401,7 @@ onMounted(loadData)
         </el-form-item>
         <!-- list7 原始字段（SPEC-B14）-->
         <el-form-item :label="$t('logistics.container.column.cabinetNo')">
-          <el-input v-model="formData.cabinetNo" placeholder="CBHU4225619" />
+          <el-input v-model="formData.cabinetNo" :placeholder="$t('logistics.container.filter.cabinetNoPlaceholder')" />
         </el-form-item>
         <el-form-item :label="$t('logistics.container.column.loadDate')">
           <el-date-picker v-model="formData.loadDate" type="date" value-format="YYYY-MM-DD" style="width:100%" />
@@ -490,5 +499,12 @@ onMounted(loadData)
 .selection-count { margin-left: 4px; }
 :deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
 :deep(.cell-single-line) { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.btn-blue { color: #409EFF !important; }
+.btn-blue { color: #E8650A !important; }
+:deep(.el-table__header-wrapper),
+:deep(.el-table__header th.el-table__cell) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: inherit;
+}
 </style>

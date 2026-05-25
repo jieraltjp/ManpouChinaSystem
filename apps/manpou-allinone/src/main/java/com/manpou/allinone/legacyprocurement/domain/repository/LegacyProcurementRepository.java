@@ -4,9 +4,12 @@ import com.manpou.allinone.legacyprocurement.domain.model.LegacyProcurement;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface LegacyProcurementRepository {
+
+    List<LegacyProcurement> findOverdueExcludeDeleted();
 
     Page<LegacyProcurement> findAllExcludeDeleted(Pageable pageable);
 
@@ -17,6 +20,10 @@ public interface LegacyProcurementRepository {
     Page<LegacyProcurement> findByItemNameContainingExcludeDeleted(String itemName, Pageable pageable);
 
     Page<LegacyProcurement> findByUpdaterContainingExcludeDeleted(String updater, Pageable pageable);
+
+    Page<LegacyProcurement> findByMaterialContainingExcludeDeleted(String material, Pageable pageable);
+
+    Page<LegacyProcurement> findByContainerContainingExcludeDeleted(String container, Pageable pageable);
 
     LegacyProcurement save(LegacyProcurement entity);
 

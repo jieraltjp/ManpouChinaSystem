@@ -26,7 +26,7 @@
 
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
-      <el-table :data="tableData" v-loading="loading" stripe style="width:100%" min-height="200">
+      <el-table :data="tableData" v-loading="loading" stripe style="width:100%">
         <el-table-column :label="$t('cargoSize.column.code')" prop="code" min-width="140">
           <template #default="{ row }">
             <el-tag type="info" size="small">{{ row.code }}</el-tag>
@@ -124,7 +124,7 @@
     <el-dialog v-model="promoteVisible" :title="$t('cargoSize.dialog.promoteTitle')" width="840px" :close-on-click-modal="false">
       <div class="dialog-info-box" v-if="currentRow">
         {{ $t('cargoSize.code') }}: {{ currentRow.code }} |
-        {{ $t('cargoSize.lengthCm') }}: {{ currentRow.lengthCm }} × {{ $t('cargoSize.widthCm') }}: {{ currentRow.widthCm }} × {{ $t('cargoSize.heightCm') }}: {{ currentRow.heightCm }} cm /
+        {{ $t('cargoSize.lengthCm') }}: {{ currentRow.lengthCm }} × {{ $t('cargoSize.widthCm') }}: {{ currentRow.widthCm }} × {{ $t('cargoSize.heightCm') }}: {{ currentRow.heightCm }} {{ $t('common.units.cm') }} /
         {{ $t('cargoSize.netWeightKg') }}: {{ currentRow.netWeightKg }} kg
       </div>
       <el-form ref="promoteFormRef" :model="promoteForm" :rules="promoteRules" label-width="110px">
@@ -168,7 +168,7 @@
           </el-col>
           <el-col :span="16">
             <el-form-item :label="$t('cargoSize.dialog.factoryIds')">
-              <el-select v-model="promoteForm.factoryIds" multiple remote filterable placeholder="搜索工厂" style="width:100%" remote-show-suffix>
+              <el-select v-model="promoteForm.factoryIds" multiple remote filterable :placeholder="$t('cargoSize.dialog.factorySearchPlaceholder')" style="width:100%" remote-show-suffix>
                 <el-option v-for="f in factoryOptions" :key="f.id" :label="f.factoryName" :value="f.id" />
               </el-select>
             </el-form-item>
@@ -712,5 +712,12 @@ onMounted(async () => {
   font-size: 13px;
   color: #606266;
   margin-bottom: 16px;
+}
+:deep(.el-table__header-wrapper),
+:deep(.el-table__header th.el-table__cell) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: inherit;
 }
 </style>

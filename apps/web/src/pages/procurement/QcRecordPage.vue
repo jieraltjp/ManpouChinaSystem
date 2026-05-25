@@ -1108,7 +1108,7 @@ function doPrint() {
   if (!printArea) return
   const printWindow = window.open('', '_blank')
   if (!printWindow) {
-    ElMessage.warning('请允许弹出窗口以进行打印')
+    ElMessage.warning(t('inspection.print.allowPopup'))
     return
   }
   const reportTitle = t('inspection.print.reportTitle')

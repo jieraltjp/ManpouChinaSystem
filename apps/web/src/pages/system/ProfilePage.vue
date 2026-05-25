@@ -240,7 +240,7 @@ const infoForm = reactive<ProfileUpdateCmd>({
 })
 
 const infoRules = {
-  phone: [{ pattern: /^[\d\-+ ]*$/, message: 'phone_invalid' }],
+  phone: [{ pattern: /^[\d\-+ ]*$/, message: t('profile.validation.phoneInvalid') }],
 }
 
 async function loadUserInfo() {
@@ -293,14 +293,14 @@ const validateConfirm = (_rule: unknown, value: string, callback: (e?: Error) =>
 }
 
 const pwdRules = {
-  oldPassword: [{ required: true, message: 'oldPassword_required', trigger: 'blur' }],
+  oldPassword: [{ required: true, message: t('profile.validation.oldPasswordRequired'), trigger: 'blur' }],
   newPassword: [
-    { required: true, message: 'newPassword_required', trigger: 'blur' },
-    { min: 8, max: 20, message: 'password_length', trigger: 'blur' },
-    { pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,20}$/, message: 'password_complexity', trigger: 'blur' },
+    { required: true, message: t('profile.validation.newPasswordRequired'), trigger: 'blur' },
+    { min: 8, max: 20, message: t('profile.validation.passwordLength'), trigger: 'blur' },
+    { pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,20}$/, message: t('profile.validation.passwordComplexity'), trigger: 'blur' },
   ],
   confirmPassword: [
-    { required: true, message: 'confirmPassword_required', trigger: 'blur' },
+    { required: true, message: t('profile.validation.confirmPasswordRequired'), trigger: 'blur' },
     { validator: validateConfirm, trigger: 'blur' },
   ],
 }

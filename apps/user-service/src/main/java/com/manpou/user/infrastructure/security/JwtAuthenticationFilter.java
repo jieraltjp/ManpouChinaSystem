@@ -47,6 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "consolidation:create", "consolidation:read", "consolidation:update", "consolidation:delete",
         "container:create", "container:read", "container:update", "container:delete",
         "ship:create", "ship:read", "ship:update", "ship:delete",
+        "dispatch:create", "dispatch:read", "dispatch:update", "dispatch:delete",
+        "offline_order:create", "offline_order:read", "offline_order:update", "offline_order:delete",
         "customs:create", "customs:read", "customs:update", "customs:delete", "customs:approve",
         "japan_customs:create", "japan_customs:read", "japan_customs:update", "japan_customs:delete",
         "japan_customs:start", "japan_customs:complete",
@@ -54,11 +56,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "sales:create", "sales:read", "sales:update", "sales:delete",
         "factory:create", "factory:read", "factory:update", "factory:delete",
         "product:create", "product:read", "product:update", "product:delete",
+        "cargo_size:read", "cargo_size:create", "cargo_size:import", "cargo_size:promote", "cargo_size:discard", "cargo_size:update", "cargo_size:delete",
+        "legacy_procurement:read", "legacy_procurement:create", "legacy_procurement:update", "legacy_procurement:delete",
         "order:read",
         "user:create", "user:read", "user:update", "user:delete", "user:approve", "user:reset_password",
         "role:create", "role:read", "role:update", "role:delete", "role:assign",
         "permission:read",
-        "audit:read", "audit:export"
+        "audit:read", "audit:export",
+        "page:demand:access", "page:procurement:access", "page:shipment:access", "page:qc:access",
+        "page:logistics:access", "page:consolidation:access", "page:container:access", "page:ship:access",
+        "page:customs:access", "page:japan_customs:access", "page:tax_refund:access", "page:sales:access",
+        "page:factory:access", "page:product:access", "page:order:access",
+        "page:user:access", "page:role:access", "page:audit:access",
+        "page:cargo_size:access", "page:dispatch:access", "page:legacy_procurement:access", "page:offline_order:access", "page:profile:access"
     );
 
     private final JwtService jwtService;

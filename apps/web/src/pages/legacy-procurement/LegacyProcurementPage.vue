@@ -6,14 +6,11 @@
         <el-form-item :label="$t('legacyProcurement.filter.code')">
           <el-input v-model="filterForm.code" :placeholder="$t('legacyProcurement.filter.codePlaceholder')" clearable style="width:160px" />
         </el-form-item>
-        <el-form-item :label="$t('legacyProcurement.filter.orderGroup')">
-          <el-input v-model="filterForm.orderGroup" :placeholder="$t('legacyProcurement.filter.orderGroupPlaceholder')" clearable style="width:200px" />
+        <el-form-item :label="$t('legacyProcurement.filter.container')">
+          <el-input v-model="filterForm.container" :placeholder="$t('legacyProcurement.filter.containerPlaceholder')" clearable style="width:200px" />
         </el-form-item>
         <el-form-item :label="$t('legacyProcurement.filter.itemName')">
           <el-input v-model="filterForm.itemName" :placeholder="$t('legacyProcurement.filter.itemNamePlaceholder')" clearable style="width:200px" />
-        </el-form-item>
-        <el-form-item :label="$t('legacyProcurement.filter.updater')">
-          <el-input v-model="filterForm.updater" :placeholder="$t('legacyProcurement.filter.updaterPlaceholder')" clearable style="width:140px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSearch">{{ $t('legacyProcurement.filter.search') }}</el-button>
@@ -42,14 +39,14 @@
           </el-radio-group>
         </div>
       </template>
-      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="displayData" stripe style="width:100%" min-height="200" :row-class-name="getRowClassName">
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="displayData" stripe style="width:100%" :row-class-name="getRowClassName">
         <el-table-column type="selection" width="40" align="center" />
         <el-table-column prop="legacyId" :label="$t('legacyProcurement.column.legacyId')" width="70" align="center" />
         <el-table-column prop="code" :label="$t('legacyProcurement.column.code')" min-width="110" show-overflow-tooltip />
         <el-table-column prop="subCode" :label="$t('legacyProcurement.column.subCode')" min-width="80" show-overflow-tooltip />
         <el-table-column prop="infoFile1" :label="$t('legacyProcurement.column.infoFile1')" min-width="100" show-overflow-tooltip />
         <el-table-column prop="infoFile2" :label="$t('legacyProcurement.column.infoFile2')" min-width="100" show-overflow-tooltip />
-        <el-table-column prop="updater" :label="$t('legacyProcurement.column.updater')" min-width="90" show-overflow-tooltip />
+        <el-table-column prop="material" :label="$t('legacyProcurement.column.material')" min-width="90" show-overflow-tooltip />
         <el-table-column prop="note" :label="$t('legacyProcurement.column.note')" min-width="130" show-overflow-tooltip />
         <el-table-column :label="$t('legacyProcurement.column.image')" width="70" align="center">
           <template #default="{ row }">
@@ -81,7 +78,13 @@
             {{ row.arrivalJikan != null ? String(row.arrivalJikan).padStart(2, '0') + ':00' : $t('common.format.dash') }}
           </template>
         </el-table-column>
-        <el-table-column prop="receive" :label="$t('legacyProcurement.column.receive')" min-width="90" show-overflow-tooltip />
+        <el-table-column prop="receive" :label="$t('legacyProcurement.column.receive')" min-width="90" align="center">
+          <template #default="{ row }">
+            <span v-if="row.receive == '13'" class="receive-13">到着済</span>
+            <span v-else-if="row.receive == '11'">{{ $t('legacyProcurement.receive.transiting') }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="neStock" :label="$t('legacyProcurement.column.neStock')" min-width="90" show-overflow-tooltip />
         <el-table-column prop="houkoku" :label="$t('legacyProcurement.column.houkoku')" min-width="70" show-overflow-tooltip />
         <el-table-column prop="kaitsuke" :label="$t('legacyProcurement.column.kaitsuke')" min-width="90" align="right">
@@ -121,6 +124,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="container" :label="$t('legacyProcurement.column.container')" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="boxNum" :label="$t('legacyProcurement.column.boxNum')" min-width="90" show-overflow-tooltip />
         <el-table-column :label="$t('legacyProcurement.column.action')" width="160" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onDetail(row)">{{ $t('legacyProcurement.action.detail') }}</el-button>
@@ -137,9 +141,11 @@
           background
           :current-page="pagination.page"
           :page-size="pagination.pageSize"
+          :page-sizes="[20, 50, 100, 500, 1000]"
           :total="pagination.total"
-          layout="total, prev, pager, next"
+          layout="total, sizes, prev, pager, next, jumper"
           @current-change="onPageChange"
+          @size-change="onSizeChange"
         />
       </div>
     </el-card>
@@ -466,8 +472,13 @@ const { t } = useI18n()
 const excelViewMode = ref<'table' | 'copy'>('table')
 
 const copyColumns: ExcelColDef[] = [
+  { prop: 'legacyId', label: t('legacyProcurement.column.legacyId') },
   { prop: 'code', label: t('legacyProcurement.column.code') },
   { prop: 'subCode', label: t('legacyProcurement.column.subCode') },
+  { prop: 'infoFile1', label: t('legacyProcurement.column.infoFile1') },
+  { prop: 'infoFile2', label: t('legacyProcurement.column.infoFile2') },
+  { prop: 'material', label: t('legacyProcurement.column.material') },
+  { prop: 'note', label: t('legacyProcurement.column.note') },
   { prop: 'itemName', label: t('legacyProcurement.column.itemName') },
   { prop: 'orderGroup', label: t('legacyProcurement.column.orderGroup') },
   { prop: 'orderCount', label: t('legacyProcurement.column.orderCount'), formatter: (row) => row.orderCount != null ? String(row.orderCount) : '' },
@@ -477,7 +488,7 @@ const copyColumns: ExcelColDef[] = [
   { prop: 'departure', label: t('legacyProcurement.column.departure') },
   { prop: 'arrival', label: t('legacyProcurement.column.arrival') },
   { prop: 'arrivalJikan', label: t('legacyProcurement.column.arrivalJikan'), formatter: (row) => row.arrivalJikan != null ? String(row.arrivalJikan).padStart(2, '0') + ':00' : '' },
-  { prop: 'receive', label: t('legacyProcurement.column.receive') },
+  { prop: 'receive', label: t('legacyProcurement.column.receive'), formatter: (row) => row.receive == '13' ? '到着済' : row.receive == '11' ? t('legacyProcurement.receive.transiting') : '' },
   { prop: 'neStock', label: t('legacyProcurement.column.neStock') },
   { prop: 'houkoku', label: t('legacyProcurement.column.houkoku') },
   { prop: 'kaitsuke', label: t('legacyProcurement.column.kaitsuke'), formatter: (row) => formatNum(row.kaitsuke) },
@@ -489,8 +500,7 @@ const copyColumns: ExcelColDef[] = [
   { prop: 'totalJp', label: t('legacyProcurement.column.totalJp'), formatter: (row) => row.totalJp != null ? row.totalJp.toLocaleString() : '' },
   { prop: 'rate', label: t('legacyProcurement.column.rate'), formatter: (row) => formatNum(row.rate) },
   { prop: 'container', label: t('legacyProcurement.column.container') },
-  { prop: 'updater', label: t('legacyProcurement.column.updater') },
-  { prop: 'note', label: t('legacyProcurement.column.note') },
+  { prop: 'boxNum', label: t('legacyProcurement.column.boxNum') },
 ]
 
 function formatTime(ts: string | undefined | null): string {
@@ -508,17 +518,20 @@ function formatNum(v: number | undefined | null): string {
 
 const loading = ref(false)
 const tableData = ref<LegacyProcurementPageVO[]>([])
+const overdueLoaded = ref(false) // overdue 全量数据是否已加载
 const detailVisible = ref(false)
 const currentRow = ref<LegacyProcurementPageVO | null>(null)
 
 const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
-const filterForm = reactive({ code: '', orderGroup: '', itemName: '', updater: '', overdueOnly: false })
+const filterForm = reactive({ code: '', container: '', itemName: '', overdueOnly: false })
 
 const { getRowClassName, filterOverdue } = useOverdue(tableData)
 
 const displayData = computed(() => {
   if (!filterForm.overdueOnly) return tableData.value
-  return filterOverdue(tableData.value)
+  const filtered = filterOverdue(tableData.value)
+  const start = (pagination.page - 1) * pagination.pageSize
+  return filtered.slice(start, start + pagination.pageSize)
 })
 
 // URL 持久化：overdueOnly ↔ ?overdue=true
@@ -526,7 +539,12 @@ const syncToQuery = useOverdueUrlSync(
   toRef(filterForm, 'overdueOnly'),
   () => { pagination.page = 1 },
 )
-watch(() => filterForm.overdueOnly, (v: boolean) => { syncToQuery(v) })
+watch(() => filterForm.overdueOnly, (v: boolean) => {
+  syncToQuery(v)
+  pagination.page = 1
+  overdueLoaded.value = false
+  loadData()
+})
 
 // Edit dialog
 const editVisible = ref(false)
@@ -575,16 +593,25 @@ const editForm = reactive({
 async function loadData() {
   loading.value = true
   try {
-    const params: Record<string, unknown> = { page: pagination.page - 1, pageSize: pagination.pageSize }
-    if (filterForm.code) params.code = filterForm.code
-    if (filterForm.orderGroup) params.orderGroup = filterForm.orderGroup
-    if (filterForm.itemName) params.itemName = filterForm.itemName
-    if (filterForm.updater) params.updater = filterForm.updater
+    if (filterForm.overdueOnly) {
+      // overdue 数据已加载则跳过，重新加载只有在首次或切换模式时
+      if (overdueLoaded.value && tableData.value.length > 0) return
+      const res = await legacyProcurementApi.overdue()
+      const data = res.data as LegacyProcurementPageVO[] | undefined
+      tableData.value = data ?? []
+      pagination.total = filterOverdue(tableData.value).length
+      overdueLoaded.value = true
+    } else {
+      const params: Record<string, unknown> = { page: pagination.page - 1, pageSize: pagination.pageSize }
+      if (filterForm.code) params.code = filterForm.code
+      if (filterForm.container) params.container = filterForm.container
+      if (filterForm.itemName) params.itemName = filterForm.itemName
 
-    const res = await legacyProcurementApi.list(params as Record<string, string | number>)
-    const data = res.data as { content?: LegacyProcurementPageVO[]; totalElements?: number } | undefined
-    tableData.value = data?.content ?? []
-    pagination.total = data?.totalElements ?? 0
+      const res = await legacyProcurementApi.list(params as Record<string, string | number>)
+      const data = res.data as { content?: LegacyProcurementPageVO[]; totalElements?: number } | undefined
+      tableData.value = data?.content ?? []
+      pagination.total = data?.totalElements ?? 0
+    }
     await loadImageMap(tableData.value, 'code')
   } catch (err: unknown) {
     console.error('[LegacyProcurement] loadData error:', err)
@@ -600,9 +627,8 @@ function onSearch() {
 
 function onReset() {
   filterForm.code = ''
-  filterForm.orderGroup = ''
+  filterForm.container = ''
   filterForm.itemName = ''
-  filterForm.updater = ''
   filterForm.overdueOnly = false
   pagination.page = 1
   loadData()
@@ -610,6 +636,12 @@ function onReset() {
 
 function onPageChange(page: number) {
   pagination.page = page
+  loadData()
+}
+
+function onSizeChange(size: number) {
+  pagination.pageSize = size
+  pagination.page = 1
   loadData()
 }
 
@@ -783,10 +815,14 @@ loadData()
   border-top: 1px solid #ebeef5;
 }
 .btn-blue {
-  color: #409EFF;
+  color: #E8650A;
 }
 .btn-danger {
   color: #F56C6C;
+}
+.receive-13 {
+  color: #67C23A;
+  font-weight: 600;
 }
 :deep(.el-table .overdue-row) {
   background-color: #fde2e2 !important;
@@ -796,5 +832,12 @@ loadData()
 }
 :deep(.el-table .overdue-row td) {
   background-color: inherit !important;
+}
+:deep(.el-table__header-wrapper),
+:deep(.el-table__header th.el-table__cell) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: inherit;
 }
 </style>

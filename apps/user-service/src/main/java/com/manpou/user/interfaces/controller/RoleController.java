@@ -1,5 +1,6 @@
 package com.manpou.user.interfaces.controller;
 
+import com.manpou.common.annotation.AuditLog;
 import com.manpou.common.result.Result;
 import com.manpou.user.application.dto.*;
 import com.manpou.user.application.service.RoleService;
@@ -43,6 +44,7 @@ public class RoleController {
      */
     @PostMapping
     @PreAuthorize("hasAuthority('role:create')")
+    @AuditLog(module = "role", action = "CREATE", resourceType = "role")
     public Result<RoleVO> create(@Valid @RequestBody RoleCreateCmd cmd) {
         return Result.ok(roleService.create(cmd));
     }
@@ -52,6 +54,7 @@ public class RoleController {
      */
     @PutMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('role:update')")
+    @AuditLog(module = "role", action = "UPDATE", resourceType = "role", resourceId = "#id")
     public Result<RoleVO> update(@PathVariable Long id,
                                   @RequestBody RoleUpdateCmd cmd) {
         return Result.ok(roleService.update(id, cmd));
@@ -62,6 +65,7 @@ public class RoleController {
      */
     @DeleteMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('role:delete')")
+    @AuditLog(module = "role", action = "DELETE", resourceType = "role", resourceId = "#id")
     public Result<Void> delete(@PathVariable Long id) {
         roleService.delete(id);
         return Result.ok();
@@ -72,6 +76,7 @@ public class RoleController {
      */
     @PutMapping("/{id:\\d+}/permissions")
     @PreAuthorize("hasAuthority('role:assign')")
+    @AuditLog(module = "role", action = "ASSIGN_PERMISSIONS", resourceType = "role_permission", resourceId = "#id")
     public Result<RoleVO> assignPermissions(@PathVariable Long id,
                                            @RequestBody RolePermissionsCmd cmd) {
         return Result.ok(roleService.assignPermissions(id, cmd));
@@ -82,6 +87,7 @@ public class RoleController {
      */
     @PatchMapping("/{id:\\d+}")
     @PreAuthorize("hasRole('ADMIN')")
+    @AuditLog(module = "role", action = "PATCH", resourceType = "role", resourceId = "#id")
     public Result<RoleVO> patch(@PathVariable Long id,
                                 @RequestBody RolePatchCmd cmd) {
         return Result.ok(roleService.patch(id, cmd));

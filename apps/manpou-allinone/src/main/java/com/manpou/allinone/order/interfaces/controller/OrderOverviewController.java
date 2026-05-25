@@ -1,5 +1,6 @@
 package com.manpou.allinone.order.interfaces.controller;
 
+import com.manpou.allinone.common.annotation.AuditLog;
 import com.manpou.allinone.common.result.Result;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.manpou.allinone.order.application.dto.DemandOverviewVO;
@@ -119,6 +120,7 @@ public class OrderOverviewController {
      */
     @DeleteMapping("/chain/{demandId}")
     @PreAuthorize("hasAuthority('procurement:delete')")
+    @AuditLog(module = "order", action = "DELETE_CHAIN", resourceType = "demand", resourceId = "#demandId")
     public Result<Void> deleteChain(@PathVariable Long demandId) {
         orderChainUseCase.deleteChain(demandId);
         return Result.ok();

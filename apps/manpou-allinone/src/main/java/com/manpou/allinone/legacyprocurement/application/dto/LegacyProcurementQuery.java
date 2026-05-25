@@ -11,4 +11,6 @@ public class LegacyProcurementQuery {
     private String orderGroup;
     private String itemName;
     private String updater;
+    private String material;
+    private String container;
 }

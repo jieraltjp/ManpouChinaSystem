@@ -64,7 +64,7 @@
         </el-form-item>
         <el-form-item :label="$t('order.filter.productType')">
           <el-select v-model="filterForm.productType" :placeholder="$t('order.filter.all')" clearable style="width: 130px">
-            <el-option v-for="opt in productCategoryOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+            <el-option v-for="opt in productCategoryOptions" :key="opt.value" :label="$t('order.dialog.productCategoryOptions.' + opt.value)" :value="opt.value" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -105,6 +105,7 @@
         :data="tableRows"
         stripe
         style="width: 100%"
+        min-height="200"
         row-key="id"
         @selection-change="onSelectionChange"
       >
@@ -185,7 +186,7 @@
         <el-table-column :label="$t('order.column.action')" min-width="300" align="center">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('order.message.detail') }}</el-button>
-            <el-button link type="success" size="small" @click.stop="onOpenShipmentBatches(row)">{{ $t('order.action.shipmentBatch') }}</el-button>
+            <el-button v-if="hasPermission('shipment:read')" link type="success" size="small" @click.stop="onOpenShipmentBatches(row)">{{ $t('order.action.shipmentBatch') }}</el-button>
             <el-button link type="warning" size="small" @click.stop="onEdit(row)"
               :disabled="row.status === ORDER_STATUS_SHIPPED" v-if="hasPermission('procurement:update')">{{ $t('demand.action.edit') }}</el-button>
             <el-button link type="danger" size="small" @click.stop="onDelete(row)"
@@ -434,7 +435,7 @@
           <div class="price-preview">
             <span class="price-value">{{ previewPriceJpy }}</span>
             <span class="price-unit">{{ $t('common.units.jpy') }}</span>
-            <span class="price-formula">= (RMB ÷ {{ formData.taxPoint }} × 1.02 × 1.2) × {{ formData.exchangeRate }} × 1.05</span>
+            <span class="price-formula">= ({{ $t('common.units.rmb') }} ÷ {{ formData.taxPoint }} × 1.02 × 1.2) × {{ formData.exchangeRate }} × 1.05</span>
           </div>
         </el-form-item>
         <!-- 报关类型 -->
@@ -669,6 +670,7 @@ import { factoryApi, type FactoryPageVO, type CreateFactoryRequest, type UpdateF
 import { demandApi, type DemandPageVO } from '@/api/demand'
 import { productApi, type MasterCodeSuggestVO } from '@/api/product'
 import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import ProductFormDialog from '@/components/product/ProductFormDialog.vue'
 import ExcelTable, { type ExcelColDef } from '@/components/ExcelTable.vue'
 
@@ -693,14 +695,14 @@ const isLinkedProcurement = ref(true)
 /** 商品分类下拉（7项：OEM/普货/厂家出口 + 普通采购/样品/自用/配件/无关联） */
 type ProductCategory = ProductType | 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT'
 const productCategoryOptions: { value: ProductCategory; label: string }[] = [
-  { value: 'OEM', label: '批发' },
-  { value: 'ORDINARY', label: '普货' },
-  { value: 'FACTORY_DIRECT', label: '厂家出口' },
-  { value: 'NORMAL', label: '普通采购' },
-  { value: 'SAMPLE', label: '样品' },
-  { value: 'SELF_USE', label: '自用' },
-  { value: 'PARTS', label: '配件' },
-  { value: 'INDEPENDENT', label: '无关联' },
+  { value: 'OEM', label: t('order.productCategoryOptions.OEM') },
+  { value: 'ORDINARY', label: t('order.productCategoryOptions.ORDINARY') },
+  { value: 'FACTORY_DIRECT', label: t('order.productCategoryOptions.FACTORY_DIRECT') },
+  { value: 'NORMAL', label: t('order.productCategoryOptions.NORMAL') },
+  { value: 'SAMPLE', label: t('order.productCategoryOptions.SAMPLE') },
+  { value: 'SELF_USE', label: t('order.productCategoryOptions.SELF_USE') },
+  { value: 'PARTS', label: t('order.productCategoryOptions.PARTS') },
+  { value: 'INDEPENDENT', label: t('order.productCategoryOptions.INDEPENDENT') },
 ]
 
 /** 商品货号搜索下拉 */
@@ -889,7 +891,7 @@ async function doCreateProcurement(req: CreateProcurementRequest) {
 
 const route = useRoute()
 const router = useRouter()
-const { t, locale: localeRef } = useI18n()
+const { locale: localeRef } = useI18n()
 const { hasPermission } = usePermission()
 
 // 后端 order_status 枚举值（同时作为 i18n key）
@@ -1784,5 +1786,12 @@ defineExpose({ prefillFromDemand })
   color: #909399;
   padding: 4px 0;
   line-height: 1.5;
+}
+:deep(.el-table__header-wrapper),
+:deep(.el-table__header th.el-table__cell) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: inherit;
 }
 </style>

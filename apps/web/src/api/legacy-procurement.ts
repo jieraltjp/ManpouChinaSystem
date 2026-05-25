@@ -106,6 +106,9 @@ export const legacyProcurementApi = {
   stats() {
     return client.get('/legacy-procurements/stats')
   },
+  overdue() {
+    return client.get<LegacyProcurementPageVO[]>('/legacy-procurements/overdue')
+  },
   get(id: number) {
     return client.get(`/legacy-procurements/${id}`)
   },

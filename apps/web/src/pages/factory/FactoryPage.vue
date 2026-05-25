@@ -5,7 +5,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#409EFF"><OfficeBuilding /></el-icon></div>
+            <div class="stat-icon-wrap"><el-icon class="stat-icon" color="#E8650A"><OfficeBuilding /></el-icon></div>
             <div>
               <div class="stat-value">{{ factoryStats.total }}</div>
               <div class="stat-label">{{ $t('factory.stat.total') }}</div>
@@ -72,7 +72,7 @@
 
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <el-table v-loading="loading" :data="tableData" stripe style="width:100%">
         <el-table-column prop="factoryCode" :label="$t('factory.column.factoryCode')" min-width="140" />
         <el-table-column prop="factoryName" :label="$t('factory.column.factoryName')" min-width="160" show-overflow-tooltip />
         <el-table-column prop="province" :label="$t('factory.column.province')" min-width="100" />
@@ -504,7 +504,7 @@ loadAll()
   color: #303133;
   margin: 8px 0 4px;
   padding-left: 4px;
-  border-left: 3px solid #409EFF;
+  border-left: 3px solid #E8650A;
 }
 .drawer-footer {
   padding: 16px 0 0;
@@ -513,6 +513,13 @@ loadAll()
   display: flex;
   gap: 8px;
 }
-.btn-blue { color: #409EFF !important; }
+.btn-blue { color: #E8650A !important; }
 :deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
+:deep(.el-table__header-wrapper),
+:deep(.el-table__header th.el-table__cell) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: inherit;
+}
 </style>

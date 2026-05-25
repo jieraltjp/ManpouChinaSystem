@@ -40,7 +40,7 @@
           </el-radio-group>
         </div>
       </template>
-      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%" min-height="200">
+      <el-table v-if="excelViewMode === 'table'" v-loading="loading" :data="tableData" stripe style="width:100%">
         <el-table-column prop="masterCode" :label="$t('product.column.masterCode')" min-width="110" />
         <el-table-column prop="subCode" :label="$t('product.column.subCode')" min-width="120" />
         <el-table-column :label="$t('product.column.image')" min-width="70" align="center">
@@ -135,7 +135,7 @@
           <div class="detail-item"><span class="detail-label">{{ $t('product.drawer.cartonQty') }}</span><span class="detail-value">{{ currentRow.cartonQty ?? '-' }}</span></div>
           <div class="detail-item full-width"><span class="detail-label">{{ $t('product.drawer.imageUrl') }}</span>
             <span class="detail-value">
-              <a v-if="currentRow.imageUrl" :href="currentRow.imageUrl" target="_blank" style="color:#409EFF">{{ currentRow.imageUrl }}</a>
+              <a v-if="currentRow.imageUrl" :href="currentRow.imageUrl" target="_blank" style="color:#E8650A">{{ currentRow.imageUrl }}</a>
               <span v-else>-</span>
             </span>
           </div>
@@ -738,7 +738,7 @@ loadData()
 .dialog-section-title {
   font-size: 13px;
   font-weight: 600;
-  color: #409EFF;
+  color: #E8650A;
   margin: 12px 0 8px;
   padding-bottom: 4px;
   border-bottom: 1px dashed #d0d7de;
@@ -759,7 +759,7 @@ loadData()
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 12px;
-  color: #409EFF;
+  color: #E8650A;
   cursor: pointer;
 }
 .detail-grid {
@@ -840,6 +840,13 @@ loadData()
   display: flex;
   gap: 8px;
 }
-.btn-blue { color: #409EFF !important; }
+.btn-blue { color: #E8650A !important; }
 :deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; }
+:deep(.el-table__header-wrapper),
+:deep(.el-table__header th.el-table__cell) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: inherit;
+}
 </style>

@@ -359,7 +359,7 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.drawer.cargoDimension')" :span="2">
           {{ currentRow.cargoLengthCm && currentRow.cargoWidthCm && currentRow.cargoHeightCm
-            ? `${currentRow.cargoLengthCm}×${currentRow.cargoWidthCm}×${currentRow.cargoHeightCm} cm`
+            ? `${currentRow.cargoLengthCm}×${currentRow.cargoWidthCm}×${currentRow.cargoHeightCm} ${$t('common.units.cm')}`
             : '-' }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('logistics.column.cargoWeightKg')">{{ currentRow.cargoWeightKg != null ? `${currentRow.cargoWeightKg} ${$t('common.units.kg')}` : '-' }}</el-descriptions-item>

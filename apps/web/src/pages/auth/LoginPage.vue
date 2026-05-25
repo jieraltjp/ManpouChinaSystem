@@ -24,7 +24,7 @@
 
         <div class="brand-footer">
           <span class="footer-line"/>
-          <span class="footer-text">MANPOU China System · Enterprise Edition</span>
+          <span class="footer-text">{{ $t('auth.enterpriseFooter') }}</span>
         </div>
       </div>
     </div>
@@ -88,7 +88,7 @@
         </el-form>
       </div>
 
-      <p class="copyright">&copy; 2024–{{ new Date().getFullYear() }} MANPOU China. All rights reserved.</p>
+      <p class="copyright">{{ $t('auth.copyright', { year: new Date().getFullYear() }) }}</p>
     </div>
   </div>
 </template>

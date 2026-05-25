@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -35,24 +36,30 @@ public class LegacyProcurementUseCase {
     public Page<LegacyProcurementPageVO> pageQuery(LegacyProcurementQuery query) {
         PageRequest pageRequest = PageRequest.of(
                 query.getPage(),
-                Math.min(query.getPageSize(), 100),
+                Math.min(query.getPageSize(), 1000),
                 Sort.by(Sort.Direction.DESC, "updatetime")
         );
 
         String code = query.getCode();
-        String orderGroup = query.getOrderGroup();
         String itemName = query.getItemName();
         String updater = query.getUpdater();
+        String material = query.getMaterial();
+        String container = query.getContainer();
+        String orderGroup = query.getOrderGroup();
 
         Page<LegacyProcurement> page;
         if (code != null && !code.isBlank()) {
             page = repository.findByCodeContainingExcludeDeleted(code, pageRequest);
-        } else if (orderGroup != null && !orderGroup.isBlank()) {
-            page = repository.findByOrderGroupContainingExcludeDeleted(orderGroup, pageRequest);
         } else if (itemName != null && !itemName.isBlank()) {
             page = repository.findByItemNameContainingExcludeDeleted(itemName, pageRequest);
         } else if (updater != null && !updater.isBlank()) {
             page = repository.findByUpdaterContainingExcludeDeleted(updater, pageRequest);
+        } else if (material != null && !material.isBlank()) {
+            page = repository.findByMaterialContainingExcludeDeleted(material, pageRequest);
+        } else if (container != null && !container.isBlank()) {
+            page = repository.findByContainerContainingExcludeDeleted(container, pageRequest);
+        } else if (orderGroup != null && !orderGroup.isBlank()) {
+            page = repository.findByOrderGroupContainingExcludeDeleted(orderGroup, pageRequest);
         } else {
             page = repository.findAllExcludeDeleted(pageRequest);
         }
@@ -143,5 +150,12 @@ public class LegacyProcurementUseCase {
                 .withContainer(jpaRepository.countByContainerIsNotNullAndDeletedFalse())
                 .withImg(jpaRepository.countByImgIsNotNullAndImgNotAndDeletedFalse(""))
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LegacyProcurementPageVO> overdueAll() {
+        return repository.findOverdueExcludeDeleted().stream()
+                .map(assembler::toDto)
+                .toList();
     }
 }

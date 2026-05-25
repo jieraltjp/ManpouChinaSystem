@@ -288,7 +288,7 @@ onMounted(loadData)
         <el-table-column prop="status" :label="$t('dispatch.column.status')" min-width="70" />
         <el-table-column :label="$t('dispatch.column.actions')" min-width="150" fixed="right">
           <template #default="{ row }">
-            <el-button link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('common.view') }}</el-button>
+            <el-button v-if="hasPermission('dispatch:read')" link class="btn-blue" size="small" @click.stop="onView(row)">{{ $t('common.view') }}</el-button>
             <el-button v-if="hasPermission('dispatch:update')" link type="warning" size="small" @click="onEdit(row)">{{ $t('common.edit') }}</el-button>
             <el-button v-if="hasPermission('dispatch:delete')" link type="danger" size="small" @click="onDelete(row)">{{ $t('common.delete') }}</el-button>
           </template>
@@ -484,5 +484,12 @@ onMounted(loadData)
 .batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .selection-count { margin-left: 4px; }
 :deep(.el-drawer__body) { overflow-y: auto !important; overflow-x: hidden; padding: 20px; }
-.btn-blue { color: #409EFF !important; }
+.btn-blue { color: #E8650A !important; }
+:deep(.el-table__header-wrapper),
+:deep(.el-table__header th.el-table__cell) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: inherit;
+}
 </style>

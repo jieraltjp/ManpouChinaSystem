@@ -37,6 +37,8 @@
 | #_return SpEL 不生效 | [85](#85-return-对-responseentityresultlist-静默失效) |
 | sanitizeImpl cyclic 误判 | [86](#86-sanitizeimpl-visited-集合误判-dag-为-cyclic) |
 | 视图列与 Entity 映射不一致导致 500 | [93](#93-视图列与-entity-映射不一致导致-500) |
+| shipment-batch 数量修改状态自转移回滚 | [94](#94-shipment-batch-状态守卫缺失-导致单事务回滚) |
+| Agent 探索报告不等于代码事实 | [95](#95-agent-探索报告不等于代码事实) |
 | 业务锚点导致 Demand 新建后不可见 | [33](#33-业务链起点-overview-入口锚点), [57](#57-业务关联变更须八层同步) |
 
 ---
@@ -127,6 +129,12 @@
 | 87 | 操作日志 operatorName 始终 null | [audit/LESSON-87.md](./audit/LESSON-87.md) |
 | 88 | JPQL 返回枚举字段强转为 String 导致 ClassCastException | [backend/LESSON-88.md](./backend/LESSON-88.md) |
 | 89 | Avast SSL 扫描拦截导致腾讯云 COS TLS 握手失败 | [ops/LESSON-89.md](./ops/LESSON-89.md) |
+| 90 | i18n key 缺失导致 [intlify] Not found | [ops/LESSON-90.md](./ops/LESSON-90.md) |
+| 91 | user-service ddl-auto:none 新字段 500 | [ops/LESSON-91.md](./ops/LESSON-91.md) |
+| 92 | JPA findByXxx 返回多条记录 NonUniqueResultException | [ops/LESSON-92.md](./ops/LESSON-92.md) |
+| 93 | 视图列与 Entity 映射不一致导致 500 | [database/LESSON-93-DB-SCHEMA-MISMATCH.md](./database/LESSON-93-DB-SCHEMA-MISMATCH.md) |
+| 94 | shipment-batch 数量修改状态自转移回滚 | [backend/LESSON-94-SHIPMENT-BATCH-QUANTITY-UPDATE.md](./backend/LESSON-94-SHIPMENT-BATCH-QUANTITY-UPDATE.md) |
+| 95 | Agent 探索报告不等于代码事实 | [LESSON-95-AGENT-REPORT-NOT-FACT.md](./LESSON-95-AGENT-REPORT-NOT-FACT.md) |
 
 > 注：Lesson 15, 19, 22-23, 35-36, 61 未分配，保持编号连续便于追溯历史。
 

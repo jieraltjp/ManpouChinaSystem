@@ -3,13 +3,15 @@
     <!-- TODO: 后续可能加复制按钮 -->
     <!-- <div class="excel-toolbar">...</div> -->
     <div ref="containerRef" class="excel-container" />
-    <div v-if="copied" class="copy-toast">已复制</div>
+    <div v-if="copied" class="copy-toast">{{ t('common.clipboard.copied') }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Spreadsheet from 'x-data-spreadsheet'
+const { t } = useI18n()
 
 export interface ExcelColDef {
   prop: string

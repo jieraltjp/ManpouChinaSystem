@@ -392,20 +392,20 @@
     <!-- 查看关联采购单弹窗（v2.0.0：单条） -->
     <el-dialog v-model="linkedDialogVisible" :title="$t('demand.dialog.linkedDialog.title')" width="600px">
       <el-table :data="linkedProcurement ? [linkedProcurement] : []" border size="small" v-loading="linkedLoading">
-        <el-table-column prop="id" :label="$t('demand.linkedDialog.column.id')" width="70" />
-        <el-table-column prop="factoryName" :label="$t('demand.linkedDialog.column.factoryName')" min-width="120" />
-        <el-table-column prop="productCode" :label="$t('demand.linkedDialog.column.productCode')" width="100" />
-        <el-table-column prop="subProductCode" :label="$t('demand.linkedDialog.column.subProductCode')" width="110" />
-        <el-table-column prop="quantity" :label="$t('demand.linkedDialog.column.quantity')" width="70" align="right" />
-        <el-table-column prop="destination" :label="$t('demand.linkedDialog.column.destination')" min-width="100" show-overflow-tooltip />
-        <el-table-column prop="status" :label="$t('demand.linkedDialog.column.status')" width="90" align="center">
+        <el-table-column prop="id" :label="$t('demand.dialog.linkedDialog.column.id')" width="70" />
+        <el-table-column prop="factoryName" :label="$t('demand.dialog.linkedDialog.column.factoryName')" min-width="120" />
+        <el-table-column prop="productCode" :label="$t('demand.dialog.linkedDialog.column.productCode')" width="100" />
+        <el-table-column prop="subProductCode" :label="$t('demand.dialog.linkedDialog.column.subProductCode')" width="110" />
+        <el-table-column prop="quantity" :label="$t('demand.dialog.linkedDialog.column.quantity')" width="70" align="right" />
+        <el-table-column prop="destination" :label="$t('demand.dialog.linkedDialog.column.destination')" min-width="100" show-overflow-tooltip />
+        <el-table-column prop="status" :label="$t('demand.dialog.linkedDialog.column.status')" width="90" align="center">
           <template #default="{ row }">
             <el-tag size="small">{{ row.status }}</el-tag>
           </template>
         </el-table-column>
       </el-table>
       <div v-if="!linkedLoading && !linkedProcurement" style="text-align:center;color:#999;padding:20px">
-        {{ $t('demand.linkedDialog.noData') }}
+        {{ $t('demand.dialog.linkedDialog.noData') }}
       </div>
     </el-dialog>
   </div>
@@ -777,7 +777,7 @@ onMounted(() => loadData())
 .stat-value { font-size: 26px; font-weight: 800; color: var(--text-primary); line-height: 1; font-variant-numeric: tabular-nums; }
 .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
 .product-code { color: var(--color-primary); font-family: monospace; font-size: 12px; font-weight: 700; }
-.btn-blue { color: #409EFF !important; }
+.btn-blue { color: #E8650A !important; }
 .qty-value { color: #D97706; font-weight: 600; }
 .dest-value { color: #6B7280; }
 .status-toggle { cursor: pointer; }
