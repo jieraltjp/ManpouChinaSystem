@@ -1,5 +1,6 @@
 package com.manpou.allinone.product.interfaces.controller;
 
+import com.manpou.allinone.product.application.dto.CustomsQueryResultVO;
 import com.manpou.allinone.product.application.dto.MasterCodeSuggestVO;
 import com.manpou.allinone.product.application.dto.ProductCategoryVO;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -91,6 +92,17 @@ public class ProductController {
     @PreAuthorize("hasAuthority('product:read')")
     public Result<List<ProductFactoryVO>> getProductFactories(@PathVariable Long id) {
         return Result.ok(productUseCase.getProductFactories(id));
+    }
+
+    /**
+     * 报关批量查询：多货号查询单价、税率、仓库、重量、HS编码。
+     * POST /api/v1/products/customs-query
+     * Body: ["odn012", "abc345", "xyz789"]
+     */
+    @PostMapping("/customs-query")
+    @PreAuthorize("hasAuthority('product:read')")
+    public Result<List<CustomsQueryResultVO>> customsQuery(@RequestBody List<String> masterCodes) {
+        return Result.ok(productUseCase.customsQuery(masterCodes));
     }
 
     /**

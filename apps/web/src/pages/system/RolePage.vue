@@ -1,13 +1,15 @@
 <template>
   <div class="role-page">
-    <!-- 角色表格 -->
+    <!-- 角色表格（左侧） -->
     <el-card shadow="never" class="role-card">
-      <div class="role-card-header">
-        <span class="section-title">{{ $t('role.title') }}</span>
-        <el-button v-if="hasPermission('role:create')" type="primary" size="small" @click="onNew">
-          <el-icon><Plus /></el-icon>{{ $t('role.newButton') }}
-        </el-button>
-      </div>
+      <template #header>
+        <div class="role-card-header">
+          <span class="section-title">{{ $t('role.title') }}</span>
+          <el-button v-if="hasPermission('role:create')" type="primary" size="small" @click="onNew">
+            <el-icon><Plus /></el-icon>{{ $t('role.newButton') }}
+          </el-button>
+        </div>
+      </template>
       <el-table
         ref="roleTableRef"
         :data="allRoles"
@@ -16,8 +18,9 @@
         @row-click="onRowClick"
         stripe
         style="width: 100%"
+        :max-height="roleTableMaxHeight"
       >
-        <el-table-column :label="$t('role.column.roleName')" min-width="140">
+        <el-table-column :label="$t('role.column.roleNameCn')" min-width="120">
           <template #default="{ row }">
             <div class="role-name-cell">
               <span class="role-name">{{ currentLocale === 'ja' ? row.roleNameJp : row.roleNameCn }}</span>
@@ -27,16 +30,16 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('role.column.roleCode')" prop="roleCode" min-width="120" />
-        <el-table-column :label="$t('role.column.roleType')" width="100" align="center">
+        <el-table-column :label="$t('role.column.roleCode')" prop="roleCode" min-width="100" />
+        <el-table-column :label="$t('role.column.roleType')" width="90" align="center">
           <template #default="{ row }">
             <el-tag size="small" :type="row.roleType === 'SYSTEM' ? 'warning' : 'primary'" effect="plain">
               {{ row.roleType === 'SYSTEM' ? $t('role.type.SYSTEM') : $t('role.type.BUSINESS') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('role.column.userCount')" prop="userCount" width="80" align="center" />
-        <el-table-column :label="$t('role.column.actions')" width="120" align="center" fixed="right">
+        <el-table-column :label="$t('role.column.userCount')" prop="userCount" width="70" align="center" />
+        <el-table-column :label="$t('role.column.actions')" width="100" align="center">
           <template #default="{ row }">
             <el-button
               v-if="hasPermission('role:update')"
@@ -57,7 +60,7 @@
       </el-table>
     </el-card>
 
-    <!-- 权限配置面板 -->
+    <!-- 权限配置面板（右侧） -->
     <el-card shadow="never" class="perm-card" :class="{ 'perm-card--active': !!selectedRole }">
       <template #header>
         <div class="perm-header">
@@ -201,6 +204,8 @@ import type { RoleVO, RoleCreateCmd, RoleUpdateCmd } from '@/api/role'
 const { t, locale } = useI18n()
 const currentLocale = computed(() => locale.value)
 const { hasPermission } = usePermission()
+
+const roleTableMaxHeight = computed(() => 'calc(100vh - 200px)')
 
 interface PermNode {
   id: number
@@ -370,21 +375,25 @@ loadRoles()
 <style scoped>
 .role-page {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 16px;
   height: calc(100vh - 120px);
-  overflow-y: auto;
+  overflow: hidden;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
-/* ── 角色卡片 ── */
+/* ── 角色卡片（左） ── */
 .role-card {
+  width: 480px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 .role-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
 }
 .section-title {
   font-size: 15px;
@@ -394,18 +403,28 @@ loadRoles()
 .role-name-cell {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 .role-name {
   font-weight: 600;
   color: var(--text-primary);
+  font-size: 13px;
 }
 
-/* ── 权限卡片 ── */
+/* ── 权限卡片（右） ── */
 .perm-card {
   flex: 1;
-  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   transition: opacity 0.3s;
+}
+.perm-card :deep(.el-card__body) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 12px 16px;
 }
 .perm-card--active {
   opacity: 1;
@@ -467,9 +486,9 @@ loadRoles()
 
 /* ── 权限内容 ── */
 .perm-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .perm-module-group {

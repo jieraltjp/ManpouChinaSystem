@@ -27,5 +27,4 @@ public class DispatchUpdateCmd {
     private String warehouse;
     private String factoryAddr;
     private Integer showFlag;
-    private String rireki;
 }

@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "consolidation:create", "consolidation:read", "consolidation:update", "consolidation:delete",
         "container:create", "container:read", "container:update", "container:delete",
         "ship:create", "ship:read", "ship:update", "ship:delete",
-        "dispatch:create", "dispatch:read", "dispatch:update", "dispatch:delete",
+        "dispatch:create", "dispatch:read", "dispatch:update", "dispatch:delete", "dispatch:export",
         "offline_order:create", "offline_order:read", "offline_order:update", "offline_order:delete",
         "customs:create", "customs:read", "customs:update", "customs:delete", "customs:approve",
         "japan_customs:create", "japan_customs:read", "japan_customs:update", "japan_customs:delete",

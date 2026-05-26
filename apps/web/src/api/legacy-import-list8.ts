@@ -58,6 +58,16 @@ export interface LegacyImportList8UpdateCmd {
   rireki?: string
 }
 
+export interface CustomsQueryResultVO {
+  code: string
+  found: boolean
+  tax?: string
+  unitCh?: number
+  rate?: number
+  souko?: string
+  location?: string
+}
+
 export const legacyImportList8Api = {
   list(params: {
     page?: number
@@ -83,5 +93,9 @@ export const legacyImportList8Api = {
   },
   count() {
     return client.get<number>('/legacy-import-list8/count')
+  },
+  /** 报关批量查询 */
+  customsQuery(codes: string[]) {
+    return client.post<CustomsQueryResultVO[]>('/legacy-import-list8/customs-query', codes)
   },
 }

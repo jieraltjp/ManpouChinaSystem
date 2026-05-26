@@ -46,6 +46,10 @@ public interface ProductJpaRepository extends ProductRepository, JpaRepository<P
     Page<Product> findByFactoryNameContaining(@Param("factoryName") String factoryName, Pageable pageable);
 
     /** 主货号模糊搜索（去重），用于自动补全 */
+    @Override
+    @Query("SELECT p FROM Product p WHERE p.masterCode LIKE %:masterCode% AND p.deleted = false")
+    Page<Product> findByMasterCodeContainingAndDeletedIsFalse(@Param("masterCode") String masterCode, Pageable pageable);
+
     @Query("SELECT DISTINCT p.masterCode FROM Product p WHERE p.masterCode LIKE %:kw% AND p.deleted = false")
     List<String> findDistinctMasterCodeByKeyword(@Param("kw") String keyword);
 

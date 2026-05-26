@@ -2234,7 +2234,8 @@
       "roleType": "角色类型",
       "description": "描述",
       "userCount": "成员数",
-      "createTime": "创建时间"
+      "createTime": "创建时间",
+      "actions": "操作"
     },
     "type": {
       "SYSTEM": "系统内置",
@@ -2610,8 +2611,8 @@
       "subCode": "枝番",
       "infoFile1": "说明书(自)",
       "infoFile2": "说明书(工)",
-      "updater": "担当者",
-      "material": "担当者",
+      "updater": "负责人",
+      "material": "材质",
       "note": "备注(评论)",
       "image": "商品图片",
       "itemName": "新品中文名",
@@ -2765,19 +2766,19 @@
     "drawerTitle": "发送详情",
     "deleteConfirm": "确认删除发送记录「{code}」？",
     "filter": {
-      "code": "编号",
-      "codeHint": "输入编号搜索",
-      "destination": "目的地",
-      "destinationHint": "输入目的地搜索",
-      "manager": "负责人",
-      "managerHint": "输入负责人搜索",
+      "keyword": "货号/商品名",
+      "keywordHint": "货号或商品名模糊搜索",
+      "destManager": "目的地/负责人",
+      "destManagerHint": "目的地或负责人模糊搜索",
       "showFlag": "显示状态",
       "all": "全部",
       "search": "查询",
-      "reset": "重置"
+      "reset": "重置",
+      "dateRange": "交货日期"
     },
     "column": {
-      "code": "编号",
+      "code": "货号",
+      "productNameZh": "名称",
       "manager": "负责人",
       "destination": "目的地",
       "tax": "税",
@@ -2787,7 +2788,7 @@
       "pieces": "件数",
       "weight": "净重",
       "weight2": "毛重",
-      "length": "长度",
+      "length": "尺",
       "location": "地点",
       "dispatchDate": "日期",
       "status": "状态",
@@ -2797,7 +2798,6 @@
       "warehouse": "仓库",
       "factoryAddr": "工厂地址",
       "showFlag": "显示",
-      "rireki": "履历",
       "actions": "操作",
       "createTime": "创建时间",
       "updateTime": "更新时间",
@@ -2807,6 +2807,16 @@
       "active": "活跃",
       "archived": "归档"
     },
+    "status": {
+      "completed": "已完成",
+      "incomplete": "未完成",
+      "batchPlaceholder": "批量改状态",
+      "batchUpdate": "批量更新",
+      "batchConfirm": "确认将选中的 {n} 条记录状态改为「{status}」？",
+      "batchConfirmTitle": "批量更新状态",
+      "batchSuccess": "批量更新成功，已更新 {n} 条"
+    },
+    "exportButton": "导出 CSV",
     "dialog": {
       "codePlaceholder": "如 ny362",
       "managerPlaceholder": "如 段",
@@ -2822,7 +2832,7 @@
       "rirekiPlaceholder": "历史记录"
     },
     "validation": {
-      "codeRequired": "请输入编号"
+      "codeRequired": "请输入货号"
     },
     "message": {
       "loadFailed": "加载发送记录失败",
@@ -2859,7 +2869,7 @@
     "column": {
       "id": "ID",
       "code": "货号",
-      "manager": "担当者",
+      "manager": "负责人",
       "destination": "目的地",
       "tax": "税",
       "material": "材质",
@@ -2928,6 +2938,26 @@
       "deleteSuccess": "删除成功",
       "saveFailed": "保存失败",
       "deleteFailed": "删除失败"
+    },
+    "customsQuery": {
+      "title": "报关查询",
+      "inputLabel": "请输入货号（每行一个）",
+      "inputPlaceholder": "odn012\nabc345",
+      "column": {
+        "code": "货号",
+        "tax": "税",
+        "unitCh": "单价(元)",
+        "rate": "汇率",
+        "souko": "仓库",
+        "location": "所在地"
+      },
+      "notFound": "未找到该货号",
+      "confirm": "确定",
+      "cancel": "取消",
+      "message": {
+        "success": "查询成功",
+        "empty": "请输入货号"
+      }
     }
   }
 }

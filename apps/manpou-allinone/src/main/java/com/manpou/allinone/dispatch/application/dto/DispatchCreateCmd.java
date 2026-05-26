@@ -55,6 +55,4 @@ public class DispatchCreateCmd {
     private String factoryAddr;
 
     private Integer showFlag = 0;
-
-    private String rireki;
 }

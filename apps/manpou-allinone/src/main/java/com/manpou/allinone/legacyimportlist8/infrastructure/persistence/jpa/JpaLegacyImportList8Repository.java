@@ -5,6 +5,7 @@ import com.manpou.allinone.legacyimportlist8.domain.repository.LegacyImportList8
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +16,7 @@ import java.util.Optional;
 
 @Repository
 public interface JpaLegacyImportList8Repository
-        extends LegacyImportList8Repository, JpaRepository<LegacyImportList8, Integer> {
+        extends LegacyImportList8Repository, JpaRepository<LegacyImportList8, Integer>, JpaSpecificationExecutor<LegacyImportList8> {
 
     @Override
     Page<LegacyImportList8> findAll(Pageable pageable);
@@ -35,7 +36,12 @@ public interface JpaLegacyImportList8Repository
     @Override
     Optional<LegacyImportList8> findById(Integer id);
 
+    @Override
     List<LegacyImportList8> findAll();
+
+    @Override
+    @Query(value = "SELECT * FROM legacy_import_list8 WHERE TRIM(UPPER(code)) = TRIM(UPPER(:code)) ORDER BY id DESC LIMIT 1", nativeQuery = true)
+    Optional<LegacyImportList8> findByCodeTrimUpper(String code);
 
     @Modifying
     @Query("DELETE FROM LegacyImportList8 e WHERE e.id = :id")

@@ -16,10 +16,13 @@
           <el-input v-model="filter.destination" :placeholder="$t('offlineOrder.filter.destinationHint')" clearable style="width: 140px" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="loadData">{{ $t('offlineOrder.filter.search') }}</el-button>
+          <el-button type="primary" @click="onSearch">{{ $t('offlineOrder.filter.search') }}</el-button>
           <el-button @click="onReset">{{ $t('offlineOrder.filter.reset') }}</el-button>
           <el-button type="primary" @click="onCreate" v-if="hasPermission('offline_order:create')">
             <el-icon><Plus /></el-icon>{{ $t('offlineOrder.newButton') }}
+          </el-button>
+          <el-button type="info" @click="onCustomsQuery" v-if="hasPermission('offline_order:read')">
+            {{ $t('offlineOrder.customsQuery.title') }}
           </el-button>
         </el-form-item>
       </el-form>
@@ -44,8 +47,6 @@
         <el-table-column :label="$t('offlineOrder.column.rate')" prop="rate" show-overflow-tooltip min-width="80" />
         <el-table-column :label="$t('offlineOrder.column.souko')" prop="souko" show-overflow-tooltip min-width="120" />
         <el-table-column :label="$t('offlineOrder.column.factory')" prop="factoryAddr" show-overflow-tooltip min-width="120" />
-        <el-table-column :label="$t('offlineOrder.column.updateuser')" prop="updateuser" show-overflow-tooltip min-width="100" />
-        <el-table-column :label="$t('offlineOrder.column.updatetimelegacy')" prop="updatetime" show-overflow-tooltip min-width="150" />
         <el-table-column :label="$t('offlineOrder.column.actions')" width="160">
           <template #default="{ row }">
             <el-button link class="btn-blue" size="small" @click="onDetail(row)">{{ $t('offlineOrder.dialog.detail') }}</el-button>
@@ -65,7 +66,7 @@
         :page-sizes="[20, 50, 100]"
         layout="total, sizes, prev, pager, next, jumper"
         @current-change="onPageChange"
-        @size-change="loadData"
+        @size-change="onPageSizeChange"
       />
     </div>
 
@@ -346,6 +347,72 @@
         <el-button type="primary" :loading="submitting" @click="onSubmit">{{ $t('offlineOrder.dialog.submit') }}</el-button>
       </template>
     </el-dialog>
+
+    <!-- Customs Query Dialog -->
+    <el-dialog
+      v-model="customsVisible"
+      :title="$t('offlineOrder.customsQuery.title')"
+      width="900px"
+      destroy-on-close
+    >
+      <div style="padding: 0 8px">
+        <div style="margin-bottom: 12px">
+          <div style="font-size: 13px; color: #606266; margin-bottom: 6px">
+            {{ $t('offlineOrder.customsQuery.inputLabel') }}
+          </div>
+          <el-input
+            v-model="customsInput"
+            type="textarea"
+            :rows="6"
+            :placeholder="$t('offlineOrder.customsQuery.inputPlaceholder')"
+            resize="vertical"
+          />
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px">
+          <el-button @click="customsVisible = false">{{ $t('offlineOrder.customsQuery.cancel') }}</el-button>
+          <el-button type="primary" :loading="customsLoading" @click="onCustomsSearch">
+            {{ $t('offlineOrder.customsQuery.confirm') }}
+          </el-button>
+        </div>
+        <el-table
+          v-if="customsResults.length > 0"
+          :data="customsResults"
+          stripe
+          max-height="400"
+          style="width: 100%"
+        >
+          <el-table-column :label="$t('offlineOrder.customsQuery.column.code')" prop="code" min-width="120" show-overflow-tooltip />
+          <el-table-column :label="$t('offlineOrder.customsQuery.column.tax')" prop="tax" min-width="100" show-overflow-tooltip>
+            <template #default="{ row }">
+              <span v-if="row.found">{{ row.tax || '-' }}</span>
+              <span v-else-if="!row.found" style="color: #f56c6c">{{ $t('offlineOrder.customsQuery.notFound') }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('offlineOrder.customsQuery.column.unitCh')" min-width="100" align="right">
+            <template #default="{ row }">
+              <span v-if="row.found && row.unitCh != null">{{ row.unitCh }}</span>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('offlineOrder.customsQuery.column.rate')" min-width="90" align="right">
+            <template #default="{ row }">
+              <span v-if="row.found && row.rate != null">{{ row.rate }}</span>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('offlineOrder.customsQuery.column.souko')" prop="souko" min-width="120" show-overflow-tooltip>
+            <template #default="{ row }">
+              <span v-if="row.found">{{ row.souko || '-' }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('offlineOrder.customsQuery.column.location')" prop="location" min-width="120" show-overflow-tooltip>
+            <template #default="{ row }">
+              <span v-if="row.found">{{ row.location || '-' }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -356,7 +423,7 @@ import { Plus } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { legacyImportList8Api } from '@/api/legacy-import-list8'
-import type { LegacyImportList8VO, LegacyImportList8UpdateCmd } from '@/api/legacy-import-list8'
+import type { LegacyImportList8VO, LegacyImportList8UpdateCmd, CustomsQueryResultVO } from '@/api/legacy-import-list8'
 import { usePermission } from '@/composables/usePermission'
 
 const { hasPermission } = usePermission()
@@ -414,6 +481,12 @@ const blankForm = (): LegacyImportList8UpdateCmd => ({
 
 const form = reactive<LegacyImportList8UpdateCmd>(blankForm())
 
+// Customs query state
+const customsVisible = ref(false)
+const customsInput = ref('')
+const customsLoading = ref(false)
+const customsResults = ref<CustomsQueryResultVO[]>([])
+
 const editTitle = computed(() =>
   isCreate.value ? t('offlineOrder.newButton') : t('offlineOrder.editTitle')
 )
@@ -444,6 +517,11 @@ const loadData = async () => {
   }
 }
 
+const onSearch = () => {
+  filter.page = 0
+  loadData()
+}
+
 const onReset = () => {
   filter.code = ''
   filter.location = ''
@@ -455,6 +533,12 @@ const onReset = () => {
 
 const onPageChange = (page: number) => {
   filter.page = page - 1
+  loadData()
+}
+
+const onPageSizeChange = (size: number) => {
+  filter.pageSize = size
+  filter.page = 0
   loadData()
 }
 
@@ -534,6 +618,30 @@ const onDelete = (row: LegacyImportList8VO) => {
       }
     })
     .catch(() => {})
+}
+
+const onCustomsQuery = () => {
+  customsVisible.value = true
+  customsInput.value = ''
+  customsResults.value = []
+}
+
+const onCustomsSearch = async () => {
+  const lines: string[] = customsInput.value.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 0)
+  if (lines.length === 0) {
+    ElMessage.warning(t('offlineOrder.customsQuery.message.empty'))
+    return
+  }
+  customsLoading.value = true
+  try {
+    const res = await legacyImportList8Api.customsQuery(lines)
+    customsResults.value = res.data ?? []
+    ElMessage.success(t('offlineOrder.customsQuery.message.success'))
+  } catch {
+    ElMessage.error(t('offlineOrder.message.loadFailed'))
+  } finally {
+    customsLoading.value = false
+  }
 }
 
 onMounted(() => {

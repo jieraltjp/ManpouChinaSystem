@@ -32,11 +32,17 @@ public class DispatchAssembler {
                 .warehouse(entity.getWarehouse())
                 .factoryAddr(entity.getFactoryAddr())
                 .showFlag(entity.getShowFlag())
-                .rireki(entity.getRireki())
                 .createBy(entity.getCreateBy())
                 .createTime(entity.getCreateTime())
                 .updateTime(entity.getUpdateTime())
+                .productNameZh(null)
                 .build();
+    }
+
+    public DispatchVO toVo(Dispatch entity, String productNameZh) {
+        DispatchVO vo = toVo(entity);
+        vo.setProductNameZh(productNameZh);
+        return vo;
     }
 
     public Dispatch toEntity(DispatchCreateCmd cmd) {
@@ -61,7 +67,6 @@ public class DispatchAssembler {
         entity.setWarehouse(cmd.getWarehouse() != null ? cmd.getWarehouse() : "");
         entity.setFactoryAddr(cmd.getFactoryAddr());
         entity.setShowFlag(cmd.getShowFlag() != null ? cmd.getShowFlag() : 0);
-        entity.setRireki(cmd.getRireki());
         return entity;
     }
 
@@ -86,6 +91,5 @@ public class DispatchAssembler {
         if (cmd.getWarehouse() != null) entity.setWarehouse(cmd.getWarehouse());
         if (cmd.getFactoryAddr() != null) entity.setFactoryAddr(cmd.getFactoryAddr());
         if (cmd.getShowFlag() != null) entity.setShowFlag(cmd.getShowFlag());
-        if (cmd.getRireki() != null) entity.setRireki(cmd.getRireki());
     }
 }

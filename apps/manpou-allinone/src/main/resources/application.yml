@@ -50,11 +50,23 @@ spring:
 
   data:
     redis:
+      enabled: false
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       database: ${REDIS_DB:0}
       timeout: 5000
+
+management:
+  health:
+    redis:
+      enabled: false
+  endpoints:
+    web.exposure.include: health,info,metrics,prometheus
+  endpoint:
+    health.show-details: when_authorized
+  metrics.tags:
+    service: ${spring.application.name}
 
 spring.cloud.nacos.discovery:
   server-addr: ${NACOS_SERVER:nacos}:8848
@@ -108,11 +120,3 @@ deepseek:
   model: ${DEEPSEEK_MODEL:deepseek-chat}
   base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
   timeout-seconds: ${DEEPSEEK_TIMEOUT:30}
-
-management:
-  endpoints:
-    web.exposure.include: health,info,metrics,prometheus
-  endpoint:
-    health.show-details: when_authorized
-  metrics.tags:
-    service: ${spring.application.name}

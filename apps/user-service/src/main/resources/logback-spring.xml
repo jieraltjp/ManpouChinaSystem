@@ -76,13 +76,33 @@
     </appender>
 
     <!-- ================================================
+         4b. 错误日志 appender（仅 ERROR/FATAL，写入独立文件）
+         ================================================ -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service":"${APP_NAME:-user-service}","logType":"error"}</customFields>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- ================================================
          5. Profile 分组
          ================================================ -->
-    <!-- 生产环境：JSON 日志 + 审计日志 -->
+    <!-- 生产环境：JSON 日志 + 审计日志 + 错误日志 -->
     <springProfile name="prod,production">
         <root level="INFO">
             <appender-ref ref="ASYNC_JSON"/>
             <appender-ref ref="JSON_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
         </root>
         <logger name="com.manpou" level="INFO"/>
         <logger name="com.manpou.audit" level="INFO" additivity="false">

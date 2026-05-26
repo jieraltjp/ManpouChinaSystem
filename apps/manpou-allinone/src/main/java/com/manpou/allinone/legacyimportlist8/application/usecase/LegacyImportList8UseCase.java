@@ -3,6 +3,7 @@ package com.manpou.allinone.legacyimportlist8.application.usecase;
 import com.manpou.allinone.common.exception.BusinessException;
 import com.manpou.allinone.infrastructure.security.JwtContextHolder;
 import com.manpou.allinone.legacyimportlist8.application.assembler.LegacyImportList8Assembler;
+import com.manpou.allinone.legacyimportlist8.application.dto.CustomsQueryResultVO;
 import com.manpou.allinone.legacyimportlist8.application.dto.LegacyImportList8Query;
 import com.manpou.allinone.legacyimportlist8.application.dto.LegacyImportList8UpdateCmd;
 import com.manpou.allinone.legacyimportlist8.application.dto.LegacyImportList8VO;
@@ -13,10 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -39,18 +42,21 @@ public class LegacyImportList8UseCase {
         String souko = query.getSouko();
         String destination = query.getDestination();
 
-        Page<LegacyImportList8> page;
+        Specification<LegacyImportList8> spec = Specification.where(null);
         if (code != null && !code.isBlank()) {
-            page = repository.findByCodeContaining(code, pageRequest);
-        } else if (location != null && !location.isBlank()) {
-            page = repository.findByLocationContaining(location, pageRequest);
-        } else if (souko != null && !souko.isBlank()) {
-            page = repository.findBySoukoContaining(souko, pageRequest);
-        } else if (destination != null && !destination.isBlank()) {
-            page = repository.findByDestinationContaining(destination, pageRequest);
-        } else {
-            page = repository.findAll(pageRequest);
+            spec = spec.and((root, query2, cb) -> cb.like(root.get("code"), "%" + code + "%"));
         }
+        if (location != null && !location.isBlank()) {
+            spec = spec.and((root, query2, cb) -> cb.like(root.get("location"), "%" + location + "%"));
+        }
+        if (souko != null && !souko.isBlank()) {
+            spec = spec.and((root, query2, cb) -> cb.like(root.get("souko"), "%" + souko + "%"));
+        }
+        if (destination != null && !destination.isBlank()) {
+            spec = spec.and((root, query2, cb) -> cb.like(root.get("destination"), "%" + destination + "%"));
+        }
+
+        Page<LegacyImportList8> page = repository.findAll(spec, pageRequest);
         return page.map(assembler::toDto);
     }
 
@@ -96,5 +102,43 @@ public class LegacyImportList8UseCase {
     @Transactional(readOnly = true)
     public long count() {
         return repository.count();
+    }
+
+    /**
+     * 报关批量查询：根据货号列表精准查询（TRIM+UPPER）。
+     * 未找到的货号返回 found=false（不抛异常）。
+     */
+    @Transactional(readOnly = true)
+    public List<CustomsQueryResultVO> customsQuery(List<String> codes) {
+        if (codes == null || codes.isEmpty()) {
+            return List.of();
+        }
+        // 去重 + 脱空格
+        List<String> trimmed = codes.stream()
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .distinct()
+                .toList();
+        if (trimmed.isEmpty()) {
+            return List.of();
+        }
+        // 逐条精准查询（TRIM+UPPER）
+        return trimmed.stream()
+                .map(code -> {
+                    LegacyImportList8 e = repository.findByCodeTrimUpper(code).orElse(null);
+                    if (e == null) {
+                        return CustomsQueryResultVO.builder().code(code).found(false).build();
+                    }
+                    return CustomsQueryResultVO.builder()
+                            .code(e.getCode())
+                            .found(true)
+                            .tax(e.getTax())
+                            .unitCh(e.getUnitCh())
+                            .rate(e.getRate())
+                            .souko(e.getSouko())
+                            .location(e.getLocation())
+                            .build();
+                })
+                .toList();
     }
 }

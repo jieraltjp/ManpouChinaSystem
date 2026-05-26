@@ -3,6 +3,7 @@ import client from './client'
 export interface DispatchVO {
   id: number
   code: string
+  productNameZh?: string
   manager: string
   destination: string
   tax: string
@@ -22,7 +23,6 @@ export interface DispatchVO {
   warehouse: string
   factoryAddr?: string
   showFlag: number
-  rireki?: string
   createBy?: string
   createTime?: string
   updateTime?: string
@@ -56,7 +56,6 @@ export interface CreateDispatchRequest {
   warehouse?: string
   factoryAddr?: string
   showFlag?: number
-  rireki?: string
 }
 
 export interface UpdateDispatchRequest {
@@ -80,22 +79,26 @@ export interface UpdateDispatchRequest {
   warehouse?: string
   factoryAddr?: string
   showFlag?: number
-  rireki?: string
 }
 
 export const dispatchApi = {
   list(params?: {
     page?: number
     pageSize?: number
-    code?: string
-    destination?: string
-    manager?: string
+    keyword?: string
+    destManager?: string
     showFlag?: string
+    status?: string
+    dateFrom?: string
+    dateTo?: string
   }) {
     return client.get<DispatchPageResponse>('/dispatches', { params })
   },
   get(id: number) {
     return client.get<DispatchVO>(`/dispatches/${id}`)
+  },
+  getLatestByCode(code: string) {
+    return client.get<DispatchVO>(`/dispatches/by-code/${encodeURIComponent(code)}`)
   },
   create(data: CreateDispatchRequest) {
     return client.post<number>('/dispatches', data)
@@ -105,5 +108,20 @@ export const dispatchApi = {
   },
   delete(id: number) {
     return client.delete<void>(`/dispatches/${id}`)
+  },
+  patchStatus(id: number, status: string) {
+    return client.patch<void>(`/dispatches/${id}/status`, { status })
+  },
+  patchBatchStatus(ids: number[], status: string) {
+    return client.patch<number>('/dispatches/batch-status', { ids, status })
+  },
+  exportCsv(params?: {
+    keyword?: string
+    destManager?: string
+    status?: string
+    dateFrom?: string
+    dateTo?: string
+  }) {
+    return client.get('/dispatches/export', { params, responseType: 'blob' })
   },
 }

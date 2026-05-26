@@ -695,14 +695,14 @@ const isLinkedProcurement = ref(true)
 /** 商品分类下拉（7项：OEM/普货/厂家出口 + 普通采购/样品/自用/配件/无关联） */
 type ProductCategory = ProductType | 'OEM' | 'ORDINARY' | 'FACTORY_DIRECT'
 const productCategoryOptions: { value: ProductCategory; label: string }[] = [
-  { value: 'OEM', label: t('order.productCategoryOptions.OEM') },
-  { value: 'ORDINARY', label: t('order.productCategoryOptions.ORDINARY') },
-  { value: 'FACTORY_DIRECT', label: t('order.productCategoryOptions.FACTORY_DIRECT') },
-  { value: 'NORMAL', label: t('order.productCategoryOptions.NORMAL') },
-  { value: 'SAMPLE', label: t('order.productCategoryOptions.SAMPLE') },
-  { value: 'SELF_USE', label: t('order.productCategoryOptions.SELF_USE') },
-  { value: 'PARTS', label: t('order.productCategoryOptions.PARTS') },
-  { value: 'INDEPENDENT', label: t('order.productCategoryOptions.INDEPENDENT') },
+  { value: 'OEM', label: t('order.dialog.productCategoryOptions.OEM') },
+  { value: 'ORDINARY', label: t('order.dialog.productCategoryOptions.ORDINARY') },
+  { value: 'FACTORY_DIRECT', label: t('order.dialog.productCategoryOptions.FACTORY_DIRECT') },
+  { value: 'NORMAL', label: t('order.dialog.productCategoryOptions.NORMAL') },
+  { value: 'SAMPLE', label: t('order.dialog.productCategoryOptions.SAMPLE') },
+  { value: 'SELF_USE', label: t('order.dialog.productCategoryOptions.SELF_USE') },
+  { value: 'PARTS', label: t('order.dialog.productCategoryOptions.PARTS') },
+  { value: 'INDEPENDENT', label: t('order.dialog.productCategoryOptions.INDEPENDENT') },
 ]
 
 /** 商品货号搜索下拉 */

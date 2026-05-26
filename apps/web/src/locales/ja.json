@@ -2235,7 +2235,8 @@
       "roleType": "役割タイプ",
       "description": "説明",
       "userCount": "メンバー数",
-      "createTime": "作成日時"
+      "createTime": "作成日時",
+      "actions": "操作"
     },
     "type": {
       "SYSTEM": "システム組み込み",
@@ -2770,19 +2771,19 @@
     "drawerTitle": "発送詳細",
     "deleteConfirm": "発送記録「{code}」を削除しますか？",
     "filter": {
-      "code": "番号",
-      "codeHint": "番号で検索",
-      "destination": "目的地",
-      "destinationHint": "目的地で検索",
-      "manager": "担当者",
-      "managerHint": "担当者で検索",
+      "keyword": "品番号/商品名",
+      "keywordHint": "品番号または商品名模糊検索",
+      "destManager": "目的地/担当者",
+      "destManagerHint": "目的地または担当者模糊検索",
       "showFlag": "表示状態",
       "all": "全部",
       "search": "検索",
-      "reset": "リセット"
+      "reset": "リセット",
+      "dateRange": "出荷日"
     },
     "column": {
-      "code": "番号",
+      "code": "品番号",
+      "productNameZh": "名称",
       "manager": "担当者",
       "destination": "目的地",
       "tax": "税",
@@ -2792,7 +2793,7 @@
       "pieces": "個数",
       "weight": "正味重量",
       "weight2": "総重量",
-      "length": "長さ",
+      "length": "尺",
       "location": "場所",
       "dispatchDate": "日付",
       "status": "状態",
@@ -2802,7 +2803,6 @@
       "warehouse": "倉庫",
       "factoryAddr": "工場住所",
       "showFlag": "表示",
-      "rireki": "履歴",
       "actions": "操作",
       "createTime": "作成日時",
       "updateTime": "更新日時",
@@ -2812,6 +2812,16 @@
       "active": "表示",
       "archived": "非表示"
     },
+    "status": {
+      "completed": "完了",
+      "incomplete": "未完了",
+      "batchPlaceholder": "一括変更",
+      "batchUpdate": "一括更新",
+      "batchConfirm": "{n}件のステータスを「{status}」に変更しますか？",
+      "batchConfirmTitle": "一括ステータス更新",
+      "batchSuccess": "一括更新完了、{n}件更新しました"
+    },
+    "exportButton": "CSV出力",
     "dialog": {
       "codePlaceholder": "例：ny362",
       "managerPlaceholder": "例：段",
@@ -2827,7 +2837,7 @@
       "rirekiPlaceholder": "履歴"
     },
     "validation": {
-      "codeRequired": "番号を入力してください"
+      "codeRequired": "品番号を入力してください"
     },
     "message": {
       "loadFailed": "発送記録の読み込みに失敗しました",
@@ -2933,6 +2943,26 @@
       "deleteSuccess": "削除成功",
       "saveFailed": "保存に失敗しました",
       "deleteFailed": "削除に失敗しました"
+    },
+    "customsQuery": {
+      "title": "通関查询",
+      "inputLabel": "SKUを入力をしてください（1行に1つ）",
+      "inputPlaceholder": "odn012\nabc345",
+      "column": {
+        "code": "SKU",
+        "tax": "税",
+        "unitCh": "単価(元)",
+        "rate": "為替レート",
+        "souko": "倉庫",
+        "location": "所在地"
+      },
+      "notFound": "このSKUは見つかりません",
+      "confirm": "確認",
+      "cancel": "キャンセル",
+      "message": {
+        "success": "検索成功",
+        "empty": "SKUを入力してください"
+      }
     }
   }
 }

@@ -171,6 +171,17 @@ export interface ProductCategoryVO {
   imageUrl?: string
 }
 
+export interface CustomsQueryResultVO {
+  masterCode: string
+  found: boolean
+  unitPriceRmb?: number
+  taxRate?: number
+  warehouse?: string
+  netWeightKg?: number
+  grossWeightKg?: number
+  hsCode?: string
+}
+
 export const productApi = {
   list(params: { page?: number; pageSize?: number; masterCode?: string; keyword?: string; hsCode?: string; hsCodeJp?: string; factoryName?: string }) {
     return client.get<ProductPageResponse>('/products', { params })
@@ -206,5 +217,9 @@ export const productApi = {
   /** 批量获取商品类别（替代逐个 getByCode 调用，解决 N+1） */
   batchGetCategories(masterCodes: string[]) {
     return client.post<ProductCategoryVO[]>('/products/batch-categories', masterCodes)
+  },
+  /** 报关批量查询：多货号查询单价、税率、仓库、重量、HS编码 */
+  customsQuery(masterCodes: string[]) {
+    return client.post<CustomsQueryResultVO[]>('/products/customs-query', masterCodes)
   },
 }

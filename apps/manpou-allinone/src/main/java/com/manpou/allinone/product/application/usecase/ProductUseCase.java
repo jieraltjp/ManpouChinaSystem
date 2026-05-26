@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import com.manpou.allinone.common.filter.TraceFilter;
 import com.manpou.allinone.product.application.assembler.ProductAssembler;
+import com.manpou.allinone.product.application.dto.CustomsQueryResultVO;
 import com.manpou.allinone.product.application.dto.MasterCodeSuggestVO;
 import com.manpou.allinone.product.application.dto.ProductCategoryVO;
 import com.manpou.allinone.product.application.dto.ProductCreateCmd;
@@ -320,5 +321,57 @@ public class ProductUseCase {
             }
         }
         return productRepository.save(product);
+    }
+
+    /**
+     * 报关批量查询：根据货号列表查询单价、税率、仓库、重量、HS编码。
+     * 输入为空时返回空列表；查不到的货号返回 found=false 的条目（不抛异常）。
+     */
+    @Transactional(readOnly = true)
+    public List<CustomsQueryResultVO> customsQuery(List<String> masterCodes) {
+        if (masterCodes == null || masterCodes.isEmpty()) {
+            return List.of();
+        }
+        // 去重 + 脱空格
+        List<String> codes = masterCodes.stream()
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .distinct()
+                .toList();
+        if (codes.isEmpty()) {
+            return List.of();
+        }
+        // 批量查询：只查 master-level（subCode IS NULL）
+        List<Product> products = productRepository.findAllByMasterCodeInAndDeletedIsFalse(codes).stream()
+                .filter(p -> p.getSubCode() == null)
+                .toList();
+        var foundMap = products.stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        Product::getMasterCode,
+                        p -> p,
+                        (a, b) -> a
+                ));
+        // 按输入顺序返回，未找到的条目标记 found=false
+        return codes.stream()
+                .map(code -> {
+                    Product p = foundMap.get(code);
+                    if (p == null) {
+                        return CustomsQueryResultVO.builder()
+                                .masterCode(code)
+                                .found(false)
+                                .build();
+                    }
+                    return CustomsQueryResultVO.builder()
+                            .masterCode(p.getMasterCode())
+                            .found(true)
+                            .unitPriceRmb(p.getUnitPriceRmb())
+                            .taxRate(p.getTaxRate())
+                            .warehouse(p.getWarehouse())
+                            .netWeightKg(p.getNetWeightKg())
+                            .grossWeightKg(p.getGrossWeightKg())
+                            .hsCode(p.getHsCode())
+                            .build();
+                })
+                .toList();
     }
 }

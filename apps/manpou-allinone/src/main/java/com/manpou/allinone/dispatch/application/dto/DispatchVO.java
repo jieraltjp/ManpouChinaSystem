@@ -31,8 +31,10 @@ public class DispatchVO {
     private String warehouse;
     private String factoryAddr;
     private Integer showFlag;
-    private String rireki;
     private String createBy;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+
+    /** 商品中文名称（从 product.name_zh 关联查询） */
+    private String productNameZh;
 }

@@ -36,6 +36,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findAllByMasterCodeAndDeletedIsFalse(String masterCode);
 
+    Page<Product> findByMasterCodeContainingAndDeletedIsFalse(String masterCode, Pageable pageable);
+
     List<Product> findAllByMasterCodeInAndDeletedIsFalse(List<String> masterCodes);
 
     Page<Product> findAllByDeletedIsFalse(Pageable pageable);
